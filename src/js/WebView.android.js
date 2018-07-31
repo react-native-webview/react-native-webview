@@ -9,21 +9,25 @@
 
 'use strict';
 
-const EdgeInsetsPropType = require('EdgeInsetsPropType');
-const ActivityIndicator = require('ActivityIndicator');
-const React = require('React');
-const PropTypes = require('prop-types');
-const ReactNative = require('ReactNative');
-const StyleSheet = require('StyleSheet');
-const UIManager = require('UIManager');
-const View = require('View');
-const ViewPropTypes = require('ViewPropTypes');
-const WebViewShared = require('WebViewShared');
+import React from 'React';
+import PropTypes from 'prop-types';
 
-const deprecatedPropType = require('deprecatedPropType');
-const keyMirror = require('fbjs/lib/keyMirror');
-const requireNativeComponent = require('requireNativeComponent');
-const resolveAssetSource = require('resolveAssetSource');
+import ReactNative from 'react-native';
+import {
+  ActivityIndicator,
+  EdgeInsetsPropType,
+  StyleSheet,
+  UIManager,
+  View,
+  ViewPropTypes,
+  requireNativeComponent,
+  resolveAssetSource
+} from 'react-native';
+
+import deprecatedPropType from 'deprecated-prop-type';
+import keyMirror from 'fbjs/lib/keyMirror';
+
+import WebViewShared from './WebViewShared';
 
 const RCT_WEBVIEW_REF = 'webview';
 

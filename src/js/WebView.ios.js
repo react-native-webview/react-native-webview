@@ -10,28 +10,46 @@
 
 'use strict';
 
-const ActivityIndicator = require('ActivityIndicator');
-const EdgeInsetsPropType = require('EdgeInsetsPropType');
-const Linking = require('Linking');
-const PropTypes = require('prop-types');
-const React = require('React');
-const ReactNative = require('ReactNative');
-const ScrollView = require('ScrollView');
-const StyleSheet = require('StyleSheet');
-const Text = require('Text');
-const UIManager = require('UIManager');
-const View = require('View');
-const ViewPropTypes = require('ViewPropTypes');
-const WebViewShared = require('WebViewShared');
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const deprecatedPropType = require('deprecatedPropType');
-const invariant = require('fbjs/lib/invariant');
-const keyMirror = require('fbjs/lib/keyMirror');
-const processDecelerationRate = require('processDecelerationRate');
-const requireNativeComponent = require('requireNativeComponent');
-const resolveAssetSource = require('resolveAssetSource');
+import ReactNative from 'react-native'
+import {
+  ActivityIndicator,
+  EdgeInsetsPropType,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  UIManager,
+  View,
+  ViewPropTypes,
+  requireNativeComponent,
+  NativeModules,
+  Image
+} from 'react-native';
 
-const RCTWebViewManager = require('NativeModules').WebViewManager;
+import invariant from 'fbjs/lib/invariant';
+import keyMirror from 'fbjs/lib/keyMirror';
+
+import deprecatedPropType from 'deprecated-prop-type';
+
+import WebViewShared from './WebViewShared';
+
+const resolveAssetSource = Image.resolveAssetSource;
+
+// Imported from https://github.com/facebook/react-native/blob/master/Libraries/Components/ScrollView/processDecelerationRate.js
+function processDecelerationRate(decelerationRate) {
+  if (decelerationRate === 'normal') {
+    decelerationRate = 0.998;
+  } else if (decelerationRate === 'fast') {
+    decelerationRate = 0.99;
+  }
+  return decelerationRate;
+}
+
+
+const RCTWebViewManager = NativeModules.WebViewManager;
 
 const BGWASH = 'rgba(255,255,255,0.8)';
 const RCT_WEBVIEW_REF = 'webview';

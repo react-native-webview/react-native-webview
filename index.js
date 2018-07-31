@@ -1,3 +1,3 @@
-import IRWebView from './src/js/IRWebView';
+import WebView from './src/js/WebView';
 
-export default IRWebView;
+export { WebView };

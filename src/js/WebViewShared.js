@@ -23,4 +23,4 @@ const WebViewShared = {
   },
 };
 
-module.exports = WebViewShared;
+export default WebViewShared;
