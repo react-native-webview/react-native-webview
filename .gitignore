@@ -1,0 +1,49 @@
+# OSX
+#
+.DS_Store
+
+# Xcode
+#
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+project.xcworkspace
+Pods/
+
+# Android/IJ
+#
+.idea
+*.iml
+.gradle
+local.properties
+lib/android/src/main/gen
+
+# node.js
+#
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Rubygem bundles
+#
+bundles/
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

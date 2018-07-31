@@ -1,0 +1,16 @@
+{
+  "name": "react-native-webview",
+  "description": "React Native WebView component for iOS + Android",
+  "main": "src/index",
+  "authors": [
+    "Jamon Holmgren <jamonholmgren@gmail.com>"
+  ],
+  "version": "0.0.1",
+  "peerDependencies": {
+    "react": "^16.0",
+    "react-native": "^0.55"
+  },
+  "dependencies": {
+    "escape-string-regexp": "^1.0.5"
+  }
+}
