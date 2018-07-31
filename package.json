@@ -1,16 +1,17 @@
 {
   "name": "react-native-webview",
   "description": "React Native WebView component for iOS + Android",
-  "main": "src/index",
+  "main": "index.js",
   "authors": [
     "Jamon Holmgren <jamonholmgren@gmail.com>"
   ],
   "version": "0.0.1",
   "peerDependencies": {
     "react": "^16.0",
-    "react-native": "^0.55"
+    "react-native": "^0.56"
   },
   "dependencies": {
-    "escape-string-regexp": "^1.0.5"
+    "escape-string-regexp": "^1.0.5",
+    "fbjs": "^0.8.17"
   }
 }
