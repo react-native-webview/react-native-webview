@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-present, Facebook, Inc.
+ * Copyright (c) 2018-present, Infinite Red, Inc.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -93,7 +93,7 @@ import org.json.JSONObject;
 @ReactModule(name = ReactWebViewManager.REACT_CLASS)
 public class ReactWebViewManager extends SimpleViewManager<WebView> {
 
-  protected static final String REACT_CLASS = "RCTWebView";
+  protected static final String REACT_CLASS = "RNCWebView";
 
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";

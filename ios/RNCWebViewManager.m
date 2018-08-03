@@ -1,22 +1,22 @@
 /**
- * Copyright (c) 2015-present, Facebook, Inc.
+ * Copyright (c) 2018-present, Infinite Red, Inc.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
-#import "RCTWebViewManager.h"
+#import "RNCWebViewManager.h"
 
-#import "RCTBridge.h"
-#import "RCTUIManager.h"
-#import "RCTWebView.h"
-#import "UIView+React.h"
+#import <React/RCTBridge.h>
+#import <React/RCTUIManager.h>
+#import <React/UIView+React.h>
+#import "RNCWebView.h"
 
-@interface RCTWebViewManager () <RCTWebViewDelegate>
+@interface RNCWebViewManager () <RNCWebViewDelegate>
 
 @end
 
-@implementation RCTWebViewManager
+@implementation RNCWebViewManager
 {
   NSConditionLock *_shouldStartLoadLock;
   BOOL _shouldStartLoad;
@@ -26,7 +26,7 @@ RCT_EXPORT_MODULE()
 
 - (UIView *)view
 {
-  RCTWebView *webView = [RCTWebView new];
+  RNCWebView *webView = [RNCWebView new];
   webView.delegate = self;
   return webView;
 }
@@ -51,10 +51,10 @@ RCT_REMAP_VIEW_PROPERTY(dataDetectorTypes, _webView.dataDetectorTypes, UIDataDet
 
 RCT_EXPORT_METHOD(goBack:(nonnull NSNumber *)reactTag)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTWebView *> *viewRegistry) {
-    RCTWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RCTWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RCTWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view goBack];
     }
@@ -65,8 +65,8 @@ RCT_EXPORT_METHOD(goForward:(nonnull NSNumber *)reactTag)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
     id view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RCTWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RCTWebView, got: %@", view);
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view goForward];
     }
@@ -75,10 +75,10 @@ RCT_EXPORT_METHOD(goForward:(nonnull NSNumber *)reactTag)
 
 RCT_EXPORT_METHOD(reload:(nonnull NSNumber *)reactTag)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTWebView *> *viewRegistry) {
-    RCTWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RCTWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RCTWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view reload];
     }
@@ -87,10 +87,10 @@ RCT_EXPORT_METHOD(reload:(nonnull NSNumber *)reactTag)
 
 RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTWebView *> *viewRegistry) {
-    RCTWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RCTWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RCTWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view stopLoading];
     }
@@ -99,10 +99,10 @@ RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
 
 RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)message)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTWebView *> *viewRegistry) {
-    RCTWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RCTWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RCTWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view postMessage:message];
     }
@@ -111,10 +111,10 @@ RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)m
 
 RCT_EXPORT_METHOD(injectJavaScript:(nonnull NSNumber *)reactTag script:(NSString *)script)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTWebView *> *viewRegistry) {
-    RCTWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RCTWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RCTWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view injectJavaScript:script];
     }
@@ -123,7 +123,7 @@ RCT_EXPORT_METHOD(injectJavaScript:(nonnull NSNumber *)reactTag script:(NSString
 
 #pragma mark - Exported synchronous methods
 
-- (BOOL)webView:(__unused RCTWebView *)webView
+- (BOOL)webView:(__unused RNCWebView *)webView
 shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
    withCallback:(RCTDirectEventBlock)callback
 {

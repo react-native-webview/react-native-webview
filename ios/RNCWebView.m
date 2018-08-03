@@ -1,27 +1,26 @@
 /**
- * Copyright (c) 2015-present, Facebook, Inc.
+ * Copyright (c) 2018-present, Infinite Red, Inc.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
-#import "RCTWebView.h"
+#import "RNCWebView.h"
 
-#import <UIKit/UIKit.h>
-
-#import "RCTAutoInsetsProtocol.h"
-#import "RCTConvert.h"
-#import "RCTEventDispatcher.h"
-#import "RCTLog.h"
-#import "RCTUtils.h"
-#import "RCTView.h"
-#import "UIView+React.h"
+// #import <UIKit/UIKit.h>
+#import <React/RCTAutoInsetsProtocol.h>
+#import <React/RCTConvert.h>
+#import <React/RCTEventDispatcher.h>
+#import <React/RCTLog.h>
+#import <React/RCTUtils.h>
+#import <React/RCTView.h>
+#import <React/UIView+React.h>
 
 NSString *const RCTJSNavigationScheme = @"react-js-navigation";
 
 static NSString *const kPostMessageHost = @"postMessage";
 
-@interface RCTWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
+@interface RNCWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
 
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
@@ -31,7 +30,7 @@ static NSString *const kPostMessageHost = @"postMessage";
 
 @end
 
-@implementation RCTWebView
+@implementation RNCWebView
 {
   UIWebView *_webView;
   NSString *_injectedJavaScript;
