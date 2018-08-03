@@ -49,7 +49,7 @@ function processDecelerationRate(decelerationRate) {
 }
 
 
-// const RNCWebViewManager = NativeModules.WebViewManager;
+const RNCWebViewManager = NativeModules.WebViewManager;
 
 const BGWASH = 'rgba(255,255,255,0.8)';
 const RCT_WEBVIEW_REF = 'webview';

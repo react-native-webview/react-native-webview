@@ -16,7 +16,7 @@
 #import <React/RCTView.h>
 #import <React/UIView+React.h>
 
-NSString *const RCTJSNavigationScheme = @"react-js-navigation";
+NSString *const RNCJSNavigationScheme = @"react-js-navigation";
 
 static NSString *const kPostMessageHost = @"postMessage";
 
@@ -201,7 +201,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (BOOL)webView:(__unused UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
  navigationType:(UIWebViewNavigationType)navigationType
 {
-  BOOL isJSNavigation = [request.URL.scheme isEqualToString:RCTJSNavigationScheme];
+  BOOL isJSNavigation = [request.URL.scheme isEqualToString:RNCJSNavigationScheme];
 
   static NSDictionary<NSNumber *, NSString *> *navigationTypes;
   static dispatch_once_t onceToken;
@@ -329,7 +329,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
           "messagePending = false;"
           "processQueue();"
         "});"
-      "})();", RCTJSNavigationScheme, kPostMessageHost
+      "})();", RNCJSNavigationScheme, kPostMessageHost
     ];
     [webView stringByEvaluatingJavaScriptFromString:source];
   }
