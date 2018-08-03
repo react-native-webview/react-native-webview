@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import "IRWebView.h"
+#import "RCTWebView.h"
 
 #import <UIKit/UIKit.h>
 
@@ -21,7 +21,7 @@ NSString *const RCTJSNavigationScheme = @"react-js-navigation";
 
 static NSString *const kPostMessageHost = @"postMessage";
 
-@interface IRWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
+@interface RCTWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
 
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
@@ -31,7 +31,7 @@ static NSString *const kPostMessageHost = @"postMessage";
 
 @end
 
-@implementation IRWebView
+@implementation RCTWebView
 {
   UIWebView *_webView;
   NSString *_injectedJavaScript;

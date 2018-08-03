@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import <React/IRViewManager.h>
+#import <React/RCTViewManager.h>
 
-@interface IRWebViewManager : IRViewManager
+@interface RCTWebViewManager : RCTViewManager
 
 @end
