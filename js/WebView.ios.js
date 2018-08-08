@@ -18,7 +18,6 @@ import {
   ActivityIndicator,
   EdgeInsetsPropType,
   Linking,
-  ScrollView,
   StyleSheet,
   Text,
   UIManager,

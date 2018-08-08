@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package com.facebook.react.views.webview.events;
+package com.infinitered.webview.events;
 
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;

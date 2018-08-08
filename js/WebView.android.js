@@ -9,7 +9,7 @@
 
 'use strict';
 
-import React from 'React';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import ReactNative from 'react-native';
@@ -20,8 +20,8 @@ import {
   UIManager,
   View,
   ViewPropTypes,
-  requireNativeComponent,
-  resolveAssetSource
+  Image,
+  requireNativeComponent
 } from 'react-native';
 
 import deprecatedPropType from 'deprecated-prop-type';
@@ -29,7 +29,9 @@ import keyMirror from 'fbjs/lib/keyMirror';
 
 import WebViewShared from './WebViewShared';
 
-const RCT_WEBVIEW_REF = 'webview';
+const resolveAssetSource = Image.resolveAssetSource;
+
+const RNC_WEBVIEW_REF = 'webview';
 
 const WebViewState = keyMirror({
   IDLE: null,
@@ -310,7 +312,7 @@ class WebView extends React.Component {
 
     const webView = (
       <NativeWebView
-        ref={RCT_WEBVIEW_REF}
+        ref={RNC_WEBVIEW_REF}
         key="webViewKey"
         style={webViewStyles}
         source={resolveAssetSource(source)}
@@ -422,7 +424,7 @@ class WebView extends React.Component {
   };
 
   getWebViewHandle = () => {
-    return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
+    return ReactNative.findNodeHandle(this.refs[RNC_WEBVIEW_REF]);
   };
 
   onLoadingStart = event => {
