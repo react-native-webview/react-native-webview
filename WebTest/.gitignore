@@ -54,3 +54,7 @@ buck-out/
 
 # Bundle artifact
 *.jsbundle
+
+# Don't save lockfiles for this test project
+package-lock.json
+yarn.lock

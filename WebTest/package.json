@@ -7,12 +7,16 @@
     "test": "jest"
   },
   "dependencies": {
+    "ir-webview": "../",
     "react": "16.4.1",
     "react-native": "0.56.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0-beta",
+    "babel-core": "^7.0.0-beta",
+    "babel-preset-react-native": "5.0.2",
     "babel-jest": "23.4.2",
-    "babel-preset-react-native": "^5",
+    "detox": "^8.1.4",
     "jest": "23.5.0",
     "react-test-renderer": "16.4.1"
   },
@@ -20,6 +24,14 @@
     "preset": "react-native"
   },
   "detox": {
+    "configurations": {
+      "ios.sim.debug": {
+        "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/WebTest.app",
+        "build": "xcodebuild -project ios/WebTest.xcodeproj -scheme WebTest -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
+        "type": "ios.simulator",
+        "name": "iPhone 6"
+      }
+    },
     "test-runner": "jest"
   }
 }
