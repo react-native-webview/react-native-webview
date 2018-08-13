@@ -31,7 +31,7 @@ var WEBVIEW_REF = 'webview';
 var DEFAULT_URL = 'https://m.facebook.com';
 const FILE_SYSTEM_ORIGIN_WHITE_LIST = ['file://*', 'http://*', 'https://*'];
 
-class WebViewExample extends React.Component<{}, $FlowFixMeState> {
+class WebViewExample extends React.Component {
   state = {
     url: DEFAULT_URL,
     status: 'No Page Loaded',
@@ -156,7 +156,7 @@ class WebViewExample extends React.Component<{}, $FlowFixMeState> {
   };
 }
 
-class Button extends React.Component<$FlowFixMeProps> {
+class Button extends React.Component {
   _handlePress = () => {
     if (this.props.enabled !== false && this.props.onPress) {
       this.props.onPress();
@@ -174,7 +174,7 @@ class Button extends React.Component<$FlowFixMeProps> {
   }
 }
 
-class ScaledWebView extends React.Component<{}, $FlowFixMeState> {
+class ScaledWebView extends React.Component {
   state = {
     scalingEnabled: true,
   };
@@ -210,7 +210,7 @@ class ScaledWebView extends React.Component<{}, $FlowFixMeState> {
   }
 }
 
-class MessagingTest extends React.Component<{}, $FlowFixMeState> {
+class MessagingTest extends React.Component {
   webview = null;
 
   state = {
@@ -230,7 +230,7 @@ class MessagingTest extends React.Component<{}, $FlowFixMeState> {
     }
   };
 
-  render(): React.Node {
+  render() {
     const { messagesReceivedFromWebView, message } = this.state;
 
     return (
@@ -267,7 +267,7 @@ class MessagingTest extends React.Component<{}, $FlowFixMeState> {
   }
 }
 
-class InjectJS extends React.Component<{}> {
+class InjectJS extends React.Component {
   webview = null;
   injectJS = () => {
     const script = 'document.write("Injected JS ")';
@@ -411,25 +411,25 @@ const HTML = `
 </html>
 `;
 
-exports.displayName = (undefined: ?string);
+exports.displayName = undefined;
 exports.title = '<WebView>';
 exports.description = 'Base component to display web content';
 exports.examples = [
   {
     title: 'Simple Browser',
-    render(): React.Element<any> {
+    render() {
       return <WebViewExample />;
     },
   },
   {
     title: 'Scale Page to Fit',
-    render(): React.Element<any> {
+    render() {
       return <ScaledWebView />;
     },
   },
   {
     title: 'Bundled HTML',
-    render(): React.Element<any> {
+    render() {
       return (
         <WebView
           style={{
@@ -445,7 +445,7 @@ exports.examples = [
   },
   {
     title: 'Static HTML',
-    render(): React.Element<any> {
+    render() {
       return (
         <WebView
           style={{
@@ -460,7 +460,7 @@ exports.examples = [
   },
   {
     title: 'POST Test',
-    render(): React.Element<any> {
+    render() {
       return (
         <WebView
           style={{
@@ -479,13 +479,13 @@ exports.examples = [
   },
   {
     title: 'Messaging Test',
-    render(): React.Element<any> {
+    render() {
       return <MessagingTest />;
     },
   },
   {
     title: 'Inject JavaScript',
-    render(): React.Element<any> {
+    render() {
       return <InjectJS />;
     },
   },
