@@ -7,15 +7,14 @@
     "test": "jest"
   },
   "dependencies": {
-    "ir-webview": "../",
     "react": "16.4.1",
     "react-native": "0.56.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta",
     "babel-core": "^7.0.0-beta",
-    "babel-preset-react-native": "5.0.2",
     "babel-jest": "23.4.2",
+    "babel-preset-react-native": "5.0.2",
     "detox": "^8.1.4",
     "jest": "23.5.0",
     "react-test-renderer": "16.4.1"

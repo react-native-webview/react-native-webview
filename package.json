@@ -1,6 +1,6 @@
 {
-  "name": "ir-webview",
-  "description": "React Native WebView component for iOS + Android",
+  "name": "react-native-webview",
+  "description": "React Native WebView component for iOS, Android, and Windows 10",
   "main": "index.js",
   "authors": [
     "Jamon Holmgren <jamon@infinite.red>"

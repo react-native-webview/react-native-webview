@@ -1,6 +1,6 @@
-# Infinite Red WebView - a Modern, Cross-Platform WebView for React Native
+# React Native WebView - a Modern, Cross-Platform WebView for React Native
 
-**Infinite Red WebView** is a modern, well-supported, and cross-platform (even Windows!) WebView for React Native. It is intended to be a replacement for the built-in WebView (which may be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
+**React Native WebView** is a modern, well-supported, and cross-platform (even Windows!) WebView for React Native. It is intended to be a replacement for the built-in WebView (which may be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
 ## Platforms Supported
 
@@ -11,18 +11,18 @@
 ## Installation
 
 ```
-$ npm install --save ir-webview
-$ react-native link ir-webview
+$ npm install --save react-native-webview
+$ react-native link react-native-webview
 ```
 
 ## Usage
 
-Import the `WebView` component from `ir-webview` and use it like so:
+Import the `WebView` component from `react-native-webview` and use it like so:
 
 ```jsx
 import React, { Component } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { WebView } from 'ir-webview'
+import { WebView } from 'react-native-webview'
 
 // ...
 class MyWebComponent extends Component {
@@ -41,9 +41,9 @@ Additional properties are supported and will be added here; for now, refer to th
 
 [https://facebook.github.io/react-native/docs/webview](https://facebook.github.io/react-native/docs/webview)
 
-## Migrate from React Native core WebView to Infinite Red WebView
+## Migrate from React Native core WebView to React Native WebView
 
-Simply install Infinite Red WebView and then use it in place of the core WebView. Their APIs are currently identical.
+Simply install React Native WebView and then use it in place of the core WebView. Their APIs are currently identical.
 
 ## Contributing
 
