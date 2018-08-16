@@ -1,18 +1,18 @@
-package com.infinitered.webview.events;
+package com.reactnativecommunity.webview.events;
 
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 /**
- * Event emitted when loading has started
+ * Event emitted when loading is completed.
  */
-public class TopLoadingStartEvent extends Event<TopLoadingStartEvent> {
+public class TopLoadingFinishEvent extends Event<TopLoadingFinishEvent> {
 
-  public static final String EVENT_NAME = "topLoadingStart";
+  public static final String EVENT_NAME = "topLoadingFinish";
   private WritableMap mEventData;
 
-  public TopLoadingStartEvent(int viewId, WritableMap eventData) {
+  public TopLoadingFinishEvent(int viewId, WritableMap eventData) {
     super(viewId);
     mEventData = eventData;
   }

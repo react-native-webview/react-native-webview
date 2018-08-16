@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "react": "16.4.1",
-    "react-native": "0.56.0"
+    "react-native": "0.56.0",
+    "react-native-webview": "../"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta",

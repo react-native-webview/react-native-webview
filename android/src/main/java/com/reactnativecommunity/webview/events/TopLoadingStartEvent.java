@@ -1,21 +1,20 @@
-package com.infinitered.webview.events;
+package com.reactnativecommunity.webview.events;
 
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 /**
- * Event emitted when there is an error in loading.
+ * Event emitted when loading has started
  */
-public class TopMessageEvent extends Event<TopMessageEvent> {
+public class TopLoadingStartEvent extends Event<TopLoadingStartEvent> {
 
-  public static final String EVENT_NAME = "topMessage";
-  private final String mData;
+  public static final String EVENT_NAME = "topLoadingStart";
+  private WritableMap mEventData;
 
-  public TopMessageEvent(int viewId, String data) {
+  public TopLoadingStartEvent(int viewId, WritableMap eventData) {
     super(viewId);
-    mData = data;
+    mEventData = eventData;
   }
 
   @Override
@@ -36,8 +35,6 @@ public class TopMessageEvent extends Event<TopMessageEvent> {
 
   @Override
   public void dispatch(RCTEventEmitter rctEventEmitter) {
-    WritableMap data = Arguments.createMap();
-    data.putString("data", mData);
-    rctEventEmitter.receiveEvent(getViewTag(), EVENT_NAME, data);
+    rctEventEmitter.receiveEvent(getViewTag(), getEventName(), mEventData);
   }
 }
