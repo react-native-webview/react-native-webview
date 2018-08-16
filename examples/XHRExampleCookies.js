@@ -1,18 +1,8 @@
-/**
- * Copyright (c) 2018-present, Infinite Red, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @format
- * @flow
- */
-
 'use strict';
 
 var React = require('react');
 var ReactNative = require('react-native');
-var {StyleSheet, Text, TouchableHighlight, View, WebView} = ReactNative;
+var { StyleSheet, Text, TouchableHighlight, View, WebView } = ReactNative;
 
 var RCTNetworking = require('RCTNetworking');
 
@@ -30,7 +20,7 @@ class XHRExampleCookies extends React.Component<any, any> {
   }
 
   setCookie(domain: string) {
-    var {a, b} = this.state;
+    var { a, b } = this.state;
     var url = `https://${domain}/cookies/set?a=${a}&b=${b}`;
     fetch(url).then(response => {
       this.setStatus(`Cookies a=${a}, b=${b} set`);
@@ -71,7 +61,7 @@ class XHRExampleCookies extends React.Component<any, any> {
   }
 
   setStatus(status: string) {
-    this.setState({status});
+    this.setState({ status });
   }
 
   render() {
@@ -122,8 +112,8 @@ class XHRExampleCookies extends React.Component<any, any> {
         </TouchableHighlight>
         <WebView
           ref="webview"
-          source={{uri: 'http://httpbin.org/cookies'}}
-          style={{height: 100}}
+          source={{ uri: 'http://httpbin.org/cookies' }}
+          style={{ height: 100 }}
         />
       </View>
     );
