@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @format
+ */
+
 'use strict';
 
 import React from 'react';
@@ -54,7 +63,7 @@ class WebView extends React.Component {
     onMessage: PropTypes.func,
     onContentSizeChange: PropTypes.func,
     startInLoadingState: PropTypes.bool, // force WebView to show loadingView on first load
-    style: ViewPropTypes.style,
+    style: DeprecatedViewPropTypes.style,
 
     html: deprecatedPropType(
       PropTypes.string,
@@ -105,6 +114,12 @@ class WebView extends React.Component {
        */
       PropTypes.number,
     ]),
+
+    /**
+     * If true, use WKWebView instead of UIWebView.
+     * @platform ios
+     */
+    useWebKit: PropTypes.bool,
 
     /**
      * Used on Android only, JS is enabled by default for WebView on iOS
@@ -265,7 +280,7 @@ class WebView extends React.Component {
         );
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        'RNCWebView invalid state encountered: ' + this.state.loading,
+        'RCTWebView invalid state encountered: ' + this.state.loading,
       );
     }
 
@@ -299,11 +314,11 @@ class WebView extends React.Component {
       WebViewShared.originWhitelistToRegex,
     );
 
-    let NativeWebView = nativeConfig.component || RNCWebView;
+    let NativeWebView = nativeConfig.component || RCTWebView;
 
     const webView = (
       <NativeWebView
-        ref={RNC_WEBVIEW_REF}
+        ref={RCT_WEBVIEW_REF}
         key="webViewKey"
         style={webViewStyles}
         source={resolveAssetSource(source)}
@@ -350,7 +365,7 @@ class WebView extends React.Component {
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.goForward,
+      UIManager.RCTWebView.Commands.goForward,
       null,
     );
   };
@@ -358,7 +373,7 @@ class WebView extends React.Component {
   goBack = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.goBack,
+      UIManager.RCTWebView.Commands.goBack,
       null,
     );
   };
@@ -369,7 +384,7 @@ class WebView extends React.Component {
     });
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.reload,
+      UIManager.RCTWebView.Commands.reload,
       null,
     );
   };
@@ -377,7 +392,7 @@ class WebView extends React.Component {
   stopLoading = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.stopLoading,
+      UIManager.RCTWebView.Commands.stopLoading,
       null,
     );
   };
@@ -385,7 +400,7 @@ class WebView extends React.Component {
   postMessage = data => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.postMessage,
+      UIManager.RCTWebView.Commands.postMessage,
       [String(data)],
     );
   };
@@ -399,7 +414,7 @@ class WebView extends React.Component {
   injectJavaScript = data => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.injectJavaScript,
+      UIManager.RCTWebView.Commands.injectJavaScript,
       [data],
     );
   };
@@ -415,7 +430,7 @@ class WebView extends React.Component {
   };
 
   getWebViewHandle = () => {
-    return ReactNative.findNodeHandle(this.refs[RNC_WEBVIEW_REF]);
+    return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
   };
 
   onLoadingStart = event => {
@@ -447,13 +462,13 @@ class WebView extends React.Component {
     this.updateNavigationState(event);
   };
 
-  onMessage = (event) => {
+  onMessage = (event: Event) => {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };
 }
 
-const RNCWebView = requireNativeComponent('RNCWebView');
+const RCTWebView = requireNativeComponent('RCTWebView');
 
 const styles = StyleSheet.create({
   container: {
