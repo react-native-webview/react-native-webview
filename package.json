@@ -2,9 +2,7 @@
   "name": "react-native-webview",
   "description": "React Native WebView component for iOS, Android, and Windows 10",
   "main": "index.js",
-  "authors": [
-    "Jamon Holmgren <jamon@infinite.red>"
-  ],
+  "author": "Jamon Holmgren <jamon@infinite.red>",
   "version": "0.0.1",
   "peerDependencies": {
     "react": "^16.0",

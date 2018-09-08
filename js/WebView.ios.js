@@ -22,7 +22,6 @@ import {
   Text,
   UIManager,
   View,
-  ViewPropTypes,
   requireNativeComponent,
   NativeModules,
   Image
@@ -31,7 +30,8 @@ import {
 import invariant from 'fbjs/lib/invariant';
 import keyMirror from 'fbjs/lib/keyMirror';
 
-import deprecatedPropType from 'deprecated-prop-type';
+import deprecatedPropType from './shims/deprecatedPropType';
+import DeprecatedViewPropTypes from './shims/DeprecatedViewPropTypes'
 
 import WebViewShared from './WebViewShared';
 
@@ -47,8 +47,8 @@ function processDecelerationRate(decelerationRate) {
   return decelerationRate;
 }
 
-
-const RNCWebViewManager = NativeModules.WebViewManager;
+const RCTWebViewManager = NativeModules.WebViewManager;
+const RCTWKWebViewManager = NativeModules.WKWebViewManager;
 
 const BGWASH = 'rgba(255,255,255,0.8)';
 const RCT_WEBVIEW_REF = 'webview';

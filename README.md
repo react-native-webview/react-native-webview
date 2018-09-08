@@ -1,6 +1,6 @@
 # React Native WebView - a Modern, Cross-Platform WebView for React Native
 
-**React Native WebView** is a modern, well-supported, and cross-platform (even Windows!) WebView for React Native. It is intended to be a replacement for the built-in WebView (which may be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
+**React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
 ## Platforms Supported
 
@@ -48,6 +48,10 @@ Simply install React Native WebView and then use it in place of the core WebView
 ## Contributing
 
 _Guide coming soon_
+
+### Contributor Notes
+
+* I'm currently shimming `ViewAccessibility`, `deprecatedPropType`, and `DeprecatedViewPropTypes` because I'm building my test app for React Native 0.56.0. If I upgrade to a version that exports these and we agree to only support that version going forward, then I'll remove them and pull in from React Native core. You can find these shims in `./js/shims`.
 
 ## Maintainers
 

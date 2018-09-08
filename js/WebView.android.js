@@ -24,7 +24,8 @@ import {
   requireNativeComponent
 } from 'react-native';
 
-import deprecatedPropType from 'deprecated-prop-type';
+import deprecatedPropType from './shims/deprecatedPropType';
+import DeprecatedViewPropTypes from './shims/DeprecatedViewPropTypes'
 import keyMirror from 'fbjs/lib/keyMirror';
 
 import WebViewShared from './WebViewShared';
