@@ -727,7 +727,7 @@ class WebView extends React.Component {
     }
   }
 
-  _showRedboxOnPropChanges(prevProps, propName: string) {
+  _showRedboxOnPropChanges(prevProps, propName) {
     if (this.props[propName] !== prevProps[propName]) {
       console.error(
         `Changes to property ${propName} do nothing after the initial render.`,
