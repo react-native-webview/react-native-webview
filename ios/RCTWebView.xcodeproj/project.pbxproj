@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E914DBF6214474710071092B /* RCTUIWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E914DBF3214474710071092B /* RCTUIWebViewManager.m */; };
+		E914DBF7214474710071092B /* RCTUIWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E914DBF4214474710071092B /* RCTUIWebView.m */; };
 		E91B351D21446E6C00F9801F /* RCTWKWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351B21446E6C00F9801F /* RCTWKWebViewManager.m */; };
 		E91B351E21446E6C00F9801F /* RCTWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351C21446E6C00F9801F /* RCTWKWebView.m */; };
 /* End PBXBuildFile section */
@@ -25,6 +27,10 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRCTWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		E914DBF2214474710071092B /* RCTUIWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTUIWebView.h; sourceTree = "<group>"; };
+		E914DBF3214474710071092B /* RCTUIWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTUIWebViewManager.m; sourceTree = "<group>"; };
+		E914DBF4214474710071092B /* RCTUIWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTUIWebView.m; sourceTree = "<group>"; };
+		E914DBF5214474710071092B /* RCTUIWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTUIWebViewManager.h; sourceTree = "<group>"; };
 		E91B351921446E6C00F9801F /* RCTWKWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTWKWebViewManager.h; sourceTree = "<group>"; };
 		E91B351A21446E6C00F9801F /* RCTWKWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTWKWebView.h; sourceTree = "<group>"; };
 		E91B351B21446E6C00F9801F /* RCTWKWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTWKWebViewManager.m; sourceTree = "<group>"; };
@@ -53,6 +59,10 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				E914DBF2214474710071092B /* RCTUIWebView.h */,
+				E914DBF4214474710071092B /* RCTUIWebView.m */,
+				E914DBF5214474710071092B /* RCTUIWebViewManager.h */,
+				E914DBF3214474710071092B /* RCTUIWebViewManager.m */,
 				E91B351A21446E6C00F9801F /* RCTWKWebView.h */,
 				E91B351C21446E6C00F9801F /* RCTWKWebView.m */,
 				E91B351921446E6C00F9801F /* RCTWKWebViewManager.h */,
@@ -118,6 +128,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E91B351D21446E6C00F9801F /* RCTWKWebViewManager.m in Sources */,
+				E914DBF7214474710071092B /* RCTUIWebView.m in Sources */,
+				E914DBF6214474710071092B /* RCTUIWebViewManager.m in Sources */,
 				E91B351E21446E6C00F9801F /* RCTWKWebView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

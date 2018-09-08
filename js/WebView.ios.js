@@ -42,7 +42,7 @@ function processDecelerationRate(decelerationRate) {
   return decelerationRate;
 }
 
-const RCTWebViewManager = NativeModules.WKWebViewManager;
+const RCTUIWebViewManager = NativeModules.UIWebViewManager;
 const RCTWKWebViewManager = NativeModules.WKWebViewManager;
 
 const BGWASH = 'rgba(255,255,255,0.8)';
@@ -193,7 +193,7 @@ class WebView extends React.Component {
     if (this.props.useWebKit) {
       viewManager = viewManager || RCTWKWebViewManager;
     } else {
-      viewManager = viewManager || RCTWebViewManager;
+      viewManager = viewManager || RCTUIWebViewManager;
     }
 
     const compiledWhitelist = [
