@@ -3,7 +3,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:RNCWebView.xcodeproj">
+      location = "group:RCTWebView.xcodeproj">
    </FileRef>
 </Workspace>
   
