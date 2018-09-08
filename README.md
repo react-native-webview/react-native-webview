@@ -51,7 +51,7 @@ _Guide coming soon_
 
 ### Contributor Notes
 
-* I'm currently shimming `ViewAccessibility`, `deprecatedPropType`, and `DeprecatedViewPropTypes` because I'm building my test app for React Native 0.56.0. If I upgrade to a version that exports these and we agree to only support that version going forward, then I'll remove them and pull in from React Native core. You can find these shims in `./js/shims`.
+* I've removed all PropTypes for now. Instead, we'll be moving toward Flow or TypeScript at some later date
 
 ## Maintainers
 
