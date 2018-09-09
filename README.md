@@ -10,8 +10,10 @@
 
 ## Installation
 
+*Note: this is currently a work-in-progress and not yet published to NPM.*
+
 ```
-$ npm install --save react-native-webview
+$ npm install --save https://github.com/react-native-community/react-native-webview
 $ react-native link react-native-webview
 ```
 
