@@ -2,6 +2,8 @@
 
 **React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
+**Please note that this package is pre-release and not yet ready for production use.**
+
 ## Platforms Supported
 
 * [x] iOS (both UIWebView and WKWebView)
