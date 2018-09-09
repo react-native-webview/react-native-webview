@@ -10,10 +10,10 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import com.facebook.react.bridge.JavaScriptModule;
-public class RNCWebViewPackage implements ReactPackage {
+public class RCTWebViewPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-      return Arrays.<NativeModule>asList(new RNCWebViewModule(reactContext));
+      return Arrays.<NativeModule>asList(new RCTWebViewModule(reactContext));
     }
 
     // Deprecated from RN 0.47
@@ -23,7 +23,7 @@ public class RNCWebViewPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        RNCWebViewManager viewManager = new RNCWebViewManager();
+        RCTWebViewManager viewManager = new RCTWebViewManager();
         return Arrays.<ViewManager>asList(viewManager);
     }
 }

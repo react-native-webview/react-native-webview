@@ -27,7 +27,7 @@ import WebViewShared from './WebViewShared';
 
 const resolveAssetSource = Image.resolveAssetSource;
 
-const RNC_WEBVIEW_REF = 'webview';
+const RCT_WEBVIEW_REF = 'webview';
 
 const WebViewState = keyMirror({
   IDLE: null,

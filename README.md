@@ -45,10 +45,6 @@ Additional properties are supported and will be added here; for now, refer to th
 
 Simply install React Native WebView and then use it in place of the core WebView. Their APIs are currently identical.
 
-## Contributing
-
-_Guide coming soon_
-
 ### Contributor Notes
 
 * I've removed all PropTypes for now. Instead, we'll be moving toward Flow or TypeScript at some later date
