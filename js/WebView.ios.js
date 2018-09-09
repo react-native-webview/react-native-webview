@@ -126,6 +126,7 @@ class WebView extends React.Component {
   static NavigationType = NavigationType;
 
   static defaultProps = {
+    useWebKit: true,
     originWhitelist: WebViewShared.defaultOriginWhitelist,
   };
 

@@ -33,7 +33,6 @@ class MyWebComponent extends Component {
   render () {
     return (
       <WebView
-        useWebKit // to use WKWebView -- will be default at some point
         src={{uri: "https://infinite.red/react-native"}}
         style={{marginTop: 20}}
       />
@@ -48,11 +47,12 @@ Additional properties are supported and will be added here; for now, refer to th
 
 ## Migrate from React Native core WebView to React Native WebView
 
-Simply install React Native WebView and then use it in place of the core WebView. Their APIs are currently identical.
+Simply install React Native WebView and then use it in place of the core WebView. Their APIs are currently identical, except that this package defaults `useWebKit={true}` unlike the built-in WebView.
 
 ### Contributor Notes
 
 * I've removed all PropTypes for now. Instead, we'll be moving toward Flow or TypeScript at a later date
+* UIWebView is not tested fully and you will encounter some yellow warning boxes. Since it is deprecated, we don't intend to put a lot of time into supporting it, but feel free to submit PRs if you have a special use case. Note that you will need to specify `useWebKit={false}` to use UIWebView
 
 ## Maintainers
 
