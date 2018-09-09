@@ -4,7 +4,7 @@
 
 ## Platforms Supported
 
-* [x] iOS
+* [x] iOS (both UIWebView and WKWebView)
 * [x] Android
 * [ ] Windows 10 (coming soon)
 
@@ -29,7 +29,8 @@ class MyWebComponent extends Component {
   render () {
     return (
       <WebView
-        src={{uri: "https://infinite.red"}}
+        useWebKit // to use WKWebView -- will be default at some point
+        src={{uri: "https://infinite.red/react-native"}}
         style={{marginTop: 20}}
       />
     )
@@ -47,7 +48,7 @@ Simply install React Native WebView and then use it in place of the core WebView
 
 ### Contributor Notes
 
-* I've removed all PropTypes for now. Instead, we'll be moving toward Flow or TypeScript at some later date
+* I've removed all PropTypes for now. Instead, we'll be moving toward Flow or TypeScript at a later date
 
 ## Maintainers
 

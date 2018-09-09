@@ -3,7 +3,7 @@
   "description": "React Native WebView component for iOS, Android, and Windows 10",
   "main": "index.js",
   "author": "Jamon Holmgren <jamon@infinite.red>",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "peerDependencies": {
     "react": "^16.0",
     "react-native": "^0.56"
