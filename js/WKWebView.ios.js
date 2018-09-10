@@ -15,14 +15,20 @@ import { requireNativeComponent } from 'react-native';
 
 const RCTWKWebView = requireNativeComponent('RCTWKWebView');
 
-class WKWebView extends React.Component {
-  componentWillReceiveProps(nextProps) {
+type RCTWKWebViewProps = {
+  allowsInlineMediaPlayback?: boolean,
+  mediaPlaybackRequiresUserAction?: boolean,
+  dataDetectorTypes?: boolean,
+};
+
+class WKWebView extends React.Component<RCTWKWebViewProps> {
+  componentWillReceiveProps(nextProps: RCTWKWebViewProps) {
     this.showRedboxOnPropChanges(nextProps, 'allowsInlineMediaPlayback');
     this.showRedboxOnPropChanges(nextProps, 'mediaPlaybackRequiresUserAction');
     this.showRedboxOnPropChanges(nextProps, 'dataDetectorTypes');
   }
 
-  showRedboxOnPropChanges(nextProps, propName) {
+  showRedboxOnPropChanges(nextProps: RCTWKWebViewProps, propName: string) {
     if (this.props[propName] !== nextProps[propName]) {
       console.error(`Changes to property ${propName} do nothing after the initial render.`);
     }

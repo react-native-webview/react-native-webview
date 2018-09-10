@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
+ * @flow
  */
 
 'use strict';
@@ -21,9 +22,16 @@ import {
   requireNativeComponent
 } from 'react-native';
 
+import invariant from 'fbjs/lib/invariant';
 import keyMirror from 'fbjs/lib/keyMirror';
 
 import WebViewShared from './WebViewShared';
+import type {
+  WebViewErrorEvent,
+  WebViewEvent,
+  WebViewSharedProps,
+  WebViewSource,
+} from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
 
@@ -41,10 +49,52 @@ const defaultRenderLoading = () => (
   </View>
 );
 
+type State = {|
+  viewState: WebViewState,
+  lastErrorEvent: ?WebViewErrorEvent,
+  startInLoadingState: boolean,
+|};
+
+type WebViewPropsAndroid = $ReadOnly<{|
+  ...WebViewSharedProps,
+  onNavigationStateChange?: (event: WebViewEvent) => any,
+  onContentSizeChange?: (event: WebViewEvent) => any,
+
+  /**
+   * Sets whether Geolocation is enabled. The default is false.
+   * @platform android
+   */
+  geolocationEnabled?: ?boolean,
+
+  /**
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from any origin.
+   * Including accessing content from other file scheme URLs
+   * @platform android
+   */
+  allowUniversalAccessFromFileURLs?: ?boolean,
+
+  /**
+   * Used on Android only, controls whether form autocomplete data should be saved
+   * @platform android
+   */
+  saveFormDataDisabled?: ?boolean,
+
+  /*
+   * Used on Android only, controls whether the given list of URL prefixes should
+   * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
+   * default activity intent for those URL instead of loading it within the webview.
+   * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
+   * @platform android
+   */
+  urlPrefixesForDefaultIntent?: $ReadOnlyArray<string>,
+
+|}>;
+
 /**
  * Renders a native WebView.
  */
-class WebView extends React.Component {
+class WebView extends React.Component<WebViewPropsAndroid, State> {
   static defaultProps = {
     javaScriptEnabled: true,
     thirdPartyCookiesEnabled: true,
@@ -55,7 +105,7 @@ class WebView extends React.Component {
 
   state = {
     viewState: WebViewState.IDLE,
-    lastErrorEvent: null,
+    lastErrorEvent: (null: ?WebViewErrorEvent),
     startInLoadingState: true,
   };
 
@@ -72,6 +122,7 @@ class WebView extends React.Component {
       otherView = (this.props.renderLoading || defaultRenderLoading)();
     } else if (this.state.viewState === WebViewState.ERROR) {
       const errorEvent = this.state.lastErrorEvent;
+      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
       otherView =
         this.props.renderError &&
         this.props.renderError(
@@ -81,7 +132,7 @@ class WebView extends React.Component {
         );
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        'RCTWebView invalid state encountered: ' + this.state.loading,
+        'RCTWebView invalid state encountered: ' + this.state.viewState,
       );
     }
 
@@ -94,11 +145,11 @@ class WebView extends React.Component {
       webViewStyles.push(styles.hidden);
     }
 
-    const source = this.props.source || {};
-    if (this.props.html) {
-      source.html = this.props.html;
-    } else if (this.props.url) {
-      source.uri = this.props.url;
+    let source = this.props.source || ({}: WebViewSource);
+    if (!this.props.source && this.props.html) {
+      source = { html: this.props.html };
+    } else if (!this.props.source && this.props.url) {
+      source = { uri: this.props.url };
     }
 
     if (source.method === 'POST' && source.headers) {
@@ -198,7 +249,7 @@ class WebView extends React.Component {
     );
   };
 
-  postMessage = data => {
+  postMessage = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RCTWebView.Commands.postMessage,
@@ -212,7 +263,7 @@ class WebView extends React.Component {
    * on pages with a Content Security Policy that disallows eval(). If you need that
    * functionality, look into postMessage/onMessage.
    */
-  injectJavaScript = data => {
+  injectJavaScript = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RCTWebView.Commands.injectJavaScript,
@@ -224,7 +275,7 @@ class WebView extends React.Component {
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
    */
-  updateNavigationState = event => {
+  updateNavigationState = (event: WebViewEvent) => {
     if (this.props.onNavigationStateChange) {
       this.props.onNavigationStateChange(event.nativeEvent);
     }
@@ -234,13 +285,13 @@ class WebView extends React.Component {
     return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
   };
 
-  onLoadingStart = event => {
+  onLoadingStart = (event: WebViewEvent) => {
     const onLoadStart = this.props.onLoadStart;
     onLoadStart && onLoadStart(event);
     this.updateNavigationState(event);
   };
 
-  onLoadingError = event => {
+  onLoadingError = (event: WebViewEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
     onError && onError(event);
@@ -253,7 +304,7 @@ class WebView extends React.Component {
     });
   };
 
-  onLoadingFinish = event => {
+  onLoadingFinish = (event: WebViewEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
@@ -263,7 +314,7 @@ class WebView extends React.Component {
     this.updateNavigationState(event);
   };
 
-  onMessage = (event) => {
+  onMessage = (event: WebViewEvent) => {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };
