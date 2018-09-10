@@ -27,8 +27,12 @@ import keyMirror from 'fbjs/lib/keyMirror';
 
 import WebViewShared from './WebViewShared';
 import type {
-  WebViewErrorEvent,
   WebViewEvent,
+  WebViewError,
+  WebViewErrorEvent,
+  WebViewMessageEvent,
+  WebViewNavigation,
+  WebViewNavigationEvent,
   WebViewSharedProps,
   WebViewSource,
 } from './WebViewTypes';
@@ -51,14 +55,14 @@ const defaultRenderLoading = () => (
 
 type State = {|
   viewState: WebViewState,
-  lastErrorEvent: ?WebViewErrorEvent,
+  lastErrorEvent: ?WebViewError,
   startInLoadingState: boolean,
 |};
 
 type WebViewPropsAndroid = $ReadOnly<{|
   ...WebViewSharedProps,
-  onNavigationStateChange?: (event: WebViewEvent) => any,
-  onContentSizeChange?: (event: WebViewEvent) => any,
+  onNavigationStateChange?: (event: WebViewNavigation) => mixed,
+  onContentSizeChange?: (event: WebViewEvent) => mixed,
 
   /**
    * Sets whether Geolocation is enabled. The default is false.
@@ -105,7 +109,7 @@ class WebView extends React.Component<WebViewPropsAndroid, State> {
 
   state = {
     viewState: WebViewState.IDLE,
-    lastErrorEvent: (null: ?WebViewErrorEvent),
+    lastErrorEvent: null,
     startInLoadingState: true,
   };
 
@@ -145,7 +149,7 @@ class WebView extends React.Component<WebViewPropsAndroid, State> {
       webViewStyles.push(styles.hidden);
     }
 
-    let source = this.props.source || ({}: WebViewSource);
+    let source: WebViewSource = this.props.source || {};
     if (!this.props.source && this.props.html) {
       source = { html: this.props.html };
     } else if (!this.props.source && this.props.url) {
@@ -275,7 +279,7 @@ class WebView extends React.Component<WebViewPropsAndroid, State> {
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
    */
-  updateNavigationState = (event: WebViewEvent) => {
+  updateNavigationState = (event: WebViewNavigationEvent) => {
     if (this.props.onNavigationStateChange) {
       this.props.onNavigationStateChange(event.nativeEvent);
     }
@@ -285,13 +289,13 @@ class WebView extends React.Component<WebViewPropsAndroid, State> {
     return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
   };
 
-  onLoadingStart = (event: WebViewEvent) => {
+  onLoadingStart = (event: WebViewNavigationEvent) => {
     const onLoadStart = this.props.onLoadStart;
     onLoadStart && onLoadStart(event);
     this.updateNavigationState(event);
   };
 
-  onLoadingError = (event: WebViewEvent) => {
+  onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
     onError && onError(event);
@@ -304,7 +308,7 @@ class WebView extends React.Component<WebViewPropsAndroid, State> {
     });
   };
 
-  onLoadingFinish = (event: WebViewEvent) => {
+  onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
@@ -314,7 +318,7 @@ class WebView extends React.Component<WebViewPropsAndroid, State> {
     this.updateNavigationState(event);
   };
 
-  onMessage = (event: WebViewEvent) => {
+  onMessage = (event: WebViewMessageEvent) => {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };

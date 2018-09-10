@@ -10,18 +10,53 @@
 
 'use strict';
 
-import type {Node, Element} from 'react';
+import type {Node, Element, ComponentType} from 'react';
+import type {SyntheticEvent} from 'CoreEventTypes';
 import type {EdgeInsetsProp} from 'EdgeInsetsPropType';
 import type {ViewStyleProp} from 'StyleSheet';
 import type {ViewProps} from 'ViewPropTypes';
 
-export type WebViewErrorEvent = {
-  domain: any,
-  code: any,
-  description: any,
-};
+export type WebViewNativeEvent = $ReadOnly<{|
+  url: string,
+  loading: boolean,
+  title: string,
+  canGoBack: boolean,
+  canGoForward: boolean,
+|}>;
 
-export type WebViewEvent = Object;
+export type WebViewNavigation = $ReadOnly<{|
+  ...WebViewNativeEvent,
+  navigationType:
+    | 'click'
+    | 'formsubmit'
+    | 'backforward'
+    | 'reload'
+    | 'formresubmit'
+    | 'other',
+|}>;
+
+export type WebViewMessage = $ReadOnly<{|
+  ...WebViewNativeEvent,
+  data: string,
+|}>;
+
+export type WebViewError = $ReadOnly<{|
+  ...WebViewNativeEvent,
+  /**
+   * `domain` is only used on iOS
+   */
+  domain: ?string,
+  code: number,
+  description: string,
+|}>;
+
+export type WebViewEvent = SyntheticEvent<WebViewNativeEvent>;
+
+export type WebViewNavigationEvent = SyntheticEvent<WebViewNavigation>;
+
+export type WebViewMessageEvent = SyntheticEvent<WebViewMessage>;
+
+export type WebViewErrorEvent = SyntheticEvent<WebViewError>;
 
 export type DataDetectorTypes =
   | 'phoneNumber'
@@ -34,7 +69,7 @@ export type DataDetectorTypes =
   | 'none'
   | 'all';
 
-export type WebViewSourceUri = {|
+export type WebViewSourceUri = $ReadOnly<{|
   /**
    * The URI to load in the `WebView`. Can be a local or remote file.
    */
@@ -59,9 +94,9 @@ export type WebViewSourceUri = {|
    * NOTE: On Android, this can only be used with POST requests.
    */
   body?: string,
-|};
+|}>;
 
-export type WebViewSourceHtml = {|
+export type WebViewSourceHtml = $ReadOnly<{|
   /**
    * A static HTML page to display in the WebView.
    */
@@ -70,7 +105,7 @@ export type WebViewSourceHtml = {|
    * The base URL to be used for any relative links in the HTML.
    */
   baseUrl?: ?string,
-|};
+|}>;
 
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
@@ -78,7 +113,7 @@ export type WebViewNativeConfig = $ReadOnly<{|
   /*
    * The native component used to render the WebView.
    */
-  component?: ?any,
+  component?: ComponentType<WebViewSharedProps>,
   /*
    * Set props directly on the native component WebView. Enables custom props which the
    * original WebView doesn't pass through.
@@ -116,7 +151,7 @@ export type WebViewSharedProps =  $ReadOnly<{|
   /**
    * Function that returns a view to show if there's an error.
    */
-  renderError: (errorDomain: any, errorCode: any, errorDesc: any) => Element<any>, // view to show if there's an error
+  renderError: (errorDomain: ?string, errorCode: number, errorDesc: string) => Element<any>, // view to show if there's an error
 
   /**
    * Function that returns a loading indicator.
@@ -126,22 +161,22 @@ export type WebViewSharedProps =  $ReadOnly<{|
   /**
    * Function that is invoked when the `WebView` has finished loading.
    */
-  onLoad: (event: WebViewEvent) => any,
+  onLoad: (event: WebViewNavigationEvent) => mixed,
 
   /**
    * Function that is invoked when the `WebView` load succeeds or fails.
    */
-  onLoadEnd: (event: WebViewEvent) => any,
+  onLoadEnd: (event: WebViewNavigationEvent | WebViewErrorEvent) => mixed,
 
   /**
    * Function that is invoked when the `WebView` starts loading.
    */
-  onLoadStart: (event: WebViewEvent) => any,
+  onLoadStart: (event: WebViewNavigationEvent) => mixed,
 
   /**
    * Function that is invoked when the `WebView` load fails.
    */
-  onError: (event: WebViewEvent) => any,
+  onError: (event: WebViewErrorEvent) => mixed,
 
   /**
    * Boolean value that determines whether the web view bounces
@@ -187,7 +222,7 @@ export type WebViewSharedProps =  $ReadOnly<{|
   /**
    * Function that is invoked when the `WebView` loading starts or ends.
    */
-  onNavigationStateChange?: (event: WebViewEvent) => any,
+  onNavigationStateChange?: (event: WebViewNavigation) => mixed,
 
   /**
    * A function that is invoked when the webview calls `window.postMessage`.
@@ -198,7 +233,7 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * available on the event object, `event.nativeEvent.data`. `data`
    * must be a string.
    */
-  onMessage?: (event: WebViewEvent) => any,
+  onMessage?: (event: WebViewMessageEvent) => mixed,
 
   /**
    * Boolean value that forces the `WebView` to show the loading view
@@ -281,7 +316,7 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * to stop loading.
    * @platform ios
    */
-  onShouldStartLoadWithRequest?: (event: WebViewEvent) => any,
+  onShouldStartLoadWithRequest?: (event: WebViewEvent) => mixed,
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the

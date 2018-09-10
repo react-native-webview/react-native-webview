@@ -13,13 +13,17 @@ import React from 'react';
 
 import { requireNativeComponent } from 'react-native';
 
+import type {DataDetectorTypes} from './WebViewTypes';
+
 const RCTWKWebView = requireNativeComponent('RCTWKWebView');
 
-type RCTWKWebViewProps = {
-  allowsInlineMediaPlayback?: boolean,
-  mediaPlaybackRequiresUserAction?: boolean,
-  dataDetectorTypes?: boolean,
-};
+type RCTWKWebViewProps = $ReadOnly<{|
+  allowsInlineMediaPlayback?: ?boolean,
+  mediaPlaybackRequiresUserAction?: ?boolean,
+  dataDetectorTypes?:
+    | ?DataDetectorTypes
+    | $ReadOnlyArray<DataDetectorTypes>,
+|}>;
 
 class WKWebView extends React.Component<RCTWKWebViewProps> {
   componentWillReceiveProps(nextProps: RCTWKWebViewProps) {

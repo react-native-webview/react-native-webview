@@ -30,8 +30,11 @@ import keyMirror from 'fbjs/lib/keyMirror';
 
 import WebViewShared from './WebViewShared';
 import type {
-  WebViewErrorEvent,
   WebViewEvent,
+  WebViewError,
+  WebViewErrorEvent,
+  WebViewMessageEvent,
+  WebViewNavigationEvent,
   WebViewSharedProps,
   WebViewSource,
 } from './WebViewTypes';
@@ -73,7 +76,7 @@ const JSNavigationScheme = 'react-js-navigation';
 
 type State = {|
   viewState: WebViewState,
-  lastErrorEvent: ?WebViewErrorEvent,
+  lastErrorEvent: ?WebViewError,
   startInLoadingState: boolean,
 |};
 
@@ -136,7 +139,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   state = {
     viewState: WebViewState.IDLE,
-    lastErrorEvent: (null: ?WebViewErrorEvent),
+    lastErrorEvent: null,
     startInLoadingState: true,
   };
 
@@ -232,7 +235,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       this.props.decelerationRate,
     );
 
-    let source = this.props.source || ({}: WebViewSource);
+    let source: WebViewSource = this.props.source || {};
     if (!this.props.source && this.props.html) {
       source = { html: this.props.html };
     } else if (!this.props.source && this.props.url) {
@@ -376,7 +379,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
    */
-  _updateNavigationState = (event: WebViewEvent) => {
+  _updateNavigationState = (event: WebViewNavigationEvent) => {
     if (this.props.onNavigationStateChange) {
       this.props.onNavigationStateChange(event.nativeEvent);
     }
@@ -389,13 +392,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
   };
 
-  _onLoadingStart = (event: WebViewEvent) => {
+  _onLoadingStart = (event: WebViewNavigationEvent) => {
     const onLoadStart = this.props.onLoadStart;
     onLoadStart && onLoadStart(event);
     this._updateNavigationState(event);
   };
 
-  _onLoadingError = (event: WebViewEvent) => {
+  _onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
     onError && onError(event);
@@ -408,7 +411,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     });
   };
 
-  _onLoadingFinish = (event: WebViewEvent) => {
+  _onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
@@ -418,7 +421,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     this._updateNavigationState(event);
   };
 
-  _onMessage = (event: WebViewEvent) => {
+  _onMessage = (event: WebViewMessageEvent) => {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };
