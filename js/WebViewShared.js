@@ -14,11 +14,11 @@ const escapeStringRegexp = require('escape-string-regexp');
 
 const WebViewShared = {
   defaultOriginWhitelist: ['http://*', 'https://*'],
-  extractOrigin: (url) => {
+  extractOrigin: (url: string) => {
     const result = /^[A-Za-z0-9]+:(\/\/)?[^/]*/.exec(url);
-    return result === null ? null : result[0];
+    return result === null ? '' : result[0];
   },
-  originWhitelistToRegex: (originWhitelist) => {
+  originWhitelistToRegex: (originWhitelist: string) => {
     return escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*');
   },
 };

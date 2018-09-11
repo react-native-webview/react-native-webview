@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
+ * @flow
  */
 
 'use strict';
@@ -21,9 +22,20 @@ import {
   requireNativeComponent
 } from 'react-native';
 
+import invariant from 'fbjs/lib/invariant';
 import keyMirror from 'fbjs/lib/keyMirror';
 
 import WebViewShared from './WebViewShared';
+import type {
+  WebViewEvent,
+  WebViewError,
+  WebViewErrorEvent,
+  WebViewMessageEvent,
+  WebViewNavigation,
+  WebViewNavigationEvent,
+  WebViewSharedProps,
+  WebViewSource,
+} from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
 
@@ -41,10 +53,16 @@ const defaultRenderLoading = () => (
   </View>
 );
 
+type State = {|
+  viewState: WebViewState,
+  lastErrorEvent: ?WebViewError,
+  startInLoadingState: boolean,
+|};
+
 /**
  * Renders a native WebView.
  */
-class WebView extends React.Component {
+class WebView extends React.Component<WebViewSharedProps, State> {
   static defaultProps = {
     javaScriptEnabled: true,
     thirdPartyCookiesEnabled: true,
@@ -72,6 +90,7 @@ class WebView extends React.Component {
       otherView = (this.props.renderLoading || defaultRenderLoading)();
     } else if (this.state.viewState === WebViewState.ERROR) {
       const errorEvent = this.state.lastErrorEvent;
+      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
       otherView =
         this.props.renderError &&
         this.props.renderError(
@@ -81,7 +100,7 @@ class WebView extends React.Component {
         );
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        'RCTWebView invalid state encountered: ' + this.state.loading,
+        'RCTWebView invalid state encountered: ' + this.state.viewState,
       );
     }
 
@@ -94,11 +113,11 @@ class WebView extends React.Component {
       webViewStyles.push(styles.hidden);
     }
 
-    const source = this.props.source || {};
-    if (this.props.html) {
-      source.html = this.props.html;
-    } else if (this.props.url) {
-      source.uri = this.props.url;
+    let source: WebViewSource = this.props.source || {};
+    if (!this.props.source && this.props.html) {
+      source = { html: this.props.html };
+    } else if (!this.props.source && this.props.url) {
+      source = { uri: this.props.url };
     }
 
     if (source.method === 'POST' && source.headers) {
@@ -198,7 +217,7 @@ class WebView extends React.Component {
     );
   };
 
-  postMessage = data => {
+  postMessage = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RCTWebView.Commands.postMessage,
@@ -212,7 +231,7 @@ class WebView extends React.Component {
    * on pages with a Content Security Policy that disallows eval(). If you need that
    * functionality, look into postMessage/onMessage.
    */
-  injectJavaScript = data => {
+  injectJavaScript = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RCTWebView.Commands.injectJavaScript,
@@ -224,7 +243,7 @@ class WebView extends React.Component {
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
    */
-  updateNavigationState = event => {
+  updateNavigationState = (event: WebViewNavigationEvent) => {
     if (this.props.onNavigationStateChange) {
       this.props.onNavigationStateChange(event.nativeEvent);
     }
@@ -234,13 +253,13 @@ class WebView extends React.Component {
     return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
   };
 
-  onLoadingStart = event => {
+  onLoadingStart = (event: WebViewNavigationEvent) => {
     const onLoadStart = this.props.onLoadStart;
     onLoadStart && onLoadStart(event);
     this.updateNavigationState(event);
   };
 
-  onLoadingError = event => {
+  onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
     onError && onError(event);
@@ -253,7 +272,7 @@ class WebView extends React.Component {
     });
   };
 
-  onLoadingFinish = event => {
+  onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
@@ -263,7 +282,7 @@ class WebView extends React.Component {
     this.updateNavigationState(event);
   };
 
-  onMessage = (event) => {
+  onMessage = (event: WebViewMessageEvent) => {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };

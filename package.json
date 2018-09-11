@@ -5,6 +5,10 @@
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "version": "0.1.0",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
+  "scripts": {
+    "flow": "flow check",
+    "flow-android": "flow check --flowconfig-name .flowconfig.android"
+  },
   "peerDependencies": {
     "react": "^16.0",
     "react-native": "^0.56"
@@ -12,5 +16,9 @@
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
     "fbjs": "^0.8.17"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.80.0",
+    "react-native": "^0.56"
   }
 }

@@ -51,8 +51,14 @@ Simply install React Native WebView and then use it in place of the core WebView
 
 ### Contributor Notes
 
-* I've removed all PropTypes for now. Instead, we'll be moving toward Flow or TypeScript at a later date
+* I've removed all PropTypes for now. Instead, we'll be using Flow types. TypeScript types will be added at a later date.
 * UIWebView is not tested fully and you will encounter some yellow warning boxes. Since it is deprecated, we don't intend to put a lot of time into supporting it, but feel free to submit PRs if you have a special use case. Note that you will need to specify `useWebKit={false}` to use UIWebView
+* After pulling this repo and installing all dependencies, you can run flow on iOS and Android-specific files using the commands:
+  * `yarn flow` or `npm run flow` for iOS
+  * `yarn flow-android` or `npm run flow-android` for Android
+* If you want to add another React Native platform to this repository, you will need to create another `.flowconfig` for it. If your platform is `example`, copy the main flowconfig and rename it to `.flowconfig.example`. Then edit the config to ignore other platforms, and add `.*/*[.]example.js` to the ignore lists of the other platforms. Then add an entry to `package.json` like this:
+  * `    "flow-example": "flow check --flowconfig-name .flowconfig.example"`
+* Currently you need to install React Native 0.57 to be able to test these types - `flow check` will not pass aganst 0.56.
 
 ## Maintainers
 
