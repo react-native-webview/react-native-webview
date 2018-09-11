@@ -59,46 +59,10 @@ type State = {|
   startInLoadingState: boolean,
 |};
 
-type WebViewPropsAndroid = $ReadOnly<{|
-  ...WebViewSharedProps,
-  onNavigationStateChange?: (event: WebViewNavigation) => mixed,
-  onContentSizeChange?: (event: WebViewEvent) => mixed,
-
-  /**
-   * Sets whether Geolocation is enabled. The default is false.
-   * @platform android
-   */
-  geolocationEnabled?: ?boolean,
-
-  /**
-   * Boolean that sets whether JavaScript running in the context of a file
-   * scheme URL should be allowed to access content from any origin.
-   * Including accessing content from other file scheme URLs
-   * @platform android
-   */
-  allowUniversalAccessFromFileURLs?: ?boolean,
-
-  /**
-   * Used on Android only, controls whether form autocomplete data should be saved
-   * @platform android
-   */
-  saveFormDataDisabled?: ?boolean,
-
-  /*
-   * Used on Android only, controls whether the given list of URL prefixes should
-   * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
-   * default activity intent for those URL instead of loading it within the webview.
-   * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
-   * @platform android
-   */
-  urlPrefixesForDefaultIntent?: $ReadOnlyArray<string>,
-
-|}>;
-
 /**
  * Renders a native WebView.
  */
-class WebView extends React.Component<WebViewPropsAndroid, State> {
+class WebView extends React.Component<WebViewSharedProps, State> {
   static defaultProps = {
     javaScriptEnabled: true,
     thirdPartyCookiesEnabled: true,

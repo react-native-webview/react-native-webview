@@ -11,6 +11,7 @@
 'use strict';
 
 import type {Node, Element, ComponentType} from 'react';
+
 import type {SyntheticEvent} from 'CoreEventTypes';
 import type {EdgeInsetsProp} from 'EdgeInsetsPropType';
 import type {ViewStyleProp} from 'StyleSheet';
@@ -126,8 +127,171 @@ export type WebViewNativeConfig = $ReadOnly<{|
   viewManager?: ?Object,
 |}>;
 
+export type IOSWebViewProps = $ReadOnly<{|
+  /**
+   * If true, use WKWebView instead of UIWebView.
+   * @platform ios
+   */
+  useWebKit?: ?boolean,
+
+  /**
+   * Boolean value that determines whether the web view bounces
+   * when it reaches the edge of the content. The default value is `true`.
+   * @platform ios
+   */
+  bounces?: ?boolean,
+
+  /**
+   * A floating-point number that determines how quickly the scroll view
+   * decelerates after the user lifts their finger. You may also use the
+   * string shortcuts `"normal"` and `"fast"` which match the underlying iOS
+   * settings for `UIScrollViewDecelerationRateNormal` and
+   * `UIScrollViewDecelerationRateFast` respectively:
+   *
+   *   - normal: 0.998
+   *   - fast: 0.99 (the default for iOS web view)
+   * @platform ios
+   */
+  decelerationRate?: ?('fast' | 'normal' | number),
+
+  /**
+   * Boolean value that determines whether scrolling is enabled in the
+   * `WebView`. The default value is `true`.
+   * @platform ios
+   */
+  scrollEnabled?: ?boolean,
+
+  /**
+   * The amount by which the web view content is inset from the edges of
+   * the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
+   * @platform ios
+   */
+  contentInset?: ?EdgeInsetsProp,
+
+  /**
+   * Determines the types of data converted to clickable URLs in the web view's content.
+   * By default only phone numbers are detected.
+   *
+   * You can provide one type or an array of many types.
+   *
+   * Possible values for `dataDetectorTypes` are:
+   *
+   * - `'phoneNumber'`
+   * - `'link'`
+   * - `'address'`
+   * - `'calendarEvent'`
+   * - `'none'`
+   * - `'all'`
+   *
+   * With the new WebKit implementation, we have three new values:
+   * - `'trackingNumber'`,
+   * - `'flightNumber'`,
+   * - `'lookupSuggestion'`,
+   *
+   * @platform ios
+   */
+  dataDetectorTypes?:
+    | ?DataDetectorTypes
+    | $ReadOnlyArray<DataDetectorTypes>,
+
+  /**
+   * Function that allows custom handling of any web view requests. Return
+   * `true` from the function to continue loading the request and `false`
+   * to stop loading.
+   * @platform ios
+   */
+  onShouldStartLoadWithRequest?: (event: WebViewEvent) => mixed,
+
+  /**
+   * Boolean that determines whether HTML5 videos play inline or use the
+   * native full-screen controller. The default value is `false`.
+   *
+   * **NOTE** : In order for video to play inline, not only does this
+   * property need to be set to `true`, but the video element in the HTML
+   * document must also include the `webkit-playsinline` attribute.
+   * @platform ios
+   */
+  allowsInlineMediaPlayback?: ?boolean,
+|}>;
+
+export type AndroidWebViewProps = $ReadOnly<{|
+  onNavigationStateChange?: (event: WebViewNavigation) => mixed,
+  onContentSizeChange?: (event: WebViewEvent) => mixed,
+
+  /**
+   * Sets whether Geolocation is enabled. The default is false.
+   * @platform android
+   */
+  geolocationEnabled?: ?boolean,
+
+  /**
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from any origin.
+   * Including accessing content from other file scheme URLs
+   * @platform android
+   */
+  allowUniversalAccessFromFileURLs?: ?boolean,
+
+  /**
+   * Used on Android only, controls whether form autocomplete data should be saved
+   * @platform android
+   */
+  saveFormDataDisabled?: ?boolean,
+
+  /*
+   * Used on Android only, controls whether the given list of URL prefixes should
+   * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
+   * default activity intent for those URL instead of loading it within the webview.
+   * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
+   * @platform android
+   */
+  urlPrefixesForDefaultIntent?: $ReadOnlyArray<string>,
+
+  /**
+   * Boolean value to enable JavaScript in the `WebView`. Used on Android only
+   * as JavaScript is enabled by default on iOS. The default value is `true`.
+   * @platform android
+   */
+  javaScriptEnabled?: ?boolean,
+
+  /**
+   * Boolean value to enable third party cookies in the `WebView`. Used on
+   * Android Lollipop and above only as third party cookies are enabled by
+   * default on Android Kitkat and below and on iOS. The default value is `true`.
+   * @platform android
+   */
+  thirdPartyCookiesEnabled?: ?boolean,
+
+  /**
+   * Boolean value to control whether DOM Storage is enabled. Used only in
+   * Android.
+   * @platform android
+   */
+  domStorageEnabled?: ?boolean,
+
+  /**
+   * Sets the user-agent for the `WebView`.
+   * @platform android
+   */
+  userAgent?: ?string,
+
+  /**
+   * Specifies the mixed content mode. i.e WebView will allow a secure origin to load content from any other origin.
+   *
+   * Possible values for `mixedContentMode` are:
+   *
+   * - `'never'` (default) - WebView will not allow a secure origin to load content from an insecure origin.
+   * - `'always'` - WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
+   * - `'compatibility'` -  WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
+   * @platform android
+   */
+  mixedContentMode?: ?('never' | 'always' | 'compatibility'),
+|}>;
+
 export type WebViewSharedProps =  $ReadOnly<{|
   ...ViewProps,
+  ...IOSWebViewProps,
+  ...AndroidWebViewProps,
   /**
    * Deprecated. Use `source` instead.
    */
@@ -141,12 +305,6 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * Loads static html or a uri (with optional headers) in the WebView.
    */
   source?: ?WebViewSource,
-
-  /**
-   * If true, use WKWebView instead of UIWebView.
-   * @platform ios
-   */
-  useWebKit?: ?boolean,
 
   /**
    * Function that returns a view to show if there's an error.
@@ -179,45 +337,11 @@ export type WebViewSharedProps =  $ReadOnly<{|
   onError: (event: WebViewErrorEvent) => mixed,
 
   /**
-   * Boolean value that determines whether the web view bounces
-   * when it reaches the edge of the content. The default value is `true`.
-   * @platform ios
-   */
-  bounces?: ?boolean,
-
-  /**
-   * A floating-point number that determines how quickly the scroll view
-   * decelerates after the user lifts their finger. You may also use the
-   * string shortcuts `"normal"` and `"fast"` which match the underlying iOS
-   * settings for `UIScrollViewDecelerationRateNormal` and
-   * `UIScrollViewDecelerationRateFast` respectively:
-   *
-   *   - normal: 0.998
-   *   - fast: 0.99 (the default for iOS web view)
-   * @platform ios
-   */
-  decelerationRate?: ?('fast' | 'normal' | number),
-
-  /**
-   * Boolean value that determines whether scrolling is enabled in the
-   * `WebView`. The default value is `true`.
-   * @platform ios
-   */
-  scrollEnabled?: ?boolean,
-
-  /**
    * Controls whether to adjust the content inset for web views that are
    * placed behind a navigation bar, tab bar, or toolbar. The default value
    * is `true`.
    */
   automaticallyAdjustContentInsets?: ?boolean,
-
-  /**
-   * The amount by which the web view content is inset from the edges of
-   * the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
-   * @platform ios
-   */
-  contentInset?: ?EdgeInsetsProp,
 
   /**
    * Function that is invoked when the `WebView` loading starts or ends.
@@ -242,64 +366,10 @@ export type WebViewSharedProps =  $ReadOnly<{|
   startInLoadingState?: ?boolean,
 
   /**
-   * Determines the types of data converted to clickable URLs in the web view's content.
-   * By default only phone numbers are detected.
-   *
-   * You can provide one type or an array of many types.
-   *
-   * Possible values for `dataDetectorTypes` are:
-   *
-   * - `'phoneNumber'`
-   * - `'link'`
-   * - `'address'`
-   * - `'calendarEvent'`
-   * - `'none'`
-   * - `'all'`
-   *
-   * With the new WebKit implementation, we have three new values:
-   * - `'trackingNumber'`,
-   * - `'flightNumber'`,
-   * - `'lookupSuggestion'`,
-   *
-   * @platform ios
-   */
-  dataDetectorTypes?:
-    | ?DataDetectorTypes
-    | $ReadOnlyArray<DataDetectorTypes>,
-
-  /**
-   * Boolean value to enable JavaScript in the `WebView`. Used on Android only
-   * as JavaScript is enabled by default on iOS. The default value is `true`.
-   * @platform android
-   */
-  javaScriptEnabled?: ?boolean,
-
-  /**
-   * Boolean value to enable third party cookies in the `WebView`. Used on
-   * Android Lollipop and above only as third party cookies are enabled by
-   * default on Android Kitkat and below and on iOS. The default value is `true`.
-   * @platform android
-   */
-  thirdPartyCookiesEnabled?: ?boolean,
-
-  /**
-   * Boolean value to control whether DOM Storage is enabled. Used only in
-   * Android.
-   * @platform android
-   */
-  domStorageEnabled?: ?boolean,
-
-  /**
    * Set this to provide JavaScript that will be injected into the web page
    * when the view loads.
    */
   injectedJavaScript?: ?string,
-
-  /**
-   * Sets the user-agent for the `WebView`.
-   * @platform android
-   */
-  userAgent?: ?string,
 
   /**
    * Boolean that controls whether the web content is scaled to fit
@@ -309,25 +379,6 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * On iOS, when `useWebKit=true`, this prop will not work.
    */
   scalesPageToFit?: ?boolean,
-
-  /**
-   * Function that allows custom handling of any web view requests. Return
-   * `true` from the function to continue loading the request and `false`
-   * to stop loading.
-   * @platform ios
-   */
-  onShouldStartLoadWithRequest?: (event: WebViewEvent) => mixed,
-
-  /**
-   * Boolean that determines whether HTML5 videos play inline or use the
-   * native full-screen controller. The default value is `false`.
-   *
-   * **NOTE** : In order for video to play inline, not only does this
-   * property need to be set to `true`, but the video element in the HTML
-   * document must also include the `webkit-playsinline` attribute.
-   * @platform ios
-   */
-  allowsInlineMediaPlayback?: ?boolean,
 
   /**
    * Boolean that determines whether HTML5 audio and video requires the user
@@ -343,18 +394,6 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * The default whitelisted origins are "http://*" and "https://*".
    */
   originWhitelist?: $ReadOnlyArray<string>,
-
-  /**
-   * Specifies the mixed content mode. i.e WebView will allow a secure origin to load content from any other origin.
-   *
-   * Possible values for `mixedContentMode` are:
-   *
-   * - `'never'` (default) - WebView will not allow a secure origin to load content from an insecure origin.
-   * - `'always'` - WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
-   * - `'compatibility'` -  WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
-   * @platform android
-   */
-  mixedContentMode?: ?('never' | 'always' | 'compatibility'),
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
