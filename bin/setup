@@ -5,7 +5,7 @@ if ! [ -x "$(command -v node)" ]; then
   echo 'Error: node is not installed.' >&2
 
   if ! [ -x "$(command -v brew)" ]; then
-    echo 'Go here to install: https://nodejs.org/en/download/'
+    echo 'Go here to install: https://brew.sh/'
   fi
 
   if [ -x "$(command -v brew)" ]; then
