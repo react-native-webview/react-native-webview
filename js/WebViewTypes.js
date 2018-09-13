@@ -236,7 +236,7 @@ export type AndroidWebViewProps = $ReadOnly<{|
    * Sets whether the webview allow access to file system.
    * @platform android
    */
-  allowFileAccess: ?boolean,
+  allowFileAccess?: ?boolean,
 
   /**
    * Used on Android only, controls whether form autocomplete data should be saved
