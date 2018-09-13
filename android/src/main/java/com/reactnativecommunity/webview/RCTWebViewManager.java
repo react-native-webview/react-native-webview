@@ -324,7 +324,8 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
         evaluateJavascript(script, null);
         return;
       }
-       try {
+
+      try {
         loadUrl("javascript:" + URLEncoder.encode(script, "UTF-8"));
       } catch (UnsupportedEncodingException e) {
         // UTF-8 should always be supported
