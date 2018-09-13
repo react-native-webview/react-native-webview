@@ -67,6 +67,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     javaScriptEnabled: true,
     thirdPartyCookiesEnabled: true,
     scalesPageToFit: true,
+    allowFileAccess: false,
     saveFormDataDisabled: false,
     originWhitelist: WebViewShared.defaultOriginWhitelist,
   };
@@ -143,6 +144,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         style={webViewStyles}
         source={resolveAssetSource(source)}
         scalesPageToFit={this.props.scalesPageToFit}
+        allowFileAccess={this.props.allowFileAccess}
         injectedJavaScript={this.props.injectedJavaScript}
         userAgent={this.props.userAgent}
         javaScriptEnabled={this.props.javaScriptEnabled}
