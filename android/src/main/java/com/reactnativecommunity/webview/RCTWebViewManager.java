@@ -589,6 +589,13 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "allowFileAccess")
+  public void setAllowFileAccess(
+    WebView view,
+    @Nullable Boolean allowFileAccess) {
+    view.getSettings().setAllowFileAccess(allowFileAccess != null && allowFileAccess);
+  }
+
   @ReactProp(name = "geolocationEnabled")
   public void setGeolocationEnabled(
     WebView view,
