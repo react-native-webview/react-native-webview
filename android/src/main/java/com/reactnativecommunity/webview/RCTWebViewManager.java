@@ -652,7 +652,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
         break;
       case COMMAND_POST_MESSAGE:
         try {
-          ReactWebView reactWebView = (ReactWebView) root;
+          RCTWebView reactWebView = (RCTWebView) root;
           JSONObject eventInitDict = new JSONObject();
           eventInitDict.put("data", args.getString(0));
           reactWebView.evaluateJavascriptWithFallback("(function () {" +
@@ -671,7 +671,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
         }
         break;
       case COMMAND_INJECT_JAVASCRIPT:
-        ReactWebView reactWebView = (ReactWebView) root;
+        RCTWebView reactWebView = (RCTWebView) root;
         reactWebView.evaluateJavascriptWithFallback(args.getString(0));
         break;
     }
