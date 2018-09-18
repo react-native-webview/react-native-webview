@@ -57,7 +57,7 @@ RCT_EXPORT_METHOD(goBack:(nonnull NSNumber *)reactTag)
 RCT_EXPORT_METHOD(goForward:(nonnull NSNumber *)reactTag)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
-    id view = viewRegistry[reactTag];
+    RCTUIWebView *view = viewRegistry[reactTag];
     if (![view isKindOfClass:[RCTUIWebView class]]) {
       RCTLogError(@"Invalid view returned from registry, expecting RCTUIWebView, got: %@", view);
     } else {
