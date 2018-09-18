@@ -9,19 +9,19 @@
 #import <React/RCTDefines.h>
 #import <WebKit/WebKit.h>
 
-@class RCTWKWebView;
+@class RNCWKWebView;
 
-@protocol RCTWKWebViewDelegate <NSObject>
+@protocol RNCWKWebViewDelegate <NSObject>
 
-- (BOOL)webView:(RCTWKWebView *)webView
+- (BOOL)webView:(RNCWKWebView *)webView
 shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
    withCallback:(RCTDirectEventBlock)callback;
 
 @end
 
-@interface RCTWKWebView : RCTView
+@interface RNCWKWebView : RCTView
 
-@property (nonatomic, weak) id<RCTWKWebViewDelegate> delegate;
+@property (nonatomic, weak) id<RNCWKWebViewDelegate> delegate;
 @property (nonatomic, copy) NSDictionary *source;
 @property (nonatomic, assign) BOOL messagingEnabled;
 @property (nonatomic, copy) NSString *injectedJavaScript;
