@@ -15,9 +15,9 @@ import { requireNativeComponent } from 'react-native';
 
 import type {DataDetectorTypes} from './WebViewTypes';
 
-const RCTWKWebView = requireNativeComponent('RCTWKWebView');
+const RNCWKWebView = requireNativeComponent('RNCWKWebView');
 
-type RCTWKWebViewProps = $ReadOnly<{|
+type RNCWKWebViewProps = $ReadOnly<{|
   allowsInlineMediaPlayback?: ?boolean,
   mediaPlaybackRequiresUserAction?: ?boolean,
   dataDetectorTypes?:
@@ -25,21 +25,21 @@ type RCTWKWebViewProps = $ReadOnly<{|
     | $ReadOnlyArray<DataDetectorTypes>,
 |}>;
 
-class WKWebView extends React.Component<RCTWKWebViewProps> {
-  componentWillReceiveProps(nextProps: RCTWKWebViewProps) {
+class WKWebView extends React.Component<RNCWKWebViewProps> {
+  componentWillReceiveProps(nextProps: RNCWKWebViewProps) {
     this.showRedboxOnPropChanges(nextProps, 'allowsInlineMediaPlayback');
     this.showRedboxOnPropChanges(nextProps, 'mediaPlaybackRequiresUserAction');
     this.showRedboxOnPropChanges(nextProps, 'dataDetectorTypes');
   }
 
-  showRedboxOnPropChanges(nextProps: RCTWKWebViewProps, propName: string) {
+  showRedboxOnPropChanges(nextProps: RNCWKWebViewProps, propName: string) {
     if (this.props[propName] !== nextProps[propName]) {
       console.error(`Changes to property ${propName} do nothing after the initial render.`);
     }
   }
 
   render() {
-    return <RCTWKWebView {...this.props} />;
+    return <RNCWKWebView {...this.props} />;
   }
 }
 
