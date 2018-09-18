@@ -39,8 +39,6 @@ import type {
 
 const resolveAssetSource = Image.resolveAssetSource;
 
-const RCT_WEBVIEW_REF = 'webview';
-
 const WebViewState = keyMirror({
   IDLE: null,
   LOADING: null,
@@ -77,6 +75,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     lastErrorEvent: null,
     startInLoadingState: true,
   };
+
+  webViewRef = React.createRef();
 
   UNSAFE_componentWillMount() {
     if (this.props.startInLoadingState) {
@@ -139,7 +139,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
     const webView = (
       <NativeWebView
-        ref={RCT_WEBVIEW_REF}
+        ref={this.webViewRef}
         key="webViewKey"
         style={webViewStyles}
         source={resolveAssetSource(source)}
@@ -252,7 +252,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   getWebViewHandle = () => {
-    return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
+    return ReactNative.findNodeHandle(this.webViewRef.current);
   };
 
   onLoadingStart = (event: WebViewNavigationEvent) => {
