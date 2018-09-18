@@ -76,7 +76,6 @@ const JSNavigationScheme = 'react-js-navigation';
 type State = {|
   viewState: WebViewState,
   lastErrorEvent: ?WebViewError,
-  startInLoadingState: boolean,
 |};
 
 const DataDetectorTypes = [
@@ -137,18 +136,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   state = {
-    viewState: WebViewState.IDLE,
+    viewState: this.props.startInLoadingState ? WebViewState.LOADING : WebViewState.IDLE,
     lastErrorEvent: null,
-    startInLoadingState: true,
   };
 
   webViewRef = React.createRef();
 
   UNSAFE_componentWillMount() {
-    if (this.props.startInLoadingState) {
-      this.setState({ viewState: WebViewState.LOADING });
-    }
-
     if (
       this.props.useWebKit === true &&
       this.props.scalesPageToFit !== undefined
