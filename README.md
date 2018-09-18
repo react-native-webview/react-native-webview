@@ -58,7 +58,7 @@ Simply install React Native WebView and then use it in place of the core WebView
   * `yarn flow-android` or `npm run flow-android` for Android
 * If you want to add another React Native platform to this repository, you will need to create another `.flowconfig` for it. If your platform is `example`, copy the main flowconfig and rename it to `.flowconfig.example`. Then edit the config to ignore other platforms, and add `.*/*[.]example.js` to the ignore lists of the other platforms. Then add an entry to `package.json` like this:
   * `    "flow-example": "flow check --flowconfig-name .flowconfig.example"`
-* Currently you need to install React Native 0.57 to be able to test these types - `flow check` will not pass aganst 0.56.
+* Currently you need to install React Native 0.57 to be able to test these types - `flow check` will not pass against 0.56.
 
 ## Maintainers
 
