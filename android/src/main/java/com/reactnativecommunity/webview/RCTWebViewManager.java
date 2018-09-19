@@ -419,7 +419,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
         event.putString("title", webView.getTitle());
         event.putBoolean("canGoBack", webView.canGoBack());
         event.putBoolean("canGoForward", webView.canGoForward());
-        event.putInt("progress", newProgress);
+        event.putDouble("progress", (float)newProgress/100);
         dispatchEvent(
                   webView,
                   new TopLoadingProgressEvent(
