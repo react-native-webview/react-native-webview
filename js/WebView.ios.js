@@ -51,11 +51,10 @@ function processDecelerationRate(decelerationRate) {
   return decelerationRate;
 }
 
-const RCTUIWebViewManager = NativeModules.UIWebViewManager;
-const RCTWKWebViewManager = NativeModules.WKWebViewManager;
+const RNCUIWebViewManager = NativeModules.RNCUIWebViewManager;
+const RNCWKWebViewManager = NativeModules.RNCWKWebViewManager;
 
 const BGWASH = 'rgba(255,255,255,0.8)';
-const RCT_WEBVIEW_REF = 'webview';
 
 const WebViewState = keyMirror({
   IDLE: null,
@@ -143,6 +142,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     startInLoadingState: true,
   };
 
+  webViewRef = React.createRef();
+
   UNSAFE_componentWillMount() {
     if (this.props.startInLoadingState) {
       this.setState({ viewState: WebViewState.LOADING });
@@ -181,7 +182,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       );
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        'RCTWebView invalid state encountered: ' + this.state.viewState,
+        'RNCWebView invalid state encountered: ' + this.state.viewState,
       );
     }
 
@@ -199,9 +200,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     let viewManager = nativeConfig.viewManager;
 
     if (this.props.useWebKit) {
-      viewManager = viewManager || RCTWKWebViewManager;
+      viewManager = viewManager || RNCWKWebViewManager;
     } else {
-      viewManager = viewManager || RCTUIWebViewManager;
+      viewManager = viewManager || RNCUIWebViewManager;
     }
 
     const compiledWhitelist = [
@@ -247,14 +248,14 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     let NativeWebView = nativeConfig.component;
 
     if (this.props.useWebKit) {
-      NativeWebView = NativeWebView || RCTWKWebView;
+      NativeWebView = NativeWebView || RNCWKWebView;
     } else {
-      NativeWebView = NativeWebView || RCTWebView;
+      NativeWebView = NativeWebView || RNCUIWebView;
     }
 
     const webView = (
       <NativeWebView
-        ref={RCT_WEBVIEW_REF}
+        ref={this.webViewRef}
         key="webViewKey"
         style={webViewStyles}
         source={resolveAssetSource(source)}
@@ -292,10 +293,10 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   _getCommands() {
     if (!this.props.useWebKit) {
-      return UIManager.RCTWebView.Commands;
+      return UIManager.RNCUIWebView.Commands;
     }
 
-    return UIManager.RCTWKWebView.Commands;
+    return UIManager.RNCWKWebView.Commands;
   }
 
   /**
@@ -389,7 +390,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
    * Returns the native `WebView` node.
    */
   getWebViewHandle = () => {
-    return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
+    return ReactNative.findNodeHandle(this.webViewRef.current);
   };
 
   _onLoadingStart = (event: WebViewNavigationEvent) => {
@@ -451,8 +452,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   }
 }
 
-const RCTWebView = requireNativeComponent('RCTWebView');
-const RCTWKWebView = requireNativeComponent('RCTWKWebView');
+const RNCUIWebView = requireNativeComponent('RNCUIWebView');
+const RNCWKWebView = requireNativeComponent('RNCWKWebView');
 
 const styles = StyleSheet.create({
   container: {

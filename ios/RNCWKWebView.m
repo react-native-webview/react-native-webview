@@ -5,13 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import "RCTWKWebView.h"
+#import "RNCWKWebView.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 
 static NSString *const MessageHanderName = @"ReactNative";
 
-@interface RCTWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
+@interface RNCWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
@@ -20,7 +20,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 @property (nonatomic, copy) WKWebView *webView;
 @end
 
-@implementation RCTWKWebView
+@implementation RNCWKWebView
 {
   UIColor * _savedBackgroundColor;
 }
@@ -206,7 +206,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 {
   [super layoutSubviews];
 
-  // Ensure webview takes the position and dimensions of RCTWKWebView
+  // Ensure webview takes the position and dimensions of RNCWKWebView
   _webView.frame = self.bounds;
 }
 

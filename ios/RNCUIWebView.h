@@ -1,6 +1,6 @@
 #import <React/RCTView.h>
 
-@class RCTUIWebView;
+@class RNCUIWebView;
 
 /**
  * Special scheme used to pass messages to the injectedJavaScript
@@ -10,17 +10,17 @@
  */
 extern NSString *const RNCJSNavigationScheme;
 
-@protocol RCTUIWebViewDelegate <NSObject>
+@protocol RNCUIWebViewDelegate <NSObject>
 
-- (BOOL)webView:(RCTUIWebView *)webView
+- (BOOL)webView:(RNCUIWebView *)webView
 shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
    withCallback:(RCTDirectEventBlock)callback;
 
 @end
 
-@interface RCTUIWebView : RCTView
+@interface RNCUIWebView : RCTView
 
-@property (nonatomic, weak) id<RCTUIWebViewDelegate> delegate;
+@property (nonatomic, weak) id<RNCUIWebViewDelegate> delegate;
 
 @property (nonatomic, copy) NSDictionary *source;
 @property (nonatomic, assign) UIEdgeInsets contentInset;

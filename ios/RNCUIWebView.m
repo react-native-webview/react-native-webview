@@ -1,4 +1,4 @@
-#import "RCTUIWebView.h"
+#import "RNCUIWebView.h"
 
 // #import <UIKit/UIKit.h>
 #import <React/RCTAutoInsetsProtocol.h>
@@ -13,7 +13,7 @@ NSString *const RNCJSNavigationScheme = @"react-js-navigation";
 
 static NSString *const kPostMessageHost = @"postMessage";
 
-@interface RCTUIWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
+@interface RNCUIWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
 
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
@@ -23,7 +23,7 @@ static NSString *const kPostMessageHost = @"postMessage";
 
 @end
 
-@implementation RCTUIWebView
+@implementation RNCUIWebView
 {
   UIWebView *_webView;
   NSString *_injectedJavaScript;
