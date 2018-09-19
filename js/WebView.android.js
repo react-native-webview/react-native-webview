@@ -40,8 +40,6 @@ import type {
 
 const resolveAssetSource = Image.resolveAssetSource;
 
-const RCT_WEBVIEW_REF = 'webview';
-
 const WebViewState = keyMirror({
   IDLE: null,
   LOADING: null,
@@ -57,7 +55,6 @@ const defaultRenderLoading = () => (
 type State = {|
   viewState: WebViewState,
   lastErrorEvent: ?WebViewError,
-  startInLoadingState: boolean,
 |};
 
 /**
@@ -74,16 +71,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   state = {
-    viewState: WebViewState.IDLE,
+    viewState: this.props.startInLoadingState ? WebViewState.LOADING : WebViewState.IDLE,
     lastErrorEvent: null,
-    startInLoadingState: true,
   };
 
-  UNSAFE_componentWillMount() {
-    if (this.props.startInLoadingState) {
-      this.setState({ viewState: WebViewState.LOADING });
-    }
-  }
+  webViewRef = React.createRef();
 
   render() {
     let otherView = null;
@@ -102,7 +94,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         );
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        'RCTWebView invalid state encountered: ' + this.state.viewState,
+        'RNCWebView invalid state encountered: ' + this.state.viewState,
       );
     }
 
@@ -136,11 +128,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       WebViewShared.originWhitelistToRegex,
     );
 
-    let NativeWebView = nativeConfig.component || RCTWebView;
+    let NativeWebView = nativeConfig.component || RNCWebView;
 
     const webView = (
       <NativeWebView
-        ref={RCT_WEBVIEW_REF}
+        ref={this.webViewRef}
         key="webViewKey"
         style={webViewStyles}
         source={resolveAssetSource(source)}
@@ -189,7 +181,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RCTWebView.Commands.goForward,
+      UIManager.RNCWebView.Commands.goForward,
       null,
     );
   };
@@ -197,7 +189,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   goBack = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RCTWebView.Commands.goBack,
+      UIManager.RNCWebView.Commands.goBack,
       null,
     );
   };
@@ -208,7 +200,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     });
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RCTWebView.Commands.reload,
+      UIManager.RNCWebView.Commands.reload,
       null,
     );
   };
@@ -216,7 +208,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   stopLoading = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RCTWebView.Commands.stopLoading,
+      UIManager.RNCWebView.Commands.stopLoading,
       null,
     );
   };
@@ -224,7 +216,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   postMessage = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RCTWebView.Commands.postMessage,
+      UIManager.RNCWebView.Commands.postMessage,
       [String(data)],
     );
   };
@@ -238,7 +230,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   injectJavaScript = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RCTWebView.Commands.injectJavaScript,
+      UIManager.RNCWebView.Commands.injectJavaScript,
       [data],
     );
   };
@@ -254,7 +246,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   getWebViewHandle = () => {
-    return ReactNative.findNodeHandle(this.refs[RCT_WEBVIEW_REF]);
+    return ReactNative.findNodeHandle(this.webViewRef.current);
   };
 
   onLoadingStart = (event: WebViewNavigationEvent) => {
@@ -297,7 +289,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   }
 }
 
-const RCTWebView = requireNativeComponent('RCTWebView');
+const RNCWebView = requireNativeComponent('RNCWebView');
 
 const styles = StyleSheet.create({
   container: {
