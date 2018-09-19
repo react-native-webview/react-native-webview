@@ -54,7 +54,6 @@ const defaultRenderLoading = () => (
 type State = {|
   viewState: WebViewState,
   lastErrorEvent: ?WebViewError,
-  startInLoadingState: boolean,
 |};
 
 /**
@@ -71,18 +70,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   state = {
-    viewState: WebViewState.IDLE,
+    viewState: this.props.startInLoadingState ? WebViewState.LOADING : WebViewState.IDLE,
     lastErrorEvent: null,
-    startInLoadingState: true,
   };
 
   webViewRef = React.createRef();
-
-  UNSAFE_componentWillMount() {
-    if (this.props.startInLoadingState) {
-      this.setState({ viewState: WebViewState.LOADING });
-    }
-  }
 
   render() {
     let otherView = null;
