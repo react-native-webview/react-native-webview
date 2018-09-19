@@ -219,7 +219,11 @@ export type AndroidWebViewProps = $ReadOnly<{|
   onContentSizeChange?: (event: WebViewEvent) => mixed,
 
   /**
-   * Sets whether Geolocation is enabled. The default is false.
+   * Sets the overScrollMode. Values can be found at
+   * https://developer.android.com/reference/android/view/View#OVER_SCROLL_NEVER
+   * 0 = always (default)
+   * 1 = if content scrolls
+   * 2 = never
    * @platform android
    */
   overScrollMode?: ?number,
