@@ -25,6 +25,13 @@ export type WebViewNativeEvent = $ReadOnly<{|
   canGoForward: boolean,
 |}>;
 
+export type WebViewProgressEvent = $ReadOnly<{|
+    progress: number,
+    title: string,
+    canGoBack: boolean,
+    canGoForword: boolean,
+|}>
+
 export type WebViewNavigation = $ReadOnly<{|
   ...WebViewNativeEvent,
   navigationType:
@@ -364,6 +371,11 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * must be a string.
    */
   onMessage?: (event: WebViewMessageEvent) => mixed,
+
+  /**
+   * Function that is invoked when the `WebView` is loading.
+   */
+  onLoadProgress?: (event: WebViewProgressEvent) => mixed,
 
   /**
    * Boolean value that forces the `WebView` to show the loading view
