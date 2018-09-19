@@ -84,10 +84,10 @@ import org.json.JSONObject;
  *  - canGoBack - boolean, whether there is anything on a history stack to go back
  *  - canGoForward - boolean, whether it is possible to request GO_FORWARD command
  */
-@ReactModule(name = RCTWebViewManager.REACT_CLASS)
-public class RCTWebViewManager extends SimpleViewManager<WebView> {
+@ReactModule(name = RNCWebViewManager.REACT_CLASS)
+public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
-  protected static final String REACT_CLASS = "RCTWebView";
+  protected static final String REACT_CLASS = "RNCWebView";
 
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
@@ -109,7 +109,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
   protected WebViewConfig mWebViewConfig;
   protected @Nullable WebView.PictureListener mPictureListener;
 
-  protected static class RCTWebViewClient extends WebViewClient {
+  protected static class RNCWebViewClient extends WebViewClient {
 
     protected boolean mLastLoadFailed = false;
     protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
@@ -120,7 +120,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
       super.onPageFinished(webView, url);
 
       if (!mLastLoadFailed) {
-        RCTWebView reactWebView = (RCTWebView) webView;
+        RNCWebView reactWebView = (RNCWebView) webView;
         reactWebView.callInjectedJavaScript();
         reactWebView.linkBridge();
         emitFinishEvent(webView, url);
@@ -243,15 +243,15 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
    * Subclass of {@link WebView} that implements {@link LifecycleEventListener} interface in order
    * to call {@link WebView#destroy} on activity destroy event and also to clear the client
    */
-  protected static class RCTWebView extends WebView implements LifecycleEventListener {
+  protected static class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable String injectedJS;
     protected boolean messagingEnabled = false;
-    protected @Nullable RCTWebViewClient mRCTWebViewClient;
+    protected @Nullable RNCWebViewClient mRNCWebViewClient;
 
-    protected class RCTWebViewBridge {
-      RCTWebView mContext;
+    protected class RNCWebViewBridge {
+      RNCWebView mContext;
 
-      RCTWebViewBridge(RCTWebView c) {
+      RNCWebViewBridge(RNCWebView c) {
         mContext = c;
       }
 
@@ -268,7 +268,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
      * Reactive Native needed for access to ReactNative internal system functionality
      *
      */
-    public RCTWebView(ThemedReactContext reactContext) {
+    public RNCWebView(ThemedReactContext reactContext) {
       super(reactContext);
     }
 
@@ -290,19 +290,19 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public void setWebViewClient(WebViewClient client) {
       super.setWebViewClient(client);
-      mRCTWebViewClient = (RCTWebViewClient)client;
+      mRNCWebViewClient = (RNCWebViewClient)client;
     }
 
-    public @Nullable RCTWebViewClient getRCTWebViewClient() {
-      return mRCTWebViewClient;
+    public @Nullable RNCWebViewClient getRNCWebViewClient() {
+      return mRNCWebViewClient;
     }
 
     public void setInjectedJavaScript(@Nullable String js) {
       injectedJS = js;
     }
 
-    protected RCTWebViewBridge createRCTWebViewBridge(RCTWebView webView) {
-      return new RCTWebViewBridge(webView);
+    protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
+      return new RNCWebViewBridge(webView);
     }
 
     public void setMessagingEnabled(boolean enabled) {
@@ -312,7 +312,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
 
       messagingEnabled = enabled;
       if (enabled) {
-        addJavascriptInterface(createRCTWebViewBridge(this), BRIDGE_NAME);
+        addJavascriptInterface(createRNCWebViewBridge(this), BRIDGE_NAME);
         linkBridge();
       } else {
         removeJavascriptInterface(BRIDGE_NAME);
@@ -375,14 +375,14 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
-  public RCTWebViewManager() {
+  public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
       }
     };
   }
 
-  public RCTWebViewManager(WebViewConfig webViewConfig) {
+  public RNCWebViewManager(WebViewConfig webViewConfig) {
     mWebViewConfig = webViewConfig;
   }
 
@@ -391,14 +391,14 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
     return REACT_CLASS;
   }
 
-  protected RCTWebView createRCTWebViewInstance(ThemedReactContext reactContext) {
-    return new RCTWebView(reactContext);
+  protected RNCWebView createRNCWebViewInstance(ThemedReactContext reactContext) {
+    return new RNCWebView(reactContext);
   }
 
   @Override
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   protected WebView createViewInstance(ThemedReactContext reactContext) {
-    RCTWebView webView = createRCTWebViewInstance(reactContext);
+    RNCWebView webView = createRNCWebViewInstance(reactContext);
     webView.setWebChromeClient(new WebChromeClient() {
       @Override
       public boolean onConsoleMessage(ConsoleMessage message) {
@@ -489,12 +489,12 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "injectedJavaScript")
   public void setInjectedJavaScript(WebView view, @Nullable String injectedJavaScript) {
-    ((RCTWebView) view).setInjectedJavaScript(injectedJavaScript);
+    ((RNCWebView) view).setInjectedJavaScript(injectedJavaScript);
   }
 
   @ReactProp(name = "messagingEnabled")
   public void setMessagingEnabled(WebView view, boolean enabled) {
-    ((RCTWebView) view).setMessagingEnabled(enabled);
+    ((RNCWebView) view).setMessagingEnabled(enabled);
   }
 
   @ReactProp(name = "source")
@@ -583,7 +583,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
   public void setUrlPrefixesForDefaultIntent(
       WebView view,
       @Nullable ReadableArray urlPrefixesForDefaultIntent) {
-    RCTWebViewClient client = ((RCTWebView) view).getRCTWebViewClient();
+    RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
     if (client != null && urlPrefixesForDefaultIntent != null) {
       client.setUrlPrefixesForDefaultIntent(urlPrefixesForDefaultIntent);
     }
@@ -607,7 +607,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
   public void setOriginWhitelist(
     WebView view,
     @Nullable ReadableArray originWhitelist) {
-    RCTWebViewClient client = ((RCTWebView) view).getRCTWebViewClient();
+    RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
     if (client != null && originWhitelist != null) {
       List<Pattern> whiteList = new LinkedList<>();
       for (int i = 0 ; i < originWhitelist.size() ; i++) {
@@ -620,7 +620,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
-    view.setWebViewClient(new RCTWebViewClient());
+    view.setWebViewClient(new RNCWebViewClient());
   }
 
   @Override
@@ -652,7 +652,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
         break;
       case COMMAND_POST_MESSAGE:
         try {
-          RCTWebView reactWebView = (RCTWebView) root;
+          RNCWebView reactWebView = (RNCWebView) root;
           JSONObject eventInitDict = new JSONObject();
           eventInitDict.put("data", args.getString(0));
           reactWebView.evaluateJavascriptWithFallback("(function () {" +
@@ -671,7 +671,7 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
         }
         break;
       case COMMAND_INJECT_JAVASCRIPT:
-        RCTWebView reactWebView = (RCTWebView) root;
+        RNCWebView reactWebView = (RNCWebView) root;
         reactWebView.evaluateJavascriptWithFallback(args.getString(0));
         break;
     }
@@ -680,8 +680,8 @@ public class RCTWebViewManager extends SimpleViewManager<WebView> {
   @Override
   public void onDropViewInstance(WebView webView) {
     super.onDropViewInstance(webView);
-    ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RCTWebView) webView);
-    ((RCTWebView) webView).cleanupCallbacksAndDestroy();
+    ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RNCWebView) webView);
+    ((RNCWebView) webView).cleanupCallbacksAndDestroy();
   }
 
   protected WebView.PictureListener getPictureListener() {
