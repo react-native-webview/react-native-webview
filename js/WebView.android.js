@@ -61,6 +61,7 @@ type State = {|
  */
 class WebView extends React.Component<WebViewSharedProps, State> {
   static defaultProps = {
+    overScrollMode: 0,
     javaScriptEnabled: true,
     thirdPartyCookiesEnabled: true,
     scalesPageToFit: true,
@@ -144,6 +145,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         domStorageEnabled={this.props.domStorageEnabled}
         messagingEnabled={typeof this.props.onMessage === 'function'}
         onMessage={this.onMessage}
+        overScrollMode={this.props.overScrollMode}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets

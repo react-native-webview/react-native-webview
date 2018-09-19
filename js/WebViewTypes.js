@@ -222,6 +222,12 @@ export type AndroidWebViewProps = $ReadOnly<{|
    * Sets whether Geolocation is enabled. The default is false.
    * @platform android
    */
+  overScrollMode?: ?number,
+
+  /**
+   * Sets whether Geolocation is enabled. The default is false.
+   * @platform android
+   */
   geolocationEnabled?: ?boolean,
 
   /**

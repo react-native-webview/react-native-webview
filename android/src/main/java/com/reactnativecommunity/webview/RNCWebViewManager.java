@@ -447,6 +447,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setJavaScriptEnabled(enabled);
   }
 
+  @ReactProp(name = "overScrollMode")
+  public void setOverScrollMode(WebView view, Integer overScrollMode) {
+    view.setOverScrollMode(overScrollMode);
+  }
+
   @ReactProp(name = "thirdPartyCookiesEnabled")
   public void setThirdPartyCookiesEnabled(WebView view, boolean enabled) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
