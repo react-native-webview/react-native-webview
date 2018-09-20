@@ -10,7 +10,7 @@
 * [x] Android
 * [ ] Windows 10 (coming soon)
 
-## Installation
+## Getting Started
 
 *Note: this is currently a work-in-progress and not yet published to NPM.*
 
@@ -18,6 +18,8 @@
 $ npm install --save https://github.com/react-native-community/react-native-webview
 $ react-native link react-native-webview
 ```
+
+Read our [Getting Started Guide](./docs/Getting-Started.md) for more.
 
 ## Usage
 
@@ -41,9 +43,7 @@ class MyWebComponent extends Component {
 }
 ```
 
-Additional properties are supported and will be added here; for now, refer to the previous React Native WebView documentation for more.
-
-[https://facebook.github.io/react-native/docs/webview](https://facebook.github.io/react-native/docs/webview)
+For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md).
 
 ## Migrate from React Native core WebView to React Native WebView
 
