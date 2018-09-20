@@ -71,6 +71,8 @@ The object passed to `source` can have either of the following shapes:
 
 **Static HTML**
 
+_Note that using static HTML requires the WebView property [originWhiteList](Reference.md#originWhiteList) to `['*']`._
+
 * `html` (string) - A static HTML page to display in the WebView.
 * `baseUrl` (string) - The base URL to be used for any relative links in the HTML.
 
