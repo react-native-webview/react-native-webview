@@ -61,7 +61,7 @@ type State = {|
  */
 class WebView extends React.Component<WebViewSharedProps, State> {
   static defaultProps = {
-    overScrollMode: 0,
+    overScrollMode: 'always',
     javaScriptEnabled: true,
     thirdPartyCookiesEnabled: true,
     scalesPageToFit: true,
