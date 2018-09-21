@@ -16,6 +16,7 @@ This document lays out the current public properties and methods for the React N
 - [`onLoad`](Reference.md#onload)
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
+- [`onLoadProgress`](Reference.md#onloadprogress)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`originWhitelist`](Reference.md#originwhitelist)
@@ -175,6 +176,19 @@ Function that is invoked when the `WebView` starts loading.
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
+
+---
+### `onLoadProgress`
+
+Function that is invoked when the `webview` is loading.
+
+> ***Note***
+>
+> On iOS, when useWebKit=false, this prop will not work.
+
+| Type | Required |
+| -------- | -------- |
+| function | No |
 
 ---
 
