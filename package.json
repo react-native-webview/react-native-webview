@@ -18,6 +18,7 @@
     "fbjs": "^0.8.17"
   },
   "devDependencies": {
+    "babel-plugin-module-resolver": "^3.1.1",
     "flow-bin": "^0.80.0",
     "react-native": "^0.57"
   }
