@@ -50,6 +50,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
@@ -114,6 +115,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean mLastLoadFailed = false;
     protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
     protected @Nullable List<Pattern> mOriginWhitelist;
+    protected boolean mUrlOverridingEnabled;
 
     @Override
     public void onPageFinished(WebView webView, String url) {
@@ -142,6 +144,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
       if (url.equals(BLANK_URL)) return false;
+
+      if (mUrlOverridingEnabled) {
+        WritableMap event = Arguments.createMap();
+        event.putString("url", url);
+        ReactContext reactContext = (ReactContext)view.getContext();
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                view.getId(),
+                "topOverrideUrlLoading",
+                event);
+        return true;
+      }
 
       // url blacklisting
       if (mUrlPrefixesForDefaultIntent != null && mUrlPrefixesForDefaultIntent.size() > 0) {
@@ -236,6 +249,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setOriginWhitelist(List<Pattern> originWhitelist) {
       mOriginWhitelist = originWhitelist;
+    }
+
+    public void setUrlOverridingEnabled(boolean urlOverridingEnabled) {
+      mUrlOverridingEnabled = urlOverridingEnabled;
     }
   }
 
@@ -497,6 +514,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ((RNCWebView) view).setMessagingEnabled(enabled);
   }
 
+  @ReactProp(name = "urlOverridingEnabled")
+  public void setUrlOverridingEnabled(WebView view, boolean enabled) {
+    ((RNCWebView) view).getRNCWebViewClient().setUrlOverridingEnabled(enabled);
+  }
+
   @ReactProp(name = "source")
   public void setSource(WebView view, @Nullable ReadableMap source) {
     if (source != null) {
@@ -706,5 +728,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     EventDispatcher eventDispatcher =
       reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
     eventDispatcher.dispatchEvent(event);
+  }
+
+  public Map getExportedCustomBubblingEventTypeConstants() {
+    return MapBuilder.builder()
+            .put("topOverrideUrlLoading",
+                    MapBuilder.of(
+                            "phasedRegistrationNames",
+                            MapBuilder.of("bubbled", "onOverrideUrlLoading")))
+            .build();
   }
 }
