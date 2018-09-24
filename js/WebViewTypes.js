@@ -118,16 +118,16 @@ export type WebViewSourceHtml = $ReadOnly<{|
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
 export type WebViewNativeConfig = $ReadOnly<{|
-  /*
+  /**
    * The native component used to render the WebView.
    */
   component?: ComponentType<WebViewSharedProps>,
-  /*
+  /**
    * Set props directly on the native component WebView. Enables custom props which the
    * original WebView doesn't pass through.
    */
   props?: ?Object,
-  /*
+  /**
    * Set the ViewManager to use for communication with the native side.
    * @platform ios
    */
@@ -273,7 +273,7 @@ export type AndroidWebViewProps = $ReadOnly<{|
    */
   saveFormDataDisabled?: ?boolean,
 
-  /*
+  /**
    * Used on Android only, controls whether the given list of URL prefixes should
    * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
    * default activity intent for those URL instead of loading it within the webview.
