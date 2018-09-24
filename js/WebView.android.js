@@ -34,7 +34,7 @@ import type {
   WebViewNavigation,
   WebViewNavigationEvent,
   WebViewSharedProps,
-  WebViewSource,
+  WebViewSource, WebViewUrlOverrideEvent,
 } from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
@@ -164,6 +164,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         mixedContentMode={this.props.mixedContentMode}
         saveFormDataDisabled={this.props.saveFormDataDisabled}
         urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}
+        onOverrideUrlLoading={this.onOverrideUrlLoading}
+        urlOverridingEnabled={this.props.urlOverridingEnabled}
         {...nativeConfig.props}
       />
     );
@@ -279,6 +281,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   onMessage = (event: WebViewMessageEvent) => {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
+  };
+
+  onOverrideUrlLoading = (event: WebViewUrlOverrideEvent) => {
+    const { onOverrideUrlLoading } = this.props;
+    onOverrideUrlLoading && onOverrideUrlLoading(event);
   };
 }
 

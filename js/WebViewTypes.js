@@ -51,6 +51,11 @@ export type WebViewError = $ReadOnly<{|
   description: string,
 |}>;
 
+export type UrlOverrideEvent = $ReadOnly<{|
+  ...WebViewNativeEvent,
+  url: string
+|}>;
+
 export type WebViewEvent = SyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewNavigationEvent = SyntheticEvent<WebViewNavigation>;
@@ -58,6 +63,8 @@ export type WebViewNavigationEvent = SyntheticEvent<WebViewNavigation>;
 export type WebViewMessageEvent = SyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = SyntheticEvent<WebViewError>;
+
+export type WebViewUrlOverrideEvent = SyntheticEvent<UrlOverrideEvent>;
 
 export type DataDetectorTypes =
   | 'phoneNumber'
@@ -292,6 +299,10 @@ export type AndroidWebViewProps = $ReadOnly<{|
    * @platform android
    */
   mixedContentMode?: ?('never' | 'always' | 'compatibility'),
+
+  onOverrideUrlLoading?: (event: WebViewUrlOverrideEvent) => void,
+
+  urlOverridingEnabled?: boolean
 |}>;
 
 export type WebViewSharedProps =  $ReadOnly<{|
