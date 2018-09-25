@@ -88,6 +88,7 @@ import org.json.JSONObject;
 public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected static final String REACT_CLASS = "RNCWebView";
+  private RNCWebViewPackage aPackage;
 
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
@@ -413,6 +414,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
         callback.invoke(origin, true, false);
       }
+
+      public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+        return getModule().startPhotoPickerIntent(filePathCallback, fileChooserParams);
+      }
     });
     reactContext.addLifecycleEventListener(webView);
     mWebViewConfig.configWebView(webView);
@@ -706,5 +711,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     EventDispatcher eventDispatcher =
       reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
     eventDispatcher.dispatchEvent(event);
+  }
+
+  public RNCWebViewPackage getPackage() {
+    return this.aPackage;
+  }
+
+  public void setPackage(RNCWebViewPackage aPackage) {
+    this.aPackage = aPackage;
+  }
+
+  public RNCWebViewModule getModule() {
+    return this.aPackage.getModule();
   }
 }

@@ -20,7 +20,69 @@ $ react-native link react-native-webview
 
 _NOTE: If you ever need to uninstall React Native WebView, run `react-native unlink react-native-webview` to unlink it._
 
-#### 3. Import the webview into your component
+#### 3. Add support for File Upload
+
+##### iOS
+
+For iOS, all you need to do is specify the permissions in your `ios/[project]/Info.plist` file:
+
+Photo capture:
+```
+<key>NSCameraUsageDescription</key>
+<string>Take pictures for certain activities</string>
+```
+
+Gallery selection:
+```
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Select pictures for certain activities</string>
+```
+
+Video recording:
+```
+<key>NSMicrophoneUsageDescription</key>
+<string>Need microphone access for recording videos</string>
+```
+
+##### Android
+
+Add file provider path resource `file_provider_paths.xml` in `[your project]/android/app/src/main/res/xml/` folder. If the folder does not exist, create a new one.
+
+NOTE: this is a requirement for sdk 26
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-path name="shared" path="." />
+</paths>
+```
+
+Add permissions & configure file provider in AndroidManifest.xml:
+```xml
+<manifest ...>
+  ......
+
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+  <application ...>
+    ......
+
+    <provider
+      android:name="android.support.v4.content.FileProvider"
+      android:authorities="${applicationId}.fileprovider"
+      android:exported="false"
+      android:grantUriPermissions="true">
+      <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/file_provider_paths" />
+    </provider>
+
+  </application>
+</manifest>
+```
+
+#### 4. Import the webview into your component
 
 ```js
 import React, { Component } from 'react';
