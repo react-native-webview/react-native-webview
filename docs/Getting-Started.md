@@ -63,7 +63,6 @@ Add permissions & configure file provider in AndroidManifest.xml:
   ......
 
   <uses-permission android:name="android.permission.CAMERA" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
   <application ...>
     ......
