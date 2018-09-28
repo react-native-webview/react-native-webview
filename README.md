@@ -35,7 +35,7 @@ class MyWebComponent extends Component {
   render () {
     return (
       <WebView
-        src={{uri: "https://infinite.red/react-native"}}
+        source={{uri: "https://infinite.red/react-native"}}
         style={{marginTop: 20}}
       />
     )
