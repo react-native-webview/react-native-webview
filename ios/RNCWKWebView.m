@@ -9,7 +9,19 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 
+#import "objc/runtime.h"
+
 static NSString *const MessageHanderName = @"ReactNative";
+
+// runtime trick to remove WKWebView keyboard default toolbar
+// see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
+@interface _SwizzleHelperWK : NSObject @end
+@implementation _SwizzleHelperWK
+-(id)inputAccessoryView
+{
+  return nil;
+}
+@end
 
 @interface RNCWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
@@ -23,6 +35,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 @implementation RNCWKWebView
 {
   UIColor * _savedBackgroundColor;
+  BOOL _savedHideKeyboardAccessoryView;
 }
 
 - (void)dealloc
@@ -93,7 +106,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 #endif
 
     [self addSubview:_webView];
-
+    [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self visitSource];
   }
 }
@@ -180,6 +193,42 @@ static NSString *const MessageHanderName = @"ReactNative";
   [_webView loadRequest:request];
 }
 
+-(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
+{
+    
+    if (_webView == nil) {
+        _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
+        return;
+    }
+
+    if (_savedHideKeyboardAccessoryView == false) {
+        return;
+    }
+    
+    UIView* subview;
+    for (UIView* view in _webView.scrollView.subviews) {
+        if([[view.class description] hasPrefix:@"WK"])
+            subview = view;
+    }
+    
+    if(subview == nil) return;
+    
+    NSString* name = [NSString stringWithFormat:@"%@_SwizzleHelperWK", subview.class.superclass];
+    Class newClass = NSClassFromString(name);
+    
+    if(newClass == nil)
+    {
+        newClass = objc_allocateClassPair(subview.class, [name cStringUsingEncoding:NSASCIIStringEncoding], 0);
+        if(!newClass) return;
+        
+        Method method = class_getInstanceMethod([_SwizzleHelperWK class], @selector(inputAccessoryView));
+        class_addMethod(newClass, @selector(inputAccessoryView), method_getImplementation(method), method_getTypeEncoding(method));
+        
+        objc_registerClassPair(newClass);
+    }
+    
+    object_setClass(subview, newClass);
+}
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
