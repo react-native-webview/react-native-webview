@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
@@ -18,8 +19,10 @@ import android.webkit.WebChromeClient;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 
@@ -118,9 +121,9 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return null;
   }
 
-  public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> filePathCallback, final WebChromeClient.FileChooserParams fileChooserParams) {
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> filePathCallback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
     this.filePathCallback = filePathCallback;
-    final String[] acceptTypes = getSafeAcceptedTypes(fileChooserParams);
     final CharSequence[] items = getDialogItems(acceptTypes);
 
     android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getCurrentActivity());
@@ -146,7 +149,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
             } else if (items[item].equals(TAKE_VIDEO)) {
                 startCamera(MediaStore.ACTION_VIDEO_CAPTURE);
             } else if (items[item].equals(CHOOSE_FILE)) {
-                startFileChooser(fileChooserParams);
+                startFileChooser(intent, acceptTypes, allowMultiple);
             } else if (items[item].equals(CANCEL)) {
                 dialog.cancel();
             }
@@ -214,13 +217,9 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
   }
 
-  private void startFileChooser(WebChromeClient.FileChooserParams fileChooserParams) {
-    final String[] acceptTypes = getSafeAcceptedTypes(fileChooserParams);
-
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  private void startFileChooser(Intent intent, String[] acceptTypes, boolean allowMultiple) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        final boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
-
-        Intent intent = fileChooserParams.createIntent();
         intent.setType("*/*");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, getAcceptedMimeType(acceptTypes));
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple);
@@ -266,18 +265,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
         }
     }
     return false;
-  }
-
-  private String[] getSafeAcceptedTypes(WebChromeClient.FileChooserParams params) {
-
-    // the getAcceptTypes() is available only in api 21+
-    // for lower level, we ignore it
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        return params.getAcceptTypes();
-    }
-
-    final String[] EMPTY = {};
-    return EMPTY;
   }
 
   private String[] getAcceptedMimeType(String[] types) {
