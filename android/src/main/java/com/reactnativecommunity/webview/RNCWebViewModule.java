@@ -66,6 +66,15 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return "RNCWebView";
   }
 
+  @ReactMethod
+  public void isFileUploadSupported(final Promise promise) {
+      Boolean result = false;
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          result = true;
+      }
+      promise.resolve(result);
+  }
+
   public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 
     if (this.filePathCallback == null) {
