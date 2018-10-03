@@ -44,8 +44,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private Uri outputFileUri;
   private String intentTypeAfterPermissionGranted;
 
-  // @todo this could be configured from JS
-  final String[] DEFAULT_MIME_TYPES = {"image/*", "video/*", "audio/*"};
+  final String[] DEFAULT_MIME_TYPES = {"*/*"};
 
   // @todo these could be passed from JS
   final String TAKE_PHOTO = "Take a photo…";
