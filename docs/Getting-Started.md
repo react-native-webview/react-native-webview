@@ -81,6 +81,23 @@ Add permissions & configure file provider in AndroidManifest.xml:
 </manifest>
 ```
 
+##### Check for File Upload support, with `static isFileUploadSupported()`
+
+File Upload using `<input type="file" />` is not supported for Android versions lower than 5 (Lollipop):
+
+```
+import { WebView } from "react-native-webview";
+
+WebView.isFileUploadSupported().then(res => {
+  if (res === true) {
+    // file upload is supported
+  } else {
+    // not file upload support
+  }
+});
+
+```
+
 #### 4. Import the webview into your component
 
 ```js
