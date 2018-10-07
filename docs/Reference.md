@@ -41,6 +41,7 @@ This document lays out the current public properties and methods for the React N
 - [`useWebKit`](Reference.md#usewebkit)
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
+- [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 
 ## Methods Index
 
@@ -449,6 +450,16 @@ If true, use WKWebView instead of UIWebView.
 | Type   | Required |
 | ------ | -------- |
 | string | No       |
+
+---
+
+### `hideKeyboardAccessoryView`
+
+If true, this will hide the keyboard accessory view (< > and Done) when using the WKWebView.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ## Methods
 
