@@ -506,7 +506,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           view.loadDataWithBaseURL(
               source.getString("baseUrl"), html, HTML_MIME_TYPE, HTML_ENCODING, null);
         } else {
-          view.loadData(html, HTML_MIME_TYPE, HTML_ENCODING);
+          view.loadData(html, HTML_MIME_TYPE + "; charset=" + HTML_ENCODING, null);
         }
         return;
       }
