@@ -1,9 +1,12 @@
 {
   "name": "react-native-webview",
-  "description": "React Native WebView component for iOS, Android, and Windows 10",
+  "description": "React Native WebView component for iOS, Android, and Windows 10 (coming soon)",
   "main": "index.js",
   "author": "Jamon Holmgren <jamon@infinite.red>",
-  "version": "0.1.0",
+  "contributors": [
+    "Thibault Malbranche <malbranche.thibault@gmail.com>"
+  ],
+  "version": "2.0.0",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "flow": "flow check",
