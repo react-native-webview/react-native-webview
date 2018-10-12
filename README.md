@@ -8,9 +8,9 @@
 - [x] Android
 - [ ] Windows 10 (coming soon)
 
-## Versionning
+## Versioning
 
-If you need the exact same Webview as the one from react-native, please use version **2.0.0**.
+If you need the same Webview as the one from react-native, please use version **2.0.0**.
 
 _This package will then follow semver rules for the next releases._
 
