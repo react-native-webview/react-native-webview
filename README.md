@@ -10,9 +10,7 @@
 
 ## Versioning
 
-If you need the same Webview as the one from react-native, please use version **2.0.0**.
-
-_This package will then follow semver rules for the next releases._
+If you need the exact same WebView as the one from react-native, please use version **2.0.0**. Future versions will follow [semantic versioning](https://semver.org/).
 
 ## Getting Started
 
