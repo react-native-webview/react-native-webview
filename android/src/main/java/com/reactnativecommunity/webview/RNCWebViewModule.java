@@ -128,8 +128,8 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-  public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> filePathCallback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
-    this.filePathCallback = filePathCallback;
+  public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
+    filePathCallback = callback;
     final CharSequence[] items = getDialogItems(acceptTypes);
 
     android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getCurrentActivity());
