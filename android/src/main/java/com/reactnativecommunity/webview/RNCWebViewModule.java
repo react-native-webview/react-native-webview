@@ -195,13 +195,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
   }
 
-  private File createCapturedFile(String prefix, String suffix) throws IOException {
-    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-    String imageFileName = prefix + "_" + timeStamp;
-    File storageDir = getReactApplicationContext().getExternalFilesDir(null);
-    return File.createTempFile(imageFileName, suffix, storageDir);
-  }
-
   private CharSequence[] getDialogItems(String[] types) {
     List<String> listItems = new ArrayList<String>();
 
@@ -263,6 +256,13 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
         e.printStackTrace();
     }
     return FileProvider.getUriForFile(getReactApplicationContext(), packageName+".fileprovider", capturedFile);
+  }
+
+  private File createCapturedFile(String prefix, String suffix) throws IOException {
+    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+    String imageFileName = prefix + "_" + timeStamp;
+    File storageDir = getReactApplicationContext().getExternalFilesDir(null);
+    return File.createTempFile(imageFileName, suffix, storageDir);
   }
 
   private Boolean isArrayEmpty(String[] arr) {
