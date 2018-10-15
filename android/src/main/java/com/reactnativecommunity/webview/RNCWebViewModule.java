@@ -23,8 +23,6 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.modules.core.PermissionAwareActivity;
-import com.facebook.react.modules.core.PermissionListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +43,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private ValueCallback<Uri[]> filePathCallback;
   private Uri outputFileUri;
-  private String intentTypeAfterPermissionGranted;
 
   final String[] DEFAULT_MIME_TYPES = {"*/*"};
 
@@ -177,53 +174,15 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     this.aPackage = aPackage;
   }
 
-  private PermissionListener listener = new PermissionListener() {
-    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CAMERA: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startCamera(intentTypeAfterPermissionGranted);
-                    break;
-                }
-                else {
-                    filePathCallback.onReceiveValue(null);
-                    break;
-                }
-            }
-        }
-        return false;
-    }
-  };
-
-  @TargetApi(Build.VERSION_CODES.M)
-  private void requestPermissions() {
-    if (getCurrentActivity() instanceof ReactActivity) {
-        ((ReactActivity) getCurrentActivity()).requestPermissions(new String[]{ Manifest.permission.CAMERA}, REQUEST_CAMERA, listener);
-    }
-    else {
-        ((PermissionAwareActivity) getCurrentActivity()).requestPermissions(new String[]{ Manifest.permission.CAMERA}, REQUEST_CAMERA, listener);
-    }
-  }
-
-  @TargetApi(Build.VERSION_CODES.M)
-  private boolean permissionsGranted() {
-    return ActivityCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-  }
-
   private void startCamera(String intentType) {
-    if (permissionsGranted()) {
-        // bring up a camera picker intent
-        // we need to pass a filename for the file to be saved to
-        Intent intent = new Intent(intentType);
+    // bring up a camera picker intent
+    // we need to pass a filename for the file to be saved to
+    Intent intent = new Intent(intentType);
 
-        // Create the File where the photo should go
-        outputFileUri = getOutputFilename(intentType);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-        getCurrentActivity().startActivityForResult(intent, REQUEST_CAMERA);
-    } else {
-        intentTypeAfterPermissionGranted = intentType;
-        requestPermissions();
-    }
+    // Create the File where the photo should go
+    outputFileUri = getOutputFilename(intentType);
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+    getCurrentActivity().startActivityForResult(intent, REQUEST_CAMERA);
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
