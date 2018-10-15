@@ -33,6 +33,7 @@ This document lays out the current public properties and methods for the React N
 - [`userAgent`](Reference.md#useragent)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
 - [`bounces`](Reference.md#bounces)
+- [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
@@ -44,11 +45,11 @@ This document lays out the current public properties and methods for the React N
 
 ## Methods Index
 
-* [`extraNativeComponentConfig`](Reference.md#extranativecomponentconfig)
-* [`goForward`](Reference.md#goforward)
-* [`goBack`](Reference.md#goback)
-* [`reload`](Reference.md#reload)
-* [`stopLoading`](Reference.md#stoploading)
+- [`extraNativeComponentConfig`](Reference.md#extranativecomponentconfig)
+- [`goForward`](Reference.md#goforward)
+- [`goBack`](Reference.md#goback)
+- [`reload`](Reference.md#reload)
+- [`stopLoading`](Reference.md#stoploading)
 
 ---
 
@@ -64,17 +65,17 @@ The object passed to `source` can have either of the following shapes:
 
 **Load uri**
 
-* `uri` (string) - The URI to load in the `WebView`. Can be a local or remote file.
-* `method` (string) - The HTTP Method to use. Defaults to GET if not specified. On Android, the only supported methods are GET and POST.
-* `headers` (object) - Additional HTTP headers to send with the request. On Android, this can only be used with GET requests.
-* `body` (string) - The HTTP body to send with the request. This must be a valid UTF-8 string, and will be sent exactly as specified, with no additional encoding (e.g. URL-escaping or base64) applied. On Android, this can only be used with POST requests.
+- `uri` (string) - The URI to load in the `WebView`. Can be a local or remote file.
+- `method` (string) - The HTTP Method to use. Defaults to GET if not specified. On Android, the only supported methods are GET and POST.
+- `headers` (object) - Additional HTTP headers to send with the request. On Android, this can only be used with GET requests.
+- `body` (string) - The HTTP body to send with the request. This must be a valid UTF-8 string, and will be sent exactly as specified, with no additional encoding (e.g. URL-escaping or base64) applied. On Android, this can only be used with POST requests.
 
 **Static HTML**
 
 _Note that using static HTML requires the WebView property [originWhiteList](Reference.md#originWhiteList) to `['*']`._
 
-* `html` (string) - A static HTML page to display in the WebView.
-* `baseUrl` (string) - The base URL to be used for any relative links in the HTML.
+- `html` (string) - A static HTML page to display in the WebView.
+- `baseUrl` (string) - The base URL to be used for any relative links in the HTML.
 
 | Type   | Required |
 | ------ | -------- |
@@ -128,9 +129,9 @@ Override the native component used to render the WebView. Enables a custom nativ
 
 The `nativeConfig` prop expects an object with the following keys:
 
-* `component` (any)
-* `props` (object)
-* `viewManager` (object)
+- `component` (any)
+- `props` (object)
+- `viewManager` (object)
 
 | Type   | Required |
 | ------ | -------- |
@@ -266,8 +267,8 @@ Boolean value that forces the `WebView` to show the loading view on the first lo
 
 A floating-point number that determines how quickly the scroll view decelerates after the user lifts their finger. You may also use the string shortcuts `"normal"` and `"fast"` which match the underlying iOS settings for `UIScrollViewDecelerationRateNormal` and `UIScrollViewDecelerationRateFast` respectively:
 
-* normal: 0.998
-* fast: 0.99 (the default for iOS web view)
+- normal: 0.998
+- fast: 0.99 (the default for iOS web view)
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
@@ -301,9 +302,9 @@ Specifies the mixed content mode. i.e WebView will allow a secure origin to load
 
 Possible values for `mixedContentMode` are:
 
-* `never` (default) - WebView will not allow a secure origin to load content from an insecure origin.
-* `always` - WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
-* `compatibility` - WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
+- `never` (default) - WebView will not allow a secure origin to load content from an insecure origin.
+- `always` - WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
+- `compatibility` - WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
@@ -355,6 +356,22 @@ Boolean value that determines whether the web view bounces when it reaches the e
 
 ---
 
+### `overScrollMode`
+
+Specifies the over scroll mode.
+
+Possible values for `overScrollMode` are:
+
+- `always` (default) - Always allow a user to over-scroll this view, provided it is a view that can scroll.
+- `content` - Allow a user to over-scroll this view only if the content is large enough to meaningfully scroll, provided it is a view that can scroll.
+- `never` - Never allow a user to over-scroll this view.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
+
+---
+
 ### `contentInset`
 
 The amount by which the web view content is inset from the edges of the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
@@ -373,18 +390,18 @@ You can provide one type or an array of many types.
 
 Possible values for `dataDetectorTypes` are:
 
-* `phoneNumber`
-* `link`
-* `address`
-* `calendarEvent`
-* `none`
-* `all`
+- `phoneNumber`
+- `link`
+- `address`
+- `calendarEvent`
+- `none`
+- `all`
 
 With the [new WebKit](Reference.md#usewebkit) implementation, we have three new values:
 
-* `trackingNumber`
-* `flightNumber`
-* `lookupSuggestion`
+- `trackingNumber`
+- `flightNumber`
+- `lookupSuggestion`
 
 | Type             | Required | Platform |
 | ---------------- | -------- | -------- |
