@@ -462,6 +462,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       default:
         overScrollMode = View.OVER_SCROLL_ALWAYS;
         break;
+    }
     view.setOverScrollMode(overScrollMode);
   }
 
