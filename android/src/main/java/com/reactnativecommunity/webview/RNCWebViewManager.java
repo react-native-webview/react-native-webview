@@ -409,14 +409,23 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         callback.invoke(origin, true, false);
       }
 
+      protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
+        getModule().startPhotoPickerIntentLegacy(filePathCallback, acceptType);
+      }
+      protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
+        getModule().startPhotoPickerIntentLegacy(filePathCallback, null);
+      }
+      protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
+        getModule().startPhotoPickerIntentLegacy(filePathCallback, acceptType);
+      }
+
+      @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+      @Override
       public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          String[] acceptTypes = fileChooserParams.getAcceptTypes();
-          boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
-          Intent intent = fileChooserParams.createIntent();
-          return getModule().startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
-        }
-        return false;
+        String[] acceptTypes = fileChooserParams.getAcceptTypes();
+        boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
+        Intent intent = fileChooserParams.createIntent();
+        return getModule().startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
       }
     });
     reactContext.addLifecycleEventListener(webView);
