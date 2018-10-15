@@ -8,11 +8,7 @@
  * @flow
  */
 
-'use strict';
-
 import React from 'react';
-
-import ReactNative from 'react-native'
 import {
   ActivityIndicator,
   Linking,
@@ -22,7 +18,8 @@ import {
   View,
   requireNativeComponent,
   NativeModules,
-  Image
+  Image,
+  findNodeHandle,
 } from 'react-native';
 
 import invariant from 'fbjs/lib/invariant';
@@ -137,7 +134,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   state = {
-    viewState: this.props.startInLoadingState ? WebViewState.LOADING : WebViewState.IDLE,
+    viewState: this.props.startInLoadingState
+      ? WebViewState.LOADING
+      : WebViewState.IDLE,
     lastErrorEvent: null,
   };
 
@@ -204,7 +203,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       'about:blank',
       ...(this.props.originWhitelist || []),
     ].map(WebViewShared.originWhitelistToRegex);
-    const onShouldStartLoadWithRequest = (event) => {
+    const onShouldStartLoadWithRequest = event => {
       let shouldStart = true;
       const { url } = event.nativeEvent;
       const origin = WebViewShared.extractOrigin(url);
@@ -386,7 +385,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
    * Returns the native `WebView` node.
    */
   getWebViewHandle = () => {
-    return ReactNative.findNodeHandle(this.webViewRef.current);
+    return findNodeHandle(this.webViewRef.current);
   };
 
   _onLoadingStart = (event: WebViewNavigationEvent) => {

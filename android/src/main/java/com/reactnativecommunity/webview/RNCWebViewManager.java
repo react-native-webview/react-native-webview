@@ -524,7 +524,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           view.loadDataWithBaseURL(
               source.getString("baseUrl"), html, HTML_MIME_TYPE, HTML_ENCODING, null);
         } else {
-          view.loadData(html, HTML_MIME_TYPE, HTML_ENCODING);
+          view.loadData(html, HTML_MIME_TYPE + "; charset=" + HTML_ENCODING, null);
         }
         return;
       }
@@ -536,7 +536,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         }
         if (source.hasKey("method")) {
           String method = source.getString("method");
-          if (method.equals(HTTP_METHOD_POST)) {
+          if (method.equalsIgnoreCase(HTTP_METHOD_POST)) {
             byte[] postData = null;
             if (source.hasKey("body")) {
               String body = source.getString("body");

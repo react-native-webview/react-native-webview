@@ -99,6 +99,8 @@ static NSString *const MessageHanderName = @"ReactNative";
     [self addSubview:_webView];
 
     [self visitSource];
+  } else {
+    [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
   }
 }
 
