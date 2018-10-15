@@ -180,7 +180,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     Intent intent = new Intent(intentType);
 
     // Create the File where the photo should go
-    outputFileUri = getOutputFilename(intentType);
+    outputFileUri = getOutputUri(intentType);
     intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
     getCurrentActivity().startActivityForResult(intent, REQUEST_CAMERA);
   }
@@ -236,7 +236,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return types;
   }
 
-  private Uri getOutputFilename(String intentType) {
+  private Uri getOutputUri(String intentType) {
     String prefix = "";
     String suffix = "";
 
