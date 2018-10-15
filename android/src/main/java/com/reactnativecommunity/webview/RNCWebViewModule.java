@@ -44,7 +44,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private ValueCallback<Uri[]> filePathCallback;
   private Uri outputFileUri;
 
-  final String[] DEFAULT_MIME_TYPES = {"*/*"};
+  final String DEFAULT_MIME_TYPES = "*/*";
 
   // @todo these could be passed from JS
   final String TAKE_PHOTO = "Take a photo…";
@@ -230,7 +230,8 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private String[] getAcceptedMimeType(String[] types) {
     if (isArrayEmpty(types)) {
-        return DEFAULT_MIME_TYPES;
+        String[] defaultTypes = {DEFAULT_MIME_TYPES};
+        return defaultTypes;
     }
     return types;
   }
