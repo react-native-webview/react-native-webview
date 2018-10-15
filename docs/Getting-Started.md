@@ -62,7 +62,9 @@ Add permissions & configure file provider in AndroidManifest.xml:
 <manifest ...>
   ......
 
-  <uses-permission android:name="android.permission.CAMERA" />
+  <!-- this is required only for Android 4.1-4.3 -->
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
   <application ...>
     ......
@@ -83,7 +85,7 @@ Add permissions & configure file provider in AndroidManifest.xml:
 
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
-File Upload using `<input type="file" />` is not supported for Android versions lower than 5 (Lollipop):
+File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
 
 ```
 import { WebView } from "react-native-webview";
