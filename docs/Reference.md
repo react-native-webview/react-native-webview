@@ -186,6 +186,7 @@ Function that is invoked when the `WebView` is loading.
 > **_Note_**
 >
 > On iOS, when useWebKit=false, this prop will not work.
+> On android, You can't get the url property, that is `event.nativeEvent.url` is null.
 
 | Type     | Required |
 | -------- | -------- |
