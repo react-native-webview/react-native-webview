@@ -75,7 +75,8 @@ import org.json.JSONObject;
  * {@link WebView} instances could emit following direct events:
  *  - topLoadingFinish
  *  - topLoadingStart
- *  - topLoadingError
+ *  - topLoadingStart
+ *  - topLoadingProgress
  *
  * Each event will carry the following properties:
  *  - target - view's react tag

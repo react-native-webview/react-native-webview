@@ -4,9 +4,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
-/**
- * Created by macbook on 2018/9/19.
- */
 public class TopLoadingProgressEvent extends Event<TopLoadingProgressEvent> {
     public static final String EVENT_NAME = "topLoadingProgress";
     private WritableMap mEventData;
