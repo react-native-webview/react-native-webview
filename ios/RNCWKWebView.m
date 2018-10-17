@@ -64,9 +64,9 @@ static NSString *const MessageHanderName = @"ReactNative";
 - (void)didMoveToWindow
 {
   if (self.window != nil) {
-    if (![[self class] dynamicallyLoadWebKitIfAvailable]) {
-      return;
-    };
+      if (![[self class] dynamicallyLoadWebKitIfAvailable] || _webView != nil) {
+          return;
+      };
 
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     wkWebViewConfig.userContentController = [WKUserContentController new];
