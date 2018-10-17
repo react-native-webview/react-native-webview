@@ -24,6 +24,19 @@ jobs:
           paths:
             - node_modules
 
+  tests:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore node modules
+          keys:
+            - node_modules-{{ arch }}-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Run Tests
+          command: yarn ci:test
+
   publish:
     <<: *defaults
     steps:
@@ -42,9 +55,12 @@ workflows:
   ci:
     jobs:
       - setup
-      - publish:
+      - tests:
           requires:
             - setup
+      - publish:
+          requires:
+            - tests
           filters:
             branches:
               only: master
