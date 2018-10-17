@@ -27,6 +27,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
+@property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) WKWebView *webView;
@@ -40,7 +41,9 @@ static NSString *const MessageHanderName = @"ReactNative";
 
 - (void)dealloc
 {
-
+    if(_webView){
+        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+    }
 }
 
 /**
@@ -98,6 +101,7 @@ static NSString *const MessageHanderName = @"ReactNative";
     _webView.navigationDelegate = self;
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.bounces = _bounces;
+    [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
@@ -108,7 +112,21 @@ static NSString *const MessageHanderName = @"ReactNative";
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self visitSource];
+  } else {
+    [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
   }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
+    if ([keyPath isEqual:@"estimatedProgress"] && object == self.webView) {
+        if(_onLoadingProgress){
+             NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+            [event addEntriesFromDictionary:@{@"progress":[NSNumber numberWithDouble:self.webView.estimatedProgress]}];
+            _onLoadingProgress(event);
+        }
+    }else{
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor
