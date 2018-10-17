@@ -13,7 +13,7 @@
     "flow-android": "yarn flow check --flowconfig-name .flowconfig.android",
     "ci:publish": "yarn semantic-release",
     "ci:test": "yarn ci:test:flow",
-    "ci:test:flow": "yarn flow && yarn flow check --flowconfig-name .flowconfig.android",
+    "ci:test:flow": "yarn flow  && yarn flow-android",
     "semantic-release": "semantic-release"
   },
   "peerDependencies": {
