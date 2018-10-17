@@ -80,8 +80,8 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
         if (resultCode != RESULT_OK) {
             filePathCallback.onReceiveValue(null);
         } else {
-            if (data != null) {
-                Uri result[] = this.getSelectedFiles(data, resultCode);
+            Uri result[] = this.getSelectedFiles(data, resultCode);
+            if (result != null) {
                 filePathCallback.onReceiveValue(result);
             } else {
                 filePathCallback.onReceiveValue(new Uri[] { outputFileUri });
@@ -103,6 +103,10 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   private Uri[] getSelectedFiles(Intent data, int resultCode) {
+    if (data == null) {
+        return null;
+    }
+
     // we have one file selected
     if (data.getData() != null) {
         if (resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -112,6 +116,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
             return null;
         }
     }
+
     // we have multiple files selected
     if (data.getClipData() != null) {
         final int numSelectedFiles = data.getClipData().getItemCount();
