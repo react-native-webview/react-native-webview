@@ -9,11 +9,11 @@
   "version": "0.0.0-development",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
-    "flow": "yarn flow check",
-    "flow-android": "yarn flow check --flowconfig-name .flowconfig.android",
+    "test:ios:flow": "flow check",
+    "test:android:flow": "flow check --flowconfig-name .flowconfig.android",
     "ci:publish": "yarn semantic-release",
     "ci:test": "yarn ci:test:flow",
-    "ci:test:flow": "yarn flow  && yarn flow-android",
+    "ci:test:flow": "yarn test:ios:flow && yarn test:android:flow",
     "semantic-release": "semantic-release"
   },
   "peerDependencies": {
