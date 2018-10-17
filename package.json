@@ -6,11 +6,15 @@
   "contributors": [
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
-  "version": "2.0.0",
+  "version": "0.0.0-development",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
-    "flow": "flow check",
-    "flow-android": "flow check --flowconfig-name .flowconfig.android"
+    "test:ios:flow": "flow check",
+    "test:android:flow": "flow check --flowconfig-name .flowconfig.android",
+    "ci:publish": "yarn semantic-release",
+    "ci:test": "yarn ci:test:flow",
+    "ci:test:flow": "yarn test:ios:flow && yarn test:android:flow",
+    "semantic-release": "semantic-release"
   },
   "peerDependencies": {
     "react": "^16.0",
@@ -22,6 +26,11 @@
   },
   "devDependencies": {
     "flow-bin": "^0.80.0",
-    "react-native": "^0.57"
+    "react-native": "^0.57",
+    "semantic-release": "^15.9.17"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/react-native-community/react-native-webview.git"
   }
 }
