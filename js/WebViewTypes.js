@@ -219,6 +219,11 @@ export type IOSWebViewProps = $ReadOnly<{|
    * @platform ios
    */
   allowsInlineMediaPlayback?: ?boolean,
+  /**
+   * Hide the accessory view when the keyboard is open. Default is false to be
+   * backward compatible.
+   */
+  hideKeyboardAccessoryView?: ?boolean,
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|
