@@ -37,6 +37,7 @@ class MyWebComponent extends Component {
       <WebView
         source={{ uri: 'https://infinite.red/react-native' }}
         style={{ marginTop: 20 }}
+        onLoadProgress={e=>console.log(e.nativeEvent.progress)}
       />
     );
   }
