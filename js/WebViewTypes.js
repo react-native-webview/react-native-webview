@@ -25,6 +25,11 @@ export type WebViewNativeEvent = $ReadOnly<{|
   canGoForward: boolean,
 |}>;
 
+export type WebViewProgressEvent = $ReadOnly<{|
+    ...WebViewNativeEvent,
+    progress: number,
+|}>
+
 export type WebViewNavigation = $ReadOnly<{|
   ...WebViewNativeEvent,
   navigationType:
@@ -69,6 +74,8 @@ export type DataDetectorTypes =
   | 'lookupSuggestion'
   | 'none'
   | 'all';
+
+export type OverScrollModeType = 'always' | 'content' | 'never';
 
 export type WebViewSourceUri = $ReadOnly<{|
   /**
@@ -212,11 +219,28 @@ export type IOSWebViewProps = $ReadOnly<{|
    * @platform ios
    */
   allowsInlineMediaPlayback?: ?boolean,
+  /**
+   * Hide the accessory view when the keyboard is open. Default is false to be
+   * backward compatible.
+   */
+  hideKeyboardAccessoryView?: ?boolean,
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|
   onNavigationStateChange?: (event: WebViewNavigation) => mixed,
   onContentSizeChange?: (event: WebViewEvent) => mixed,
+
+  /**
+   * https://developer.android.com/reference/android/view/View#OVER_SCROLL_NEVER
+   * Sets the overScrollMode. Possible values are:
+   *
+   * - `'always'` (default)
+   * - `'content'`
+   * - `'never'`
+   *
+   * @platform android
+   */
+  overScrollMode?: ?OverScrollModeType,
 
   /**
    * Sets whether Geolocation is enabled. The default is false.
@@ -364,6 +388,11 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * must be a string.
    */
   onMessage?: (event: WebViewMessageEvent) => mixed,
+
+  /**
+   * Function that is invoked when the `WebView` is loading.
+   */
+  onLoadProgress?: (event: WebViewProgressEvent) => mixed,
 
   /**
    * Boolean value that forces the `WebView` to show the loading view

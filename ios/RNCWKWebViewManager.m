@@ -33,6 +33,7 @@ RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingStart, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingFinish, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingError, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onLoadingProgress, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onShouldStartLoadWithRequest, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(injectedJavaScript, NSString)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
@@ -42,6 +43,7 @@ RCT_EXPORT_VIEW_PROPERTY(dataDetectorTypes, WKDataDetectorTypes)
 #endif
 RCT_EXPORT_VIEW_PROPERTY(contentInset, UIEdgeInsets)
 RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustContentInsets, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
 
 /**
  * Expose methods to enable messaging the webview.
