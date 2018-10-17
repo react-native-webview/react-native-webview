@@ -11,6 +11,7 @@
   "scripts": {
     "flow": "flow check",
     "flow-android": "flow check --flowconfig-name .flowconfig.android",
+    "ci:publish": "yarn semantic-release",
     "semantic-release": "semantic-release"
   },
   "peerDependencies": {

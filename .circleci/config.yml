@@ -1,0 +1,50 @@
+defaults: &defaults
+  working_directory: ~/code
+  docker:
+    - image: circleci/node:10.6.0-browsers
+
+version: 2
+jobs:
+  setup:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore node modules
+          keys:
+            - node_modules-{{ arch }}-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Install dependencies
+          command: yarn --pure-lockfile
+
+      - save_cache:
+          name: Save node modules
+          key: node_modules-{{ arch }}-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+
+  publish:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore node modules
+          keys:
+            - node_modules-{{ arch }}-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Publish to NPM
+          command: yarn ci:publish
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - setup
+      - publish:
+          requires:
+            - setup
+          filters:
+            branches:
+              only: master
