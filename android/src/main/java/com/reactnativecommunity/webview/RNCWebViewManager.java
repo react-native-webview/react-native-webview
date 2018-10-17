@@ -22,6 +22,7 @@ import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
@@ -464,6 +465,24 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "overScrollMode")
+  public void setOverScrollMode(WebView view, String overScrollModeString) {
+    Integer overScrollMode;
+    switch (overScrollModeString) {
+      case "never":
+        overScrollMode = View.OVER_SCROLL_NEVER;
+        break;
+      case "content":
+        overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS;
+        break;
+      case "always":
+      default:
+        overScrollMode = View.OVER_SCROLL_ALWAYS;
+        break;
+    }
+    view.setOverScrollMode(overScrollMode);
   }
 
   @ReactProp(name = "thirdPartyCookiesEnabled")

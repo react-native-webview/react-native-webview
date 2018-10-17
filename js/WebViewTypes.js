@@ -75,6 +75,8 @@ export type DataDetectorTypes =
   | 'none'
   | 'all';
 
+export type OverScrollModeType = 'always' | 'content' | 'never';
+
 export type WebViewSourceUri = $ReadOnly<{|
   /**
    * The URI to load in the `WebView`. Can be a local or remote file.
@@ -222,6 +224,18 @@ export type IOSWebViewProps = $ReadOnly<{|
 export type AndroidWebViewProps = $ReadOnly<{|
   onNavigationStateChange?: (event: WebViewNavigation) => mixed,
   onContentSizeChange?: (event: WebViewEvent) => mixed,
+
+  /**
+   * https://developer.android.com/reference/android/view/View#OVER_SCROLL_NEVER
+   * Sets the overScrollMode. Possible values are:
+   *
+   * - `'always'` (default)
+   * - `'content'`
+   * - `'never'`
+   *
+   * @platform android
+   */
+  overScrollMode?: ?OverScrollModeType,
 
   /**
    * Sets whether Geolocation is enabled. The default is false.

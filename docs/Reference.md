@@ -34,6 +34,7 @@ This document lays out the current public properties and methods for the React N
 - [`userAgent`](Reference.md#useragent)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
 - [`bounces`](Reference.md#bounces)
+- [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
@@ -368,6 +369,22 @@ Boolean value that determines whether the web view bounces when it reaches the e
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | iOS      |
+
+---
+
+### `overScrollMode`
+
+Specifies the over scroll mode.
+
+Possible values for `overScrollMode` are:
+
+- `always` (default) - Always allow a user to over-scroll this view, provided it is a view that can scroll.
+- `content` - Allow a user to over-scroll this view only if the content is large enough to meaningfully scroll, provided it is a view that can scroll.
+- `never` - Never allow a user to over-scroll this view.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
 
 ---
 
