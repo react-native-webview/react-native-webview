@@ -70,7 +70,7 @@ Add permissions & configure file provider in AndroidManifest.xml:
     ......
 
     <provider
-      android:name="android.support.v4.content.FileProvider"
+      android:name="com.reactnativecommunity.webview.RNCWebViewFileProvider"
       android:authorities="${applicationId}.fileprovider"
       android:exported="false"
       android:grantUriPermissions="true">
