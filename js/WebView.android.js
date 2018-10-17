@@ -35,6 +35,7 @@ import type {
   WebViewNavigationEvent,
   WebViewSharedProps,
   WebViewSource,
+  WebViewProgressEvent,
 } from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
@@ -152,6 +153,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         onLoadingStart={this.onLoadingStart}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingError={this.onLoadingError}
+        onLoadingProgress={this.onLoadingProgress}
         testID={this.props.testID}
         geolocationEnabled={this.props.geolocationEnabled}
         mediaPlaybackRequiresUserAction={
@@ -280,6 +282,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };
+  
+  onLoadingProgress = (event: WebViewProgressEvent) => {
+    const { onLoadProgress} = this.props;
+    onLoadProgress && onLoadProgress(event);
+  }
 }
 
 const RNCWebView = requireNativeComponent('RNCWebView');

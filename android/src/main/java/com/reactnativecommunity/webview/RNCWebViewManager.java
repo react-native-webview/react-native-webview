@@ -54,6 +54,7 @@ import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
+import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +75,8 @@ import org.json.JSONObject;
  * {@link WebView} instances could emit following direct events:
  *  - topLoadingFinish
  *  - topLoadingStart
- *  - topLoadingError
+ *  - topLoadingStart
+ *  - topLoadingProgress
  *
  * Each event will carry the following properties:
  *  - target - view's react tag
@@ -409,6 +411,23 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         return true;
       }
 
+
+    @Override
+    public void onProgressChanged(WebView webView, int newProgress) {
+        super.onProgressChanged(webView, newProgress);
+        WritableMap event = Arguments.createMap();
+        event.putDouble("target", webView.getId());
+        event.putString("title", webView.getTitle());
+        event.putBoolean("canGoBack", webView.canGoBack());
+        event.putBoolean("canGoForward", webView.canGoForward());
+        event.putDouble("progress", (float)newProgress/100);
+        dispatchEvent(
+                  webView,
+                  new TopLoadingProgressEvent(
+                      webView.getId(),
+                      event));
+    }
+
       @Override
       public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
         callback.invoke(origin, true, false);
@@ -621,6 +640,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
     view.setWebViewClient(new RNCWebViewClient());
+  }
+
+  @Override
+  public Map getExportedCustomDirectEventTypeConstants() {
+    MapBuilder.Builder builder = MapBuilder.builder();
+    builder.put("topLoadingProgress", MapBuilder.of("registrationName", "onLoadingProgress"));
+    return builder.build();
   }
 
   @Override
