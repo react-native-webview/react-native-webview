@@ -34,6 +34,7 @@ This document lays out the current public properties and methods for the React N
 - [`userAgent`](Reference.md#useragent)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
 - [`bounces`](Reference.md#bounces)
+- [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
@@ -42,6 +43,7 @@ This document lays out the current public properties and methods for the React N
 - [`useWebKit`](Reference.md#usewebkit)
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
+- [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 
 ## Methods Index
 
@@ -371,6 +373,22 @@ Boolean value that determines whether the web view bounces when it reaches the e
 
 ---
 
+### `overScrollMode`
+
+Specifies the over scroll mode.
+
+Possible values for `overScrollMode` are:
+
+- `always` (default) - Always allow a user to over-scroll this view, provided it is a view that can scroll.
+- `content` - Allow a user to over-scroll this view only if the content is large enough to meaningfully scroll, provided it is a view that can scroll.
+- `never` - Never allow a user to over-scroll this view.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
+
+---
+
 ### `contentInset`
 
 The amount by which the web view content is inset from the edges of the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
@@ -465,6 +483,16 @@ If true, use WKWebView instead of UIWebView.
 | Type   | Required |
 | ------ | -------- |
 | string | No       |
+
+---
+
+### `hideKeyboardAccessoryView`
+
+If true, this will hide the keyboard accessory view (< > and Done) when using the WKWebView.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ## Methods
 
