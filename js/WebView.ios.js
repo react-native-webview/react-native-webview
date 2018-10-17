@@ -261,6 +261,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
+        hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
         onLoadingError={this._onLoadingError}
