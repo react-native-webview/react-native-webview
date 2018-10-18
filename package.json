@@ -26,6 +26,7 @@
     "fbjs": "^0.8.17"
   },
   "devDependencies": {
+    "@semantic-release/git": "7.0.5",
     "flow-bin": "^0.80.0",
     "react-native": "^0.57",
     "semantic-release": "15.10.3"
