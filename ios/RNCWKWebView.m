@@ -79,7 +79,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 
 - (void)didMoveToWindow
 {
-  if (self.window != nil) {
+  if (self.window != nil && _webView == nil) {
     if (![[self class] dynamicallyLoadWebKitIfAvailable]) {
       return;
     };
