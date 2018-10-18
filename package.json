@@ -28,7 +28,7 @@
   "devDependencies": {
     "flow-bin": "^0.80.0",
     "react-native": "^0.57",
-    "semantic-release": "^15.9.17"
+    "semantic-release": "15.10.3"
   },
   "repository": {
     "type": "git",
