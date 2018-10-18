@@ -7,7 +7,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "0.0.0-development",
+  "version": "2.4.3",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "test:ios:flow": "flow check",
