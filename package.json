@@ -6,6 +6,7 @@
   "contributors": [
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
+  "license": "MIT",
   "version": "0.0.0-development",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
