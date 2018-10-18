@@ -224,6 +224,11 @@ export type IOSWebViewProps = $ReadOnly<{|
    * backward compatible.
    */
   hideKeyboardAccessoryView?: ?boolean,
+  /**
+   * A Boolean value indicating whether horizontal swipe gestures will trigger
+   * back-forward list navigations.
+   */
+  allowsBackForwardNavigationGestures?: ?boolean,
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|
