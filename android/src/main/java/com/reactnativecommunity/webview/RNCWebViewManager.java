@@ -359,12 +359,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           });
         }
 
-        evaluateJavascriptWithFallback("(" +
-          "window.originalPostMessage = window.postMessage," +
-          "window.postMessage = function(data) {" +
-            BRIDGE_NAME + ".postMessage(String(data));" +
-          "}" +
-        ")");
+        // evaluateJavascriptWithFallback("(" +
+        //   "window.originalPostMessage = window.postMessage," +
+        //   "window.postMessage = function(data) {" +
+        //     BRIDGE_NAME + ".postMessage(String(data));" +
+        //   "}" +
+        // ")");
       }
     }
 
