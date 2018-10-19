@@ -9,7 +9,6 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -22,9 +21,7 @@ import com.facebook.react.bridge.ReactMethod;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -138,11 +135,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       }
 
       final Intent capturePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-      outputFileUri = getOutputUriLegacy(MediaStore.ACTION_IMAGE_CAPTURE);
+      outputFileUri = getOutputUri(MediaStore.ACTION_IMAGE_CAPTURE);
       capturePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
       final Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-      Uri outputVideoUri = getOutputUriLegacy(MediaStore.ACTION_VIDEO_CAPTURE);
+      Uri outputVideoUri = getOutputUri(MediaStore.ACTION_VIDEO_CAPTURE);
       takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputVideoUri);
 
       Intent fileChooserIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -249,51 +246,38 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return types;
   }
 
-  private Uri getOutputUriLegacy(String intentType) {
-      String prefix = "";
-      String suffix = "";
-
-      if (intentType == MediaStore.ACTION_IMAGE_CAPTURE) {
-          prefix = "image-";
-          suffix = ".jpg";
-      } else if (intentType == MediaStore.ACTION_VIDEO_CAPTURE) {
-          prefix = "video-";
-          suffix = ".mp4";
-      }
-
-      File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-      File file = new File(storageDir, prefix + String.valueOf(System.currentTimeMillis()) + suffix);
-      return Uri.fromFile(file);
-  }
-
   private Uri getOutputUri(String intentType) {
-    String prefix = "";
-    String suffix = "";
-
-    if (intentType == MediaStore.ACTION_IMAGE_CAPTURE) {
-        prefix = "image-";
-        suffix = ".jpg";
-    } else if (intentType == MediaStore.ACTION_VIDEO_CAPTURE) {
-        prefix = "video-";
-        suffix = ".mp4";
-    }
-
-    String packageName = getReactApplicationContext().getPackageName();
     File capturedFile = null;
     try {
-        capturedFile = createCapturedFile(prefix, suffix);
+        capturedFile = getCapturedFile(intentType);
     } catch (IOException e) {
         Log.e("CREATE FILE", "Error occurred while creating the File", e);
         e.printStackTrace();
     }
-    return FileProvider.getUriForFile(getReactApplicationContext(), packageName+".fileprovider", capturedFile);
+    return Uri.fromFile(capturedFile);
   }
 
-  private File createCapturedFile(String prefix, String suffix) throws IOException {
-    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-    String imageFileName = prefix + "_" + timeStamp;
-    File storageDir = getReactApplicationContext().getExternalFilesDir(null);
-    return File.createTempFile(imageFileName, suffix, storageDir);
+  private File getCapturedFile(String intentType) throws IOException {
+    String prefix = "";
+    String suffix = "";
+    String dir = "";
+
+    if (intentType == MediaStore.ACTION_IMAGE_CAPTURE) {
+      prefix = "image-";
+      suffix = ".jpg";
+      dir = Environment.DIRECTORY_PICTURES;
+    } else if (intentType == MediaStore.ACTION_VIDEO_CAPTURE) {
+      prefix = "video-";
+      suffix = ".mp4";
+      dir = Environment.DIRECTORY_MOVIES;
+    }
+
+    // only this Directory works on all tested Android versions
+    // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
+    File storageDir = Environment.getExternalStoragePublicDirectory(dir);
+    File file = new File(storageDir, prefix + String.valueOf(System.currentTimeMillis()) + suffix);
+
+    return file;
   }
 
   private Boolean isArrayEmpty(String[] arr) {
