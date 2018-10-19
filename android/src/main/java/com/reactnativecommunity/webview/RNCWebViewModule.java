@@ -264,11 +264,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     String suffix = "";
     String dir = "";
 
-    if (intentType == MediaStore.ACTION_IMAGE_CAPTURE) {
+    if (intentType.equals(MediaStore.ACTION_IMAGE_CAPTURE)) {
       prefix = "image-";
       suffix = ".jpg";
       dir = Environment.DIRECTORY_PICTURES;
-    } else if (intentType == MediaStore.ACTION_VIDEO_CAPTURE) {
+    } else if (intentType.equals(MediaStore.ACTION_VIDEO_CAPTURE)) {
       prefix = "video-";
       suffix = ".mp4";
       dir = Environment.DIRECTORY_MOVIES;
