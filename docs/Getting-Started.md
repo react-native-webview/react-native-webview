@@ -46,40 +46,16 @@ Video recording:
 
 ##### Android
 
-Add file provider path resource `file_provider_paths.xml` in `[your project]/android/app/src/main/res/xml/` folder. If the folder does not exist, create a new one.
-
-NOTE: this is a requirement for sdk 26
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <external-path name="shared" path="." />
-</paths>
-```
-
-Add permissions & configure file provider in AndroidManifest.xml:
+Add permissions in AndroidManifest.xml:
 ```xml
 <manifest ...>
   ......
 
-  <!-- this is required only for Android 4.1-4.3 -->
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <!-- this is required only for Android 4.1-4.3 (16-18)  -->
+  <uses-permission
+    android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    android:maxSdkVersion="18" />
 
-  <application ...>
-    ......
-
-    <provider
-      android:name="com.reactnativecommunity.webview.RNCWebViewFileProvider"
-      android:authorities="${applicationId}.fileprovider"
-      android:exported="false"
-      android:grantUriPermissions="true">
-      <meta-data
-        android:name="android.support.FILE_PROVIDER_PATHS"
-        android:resource="@xml/file_provider_paths" />
-    </provider>
-
-  </application>
 </manifest>
 ```
 
