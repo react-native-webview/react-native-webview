@@ -107,8 +107,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     // we have one file selected
     if (data.getData() != null) {
         if (resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Uri[] result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
-            return result;
+            return WebChromeClient.FileChooserParams.parseResult(resultCode, data);
         } else {
             return null;
         }
@@ -240,8 +239,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private String[] getAcceptedMimeType(String[] types) {
     if (isArrayEmpty(types)) {
-        String[] defaultTypes = {DEFAULT_MIME_TYPES};
-        return defaultTypes;
+        return new String[]{DEFAULT_MIME_TYPES};
     }
     return types;
   }
@@ -275,9 +273,8 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     // only this Directory works on all tested Android versions
     // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
     File storageDir = Environment.getExternalStoragePublicDirectory(dir);
-    File file = new File(storageDir, prefix + String.valueOf(System.currentTimeMillis()) + suffix);
 
-    return file;
+    return new File(storageDir, prefix + String.valueOf(System.currentTimeMillis()) + suffix);
   }
 
   private Boolean isArrayEmpty(String[] arr) {
