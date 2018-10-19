@@ -75,7 +75,9 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     switch (requestCode) {
     case PICKER:
         if (resultCode != RESULT_OK) {
-            filePathCallback.onReceiveValue(null);
+            if (filePathCallback != null) {
+                filePathCallback.onReceiveValue(null);
+            }
         } else {
             Uri result[] = this.getSelectedFiles(data, resultCode);
             if (result != null) {
