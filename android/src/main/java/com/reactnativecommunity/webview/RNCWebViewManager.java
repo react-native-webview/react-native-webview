@@ -436,13 +436,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
       protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-        getModule().startPhotoPickerIntentLegacy(filePathCallback, acceptType);
+        getModule().startPhotoPickerIntent(filePathCallback, acceptType);
       }
       protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-        getModule().startPhotoPickerIntentLegacy(filePathCallback, null);
+        getModule().startPhotoPickerIntent(filePathCallback, "");
       }
       protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-        getModule().startPhotoPickerIntentLegacy(filePathCallback, acceptType);
+        getModule().startPhotoPickerIntent(filePathCallback, acceptType);
       }
 
       @TargetApi(Build.VERSION_CODES.LOLLIPOP)

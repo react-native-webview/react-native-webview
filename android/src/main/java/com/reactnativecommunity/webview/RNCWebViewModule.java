@@ -130,31 +130,15 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {
       filePathCallbackLegacy = filePathCallback;
 
-      String acceptTypes = acceptType;
-      if (acceptType.isEmpty()) {
-          acceptTypes = DEFAULT_MIME_TYPES;
-      }
-
-      final Intent capturePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-      outputFileUri = getOutputUri(MediaStore.ACTION_IMAGE_CAPTURE);
-      capturePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
-      final Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-      Uri outputVideoUri = getOutputUri(MediaStore.ACTION_VIDEO_CAPTURE);
-      takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputVideoUri);
-
-      Intent fileChooserIntent = new Intent(Intent.ACTION_GET_CONTENT);
-      fileChooserIntent.addCategory(Intent.CATEGORY_OPENABLE);
-      fileChooserIntent.setType(acceptTypes);
-
+      Intent fileChooserIntent = getFileChooserIntent(acceptType);
       Intent chooserIntent = Intent.createChooser(fileChooserIntent, "");
 
       ArrayList<Parcelable> extraIntents = new ArrayList<>();
       if (acceptsImages(acceptType)) {
-          extraIntents.add(capturePhotoIntent);
+          extraIntents.add(getPhotoIntent());
       }
       if (acceptsVideo(acceptType)) {
-          extraIntents.add(takeVideoIntent);
+          extraIntents.add(getVideoIntent());
       }
       chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
 
@@ -214,7 +198,17 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return intent;
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  private Intent getFileChooserIntent(String acceptTypes) {
+    String _acceptTypes = acceptTypes;
+    if (acceptTypes.isEmpty()) {
+      _acceptTypes = DEFAULT_MIME_TYPES;
+    }
+    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType(_acceptTypes);
+    return intent;
+  }
+
   private Intent getFileChooserIntent(String[] acceptTypes, boolean allowMultiple) {
     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
