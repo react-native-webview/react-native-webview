@@ -158,7 +158,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       }
       chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
 
-      getCurrentActivity().startActivityForResult(chooserIntent, PICKER_LEGACY);
+      if (chooserIntent.resolveActivity(getCurrentActivity().getPackageManager()) != null) {
+          getCurrentActivity().startActivityForResult(chooserIntent, PICKER_LEGACY);
+      } else {
+          Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
+      }
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -179,7 +183,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
     chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
 
-    getCurrentActivity().startActivityForResult(chooserIntent, PICKER);
+    if (chooserIntent.resolveActivity(getCurrentActivity().getPackageManager()) != null) {
+        getCurrentActivity().startActivityForResult(chooserIntent, PICKER);
+    } else {
+        Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
+    }
 
     return true;
   }
