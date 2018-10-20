@@ -6,7 +6,8 @@
   "contributors": [
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
-  "version": "0.0.0-development",
+  "license": "MIT",
+  "version": "2.4.3",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "test:ios:flow": "flow check",
@@ -25,9 +26,10 @@
     "fbjs": "^0.8.17"
   },
   "devDependencies": {
+    "@semantic-release/git": "7.0.5",
     "flow-bin": "^0.80.0",
     "react-native": "^0.57",
-    "semantic-release": "^15.9.17"
+    "semantic-release": "15.10.3"
   },
   "repository": {
     "type": "git",
