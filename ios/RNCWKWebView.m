@@ -102,6 +102,7 @@ static NSString *const MessageHanderName = @"ReactNative";
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.bounces = _bounces;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
+    _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {

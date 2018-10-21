@@ -44,6 +44,7 @@ This document lays out the current public properties and methods for the React N
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
+- [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 
 ## Methods Index
 
@@ -493,6 +494,17 @@ If true, this will hide the keyboard accessory view (< > and Done) when using th
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
+
+---
+
+### `allowsBackForwardNavigationGestures`
+
+If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
 
 ## Methods
 
