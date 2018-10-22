@@ -34,6 +34,7 @@ public class TopShouldStartLoadWithRequestEvent extends Event<TopMessageEvent> {
     public void dispatch(RCTEventEmitter rctEventEmitter) {
         WritableMap data = Arguments.createMap();
         data.putString("url", mUrl);
+        data.putString("navigationType", "other");
         rctEventEmitter.receiveEvent(getViewTag(), EVENT_NAME, data);
     }
 }

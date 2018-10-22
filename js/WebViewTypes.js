@@ -62,6 +62,8 @@ export type WebViewNavigationEvent = SyntheticEvent<WebViewNavigation>;
 
 export type WebViewMessageEvent = SyntheticEvent<WebViewMessage>;
 
+export type WebViewMessageEvent = SyntheticEvent<WebViewMessage>;
+
 export type WebViewErrorEvent = SyntheticEvent<WebViewError>;
 
 export type DataDetectorTypes =
@@ -430,9 +432,9 @@ export type WebViewSharedProps =  $ReadOnly<{|
   /**
    * Function that allows custom handling of any web view requests. Return
    * `true` from the function to continue loading the request and `false`
-   * to stop loading.
+   * to stop loading. The `navigationType` is always `other` on android.
    */
-  onShouldStartLoadWithRequest?: (event: WebViewEvent) => mixed,
+  onShouldStartLoadWithRequest?: (event: WebViewNavigation) => mixed,
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
