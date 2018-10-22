@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -193,6 +194,8 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private Intent getVideoIntent() {
     Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+    // @todo from experience, for Videos we get the data onActivityResult
+    // so there's no need to store the Uri
     Uri outputVideoUri = getOutputUri(MediaStore.ACTION_VIDEO_CAPTURE);
     intent.putExtra(MediaStore.EXTRA_OUTPUT, outputVideoUri);
     return intent;
@@ -256,13 +259,22 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
         Log.e("CREATE FILE", "Error occurred while creating the File", e);
         e.printStackTrace();
     }
-    return Uri.fromFile(capturedFile);
+
+    // for versions below 6.0 (23) we use the old File creation & permissions model
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        return Uri.fromFile(capturedFile);
+    }
+
+    // for versions 6.0+ (23) we use the FileProvider to avoid runtime permissions
+    String packageName = getReactApplicationContext().getPackageName();
+    return FileProvider.getUriForFile(getReactApplicationContext(), packageName+".fileprovider", capturedFile);
   }
 
   private File getCapturedFile(String intentType) throws IOException {
     String prefix = "";
     String suffix = "";
     String dir = "";
+    String filename = "";
 
     if (intentType.equals(MediaStore.ACTION_IMAGE_CAPTURE)) {
       prefix = "image-";
@@ -274,11 +286,18 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       dir = Environment.DIRECTORY_MOVIES;
     }
 
-    // only this Directory works on all tested Android versions
-    // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
-    File storageDir = Environment.getExternalStoragePublicDirectory(dir);
+    filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
 
-    return new File(storageDir, prefix + String.valueOf(System.currentTimeMillis()) + suffix);
+    // for versions below 6.0 (23) we use the old File creation & permissions model
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        // only this Directory works on all tested Android versions
+        // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
+        File storageDir = Environment.getExternalStoragePublicDirectory(dir);
+        return new File(storageDir, filename);
+    }
+
+    File storageDir = getReactApplicationContext().getExternalFilesDir(null);
+    return File.createTempFile(filename, suffix, storageDir);
   }
 
   private Boolean isArrayEmpty(String[] arr) {

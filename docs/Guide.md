@@ -76,15 +76,13 @@ Video recording:
 
 ##### Android
 
-Add permissions in AndroidManifest.xml:
+Add permission in AndroidManifest.xml:
 ```xml
 <manifest ...>
   ......
 
-  <!-- this is required only for Android 4.1-4.3 (16-18)  -->
-  <uses-permission
-    android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-    android:maxSdkVersion="18" />
+  <!-- this is required only for Android 4.1-5.1 (api 16-22)  -->
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
   ......
 </manifest>
