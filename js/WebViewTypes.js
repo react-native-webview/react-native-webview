@@ -202,14 +202,6 @@ export type IOSWebViewProps = $ReadOnly<{|
     | $ReadOnlyArray<DataDetectorTypes>,
 
   /**
-   * Function that allows custom handling of any web view requests. Return
-   * `true` from the function to continue loading the request and `false`
-   * to stop loading.
-   * @platform ios
-   */
-  onShouldStartLoadWithRequest?: (event: WebViewEvent) => mixed,
-
-  /**
    * Boolean that determines whether HTML5 videos play inline or use the
    * native full-screen controller. The default value is `false`.
    *
@@ -434,6 +426,13 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * The default whitelisted origins are "http://*" and "https://*".
    */
   originWhitelist?: $ReadOnlyArray<string>,
+
+  /**
+   * Function that allows custom handling of any web view requests. Return
+   * `true` from the function to continue loading the request and `false`
+   * to stop loading.
+   */
+  onShouldStartLoadWithRequest?: (event: WebViewEvent) => mixed,
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
