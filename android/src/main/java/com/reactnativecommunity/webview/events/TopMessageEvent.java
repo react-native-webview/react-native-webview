@@ -5,9 +5,6 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
-/**
- * Event emitted when there is an error in loading.
- */
 public class TopMessageEvent extends Event<TopMessageEvent> {
 
   public static final String EVENT_NAME = "topMessage";
