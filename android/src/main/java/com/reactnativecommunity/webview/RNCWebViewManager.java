@@ -78,12 +78,14 @@ import org.json.JSONObject;
  *  - GO_BACK
  *  - GO_FORWARD
  *  - RELOAD
+ *  - LOAD_URL
  *
  * {@link WebView} instances could emit following direct events:
  *  - topLoadingFinish
  *  - topLoadingStart
  *  - topLoadingStart
  *  - topLoadingProgress
+ *  - topShouldStartLoadWithRequest
  *
  * Each event will carry the following properties:
  *  - target - view's react tag
