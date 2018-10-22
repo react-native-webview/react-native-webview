@@ -131,6 +131,37 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
     let NativeWebView = nativeConfig.component || RNCWebView;
 
+    const compiledWhitelist = [
+      'about:blank',
+      ...(this.props.originWhitelist || []),
+    ].map(WebViewShared.originWhitelistToRegex);
+
+    const onShouldStartLoadWithRequest = (event) => {
+      let shouldStart = true;
+      const { url } = event.nativeEvent;
+      const origin = WebViewShared.extractOrigin(url);
+      const passesWhitelist = compiledWhitelist.some(x =>
+          new RegExp(x).test(origin),
+      );
+      shouldStart = shouldStart && passesWhitelist;
+      if (!passesWhitelist) {
+        Linking.openURL(url);
+      }
+      if (this.props.onShouldStartLoadWithRequest) {
+        shouldStart =
+            shouldStart &&
+            this.props.onShouldStartLoadWithRequest(event.nativeEvent);
+      }
+
+      if (shouldStart) {
+        UIManager.dispatchViewManagerCommand(
+            this.getWebViewHandle(),
+            UIManager.RNCWebView.Commands.loadUrl,
+            [String(url)],
+        );
+      }
+    };
+
     const webView = (
       <NativeWebView
         ref={this.webViewRef}
@@ -146,6 +177,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         domStorageEnabled={this.props.domStorageEnabled}
         messagingEnabled={typeof this.props.onMessage === 'function'}
         onMessage={this.onMessage}
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         overScrollMode={this.props.overScrollMode}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
@@ -284,7 +316,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };
-  
+
   onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress} = this.props;
     onLoadProgress && onLoadProgress(event);
