@@ -342,11 +342,11 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 ### `userAgent`
 
-Sets the user-agent for the `WebView`.
+Sets the user-agent for the `WebView`. If you are using iOS WKWebView, it works as customUserAgent.
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| string | No       | Android  |
+| Type   | Required |
+| ------ | -------- |
+| string | No       |
 
 ---
 

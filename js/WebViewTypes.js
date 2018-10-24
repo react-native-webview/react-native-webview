@@ -229,6 +229,10 @@ export type IOSWebViewProps = $ReadOnly<{|
    * back-forward list navigations.
    */
   allowsBackForwardNavigationGestures?: ?boolean,
+  /**
+   * The custom user agent string.
+   */
+  userAgent?: ?string,
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|
