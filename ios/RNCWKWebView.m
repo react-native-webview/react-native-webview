@@ -11,7 +11,7 @@
 
 #import "objc/runtime.h"
 
-static NSString *const MessageHandlerName = @"_ReactNativeBridge";
+static NSString *const MessageHandlerName = @"ReactNativeBridge";
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -144,7 +144,7 @@ static NSString *const MessageHandlerName = @"_ReactNativeBridge";
 
 /**
  * This method is called whenever JavaScript running within the web view calls:
- *   - window.[MessageHandlerName].postMessage
+ *   - window.webkit.messageHandlers[MessageHandlerName].postMessage
  */
 - (void)userContentController:(WKUserContentController *)userContentController
        didReceiveScriptMessage:(WKScriptMessage *)message
