@@ -45,6 +45,8 @@ This document lays out the current public properties and methods for the React N
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`userScript`](Reference.md#userScript)
+- [`userScriptForMainFrameOnly`](Reference.md#userScriptForMainFrameOnly)
 
 ## Methods Index
 
@@ -505,6 +507,21 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
 
+### `userScript`
+
+The script will be injected into the webpage after the document finishes loading.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| string  | No       | iOS      |
+
+### `userScriptForMainFrameOnly`
+
+A Boolean value indicating whether the script should be injected only into the main frame(true) or into all frames(false). The default value is `false`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ## Methods
 

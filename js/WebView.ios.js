@@ -159,6 +159,14 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         'The allowsBackForwardNavigationGestures property is not supported when useWebKit = false',
       );
     }
+    if (
+      !this.props.useWebKit &&
+      this.props.userScript !== undefined
+    ) {
+      console.warn(
+        'The userScript property is not supported when useWebKit = false',
+      );
+    }
   }
 
   render() {
@@ -284,6 +292,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.mediaPlaybackRequiresUserAction
         }
         dataDetectorTypes={this.props.dataDetectorTypes}
+        userScript={this.props.userScript}
+        userScriptForMainFrameOnly={this.props.userScriptForMainFrameOnly}
         {...nativeConfig.props}
       />
     );

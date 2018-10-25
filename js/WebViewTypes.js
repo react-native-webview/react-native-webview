@@ -229,6 +229,20 @@ export type IOSWebViewProps = $ReadOnly<{|
    * back-forward list navigations.
    */
   allowsBackForwardNavigationGestures?: ?boolean,
+
+  /**
+    * The script will be injected into the webpage after the document finishes loading.
+    * @platform ios
+    */
+  userScript?: ?string,
+
+  /**
+   * A Boolean value indicating whether the script should be injected
+   * only into the main frame(true) or into all frames(false).
+   * The default value is `false`.
+   * @platform ios
+   */
+  userScriptForMainFrameOnly?: ?boolean,
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|
