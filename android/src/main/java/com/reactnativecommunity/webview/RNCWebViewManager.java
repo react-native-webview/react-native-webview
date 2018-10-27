@@ -95,7 +95,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
   protected static final String WEBVIEW_MESSAGE_HANDLER = "window.webkit.messageHandlers.";
-  protected static final String BRIDGE_NAME = "ReactNativeBridge";
+  protected static final String HANDLER_NAME = "ReactNative";
 
   protected static final String HTTP_METHOD_POST = "POST";
 
@@ -266,7 +266,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       /**
        * This method is called whenever JavaScript running within the web view calls:
-       *   - window.webkit.messageHandlers[BRIDGE_NAME].postMessage
+       *   - window.webkit.messageHandlers[HANDLER_NAME].postMessage
        */
       @JavascriptInterface
       public void postMessage(String message) {
@@ -326,9 +326,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       messagingEnabled = enabled;
 
       if (enabled) {
-        addJavascriptInterface(createRNCWebViewBridge(this), WEBVIEW_MESSAGE_HANDLER + BRIDGE_NAME);
+        addJavascriptInterface(createRNCWebViewBridge(this), WEBVIEW_MESSAGE_HANDLER + HANDLER_NAME);
       } else {
-        removeJavascriptInterface(WEBVIEW_MESSAGE_HANDLER + BRIDGE_NAME);
+        removeJavascriptInterface(WEBVIEW_MESSAGE_HANDLER + HANDLER_NAME);
       }
     }
 
@@ -378,7 +378,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         "window.originalPostMessage = window.postMessage;" +
         "window.postMessage = function(data, origin) {" +
           "window.originalPostMessage(data, origin);" +
-          WEBVIEW_MESSAGE_HANDLER + BRIDGE_NAME + ".postMessage(String(data));" +
+          WEBVIEW_MESSAGE_HANDLER + HANDLER_NAME + ".postMessage(String(data));" +
         "}" +
       ")");
     }
