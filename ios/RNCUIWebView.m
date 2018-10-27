@@ -313,7 +313,8 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
           "window.location = '%@://%@?' + encodeURIComponent(messageQueue.shift());"
         "}"
 
-        "window.postMessage = function(data) {"
+        "window.postMessage = function(data, origin) {"
+          "window.originalPostMessage(data, origin);"
           "messageQueue.push(String(data));"
           "processQueue();"
         "};"
