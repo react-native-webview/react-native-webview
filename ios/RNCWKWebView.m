@@ -86,7 +86,11 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
 
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     wkWebViewConfig.userContentController = [WKUserContentController new];
-    [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHandlerName];
+
+    if (_messagingEnabled) {
+      [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHandlerName];
+    }
+    
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
     wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
@@ -112,7 +116,7 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self visitSource];
-  } else {
+  } else if (_messagingEnabled) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
   }
 }
@@ -213,7 +217,6 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
 {
-    
     if (_webView == nil) {
         _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
         return;
@@ -224,6 +227,7 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
     }
     
     UIView* subview;
+
     for (UIView* view in _webView.scrollView.subviews) {
         if([[view.class description] hasPrefix:@"WK"])
             subview = view;
@@ -387,6 +391,32 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
   }];
 }
 
+- (void)overwritePostMessage
+          thenCall: (void (^)(NSString*)) callback
+{
+  NSString *source = [NSString stringWithFormat:
+    @"(function() {"
+      "window.originalPostMessage = window.postMessage;"
+      "window.postMessage = function(data, origin) {"
+        "window.originalPostMessage(data, origin);"
+        "window.webkit.messageHandlers.%@.postMessage(String(data));"
+      "};"
+    "})();",
+    MessageHandlerName
+  ];
+  [self evaluateJS: source thenCall: nil];
+}
+
+- (void)restorePostMessage
+          thenCall: (void (^)(NSString*)) callback
+{
+  NSString *source = [NSString
+    @"(function() {"
+      "window.postMessage = window.originalPostMessage || window.postMessage;"
+    "})();"
+  ];
+  [self evaluateJS: source thenCall: nil];
+}
 
 /**
  * Called when the navigation is complete.
@@ -395,10 +425,18 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
 - (void)      webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
+  if (_messagingEnabled && _overwriteWindowPostMessage) {
+    [self overwritePostMessage thenCall: nil];
+  }
+  else {
+    [self restorePostMessage thenCall: nil];
+  }
+
   if (_injectedJavaScript) {
     [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
       NSMutableDictionary *event = [self baseEvent];
       event[@"jsEvaluationValue"] = jsEvaluationValue;
+
       if (self.onLoadingFinish) {
         self.onLoadingFinish(event);
       }

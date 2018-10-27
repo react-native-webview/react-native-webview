@@ -94,7 +94,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
-  protected static final String WEBVIEW_MESSAGE_HANDLER = "window.webkit.messageHandlers";
+  protected static final String WEBVIEW_MESSAGE_HANDLER = "window.webkit.messageHandlers.";
   protected static final String BRIDGE_NAME = "ReactNativeBridge";
 
   protected static final String HTTP_METHOD_POST = "POST";
@@ -249,6 +249,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable String injectedJS;
     protected boolean messagingEnabled = false;
+    protected boolean overwriteWindowPostMessage = false;
     protected @Nullable RNCWebViewClient mRNCWebViewClient;
 
     protected class RNCWebViewBridge {
@@ -326,6 +327,20 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
     }
 
+    public void setOverwriteWindowPostMessage(boolean overwrite) {
+      if (overwriteWindowPostMessage == overwrite) {
+        return;
+      }
+
+      overwriteWindowPostMessage = overwrite;
+
+      if (messagingEnabled && overwriteWindowPostMessage) {
+        overwritePostMessage();
+      } else {
+        restorePostMessage();
+      }
+    }
+
     protected void evaluateJavascriptWithFallback(String script) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
         evaluateJavascript(script, null);
@@ -350,6 +365,22 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void onMessage(String message) {
       dispatchEvent(this, new TopMessageEvent(this.getId(), message));
+    }
+
+    public void overwritePostMessage() {
+      evaluateJavascriptWithFallback("(" +
+        "window.originalPostMessage = window.postMessage;" +
+        "window.postMessage = function(data, origin) {" +
+          "window.originalPostMessage(data, origin);" +
+          WEBVIEW_MESSAGE_HANDLER + BRIDGE_NAME + ".postMessage(String(data));" +
+        "}" +
+      ")");
+    }
+
+    public void restorePostMessage() {
+      evaluateJavascriptWithFallback("(" +
+        "window.postMessage = window.originalPostMessage || window.postMessage;" +
+      ")");
     }
 
     protected void cleanupCallbacksAndDestroy() {
@@ -513,6 +544,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "messagingEnabled")
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
+  }
+
+  @ReactProp(name = "overwriteWindowPostMessage")
+  public void setOverwriteWindowPostMessage(WebView view, boolean overwrite) {
+    ((RNCWebView) view).setOverwriteWindowPostMessage(overwrite);
   }
 
   @ReactProp(name = "source")

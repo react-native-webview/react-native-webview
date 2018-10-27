@@ -19,7 +19,7 @@ import {
   UIManager,
   View,
   Image,
-  requireNativeComponent
+  requireNativeComponent,
 } from 'react-native';
 
 import invariant from 'fbjs/lib/invariant';
@@ -72,7 +72,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   state = {
-    viewState: this.props.startInLoadingState ? WebViewState.LOADING : WebViewState.IDLE,
+    viewState: this.props.startInLoadingState
+      ? WebViewState.LOADING
+      : WebViewState.IDLE,
     lastErrorEvent: null,
   };
 
@@ -144,8 +146,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         javaScriptEnabled={this.props.javaScriptEnabled}
         thirdPartyCookiesEnabled={this.props.thirdPartyCookiesEnabled}
         domStorageEnabled={this.props.domStorageEnabled}
-        messagingEnabled={typeof this.props.onMessage === 'function'}
         onMessage={this.onMessage}
+        messagingEnabled={typeof this.props.onMessage === 'function'}
+        overwriteWindowPostMessage={this.props.overwriteWindowPostMessage}
         overScrollMode={this.props.overScrollMode}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
@@ -284,11 +287,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };
-  
+
   onLoadingProgress = (event: WebViewProgressEvent) => {
-    const { onLoadProgress} = this.props;
+    const { onLoadProgress } = this.props;
     onLoadProgress && onLoadProgress(event);
-  }
+  };
 }
 
 const RNCWebView = requireNativeComponent('RNCWebView');

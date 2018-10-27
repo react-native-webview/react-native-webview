@@ -49,6 +49,7 @@ RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
  * Expose methods to enable messaging the webview.
  */
 RCT_EXPORT_VIEW_PROPERTY(messagingEnabled, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(overwriteWindowPostMessage, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(onMessage, RCTDirectEventBlock)
 
 RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)message)
