@@ -391,6 +391,7 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
   }];
 }
 
+// Start of legacy code which overwrites window.postMessage
 - (void)overwritePostMessage
           thenCall: (void (^)(NSString*)) callback
 {
@@ -404,7 +405,7 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
     "})();",
     MessageHandlerName
   ];
-  [self evaluateJS: source thenCall: nil];
+  [self evaluateJS: source thenCall: callback];
 }
 
 - (void)restorePostMessage
@@ -415,8 +416,9 @@ static NSString *const MessageHandlerName = @"ReactNativeBridge";
       "window.postMessage = window.originalPostMessage || window.postMessage;"
     "})();"
   ];
-  [self evaluateJS: source thenCall: nil];
+  [self evaluateJS: source thenCall: callback];
 }
+// End of legacy code which overwrites window.postMessage
 
 /**
  * Called when the navigation is complete.

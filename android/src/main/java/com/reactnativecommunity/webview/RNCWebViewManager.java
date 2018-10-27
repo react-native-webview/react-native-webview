@@ -327,20 +327,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
     }
 
-    public void setOverwriteWindowPostMessage(boolean overwrite) {
-      if (overwriteWindowPostMessage == overwrite) {
-        return;
-      }
-
-      overwriteWindowPostMessage = overwrite;
-
-      if (messagingEnabled && overwriteWindowPostMessage) {
-        overwritePostMessage();
-      } else {
-        restorePostMessage();
-      }
-    }
-
     protected void evaluateJavascriptWithFallback(String script) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
         evaluateJavascript(script, null);
@@ -367,6 +353,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       dispatchEvent(this, new TopMessageEvent(this.getId(), message));
     }
 
+    // Start of legacy code which overwrites window.postMessage
+    public void setOverwriteWindowPostMessage(boolean overwrite) {
+      if (overwriteWindowPostMessage == overwrite) {
+        return;
+      }
+
+      overwriteWindowPostMessage = overwrite;
+
+      if (messagingEnabled && overwriteWindowPostMessage) {
+        overwritePostMessage();
+      } else {
+        restorePostMessage();
+      }
+    }
+
     public void overwritePostMessage() {
       evaluateJavascriptWithFallback("(" +
         "window.originalPostMessage = window.postMessage;" +
@@ -382,6 +383,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         "window.postMessage = window.originalPostMessage || window.postMessage;" +
       ")");
     }
+    // End of legacy code which overwrites window.postMessage
 
     protected void cleanupCallbacksAndDestroy() {
       setWebViewClient(null);
