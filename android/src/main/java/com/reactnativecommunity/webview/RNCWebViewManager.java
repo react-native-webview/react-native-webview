@@ -369,7 +369,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     public void onMessage(String message) {
-      dispatchEvent(this, new TopMessageEvent(this.getId(), message));
+      if (mRNCWebViewClient != null) {
+        WritableMap eventData = mRNCWebViewClient.createWebViewEvent(this, this.getUrl());
+        eventData.putString("data", message);
+        dispatchEvent(this, new TopMessageEvent(this.getId(), eventData));
+      }
     }
 
     protected void cleanupCallbacksAndDestroy() {
