@@ -52,7 +52,7 @@ This document lays out the current public properties and methods for the React N
 - [`goBack`](Reference.md#goback)
 - [`reload`](Reference.md#reload)
 - [`stopLoading`](Reference.md#stoploading)
-- [`injectJavaScript`](Reference.md#injectjavascriptscript)
+- [`injectJavaScript`](Reference.md#injectjavascriptstr)
 
 ---
 
@@ -536,13 +536,13 @@ stopLoading();
 
 Stop loading the current page.
 
-### `injectJavaScript(script)`
+### `injectJavaScript(str)`
 
 ```javascript
-injectJavaScript("...");
+injectJavaScript("... javascript string ...");
 ```
 
-Script will be passed to the WebView and executed immediately as JavaScript.
+Executes the JavaScript string.
 
 ## Other Docs
 
