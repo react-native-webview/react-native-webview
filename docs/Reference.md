@@ -8,7 +8,6 @@ This document lays out the current public properties and methods for the React N
 
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
-- [`injectJavaScript`](Reference.md#injectjavascript)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
@@ -44,6 +43,7 @@ This document lays out the current public properties and methods for the React N
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
+- [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 
 ## Methods Index
 
@@ -52,6 +52,7 @@ This document lays out the current public properties and methods for the React N
 - [`goBack`](Reference.md#goback)
 - [`reload`](Reference.md#reload)
 - [`stopLoading`](Reference.md#stoploading)
+- [`injectJavaScript`](Reference.md#injectjavascriptstr)
 
 ---
 
@@ -92,16 +93,6 @@ Controls whether to adjust the content inset for web views that are placed behin
 | Type | Required |
 | ---- | -------- |
 | bool | No       |
-
----
-
-### `injectJavaScript`
-
-Function that accepts a string that will be passed to the WebView and executed immediately as JavaScript.
-
-| Type     | Required |
-| -------- | -------- |
-| function | No       |
 
 ---
 
@@ -494,6 +485,17 @@ If true, this will hide the keyboard accessory view (< > and Done) when using th
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
 
+---
+
+### `allowsBackForwardNavigationGestures`
+
+If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+
 ## Methods
 
 ### `extraNativeComponentConfig()`
@@ -533,6 +535,14 @@ stopLoading();
 ```
 
 Stop loading the current page.
+
+### `injectJavaScript(str)`
+
+```javascript
+injectJavaScript("... javascript string ...");
+```
+
+Executes the JavaScript string.
 
 ## Other Docs
 
