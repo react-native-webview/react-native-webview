@@ -93,7 +93,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static final String REACT_CLASS = "RNCWebView";
 
   protected static final String HTML_ENCODING = "UTF-8";
-  protected static final String HTML_MIME_TYPE = "text/html";
+  protected static final String HTML_MIME_TYPE = "text/html; charset=utf-8";
   protected static final String BRIDGE_NAME = "__REACT_WEB_VIEW_BRIDGE";
 
   protected static final String HTTP_METHOD_POST = "POST";
