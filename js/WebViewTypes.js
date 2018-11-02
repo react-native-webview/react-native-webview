@@ -23,6 +23,7 @@ export type WebViewNativeEvent = $ReadOnly<{|
   title: string,
   canGoBack: boolean,
   canGoForward: boolean,
+  lockIdentifier: number
 |}>;
 
 export type WebViewProgressEvent = $ReadOnly<{|

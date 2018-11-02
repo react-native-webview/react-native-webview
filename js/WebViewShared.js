@@ -12,7 +12,7 @@
 
 import escapeStringRegexp from 'escape-string-regexp';
 import { Linking } from 'react-native';
-import type {WebViewNavigation} from "./WebViewTypes";
+import type {WebViewNavigationEvent} from "./WebViewTypes";
 
 const WebViewShared = {
   defaultOriginWhitelist: ['http://*', 'https://*'],
@@ -33,10 +33,10 @@ const WebViewShared = {
     )
   },
   createOnShouldStartLoadWithRequest(loadRequest: (shouldStart: boolean,
-      url: string, lockIdentifier) => void, compiledWhitelist: Array<string>) {
-    return (event: WebViewNavigation) => {
+      url: string, lockIdentifier: number) => void, compiledWhitelist: Array<string>) {
+    return (event: WebViewNavigationEvent) => {
       let shouldStart = true;
-      const {url} = event.nativeEvent;
+      const {url, lockIdentifier} = event.nativeEvent;
 
       if (WebViewShared.passesWhitelist(compiledWhitelist, url)) {
         Linking.openURL(url);
@@ -46,7 +46,7 @@ const WebViewShared = {
         shouldStart = this.props.onShouldStartLoadWithRequest(event.nativeEvent)
       }
 
-      loadRequest(shouldStart, url, event.nativeEvent.lockIdentifier)
+      loadRequest(shouldStart, url, lockIdentifier)
     };
   }
 };
