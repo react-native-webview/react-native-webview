@@ -21,7 +21,7 @@ const WebViewShared = {
   originWhitelistToRegex: (originWhitelist: string): string => {
     return escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*');
   },
-  compileWhitelist: (originWhitelist: Array<string>): Array<string> => [
+  compileWhitelist: (originWhitelist?: $ReadOnlyArray<string>): Array<string> => [
     'about:blank', ...(originWhitelist || []),
   ].map(WebViewShared.originWhitelistToRegex),
   passesWhitelist: (compiledWhitelist: Array<string>, url: string) => {
@@ -33,16 +33,18 @@ const WebViewShared = {
   createOnShouldStartLoadWithRequest(loadRequest: () => void,
       compiledWhitelist: Array<string>) {
     return (event) => {
+      let shouldStart = true;
       const {url} = event.nativeEvent;
 
       if (WebViewShared.passesWhitelist(compiledWhitelist, url)) {
         Linking.openURL(url);
       }
 
-      if (this.props.onShouldStartLoadWithRequest &&
-          this.props.onShouldStartLoadWithRequest(event.nativeEvent)) {
-        loadRequest(url)
+      if (this.props.onShouldStartLoadWithRequest)
+        shouldStart = this.props.onShouldStartLoadWithRequest(event.nativeEvent) {
       }
+
+      loadRequest(shouldStart, url)
     };
   }
 };

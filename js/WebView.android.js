@@ -134,12 +134,14 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
 
     const onShouldStartLoadWithRequest = WebViewShared.createOnShouldStartLoadWithRequest(
-        (url: string) => {
-          UIManager.dispatchViewManagerCommand(
-              this.getWebViewHandle(),
-              UIManager.RNCWebView.Commands.loadUrl,
-              [String(url)],
-          );
+        (shouldStart: boolean, url: string) => {
+          if (shouldStart) {
+            UIManager.dispatchViewManagerCommand(
+                this.getWebViewHandle(),
+                UIManager.RNCWebView.Commands.loadUrl,
+                [String(url)],
+            );
+          }
         },
         compiledWhitelist
     );

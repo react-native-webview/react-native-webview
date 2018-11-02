@@ -212,7 +212,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
 
     const onShouldStartLoadWithRequest = WebViewShared.createOnShouldStartLoadWithRequest(
-        () => {
+        (shouldStart: boolean) => {
           invariant(viewManager != null, 'viewManager expected to be non-null');
           viewManager.startLoadWithResult(
               !!shouldStart,
