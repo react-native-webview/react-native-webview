@@ -40,11 +40,11 @@ const WebViewShared = {
         Linking.openURL(url);
       }
 
-      if (this.props.onShouldStartLoadWithRequest)
-        shouldStart = this.props.onShouldStartLoadWithRequest(event.nativeEvent) {
+      if (this.props.onShouldStartLoadWithRequest) {
+        shouldStart = this.props.onShouldStartLoadWithRequest(event.nativeEvent)
       }
 
-      loadRequest(shouldStart, url)
+      loadRequest(shouldStart, url, event.nativeEvent.lockIdentifier)
     };
   }
 };
