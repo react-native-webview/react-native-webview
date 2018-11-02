@@ -211,22 +211,16 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         this.props.originWhitelist
     );
 
-    const onShouldStartLoadWithRequest = (event) => {
-      const {url} = event.nativeEvent;
-
-      if (WebViewShared.passesWhitelist(compiledWhitelist, url)) {
-        Linking.openURL(url);
-      }
-
-      if (this.props.onShouldStartLoadWithRequest &&
-          this.props.onShouldStartLoadWithRequest(event.nativeEvent)) {
-        invariant(viewManager != null, 'viewManager expected to be non-null');
-        viewManager.startLoadWithResult(
-            !!shouldStart,
-            event.nativeEvent.lockIdentifier,
-        );
-      }
-    };
+    const onShouldStartLoadWithRequest = WebViewShared.createOnShouldStartLoadWithRequest(
+        () => {
+          invariant(viewManager != null, 'viewManager expected to be non-null');
+          viewManager.startLoadWithResult(
+              !!shouldStart,
+              event.nativeEvent.lockIdentifier,
+          );
+        },
+        compiledWhitelist
+    );
 
     const decelerationRate = processDecelerationRate(
       this.props.decelerationRate,

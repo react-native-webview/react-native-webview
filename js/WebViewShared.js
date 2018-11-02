@@ -29,6 +29,21 @@ const WebViewShared = {
     return compiledWhitelist.some(x =>
         new RegExp(x).test(origin),
     )
+  },
+  createOnShouldStartLoadWithRequest(loadRequest: () => void,
+      compiledWhitelist: Array<string>) {
+    return (event) => {
+      const {url} = event.nativeEvent;
+
+      if (WebViewShared.passesWhitelist(compiledWhitelist, url)) {
+        Linking.openURL(url);
+      }
+
+      if (this.props.onShouldStartLoadWithRequest &&
+          this.props.onShouldStartLoadWithRequest(event.nativeEvent)) {
+        loadRequest(url)
+      }
+    };
   }
 };
 
