@@ -15,6 +15,7 @@ import React from 'react';
 import ReactNative from 'react-native';
 import {
   ActivityIndicator,
+  Linking,
   StyleSheet,
   UIManager,
   View,
