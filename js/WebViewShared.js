@@ -10,7 +10,9 @@
 
 'use strict';
 
-const escapeStringRegexp = require('escape-string-regexp');
+import escapeStringRegexp from 'escape-string-regexp';
+import { Linking } from 'react-native';
+import type {WebViewNavigation} from "./WebViewTypes";
 
 const WebViewShared = {
   defaultOriginWhitelist: ['http://*', 'https://*'],
@@ -30,9 +32,9 @@ const WebViewShared = {
         new RegExp(x).test(origin),
     )
   },
-  createOnShouldStartLoadWithRequest(loadRequest: () => void,
-      compiledWhitelist: Array<string>) {
-    return (event) => {
+  createOnShouldStartLoadWithRequest(loadRequest: (shouldStart: boolean,
+      url: string, lockIdentifier) => void, compiledWhitelist: Array<string>) {
+    return (event: WebViewNavigation) => {
       let shouldStart = true;
       const {url} = event.nativeEvent;
 
