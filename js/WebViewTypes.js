@@ -62,8 +62,6 @@ export type WebViewNavigationEvent = SyntheticEvent<WebViewNavigation>;
 
 export type WebViewMessageEvent = SyntheticEvent<WebViewMessage>;
 
-export type WebViewMessageEvent = SyntheticEvent<WebViewMessage>;
-
 export type WebViewErrorEvent = SyntheticEvent<WebViewError>;
 
 export type DataDetectorTypes =
