@@ -207,31 +207,25 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       viewManager = viewManager || RNCUIWebViewManager;
     }
 
-    const compiledWhitelist = [
-      'about:blank',
-      ...(this.props.originWhitelist || []),
-    ].map(WebViewShared.originWhitelistToRegex);
-    const onShouldStartLoadWithRequest = event => {
-      let shouldStart = true;
-      const { url } = event.nativeEvent;
-      const origin = WebViewShared.extractOrigin(url);
-      const passesWhitelist = compiledWhitelist.some(x =>
-        new RegExp(x).test(origin),
-      );
-      shouldStart = shouldStart && passesWhitelist;
-      if (!passesWhitelist) {
+    const compiledWhitelist = WebViewShared.compileWhitelist(
+        this.props.originWhitelist
+    );
+
+    const onShouldStartLoadWithRequest = (event) => {
+      const {url} = event.nativeEvent;
+
+      if (WebViewShared.passesWhitelist(compiledWhitelist, url)) {
         Linking.openURL(url);
       }
-      if (this.props.onShouldStartLoadWithRequest) {
-        shouldStart =
-          shouldStart &&
-          this.props.onShouldStartLoadWithRequest(event.nativeEvent);
+
+      if (this.props.onShouldStartLoadWithRequest &&
+          this.props.onShouldStartLoadWithRequest(event.nativeEvent)) {
+        invariant(viewManager != null, 'viewManager expected to be non-null');
+        viewManager.startLoadWithResult(
+            !!shouldStart,
+            event.nativeEvent.lockIdentifier,
+        );
       }
-      invariant(viewManager != null, 'viewManager expected to be non-null');
-      viewManager.startLoadWithResult(
-        !!shouldStart,
-        event.nativeEvent.lockIdentifier,
-      );
     };
 
     const decelerationRate = processDecelerationRate(

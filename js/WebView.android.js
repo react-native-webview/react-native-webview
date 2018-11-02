@@ -12,15 +12,14 @@
 
 import React from 'react';
 
-import ReactNative from 'react-native';
-import {
+import ReactNative, {
   ActivityIndicator,
+  Image,
   Linking,
+  requireNativeComponent,
   StyleSheet,
   UIManager,
-  View,
-  Image,
-  requireNativeComponent
+  View
 } from 'react-native';
 
 import invariant from 'fbjs/lib/invariant';
@@ -28,15 +27,13 @@ import keyMirror from 'fbjs/lib/keyMirror';
 
 import WebViewShared from './WebViewShared';
 import type {
-  WebViewEvent,
   WebViewError,
   WebViewErrorEvent,
   WebViewMessageEvent,
-  WebViewNavigation,
   WebViewNavigationEvent,
+  WebViewProgressEvent,
   WebViewSharedProps,
   WebViewSource,
-  WebViewProgressEvent,
 } from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
@@ -132,29 +129,19 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
     let NativeWebView = nativeConfig.component || RNCWebView;
 
-    const compiledWhitelist = [
-      'about:blank',
-      ...(this.props.originWhitelist || []),
-    ].map(WebViewShared.originWhitelistToRegex);
+    const compiledWhitelist = WebViewShared.compileWhitelist(
+        this.props.originWhitelist
+    );
 
     const onShouldStartLoadWithRequest = (event) => {
-      let shouldStart = true;
       const { url } = event.nativeEvent;
-      const origin = WebViewShared.extractOrigin(url);
-      const passesWhitelist = compiledWhitelist.some(x =>
-          new RegExp(x).test(origin),
-      );
-      shouldStart = shouldStart && passesWhitelist;
-      if (!passesWhitelist) {
+
+      if (WebViewShared.passesWhitelist(compiledWhitelist, url)) {
         Linking.openURL(url);
       }
-      if (this.props.onShouldStartLoadWithRequest) {
-        shouldStart =
-            shouldStart &&
-            this.props.onShouldStartLoadWithRequest(event.nativeEvent);
-      }
 
-      if (shouldStart) {
+      if (this.props.onShouldStartLoadWithRequest &&
+          this.props.onShouldStartLoadWithRequest(event.nativeEvent)) {
         UIManager.dispatchViewManagerCommand(
             this.getWebViewHandle(),
             UIManager.RNCWebView.Commands.loadUrl,

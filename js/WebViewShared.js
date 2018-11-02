@@ -21,6 +21,15 @@ const WebViewShared = {
   originWhitelistToRegex: (originWhitelist: string): string => {
     return escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*');
   },
+  compileWhitelist: (originWhitelist: Array<string>): Array<string> => [
+    'about:blank', ...(originWhitelist || []),
+  ].map(WebViewShared.originWhitelistToRegex),
+  passesWhitelist: (compiledWhitelist: Array<string>, url: string) => {
+    const origin = WebViewShared.extractOrigin(url);
+    return compiledWhitelist.some(x =>
+        new RegExp(x).test(origin),
+    )
+  }
 };
 
 module.exports = WebViewShared;
