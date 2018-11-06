@@ -616,10 +616,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @Override
   public Map getExportedCustomDirectEventTypeConstants() {
-    return MapBuilder.builder()
-      .put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"))
-      .put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"))
-      .build();
+    Map export = super.getExportedCustomDirectEventTypeConstants();
+    if (export == null) {
+      export = MapBuilder.newHashMap();
+    }
+    export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
+    export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
+    return export;
   }
 
   @Override
