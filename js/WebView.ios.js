@@ -25,7 +25,10 @@ import {
 import invariant from 'fbjs/lib/invariant';
 import keyMirror from 'fbjs/lib/keyMirror';
 
-import WebViewShared from './WebViewShared';
+import {
+  defaultOriginWhitelist,
+  createOnShouldStartLoadWithRequest,
+} from './WebViewShared';
 import type {
   WebViewEvent,
   WebViewError,
@@ -130,7 +133,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   static defaultProps = {
     useWebKit: true,
-    originWhitelist: WebViewShared.defaultOriginWhitelist,
+    originWhitelist: defaultOriginWhitelist,
   };
 
   state = {
@@ -207,19 +210,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       viewManager = viewManager || RNCUIWebViewManager;
     }
 
-    const compiledWhitelist = WebViewShared.compileWhitelist(
-        this.props.originWhitelist
-    );
-
-    const onShouldStartLoadWithRequest = WebViewShared.createOnShouldStartLoadWithRequest(
-        (shouldStart: boolean, url: string, lockIdentifier) => {
-          invariant(viewManager != null, 'viewManager expected to be non-null');
-          viewManager.startLoadWithResult(
-              !!shouldStart,
-              lockIdentifier,
-          );
-        },
-        compiledWhitelist
+    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+      (shouldStart: boolean, url: string, lockIdentifier) => {
+        invariant(viewManager != null, 'viewManager expected to be non-null');
+        viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
+      },
+      this.props.originWhitelist,
+      this.props.onShouldStartLoadWithRequest,
     );
 
     const decelerationRate = processDecelerationRate(
@@ -258,7 +255,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.automaticallyAdjustContentInsets
         }
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+        allowsBackForwardNavigationGestures={
+          this.props.allowsBackForwardNavigationGestures
+        }
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
         onLoadingError={this._onLoadingError}
@@ -421,9 +420,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   _onLoadingProgress = (event: WebViewProgressEvent) => {
-    const {onLoadProgress} = this.props;
+    const { onLoadProgress } = this.props;
     onLoadProgress && onLoadProgress(event);
-  }
+  };
 
   componentDidUpdate(prevProps: WebViewSharedProps) {
     if (!(prevProps.useWebKit && this.props.useWebKit)) {

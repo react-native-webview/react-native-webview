@@ -8,47 +8,57 @@
  * @flow
  */
 
-'use strict';
-
 import escapeStringRegexp from 'escape-string-regexp';
 import { Linking } from 'react-native';
-import type {WebViewNavigationEvent} from "./WebViewTypes";
+import type {
+  WebViewNavigationEvent,
+  WebViewNavigation,
+  OnShouldStartLoadWithRequest,
+} from './WebViewTypes';
 
-const WebViewShared = {
-  defaultOriginWhitelist: ['http://*', 'https://*'],
-  extractOrigin: (url: string): string => {
-    const result = /^[A-Za-z0-9]+:(\/\/)?[^/]*/.exec(url);
-    return result === null ? '' : result[0];
-  },
-  originWhitelistToRegex: (originWhitelist: string): string => {
-    return escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*');
-  },
-  compileWhitelist: (originWhitelist?: $ReadOnlyArray<string>): Array<string> => [
-    'about:blank', ...(originWhitelist || []),
-  ].map(WebViewShared.originWhitelistToRegex),
-  passesWhitelist: (compiledWhitelist: Array<string>, url: string) => {
-    const origin = WebViewShared.extractOrigin(url);
-    return compiledWhitelist.some(x =>
-        new RegExp(x).test(origin),
-    )
-  },
-  createOnShouldStartLoadWithRequest(loadRequest: (shouldStart: boolean,
-      url: string, lockIdentifier: number) => void, compiledWhitelist: Array<string>) {
-    return (event: WebViewNavigationEvent) => {
-      let shouldStart = true;
-      const {url, lockIdentifier} = event.nativeEvent;
+const defaultOriginWhitelist = ['http://*', 'https://*'];
 
-      if (WebViewShared.passesWhitelist(compiledWhitelist, url)) {
-        Linking.openURL(url);
-      }
-
-      if (this.props.onShouldStartLoadWithRequest) {
-        shouldStart = this.props.onShouldStartLoadWithRequest(event.nativeEvent)
-      }
-
-      loadRequest(shouldStart, url, lockIdentifier)
-    };
-  }
+const extractOrigin = (url: string): string => {
+  const result = /^[A-Za-z0-9]+:(\/\/)?[^/]*/.exec(url);
+  return result === null ? '' : result[0];
 };
 
-module.exports = WebViewShared;
+const originWhitelistToRegex = (originWhitelist: string): string =>
+  escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*');
+
+const passesWhitelist = (compiledWhitelist: Array<string>, url: string) => {
+  const origin = extractOrigin(url);
+  return compiledWhitelist.some(x => new RegExp(x).test(origin));
+};
+
+const compileWhitelist = (
+  originWhitelist: ?$ReadOnlyArray<string>,
+): Array<string> =>
+  ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
+
+const createOnShouldStartLoadWithRequest = (
+  loadRequest: (
+    shouldStart: boolean,
+    url: string,
+    lockIdentifier: number,
+  ) => void,
+  originWhitelist: ?$ReadOnlyArray<string>,
+  onShouldStartLoadWithRequest: ?OnShouldStartLoadWithRequest,
+) => {
+  return ({ nativeEvent }: WebViewNavigationEvent) => {
+    let shouldStart = true;
+    const { url, lockIdentifier } = nativeEvent;
+
+    if (passesWhitelist(compileWhitelist(originWhitelist), url)) {
+      Linking.openURL(url);
+    }
+
+    if (onShouldStartLoadWithRequest) {
+      shouldStart = onShouldStartLoadWithRequest(nativeEvent);
+    }
+
+    loadRequest(shouldStart, url, lockIdentifier);
+  };
+};
+
+export { defaultOriginWhitelist, createOnShouldStartLoadWithRequest };

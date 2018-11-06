@@ -10,12 +10,12 @@
 
 'use strict';
 
-import type {Node, Element, ComponentType} from 'react';
+import type { Node, Element, ComponentType } from 'react';
 
-import type {SyntheticEvent} from 'CoreEventTypes';
-import type {EdgeInsetsProp} from 'EdgeInsetsPropType';
-import type {ViewStyleProp} from 'StyleSheet';
-import type {ViewProps} from 'ViewPropTypes';
+import type { SyntheticEvent } from 'CoreEventTypes';
+import type { EdgeInsetsProp } from 'EdgeInsetsPropType';
+import type { ViewStyleProp } from 'StyleSheet';
+import type { ViewProps } from 'ViewPropTypes';
 
 export type WebViewNativeEvent = $ReadOnly<{|
   url: string,
@@ -23,13 +23,13 @@ export type WebViewNativeEvent = $ReadOnly<{|
   title: string,
   canGoBack: boolean,
   canGoForward: boolean,
-  lockIdentifier: number
+  lockIdentifier: number,
 |}>;
 
 export type WebViewProgressEvent = $ReadOnly<{|
-    ...WebViewNativeEvent,
-    progress: number,
-|}>
+  ...WebViewNativeEvent,
+  progress: number,
+|}>;
 
 export type WebViewNavigation = $ReadOnly<{|
   ...WebViewNativeEvent,
@@ -135,6 +135,10 @@ export type WebViewNativeConfig = $ReadOnly<{|
   viewManager?: ?Object,
 |}>;
 
+export type OnShouldStartLoadWithRequest = (
+  event: WebViewNavigation,
+) => boolean;
+
 export type IOSWebViewProps = $ReadOnly<{|
   /**
    * If true, use WKWebView instead of UIWebView.
@@ -198,9 +202,7 @@ export type IOSWebViewProps = $ReadOnly<{|
    *
    * @platform ios
    */
-  dataDetectorTypes?:
-    | ?DataDetectorTypes
-    | $ReadOnlyArray<DataDetectorTypes>,
+  dataDetectorTypes?: ?DataDetectorTypes | $ReadOnlyArray<DataDetectorTypes>,
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -316,7 +318,7 @@ export type AndroidWebViewProps = $ReadOnly<{|
   mixedContentMode?: ?('never' | 'always' | 'compatibility'),
 |}>;
 
-export type WebViewSharedProps =  $ReadOnly<{|
+export type WebViewSharedProps = $ReadOnly<{|
   ...ViewProps,
   ...IOSWebViewProps,
   ...AndroidWebViewProps,
@@ -337,7 +339,11 @@ export type WebViewSharedProps =  $ReadOnly<{|
   /**
    * Function that returns a view to show if there's an error.
    */
-  renderError: (errorDomain: ?string, errorCode: number, errorDesc: string) => Element<any>, // view to show if there's an error
+  renderError: (
+    errorDomain: ?string,
+    errorCode: number,
+    errorDesc: string,
+  ) => Element<any>, // view to show if there's an error
 
   /**
    * Function that returns a loading indicator.
@@ -433,7 +439,7 @@ export type WebViewSharedProps =  $ReadOnly<{|
    * `true` from the function to continue loading the request and `false`
    * to stop loading. The `navigationType` is always `other` on android.
    */
-  onShouldStartLoadWithRequest?: (event: WebViewNavigation) => mixed,
+  onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 
   /**
    * Override the native component used to render the WebView. Enables a custom native

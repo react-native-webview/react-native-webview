@@ -608,20 +608,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setGeolocationEnabled(isGeolocationEnabled != null && isGeolocationEnabled);
   }
 
-  @ReactProp(name = "originWhitelist")
-  public void setOriginWhitelist(
-    WebView view,
-    @Nullable ReadableArray originWhitelist) {
-    RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
-    if (client != null && originWhitelist != null) {
-      List<Pattern> whiteList = new LinkedList<>();
-      for (int i = 0 ; i < originWhitelist.size() ; i++) {
-        whiteList.add(Pattern.compile(originWhitelist.getString(i)));
-      }
-      client.setOriginWhitelist(whiteList);
-    }
-  }
-
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -630,9 +616,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @Override
   public Map getExportedCustomDirectEventTypeConstants() {
-    MapBuilder.Builder builder = MapBuilder.builder();
-    builder.put("topLoadingProgress", MapBuilder.of("registrationName", "onLoadingProgress"));
-    return builder.build();
+    return MapBuilder.builder()
+      .put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"))
+      .put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"))
+      .build();
   }
 
   @Override
@@ -725,14 +712,5 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     EventDispatcher eventDispatcher =
       reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
     eventDispatcher.dispatchEvent(event);
-  }
-
-  public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-    return MapBuilder.<String, Object>builder()
-            .put(TopShouldStartLoadWithRequestEvent.EVENT_NAME,
-                    MapBuilder.of(
-                            "phasedRegistrationNames",
-                            MapBuilder.of("bubbled", "onShouldStartLoadWithRequest")))
-            .build();
   }
 }
