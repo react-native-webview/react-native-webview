@@ -49,7 +49,7 @@ const createOnShouldStartLoadWithRequest = (
     let shouldStart = true;
     const { url, lockIdentifier } = nativeEvent;
 
-    if (passesWhitelist(compileWhitelist(originWhitelist), url)) {
+    if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
       Linking.openURL(url);
     }
 
