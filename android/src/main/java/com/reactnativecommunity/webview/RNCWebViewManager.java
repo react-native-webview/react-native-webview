@@ -30,6 +30,7 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -142,8 +143,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
               createWebViewEvent(webView, url)));
     }
 
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+    private boolean overrideUrlLoading(WebView view, String url) {
       if (url.equals(BLANK_URL)) return false;
 
       // url blacklisting
@@ -164,6 +164,24 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       launchIntent(view.getContext(), url);
       return true;
+    }
+
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+      if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
+        return false;
+      } else {
+        return overrideUrlLoading(view, url);
+      }
+    }
+
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        return overrideUrlLoading(view, request.getUrl().toString());
+      } else {
+        return false;
+      }
     }
 
     private void launchIntent(Context context, String url) {
