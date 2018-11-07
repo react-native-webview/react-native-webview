@@ -129,15 +129,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     let NativeWebView = nativeConfig.component || RNCWebView;
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
-      (shouldStart: boolean, url: string) => {
-        if (shouldStart) {
-          UIManager.dispatchViewManagerCommand(
-            this.getWebViewHandle(),
-            UIManager.RNCWebView.Commands.loadUrl,
-            [String(url)],
-          );
-        }
-      },
+      this.onShouldStartLoadWithRequestCallback,
       this.props.originWhitelist,
       this.props.onShouldStartLoadWithRequest,
     );
@@ -162,6 +154,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentSizeChange={this.props.onContentSizeChange}
         onLoadingStart={this.onLoadingStart}
         onLoadingFinish={this.onLoadingFinish}
@@ -298,6 +291,19 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress } = this.props;
     onLoadProgress && onLoadProgress(event);
+  };
+
+  onShouldStartLoadWithRequestCallback = (
+    shouldStart: boolean,
+    url: string,
+  ) => {
+    if (shouldStart) {
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        UIManager.RNCWebView.Commands.loadUrl,
+        [String(url)],
+      );
+    }
   };
 }
 

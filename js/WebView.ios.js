@@ -202,19 +202,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
     const nativeConfig = this.props.nativeConfig || {};
 
-    let viewManager = nativeConfig.viewManager;
-
-    if (this.props.useWebKit) {
-      viewManager = viewManager || RNCWKWebViewManager;
-    } else {
-      viewManager = viewManager || RNCUIWebViewManager;
-    }
-
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
-      (shouldStart: boolean, url: string, lockIdentifier) => {
-        invariant(viewManager != null, 'viewManager expected to be non-null');
-        viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
-      },
+      this.onShouldStartLoadWithRequestCallback,
       this.props.originWhitelist,
       this.props.onShouldStartLoadWithRequest,
     );
@@ -422,6 +411,22 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   _onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress } = this.props;
     onLoadProgress && onLoadProgress(event);
+  };
+
+  onShouldStartLoadWithRequestCallback = (
+    shouldStart: boolean,
+    url: string,
+    lockIdentifier: number,
+  ) => {
+    let viewManager = (this.props.nativeConfig || {}).viewManager;
+
+    if (this.props.useWebKit) {
+      viewManager = viewManager || RNCWKWebViewManager;
+    } else {
+      viewManager = viewManager || RNCUIWebViewManager;
+    }
+    invariant(viewManager != null, 'viewManager expected to be non-null');
+    viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
   };
 
   componentDidUpdate(prevProps: WebViewSharedProps) {
