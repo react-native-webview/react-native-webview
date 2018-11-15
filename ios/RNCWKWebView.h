@@ -44,5 +44,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)goBack;
 - (void)reload;
 - (void)stopLoading;
+    
+- (instancetype)initWithProcessPool:(WKProcessPool*)processPool;
 
 @end
