@@ -132,6 +132,16 @@ Once these are exposed, you can reference them in your custom web view class.
 }
 ```
 
+### Setting Client Certificate Authentication Credential
+
+If you open webpages that needs a Client Certificate for Authentication, you can create a credential and pass it to the webview:
+
+```
+[RNCWKWebView setClientAuthenticationCredential:credential];
+```
+
+This can be paired with a call from Javascript to pass a string label for the certificate stored in keychain and use native calls to fetch the certificate to create a credential object.
+
 ## JavaScript Interface
 
 To use your custom web view, you'll need to create a class for it. Your class must:
