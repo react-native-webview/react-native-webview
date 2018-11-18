@@ -39,12 +39,7 @@ static NSString *const MessageHanderName = @"ReactNative";
   BOOL _savedHideKeyboardAccessoryView;
 }
 
-- (void)dealloc
-{
-    if(_webView){
-        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
-    }
-}
+- (void)dealloc{}
 
 /**
  * See https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DisplayWebContent/Tasks/WebKitAvail.html.
@@ -112,9 +107,19 @@ static NSString *const MessageHanderName = @"ReactNative";
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self visitSource];
-  } else {
-    [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
   }
+}
+
+- (void)removeFromSuperview
+{
+    if (_webView) {
+        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
+        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+        [_webView removeFromSuperview];
+        _webView = nil;
+    }
+    
+    [super removeFromSuperview];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
