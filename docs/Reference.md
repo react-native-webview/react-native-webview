@@ -44,6 +44,8 @@ This document lays out the current public properties and methods for the React N
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`allowFileAccess`](Reference.md#allowFileAccess)
+- [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 
 ## Methods Index
 
@@ -332,11 +334,11 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 ### `userAgent`
 
-Sets the user-agent for the `WebView`.
+Sets the user-agent for the `WebView`. This will only work for iOS if you are using WKWebView, not UIWebView (see https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent).
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| string | No       | Android  |
+| string | No       | Android, iOS WKWebView  |
 
 ---
 
@@ -494,6 +496,26 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
+
+---
+
+### `allowFileAccess`
+
+If true, this will allow access to the file system via `file://` URI's. The default value is `false`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+---
+
+### `saveFormDataDisabled`
+
+Sets whether the WebView should disable saving form data. The default value is `false`. This function does not have any effect from Android API level 26 onwards as there is an Autofill feature which stores form data.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
 
 ## Methods
 

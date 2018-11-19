@@ -271,6 +271,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         }
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
         allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+        userAgent={this.props.userAgent}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
         onLoadingError={this._onLoadingError}
