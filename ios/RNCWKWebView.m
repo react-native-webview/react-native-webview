@@ -92,7 +92,9 @@ static NSString *const MessageHanderName = @"ReactNative";
     wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
       ? WKAudiovisualMediaTypeAll
       : WKAudiovisualMediaTypeNone;
-   wkWebViewConfig.dataDetectorTypes = _dataDetectorTypes;
+    wkWebViewConfig.dataDetectorTypes = _dataDetectorTypes;
+#else
+    wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
 #endif
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
@@ -216,7 +218,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
 {
-    
+
     if (_webView == nil) {
         _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
         return;
@@ -225,29 +227,29 @@ static NSString *const MessageHanderName = @"ReactNative";
     if (_savedHideKeyboardAccessoryView == false) {
         return;
     }
-    
+
     UIView* subview;
     for (UIView* view in _webView.scrollView.subviews) {
         if([[view.class description] hasPrefix:@"WK"])
             subview = view;
     }
-    
+
     if(subview == nil) return;
-    
+
     NSString* name = [NSString stringWithFormat:@"%@_SwizzleHelperWK", subview.class.superclass];
     Class newClass = NSClassFromString(name);
-    
+
     if(newClass == nil)
     {
         newClass = objc_allocateClassPair(subview.class, [name cStringUsingEncoding:NSASCIIStringEncoding], 0);
         if(!newClass) return;
-        
+
         Method method = class_getInstanceMethod([_SwizzleHelperWK class], @selector(inputAccessoryView));
         class_addMethod(newClass, @selector(inputAccessoryView), method_getImplementation(method), method_getTypeEncoding(method));
-        
+
         objc_registerClassPair(newClass);
     }
-    
+
     object_setClass(subview, newClass);
 }
 
