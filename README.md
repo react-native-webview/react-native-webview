@@ -46,7 +46,7 @@ class MyWebComponent extends Component {
 }
 ```
 
-For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md).
+For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md). If you're interested in contributing, check out the [Contributing Guide](./docs/Contributing.md).
 
 ## Migrate from React Native core WebView to React Native WebView
 
@@ -71,6 +71,7 @@ Simply install React Native WebView and then use it in place of the core WebView
 
 - [Jamon Holmgren](https://github.com/jamonholmgren) ([Twitter @jamonholmgren](https://twitter.com/jamonholmgren)) from [Infinite Red](https://infinite.red/react-native)
 - [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
+- [Empyrical](https://github.com/empyrical) ([Twitter @empyrical](https://twitter.com/empyrical))
 
 ## License
 
