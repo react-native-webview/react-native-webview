@@ -2,6 +2,7 @@
   "name": "react-native-webview",
   "description": "React Native WebView component for iOS, Android, and Windows 10 (coming soon)",
   "main": "index.js",
+  "typings": "typings/index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "contributors": [
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
@@ -27,6 +28,8 @@
   },
   "devDependencies": {
     "@semantic-release/git": "7.0.5",
+    "@types/react": "^16.4.18",
+    "@types/react-native": "^0.57.6",
     "flow-bin": "^0.80.0",
     "react-native": "^0.57",
     "semantic-release": "15.10.3"
