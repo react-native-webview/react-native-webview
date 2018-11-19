@@ -44,6 +44,8 @@ This document lays out the current public properties and methods for the React N
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`allowFileAccess`](Reference.md#allowFileAccess)
+- [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 
 ## Methods Index
 
@@ -495,6 +497,21 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
 
+### `allowFileAccess`
+
+If true, this will allow access to the file system via `file://` URI's. The default value is `false`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+### `saveFormDataDisabled`
+
+Sets whether the WebView should disable saving form data. The default value is `false`. This function does not have any effect from Android API level 26 onwards as there is an Autofill feature which stores form data.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
 
 ## Methods
 
