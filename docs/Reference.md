@@ -110,7 +110,7 @@ Set this to provide JavaScript that will be injected into the web page when the 
 
 ### `mediaPlaybackRequiresUserAction`
 
-Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`.
+Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`. (Android API minimum version 17)
 
 | Type | Required |
 | ---- | -------- |
@@ -497,6 +497,8 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
 
+---
+
 ### `allowFileAccess`
 
 If true, this will allow access to the file system via `file://` URI's. The default value is `false`.
@@ -504,6 +506,8 @@ If true, this will allow access to the file system via `file://` URI's. The defa
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | Android  |
+
+---
 
 ### `saveFormDataDisabled`
 
@@ -556,7 +560,7 @@ Stop loading the current page.
 ### `injectJavaScript(str)`
 
 ```javascript
-injectJavaScript("... javascript string ...");
+injectJavaScript('... javascript string ...');
 ```
 
 Executes the JavaScript string.
