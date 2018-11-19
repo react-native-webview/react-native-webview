@@ -25,7 +25,7 @@ Settings -> Safari -> Advanced -> Web Inspector
 
 It's possible to debug WebView contents in the Android emulator or on a device using Chrome DevTools.
 
-1. You will need to make the following change to `MainActivity.java` to enabled web contents debugging:
+1. You will need to make the following change to `MainApplication.java` to enabled web contents debugging:
 ```java
   import android.webkit.WebView;
 
@@ -40,6 +40,8 @@ It's possible to debug WebView contents in the Android emulator or on a device u
 3. Chrome -> DevTools -> Menu (3 dots) -> More tools -> Remote devices
 4. Select your device on the left and select "Inspect" on the WebView contents you'd like to inspect
 5. You can now debug the WebView contents just as you would on the web
+
+![image](https://user-images.githubusercontent.com/1479215/47129785-9476e480-d24b-11e8-8cb1-fba77ee1c072.png)
 
 ##### Note:
 
