@@ -11,6 +11,7 @@
 
 #import "objc/runtime.h"
 
+static NSTimer *keyboardTimer;
 static NSString *const MessageHanderName = @"ReactNative";
 
 // runtime trick to remove WKWebView keyboard default toolbar
@@ -74,6 +75,19 @@ static NSString *const MessageHanderName = @"ReactNative";
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
   }
+    
+  // Workaround for a keyboard dismissal bug present in iOS 12
+  // https://openradar.appspot.com/radar?id=5018321736957952
+  if (@available(iOS 12.0, *)) {
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+      selector:@selector(keyboardWillHide)
+      name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+      selector:@selector(keyboardWillShow)
+      name:UIKeyboardWillShowNotification object:nil];
+  }
   return self;
 }
 
@@ -92,7 +106,9 @@ static NSString *const MessageHanderName = @"ReactNative";
     wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
       ? WKAudiovisualMediaTypeAll
       : WKAudiovisualMediaTypeNone;
-   wkWebViewConfig.dataDetectorTypes = _dataDetectorTypes;
+    wkWebViewConfig.dataDetectorTypes = _dataDetectorTypes;
+#else
+    wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
 #endif
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
@@ -103,7 +119,9 @@ static NSString *const MessageHanderName = @"ReactNative";
     _webView.scrollView.bounces = _bounces;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
-
+    if (_userAgent) {
+      _webView.customUserAgent = _userAgent;
+    }
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
       _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -116,6 +134,25 @@ static NSString *const MessageHanderName = @"ReactNative";
   } else {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
   }
+}
+
+-(void)keyboardWillHide
+{
+    keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
+    [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
+}
+-(void)keyboardWillShow
+{
+    if (keyboardTimer != nil) {
+        [keyboardTimer invalidate];
+    }
+}
+-(void)keyboardDisplacementFix
+{
+    // https://stackoverflow.com/a/9637807/824966
+    [UIView animateWithDuration:.25 animations:^{
+        self.webView.scrollView.contentOffset = CGPointMake(0, 0);
+    }];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
@@ -214,7 +251,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
 {
-    
+
     if (_webView == nil) {
         _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
         return;
@@ -223,29 +260,29 @@ static NSString *const MessageHanderName = @"ReactNative";
     if (_savedHideKeyboardAccessoryView == false) {
         return;
     }
-    
+
     UIView* subview;
     for (UIView* view in _webView.scrollView.subviews) {
         if([[view.class description] hasPrefix:@"WK"])
             subview = view;
     }
-    
+
     if(subview == nil) return;
-    
+
     NSString* name = [NSString stringWithFormat:@"%@_SwizzleHelperWK", subview.class.superclass];
     Class newClass = NSClassFromString(name);
-    
+
     if(newClass == nil)
     {
         newClass = objc_allocateClassPair(subview.class, [name cStringUsingEncoding:NSASCIIStringEncoding], 0);
         if(!newClass) return;
-        
+
         Method method = class_getInstanceMethod([_SwizzleHelperWK class], @selector(inputAccessoryView));
         class_addMethod(newClass, @selector(inputAccessoryView), method_getImplementation(method), method_getTypeEncoding(method));
-        
+
         objc_registerClassPair(newClass);
     }
-    
+
     object_setClass(subview, newClass);
 }
 
