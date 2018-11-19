@@ -8,6 +8,8 @@
 - [x] Android
 - [ ] Windows 10 (coming soon)
 
+_Note: React Native WebView is not currently supported by Expo unless you "eject"._
+
 ## Versioning
 
 If you need the exact same WebView as the one from react-native, please use version **2.0.0**. Future versions will follow [semantic versioning](https://semver.org/).
@@ -26,18 +28,18 @@ Read our [Getting Started Guide](./docs/Getting-Started.md) for more.
 Import the `WebView` component from `react-native-webview` and use it like so:
 
 ```jsx
-import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, { Component } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { WebView } from "react-native-webview";
 
 // ...
 class MyWebComponent extends Component {
   render() {
     return (
       <WebView
-        source={{ uri: 'https://infinite.red/react-native' }}
+        source={{ uri: "https://infinite.red/react-native" }}
         style={{ marginTop: 20 }}
-        onLoadProgress={e=>console.log(e.nativeEvent.progress)}
+        onLoadProgress={e => console.log(e.nativeEvent.progress)}
       />
     );
   }
@@ -49,6 +51,10 @@ For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide
 ## Migrate from React Native core WebView to React Native WebView
 
 Simply install React Native WebView and then use it in place of the core WebView. Their APIs are currently identical, except that this package defaults `useWebKit={true}` unlike the built-in WebView.
+
+## Troubleshooting
+
+- If you're getting `Invariant Violation: Native component for "RNCWKWebView does not exist"` it likely means you forgot to run `react-native link` or there was some error with the linking process
 
 ### Contributor Notes
 
