@@ -8,7 +8,6 @@ This document lays out the current public properties and methods for the React N
 
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
-- [`injectJavaScript`](Reference.md#injectjavascript)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
@@ -53,6 +52,7 @@ This document lays out the current public properties and methods for the React N
 - [`goBack`](Reference.md#goback)
 - [`reload`](Reference.md#reload)
 - [`stopLoading`](Reference.md#stoploading)
+- [`injectJavaScript`](Reference.md#injectjavascriptstr)
 
 ---
 
@@ -93,16 +93,6 @@ Controls whether to adjust the content inset for web views that are placed behin
 | Type | Required |
 | ---- | -------- |
 | bool | No       |
-
----
-
-### `injectJavaScript`
-
-Function that accepts a string that will be passed to the WebView and executed immediately as JavaScript.
-
-| Type     | Required |
-| -------- | -------- |
-| function | No       |
 
 ---
 
@@ -545,6 +535,14 @@ stopLoading();
 ```
 
 Stop loading the current page.
+
+### `injectJavaScript(str)`
+
+```javascript
+injectJavaScript("... javascript string ...");
+```
+
+Executes the JavaScript string.
 
 ## Other Docs
 
