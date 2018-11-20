@@ -461,6 +461,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setJavaScriptEnabled(enabled);
   }
 
+  @ReactProp(name = "enableCache")
+  public void setCacheEnabled(WebView view, boolean enabled) {
+    if (enabled) {
+      view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+    } else {
+      view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+    }
+  }
+
   @ReactProp(name = "overScrollMode")
   public void setOverScrollMode(WebView view, String overScrollModeString) {
     Integer overScrollMode;
