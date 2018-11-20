@@ -40,12 +40,7 @@ static NSString *const MessageHanderName = @"ReactNative";
   BOOL _savedHideKeyboardAccessoryView;
 }
 
-- (void)dealloc
-{
-    if(_webView){
-        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
-    }
-}
+- (void)dealloc{}
 
 /**
  * See https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DisplayWebContent/Tasks/WebKitAvail.html.
@@ -131,9 +126,19 @@ static NSString *const MessageHanderName = @"ReactNative";
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self visitSource];
-  } else {
-    [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
   }
+}
+
+- (void)removeFromSuperview
+{
+    if (_webView) {
+        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
+        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+        [_webView removeFromSuperview];
+        _webView = nil;
+    }
+    
+    [super removeFromSuperview];
 }
 
 -(void)keyboardWillHide
@@ -141,12 +146,14 @@ static NSString *const MessageHanderName = @"ReactNative";
     keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
     [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
 }
+  
 -(void)keyboardWillShow
 {
     if (keyboardTimer != nil) {
         [keyboardTimer invalidate];
     }
 }
+
 -(void)keyboardDisplacementFix
 {
     // https://stackoverflow.com/a/9637807/824966
