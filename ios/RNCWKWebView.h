@@ -17,7 +17,6 @@
    shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
    withCallback:(RCTDirectEventBlock)callback;
 
-
 @end
 
 @interface RNCWKWebView : RCTView
@@ -39,6 +38,7 @@
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 @property (nonatomic, assign) BOOL allowsBackForwardNavigationGestures;
 @property (nonatomic, assign) BOOL useSharedProcessPool;
+@property (nonatomic, copy) NSString *userAgent;
 
 - (void)postMessage:(NSString *)message;
 - (void)injectJavaScript:(NSString *)script;

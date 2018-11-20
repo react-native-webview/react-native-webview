@@ -56,12 +56,6 @@ import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import javax.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -510,6 +504,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
   @ReactProp(name = "mediaPlaybackRequiresUserAction")
   public void setMediaPlaybackRequiresUserAction(WebView view, boolean requires) {
     view.getSettings().setMediaPlaybackRequiresUserGesture(requires);
