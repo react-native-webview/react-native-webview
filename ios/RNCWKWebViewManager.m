@@ -46,6 +46,7 @@ RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustContentInsets, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(userAgent, NSString)
+RCT_EXPORT_VIEW_PROPERTY(enableCache, BOOL)
 
 /**
  * Expose methods to enable messaging the webview.
