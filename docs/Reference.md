@@ -8,7 +8,6 @@ This document lays out the current public properties and methods for the React N
 
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
-- [`injectJavaScript`](Reference.md#injectjavascript)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
@@ -44,6 +43,9 @@ This document lays out the current public properties and methods for the React N
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
+- [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`allowFileAccess`](Reference.md#allowFileAccess)
+- [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 
 ## Methods Index
 
@@ -52,6 +54,7 @@ This document lays out the current public properties and methods for the React N
 - [`goBack`](Reference.md#goback)
 - [`reload`](Reference.md#reload)
 - [`stopLoading`](Reference.md#stoploading)
+- [`injectJavaScript`](Reference.md#injectjavascriptstr)
 
 ---
 
@@ -95,16 +98,6 @@ Controls whether to adjust the content inset for web views that are placed behin
 
 ---
 
-### `injectJavaScript`
-
-Function that accepts a string that will be passed to the WebView and executed immediately as JavaScript.
-
-| Type     | Required |
-| -------- | -------- |
-| function | No       |
-
----
-
 ### `injectedJavaScript`
 
 Set this to provide JavaScript that will be injected into the web page when the view loads.
@@ -117,7 +110,7 @@ Set this to provide JavaScript that will be injected into the web page when the 
 
 ### `mediaPlaybackRequiresUserAction`
 
-Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`.
+Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`. (Android API minimum version 17)
 
 | Type | Required |
 | ---- | -------- |
@@ -341,11 +334,11 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 ### `userAgent`
 
-Sets the user-agent for the `WebView`.
+Sets the user-agent for the `WebView`. This will only work for iOS if you are using WKWebView, not UIWebView (see https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent).
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| string | No       | Android  |
+| string | No       | Android, iOS WKWebView  |
 
 ---
 
@@ -494,6 +487,36 @@ If true, this will hide the keyboard accessory view (< > and Done) when using th
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
 
+---
+
+### `allowsBackForwardNavigationGestures`
+
+If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+---
+
+### `allowFileAccess`
+
+If true, this will allow access to the file system via `file://` URI's. The default value is `false`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+---
+
+### `saveFormDataDisabled`
+
+Sets whether the WebView should disable saving form data. The default value is `false`. This function does not have any effect from Android API level 26 onwards as there is an Autofill feature which stores form data.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
 ## Methods
 
 ### `extraNativeComponentConfig()`
@@ -533,6 +556,14 @@ stopLoading();
 ```
 
 Stop loading the current page.
+
+### `injectJavaScript(str)`
+
+```javascript
+injectJavaScript('... javascript string ...');
+```
+
+Executes the JavaScript string.
 
 ## Other Docs
 

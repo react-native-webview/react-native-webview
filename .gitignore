@@ -48,3 +48,7 @@ bundles/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+android/gradle
+android/gradlew
+android/gradlew.bat
