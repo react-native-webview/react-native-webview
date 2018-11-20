@@ -130,6 +130,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   static defaultProps = {
     useWebKit: true,
+    enableCache: true,
     originWhitelist: WebViewShared.defaultOriginWhitelist,
   };
 

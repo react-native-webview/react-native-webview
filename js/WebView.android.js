@@ -69,6 +69,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     allowFileAccess: false,
     saveFormDataDisabled: false,
     originWhitelist: WebViewShared.defaultOriginWhitelist,
+    enableCache: true,
   };
 
   state = {
@@ -284,7 +285,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };
-  
+
   onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress} = this.props;
     onLoadProgress && onLoadProgress(event);
