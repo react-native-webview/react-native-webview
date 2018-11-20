@@ -8,6 +8,7 @@
 #import "RNCWKWebView.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import "RNCWKProcessPoolManager.h"
 
 #import "objc/runtime.h"
 
@@ -37,7 +38,6 @@ static NSString *const MessageHanderName = @"ReactNative";
 {
   UIColor * _savedBackgroundColor;
   BOOL _savedHideKeyboardAccessoryView;
-  WKProcessPool *_processPool;
 }
 
 - (void)dealloc
@@ -64,14 +64,6 @@ static NSString *const MessageHanderName = @"ReactNative";
 
   return _webkitAvailable;
 }
-    
-- (instancetype)initWithProcessPool:(WKProcessPool*)processPool {
-     if (self = [self initWithFrame:CGRectZero]) {
-         _processPool = processPool;
-    }
-    return self;
-}
-
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -93,7 +85,9 @@ static NSString *const MessageHanderName = @"ReactNative";
     };
 
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
-    wkWebViewConfig.processPool = _processPool;
+    if(self.useSharedProcessPool) {
+        wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
+    }
     wkWebViewConfig.userContentController = [WKUserContentController new];
     [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHanderName];
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;

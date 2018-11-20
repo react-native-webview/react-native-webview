@@ -131,6 +131,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   static defaultProps = {
     useWebKit: true,
     originWhitelist: WebViewShared.defaultOriginWhitelist,
+    useSharedProcessPool: true,
   };
 
   state = {
@@ -284,6 +285,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.mediaPlaybackRequiresUserAction
         }
         dataDetectorTypes={this.props.dataDetectorTypes}
+        useSharedProcessPool={this.props.useSharedProcessPool}
         {...nativeConfig.props}
       />
     );

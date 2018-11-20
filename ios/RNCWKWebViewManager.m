@@ -18,22 +18,13 @@
 {
   NSConditionLock *_shouldStartLoadLock;
   BOOL _shouldStartLoad;
-  WKProcessPool *_processPool;
 }
 
 RCT_EXPORT_MODULE()
 
-- (id)init {
-    if (self = [super init]) {
-        _processPool = [[WKProcessPool alloc] init];
-    }
-    
-    return self;
-}
-
 - (UIView *)view
 {
-  RNCWKWebView *webView = [[RNCWKWebView alloc] initWithProcessPool:_processPool];
+  RNCWKWebView *webView = [RNCWKWebView new];
   webView.delegate = self;
   return webView;
 }
@@ -75,6 +66,10 @@ RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)m
 
 RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWKWebView) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, RNCWKWebView) {
+  view.useSharedProcessPool = json == nil ? true : [RCTConvert BOOL: json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, RNCWKWebView) {

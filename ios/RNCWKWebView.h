@@ -14,8 +14,9 @@
 @protocol RNCWKWebViewDelegate <NSObject>
 
 - (BOOL)webView:(RNCWKWebView *)webView
-shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
+   shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
    withCallback:(RCTDirectEventBlock)callback;
+
 
 @end
 
@@ -37,6 +38,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL automaticallyAdjustContentInsets;
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 @property (nonatomic, assign) BOOL allowsBackForwardNavigationGestures;
+@property (nonatomic, assign) BOOL useSharedProcessPool;
 
 - (void)postMessage:(NSString *)message;
 - (void)injectJavaScript:(NSString *)script;
@@ -44,7 +46,5 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)goBack;
 - (void)reload;
 - (void)stopLoading;
-    
-- (instancetype)initWithProcessPool:(WKProcessPool*)processPool;
 
 @end
