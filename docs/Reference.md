@@ -46,6 +46,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
+- [`enableCache`](Reference.md#enableCache)
 
 ## Methods Index
 
@@ -516,6 +517,16 @@ Sets whether the WebView should disable saving form data. The default value is `
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | Android  |
+
+---
+
+### `enableCache`
+
+Sets whether WebView & WKWebView should use browser caching.
+
+| Type    | Required | Default |
+| ------- | -------- | ------- |
+| boolean | No       | true    |
 
 ## Methods
 
