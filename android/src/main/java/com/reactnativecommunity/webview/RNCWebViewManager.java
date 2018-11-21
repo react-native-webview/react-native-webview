@@ -295,8 +295,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           this,
           new ContentSizeChangeEvent(
             this.getId(),
-            this.getWidth(),
-            this.getContentHeight()
+            w,
+            h
           )
         );
       }
