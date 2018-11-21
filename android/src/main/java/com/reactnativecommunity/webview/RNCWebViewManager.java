@@ -85,6 +85,7 @@ import org.json.JSONObject;
 public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected static final String REACT_CLASS = "RNCWebView";
+  private RNCWebViewPackage aPackage;
 
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
@@ -427,6 +428,25 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
         callback.invoke(origin, true, false);
       }
+
+      protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
+        getModule().startPhotoPickerIntent(filePathCallback, acceptType);
+      }
+      protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
+        getModule().startPhotoPickerIntent(filePathCallback, "");
+      }
+      protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
+        getModule().startPhotoPickerIntent(filePathCallback, acceptType);
+      }
+
+      @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+      @Override
+      public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+        String[] acceptTypes = fileChooserParams.getAcceptTypes();
+        boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
+        Intent intent = fileChooserParams.createIntent();
+        return getModule().startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+      }
     });
     reactContext.addLifecycleEventListener(webView);
     mWebViewConfig.configWebView(webView);
@@ -746,5 +766,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     EventDispatcher eventDispatcher =
       reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
     eventDispatcher.dispatchEvent(event);
+  }
+
+  public RNCWebViewPackage getPackage() {
+    return this.aPackage;
+  }
+
+  public void setPackage(RNCWebViewPackage aPackage) {
+    this.aPackage = aPackage;
+  }
+
+  public RNCWebViewModule getModule() {
+    return this.aPackage.getModule();
   }
 }
