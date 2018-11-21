@@ -202,43 +202,6 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       webViewStyles.push(styles.hidden);
     }
 
-    const nativeConfig = this.props.nativeConfig || {};
-
-    let viewManager = nativeConfig.viewManager;
-
-    if (this.props.useWebKit) {
-      viewManager = viewManager || RNCWKWebViewManager;
-    } else {
-      viewManager = viewManager || RNCUIWebViewManager;
-    }
-
-    const compiledWhitelist = [
-      'about:blank',
-      ...(this.props.originWhitelist || []),
-    ].map(WebViewShared.originWhitelistToRegex);
-    const onShouldStartLoadWithRequest = event => {
-      let shouldStart = true;
-      const { url } = event.nativeEvent;
-      const origin = WebViewShared.extractOrigin(url);
-      const passesWhitelist = compiledWhitelist.some(x =>
-        new RegExp(x).test(origin),
-      );
-      shouldStart = shouldStart && passesWhitelist;
-      if (!passesWhitelist) {
-        Linking.openURL(url);
-      }
-      if (this.props.onShouldStartLoadWithRequest) {
-        shouldStart =
-          shouldStart &&
-          this.props.onShouldStartLoadWithRequest(event.nativeEvent);
-      }
-      invariant(viewManager != null, 'viewManager expected to be non-null');
-      viewManager.startLoadWithResult(
-        !!shouldStart,
-        event.nativeEvent.lockIdentifier,
-      );
-    };
-
     const decelerationRate = processDecelerationRate(
       this.props.decelerationRate,
     );
@@ -252,13 +215,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
     const messagingEnabled = typeof this.props.onMessage === 'function';
 
-    let NativeWebView = nativeConfig.component;
-
-    if (this.props.useWebKit) {
-      NativeWebView = NativeWebView || RNCWKWebView;
-    } else {
-      NativeWebView = NativeWebView || RNCUIWebView;
-    }
+    const nativeConfig = this.props.nativeConfig || {};
+    const NativeWebView = this.getViewCompontent();
 
     const webView = (
       <NativeWebView
@@ -284,7 +242,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         onLoadingProgress={this._onLoadingProgress}
         messagingEnabled={messagingEnabled}
         onMessage={this._onMessage}
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
         scalesPageToFit={scalesPageToFit}
         allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}
         mediaPlaybackRequiresUserAction={
@@ -405,6 +363,28 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     return findNodeHandle(this.webViewRef.current);
   };
 
+  getViewManager = () => {
+    const { nativeConfig } = this.props;
+    if (nativeConfig && nativeConfig.viewManager) {
+      return nativeConfig.viewManager;
+    } else if (this.props.useWebKit) {
+      return RNCWKWebViewManager;
+    } else {
+      return RNCUIWebViewManager;
+    }
+  };
+
+  getViewCompontent = () => {
+    const { nativeConfig } = this.props;
+    if (nativeConfig && nativeConfig.component) {
+      return nativeConfig.component;
+    } else if (this.props.useWebKit) {
+      return RNCWKWebView;
+    } else {
+      return RNCUIWebView;
+    }
+  };
+
   _onLoadingStart = (event: WebViewNavigationEvent) => {
     const onLoadStart = this.props.onLoadStart;
     onLoadStart && onLoadStart(event);
@@ -442,7 +422,39 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   _onLoadingProgress = (event: WebViewProgressEvent) => {
     const {onLoadProgress} = this.props;
     onLoadProgress && onLoadProgress(event);
-  }
+  };
+
+  _onShouldStartLoadWithRequest = async (event) => {
+    const { url, lockIdentifier } = event.nativeEvent;
+    const origin = WebViewShared.extractOrigin(url);
+    const viewManager = this.getViewManager();
+
+    invariant(typeof lockIdentifier === 'number', 'lockIdentifier expected to be a number');
+    invariant(viewManager != null, 'viewManager expected to be non-null');
+
+    let shouldStart = true;
+    const compiledWhitelist = [
+      'about:blank',
+      ...(this.props.originWhitelist || []),
+    ].map(WebViewShared.originWhitelistToRegex);
+    const passesWhitelist = compiledWhitelist.some(x =>
+      new RegExp(x).test(origin),
+    );
+    shouldStart = shouldStart && passesWhitelist;
+    if (!passesWhitelist) {
+      try {
+        await Linking.openURL(url);
+      } catch (error) {
+        console.warn('Could not open URL which wasn\'t whitelisted:', url, error);
+      }
+    }
+    if (this.props.onShouldStartLoadWithRequest) {
+      shouldStart =
+        shouldStart &&
+        this.props.onShouldStartLoadWithRequest(event.nativeEvent);
+    }
+    viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
+  };
 
   componentDidUpdate(prevProps: WebViewSharedProps) {
     if (!(prevProps.useWebKit && this.props.useWebKit)) {
