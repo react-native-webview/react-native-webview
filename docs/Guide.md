@@ -50,3 +50,58 @@ class MyWeb extends Component {
 }
 ```
 
+### Add support for File Upload
+
+##### iOS
+
+For iOS, all you need to do is specify the permissions in your `ios/[project]/Info.plist` file:
+
+Photo capture:
+```
+<key>NSCameraUsageDescription</key>
+<string>Take pictures for certain activities</string>
+```
+
+Gallery selection:
+```
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Select pictures for certain activities</string>
+```
+
+Video recording:
+```
+<key>NSMicrophoneUsageDescription</key>
+<string>Need microphone access for recording videos</string>
+```
+
+##### Android
+
+Add permission in AndroidManifest.xml:
+```xml
+<manifest ...>
+  ......
+
+  <!-- this is required only for Android 4.1-5.1 (api 16-22)  -->
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+  ......
+</manifest>
+```
+
+##### Check for File Upload support, with `static isFileUploadSupported()`
+
+File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
+
+```
+import { WebView } from "react-native-webview";
+
+WebView.isFileUploadSupported().then(res => {
+  if (res === true) {
+    // file upload is supported
+  } else {
+    // not file upload support
+  }
+});
+
+```
+

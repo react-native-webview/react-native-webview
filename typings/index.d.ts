@@ -199,6 +199,10 @@ export interface IOSWebViewProps {
    * backward compatible.
    */
   hideKeyboardAccessoryView?: boolean;
+  /**
+   * If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
+   */
+  allowsBackForwardNavigationGestures?: boolean
 }
 
 export interface AndroidWebViewProps {
@@ -417,4 +421,5 @@ export class WebView extends Component<WebViewSharedProps> {
   public goBack: () => void;
   public reload: () => void;
   public stopLoading: () => void;
+  public injectJavaScript: (js: string) => void
 }
