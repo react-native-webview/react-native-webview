@@ -1,8 +1,11 @@
 package com.reactnativecommunity.webview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+
 import com.facebook.react.uimanager.UIManagerModule;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -303,6 +306,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       return new RNCWebViewBridge(webView);
     }
 
+    @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
       if (messagingEnabled == enabled) {
         return;
@@ -484,9 +488,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "enableCache")
   public void setCacheEnabled(WebView view, boolean enabled) {
     if (enabled) {
-      view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+      Context ctx = view.getContext();
+      if (ctx != null) {
+        view.getSettings().setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        view.getSettings().setAppCacheEnabled(true);
+      }
     } else {
       view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+      view.getSettings().setAppCacheEnabled(false);
     }
   }
 
