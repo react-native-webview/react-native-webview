@@ -24,7 +24,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 }
 @end
 
-@interface RNCWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
+@interface RNCWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol, UIScrollViewDelegate>
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
@@ -302,6 +302,19 @@ static NSString *const MessageHanderName = @"ReactNative";
 {
   _scrollEnabled = scrollEnabled;
   _webView.scrollView.scrollEnabled = scrollEnabled;
+
+  // Override the scrollView delegate to prevent scrolling.
+  if (!scrollEnabled) {
+    _webView.scrollView.delegate = self;
+  } else {
+    _webView.scrollView.delegate = _webView;
+  }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  // Don't allow scrolling the scrollView.
+  scrollView.bounds = _webView.bounds;
 }
 
 - (void)postMessage:(NSString *)message
