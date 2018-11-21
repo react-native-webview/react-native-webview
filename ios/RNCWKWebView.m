@@ -70,7 +70,7 @@ static NSString *const MessageHanderName = @"ReactNative";
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
   }
-    
+
   // Workaround for a keyboard dismissal bug present in iOS 12
   // https://openradar.appspot.com/radar?id=5018321736957952
   if (@available(iOS 12.0, *)) {
@@ -111,6 +111,7 @@ static NSString *const MessageHanderName = @"ReactNative";
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
     _webView.scrollView.scrollEnabled = _scrollEnabled;
+    _webView.scrollView.pagingEnabled = _pagingEnabled;
     _webView.scrollView.bounces = _bounces;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
@@ -137,7 +138,7 @@ static NSString *const MessageHanderName = @"ReactNative";
         [_webView removeFromSuperview];
         _webView = nil;
     }
-    
+
     [super removeFromSuperview];
 }
 
@@ -146,7 +147,7 @@ static NSString *const MessageHanderName = @"ReactNative";
     keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
     [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
 }
-  
+
 -(void)keyboardWillShow
 {
     if (keyboardTimer != nil) {
