@@ -134,6 +134,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     useSharedProcessPool: true,
   };
 
+  static isFileUploadSupported = async () => {
+    // no native implementation for iOS, depends only on permissions
+    return true;
+  }
+
   state = {
     viewState: this.props.startInLoadingState
       ? WebViewState.LOADING
