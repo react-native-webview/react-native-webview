@@ -436,5 +436,5 @@ export class WebView extends Component<WebViewSharedProps> {
   public reload: () => void;
   public stopLoading: () => void;
   public postMessage: (msg: string) => void;
-  public injectJavaScript: (js: string) => void
+  public injectJavaScript: (js: string) => void;
 }
