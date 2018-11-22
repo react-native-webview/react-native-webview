@@ -374,7 +374,7 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
    * Boolean value that forces the `WebView` to show the loading view
    * on the first load.
    */
-  startInLoadingState?: string;
+  startInLoadingState?: boolean;
 
   /**
    * Set this to provide JavaScript that will be injected into the web page
