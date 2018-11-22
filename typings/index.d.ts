@@ -9,6 +9,12 @@ export interface WebViewNativeEvent {
   readonly canGoForward: boolean;
 }
 
+export interface WebViewIOSLoadRequestEvent extends WebViewNativeEvent {
+  target: number;
+  lockIdentifier: number;
+  navigationType: "click" | "formsubmit" | "backforward" | "reload" | "formresubmit" | "other";
+}
+
 export interface WebViewProgressEvent extends WebViewNativeEvent {
   readonly progress: number;
 }
@@ -182,7 +188,7 @@ export interface IOSWebViewProps {
    * to stop loading.
    * @platform ios
    */
-  onShouldStartLoadWithRequest?: (event: WebViewNativeEvent) => any;
+  onShouldStartLoadWithRequest?: (event: WebViewIOSLoadRequestEvent) => any;
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
