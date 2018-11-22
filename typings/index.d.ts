@@ -146,6 +146,14 @@ export interface IOSWebViewProps {
   scrollEnabled?: boolean;
 
   /**
+   * If the value of this property is true, the scroll view stops on multiples
+   * of the scroll view’s bounds when the user scrolls.
+   * The default value is false.
+   * @platform ios
+   */
+  pagingEnabled?: boolean,
+
+  /**
    * The amount by which the web view content is inset from the edges of
    * the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
    * @platform ios
