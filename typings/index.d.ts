@@ -9,6 +9,12 @@ export interface WebViewNativeEvent {
   readonly canGoForward: boolean;
 }
 
+export interface WebViewIOSLoadRequestEvent extends WebViewNativeEvent {
+  target: number;
+  lockIdentifier: number;
+  navigationType: "click" | "formsubmit" | "backforward" | "reload" | "formresubmit" | "other";
+}
+
 export interface WebViewProgressEvent extends WebViewNativeEvent {
   readonly progress: number;
 }
@@ -190,7 +196,7 @@ export interface IOSWebViewProps {
    * to stop loading.
    * @platform ios
    */
-  onShouldStartLoadWithRequest?: (event: WebViewNativeEvent) => any;
+  onShouldStartLoadWithRequest?: (event: WebViewIOSLoadRequestEvent) => any;
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -382,7 +388,7 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
    * Boolean value that forces the `WebView` to show the loading view
    * on the first load.
    */
-  startInLoadingState?: string;
+  startInLoadingState?: boolean;
 
   /**
    * Set this to provide JavaScript that will be injected into the web page
@@ -429,6 +435,6 @@ export class WebView extends Component<WebViewSharedProps> {
   public goBack: () => void;
   public reload: () => void;
   public stopLoading: () => void;
-  public postMessage: (msg: string) => void
-  public injectJavaScript: (js: string) => void
+  public postMessage: (msg: string) => void;
+  public injectJavaScript: (js: string) => void;
 }
