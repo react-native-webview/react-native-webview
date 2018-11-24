@@ -216,7 +216,17 @@ export interface IOSWebViewProps {
   /**
    * If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
    */
-  allowsBackForwardNavigationGestures?: boolean
+  allowsBackForwardNavigationGestures?: boolean;
+
+  /**
+   * A Boolean value that determines whether pressing on a link
+   * displays a preview of the destination for the link.
+   *
+   * This property is available on devices that support 3D Touch.
+   * In iOS 10 and later, the default value is `true`; before that, the default value is `false`.
+   * @platform ios
+   */
+  allowsLinkPreview?: boolean;
 }
 
 export interface AndroidWebViewProps {
