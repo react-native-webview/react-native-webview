@@ -1,8 +1,8 @@
 {
   "name": "react-native-webview",
   "description": "React Native WebView component for iOS, Android, and Windows 10 (coming soon)",
-  "main": "index.js",
-  "typings": "typings/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "contributors": [
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
@@ -11,11 +11,10 @@
   "version": "2.12.1",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
-    "test:ios:flow": "flow check",
-    "test:android:flow": "flow check --flowconfig-name .flowconfig.android",
+    "compile": "tsc",
     "ci:publish": "yarn semantic-release",
-    "ci:test": "yarn ci:test:flow",
-    "ci:test:flow": "yarn test:ios:flow && yarn test:android:flow",
+    "ci:test": "yarn ci:test:compile",
+    "ci:test:compile": "yarn compile",
     "semantic-release": "semantic-release"
   },
   "peerDependencies": {
@@ -24,15 +23,16 @@
   },
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
-    "fbjs": "^0.8.17"
+    "invariant": "^2.2.4"
   },
   "devDependencies": {
     "@semantic-release/git": "7.0.5",
+    "@types/invariant": "^2.2.29",
     "@types/react": "^16.4.18",
     "@types/react-native": "^0.57.6",
-    "flow-bin": "^0.80.0",
     "react-native": "^0.57",
-    "semantic-release": "15.10.3"
+    "semantic-release": "15.10.3",
+    "typescript": "^3.1.6"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "lib",    
+    "esModuleInterop": true,
+    "isolatedModules": false,
+    "outDir": "./lib",
+    "moduleResolution": "node",
+    "module": "esnext",
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["es6"],
+    "sourceMap": true,
+    "removeComments": true,
+    "jsx": "react-native",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": false,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "target": "esnext"
+  }
+}
