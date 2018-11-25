@@ -42,6 +42,9 @@ package-lock.json
 #
 bundles/
 
+# Typescript compile
+lib/
+
 # VS Code
 .vscode/*
 !.vscode/settings.json
@@ -52,3 +55,4 @@ bundles/
 android/gradle
 android/gradlew
 android/gradlew.bat
+

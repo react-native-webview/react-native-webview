@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- * @flow
+ * @typescript
  */
 
 'use strict';
@@ -23,4 +23,4 @@ const WebViewShared = {
   },
 };
 
-module.exports = WebViewShared;
+export default WebViewShared

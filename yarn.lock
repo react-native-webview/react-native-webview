@@ -739,18 +739,24 @@
     into-stream "^4.0.0"
     lodash "^4.17.4"
 
+"@types/invariant@^2.2.29":
+  version "2.2.29"
+  resolved "https://registry.yarnpkg.com/@types/invariant/-/invariant-2.2.29.tgz#aa845204cd0a289f65d47e0de63a6a815e30cc66"
+  integrity sha512-lRVw09gOvgviOfeUrKc/pmTiRZ7g7oDOU6OAutyuSHpm1/o2RaBQvRhgK8QEdu+FFuw/wnWb29A/iuxv9i8OpQ==
+
 "@types/prop-types@*":
   version "15.5.6"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.5.6.tgz#9c03d3fed70a8d517c191b7734da2879b50ca26c"
 
 "@types/react-native@^0.57.6":
-  version "0.57.6"
-  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.57.6.tgz#b53afeebcb19f7ba353f0937b6778d39c2cf10d0"
+  version "0.57.13"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.57.13.tgz#02dc7b8f5b291b290e047fb0da3ceaa27d7c71b9"
+  integrity sha512-0r6XoeIz4rujZx7ZKKE58ilSxlReXbIVBFAquTuzrIV0SP+EDjI+ePwIhfnMn/F3Wt2b2R/GXqFsW643lKwmLA==
   dependencies:
     "@types/prop-types" "*"
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^16.4.18":
+"@types/react@*":
   version "16.4.18"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.4.18.tgz#2e28a2e7f92d3fa7d6a65f2b73275c3e3138a13d"
   dependencies:
@@ -2572,7 +2578,7 @@ fbjs-scripts@^0.8.1:
     semver "^5.1.0"
     through2 "^2.0.0"
 
-fbjs@^0.8.17, fbjs@^0.8.9:
+fbjs@^0.8.9:
   version "0.8.17"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.17.tgz#c4d598ead6949112653d6588b01a5cdcd9f90fdd"
   dependencies:
@@ -2672,10 +2678,6 @@ find-versions@^2.0.0:
   dependencies:
     array-uniq "^1.0.0"
     semver-regex "^1.0.0"
-
-flow-bin@^0.80.0:
-  version "0.80.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.80.0.tgz#04cc1ee626a6f50786f78170c92ebe1745235403"
 
 flush-write-stream@^1.0.0:
   version "1.0.3"
@@ -6373,6 +6375,11 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
 typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
+
+typescript@^3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.6.tgz#b6543a83cfc8c2befb3f4c8fba6896f5b0c9be68"
+  integrity sha512-tDMYfVtvpb96msS1lDX9MEdHrW4yOuZ4Kdc4Him9oU796XldPYF/t2+uKoX0BBa0hXXwDlqYQbXY5Rzjzc5hBA==
 
 ua-parser-js@^0.7.18:
   version "0.7.18"

@@ -1,3 +1,3 @@
-import WebView from './js/WebView';
+import WebView from "./WebView";
 
 export { WebView };
