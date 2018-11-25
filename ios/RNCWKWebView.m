@@ -113,8 +113,10 @@ static NSString *const MessageHanderName = @"ReactNative";
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
     _webView.scrollView.bounces = _bounces;
+    _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
+
     if (_userAgent) {
       _webView.customUserAgent = _userAgent;
     }
