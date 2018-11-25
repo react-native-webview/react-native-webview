@@ -12,7 +12,7 @@
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "prebuild": "rimraf lib",
-    "prepare": "yarn run build",
+    "prepare": "npm run build",
     "build": "tsc -p tsconfig.base.json && cp ./index.js ./lib/index.js",
     "ci:publish": "yarn semantic-release",
     "ci:test": "yarn ci:test:build",
