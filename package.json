@@ -31,7 +31,6 @@
     "@semantic-release/git": "7.0.5",
     "@types/invariant": "^2.2.29",
     "@types/react-native": "^0.57.6",
-    "react-native": "^0.57",
     "rimraf": "^2.6.2",
     "semantic-release": "15.10.3",
     "typescript": "^3.1.6"
