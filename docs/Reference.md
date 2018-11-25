@@ -47,6 +47,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
+- [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 
 ## Methods Index
 
@@ -523,6 +524,16 @@ Sets whether the WebView should disable saving form data. The default value is `
 ### `pagingEnabled`
 
 If the value of this property is true, the scroll view stops on multiples of the scroll view’s bounds when the user scrolls. The default value is false.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+---
+
+### `allowsLinkPreview`
+
+A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is true; before that, the default value is false.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |

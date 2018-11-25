@@ -1,103 +1,99 @@
-import { ComponentType, ReactElement, ReactNode } from "react";
-import {
-  Insets,
-  NativeSyntheticEvent,
-  StyleProp,
-  ViewProps,
-  ViewStyle
-} from "react-native";
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @format
+ * @flow
+ */
 
-declare module "react-native" {
-  interface UIManagerStatic {
-    dispatchViewManagerCommand(node: any, callback: any, x: any): void;
-    RNCUIWebView: any;
-    RNCWKWebView: any;
-    RNCWebView: any;
-  }
-}
+'use strict';
 
-export interface WebViewNativeEvent {
-  readonly url: string;
-  readonly loading: boolean;
-  readonly title: string;
-  readonly canGoBack: boolean;
-  readonly canGoForward: boolean;
-}
+import type {Node, Element, ComponentType} from 'react';
 
-export interface WebViewIOSLoadRequestEvent extends WebViewNativeEvent {
-  target: number;
-  lockIdentifier: number;
+import type {SyntheticEvent} from 'CoreEventTypes';
+import type {EdgeInsetsProp} from 'EdgeInsetsPropType';
+import type {ViewStyleProp} from 'StyleSheet';
+import type {ViewProps} from 'ViewPropTypes';
+
+export type WebViewNativeEvent = $ReadOnly<{|
+  url: string,
+  loading: boolean,
+  title: string,
+  canGoBack: boolean,
+  canGoForward: boolean,
+|}>;
+
+export type WebViewProgressEvent = $ReadOnly<{|
+    ...WebViewNativeEvent,
+    progress: number,
+|}>
+
+export type WebViewNavigation = $ReadOnly<{|
+  ...WebViewNativeEvent,
   navigationType:
-    | "click"
-    | "formsubmit"
-    | "backforward"
-    | "reload"
-    | "formresubmit"
-    | "other";
-}
+    | 'click'
+    | 'formsubmit'
+    | 'backforward'
+    | 'reload'
+    | 'formresubmit'
+    | 'other',
+|}>;
 
-export interface WebViewProgressEvent extends WebViewNativeEvent {
-  readonly progress: number;
-}
+export type WebViewMessage = $ReadOnly<{|
+  ...WebViewNativeEvent,
+  data: string,
+|}>;
 
-export interface WebViewNavigation extends WebViewNativeEvent {
-  readonly navigationType:
-    | "click"
-    | "formsubmit"
-    | "backforward"
-    | "reload"
-    | "formresubmit"
-    | "other";
-}
+export type WebViewError = $ReadOnly<{|
+  ...WebViewNativeEvent,
+  /**
+   * `domain` is only used on iOS
+   */
+  domain: ?string,
+  code: number,
+  description: string,
+|}>;
 
-export interface WebViewMessage extends WebViewNativeEvent {
-  readonly data: string;
-}
+export type WebViewEvent = SyntheticEvent<WebViewNativeEvent>;
 
-export interface WebViewError extends WebViewNativeEvent {
-  readonly domain?: string;
-  readonly code: number;
-  readonly description: string;
-}
+export type WebViewNavigationEvent = SyntheticEvent<WebViewNavigation>;
 
-export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
+export type WebViewMessageEvent = SyntheticEvent<WebViewMessage>;
 
-export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
-
-export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
-
-export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
+export type WebViewErrorEvent = SyntheticEvent<WebViewError>;
 
 export type DataDetectorTypes =
-  | "phoneNumber"
-  | "link"
-  | "address"
-  | "calendarEvent"
-  | "trackingNumber"
-  | "flightNumber"
-  | "lookupSuggestion"
-  | "none"
-  | "all";
+  | 'phoneNumber'
+  | 'link'
+  | 'address'
+  | 'calendarEvent'
+  | 'trackingNumber'
+  | 'flightNumber'
+  | 'lookupSuggestion'
+  | 'none'
+  | 'all';
 
-export type OverScrollModeType = "always" | "content" | "never";
+export type OverScrollModeType = 'always' | 'content' | 'never';
 
-export interface WebViewSourceUri {
+export type WebViewSourceUri = $ReadOnly<{|
   /**
    * The URI to load in the `WebView`. Can be a local or remote file.
    */
-  uri?: string;
+  uri?: ?string,
 
   /**
    * The HTTP Method to use. Defaults to GET if not specified.
    * NOTE: On Android, only GET and POST are supported.
    */
-  method?: string;
+  method?: string,
 
   /**
    * Additional HTTP headers to send with the request.
    * NOTE: On Android, this can only be used with GET requests.
    */
-  headers?: { [key: string]: string };
+  headers?: Object,
 
   /**
    * The HTTP body to send with the request. This must be a valid
@@ -105,52 +101,52 @@ export interface WebViewSourceUri {
    * additional encoding (e.g. URL-escaping or base64) applied.
    * NOTE: On Android, this can only be used with POST requests.
    */
-  body?: string;
-}
+  body?: string,
+|}>;
 
-export interface WebViewSourceHtml {
+export type WebViewSourceHtml = $ReadOnly<{|
   /**
    * A static HTML page to display in the WebView.
    */
-  html?: string;
+  html?: ?string,
   /**
    * The base URL to be used for any relative links in the HTML.
    */
-  baseUrl?: string;
-}
+  baseUrl?: ?string,
+|}>;
 
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
-export interface WebViewNativeConfig {
+export type WebViewNativeConfig = $ReadOnly<{|
   /*
    * The native component used to render the WebView.
    */
-  component?: ComponentType<WebViewSharedProps>;
+  component?: ComponentType<WebViewSharedProps>,
   /*
    * Set props directly on the native component WebView. Enables custom props which the
    * original WebView doesn't pass through.
    */
-  props?: any;
+  props?: ?Object,
   /*
    * Set the ViewManager to use for communication with the native side.
    * @platform ios
    */
-  viewManager?: any;
-}
+  viewManager?: ?Object,
+|}>;
 
-export interface IOSWebViewProps {
+export type IOSWebViewProps = $ReadOnly<{|
   /**
    * If true, use WKWebView instead of UIWebView.
    * @platform ios
    */
-  useWebKit?: boolean;
+  useWebKit?: ?boolean,
 
   /**
    * Boolean value that determines whether the web view bounces
    * when it reaches the edge of the content. The default value is `true`.
    * @platform ios
    */
-  bounces?: boolean;
+  bounces?: ?boolean,
 
   /**
    * A floating-point number that determines how quickly the scroll view
@@ -163,14 +159,14 @@ export interface IOSWebViewProps {
    *   - fast: 0.99 (the default for iOS web view)
    * @platform ios
    */
-  decelerationRate?: "fast" | "normal" | number;
+  decelerationRate?: ?('fast' | 'normal' | number),
 
   /**
    * Boolean value that determines whether scrolling is enabled in the
    * `WebView`. The default value is `true`.
    * @platform ios
    */
-  scrollEnabled?: boolean;
+  scrollEnabled?: ?boolean,
 
   /**
    * If the value of this property is true, the scroll view stops on multiples
@@ -178,14 +174,14 @@ export interface IOSWebViewProps {
    * The default value is false.
    * @platform ios
    */
-  pagingEnabled?: boolean;
+  pagingEnabled?: ?boolean,
 
   /**
    * The amount by which the web view content is inset from the edges of
    * the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
    * @platform ios
    */
-  contentInset?: Insets;
+  contentInset?: ?EdgeInsetsProp,
 
   /**
    * Determines the types of data converted to clickable URLs in the web view's content.
@@ -209,7 +205,9 @@ export interface IOSWebViewProps {
    *
    * @platform ios
    */
-  dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
+  dataDetectorTypes?:
+    | ?DataDetectorTypes
+    | $ReadOnlyArray<DataDetectorTypes>,
 
   /**
    * Function that allows custom handling of any web view requests. Return
@@ -217,7 +215,7 @@ export interface IOSWebViewProps {
    * to stop loading.
    * @platform ios
    */
-  onShouldStartLoadWithRequest?: (event: WebViewIOSLoadRequestEvent) => any;
+  onShouldStartLoadWithRequest?: (event: WebViewEvent) => mixed,
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -228,16 +226,21 @@ export interface IOSWebViewProps {
    * document must also include the `webkit-playsinline` attribute.
    * @platform ios
    */
-  allowsInlineMediaPlayback?: boolean;
+  allowsInlineMediaPlayback?: ?boolean,
   /**
    * Hide the accessory view when the keyboard is open. Default is false to be
    * backward compatible.
    */
-  hideKeyboardAccessoryView?: boolean;
+  hideKeyboardAccessoryView?: ?boolean,
   /**
-   * If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
+   * A Boolean value indicating whether horizontal swipe gestures will trigger
+   * back-forward list navigations.
    */
-  allowsBackForwardNavigationGestures?: boolean;
+  allowsBackForwardNavigationGestures?: ?boolean,
+  /**
+   * The custom user agent string.
+   */
+  userAgent?: ?string,
 
   /**
    * A Boolean value that determines whether pressing on a link
@@ -247,12 +250,12 @@ export interface IOSWebViewProps {
    * In iOS 10 and later, the default value is `true`; before that, the default value is `false`.
    * @platform ios
    */
-  allowsLinkPreview?: boolean;
-}
+  allowsLinkPreview?: ?boolean,
+|}>;
 
-export interface AndroidWebViewProps {
-  onNavigationStateChange?: (event: WebViewNavigation) => any;
-  onContentSizeChange?: (event: WebViewEvent) => any;
+export type AndroidWebViewProps = $ReadOnly<{|
+  onNavigationStateChange?: (event: WebViewNavigation) => mixed,
+  onContentSizeChange?: (event: WebViewEvent) => mixed,
 
   /**
    * https://developer.android.com/reference/android/view/View#OVER_SCROLL_NEVER
@@ -264,13 +267,13 @@ export interface AndroidWebViewProps {
    *
    * @platform android
    */
-  overScrollMode?: OverScrollModeType;
+  overScrollMode?: ?OverScrollModeType,
 
   /**
    * Sets whether Geolocation is enabled. The default is false.
    * @platform android
    */
-  geolocationEnabled?: boolean;
+  geolocationEnabled?: ?boolean,
 
   /**
    * Boolean that sets whether JavaScript running in the context of a file
@@ -278,19 +281,19 @@ export interface AndroidWebViewProps {
    * Including accessing content from other file scheme URLs
    * @platform android
    */
-  allowUniversalAccessFromFileURLs?: boolean;
+  allowUniversalAccessFromFileURLs?: ?boolean,
 
   /**
    * Sets whether the webview allow access to file system.
    * @platform android
    */
-  allowFileAccess?: boolean;
+  allowFileAccess?: ?boolean,
 
   /**
    * Used on Android only, controls whether form autocomplete data should be saved
    * @platform android
    */
-  saveFormDataDisabled?: boolean;
+  saveFormDataDisabled?: ?boolean,
 
   /*
    * Used on Android only, controls whether the given list of URL prefixes should
@@ -299,14 +302,14 @@ export interface AndroidWebViewProps {
    * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
    * @platform android
    */
-  urlPrefixesForDefaultIntent?: string[];
+  urlPrefixesForDefaultIntent?: $ReadOnlyArray<string>,
 
   /**
    * Boolean value to enable JavaScript in the `WebView`. Used on Android only
    * as JavaScript is enabled by default on iOS. The default value is `true`.
    * @platform android
    */
-  javaScriptEnabled?: boolean;
+  javaScriptEnabled?: ?boolean,
 
   /**
    * Boolean value to enable third party cookies in the `WebView`. Used on
@@ -314,20 +317,20 @@ export interface AndroidWebViewProps {
    * default on Android Kitkat and below and on iOS. The default value is `true`.
    * @platform android
    */
-  thirdPartyCookiesEnabled?: boolean;
+  thirdPartyCookiesEnabled?: ?boolean,
 
   /**
    * Boolean value to control whether DOM Storage is enabled. Used only in
    * Android.
    * @platform android
    */
-  domStorageEnabled?: boolean;
+  domStorageEnabled?: ?boolean,
 
   /**
    * Sets the user-agent for the `WebView`.
    * @platform android
    */
-  userAgent?: string;
+  userAgent?: ?string,
 
   /**
    * Specifies the mixed content mode. i.e WebView will allow a secure origin to load content from any other origin.
@@ -339,72 +342,68 @@ export interface AndroidWebViewProps {
    * - `'compatibility'` -  WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
    * @platform android
    */
-  mixedContentMode?: "never" | "always" | "compatibility";
-}
+  mixedContentMode?: ?('never' | 'always' | 'compatibility'),
+|}>;
 
-export interface WebViewSharedProps
-  extends ViewProps,
-    IOSWebViewProps,
-    AndroidWebViewProps {
+export type WebViewSharedProps =  $ReadOnly<{|
+  ...ViewProps,
+  ...IOSWebViewProps,
+  ...AndroidWebViewProps,
   /**
-   * @Deprecated. Use `source` instead.
+   * Deprecated. Use `source` instead.
    */
-  url?: string;
+  url?: ?string,
   /**
-   * @Deprecated. Use `source` instead.
+   * Deprecated. Use `source` instead.
    */
-  html?: string;
+  html?: ?string,
 
   /**
    * Loads static html or a uri (with optional headers) in the WebView.
    */
-  source?: WebViewSource;
+  source?: ?WebViewSource,
 
   /**
    * Function that returns a view to show if there's an error.
    */
-  renderError?: (
-    errorDomain: string | undefined,
-    errorCode: number,
-    errorDesc: string
-  ) => ReactElement<any>; // view to show if there's an error
+  renderError: (errorDomain: ?string, errorCode: number, errorDesc: string) => Element<any>, // view to show if there's an error
 
   /**
    * Function that returns a loading indicator.
    */
-  renderLoading?: () => ReactElement<any>;
+  renderLoading: () => Element<any>,
 
   /**
    * Function that is invoked when the `WebView` has finished loading.
    */
-  onLoad?: (event: WebViewNavigationEvent) => any;
+  onLoad: (event: WebViewNavigationEvent) => mixed,
 
   /**
    * Function that is invoked when the `WebView` load succeeds or fails.
    */
-  onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => any;
+  onLoadEnd: (event: WebViewNavigationEvent | WebViewErrorEvent) => mixed,
 
   /**
    * Function that is invoked when the `WebView` starts loading.
    */
-  onLoadStart?: (event: WebViewNavigationEvent) => any;
+  onLoadStart: (event: WebViewNavigationEvent) => mixed,
 
   /**
    * Function that is invoked when the `WebView` load fails.
    */
-  onError?: (event: WebViewErrorEvent) => any;
+  onError: (event: WebViewErrorEvent) => mixed,
 
   /**
    * Controls whether to adjust the content inset for web views that are
    * placed behind a navigation bar, tab bar, or toolbar. The default value
    * is `true`.
    */
-  automaticallyAdjustContentInsets?: boolean;
+  automaticallyAdjustContentInsets?: ?boolean,
 
   /**
    * Function that is invoked when the `WebView` loading starts or ends.
    */
-  onNavigationStateChange?: (event: WebViewNavigation) => any;
+  onNavigationStateChange?: (event: WebViewNavigation) => mixed,
 
   /**
    * A function that is invoked when the webview calls `window.postMessage`.
@@ -415,24 +414,24 @@ export interface WebViewSharedProps
    * available on the event object, `event.nativeEvent.data`. `data`
    * must be a string.
    */
-  onMessage?: (event: WebViewMessageEvent) => any;
+  onMessage?: (event: WebViewMessageEvent) => mixed,
 
   /**
    * Function that is invoked when the `WebView` is loading.
    */
-  onLoadProgress?: (event: NativeSyntheticEvent<WebViewProgressEvent>) => any;
+  onLoadProgress?: (event: WebViewProgressEvent) => mixed,
 
   /**
    * Boolean value that forces the `WebView` to show the loading view
    * on the first load.
    */
-  startInLoadingState?: boolean;
+  startInLoadingState?: ?boolean,
 
   /**
    * Set this to provide JavaScript that will be injected into the web page
    * when the view loads.
    */
-  injectedJavaScript?: string;
+  injectedJavaScript?: ?string,
 
   /**
    * Boolean that controls whether the web content is scaled to fit
@@ -441,13 +440,13 @@ export interface WebViewSharedProps
    *
    * On iOS, when `useWebKit=true`, this prop will not work.
    */
-  scalesPageToFit?: boolean;
+  scalesPageToFit?: ?boolean,
 
   /**
    * Boolean that determines whether HTML5 audio and video requires the user
    * to tap them before they start playing. The default value is `true`.
    */
-  mediaPlaybackRequiresUserAction?: boolean;
+  mediaPlaybackRequiresUserAction?: ?boolean,
 
   /**
    * List of origin strings to allow being navigated to. The strings allow
@@ -456,14 +455,14 @@ export interface WebViewSharedProps
    * this whitelist, we will open the URL in Safari.
    * The default whitelisted origins are "http://*" and "https://*".
    */
-  originWhitelist?: string[];
+  originWhitelist?: $ReadOnlyArray<string>,
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
    * WebView which uses the same JavaScript as the original WebView.
    */
-  nativeConfig?: WebViewNativeConfig;
+  nativeConfig?: ?WebViewNativeConfig,
 
-  style?: StyleProp<ViewStyle>;
-  children?: ReactNode;
-}
+  style?: ViewStyleProp,
+  children: Node,
+|}>;

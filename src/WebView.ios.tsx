@@ -281,6 +281,7 @@ export default class WebView extends React.Component<
           this.props.mediaPlaybackRequiresUserAction
         }
         dataDetectorTypes={this.props.dataDetectorTypes}
+        allowsLinkPreview={this.props.allowsLinkPreview}
         {...nativeConfig.props}
       />
     );
