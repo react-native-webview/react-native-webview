@@ -46,6 +46,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
+- [`pagingEnabled`](Reference.md#pagingEnabled)
 
 ## Methods Index
 
@@ -516,6 +517,16 @@ Sets whether the WebView should disable saving form data. The default value is `
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | Android  |
+
+---
+
+### `pagingEnabled`
+
+If the value of this property is true, the scroll view stops on multiples of the scroll view’s bounds when the user scrolls. The default value is false.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ## Methods
 
