@@ -1,2 +1,2 @@
-export * from './types/WebViewTypes'
-export * from './WebView.ios'
+export * from './types/WebViewTypes';
+export * from './WebView.ios';

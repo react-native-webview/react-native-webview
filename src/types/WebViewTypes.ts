@@ -68,8 +68,8 @@ export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 
-export type DataDetectorTypes =
-  | 'phoneNumber'
+export type DataDetectorTypes
+  = | 'phoneNumber'
   | 'link'
   | 'address'
   | 'calendarEvent'

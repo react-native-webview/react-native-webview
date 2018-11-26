@@ -3,27 +3,18 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "jsx": "react-native",
+    "lib": ["es6"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "pretty": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": true
   },
-  "include": [
-    "src",
-    "./typings.d.ts",
-    "types",
-    "test"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src", "./typings.d.ts", "types", "test"],
+  "exclude": ["node_modules"]
 }

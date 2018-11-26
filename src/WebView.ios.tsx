@@ -79,9 +79,9 @@ const defaultRenderError = (
 ) => (
   <View style={styles.errorContainer}>
     <Text style={styles.errorTextTitle}>Error loading page</Text>
-    <Text style={styles.errorText}>{'Domain: ' + errorDomain}</Text>
-    <Text style={styles.errorText}>{'Error Code: ' + errorCode}</Text>
-    <Text style={styles.errorText}>{'Description: ' + errorDesc}</Text>
+    <Text style={styles.errorText}>{`Domain: ${errorDomain}`}</Text>
+    <Text style={styles.errorText}>{`Error Code: ${errorCode}`}</Text>
+    <Text style={styles.errorText}>{`Description: ${errorDesc}`}</Text>
   </View>
 );
 
@@ -112,6 +112,7 @@ export default class WebView extends React.Component<
   State
 > {
   static JSNavigationScheme = JSNavigationScheme;
+
   static NavigationType = NavigationType;
 
   static defaultProps = {
@@ -119,10 +120,9 @@ export default class WebView extends React.Component<
     originWhitelist: WebViewShared.defaultOriginWhitelist,
   };
 
-  static isFileUploadSupported = async () => {
+  static isFileUploadSupported = async () =>
     // no native implementation for iOS, depends only on permissions
-    return true;
-  };
+    true;
 
   state: State = {
     viewState: this.props.startInLoadingState
@@ -135,16 +135,16 @@ export default class WebView extends React.Component<
 
   UNSAFE_componentWillMount() {
     if (
-      this.props.useWebKit === true &&
-      this.props.scalesPageToFit !== undefined
+      this.props.useWebKit === true
+      && this.props.scalesPageToFit !== undefined
     ) {
       console.warn(
         'The scalesPageToFit property is not supported when useWebKit = true',
       );
     }
     if (
-      !this.props.useWebKit &&
-      this.props.allowsBackForwardNavigationGestures
+      !this.props.useWebKit
+      && this.props.allowsBackForwardNavigationGestures
     ) {
       console.warn(
         'The allowsBackForwardNavigationGestures property is not supported when useWebKit = false',
@@ -152,7 +152,7 @@ export default class WebView extends React.Component<
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     let otherView = null;
 
     let scalesPageToFit;
@@ -175,14 +175,14 @@ export default class WebView extends React.Component<
       );
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        'RNCWebView invalid state encountered: ' + this.state.viewState,
+        `RNCWebView invalid state encountered: ${this.state.viewState}`,
       );
     }
 
     const webViewStyles = [styles.container, styles.webView, this.props.style];
     if (
-      this.state.viewState === WebViewState.LOADING ||
-      this.state.viewState === WebViewState.ERROR
+      this.state.viewState === WebViewState.LOADING
+      || this.state.viewState === WebViewState.ERROR
     ) {
       // if we're in either LOADING or ERROR states, don't show the webView
       webViewStyles.push(styles.hidden);
@@ -216,9 +216,9 @@ export default class WebView extends React.Component<
         Linking.openURL(url);
       }
       if (this.props.onShouldStartLoadWithRequest) {
-        shouldStart =
-          shouldStart &&
-          this.props.onShouldStartLoadWithRequest(event.nativeEvent);
+        shouldStart
+          = shouldStart
+          && this.props.onShouldStartLoadWithRequest(event.nativeEvent);
       }
       invariant(viewManager != null, 'viewManager expected to be non-null');
       viewManager.startLoadWithResult(
@@ -392,9 +392,7 @@ export default class WebView extends React.Component<
   /**
    * Returns the native `WebView` node.
    */
-  getWebViewHandle = () => {
-    return findNodeHandle(this.webViewRef.current);
-  };
+  getWebViewHandle = () => findNodeHandle(this.webViewRef.current);
 
   _onLoadingStart = (event: WebViewNavigationEvent) => {
     const onLoadStart = this.props.onLoadStart;

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import ReactNative from 'react-native';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -10,6 +9,7 @@ import {
   NativeModules,
   Image,
   NativeSyntheticEvent,
+  findNodeHandle,
 } from 'react-native';
 
 import invariant from 'invariant';
@@ -33,7 +33,7 @@ enum WebViewState {
   ERROR = 'ERROR',
 }
 
-const defaultRenderLoading = () => (
+const defaultRenderLoading = (): React.ReactNode => (
   <View style={styles.loadingView}>
     <ActivityIndicator style={styles.loadingProgressBar} />
   </View>
@@ -61,10 +61,9 @@ export default class WebView extends React.Component<
     originWhitelist: WebViewShared.defaultOriginWhitelist,
   };
 
-  static isFileUploadSupported = async () => {
+  static isFileUploadSupported = async (): Promise<boolean> =>
     // native implementation should return "true" only for Android 5+
-    return NativeModules.RNCWebView.isFileUploadSupported();
-  };
+    NativeModules.RNCWebView.isFileUploadSupported();
 
   state: State = {
     viewState: this.props.startInLoadingState
@@ -75,31 +74,34 @@ export default class WebView extends React.Component<
 
   webViewRef = React.createRef<React.ComponentClass>();
 
-  render() {
+  render(): React.ReactNode {
     let otherView = null;
 
     if (this.state.viewState === WebViewState.LOADING) {
       otherView = (this.props.renderLoading || defaultRenderLoading)();
     } else if (this.state.viewState === WebViewState.ERROR) {
       const errorEvent = this.state.lastErrorEvent;
-      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
-      otherView =
-        this.props.renderError &&
-        this.props.renderError(
-          errorEvent!.domain,
-          errorEvent!.code,
-          errorEvent!.description,
-        );
+      if (errorEvent) {
+        otherView
+          = this.props.renderError
+          && this.props.renderError(
+            errorEvent.domain,
+            errorEvent.code,
+            errorEvent.description,
+          );
+      } else {
+        invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
+      }
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        'RNCWebView invalid state encountered: ' + this.state.viewState,
+        `RNCWebView invalid state encountered: ${this.state.viewState}`,
       );
     }
 
     const webViewStyles = [styles.container, this.props.style];
     if (
-      this.state.viewState === WebViewState.LOADING ||
-      this.state.viewState === WebViewState.ERROR
+      this.state.viewState === WebViewState.LOADING
+      || this.state.viewState === WebViewState.ERROR
     ) {
       // if we're in either LOADING or ERROR states, don't show the webView
       webViewStyles.push(styles.hidden);
@@ -128,7 +130,7 @@ export default class WebView extends React.Component<
       WebViewShared.originWhitelistToRegex,
     );
 
-    let NativeWebView = nativeConfig.component || RNCWebView;
+    const NativeWebView = nativeConfig.component || RNCWebView;
 
     const webView = (
       <NativeWebView
@@ -246,9 +248,7 @@ export default class WebView extends React.Component<
     }
   };
 
-  getWebViewHandle = () => {
-    return ReactNative.findNodeHandle(this.webViewRef.current);
-  };
+  getWebViewHandle = () => findNodeHandle(this.webViewRef.current);
 
   onLoadingStart = (event: WebViewNavigationEvent) => {
     const onLoadStart = this.props.onLoadStart;

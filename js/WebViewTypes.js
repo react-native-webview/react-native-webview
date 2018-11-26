@@ -8,6 +8,8 @@
  * @flow
  */
 
+ /* eslint-disable */
+
 'use strict';
 
 import type {Node, Element, ComponentType} from 'react';

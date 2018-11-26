@@ -1,8 +1,6 @@
 // https://prettier.io/docs/en/options.html
 
 module.exports = {
-  // Allow to parse .ts files and TS annotations
-  parser: 'typescript',
   // Enables semicolons at the end of statements
   semi: true,
   // Formats strings with single quotes ('') instead of quotes ("")

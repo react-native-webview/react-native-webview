@@ -1,9 +1,22 @@
 {
-  "prettier.disableLanguages": [
-    "json"
-  ],
+  "files.associations": {
+    "*.test.js": "javascript",
+    "*.js": "javascriptreact",
+    "*.test.ts": "typescript",
+    "*.ts": "typescript",
+    "*.tsx": "typescriptreact"
+  },
+  "prettier.disableLanguages": ["json"],
   "prettier.eslintIntegration": true,
-  "prettier.stylelintIntegration": true,
   "prettier.singleQuote": true,
   "prettier.trailingComma": "all",
+  "eslint.options": {
+    "extensions": [".js", ".ts", ".tsx"]
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ]
 }
