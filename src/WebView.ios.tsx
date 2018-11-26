@@ -31,17 +31,19 @@ import {
 type DecelerationRate = number | 'normal' | 'fast';
 
 // Imported from https://github.com/facebook/react-native/blob/master/Libraries/Components/ScrollView/processDecelerationRate.js
-function processDecelerationRate(decelerationRate?: DecelerationRate) {
+function processDecelerationRate(
+  decelerationRate?: DecelerationRate,
+): number | undefined {
   if (decelerationRate === 'normal') {
-    decelerationRate = 0.998;
-  } else if (decelerationRate === 'fast') {
-    decelerationRate = 0.99;
+    return 0.998;
+  }
+  if (decelerationRate === 'fast') {
+    return 0.99;
   }
   return decelerationRate;
 }
 
-const RNCUIWebViewManager = NativeModules.RNCUIWebViewManager;
-const RNCWKWebViewManager = NativeModules.RNCWKWebViewManager;
+const { RNCWKWebViewManager, RNCUIWebViewManager } = NativeModules;
 
 const BGWASH = 'rgba(255,255,255,0.8)';
 
@@ -67,7 +69,7 @@ type State = {
   lastErrorEvent: WebViewError | null;
 };
 
-const defaultRenderLoading = () => (
+const defaultRenderLoading = (): React.ReactNode => (
   <View style={styles.loadingView}>
     <ActivityIndicator />
   </View>
@@ -76,7 +78,7 @@ const defaultRenderError = (
   errorDomain: string | undefined,
   errorCode: number,
   errorDesc: string,
-) => (
+): React.ReactNode => (
   <View style={styles.errorContainer}>
     <Text style={styles.errorTextTitle}>Error loading page</Text>
     <Text style={styles.errorText}>{`Domain: ${errorDomain}`}</Text>
@@ -120,7 +122,7 @@ export default class WebView extends React.Component<
     originWhitelist: WebViewShared.defaultOriginWhitelist,
   };
 
-  static isFileUploadSupported = async () =>
+  static isFileUploadSupported = async (): Promise<boolean> =>
     // no native implementation for iOS, depends only on permissions
     true;
 
@@ -152,6 +154,185 @@ export default class WebView extends React.Component<
     }
   }
 
+  _getCommands(): {
+    goForward: () => void,
+    goBack: () => void,
+    reload: () => void,
+    stopLoading: () => void,
+    postMessage: () => void,
+    injectJavaScript: () => void,
+  } {
+    if (!this.props.useWebKit) {
+      return UIManager.RNCUIWebView.Commands;
+    }
+
+    return UIManager.RNCWKWebView.Commands;
+  }
+
+  /**
+   * Go forward one page in the web view's history.
+   */
+  goForward = (): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this._getCommands().goForward,
+      null,
+    );
+  };
+
+  /**
+   * Go back one page in the web view's history.
+   */
+  goBack = (): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this._getCommands().goBack,
+      null,
+    );
+  };
+
+  /**
+   * Reloads the current page.
+   */
+  reload = (): void => {
+    this.setState({ viewState: WebViewState.LOADING });
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this._getCommands().reload,
+      null,
+    );
+  };
+
+  /**
+   * Stop loading the current page.
+   */
+  stopLoading = (): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this._getCommands().stopLoading,
+      null,
+    );
+  };
+
+  /**
+   * Posts a message to the web view, which will emit a `message` event.
+   * Accepts one argument, `data`, which must be a string.
+   *
+   * In your webview, you'll need to something like the following.
+   *
+   * ```js
+   * document.addEventListener('message', e => { document.title = e.data; });
+   * ```
+   */
+  postMessage = (data: string): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this._getCommands().postMessage,
+      [String(data)],
+    );
+  };
+
+  /**
+   * Injects a javascript string into the referenced WebView. Deliberately does not
+   * return a response because using eval() to return a response breaks this method
+   * on pages with a Content Security Policy that disallows eval(). If you need that
+   * functionality, look into postMessage/onMessage.
+   */
+  injectJavaScript = (data: string): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this._getCommands().injectJavaScript,
+      [data],
+    );
+  };
+
+  /**
+   * We return an event with a bunch of fields including:
+   *  url, title, loading, canGoBack, canGoForward
+   */
+  _updateNavigationState = (event: WebViewNavigationEvent): void => {
+    if (this.props.onNavigationStateChange) {
+      this.props.onNavigationStateChange(event.nativeEvent);
+    }
+  };
+
+  /**
+   * Returns the native `WebView` node.
+   */
+  getWebViewHandle = (): number | null =>
+    findNodeHandle(this.webViewRef.current);
+
+  _onLoadingStart = (event: WebViewNavigationEvent): void => {
+    const onLoadStart = this.props.onLoadStart;
+    onLoadStart && onLoadStart(event);
+    this._updateNavigationState(event);
+  };
+
+  _onLoadingError = (event: WebViewErrorEvent): void => {
+    event.persist(); // persist this event because we need to store it
+    const { onError, onLoadEnd } = this.props;
+    onError && onError(event);
+    onLoadEnd && onLoadEnd(event);
+    console.warn('Encountered an error loading page', event.nativeEvent);
+
+    this.setState({
+      lastErrorEvent: event.nativeEvent,
+      viewState: WebViewState.ERROR,
+    });
+  };
+
+  _onLoadingFinish = (event: WebViewNavigationEvent): void => {
+    const { onLoad, onLoadEnd } = this.props;
+    onLoad && onLoad(event);
+    onLoadEnd && onLoadEnd(event);
+    this.setState({
+      viewState: WebViewState.IDLE,
+    });
+    this._updateNavigationState(event);
+  };
+
+  _onMessage = (event: WebViewMessageEvent): void => {
+    const { onMessage } = this.props;
+    onMessage && onMessage(event);
+  };
+
+  _onLoadingProgress = (
+    event: NativeSyntheticEvent<WebViewProgressEvent>,
+  ): void => {
+    const { onLoadProgress } = this.props;
+    onLoadProgress && onLoadProgress(event);
+  };
+
+  componentDidUpdate(prevProps: WebViewSharedProps): void {
+    if (!(prevProps.useWebKit && this.props.useWebKit)) {
+      return;
+    }
+
+    this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
+    this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
+
+    if (this.props.scalesPageToFit !== undefined) {
+      console.warn(
+        'The scalesPageToFit property is not supported when useWebKit = true',
+      );
+    }
+  }
+
+  _showRedboxOnPropChanges(
+    prevProps: WebViewSharedProps,
+    propName:
+      | 'allowsInlineMediaPlayback'
+      | 'mediaPlaybackRequiresUserAction'
+      | 'dataDetectorTypes',
+  ): void {
+    if (this.props[propName] !== prevProps[propName]) {
+      console.error(
+        `Changes to property ${propName} do nothing after the initial render.`,
+      );
+    }
+  }
+
   render(): React.ReactNode {
     let otherView = null;
 
@@ -167,12 +348,15 @@ export default class WebView extends React.Component<
       otherView = (this.props.renderLoading || defaultRenderLoading)();
     } else if (this.state.viewState === WebViewState.ERROR) {
       const errorEvent = this.state.lastErrorEvent;
-      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
-      otherView = (this.props.renderError || defaultRenderError)(
-        errorEvent!.domain,
-        errorEvent!.code,
-        errorEvent!.description,
-      );
+      if (errorEvent) {
+        otherView = (this.props.renderError || defaultRenderError)(
+          errorEvent.domain,
+          errorEvent.code,
+          errorEvent.description,
+        );
+      } else {
+        invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
+      }
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
         `RNCWebView invalid state encountered: ${this.state.viewState}`,
@@ -190,7 +374,7 @@ export default class WebView extends React.Component<
 
     const nativeConfig = this.props.nativeConfig || {};
 
-    let viewManager = nativeConfig.viewManager;
+    let { viewManager } = nativeConfig;
 
     if (this.props.useWebKit) {
       viewManager = viewManager || RNCWKWebViewManager;
@@ -204,12 +388,12 @@ export default class WebView extends React.Component<
     ].map(WebViewShared.originWhitelistToRegex);
     const onShouldStartLoadWithRequest = (
       event: NativeSyntheticEvent<WebViewIOSLoadRequestEvent>,
-    ) => {
+    ): void => {
       let shouldStart = true;
       const { url } = event.nativeEvent;
       const origin = WebViewShared.extractOrigin(url);
-      const passesWhitelist = compiledWhitelist.some(x =>
-        new RegExp(x).test(origin),
+      const passesWhitelist = compiledWhitelist.some(
+        (x): boolean => new RegExp(x).test(origin),
       );
       shouldStart = shouldStart && passesWhitelist;
       if (!passesWhitelist) {
@@ -292,175 +476,6 @@ export default class WebView extends React.Component<
         {otherView}
       </View>
     );
-  }
-
-  _getCommands() {
-    if (!this.props.useWebKit) {
-      return UIManager.RNCUIWebView.Commands;
-    }
-
-    return UIManager.RNCWKWebView.Commands;
-  }
-
-  /**
-   * Go forward one page in the web view's history.
-   */
-  goForward = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this._getCommands().goForward,
-      null,
-    );
-  };
-
-  /**
-   * Go back one page in the web view's history.
-   */
-  goBack = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this._getCommands().goBack,
-      null,
-    );
-  };
-
-  /**
-   * Reloads the current page.
-   */
-  reload = () => {
-    this.setState({ viewState: WebViewState.LOADING });
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this._getCommands().reload,
-      null,
-    );
-  };
-
-  /**
-   * Stop loading the current page.
-   */
-  stopLoading = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this._getCommands().stopLoading,
-      null,
-    );
-  };
-
-  /**
-   * Posts a message to the web view, which will emit a `message` event.
-   * Accepts one argument, `data`, which must be a string.
-   *
-   * In your webview, you'll need to something like the following.
-   *
-   * ```js
-   * document.addEventListener('message', e => { document.title = e.data; });
-   * ```
-   */
-  postMessage = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this._getCommands().postMessage,
-      [String(data)],
-    );
-  };
-
-  /**
-   * Injects a javascript string into the referenced WebView. Deliberately does not
-   * return a response because using eval() to return a response breaks this method
-   * on pages with a Content Security Policy that disallows eval(). If you need that
-   * functionality, look into postMessage/onMessage.
-   */
-  injectJavaScript = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this._getCommands().injectJavaScript,
-      [data],
-    );
-  };
-
-  /**
-   * We return an event with a bunch of fields including:
-   *  url, title, loading, canGoBack, canGoForward
-   */
-  _updateNavigationState = (event: WebViewNavigationEvent) => {
-    if (this.props.onNavigationStateChange) {
-      this.props.onNavigationStateChange(event.nativeEvent);
-    }
-  };
-
-  /**
-   * Returns the native `WebView` node.
-   */
-  getWebViewHandle = () => findNodeHandle(this.webViewRef.current);
-
-  _onLoadingStart = (event: WebViewNavigationEvent) => {
-    const onLoadStart = this.props.onLoadStart;
-    onLoadStart && onLoadStart(event);
-    this._updateNavigationState(event);
-  };
-
-  _onLoadingError = (event: WebViewErrorEvent) => {
-    event.persist(); // persist this event because we need to store it
-    const { onError, onLoadEnd } = this.props;
-    onError && onError(event);
-    onLoadEnd && onLoadEnd(event);
-    console.warn('Encountered an error loading page', event.nativeEvent);
-
-    this.setState({
-      lastErrorEvent: event.nativeEvent,
-      viewState: WebViewState.ERROR,
-    });
-  };
-
-  _onLoadingFinish = (event: WebViewNavigationEvent) => {
-    const { onLoad, onLoadEnd } = this.props;
-    onLoad && onLoad(event);
-    onLoadEnd && onLoadEnd(event);
-    this.setState({
-      viewState: WebViewState.IDLE,
-    });
-    this._updateNavigationState(event);
-  };
-
-  _onMessage = (event: WebViewMessageEvent) => {
-    const { onMessage } = this.props;
-    onMessage && onMessage(event);
-  };
-
-  _onLoadingProgress = (event: NativeSyntheticEvent<WebViewProgressEvent>) => {
-    const { onLoadProgress } = this.props;
-    onLoadProgress && onLoadProgress(event);
-  };
-
-  componentDidUpdate(prevProps: WebViewSharedProps) {
-    if (!(prevProps.useWebKit && this.props.useWebKit)) {
-      return;
-    }
-
-    this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
-    this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
-    this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
-
-    if (this.props.scalesPageToFit !== undefined) {
-      console.warn(
-        'The scalesPageToFit property is not supported when useWebKit = true',
-      );
-    }
-  }
-
-  _showRedboxOnPropChanges(
-    prevProps: WebViewSharedProps,
-    propName:
-      | 'allowsInlineMediaPlayback'
-      | 'mediaPlaybackRequiresUserAction'
-      | 'dataDetectorTypes',
-  ) {
-    if (this.props[propName] !== prevProps[propName]) {
-      console.error(
-        `Changes to property ${propName} do nothing after the initial render.`,
-      );
-    }
   }
 }
 

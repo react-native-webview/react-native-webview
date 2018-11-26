@@ -25,13 +25,33 @@ import {
   WebViewSource,
   WebViewProgressEvent,
 } from './types/WebViewTypes';
-import { isWebViewUriSource } from './utils';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  hidden: {
+    height: 0,
+    flex: 0, // disable 'flex:1' when hiding a View
+  },
+  loadingView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingProgressBar: {
+    height: 20,
+  },
+});
 
 enum WebViewState {
   IDLE = 'IDLE',
   LOADING = 'LOADING',
   ERROR = 'ERROR',
 }
+
+const isWebViewUriSource = (source: any): source is WebViewSourceUri =>
+  typeof source !== 'number' && !('html' in source);
 
 const defaultRenderLoading = (): React.ReactNode => (
   <View style={styles.loadingView}>
@@ -43,6 +63,8 @@ type State = {
   viewState: WebViewState;
   lastErrorEvent: WebViewError | null;
 };
+
+const RNCWebView = requireNativeComponent('RNCWebView');
 
 /**
  * Renders a native WebView.
@@ -73,6 +95,117 @@ export default class WebView extends React.Component<
   };
 
   webViewRef = React.createRef<React.ComponentClass>();
+
+  goForward = (): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      UIManager.RNCWebView.Commands.goForward,
+      null,
+    );
+  };
+
+  goBack = (): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      UIManager.RNCWebView.Commands.goBack,
+      null,
+    );
+  };
+
+  reload = (): void => {
+    this.setState({
+      viewState: WebViewState.LOADING,
+    });
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      UIManager.RNCWebView.Commands.reload,
+      null,
+    );
+  };
+
+  stopLoading = (): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      UIManager.RNCWebView.Commands.stopLoading,
+      null,
+    );
+  };
+
+  postMessage = (data: string): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      UIManager.RNCWebView.Commands.postMessage,
+      [String(data)],
+    );
+  };
+
+  /**
+   * Injects a javascript string into the referenced WebView. Deliberately does not
+   * return a response because using eval() to return a response breaks this method
+   * on pages with a Content Security Policy that disallows eval(). If you need that
+   * functionality, look into postMessage/onMessage.
+   */
+  injectJavaScript = (data: string): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      UIManager.RNCWebView.Commands.injectJavaScript,
+      [data],
+    );
+  };
+
+  /**
+   * We return an event with a bunch of fields including:
+   *  url, title, loading, canGoBack, canGoForward
+   */
+  updateNavigationState = (event: WebViewNavigationEvent): void => {
+    if (this.props.onNavigationStateChange) {
+      this.props.onNavigationStateChange(event.nativeEvent);
+    }
+  };
+
+  getWebViewHandle = (): number | null =>
+    findNodeHandle(this.webViewRef.current);
+
+  onLoadingStart = (event: WebViewNavigationEvent): void => {
+    const { onLoadStart } = this.props;
+    onLoadStart && onLoadStart(event);
+    this.updateNavigationState(event);
+  };
+
+  onLoadingError = (event: WebViewErrorEvent): void => {
+    event.persist(); // persist this event because we need to store it
+    const { onError, onLoadEnd } = this.props;
+    onError && onError(event);
+    onLoadEnd && onLoadEnd(event);
+    console.warn('Encountered an error loading page', event.nativeEvent);
+
+    this.setState({
+      lastErrorEvent: event.nativeEvent,
+      viewState: WebViewState.ERROR,
+    });
+  };
+
+  onLoadingFinish = (event: WebViewNavigationEvent): void => {
+    const { onLoad, onLoadEnd } = this.props;
+    onLoad && onLoad(event);
+    onLoadEnd && onLoadEnd(event);
+    this.setState({
+      viewState: WebViewState.IDLE,
+    });
+    this.updateNavigationState(event);
+  };
+
+  onMessage = (event: WebViewMessageEvent): void => {
+    const { onMessage } = this.props;
+    onMessage && onMessage(event);
+  };
+
+  onLoadingProgress = (
+    event: NativeSyntheticEvent<WebViewProgressEvent>,
+  ): void => {
+    const { onLoadProgress } = this.props;
+    onLoadProgress && onLoadProgress(event);
+  };
 
   render(): React.ReactNode {
     let otherView = null;
@@ -180,132 +313,4 @@ export default class WebView extends React.Component<
       </View>
     );
   }
-
-  goForward = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.goForward,
-      null,
-    );
-  };
-
-  goBack = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.goBack,
-      null,
-    );
-  };
-
-  reload = () => {
-    this.setState({
-      viewState: WebViewState.LOADING,
-    });
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.reload,
-      null,
-    );
-  };
-
-  stopLoading = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.stopLoading,
-      null,
-    );
-  };
-
-  postMessage = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.postMessage,
-      [String(data)],
-    );
-  };
-
-  /**
-   * Injects a javascript string into the referenced WebView. Deliberately does not
-   * return a response because using eval() to return a response breaks this method
-   * on pages with a Content Security Policy that disallows eval(). If you need that
-   * functionality, look into postMessage/onMessage.
-   */
-  injectJavaScript = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.injectJavaScript,
-      [data],
-    );
-  };
-
-  /**
-   * We return an event with a bunch of fields including:
-   *  url, title, loading, canGoBack, canGoForward
-   */
-  updateNavigationState = (event: WebViewNavigationEvent) => {
-    if (this.props.onNavigationStateChange) {
-      this.props.onNavigationStateChange(event.nativeEvent);
-    }
-  };
-
-  getWebViewHandle = () => findNodeHandle(this.webViewRef.current);
-
-  onLoadingStart = (event: WebViewNavigationEvent) => {
-    const onLoadStart = this.props.onLoadStart;
-    onLoadStart && onLoadStart(event);
-    this.updateNavigationState(event);
-  };
-
-  onLoadingError = (event: WebViewErrorEvent) => {
-    event.persist(); // persist this event because we need to store it
-    const { onError, onLoadEnd } = this.props;
-    onError && onError(event);
-    onLoadEnd && onLoadEnd(event);
-    console.warn('Encountered an error loading page', event.nativeEvent);
-
-    this.setState({
-      lastErrorEvent: event.nativeEvent,
-      viewState: WebViewState.ERROR,
-    });
-  };
-
-  onLoadingFinish = (event: WebViewNavigationEvent) => {
-    const { onLoad, onLoadEnd } = this.props;
-    onLoad && onLoad(event);
-    onLoadEnd && onLoadEnd(event);
-    this.setState({
-      viewState: WebViewState.IDLE,
-    });
-    this.updateNavigationState(event);
-  };
-
-  onMessage = (event: WebViewMessageEvent) => {
-    const { onMessage } = this.props;
-    onMessage && onMessage(event);
-  };
-
-  onLoadingProgress = (event: NativeSyntheticEvent<WebViewProgressEvent>) => {
-    const { onLoadProgress } = this.props;
-    onLoadProgress && onLoadProgress(event);
-  };
 }
-
-const RNCWebView = requireNativeComponent('RNCWebView');
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  hidden: {
-    height: 0,
-    flex: 0, // disable 'flex:1' when hiding a View
-  },
-  loadingView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingProgressBar: {
-    height: 20,
-  },
-});

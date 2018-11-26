@@ -1,20 +1,22 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "jsx": "react-native",
     "lib": ["es6"],
     "module": "esnext",
     "moduleResolution": "node",
-    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "outDir": "./types/",
     "pretty": true,
     "skipLibCheck": true,
     "strict": true
   },
-  "include": ["src", "./typings.d.ts", "types", "test"],
-  "exclude": ["node_modules"]
+  "include": ["src", "index.js"],
+  "exclude": ["node_modules", "index.flow.js", "types"]
 }

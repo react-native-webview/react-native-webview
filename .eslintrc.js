@@ -1,8 +1,8 @@
 module.exports = {
   // Airbnb is the base, prettier is here so that eslint doesn't conflict with prettier
-  extends: ['airbnb-base', 'prettier', 'prettier/react'],
+  extends: ['airbnb', 'prettier', 'prettier/react'],
   parser: 'typescript-eslint-parser',
-  plugins: ['react', 'react-native', 'typescript'],
+  plugins: ['react-native', 'typescript'],
   rules: {
     // Parens will be needed for arrow functions
     'arrow-parens': ['error', 'as-needed', { requireForBlockBody: true }],
@@ -42,7 +42,7 @@ module.exports = {
     {
       files: ['*.ts?(x)'],
       parser: 'typescript-eslint-parser',
-      plugins: ['react', 'react-native', 'typescript'],
+      plugins: ['react-native', 'typescript'],
     },
   ],
   settings: {
