@@ -1,13 +1,13 @@
-import { ComponentType, ReactElement, ReactNode } from "react";
+import { ComponentType, ReactElement, ReactNode } from 'react';
 import {
   Insets,
   NativeSyntheticEvent,
   StyleProp,
   ViewProps,
-  ViewStyle
-} from "react-native";
+  ViewStyle,
+} from 'react-native';
 
-declare module "react-native" {
+declare module 'react-native' {
   interface UIManagerStatic {
     dispatchViewManagerCommand(node: any, callback: any, x: any): void;
     RNCUIWebView: any;
@@ -28,12 +28,12 @@ export interface WebViewIOSLoadRequestEvent extends WebViewNativeEvent {
   target: number;
   lockIdentifier: number;
   navigationType:
-    | "click"
-    | "formsubmit"
-    | "backforward"
-    | "reload"
-    | "formresubmit"
-    | "other";
+    | 'click'
+    | 'formsubmit'
+    | 'backforward'
+    | 'reload'
+    | 'formresubmit'
+    | 'other';
 }
 
 export interface WebViewProgressEvent extends WebViewNativeEvent {
@@ -42,12 +42,12 @@ export interface WebViewProgressEvent extends WebViewNativeEvent {
 
 export interface WebViewNavigation extends WebViewNativeEvent {
   readonly navigationType:
-    | "click"
-    | "formsubmit"
-    | "backforward"
-    | "reload"
-    | "formresubmit"
-    | "other";
+    | 'click'
+    | 'formsubmit'
+    | 'backforward'
+    | 'reload'
+    | 'formresubmit'
+    | 'other';
 }
 
 export interface WebViewMessage extends WebViewNativeEvent {
@@ -69,17 +69,17 @@ export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 
 export type DataDetectorTypes =
-  | "phoneNumber"
-  | "link"
-  | "address"
-  | "calendarEvent"
-  | "trackingNumber"
-  | "flightNumber"
-  | "lookupSuggestion"
-  | "none"
-  | "all";
+  | 'phoneNumber'
+  | 'link'
+  | 'address'
+  | 'calendarEvent'
+  | 'trackingNumber'
+  | 'flightNumber'
+  | 'lookupSuggestion'
+  | 'none'
+  | 'all';
 
-export type OverScrollModeType = "always" | "content" | "never";
+export type OverScrollModeType = 'always' | 'content' | 'never';
 
 export interface WebViewSourceUri {
   /**
@@ -163,7 +163,7 @@ export interface IOSWebViewProps {
    *   - fast: 0.99 (the default for iOS web view)
    * @platform ios
    */
-  decelerationRate?: "fast" | "normal" | number;
+  decelerationRate?: 'fast' | 'normal' | number;
 
   /**
    * Boolean value that determines whether scrolling is enabled in the
@@ -339,7 +339,7 @@ export interface AndroidWebViewProps {
    * - `'compatibility'` -  WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
    * @platform android
    */
-  mixedContentMode?: "never" | "always" | "compatibility";
+  mixedContentMode?: 'never' | 'always' | 'compatibility';
 }
 
 export interface WebViewSharedProps
@@ -366,7 +366,7 @@ export interface WebViewSharedProps
   renderError?: (
     errorDomain: string | undefined,
     errorCode: number,
-    errorDesc: string
+    errorDesc: string,
   ) => ReactElement<any>; // view to show if there's an error
 
   /**
