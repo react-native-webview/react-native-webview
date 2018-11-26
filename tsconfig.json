@@ -1,5 +1,29 @@
 {
-  "extends": "./tsconfig.base.json",
-  "include": ["src", "./typings.d.ts", "types", "test"],
-  "exclude": ["node_modules", "dist"]  
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "react-native",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "pretty": true,
+    "skipLibCheck": true,
+    "strict": true,
+  },
+  "include": [
+    "src",
+    "./typings.d.ts",
+    "types",
+    "test"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

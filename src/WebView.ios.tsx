@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -10,12 +10,12 @@ import {
   NativeModules,
   Image,
   findNodeHandle,
-  NativeSyntheticEvent
-} from "react-native";
+  NativeSyntheticEvent,
+} from 'react-native';
 
-import invariant from "invariant";
+import invariant from 'invariant';
 
-import WebViewShared from "./WebViewShared";
+import WebViewShared from './WebViewShared';
 import {
   WebViewSourceUri,
   WebViewError,
@@ -25,16 +25,16 @@ import {
   WebViewNavigationEvent,
   WebViewSharedProps,
   WebViewSource,
-  WebViewProgressEvent
-} from "./types/WebViewTypes";
+  WebViewProgressEvent,
+} from './types/WebViewTypes';
 
-type DecelerationRate = number | "normal" | "fast";
+type DecelerationRate = number | 'normal' | 'fast';
 
 // Imported from https://github.com/facebook/react-native/blob/master/Libraries/Components/ScrollView/processDecelerationRate.js
-function processDecelerationRate(decelerationRate: DecelerationRate) {
-  if (decelerationRate === "normal") {
+function processDecelerationRate(decelerationRate?: DecelerationRate) {
+  if (decelerationRate === 'normal') {
     decelerationRate = 0.998;
-  } else if (decelerationRate === "fast") {
+  } else if (decelerationRate === 'fast') {
     decelerationRate = 0.99;
   }
   return decelerationRate;
@@ -43,28 +43,28 @@ function processDecelerationRate(decelerationRate: DecelerationRate) {
 const RNCUIWebViewManager = NativeModules.RNCUIWebViewManager;
 const RNCWKWebViewManager = NativeModules.RNCWKWebViewManager;
 
-const BGWASH = "rgba(255,255,255,0.8)";
+const BGWASH = 'rgba(255,255,255,0.8)';
 
 enum WebViewState {
-  IDLE = "IDLE",
-  LOADING = "LOADING",
-  ERROR = "ERROR"
+  IDLE = 'IDLE',
+  LOADING = 'LOADING',
+  ERROR = 'ERROR',
 }
 
 enum NavigationType {
-  click = "click",
-  formsubmit = "formsubmit",
-  backforward = "backforward",
-  reload = "reload",
-  formresubmit = "formresubmit",
-  other = "other"
+  click = 'click',
+  formsubmit = 'formsubmit',
+  backforward = 'backforward',
+  reload = 'reload',
+  formresubmit = 'formresubmit',
+  other = 'other',
 }
 
-const JSNavigationScheme = "react-js-navigation";
+const JSNavigationScheme = 'react-js-navigation';
 
 type State = {
   viewState: WebViewState;
-  lastErrorEvent: WebViewError;
+  lastErrorEvent: WebViewError | null;
 };
 
 const defaultRenderLoading = () => (
@@ -73,15 +73,15 @@ const defaultRenderLoading = () => (
   </View>
 );
 const defaultRenderError = (
-  errorDomain: string,
+  errorDomain: string | undefined,
   errorCode: number,
-  errorDesc: string
+  errorDesc: string,
 ) => (
   <View style={styles.errorContainer}>
     <Text style={styles.errorTextTitle}>Error loading page</Text>
-    <Text style={styles.errorText}>{"Domain: " + errorDomain}</Text>
-    <Text style={styles.errorText}>{"Error Code: " + errorCode}</Text>
-    <Text style={styles.errorText}>{"Description: " + errorDesc}</Text>
+    <Text style={styles.errorText}>{'Domain: ' + errorDomain}</Text>
+    <Text style={styles.errorText}>{'Error Code: ' + errorCode}</Text>
+    <Text style={styles.errorText}>{'Description: ' + errorDesc}</Text>
   </View>
 );
 
@@ -116,7 +116,7 @@ export default class WebView extends React.Component<
 
   static defaultProps = {
     useWebKit: true,
-    originWhitelist: WebViewShared.defaultOriginWhitelist
+    originWhitelist: WebViewShared.defaultOriginWhitelist,
   };
 
   static isFileUploadSupported = async () => {
@@ -128,7 +128,7 @@ export default class WebView extends React.Component<
     viewState: this.props.startInLoadingState
       ? WebViewState.LOADING
       : WebViewState.IDLE,
-    lastErrorEvent: null
+    lastErrorEvent: null,
   };
 
   webViewRef = React.createRef<React.ComponentClass>();
@@ -139,7 +139,7 @@ export default class WebView extends React.Component<
       this.props.scalesPageToFit !== undefined
     ) {
       console.warn(
-        "The scalesPageToFit property is not supported when useWebKit = true"
+        'The scalesPageToFit property is not supported when useWebKit = true',
       );
     }
     if (
@@ -147,7 +147,7 @@ export default class WebView extends React.Component<
       this.props.allowsBackForwardNavigationGestures
     ) {
       console.warn(
-        "The allowsBackForwardNavigationGestures property is not supported when useWebKit = false"
+        'The allowsBackForwardNavigationGestures property is not supported when useWebKit = false',
       );
     }
   }
@@ -167,15 +167,15 @@ export default class WebView extends React.Component<
       otherView = (this.props.renderLoading || defaultRenderLoading)();
     } else if (this.state.viewState === WebViewState.ERROR) {
       const errorEvent = this.state.lastErrorEvent;
-      invariant(errorEvent != null, "lastErrorEvent expected to be non-null");
+      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
       otherView = (this.props.renderError || defaultRenderError)(
-        errorEvent.domain,
-        errorEvent.code,
-        errorEvent.description
+        errorEvent!.domain,
+        errorEvent!.code,
+        errorEvent!.description,
       );
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        "RNCWebView invalid state encountered: " + this.state.viewState
+        'RNCWebView invalid state encountered: ' + this.state.viewState,
       );
     }
 
@@ -199,17 +199,17 @@ export default class WebView extends React.Component<
     }
 
     const compiledWhitelist = [
-      "about:blank",
-      ...(this.props.originWhitelist || [])
+      'about:blank',
+      ...(this.props.originWhitelist || []),
     ].map(WebViewShared.originWhitelistToRegex);
     const onShouldStartLoadWithRequest = (
-      event: NativeSyntheticEvent<WebViewIOSLoadRequestEvent>
+      event: NativeSyntheticEvent<WebViewIOSLoadRequestEvent>,
     ) => {
       let shouldStart = true;
       const { url } = event.nativeEvent;
       const origin = WebViewShared.extractOrigin(url);
       const passesWhitelist = compiledWhitelist.some(x =>
-        new RegExp(x).test(origin)
+        new RegExp(x).test(origin),
       );
       shouldStart = shouldStart && passesWhitelist;
       if (!passesWhitelist) {
@@ -220,15 +220,15 @@ export default class WebView extends React.Component<
           shouldStart &&
           this.props.onShouldStartLoadWithRequest(event.nativeEvent);
       }
-      invariant(viewManager != null, "viewManager expected to be non-null");
+      invariant(viewManager != null, 'viewManager expected to be non-null');
       viewManager.startLoadWithResult(
         !!shouldStart,
-        event.nativeEvent.lockIdentifier
+        event.nativeEvent.lockIdentifier,
       );
     };
 
     const decelerationRate = processDecelerationRate(
-      this.props.decelerationRate
+      this.props.decelerationRate,
     );
 
     let source: WebViewSource = this.props.source || {};
@@ -238,7 +238,7 @@ export default class WebView extends React.Component<
       source = { uri: this.props.url };
     }
 
-    const messagingEnabled = typeof this.props.onMessage === "function";
+    const messagingEnabled = typeof this.props.onMessage === 'function';
 
     let NativeWebView = nativeConfig.component;
 
@@ -309,7 +309,7 @@ export default class WebView extends React.Component<
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this._getCommands().goForward,
-      null
+      null,
     );
   };
 
@@ -320,7 +320,7 @@ export default class WebView extends React.Component<
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this._getCommands().goBack,
-      null
+      null,
     );
   };
 
@@ -332,7 +332,7 @@ export default class WebView extends React.Component<
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this._getCommands().reload,
-      null
+      null,
     );
   };
 
@@ -343,7 +343,7 @@ export default class WebView extends React.Component<
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this._getCommands().stopLoading,
-      null
+      null,
     );
   };
 
@@ -361,7 +361,7 @@ export default class WebView extends React.Component<
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this._getCommands().postMessage,
-      [String(data)]
+      [String(data)],
     );
   };
 
@@ -375,7 +375,7 @@ export default class WebView extends React.Component<
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this._getCommands().injectJavaScript,
-      [data]
+      [data],
     );
   };
 
@@ -407,11 +407,11 @@ export default class WebView extends React.Component<
     const { onError, onLoadEnd } = this.props;
     onError && onError(event);
     onLoadEnd && onLoadEnd(event);
-    console.warn("Encountered an error loading page", event.nativeEvent);
+    console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
       lastErrorEvent: event.nativeEvent,
-      viewState: WebViewState.ERROR
+      viewState: WebViewState.ERROR,
     });
   };
 
@@ -420,7 +420,7 @@ export default class WebView extends React.Component<
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
     this.setState({
-      viewState: WebViewState.IDLE
+      viewState: WebViewState.IDLE,
     });
     this._updateNavigationState(event);
   };
@@ -440,13 +440,13 @@ export default class WebView extends React.Component<
       return;
     }
 
-    this._showRedboxOnPropChanges(prevProps, "allowsInlineMediaPlayback");
-    this._showRedboxOnPropChanges(prevProps, "mediaPlaybackRequiresUserAction");
-    this._showRedboxOnPropChanges(prevProps, "dataDetectorTypes");
+    this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
+    this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
 
     if (this.props.scalesPageToFit !== undefined) {
       console.warn(
-        "The scalesPageToFit property is not supported when useWebKit = true"
+        'The scalesPageToFit property is not supported when useWebKit = true',
       );
     }
   }
@@ -454,53 +454,53 @@ export default class WebView extends React.Component<
   _showRedboxOnPropChanges(
     prevProps: WebViewSharedProps,
     propName:
-      | "allowsInlineMediaPlayback"
-      | "mediaPlaybackRequiresUserAction"
-      | "dataDetectorTypes"
+      | 'allowsInlineMediaPlayback'
+      | 'mediaPlaybackRequiresUserAction'
+      | 'dataDetectorTypes',
   ) {
     if (this.props[propName] !== prevProps[propName]) {
       console.error(
-        `Changes to property ${propName} do nothing after the initial render.`
+        `Changes to property ${propName} do nothing after the initial render.`,
       );
     }
   }
 }
 
-const RNCUIWebView = requireNativeComponent("RNCUIWebView");
-const RNCWKWebView = requireNativeComponent("RNCWKWebView");
+const RNCUIWebView = requireNativeComponent('RNCUIWebView');
+const RNCWKWebView = requireNativeComponent('RNCWKWebView');
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   errorContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: BGWASH
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BGWASH,
   },
   errorText: {
     fontSize: 14,
-    textAlign: "center",
-    marginBottom: 2
+    textAlign: 'center',
+    marginBottom: 2,
   },
   errorTextTitle: {
     fontSize: 15,
-    fontWeight: "500",
-    marginBottom: 10
+    fontWeight: '500',
+    marginBottom: 10,
   },
   hidden: {
     height: 0,
-    flex: 0 // disable 'flex:1' when hiding a View
+    flex: 0, // disable 'flex:1' when hiding a View
   },
   loadingView: {
     backgroundColor: BGWASH,
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    height: 100
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 100,
   },
   webView: {
-    backgroundColor: "#ffffff"
-  }
+    backgroundColor: '#ffffff',
+  },
 });
