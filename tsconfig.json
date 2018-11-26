@@ -17,6 +17,6 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "include": ["src", "index.js"],
+  "include": ["src", "index.ts"],
   "exclude": ["node_modules", "index.flow.js", "types"]
 }

@@ -1,8 +1,8 @@
 {
   "name": "react-native-webview",
   "description": "React Native WebView component for iOS, Android, and Windows 10 (coming soon)",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "index.ts",
+  "types": "types/index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "contributors": [
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
