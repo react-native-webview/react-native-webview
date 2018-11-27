@@ -13,7 +13,7 @@ module.exports = {
       'error',
       { devDependencies: true, peerDependencies: true },
     ],
-    // Allows writing JSX in JS & TS files
+    // Allows writing JSX in TSX files only
     'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }],
     // This rule doesn't play nice with Prettier
     'react/jsx-one-expression-per-line': 'off',
@@ -21,7 +21,6 @@ module.exports = {
     'react/jsx-wrap-multilines': 'off',
     // Remove this rule because we only destructure props, but never state
     'react/destructuring-assignment': 'off',
-    // Restrict imports that should be used carefully. Usually we have created a wrapper around them
 
     'typescript/adjacent-overload-signatures': 'error',
     'typescript/explicit-function-return-type': 'error',

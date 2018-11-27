@@ -1,23 +1,19 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "esModuleInterop": true,
     "jsx": "react-native",
     "lib": ["es6"],
-    "module": "AMD",
+    "module": "esnext",
     "moduleResolution": "node",
+    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "./types/",
-    "outFile": "./types/index.ts",
     "pretty": true,
     "skipLibCheck": true,
     "strict": true
   },
   "include": ["src", "index.ts"],
-  "exclude": ["node_modules", "index.flow.js", "types"]
+  "exclude": ["node_modules", "index.flow.js"]
 }
