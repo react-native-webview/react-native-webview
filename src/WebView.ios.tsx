@@ -123,6 +123,9 @@ const defaultRenderError = (
   </View>
 );
 
+const RNCUIWebView = requireNativeComponent('RNCUIWebView');
+const RNCWKWebView = requireNativeComponent('RNCWKWebView');
+
 /**
  * `WebView` renders web content in a native view.
  *
@@ -475,13 +478,9 @@ export default class WebView extends React.Component<
 
     const messagingEnabled = typeof this.props.onMessage === 'function';
 
-    let NativeWebView = nativeConfig.component;
-
-    if (this.props.useWebKit) {
-      NativeWebView = NativeWebView || RNCWKWebView;
-    } else {
-      NativeWebView = NativeWebView || RNCUIWebView;
-    }
+    const NativeWebView
+      = nativeConfig.component
+      || (this.props.useWebKit ? RNCWKWebView : RNCUIWebView);
 
     const webView = (
       <NativeWebView
@@ -529,6 +528,3 @@ export default class WebView extends React.Component<
     );
   }
 }
-
-const RNCUIWebView = requireNativeComponent('RNCUIWebView');
-const RNCWKWebView = requireNativeComponent('RNCWKWebView');

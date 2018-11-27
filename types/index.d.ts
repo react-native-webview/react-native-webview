@@ -476,7 +476,12 @@ declare module "src/WebView.ios" {
         state: State;
         webViewRef: React.RefObject<React.ComponentClass<{}, any>>;
         UNSAFE_componentWillMount(): void;
-        _getCommands(): {
+        componentDidUpdate(prevProps: WebViewSharedProps): void;
+        /**
+         * Go forward one page in the web view's history.
+         */
+        goForward: () => void;
+        getCommands(): {
             goForward: () => void;
             goBack: () => void;
             reload: () => void;
@@ -484,10 +489,6 @@ declare module "src/WebView.ios" {
             postMessage: () => void;
             injectJavaScript: () => void;
         };
-        /**
-         * Go forward one page in the web view's history.
-         */
-        goForward: () => void;
         /**
          * Go back one page in the web view's history.
          */
@@ -522,18 +523,17 @@ declare module "src/WebView.ios" {
          * We return an event with a bunch of fields including:
          *  url, title, loading, canGoBack, canGoForward
          */
-        _updateNavigationState: (event: NativeSyntheticEvent<import("src/types/WebViewTypes").WebViewNavigation>) => void;
+        updateNavigationState: (event: NativeSyntheticEvent<import("src/types/WebViewTypes").WebViewNavigation>) => void;
         /**
          * Returns the native `WebView` node.
          */
         getWebViewHandle: () => number | null;
-        _onLoadingStart: (event: NativeSyntheticEvent<import("src/types/WebViewTypes").WebViewNavigation>) => void;
-        _onLoadingError: (event: NativeSyntheticEvent<WebViewError>) => void;
-        _onLoadingFinish: (event: NativeSyntheticEvent<import("src/types/WebViewTypes").WebViewNavigation>) => void;
-        _onMessage: (event: NativeSyntheticEvent<import("src/types/WebViewTypes").WebViewMessage>) => void;
-        _onLoadingProgress: (event: NativeSyntheticEvent<WebViewProgressEvent>) => void;
-        componentDidUpdate(prevProps: WebViewSharedProps): void;
-        _showRedboxOnPropChanges(prevProps: WebViewSharedProps, propName: 'allowsInlineMediaPlayback' | 'mediaPlaybackRequiresUserAction' | 'dataDetectorTypes'): void;
+        onLoadingStart: (event: NativeSyntheticEvent<import("src/types/WebViewTypes").WebViewNavigation>) => void;
+        onLoadingError: (event: NativeSyntheticEvent<WebViewError>) => void;
+        onLoadingFinish: (event: NativeSyntheticEvent<import("src/types/WebViewTypes").WebViewNavigation>) => void;
+        onMessage: (event: NativeSyntheticEvent<import("src/types/WebViewTypes").WebViewMessage>) => void;
+        onLoadingProgress: (event: NativeSyntheticEvent<WebViewProgressEvent>) => void;
+        showRedboxOnPropChanges(prevProps: WebViewSharedProps, propName: 'allowsInlineMediaPlayback' | 'mediaPlaybackRequiresUserAction' | 'dataDetectorTypes'): void;
         render(): React.ReactNode;
     }
 }

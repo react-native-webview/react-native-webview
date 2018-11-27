@@ -50,7 +50,9 @@ enum WebViewState {
   ERROR = 'ERROR',
 }
 
-const isWebViewUriSource = (source: any): source is WebViewSourceUri =>
+const isWebViewUriSource = (
+  source: WebViewSource,
+): source is WebViewSourceUri =>
   typeof source !== 'number' && !('html' in source);
 
 const defaultRenderLoading = (): React.ReactNode => (
