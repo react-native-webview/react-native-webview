@@ -180,6 +180,7 @@ export default class WebView extends React.Component<
       this.props.useWebKit === true
       && this.props.scalesPageToFit !== undefined
     ) {
+      // eslint-disable-next-line no-console
       console.warn(
         'The scalesPageToFit property is not supported when useWebKit = true',
       );
@@ -188,6 +189,7 @@ export default class WebView extends React.Component<
       !this.props.useWebKit
       && this.props.allowsBackForwardNavigationGestures
     ) {
+      // eslint-disable-next-line no-console
       console.warn(
         'The allowsBackForwardNavigationGestures property is not supported when useWebKit = false',
       );
@@ -204,6 +206,7 @@ export default class WebView extends React.Component<
     this.showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
 
     if (this.props.scalesPageToFit !== undefined) {
+      // eslint-disable-next-line no-console
       console.warn(
         'The scalesPageToFit property is not supported when useWebKit = true',
       );
@@ -335,6 +338,7 @@ export default class WebView extends React.Component<
     if (onLoadEnd) {
       onLoadEnd(event);
     }
+    // eslint-disable-next-line no-console
     console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
@@ -381,6 +385,7 @@ export default class WebView extends React.Component<
       | 'dataDetectorTypes',
   ): void {
     if (this.props[propName] !== prevProps[propName]) {
+      // eslint-disable-next-line no-console
       console.error(
         `Changes to property ${propName} do nothing after the initial render.`,
       );
@@ -412,6 +417,7 @@ export default class WebView extends React.Component<
         invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
       }
     } else if (this.state.viewState !== WebViewState.IDLE) {
+      // eslint-disable-next-line no-console
       console.error(
         `RNCWebView invalid state encountered: ${this.state.viewState}`,
       );

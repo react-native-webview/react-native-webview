@@ -185,6 +185,7 @@ export default class WebView extends React.Component<
     if (onLoadEnd) {
       onLoadEnd(event);
     }
+    // eslint-disable-next-line no-console
     console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
@@ -242,6 +243,7 @@ export default class WebView extends React.Component<
         invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
       }
     } else if (this.state.viewState !== WebViewState.IDLE) {
+      // eslint-disable-next-line no-console
       console.error(
         `RNCWebView invalid state encountered: ${this.state.viewState}`,
       );
@@ -265,10 +267,12 @@ export default class WebView extends React.Component<
 
     if (isWebViewUriSource(source)) {
       if (source.method === 'POST' && source.headers) {
+        // eslint-disable-next-line no-console
         console.warn(
           'WebView: `source.headers` is not supported when using POST.',
         );
       } else if (source.method === 'GET' && source.body) {
+        // eslint-disable-next-line no-console
         console.warn('WebView: `source.body` is not supported when using GET.');
       }
     }
