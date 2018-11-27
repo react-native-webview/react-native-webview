@@ -47,6 +47,42 @@ const { RNCWKWebViewManager, RNCUIWebViewManager } = NativeModules;
 
 const BGWASH = 'rgba(255,255,255,0.8)';
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BGWASH,
+  },
+  errorText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  errorTextTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    marginBottom: 10,
+  },
+  hidden: {
+    height: 0,
+    flex: 0, // disable 'flex:1' when hiding a View
+  },
+  loadingView: {
+    backgroundColor: BGWASH,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 100,
+  },
+  webView: {
+    backgroundColor: '#ffffff',
+  },
+});
+
 enum WebViewState {
   IDLE = 'IDLE',
   LOADING = 'LOADING',
@@ -135,7 +171,8 @@ export default class WebView extends React.Component<
 
   webViewRef = React.createRef<React.ComponentClass>();
 
-  UNSAFE_componentWillMount() {
+  // eslint-disable-next-line camelcase, react/sort-comp
+  UNSAFE_componentWillMount(): void {
     if (
       this.props.useWebKit === true
       && this.props.scalesPageToFit !== undefined
@@ -154,6 +191,33 @@ export default class WebView extends React.Component<
     }
   }
 
+  componentDidUpdate(prevProps: WebViewSharedProps): void {
+    if (!(prevProps.useWebKit && this.props.useWebKit)) {
+      return;
+    }
+
+    this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
+    this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
+
+    if (this.props.scalesPageToFit !== undefined) {
+      console.warn(
+        'The scalesPageToFit property is not supported when useWebKit = true',
+      );
+    }
+  }
+
+  /**
+   * Go forward one page in the web view's history.
+   */
+  goForward = (): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this._getCommands().goForward,
+      null,
+    );
+  };
+
   _getCommands(): {
     goForward: () => void;
     goBack: () => void;
@@ -168,17 +232,6 @@ export default class WebView extends React.Component<
 
     return UIManager.RNCWKWebView.Commands;
   }
-
-  /**
-   * Go forward one page in the web view's history.
-   */
-  goForward = (): void => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this._getCommands().goForward,
-      null,
-    );
-  };
 
   /**
    * Go back one page in the web view's history.
@@ -263,16 +316,22 @@ export default class WebView extends React.Component<
     findNodeHandle(this.webViewRef.current);
 
   _onLoadingStart = (event: WebViewNavigationEvent): void => {
-    const onLoadStart = this.props.onLoadStart;
-    onLoadStart && onLoadStart(event);
+    const { onLoadStart } = this.props;
+    if (onLoadStart) {
+      onLoadStart(event);
+    }
     this._updateNavigationState(event);
   };
 
   _onLoadingError = (event: WebViewErrorEvent): void => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
-    onError && onError(event);
-    onLoadEnd && onLoadEnd(event);
+    if (onError) {
+      onError(event);
+    }
+    if (onLoadEnd) {
+      onLoadEnd(event);
+    }
     console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
@@ -283,8 +342,12 @@ export default class WebView extends React.Component<
 
   _onLoadingFinish = (event: WebViewNavigationEvent): void => {
     const { onLoad, onLoadEnd } = this.props;
-    onLoad && onLoad(event);
-    onLoadEnd && onLoadEnd(event);
+    if (onLoad) {
+      onLoad(event);
+    }
+    if (onLoadEnd) {
+      onLoadEnd(event);
+    }
     this.setState({
       viewState: WebViewState.IDLE,
     });
@@ -293,31 +356,19 @@ export default class WebView extends React.Component<
 
   _onMessage = (event: WebViewMessageEvent): void => {
     const { onMessage } = this.props;
-    onMessage && onMessage(event);
+    if (onMessage) {
+      onMessage(event);
+    }
   };
 
   _onLoadingProgress = (
     event: NativeSyntheticEvent<WebViewProgressEvent>,
   ): void => {
     const { onLoadProgress } = this.props;
-    onLoadProgress && onLoadProgress(event);
+    if (onLoadProgress) {
+      onLoadProgress(event);
+    }
   };
-
-  componentDidUpdate(prevProps: WebViewSharedProps): void {
-    if (!(prevProps.useWebKit && this.props.useWebKit)) {
-      return;
-    }
-
-    this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
-    this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
-    this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
-
-    if (this.props.scalesPageToFit !== undefined) {
-      console.warn(
-        'The scalesPageToFit property is not supported when useWebKit = true',
-      );
-    }
-  }
 
   _showRedboxOnPropChanges(
     prevProps: WebViewSharedProps,
@@ -481,39 +532,3 @@ export default class WebView extends React.Component<
 
 const RNCUIWebView = requireNativeComponent('RNCUIWebView');
 const RNCWKWebView = requireNativeComponent('RNCWKWebView');
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BGWASH,
-  },
-  errorText: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  errorTextTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    marginBottom: 10,
-  },
-  hidden: {
-    height: 0,
-    flex: 0, // disable 'flex:1' when hiding a View
-  },
-  loadingView: {
-    backgroundColor: BGWASH,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 100,
-  },
-  webView: {
-    backgroundColor: '#ffffff',
-  },
-});

@@ -168,15 +168,21 @@ export default class WebView extends React.Component<
 
   onLoadingStart = (event: WebViewNavigationEvent): void => {
     const { onLoadStart } = this.props;
-    onLoadStart && onLoadStart(event);
+    if (onLoadStart) {
+      onLoadStart(event);
+    }
     this.updateNavigationState(event);
   };
 
   onLoadingError = (event: WebViewErrorEvent): void => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
-    onError && onError(event);
-    onLoadEnd && onLoadEnd(event);
+    if (onError) {
+      onError(event);
+    }
+    if (onLoadEnd) {
+      onLoadEnd(event);
+    }
     console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
@@ -187,8 +193,12 @@ export default class WebView extends React.Component<
 
   onLoadingFinish = (event: WebViewNavigationEvent): void => {
     const { onLoad, onLoadEnd } = this.props;
-    onLoad && onLoad(event);
-    onLoadEnd && onLoadEnd(event);
+    if (onLoad) {
+      onLoad(event);
+    }
+    if (onLoadEnd) {
+      onLoadEnd(event);
+    }
     this.setState({
       viewState: WebViewState.IDLE,
     });
@@ -197,14 +207,18 @@ export default class WebView extends React.Component<
 
   onMessage = (event: WebViewMessageEvent): void => {
     const { onMessage } = this.props;
-    onMessage && onMessage(event);
+    if (onMessage) {
+      onMessage(event);
+    }
   };
 
   onLoadingProgress = (
     event: NativeSyntheticEvent<WebViewProgressEvent>,
   ): void => {
     const { onLoadProgress } = this.props;
-    onLoadProgress && onLoadProgress(event);
+    if (onLoadProgress) {
+      onLoadProgress(event);
+    }
   };
 
   render(): React.ReactNode {

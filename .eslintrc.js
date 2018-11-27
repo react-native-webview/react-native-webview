@@ -32,7 +32,6 @@ module.exports = {
     'typescript/no-namespace': 'error',
     'typescript/no-non-null-assertion': 'error',
     'typescript/no-triple-slash-reference': 'error',
-    'typescript/no-type-alias': 'error',
     'typescript/prefer-namespace-keyword': 'error',
     'typescript/type-annotation-spacing': 'error',
 
