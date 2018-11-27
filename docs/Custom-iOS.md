@@ -140,7 +140,7 @@ If you open webpages that needs a Client Certificate for Authentication, you can
 [RNCWKWebView setClientAuthenticationCredential:credential];
 ```
 
-This can be paired with a call from Javascript to pass a string label for the certificate stored in keychain and use native calls to fetch the certificate to create a credential object.
+This can be paired with a call from Javascript to pass a string label for the certificate stored in keychain and use native calls to fetch the certificate to create a credential object. This call can be made anywhere that makes sense for your application (e.g. as part of the user authentication stack). The only requirement is to make this call before displaying any webviews.
 
 ## JavaScript Interface
 
