@@ -43,6 +43,10 @@ module.exports = {
         extensions: [
           '.js',
           '.jsx',
+          '.android.jsx',
+          '.android.js',
+          '.ios.jsx',
+          '.ios.js',
           '.tsx',
           '.ts',
           '.android.tsx',

@@ -196,9 +196,9 @@ export default class WebView extends React.Component<
       return;
     }
 
-    this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
-    this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
-    this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
+    this.showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this.showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
+    this.showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
 
     if (this.props.scalesPageToFit !== undefined) {
       console.warn(
@@ -213,12 +213,12 @@ export default class WebView extends React.Component<
   goForward = (): void => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this._getCommands().goForward,
+      this.getCommands().goForward,
       null,
     );
   };
 
-  _getCommands(): {
+  getCommands(): {
     goForward: () => void;
     goBack: () => void;
     reload: () => void;
@@ -239,7 +239,7 @@ export default class WebView extends React.Component<
   goBack = (): void => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this._getCommands().goBack,
+      this.getCommands().goBack,
       null,
     );
   };
@@ -251,7 +251,7 @@ export default class WebView extends React.Component<
     this.setState({ viewState: WebViewState.LOADING });
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this._getCommands().reload,
+      this.getCommands().reload,
       null,
     );
   };
@@ -262,7 +262,7 @@ export default class WebView extends React.Component<
   stopLoading = (): void => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this._getCommands().stopLoading,
+      this.getCommands().stopLoading,
       null,
     );
   };
@@ -280,7 +280,7 @@ export default class WebView extends React.Component<
   postMessage = (data: string): void => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this._getCommands().postMessage,
+      this.getCommands().postMessage,
       [String(data)],
     );
   };
@@ -294,7 +294,7 @@ export default class WebView extends React.Component<
   injectJavaScript = (data: string): void => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this._getCommands().injectJavaScript,
+      this.getCommands().injectJavaScript,
       [data],
     );
   };
@@ -303,7 +303,7 @@ export default class WebView extends React.Component<
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
    */
-  _updateNavigationState = (event: WebViewNavigationEvent): void => {
+  updateNavigationState = (event: WebViewNavigationEvent): void => {
     if (this.props.onNavigationStateChange) {
       this.props.onNavigationStateChange(event.nativeEvent);
     }
@@ -315,15 +315,15 @@ export default class WebView extends React.Component<
   getWebViewHandle = (): number | null =>
     findNodeHandle(this.webViewRef.current);
 
-  _onLoadingStart = (event: WebViewNavigationEvent): void => {
+  onLoadingStart = (event: WebViewNavigationEvent): void => {
     const { onLoadStart } = this.props;
     if (onLoadStart) {
       onLoadStart(event);
     }
-    this._updateNavigationState(event);
+    this.updateNavigationState(event);
   };
 
-  _onLoadingError = (event: WebViewErrorEvent): void => {
+  onLoadingError = (event: WebViewErrorEvent): void => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
     if (onError) {
@@ -340,7 +340,7 @@ export default class WebView extends React.Component<
     });
   };
 
-  _onLoadingFinish = (event: WebViewNavigationEvent): void => {
+  onLoadingFinish = (event: WebViewNavigationEvent): void => {
     const { onLoad, onLoadEnd } = this.props;
     if (onLoad) {
       onLoad(event);
@@ -351,17 +351,17 @@ export default class WebView extends React.Component<
     this.setState({
       viewState: WebViewState.IDLE,
     });
-    this._updateNavigationState(event);
+    this.updateNavigationState(event);
   };
 
-  _onMessage = (event: WebViewMessageEvent): void => {
+  onMessage = (event: WebViewMessageEvent): void => {
     const { onMessage } = this.props;
     if (onMessage) {
       onMessage(event);
     }
   };
 
-  _onLoadingProgress = (
+  onLoadingProgress = (
     event: NativeSyntheticEvent<WebViewProgressEvent>,
   ): void => {
     const { onLoadProgress } = this.props;
@@ -370,7 +370,7 @@ export default class WebView extends React.Component<
     }
   };
 
-  _showRedboxOnPropChanges(
+  showRedboxOnPropChanges(
     prevProps: WebViewSharedProps,
     propName:
       | 'allowsInlineMediaPlayback'
@@ -503,12 +503,12 @@ export default class WebView extends React.Component<
           this.props.allowsBackForwardNavigationGestures
         }
         userAgent={this.props.userAgent}
-        onLoadingStart={this._onLoadingStart}
-        onLoadingFinish={this._onLoadingFinish}
-        onLoadingError={this._onLoadingError}
-        onLoadingProgress={this._onLoadingProgress}
+        onLoadingStart={this.onLoadingStart}
+        onLoadingFinish={this.onLoadingFinish}
+        onLoadingError={this.onLoadingError}
+        onLoadingProgress={this.onLoadingProgress}
         messagingEnabled={messagingEnabled}
-        onMessage={this._onMessage}
+        onMessage={this.onMessage}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         scalesPageToFit={scalesPageToFit}
         allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}
