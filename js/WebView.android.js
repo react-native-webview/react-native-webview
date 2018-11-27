@@ -13,13 +13,10 @@ import React from 'react';
 import ReactNative, {
   ActivityIndicator,
   Image,
-  Linking,
   requireNativeComponent,
   StyleSheet,
   UIManager,
   View,
-  Image,
-  requireNativeComponent,
   NativeModules
 } from 'react-native';
 
