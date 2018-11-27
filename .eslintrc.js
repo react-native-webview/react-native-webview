@@ -42,6 +42,8 @@ module.exports = {
     'import/resolver': {
       node: {
         extensions: [
+          '.js',
+          '.jsx',
           '.tsx',
           '.ts',
           '.android.tsx',
