@@ -155,12 +155,12 @@ export default class WebView extends React.Component<
   }
 
   _getCommands(): {
-    goForward: () => void,
-    goBack: () => void,
-    reload: () => void,
-    stopLoading: () => void,
-    postMessage: () => void,
-    injectJavaScript: () => void,
+    goForward: () => void;
+    goBack: () => void;
+    reload: () => void;
+    stopLoading: () => void;
+    postMessage: () => void;
+    injectJavaScript: () => void;
   } {
     if (!this.props.useWebKit) {
       return UIManager.RNCUIWebView.Commands;

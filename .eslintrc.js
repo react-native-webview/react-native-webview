@@ -38,13 +38,6 @@ module.exports = {
 
     'no-unused-vars': 'off',
   },
-  overrides: [
-    {
-      files: ['*.ts?(x)'],
-      parser: 'typescript-eslint-parser',
-      plugins: ['react-native', 'typescript'],
-    },
-  ],
   settings: {
     'import/resolver': {
       node: {
