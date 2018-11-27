@@ -136,6 +136,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     originWhitelist: defaultOriginWhitelist,
   };
 
+  static isFileUploadSupported = async () => {
+    // no native implementation for iOS, depends only on permissions
+    return true;
+  }
+
   state = {
     viewState: this.props.startInLoadingState
       ? WebViewState.LOADING
@@ -238,6 +243,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         injectedJavaScript={this.props.injectedJavaScript}
         bounces={this.props.bounces}
         scrollEnabled={this.props.scrollEnabled}
+        pagingEnabled={this.props.pagingEnabled}
         decelerationRate={decelerationRate}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
@@ -247,6 +253,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         allowsBackForwardNavigationGestures={
           this.props.allowsBackForwardNavigationGestures
         }
+        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+        userAgent={this.props.userAgent}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
         onLoadingError={this._onLoadingError}
@@ -260,6 +268,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.mediaPlaybackRequiresUserAction
         }
         dataDetectorTypes={this.props.dataDetectorTypes}
+        allowsLinkPreview={this.props.allowsLinkPreview}
         {...nativeConfig.props}
       />
     );

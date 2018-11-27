@@ -18,6 +18,9 @@ import ReactNative, {
   StyleSheet,
   UIManager,
   View,
+  Image,
+  requireNativeComponent,
+  NativeModules
 } from 'react-native';
 
 import invariant from 'fbjs/lib/invariant';
@@ -69,6 +72,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     saveFormDataDisabled: false,
     originWhitelist: defaultOriginWhitelist,
   };
+
+  static isFileUploadSupported = async () => {
+    // native implementation should return "true" only for Android 5+
+    return NativeModules.RNCWebView.isFileUploadSupported();
+  }
 
   state = {
     viewState: this.props.startInLoadingState
