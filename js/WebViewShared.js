@@ -51,6 +51,7 @@ const createOnShouldStartLoadWithRequest = (
 
     if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
       Linking.openURL(url);
+      shouldStart = false
     }
 
     if (onShouldStartLoadWithRequest) {
