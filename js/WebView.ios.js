@@ -270,6 +270,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         injectedJavaScript={this.props.injectedJavaScript}
         bounces={this.props.bounces}
         scrollEnabled={this.props.scrollEnabled}
+        pagingEnabled={this.props.pagingEnabled}
         decelerationRate={decelerationRate}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
@@ -291,6 +292,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.mediaPlaybackRequiresUserAction
         }
         dataDetectorTypes={this.props.dataDetectorTypes}
+        allowsLinkPreview={this.props.allowsLinkPreview}
         {...nativeConfig.props}
       />
     );

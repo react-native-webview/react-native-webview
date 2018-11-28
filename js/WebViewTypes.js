@@ -169,6 +169,14 @@ export type IOSWebViewProps = $ReadOnly<{|
   scrollEnabled?: ?boolean,
 
   /**
+   * If the value of this property is true, the scroll view stops on multiples
+   * of the scroll view’s bounds when the user scrolls.
+   * The default value is false.
+   * @platform ios
+   */
+  pagingEnabled?: ?boolean,
+
+  /**
    * The amount by which the web view content is inset from the edges of
    * the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
    * @platform ios
@@ -233,6 +241,16 @@ export type IOSWebViewProps = $ReadOnly<{|
    * The custom user agent string.
    */
   userAgent?: ?string,
+
+  /**
+   * A Boolean value that determines whether pressing on a link
+   * displays a preview of the destination for the link.
+   *
+   * This property is available on devices that support 3D Touch.
+   * In iOS 10 and later, the default value is `true`; before that, the default value is `false`.
+   * @platform ios
+   */
+  allowsLinkPreview?: ?boolean,
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|
