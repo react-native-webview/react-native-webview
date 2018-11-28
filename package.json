@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "2.13.0",
+  "version": "2.13.0-alpha.1",
   "homepage": "https://github.com/vivid-planet/react-native-webview#readme",
   "scripts": {
     "test:ios:flow": "flow check",
@@ -37,5 +37,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/vivid-planet/react-native-webview.git"
-  }
+  },
+  "gitHead": "264edae36611f12100085205ffe0c2ecced63c27"
 }
