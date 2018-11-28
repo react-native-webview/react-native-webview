@@ -1,5 +1,5 @@
 {
-  "name": "react-native-webview",
+  "name": "@vivid-planet/react-native-webview",
   "description": "React Native WebView component for iOS, Android, and Windows 10 (coming soon)",
   "main": "index.js",
   "typings": "typings/index.d.ts",
@@ -9,7 +9,7 @@
   ],
   "license": "MIT",
   "version": "2.13.0",
-  "homepage": "https://github.com/react-native-community/react-native-webview#readme",
+  "homepage": "https://github.com/vivid-planet/react-native-webview#readme",
   "scripts": {
     "test:ios:flow": "flow check",
     "test:android:flow": "flow check --flowconfig-name .flowconfig.android",
@@ -36,6 +36,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-community/react-native-webview.git"
+    "url": "https://github.com/vivid-planet/react-native-webview.git"
   }
 }
