@@ -93,7 +93,63 @@ static NSString *const MessageHanderName = @"ReactNative";
     wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
 #endif
 
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    if(_sharedCookiesEnabled) {
+        // More info to sending cookies with wkwebview: https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
+        if (@available(iOS 11.0, *)) {
+          NSArray<NSHTTPCookie*>* cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
+          for(int i = 0; i < (int)[cookies count]; ++i)
+          {
+              NSHTTPCookie* currentCookie = cookies[i];
+              [wkWebViewConfig.websiteDataStore.httpCookieStore setCookie: currentCookie completionHandler: nil];
+          }
+
+          _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+
+          // Hotfix: set cookies twice, otherwise they are not sent with first request
+          for(int i = 0; i < (int)[cookies count]; ++i)
+          {
+              NSHTTPCookie* currentCookie = cookies[i];
+              [_webView.configuration.websiteDataStore.httpCookieStore setCookie: currentCookie completionHandler: nil];
+          }
+        }
+        else
+        {
+          NSMutableString* script = [NSMutableString string];
+
+          // Get the currently set cookie names in javascript
+          [script appendString: @"var cookieNames = document.cookie.split('; ').map(function(cookie) { return cookie.split('=')[0] } );\n"];
+
+          for(NSHTTPCookie* cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
+          {
+              // Skip cookies that will break our script
+              if([cookie.value rangeOfString: @"'"].location != NSNotFound)
+              {
+                  continue;
+              }
+
+              NSString* javascriptCookieString = [NSString stringWithFormat: @"%@=%@;domain=%@;path=%@", cookie.name, cookie.value, cookie.domain, cookie.path ? cookie.path : @"/"];
+
+              // Create a line that appends this cookie to the web view's document's cookies
+              [script appendFormat: @"if (cookieNames.indexOf('%@') == -1) { document.cookie='%@'; };\n", cookie.name, javascriptCookieString];
+          }
+
+          WKUserContentController* userContentController = [[WKUserContentController alloc] init];
+          WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource: script
+                                                                injectionTime: WKUserScriptInjectionTimeAtDocumentStart
+                                                             forMainFrameOnly: NO];
+          [userContentController addUserScript: cookieInScript];
+
+          // Create a config out of that userContentController and specify it when we create our web view.
+          wkWebViewConfig.userContentController = userContentController;
+
+          _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+        }
+    }
+    else
+    {
+        _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    }
+
     _webView.scrollView.delegate = self;
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
