@@ -227,6 +227,13 @@ export interface IOSWebViewProps {
    * @platform ios
    */
   allowsLinkPreview?: boolean;
+
+  /**
+   * Set true if shared cookies from HTTPCookieStorage should used for every load request in the
+   * `RNCWKWebView`. The default value is `false`.
+   * @platform ios
+   */
+  sharedCookiesEnabled?: boolean;
 }
 
 export interface AndroidWebViewProps {
