@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C26C492921AE6DAB00F47614 /* NSURLRequest+HeaderHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = C26C492821AE6DAB00F47614 /* NSURLRequest+HeaderHelpers.m */; };
 		E914DBF6214474710071092B /* RNCUIWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E914DBF3214474710071092B /* RNCUIWebViewManager.m */; };
 		E914DBF7214474710071092B /* RNCUIWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E914DBF4214474710071092B /* RNCUIWebView.m */; };
 		E91B351D21446E6C00F9801F /* RNCWKWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351B21446E6C00F9801F /* RNCWKWebViewManager.m */; };
@@ -27,6 +28,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C26C492721AE6DAB00F47614 /* NSURLRequest+HeaderHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+HeaderHelpers.h"; sourceTree = "<group>"; };
+		C26C492821AE6DAB00F47614 /* NSURLRequest+HeaderHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+HeaderHelpers.m"; sourceTree = "<group>"; };
 		E914DBF2214474710071092B /* RNCUIWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCUIWebView.h; sourceTree = "<group>"; };
 		E914DBF3214474710071092B /* RNCUIWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCUIWebViewManager.m; sourceTree = "<group>"; };
 		E914DBF4214474710071092B /* RNCUIWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCUIWebView.m; sourceTree = "<group>"; };
@@ -59,6 +62,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				C26C492721AE6DAB00F47614 /* NSURLRequest+HeaderHelpers.h */,
+				C26C492821AE6DAB00F47614 /* NSURLRequest+HeaderHelpers.m */,
 				E914DBF2214474710071092B /* RNCUIWebView.h */,
 				E914DBF4214474710071092B /* RNCUIWebView.m */,
 				E914DBF5214474710071092B /* RNCUIWebViewManager.h */,
@@ -131,6 +136,7 @@
 				E914DBF7214474710071092B /* RNCUIWebView.m in Sources */,
 				E914DBF6214474710071092B /* RNCUIWebViewManager.m in Sources */,
 				E91B351E21446E6C00F9801F /* RNCWKWebView.m in Sources */,
+				C26C492921AE6DAB00F47614 /* NSURLRequest+HeaderHelpers.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

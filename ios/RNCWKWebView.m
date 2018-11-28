@@ -8,6 +8,7 @@
 #import "RNCWKWebView.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import "NSURLRequest+HeaderHelpers.h"
 
 #import "objc/runtime.h"
 
@@ -378,6 +379,21 @@ static NSString *const MessageHanderName = @"ReactNative";
     }
   }
 
+  NSDictionary *customHeaders = [_source valueForKey:@"headers"];
+  BOOL userAction = navigationAction.navigationType != WKNavigationTypeOther;
+  if (userAction && customHeaders &&
+      ![request containsHeaders:customHeaders]) {
+    NSMutableURLRequest *newRequest = [request mutableCopy];
+    NSArray *headerKeys = customHeaders.allKeys;
+    for (NSString *key in headerKeys) {
+      [newRequest addValue:[customHeaders valueForKey:key]
+        forHTTPHeaderField:key];
+    }
+    decisionHandler(WKNavigationActionPolicyCancel);
+    [self.webView loadRequest:newRequest];
+    return;
+  }
+  
   if (_onLoadingStart) {
     // We have this check to filter out iframe requests and whatnot
     BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
