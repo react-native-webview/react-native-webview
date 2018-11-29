@@ -252,7 +252,7 @@ export type IOSWebViewProps = $ReadOnly<{|
    * `RNCWKWebView`. The default value is `false`.
    * @platform ios
    */
-  sharedCookiesEnabled?: boolean,
+  sharedCookiesEnabled?: ?boolean,
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|
