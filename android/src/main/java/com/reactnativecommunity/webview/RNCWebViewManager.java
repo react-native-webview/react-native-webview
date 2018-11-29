@@ -123,7 +123,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     protected boolean mLastLoadFailed = false;
     protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
-    protected @Nullable List<Pattern> mOriginWhitelist;
 
     @Override
     public void onPageFinished(WebView webView, String url) {
@@ -208,10 +207,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
       mUrlPrefixesForDefaultIntent = specialUrls;
-    }
-
-    public void setOriginWhitelist(List<Pattern> originWhitelist) {
-      mOriginWhitelist = originWhitelist;
     }
   }
 
