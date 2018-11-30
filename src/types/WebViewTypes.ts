@@ -19,6 +19,7 @@ declare module 'react-native' {
 export interface WebViewNativeEvent {
   readonly url: string;
   readonly loading: boolean;
+  readonly lockIdentifier: number;
   readonly title: string;
   readonly canGoBack: boolean;
   readonly canGoForward: boolean;
@@ -26,7 +27,6 @@ export interface WebViewNativeEvent {
 
 export interface WebViewIOSLoadRequestEvent extends WebViewNativeEvent {
   target: number;
-  lockIdentifier: number;
   navigationType:
     | 'click'
     | 'formsubmit'
@@ -68,8 +68,8 @@ export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 
-export type DataDetectorTypes
-  = | 'phoneNumber'
+export type DataDetectorTypes =
+  | 'phoneNumber'
   | 'link'
   | 'address'
   | 'calendarEvent'
@@ -137,6 +137,10 @@ export interface WebViewNativeConfig {
    */
   viewManager?: any;
 }
+
+export type OnShouldStartLoadWithRequest = (
+  event: WebViewNavigation,
+) => boolean;
 
 export interface IOSWebViewProps {
   /**
@@ -217,7 +221,7 @@ export interface IOSWebViewProps {
    * to stop loading.
    * @platform ios
    */
-  onShouldStartLoadWithRequest?: (event: WebViewIOSLoadRequestEvent) => any;
+  onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest;
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the

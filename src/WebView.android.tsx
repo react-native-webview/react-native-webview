@@ -2,19 +2,24 @@ import React from 'react';
 
 import {
   ActivityIndicator,
+  Image,
+  requireNativeComponent,
   StyleSheet,
   UIManager,
   View,
-  requireNativeComponent,
   NativeModules,
-  Image,
+
   NativeSyntheticEvent,
-  findNodeHandle,
+  findNodeHandle  
 } from 'react-native';
 
 import invariant from 'invariant';
 
-import WebViewShared from './WebViewShared';
+import {
+  defaultOriginWhitelist,
+  createOnShouldStartLoadWithRequest,
+  originWhitelistToRegex
+} from './WebViewShared';
 import {
   WebViewSourceUri,
   WebViewError,
@@ -82,7 +87,7 @@ export default class WebView extends React.Component<
     scalesPageToFit: true,
     allowFileAccess: false,
     saveFormDataDisabled: false,
-    originWhitelist: WebViewShared.defaultOriginWhitelist,
+    originWhitelist: defaultOriginWhitelist,
   };
 
   static isFileUploadSupported = async (): Promise<boolean> =>
@@ -97,6 +102,7 @@ export default class WebView extends React.Component<
   };
 
   webViewRef = React.createRef<React.ComponentClass>();
+
 
   goForward = (): void => {
     UIManager.dispatchViewManagerCommand(
@@ -215,6 +221,22 @@ export default class WebView extends React.Component<
     }
   };
 
+
+
+  onShouldStartLoadWithRequestCallback = (
+    shouldStart: boolean,
+    url: string,
+  ) => {
+    if (shouldStart) {
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        UIManager.RNCWebView.Commands.loadUrl,
+        [String(url)],
+      );
+    }
+  };
+
+
   onLoadingProgress = (
     event: NativeSyntheticEvent<WebViewProgressEvent>,
   ): void => {
@@ -224,6 +246,7 @@ export default class WebView extends React.Component<
     }
   };
 
+  
   render(): React.ReactNode {
     let otherView = null;
 
@@ -280,11 +303,17 @@ export default class WebView extends React.Component<
     const nativeConfig = this.props.nativeConfig || {};
 
     const originWhitelist = (this.props.originWhitelist || []).map(
-      WebViewShared.originWhitelistToRegex,
+      originWhitelistToRegex,
     );
 
     const NativeWebView = nativeConfig.component || RNCWebView;
 
+    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+      this.onShouldStartLoadWithRequestCallback,
+      this.props.originWhitelist,
+      this.props.onShouldStartLoadWithRequest,
+    );
+    
     const webView = (
       <NativeWebView
         ref={this.webViewRef}
@@ -305,6 +334,7 @@ export default class WebView extends React.Component<
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentSizeChange={this.props.onContentSizeChange}
         onLoadingStart={this.onLoadingStart}
         onLoadingFinish={this.onLoadingFinish}
