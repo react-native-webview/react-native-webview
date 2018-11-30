@@ -13,7 +13,7 @@
     "ci:publish": "yarn semantic-release",
     "ci:test": "yarn ci:test:types && yarn ci:test:lint",
     "ci:test:types": "yarn tsc",
-    "ci:test:lint": "yarn eslint . --max-warnings=0 --ext .js,.ts,.tsx",
+    "ci:test:lint": "yarn eslint . --max-warnings=0 --ext .js,.ts,.tsx --ignore-path .gitignore",
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "semantic-release": "semantic-release"
   },
