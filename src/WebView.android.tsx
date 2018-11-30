@@ -226,7 +226,7 @@ export default class WebView extends React.Component<
   onShouldStartLoadWithRequestCallback = (
     shouldStart: boolean,
     url: string,
-  ) => {
+  ): void => {
     if (shouldStart) {
       UIManager.dispatchViewManagerCommand(
         this.getWebViewHandle(),

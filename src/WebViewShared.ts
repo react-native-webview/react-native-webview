@@ -15,9 +15,9 @@ const extractOrigin = (url: string): string => {
 const originWhitelistToRegex = (originWhitelist: string): string =>
   escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*');
 
-const passesWhitelist = (compiledWhitelist: Array<string>, url: string) => {
+const passesWhitelist = (compiledWhitelist: Array<string>, url: string): boolean => {
   const origin = extractOrigin(url);
-  return compiledWhitelist.some(x => new RegExp(x).test(origin));
+  return compiledWhitelist.some((x: string): boolean  => new RegExp(x).test(origin));
 };
 
 const compileWhitelist = (
@@ -33,8 +33,8 @@ const createOnShouldStartLoadWithRequest = (
   ) => void,
   originWhitelist?: Readonly<string[]>,
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
-) => {
-  return ({ nativeEvent }: WebViewNavigationEvent) => {
+): (e: WebViewNavigationEvent) => void => 
+  ({ nativeEvent }: WebViewNavigationEvent): void => {
     let shouldStart = true;
     const { url, lockIdentifier } = nativeEvent;
 
@@ -49,6 +49,6 @@ const createOnShouldStartLoadWithRequest = (
 
     loadRequest(shouldStart, url, lockIdentifier);
   };
-};
+;
 
 export { originWhitelistToRegex, defaultOriginWhitelist, createOnShouldStartLoadWithRequest };

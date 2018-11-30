@@ -1,3 +1,5 @@
+/* eslint-disable typescript/no-explicit-any */
+
 import { ComponentType, ReactElement, ReactNode } from 'react';
 import {
   Insets,
@@ -68,8 +70,8 @@ export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 
-export type DataDetectorTypes =
-  | 'phoneNumber'
+export type DataDetectorTypes
+  = | 'phoneNumber'
   | 'link'
   | 'address'
   | 'calendarEvent'

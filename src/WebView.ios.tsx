@@ -198,17 +198,23 @@ export default class WebView extends React.Component<
     }
   }
 
-  /**
-   * Go forward one page in the web view's history.
-   */
-  goForward = (): void => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().goForward,
-      null,
-    );
-  };
+  componentDidUpdate(prevProps: WebViewSharedProps): void {
+    if (!(prevProps.useWebKit && this.props.useWebKit)) {
+      return;
+    }
 
+    this.showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this.showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
+    this.showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
+
+    if (this.props.scalesPageToFit !== undefined) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'The scalesPageToFit property is not supported when useWebKit = true',
+      );
+    }
+  }
+  
   getCommands(): {
     goForward: () => void;
     goBack: () => void;
@@ -223,6 +229,17 @@ export default class WebView extends React.Component<
 
     return UIManager.RNCWKWebView.Commands;
   }
+
+  /**
+   * Go forward one page in the web view's history.
+   */
+  goForward = (): void => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().goForward,
+      null,
+    );
+  };
 
   /**
    * Go back one page in the web view's history.
@@ -367,7 +384,7 @@ export default class WebView extends React.Component<
     _url: string,
     lockIdentifier: number,
   ): void => {
-    let viewManager = (this.props.nativeConfig || {}).viewManager;
+    let { viewManager = null } = (this.props.nativeConfig || {});
 
     if (this.props.useWebKit) {
       viewManager = viewManager || RNCWKWebViewManager;
@@ -377,23 +394,6 @@ export default class WebView extends React.Component<
     invariant(viewManager != null, 'viewManager expected to be non-null');
     viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
   };
-
-  componentDidUpdate(prevProps: WebViewSharedProps): void {
-    if (!(prevProps.useWebKit && this.props.useWebKit)) {
-      return;
-    }
-
-    this.showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
-    this.showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
-    this.showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
-
-    if (this.props.scalesPageToFit !== undefined) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        'The scalesPageToFit property is not supported when useWebKit = true',
-      );
-    }
-  }
 
   showRedboxOnPropChanges(
     prevProps: WebViewSharedProps,
