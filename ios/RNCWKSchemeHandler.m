@@ -60,16 +60,13 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
   NSString *requestId = [resp objectForKey:@"requestId"];
   id<WKURLSchemeTask> urlSchemeTask = [self.urlSchemeRequestTasks objectForKey:requestId];
   
-  // TODO: body response needs to have url! only difference is if there's a status vs method!
-  //  {url: string, method: string, headers: { [string]: string }}
-  //  {status: number, headers: { [string]: string }, body: string}
-  
-  NSNumber *status = [resp objectForKey:@"status"];
+  NSString *url = [resp objectForKey:@"url"];
+  NSDictionary *headers = [resp objectForKey:@"headers"];
   NSString *body = [resp objectForKey:@"body"];
   
-  NSString *url = [resp objectForKey:@"url"];
+  NSNumber *status = [resp objectForKey:@"status"];
   NSString *method = [resp objectForKey:@"method"];
-  NSDictionary *headers = [resp objectForKey:@"headers"];
+  
 
   if (status) {
     NSHTTPURLResponse* response = [[NSHTTPURLResponse alloc] initWithURL:[[NSURL alloc] initWithString:url]
@@ -84,7 +81,7 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
     }
     
     [urlSchemeTask didFinish];
-  } else if (url) {
+  } else if (method) {
     
     NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[[NSURL alloc] initWithString:url]
                                                                 cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
@@ -96,7 +93,7 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
       [request setHTTPBody: [body dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO]];
     }
 
-    // Would be nice if we had access to body data.
+    // Would be nice if we had access to body data, but it doesn't.
     // if ([urlSchemeTask request].HTTPBodyStream) {
     //     [request setHTTPBodyStream: [urlSchemeTask request].HTTPBodyStream];
     // } else if ([urlSchemeTask request].HTTPBody) {

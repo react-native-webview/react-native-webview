@@ -246,8 +246,8 @@ export interface IOSWebViewProps {
 	onUrlSchemeRequest?: (
 		event: WebViewUrlSchemeRequest
 	) =>
-		| Promise<{status: number, headers: { [string]: string }, body: string}>
-		| Promise<{url: string, method: string, headers: { [string]: string }}>;
+		| Promise<{url: string, status: number, headers: { [key: string]: string }, body?: string}>
+		| Promise<{url: string, method: string, headers: { [key: string]: string }, body?: string}>;
 
 }
 
