@@ -39,6 +39,13 @@ export interface WebViewError extends WebViewNativeEvent {
   readonly description: string;
 }
 
+export interface WebViewUrlSchemeRequest extends WebViewNativeEvent {
+	readonly url: string,
+	readonly method: string,
+	readonly headers: { [key: string]: string },
+	readonly requestId: string,
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
@@ -227,6 +234,21 @@ export interface IOSWebViewProps {
    * @platform ios
    */
   allowsLinkPreview?: boolean;
+
+  /**
+	 * Specify a url scheme to intercept.
+	 */
+	urlScheme?: string;
+
+	/**
+	 * Intercept a url scheme request. Either return a response or return a new request.
+	 */
+	onUrlSchemeRequest?: (
+		event: WebViewUrlSchemeRequest
+	) =>
+		| Promise<{status: number, headers: { [string]: string }, body: string}>
+		| Promise<{url: string, method: string, headers: { [string]: string }}>;
+
 }
 
 export interface AndroidWebViewProps {

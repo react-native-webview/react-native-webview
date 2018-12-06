@@ -10,6 +10,7 @@
 #import <React/RCTUIManager.h>
 #import <React/RCTDefines.h>
 #import "RNCWKWebView.h"
+#import <WebKit/WebKit.h>
 
 @interface RNCWKWebViewManager () <RNCWKWebViewDelegate>
 @end
@@ -35,6 +36,7 @@ RCT_EXPORT_VIEW_PROPERTY(onLoadingFinish, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingError, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingProgress, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onShouldStartLoadWithRequest, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onUrlSchemeRequest, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(injectedJavaScript, NSString)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaPlaybackRequiresUserAction, BOOL)
@@ -47,6 +49,7 @@ RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(pagingEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(userAgent, NSString)
+RCT_EXPORT_VIEW_PROPERTY(urlScheme, NSString)
 RCT_EXPORT_VIEW_PROPERTY(allowsLinkPreview, BOOL)
 
 /**
@@ -171,6 +174,18 @@ RCT_EXPORT_METHOD(startLoadWithResult:(BOOL)result lockIdentifier:(NSInteger)loc
     RCTLogWarn(@"startLoadWithResult invoked with invalid lockIdentifier: "
                "got %lld, expected %lld", (long long)lockIdentifier, (long long)_shouldStartLoadLock.condition);
   }
+}
+
+RCT_EXPORT_METHOD(handleUrlSchemeResponse:(nonnull NSNumber *)reactTag result:(NSDictionary *)resp)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
+    RNCWKWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWKWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+    } else {
+      [view handleUrlSchemeResponse:resp];
+    }
+  }];
 }
 
 @end

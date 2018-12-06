@@ -56,6 +56,14 @@ export type WebViewError = $ReadOnly<{|
   description: string,
 |}>;
 
+export type WebViewUrlSchemeRequest = $ReadOnly<{|
+	...WebViewNativeEvent,
+	url: string,
+	method: string,
+	headers: { [string]: string },
+	requestId: string,
+|}>
+
 export type WebViewEvent = SyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewNavigationEvent = SyntheticEvent<WebViewNavigation>;
@@ -250,7 +258,22 @@ export type IOSWebViewProps = $ReadOnly<{|
    * In iOS 10 and later, the default value is `true`; before that, the default value is `false`.
    * @platform ios
    */
-  allowsLinkPreview?: ?boolean,
+	allowsLinkPreview?: ?boolean,
+
+	/**
+	 * Specify a url scheme to intercept.
+	 */
+	urlScheme?: ?string,
+
+	/**
+	 * Intercept a url scheme request. Either return a response or return a new request.
+	 */
+	onUrlSchemeRequest?: (
+		event: WebViewUrlSchemeRequest
+	) =>
+		| Promise<{| status: number, headers: { [string]: string }, body: string |}>
+		| Promise<{| url: string, method: string, headers: { [string]: string } |}>,
+
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|
