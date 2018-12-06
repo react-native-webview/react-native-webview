@@ -28,7 +28,7 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		7B9D858621B8AFD900910471 /* RNCWKSchemeHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNCWKSchemeHandler.m; sourceTree = "<group>"; };
+		7B9D858621B8AFD900910471 /* RNCWKSchemeHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCWKSchemeHandler.m; sourceTree = "<group>"; };
 		7B9D858821B8AFED00910471 /* RNCWKSchemeHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCWKSchemeHandler.h; sourceTree = "<group>"; };
 		E914DBF2214474710071092B /* RNCUIWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCUIWebView.h; sourceTree = "<group>"; };
 		E914DBF3214474710071092B /* RNCUIWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCUIWebViewManager.m; sourceTree = "<group>"; };
