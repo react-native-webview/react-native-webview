@@ -44,7 +44,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) NSString *urlScheme;
 @property (nonatomic, strong) RNCWKSchemeHandler* schemeHandler;
 
-- (void)postMessage:(NSStrinzg *)message;
+- (void)postMessage:(NSString *)message;
 - (void)injectJavaScript:(NSString *)script;
 - (void)goForward;
 - (void)goBack;
