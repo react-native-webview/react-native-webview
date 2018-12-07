@@ -1,10 +1,15 @@
+
 package com.reactnativecommunity.webview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.uimanager.UIManagerModule;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
@@ -30,6 +35,8 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -56,6 +63,8 @@ import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
+import com.reactnativecommunity.webview.events.TopUrlSchemeRequestEvent;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -72,6 +81,7 @@ import org.json.JSONObject;
  *  - topLoadingStart
  *  - topLoadingStart
  *  - topLoadingProgress
+ *  - topUrlSchemeRequest
  *
  * Each event will carry the following properties:
  *  - target - view's react tag
@@ -113,6 +123,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
     protected @Nullable List<Pattern> mOriginWhitelist;
 
+    // This is a boolean that indicates whether or not the schemeUrlRequest feature is enabled.
+    private boolean isOnUrlSchemeRequestEnabled = false;
+
+    // This is mapping from the Request IDs back to the response from Javascript.
+    private final Map<String, Future<String>> futureMap = new HashMap<String, Future<String>>();
+
     @Override
     public void onPageFinished(WebView webView, String url) {
       super.onPageFinished(webView, url);
@@ -135,6 +151,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           new TopLoadingStartEvent(
               webView.getId(),
               createWebViewEvent(webView, url)));
+    }
+
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest request) {
+      Uri uri = request.getUrl();
+      String method = request.getMethod();
+
+      System.out.println("net-test: request: " + uri  + " method: " + method);
+
+      if (this.isOnUrlSchemeRequestEnabled) {
+        System.out.println("Scheme Request magic is enabled");
+
+        dispatchEvent(
+            webView,
+            new TopUrlSchemeRequestEvent(
+                webView.getId(),
+                "hello"
+            )
+        );
+      }
+
+      return null;
     }
 
     @Override
@@ -234,6 +272,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setOriginWhitelist(List<Pattern> originWhitelist) {
       mOriginWhitelist = originWhitelist;
+    }
+
+    public void setIsOnUrlSchemeRequestEnabled(boolean isOnUrlSchemeRequestEnabled) {
+      this.isOnUrlSchemeRequestEnabled = isOnUrlSchemeRequestEnabled;
     }
   }
 
@@ -388,6 +430,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public String getName() {
     return REACT_CLASS;
   }
+
+  private Boolean isOnUrlSchemeRequestEnabled = false;
 
   protected RNCWebView createRNCWebViewInstance(ThemedReactContext reactContext) {
     return new RNCWebView(reactContext);
@@ -670,6 +714,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "onUrlSchemeRequest")
+  public void setOnUrlSchemeRequest(
+    WebView view,
+    boolean isOnUrlSchemeRequestEnabled) {
+    this.isOnUrlSchemeRequestEnabled = isOnUrlSchemeRequestEnabled;
+
+    RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
+    if (client != null) {
+      client.setIsOnUrlSchemeRequestEnabled(this.isOnUrlSchemeRequestEnabled);
+    }
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -680,6 +736,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public Map getExportedCustomDirectEventTypeConstants() {
     MapBuilder.Builder builder = MapBuilder.builder();
     builder.put("topLoadingProgress", MapBuilder.of("registrationName", "onLoadingProgress"));
+    builder.put("topUrlSchemeRequest", MapBuilder.of("registrationName", "onUrlSchemeRequest"));
     return builder.build();
   }
 

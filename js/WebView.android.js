@@ -174,6 +174,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         mixedContentMode={this.props.mixedContentMode}
         saveFormDataDisabled={this.props.saveFormDataDisabled}
         urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}
+        onUrlSchemeRequest={(args) => console.log(`net-test: onUrlSchemeRequest: "${args.nativeEvent.requestId}"`)}
         {...nativeConfig.props}
       />
     );
