@@ -392,6 +392,10 @@ export type WebViewSharedProps = $ReadOnly<{|
    */
   onError: (event: WebViewErrorEvent) => mixed,
 
+  //添加滚动
+  onScroll: (event: WebViewErrorEvent) => mixed,
+
+
   /**
    * Controls whether to adjust the content inset for web views that are
    * placed behind a navigation bar, tab bar, or toolbar. The default value
