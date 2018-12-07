@@ -19,7 +19,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 @end
 
-@interface RNCWKWebView : RCTView
+@interface RNCWKWebView : RCTView<UIScrollViewDelegate>
 
 @property (nonatomic, weak) id<RNCWKWebViewDelegate> delegate;
 @property (nonatomic, copy) NSDictionary *source;
