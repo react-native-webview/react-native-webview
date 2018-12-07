@@ -162,6 +162,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         onLoadingFinish={this.onLoadingFinish}
         onLoadingError={this.onLoadingError}
         onLoadingProgress={this.onLoadingProgress}
+        onUrlSchemeRequest={this.onUrlSchemeRequest}
         testID={this.props.testID}
         geolocationEnabled={this.props.geolocationEnabled}
         mediaPlaybackRequiresUserAction={
@@ -174,7 +175,6 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         mixedContentMode={this.props.mixedContentMode}
         saveFormDataDisabled={this.props.saveFormDataDisabled}
         urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}
-        onUrlSchemeRequest={(args) => console.log(`net-test: onUrlSchemeRequest: "${args.nativeEvent.requestId}"`)}
         {...nativeConfig.props}
       />
     );
@@ -295,6 +295,47 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress} = this.props;
     onLoadProgress && onLoadProgress(event);
+  }
+
+  onUrlSchemeRequest = (event: WebViewUrlSchemeRequestEvent) => {
+    const { onUrlSchemeRequest } = this.props;
+
+    if (!onUrlSchemeRequest) {
+      return
+    }
+
+    const { requestId } = event.nativeEvent;
+
+    if (!requestId) {
+      console.log("Received an onUrlSchemeRequest without a requestId", event.nativeEvent);
+      return;
+    }
+
+    onUrlSchemeRequest(event).then(response => {
+      const data = {
+        response,
+        requestId,
+      }
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        UIManager.RNCWebView.Commands.handleUrlSchemeResponse,
+        [data],
+      );
+    }).catch(err => {
+      const data = {
+        requestId,
+        response: {
+          type: "error",
+          message: err.toString(),
+        }
+      }
+
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        UIManager.RNCWebView.Commands.handleUrlSchemeResponse,
+        [data],
+      );
+    });
   }
 }
 

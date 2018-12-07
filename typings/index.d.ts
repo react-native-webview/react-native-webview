@@ -39,7 +39,7 @@ export interface WebViewError extends WebViewNativeEvent {
   readonly description: string;
 }
 
-export interface WebViewUrlSchemeRequest extends WebViewNativeEvent {
+export interface WebViewUrlSchemeRequest {
 	readonly url: string,
 	readonly method: string,
 	readonly headers: { [key: string]: string },
@@ -53,6 +53,8 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
+
+export type WebViewUrlSchemeRequestEvent = NativeSyntheticEvent<WebViewUrlSchemeRequest>;
 
 export type DataDetectorTypes =
   | 'phoneNumber'
@@ -270,7 +272,6 @@ export interface IOSWebViewProps {
 		event: WebViewUrlSchemeRequest
 	) =>
 		| Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
-
 }
 
 export interface AndroidWebViewProps {
