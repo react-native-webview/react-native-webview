@@ -36,9 +36,9 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
   NSString* url = [[urlSchemeTask request] URL].absoluteString;
   NSString* method = [urlSchemeTask request].HTTPMethod;
   NSDictionary* headers = urlSchemeTask.request.allHTTPHeaderFields;
-
+  
   // Save the task in a map.
-  NSString* requestId = [NSString stringWithFormat:@"%d", arc4random()];
+  NSString* requestId = [NSString stringWithFormat:@"%p", urlSchemeTask];
   [self.urlSchemeRequestTasks setObject:urlSchemeTask forKey:requestId];
 
   // Package up all the information for the JS event.
@@ -59,6 +59,9 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
   // Grab the task we want to complete.
   NSString *requestId = [resp objectForKey:@"requestId"];
   id<WKURLSchemeTask> urlSchemeTask = [self.urlSchemeRequestTasks objectForKey:requestId];
+  if (!urlSchemeTask) {
+    return;
+  }
 
   NSString *type = [resp objectForKey:@"type"];
 
@@ -104,6 +107,12 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
     // }
 
     NSURLSessionDataTask* requestTask = [self.session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+      
+      id<WKURLSchemeTask> urlSchemeTask = [self.urlSchemeRequestTasks objectForKey:requestId];
+      if (!urlSchemeTask) {
+        return;
+      }
+      
       if (response) {
         [urlSchemeTask didReceiveResponse: response];
         [urlSchemeTask didReceiveData:data];
@@ -117,6 +126,9 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
   }
 }
 
-- (void)webView:(WKWebView *)webView stopURLSchemeTask:(id<WKURLSchemeTask>)urlSchemeTask {}
+- (void)webView:(WKWebView *)webView stopURLSchemeTask:(id<WKURLSchemeTask>)urlSchemeTask {
+  NSString* requestId = [NSString stringWithFormat:@"%p", urlSchemeTask];
+  [self.urlSchemeRequestTasks removeObjectForKey:requestId];
+}
 
 @end
