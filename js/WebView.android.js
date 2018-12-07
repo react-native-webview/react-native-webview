@@ -154,6 +154,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         domStorageEnabled={this.props.domStorageEnabled}
         messagingEnabled={typeof this.props.onMessage === 'function'}
         onMessage={this.onMessage}
+        onScroll = {this._onScroll}//添加滚动
         overScrollMode={this.props.overScrollMode}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
@@ -230,6 +231,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       [String(data)],
     );
   };
+  
 
   /**
    * Injects a javascript string into the referenced WebView. Deliberately does not
@@ -244,6 +246,17 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       [data],
     );
   };
+
+  //添加 文字缩放
+  textZoom = (data: number) => {
+    // NativeModules.RNCWebView.textZoom(this.getWebViewHandle(),data)
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      UIManager.RNCWebView.Commands.injectJavaScript,
+      ['',data],
+    );
+  };
+  
 
   /**
    * We return an event with a bunch of fields including:
@@ -291,6 +304,12 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   onMessage = (event: WebViewMessageEvent) => {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
+  };
+
+  //添加滚动
+  _onScroll = (event: WebViewMessageEvent) => {
+    var {onScroll} = this.props;
+    onScroll && onScroll(event);
   };
 
   onLoadingProgress = (event: WebViewProgressEvent) => {
