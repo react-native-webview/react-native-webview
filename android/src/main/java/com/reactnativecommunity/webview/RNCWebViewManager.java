@@ -66,11 +66,10 @@ import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopUrlSchemeRequestEvent;
-import com.reactnativecommunity.webview.events.WebViewUrlSchemeResponse;
-import com.reactnativecommunity.webview.events.WebViewUrlSchemeResponseError;
-import com.reactnativecommunity.webview.events.WebViewUrlSchemeResponsePass;
-import com.reactnativecommunity.webview.events.WebViewUrlSchemeResponseRedirect;
-import com.reactnativecommunity.webview.events.WebViewUrlSchemeResponseValue;
+import com.reactnativecommunity.webview.events.WebViewUrlSchemeResult;
+import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultError;
+import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultRedirect;
+import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -135,7 +134,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     private boolean isOnUrlSchemeRequestEnabled = false;
 
     // This is mapping from the Request IDs back to the response from Javascript.
-    private final Map<String, CompletableFuture<WebViewUrlSchemeResponse>> futureMap = new HashMap<>();
+    private final Map<String, CompletableFuture<WebViewUrlSchemeResult>> futureMap = new HashMap<>();
 
     // Eventually this should be configurable
     private final long SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS = 5000;
@@ -176,7 +175,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         System.out.println("Scheme Request magic is enabled");
         String requestId = UUID.randomUUID().toString();
 
-        CompletableFuture<WebViewUrlSchemeResponse> completableFuture = new CompletableFuture<WebViewUrlSchemeResponse>();
+        CompletableFuture<WebViewUrlSchemeResult> completableFuture = new CompletableFuture<WebViewUrlSchemeResult>();
 
         futureMap.put(requestId, completableFuture);
         dispatchEvent(
@@ -188,10 +187,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         );
 
         try {
-          WebViewUrlSchemeResponse response = completableFuture.get(
+          WebViewUrlSchemeResult result = completableFuture.get(
                   SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
-          System.out.println("Received the response: " + response);
+          System.out.println("Received the response: " + result);
         } catch(InterruptedException| TimeoutException | ExecutionException exn) {
           // TODO: This should log an error and then do the default thing. The default thing
           // is probably to return a server not available error.
@@ -350,17 +349,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       if (responseType.equals("error")) {
         String message = responseMap.getString("message");
 
-        future.complete(new WebViewUrlSchemeResponseError(message));
+        future.complete(new WebViewUrlSchemeResultError(message));
         return;
-      } else if (responseType.equals("pass")) {
-        future.complete(new WebViewUrlSchemeResponsePass());
       } else if (responseType.equals("redirect")) {
         String url = responseMap.getString("url");
         String method = responseMap.getString("method");
         Map<String, String> headers = new HashMap<>();
         ReadableMap headerMap = responseMap.getMap("headers");
         if (headerMap == null) {
-          future.complete(new WebViewUrlSchemeResponseError("Missing headers for a redirect"));
+          future.complete(new WebViewUrlSchemeResultError("Missing headers for a redirect"));
           return;
         }
 
@@ -368,7 +365,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           String key = iterator.nextKey();
           String keyValue = headerMap.getString(key);
           if (keyValue == null) {
-            future.complete(new WebViewUrlSchemeResponseError("Non-string header value for key: '" + key + "'"));
+            future.complete(new WebViewUrlSchemeResultError("Non-string header value for key: '" + key + "'"));
             return;
           }
           headers.put(key, keyValue);
@@ -376,7 +373,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         String body = responseMap.getString("body");
 
-        future.complete(new WebViewUrlSchemeResponseRedirect(url, method, headers, body));
+        future.complete(new WebViewUrlSchemeResultRedirect(url, method, headers, body));
 
       } else if (responseType.equals("value")) {
         String url = responseMap.getString("url");
@@ -384,7 +381,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         Map<String, String> headers = new HashMap<>();
         ReadableMap headerMap = responseMap.getMap("headers");
         if (headerMap == null) {
-          future.complete(new WebViewUrlSchemeResponseError("Missing headers for a redirect"));
+          future.complete(new WebViewUrlSchemeResultError("Missing headers for a redirect"));
           return;
         }
 
@@ -392,7 +389,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           String key = iterator.nextKey();
           String keyValue = headerMap.getString(key);
           if (keyValue == null) {
-            future.complete(new WebViewUrlSchemeResponseError("Non-string header value for key: '" + key + "'"));
+            future.complete(new WebViewUrlSchemeResultError("Non-string header value for key: '" + key + "'"));
             return;
           }
           headers.put(key, keyValue);
@@ -400,9 +397,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         String body = responseMap.getString("body");
 
-        future.complete(new WebViewUrlSchemeResponseValue(url, status, headers, body));
+        future.complete(new WebViewUrlSchemeResultResponse(url, status, headers, body));
       } else {
-        future.complete(new WebViewUrlSchemeResponseError("Unknown type of message: '" + responseType + "'"));
+        future.complete(new WebViewUrlSchemeResultError("Unknown type of message: '" + responseType + "'"));
       }
 
     }

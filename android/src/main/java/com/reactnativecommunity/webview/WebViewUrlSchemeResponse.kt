@@ -1,17 +1,15 @@
 package com.reactnativecommunity.webview.events
 
-sealed class WebViewUrlSchemeResponse;
+sealed class WebViewUrlSchemeResult;
 
-data class WebViewUrlSchemeResponseError(val message: String) : WebViewUrlSchemeResponse();
+data class WebViewUrlSchemeResultError(val message: String) : WebViewUrlSchemeResult()
 
-data class WebViewUrlSchemeResponseRedirect(val url: String,
+data class WebViewUrlSchemeResultRedirect(val url: String,
     val method: String,
     val headers: Map<String, String>,
-    val body: String) : WebViewUrlSchemeResponse();
+    val body: String) : WebViewUrlSchemeResult()
 
-data class WebViewUrlSchemeResponseValue(val url: String,
+data class WebViewUrlSchemeResultResponse(val url: String,
                                          val status: Int,
                                          val headers: Map<String, String>,
-                                         val body: String) : WebViewUrlSchemeResponse();
-
-class WebViewUrlSchemeResponsePass : WebViewUrlSchemeResponse();
+                                         val body: String) : WebViewUrlSchemeResult()

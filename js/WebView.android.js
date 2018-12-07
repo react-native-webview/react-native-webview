@@ -298,20 +298,34 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   }
 
   onUrlSchemeRequest = (event: WebViewUrlSchemeRequestEvent) => {
-    const { onUrlSchemeRequest } = this.props;
-
-    if (!onUrlSchemeRequest) {
-      return
-    }
-
     const { requestId } = event.nativeEvent;
 
     if (!requestId) {
-      console.log("Received an onUrlSchemeRequest without a requestId", event.nativeEvent);
+      console.warn("Received an onUrlSchemeRequest without a requestId", event.nativeEvent);
       return;
     }
 
-    onUrlSchemeRequest(event).then(response => {
+    const { onUrlSchemeRequest } = this.props;
+
+    if (!onUrlSchemeRequest) {
+      const data = {
+        requestId,
+        response: {
+          type: "error",
+          message: "Webview is missing required property onUrlSchemeRequest",
+        }
+      };
+
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        UIManager.RNCWebView.Commands.handleUrlSchemeResponse,
+        [data],
+      );
+
+      return;
+    }
+
+    onUrlSchemeRequest(event.nativeEvent).then(response => {
       const data = {
         response,
         requestId,

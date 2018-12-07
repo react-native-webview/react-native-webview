@@ -61,7 +61,7 @@ export type WebViewUrlSchemeRequest = $ReadOnly<{|
 	method: string,
 	headers: { [string]: string },
 	requestId: string,
-|}>
+|}>;
 
 export type WebViewEvent = SyntheticEvent<WebViewNativeEvent>;
 

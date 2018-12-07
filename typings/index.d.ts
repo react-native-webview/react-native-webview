@@ -271,6 +271,7 @@ export interface IOSWebViewProps {
 	onUrlSchemeRequest?: (
 		event: WebViewUrlSchemeRequest
 	) =>
+
 		| Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
 }
 
