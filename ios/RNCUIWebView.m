@@ -20,6 +20,9 @@ static NSString *const kPostMessageHost = @"postMessage";
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
+//添加
+@property (nonatomic, copy) RCTDirectEventBlock onScroll;
+
 
 @end
 
@@ -42,6 +45,8 @@ static NSString *const kPostMessageHost = @"postMessage";
     _contentInset = UIEdgeInsetsZero;
     _webView = [[UIWebView alloc] initWithFrame:self.bounds];
     _webView.delegate = self;
+    _webView.scrollView.delegate = self;//添加
+      
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
       _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -189,6 +194,35 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
                       updateOffset:YES];
 }
 
+//添加
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    
+    [event addEntriesFromDictionary: @{
+                                       @"contentOffset":  @{
+                                               @"x":[NSNumber numberWithFloat:scrollView.contentOffset.x],
+                                               @"y":[NSNumber numberWithFloat:scrollView.contentOffset.y]},
+                                       @"contentInset": @{
+                                               @"bottom": [NSNumber numberWithFloat:scrollView.contentInset.bottom],
+                                               @"left": [NSNumber numberWithFloat:scrollView.contentInset.left],
+                                               @"right": [NSNumber numberWithFloat:scrollView.contentInset.right],
+                                               @"top": [NSNumber numberWithFloat:scrollView.contentInset.top]},
+                                       @"contentSize": @{
+                                               @"width": [NSNumber numberWithFloat:scrollView.contentSize.width],
+                                               @"height": [NSNumber numberWithFloat:scrollView.contentSize.height]},
+                                       @"layoutMeasurement": @{
+                                               @"x": [NSNumber numberWithFloat:scrollView.frame.origin.x],
+                                               @"y": [NSNumber numberWithFloat:scrollView.frame.origin.y],
+                                               @"width": [NSNumber numberWithFloat:scrollView.frame.size.width],
+                                               @"height": [NSNumber numberWithFloat:scrollView.frame.size.height]},
+                                       @"zoomScale": [NSNumber numberWithFloat:scrollView.zoomScale]
+                                       }
+     ];
+    _onScroll(event);
+    
+}
+//添加结束
+
 #pragma mark - UIWebViewDelegate methods
 
 - (BOOL)webView:(__unused UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
@@ -326,18 +360,31 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     ];
     [webView stringByEvaluatingJavaScriptFromString:source];
   }
+    //添加 计算webview高度
+    CGFloat webViewHeight=[webView.scrollView contentSize].height;
+    //添加结束
+
   if (_injectedJavaScript != nil) {
     NSString *jsEvaluationValue = [webView stringByEvaluatingJavaScriptFromString:_injectedJavaScript];
 
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    //添加
+    [event setValue: [NSNumber numberWithFloat:webViewHeight] forKey:@"height"];
+    //添加结束
     event[@"jsEvaluationValue"] = jsEvaluationValue;
 
     _onLoadingFinish(event);
   }
   // we only need the final 'finishLoad' call so only fire the event when we're actually done loading.
   else if (_onLoadingFinish && !webView.loading && ![webView.request.URL.absoluteString isEqualToString:@"about:blank"]) {
-    _onLoadingFinish([self baseEvent]);
+      //添加
+      NSMutableDictionary *event = [self baseEvent];
+      [event setValue: [NSNumber numberWithFloat:webViewHeight] forKey:@"height"];
+      _onLoadingFinish(event);
+      //添加结束
+
   }
 }
+
 
 @end
