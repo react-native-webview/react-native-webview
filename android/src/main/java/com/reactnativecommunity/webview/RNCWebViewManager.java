@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import com.facebook.react.bridge.ReactMethod;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -68,6 +69,10 @@ import javax.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.facebook.react.views.scroll.OnScrollDispatchHelper;
+import com.facebook.react.views.scroll.ScrollEvent;
+import com.facebook.react.views.scroll.ScrollEventType;
+
 /**
  * Manages instances of {@link WebView}
  *
@@ -111,6 +116,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_POST_MESSAGE = 5;
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
+  public static final int COMMAND_TEXT_ZOOM = 8;
 
   // Use `webView.loadUrl("about:blank")` to reliably reset the view
   // state and release page resources (including any running JavaScript).
@@ -202,6 +208,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       event.putString("title", webView.getTitle());
       event.putBoolean("canGoBack", webView.canGoBack());
       event.putBoolean("canGoForward", webView.canGoForward());
+      //添加-webview的高度
+      event.putDouble("height", webView.getContentHeight());
+      
       return event;
     }
 
@@ -218,6 +227,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected @Nullable String injectedJS;
     protected boolean messagingEnabled = false;
     protected @Nullable RNCWebViewClient mRNCWebViewClient;
+
+    private final OnScrollDispatchHelper mOnScrollDispatchHelper = new OnScrollDispatchHelper();
+
 
     protected class RNCWebViewBridge {
       RNCWebView mContext;
@@ -336,6 +348,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
     }
 
+    //添加开始-添加webview滚动
+    @Override
+    protected void onScrollChanged(int x, int y, int oldX, int oldY) {
+      super.onScrollChanged(x, y, oldX, oldY);
+      if (mOnScrollDispatchHelper.onScrollChanged(x, y)) {
+        ReactContext reactContext = (ReactContext) this.getContext();
+        reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher().dispatchEvent(
+                ScrollEvent.obtain(
+                        this.getId(),
+                        ScrollEventType.SCROLL,
+                        this.getScrollX(),
+                        this.getScrollY(),
+                        this.computeHorizontalScrollRange(),
+                        this.computeVerticalScrollRange(),
+                        this.getWidth(),
+                        this.getHeight(),
+                        this.getContentHeight(),
+                        this.getContentHeight()));
+      }
+    }
+
+
     public void onMessage(String message) {
       dispatchEvent(this, new TopMessageEvent(this.getId(), message));
     }
@@ -390,6 +424,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         event.putBoolean("canGoBack", webView.canGoBack());
         event.putBoolean("canGoForward", webView.canGoForward());
         event.putDouble("progress", (float)newProgress/100);
+        //添加-webview的高度
+        event.putDouble("height", webView.getContentHeight());
+
         dispatchEvent(
                   webView,
                   new TopLoadingProgressEvent(
@@ -427,7 +464,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     settings.setBuiltInZoomControls(true);
     settings.setDisplayZoomControls(false);
     settings.setDomStorageEnabled(true);
-
+    settings.setTextZoom(100);
     settings.setAllowFileAccess(false);
     settings.setAllowContentAccess(false);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -448,6 +485,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     return webView;
   }
+
+  @ReactMethod
+  public void textZoom(WebView view, int zoom) {
+    view.getSettings().setTextZoom(zoom);
+  }
+
 
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
@@ -647,7 +690,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   @Override
-  public @Nullable Map<String, Integer> getCommandsMap() {
+  public Map<String, Integer> getCommandsMap() {
     return MapBuilder.of(
         "goBack", COMMAND_GO_BACK,
         "goForward", COMMAND_GO_FORWARD,
@@ -696,7 +739,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         break;
       case COMMAND_INJECT_JAVASCRIPT:
         RNCWebView reactWebView = (RNCWebView) root;
-        reactWebView.evaluateJavascriptWithFallback(args.getString(0));
+        if(!TextUtils.isEmpty(args.getString(0))){
+          reactWebView.evaluateJavascriptWithFallback(args.getString(0));
+        }else{
+          root.getSettings().setTextZoom(args.getInt(1));
+        }
         break;
       case COMMAND_LOAD_URL:
         if (args == null) {
