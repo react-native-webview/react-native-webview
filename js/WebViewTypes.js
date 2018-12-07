@@ -87,6 +87,22 @@ export type DataDetectorTypes =
 
 export type OverScrollModeType = 'always' | 'content' | 'never';
 
+export type UrlSchemeResponse = {|
+  type: "response"
+  url: string,
+  status: number,
+  headers: { [string]: string },
+  body?: ?string
+|}
+
+export type UrlSchemeRedirect = {|
+  type: "redirect"
+  url: string,
+  method: string,
+  headers: { [string]: string },
+  body?: ?string
+|}
+
 export type WebViewSourceUri = $ReadOnly<{|
   /**
    * The URI to load in the `WebView`. Can be a local or remote file.
@@ -275,8 +291,8 @@ export type IOSWebViewProps = $ReadOnly<{|
 	onUrlSchemeRequest?: (
 		event: WebViewUrlSchemeRequest
 	) =>
-		| Promise<{| url: string, status: number, headers: { [string]: string }, body?: ?string |}>
-		| Promise<{| url: string, method: string, headers: { [string]: string }, body?: ?string |}>,
+		| Promise<UrlSchemeResponse>
+		| Promise<UrlSchemeRedirect>,
 
 |}>;
 
