@@ -18,7 +18,8 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 @end
 
-@interface RNCUIWebView : RCTView
+//添加
+@interface RNCUIWebView : RCTView<UIScrollViewDelegate>
 
 @property (nonatomic, weak) id<RNCUIWebViewDelegate> delegate;
 
