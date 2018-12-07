@@ -31,6 +31,9 @@ static NSString *const MessageHanderName = @"ReactNative";
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
+@property (nonatomic, copy) RCTDirectEventBlock onScroll;
+
+
 @property (nonatomic, copy) WKWebView *webView;
 @end
 
@@ -301,6 +304,34 @@ static NSString *const MessageHanderName = @"ReactNative";
   scrollView.decelerationRate = _decelerationRate;
 }
 
+//添加
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+
+    [event addEntriesFromDictionary: @{
+        @"contentOffset":  @{
+                             @"x":[NSNumber numberWithFloat:scrollView.contentOffset.x],
+                             @"y":[NSNumber numberWithFloat:scrollView.contentOffset.y]},
+        @"contentInset": @{
+                           @"bottom": [NSNumber numberWithFloat:scrollView.contentInset.bottom],
+                           @"left": [NSNumber numberWithFloat:scrollView.contentInset.left],
+                           @"right": [NSNumber numberWithFloat:scrollView.contentInset.right],
+                           @"top": [NSNumber numberWithFloat:scrollView.contentInset.top]},
+        @"contentSize": @{
+                          @"width": [NSNumber numberWithFloat:scrollView.contentSize.width],
+                          @"height": [NSNumber numberWithFloat:scrollView.contentSize.height]},
+        @"layoutMeasurement": @{
+                                @"x": [NSNumber numberWithFloat:scrollView.frame.origin.x],
+                                @"y": [NSNumber numberWithFloat:scrollView.frame.origin.y],
+                                @"width": [NSNumber numberWithFloat:scrollView.frame.size.width],
+                                @"height": [NSNumber numberWithFloat:scrollView.frame.size.height]},
+        @"zoomScale": [NSNumber numberWithFloat:scrollView.zoomScale]
+    }
+];
+    _onScroll(event);
+
+}
+
 - (void)setScrollEnabled:(BOOL)scrollEnabled
 {
   _scrollEnabled = scrollEnabled;
@@ -468,18 +499,46 @@ static NSString *const MessageHanderName = @"ReactNative";
     [self evaluateJS: source thenCall: nil];
   }
 
+    CGFloat webViewHeight=[webView.scrollView contentSize].height;
+
   if (_injectedJavaScript) {
     [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
+        
+
       NSMutableDictionary *event = [self baseEvent];
+      [event setValue: [NSNumber numberWithFloat:webViewHeight] forKey:@"height"];
       event[@"jsEvaluationValue"] = jsEvaluationValue;
       if (self.onLoadingFinish) {
         self.onLoadingFinish(event);
       }
     }];
   } else if (_onLoadingFinish) {
-    _onLoadingFinish([self baseEvent]);
-  }
+      NSMutableDictionary *eventTemp = [self baseEvent];
+      [eventTemp setValue: [NSNumber numberWithDouble:webViewHeight]  forKey:@"height"];
+      _onLoadingFinish(eventTemp);
 
+      //获取高度另一方法
+//      [webView evaluateJavaScript:@"document.body.scrollHeight"
+//                completionHandler:^(id result, NSError *_Nullable error) {
+//                    if(!error) {
+//
+//                        NSNumber*height = result;
+//
+//                        NSMutableDictionary *eventTemp = [self baseEvent];
+//                        [eventTemp setValue: height forKey:@"height"];
+//                        _onLoadingFinish(eventTemp);
+//                    }else{
+//                        NSMutableDictionary *eventTemp = [self baseEvent];
+//                        [eventTemp setValue: [NSNumber numberWithDouble:webViewHeight]  forKey:@"height"];
+//                        _onLoadingFinish(eventTemp);
+//                    }
+//                    //result 就是加载完成后 webView的实际高度
+//                    //获取后返回重新布局
+//            }];
+      
+      
+  }
+    
   [self setBackgroundColor: _savedBackgroundColor];
 }
 
