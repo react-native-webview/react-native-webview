@@ -448,13 +448,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     onLoadProgress && onLoadProgress(event);
   }
 
-  _onUrlSchemeRequest = (event: WebViewUrlSchemeRequest) => {
+  _onUrlSchemeRequest = (event: WebViewUrlSchemeRequestEvent) => {
     const {onUrlSchemeRequest} = this.props;
     if (!onUrlSchemeRequest) {
       throw new Error("Must provide `onUrlSchemeRequest` if you provide `urlScheme`.");
     }
-    const { requestId } = event
-    onUrlSchemeRequest(event)
+    const { requestId } = event.nativeEvent
+    onUrlSchemeRequest(event.nativeEvent)
       .then((response) => {
         UIManager.dispatchViewManagerCommand(
           this.getWebViewHandle(),

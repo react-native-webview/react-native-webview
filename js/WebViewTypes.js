@@ -72,6 +72,8 @@ export type WebViewMessageEvent = SyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = SyntheticEvent<WebViewError>;
 
+export type WebViewUrlSchemeRequestEvent = SyntheticEvent<WebViewUrlSchemeRequest>;
+
 export type DataDetectorTypes =
   | 'phoneNumber'
   | 'link'
