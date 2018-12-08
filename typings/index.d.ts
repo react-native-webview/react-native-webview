@@ -71,7 +71,7 @@ export type UrlSchemeResponse = {
   type: "response"
   url: string,
   status: number,
-  headers: { [string]: string },
+  headers: { [key: string]: string },
   body?: string
 }
 
@@ -79,7 +79,7 @@ export type UrlSchemeRedirect = {
   type: "redirect"
   url: string,
   method: string,
-  headers: { [string]: string },
+  headers: { [key: string]: string },
   body?: string
 }
 
