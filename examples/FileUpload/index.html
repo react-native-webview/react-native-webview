@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    function setupEmbeddedView(callingCode, phoneNumber) {
+      document.getElementById("title").innerHTML = callingCode + phoneNumber;
+    }
+     function onBtnClick() {
+      console.log('post message');
+      var obj= '{"message":"This is a secret JSON message"}';
+      window.postMessage(obj, "*");
+    }
+  </script>
+</head>
+ <body style="background-color:  #d4dfe6;">
+ <h2 id="title" style="font-size: 48px;">Test Website</h2>
+  <button type="button" onclick="onBtnClick()" style="
+  width: 350px;
+  height:  250px;
+  color: #FFF;
+  background-color: #d71664;
+  font-size: 60px;">
+  Send a message!
+  </button>
+
+  <input type="file"
+               id="avatar" name="avatar"
+               accept="image/*, video/*" />
+ 
+</body>
+</html>
