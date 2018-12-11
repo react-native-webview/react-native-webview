@@ -4,7 +4,13 @@ package com.reactnativecommunity.webview;
 import android.annotation.TargetApi;
 import android.content.Context;
 
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.uimanager.UIManagerModule;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -74,6 +80,11 @@ import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+
 /**
  * Manages instances of {@link WebView}
  *
@@ -124,11 +135,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected WebViewConfig mWebViewConfig;
   protected @Nullable WebView.PictureListener mPictureListener;
 
+  private OkHttpClient httpClient;
+
   protected static class RNCWebViewClient extends WebViewClient {
 
     protected boolean mLastLoadFailed = false;
     protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
     protected @Nullable List<Pattern> mOriginWhitelist;
+
+    // This is the custom url scheme that is proxied to onUrlSchemeRequestEnabled
+    private String urlScheme = null;
 
     // This is a boolean that indicates whether or not the schemeUrlRequest feature is enabled.
     private boolean isOnUrlSchemeRequestEnabled = false;
@@ -138,6 +154,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     // Eventually this should be configurable
     private final long SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS = 5000;
+
+    // Shared client for forwarding all of the requests for onUrlSchemeRequest.
+    private final OkHttpClient httpClient;
+
+    // URL to intercept requests from the browser
+    private String baseInterceptURL;
+
+    protected RNCWebViewClient(OkHttpClient httpClient) {
+      this.httpClient = httpClient;
+    }
 
     @Override
     public void onPageFinished(WebView webView, String url) {
@@ -166,23 +192,36 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest request) {
       Uri uri = request.getUrl();
-      String method = request.getMethod();
 
-      System.out.println("net-test: request: " + uri  + " method: " + method);
+      if (this.urlScheme == null) {
+        return null;
+      }
+
+//      if (!this.urlScheme.equals(uri.getScheme())) {
+//        return null;
+//      }
+
+      String host = uri.getHost();
+      int port = uri.getPort();
+
+      if (!"192.168.7.180".equals(host) || port != 3000) {
+        return null;
+      }
 
       if (this.isOnUrlSchemeRequestEnabled) {
-
-        System.out.println("Scheme Request magic is enabled");
         String requestId = UUID.randomUUID().toString();
 
-        CompletableFuture<WebViewUrlSchemeResult> completableFuture = new CompletableFuture<WebViewUrlSchemeResult>();
+        CompletableFuture<WebViewUrlSchemeResult> completableFuture = new CompletableFuture<>();
 
         futureMap.put(requestId, completableFuture);
         dispatchEvent(
             webView,
             new TopUrlSchemeRequestEvent(
                 webView.getId(),
-                requestId
+                requestId,
+                uri.toString(),
+                request.getMethod(),
+                request.getRequestHeaders()
             )
         );
 
@@ -190,12 +229,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           WebViewUrlSchemeResult result = completableFuture.get(
                   SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
-          System.out.println("Received the response: " + result);
+          WebResourceResponse response = handleUrlSchemeResult(result);
+          return response;
         } catch(InterruptedException| TimeoutException | ExecutionException exn) {
-          // TODO: This should log an error and then do the default thing. The default thing
-          // is probably to return a server not available error.
-          System.out.println("Timeout waiting for response from the server");
-
+          // TODO: The default thing is probably to return a server not available error.
+          FLog.w(ReactConstants.TAG, "Timeout waiting for response from the server on " + requestId);
         } finally {
           futureMap.remove(requestId);
         }
@@ -307,31 +345,35 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       this.isOnUrlSchemeRequestEnabled = isOnUrlSchemeRequestEnabled;
     }
 
+    public void setUrlScheme(String urlScheme) {
+      this.urlScheme = urlScheme;
+    }
+
+    public void setBaseInterceptURL(String baseInterceptURL) {
+      this.baseInterceptURL = baseInterceptURL;
+    }
+
     public void handleUrlSchemeResponse(@Nullable ReadableArray args) {
       if (args == null) {
-        // TODO: Log properly.
-        System.out.println("handleUrlSchemeResponse: Received null arguments");
+        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Received null arguments");
         return;
       }
 
       if (args.size() != 1) {
-        // TODO: Log properly.
-        System.out.println("handleUrlSchemeResponse: Received an invalid number of arguments" + args);
+        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Received an invalid number of arguments" + args);
         return;
       }
 
       ReadableMap argMap = args.getMap(0);
 
       if (argMap == null) {
-        // TODO: Log properly.
-        System.out.println("handleUrlSchemeResponse: First argument is not a map.");
+        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: First argument is not a map.");
         return;
       }
 
       String requestId = argMap.getString("requestId");
       if (requestId == null) {
-        // TODO: Log properly.
-        System.out.println("handleUrlSchemeResponse: Missing requestId.");
+        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Missing requestId.");
         return;
       }
 
@@ -339,10 +381,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       if (future == null) {
         // This might not be an error if there is a timeout
-        System.out.println("handleUrlSchemeResponse: Missing future for '" + requestId + "'");
+        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Missing future for '" + requestId + "'");
         return;
       }
 
+      // TODO: If these conversions should fail, this should still complete the future with an error.
       ReadableMap responseMap = argMap.getMap("response");
 
       String responseType = responseMap.getString("type");
@@ -368,14 +411,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
             future.complete(new WebViewUrlSchemeResultError("Non-string header value for key: '" + key + "'"));
             return;
           }
-          headers.put(key, keyValue);
+          headers.put(key.toLowerCase(), keyValue);
         }
 
-        String body = responseMap.getString("body");
+        String body = null;
+        if (responseMap.hasKey("body") && responseMap.getType("body") == ReadableType.String) {
+          body = responseMap.getString("body");
+        }
 
         future.complete(new WebViewUrlSchemeResultRedirect(url, method, headers, body));
 
-      } else if (responseType.equals("value")) {
+      } else if (responseType.equals("response")) {
         String url = responseMap.getString("url");
         Integer status = responseMap.getInt("status");
         Map<String, String> headers = new HashMap<>();
@@ -392,7 +438,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
             future.complete(new WebViewUrlSchemeResultError("Non-string header value for key: '" + key + "'"));
             return;
           }
-          headers.put(key, keyValue);
+          headers.put(key.toLowerCase(), keyValue);
         }
 
         String body = responseMap.getString("body");
@@ -402,6 +448,97 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         future.complete(new WebViewUrlSchemeResultError("Unknown type of message: '" + responseType + "'"));
       }
 
+    }
+
+    private WebResourceResponse handleUrlSchemeResult(WebViewUrlSchemeResult result) {
+      if (result instanceof WebViewUrlSchemeResultError) {
+        WebViewUrlSchemeResultError error = (WebViewUrlSchemeResultError)result;
+
+        Map<String, String> body = new HashMap<>();
+        body.put("status", "error");
+        body.put("message", error.getMessage());
+        String bodyString = new JSONObject(body).toString();
+
+          return new WebResourceResponse("application/json",
+                  "utf-8", HttpURLConnection.HTTP_NOT_IMPLEMENTED,
+                  result.reasonPhrase(HttpURLConnection.HTTP_NOT_IMPLEMENTED),
+                  new HashMap<>(),
+                  new ByteArrayInputStream(bodyString.getBytes(StandardCharsets.UTF_8)));
+      } else if (result instanceof  WebViewUrlSchemeResultResponse) {
+        WebViewUrlSchemeResultResponse response = (WebViewUrlSchemeResultResponse)result;
+        Map<String, String> headers = response.getHeaders();
+
+        // Header keys are all lower cased since they are case insensitive.
+        String mimeType = headers.getOrDefault("content-type", "text/html");
+        // You can't include the charset in the mimetype, Android just renders
+        // this as a blank page:
+        // https://stackoverflow.com/questions/15937063/webview-only-showing-raw-html-text-on-some-pages
+        mimeType = mimeType.split(";")[0];
+
+        return new WebResourceResponse(mimeType,
+                "UTF-8", response.getStatus(), response.reasonPhrase(),
+                headers,
+                new ByteArrayInputStream(response.getBody().getBytes(StandardCharsets.UTF_8)));
+      } else if (result instanceof  WebViewUrlSchemeResultRedirect) {
+        WebViewUrlSchemeResultRedirect redirect = (WebViewUrlSchemeResultRedirect)result;
+        Map<String, String> redirectHeaders = redirect.getHeaders();
+
+        // application/x-www-form-urlencoded is the default media type from curl.
+        String mediaTypeString = redirectHeaders.getOrDefault("content-type", "application/x-www-form-urlencoded");
+        okhttp3.MediaType mediaType = okhttp3.MediaType.get(mediaTypeString);
+
+        okhttp3.Request.Builder builder = new okhttp3.Request.Builder()
+                .cacheControl(new okhttp3.CacheControl.Builder().noCache().build())
+                .url(redirect.getUrl())
+                .headers(okhttp3.Headers.of(redirectHeaders));
+
+
+        String redirectBody = redirect.getBody();
+        okhttp3.RequestBody body = null;
+        if (redirectBody != null) {
+          body = okhttp3.RequestBody.create(mediaType, redirect.getBody());
+        }
+
+        builder.method(redirect.getMethod(), body);
+        okhttp3.Request request = builder.build();
+
+        try {
+          okhttp3.Response response = this.httpClient.newCall(request).execute();
+
+          int status = response.code();
+          String reasonPhrase = response.message();
+          okhttp3.ResponseBody responseBody = response.body();
+          okhttp3.MediaType contentType = responseBody.contentType();
+
+          String encoding = null;
+          if (contentType == null || contentType.charset() == null) {
+            System.out.println("Unknown charset for the uri: '" + redirect.getUrl());
+          } else {
+            encoding = contentType.charset().toString();
+          }
+
+          Map<String, String> responseHeaders = new HashMap<>();
+
+          for (String headerName : response.headers().names()) {
+            responseHeaders.put(headerName, response.headers(headerName).get(0));
+          }
+
+          String mimeType = null;
+          if (contentType != null) {
+            mimeType = contentType.type() + "/" + contentType.subtype();
+          }
+
+          return new WebResourceResponse(mimeType,
+                  encoding, status, reasonPhrase,
+                  responseHeaders,
+                  responseBody.byteStream());
+        } catch (IOException exn) {
+          FLog.w(ReactConstants.TAG, "Error fetching request from: '" + redirect.getUrl() + "'", exn);
+          return null;
+        }
+      }
+
+      return null;
     }
   }
 
@@ -547,6 +684,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       public void configWebView(WebView webView) {
       }
     };
+
+    this.httpClient = new OkHttpClient.Builder().cookieJar(new OkHttpCookieJar()).build();
+
   }
 
   public RNCWebViewManager(WebViewConfig webViewConfig) {
@@ -557,8 +697,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public String getName() {
     return REACT_CLASS;
   }
-
-  private Boolean isOnUrlSchemeRequestEnabled = false;
 
   protected RNCWebView createRNCWebViewInstance(ThemedReactContext reactContext) {
     return new RNCWebView(reactContext);
@@ -640,7 +778,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 LayoutParams.MATCH_PARENT));
 
     setGeolocationEnabled(webView, false);
-    if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+    if (true || ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
@@ -843,20 +981,40 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "onUrlSchemeRequest")
   public void setOnUrlSchemeRequest(
-    WebView view,
+    WebView webView,
     boolean isOnUrlSchemeRequestEnabled) {
-    this.isOnUrlSchemeRequestEnabled = isOnUrlSchemeRequestEnabled;
-
-    RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
+    RNCWebViewClient client = ((RNCWebView) webView).getRNCWebViewClient();
     if (client != null) {
-      client.setIsOnUrlSchemeRequestEnabled(this.isOnUrlSchemeRequestEnabled);
+      client.setIsOnUrlSchemeRequestEnabled(isOnUrlSchemeRequestEnabled);
+    }
+  }
+
+  @ReactProp(name = "urlScheme")
+  public void setUrlScheme(
+    WebView webView,
+    String urlScheme) {
+
+    RNCWebViewClient client = ((RNCWebView) webView).getRNCWebViewClient();
+    if (client != null) {
+      client.setUrlScheme(urlScheme);
+    }
+  }
+
+  @ReactProp(name = "baseInterceptURL")
+  public void setBaseInterceptURL(
+          WebView webView,
+          String baseInterceptURL) {
+
+    RNCWebViewClient client = ((RNCWebView) webView).getRNCWebViewClient();
+    if (client != null) {
+      client.setBaseInterceptURL(baseInterceptURL);
     }
   }
 
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
-    view.setWebViewClient(new RNCWebViewClient());
+    view.setWebViewClient(new RNCWebViewClient(this.httpClient));
   }
 
   @Override
