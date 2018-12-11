@@ -36,7 +36,7 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
   NSString* url = [[urlSchemeTask request] URL].absoluteString;
   NSString* method = [urlSchemeTask request].HTTPMethod;
   NSDictionary* headers = urlSchemeTask.request.allHTTPHeaderFields;
-  
+
   // Save the task in a map.
   NSString* requestId = [NSString stringWithFormat:@"%p", urlSchemeTask];
   [self.urlSchemeRequestTasks setObject:urlSchemeTask forKey:requestId];
@@ -83,13 +83,50 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
     }
 
     [urlSchemeTask didFinish];
+  } else if ([type isEqualToString:@"file"]) {
+    NSString *url = [resp objectForKey:@"url"];
+    NSString *file = [resp objectForKey:@"file"];
+    NSDictionary *headers = [resp objectForKey:@"headers"];
+
+    NSURL *requestUrl = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"file://%@", file]];
+    NSURL *responseUrl = [[NSURL alloc] initWithString:url];
+
+    NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:requestUrl
+                                                                cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
+                                                            timeoutInterval:60.0];
+
+    NSURLSessionDataTask* requestTask = [self.session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+
+      id<WKURLSchemeTask> urlSchemeTask = [self.urlSchemeRequestTasks objectForKey:requestId];
+      if (!urlSchemeTask) {
+        return;
+      }
+
+      if (response) {
+        // Need to respond with the responseUrl, not the requestUrl or else the WebView is unhappy.
+        // Also need to respond with the response headers specifying the content type.
+        NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+        NSHTTPURLResponse* proxyResponse = [[NSHTTPURLResponse alloc] initWithURL:responseUrl statusCode:httpResponse.statusCode HTTPVersion:@"HTTP/2" headerFields:headers];
+
+        [urlSchemeTask didReceiveResponse: proxyResponse];
+        [urlSchemeTask didReceiveData:data];
+        [urlSchemeTask didFinish];
+      } else if (error) {
+        [urlSchemeTask didFailWithError:error];
+      }
+    }];
+
+    [requestTask resume];
+
   } else if ([type isEqualToString:@"redirect"]) {
     NSString *url = [resp objectForKey:@"url"];
     NSDictionary *headers = [resp objectForKey:@"headers"];
     NSString *body = [resp objectForKey:@"body"];
     NSString *method = [resp objectForKey:@"method"];
 
-    NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[[NSURL alloc] initWithString:url]
+    NSURL *requestUrl = [[NSURL alloc] initWithString: url];
+
+    NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:requestUrl
                                                                 cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                                                             timeoutInterval:60.0];
 
@@ -99,27 +136,23 @@ completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
       [request setHTTPBody: [body dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO]];
     }
 
-    // Would be nice if we had access to body data, but it doesn't.
-    // if ([urlSchemeTask request].HTTPBodyStream) {
-    //     [request setHTTPBodyStream: [urlSchemeTask request].HTTPBodyStream];
-    // } else if ([urlSchemeTask request].HTTPBody) {
-    //     [request setHTTPBody: [urlSchemeTask request].HTTPBody];
-    // }
-
     NSURLSessionDataTask* requestTask = [self.session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-      
+
       id<WKURLSchemeTask> urlSchemeTask = [self.urlSchemeRequestTasks objectForKey:requestId];
       if (!urlSchemeTask) {
         return;
       }
-      
+
       if (response) {
-        [urlSchemeTask didReceiveResponse: response];
+        NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+        NSHTTPURLResponse* proxyResponse = [[NSHTTPURLResponse alloc] initWithURL:requestUrl statusCode:httpResponse.statusCode HTTPVersion:@"HTTP/2" headerFields:[httpResponse allHeaderFields]];
+
+        [urlSchemeTask didReceiveResponse: proxyResponse];
         [urlSchemeTask didReceiveData:data];
+        [urlSchemeTask didFinish];
       } else if (error) {
         [urlSchemeTask didFailWithError:error];
       }
-      [urlSchemeTask didFinish];
     }];
 
     [requestTask resume];

@@ -75,6 +75,13 @@ export type UrlSchemeResponse = {
   body?: string
 }
 
+export type UrlSchemeFile = {
+  type: "file"
+  file: string
+  url: string,
+  headers: { [key: string]: string },
+}
+
 export type UrlSchemeRedirect = {
   type: "redirect"
   url: string,
@@ -262,8 +269,7 @@ export interface IOSWebViewProps {
 	onUrlSchemeRequest?: (
 		event: WebViewUrlSchemeRequest
 	) =>
-		| Promise<UrlSchemeResponse>
-		| Promise<UrlSchemeRedirect>;
+		| Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
 
 }
 
