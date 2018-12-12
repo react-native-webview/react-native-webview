@@ -2,8 +2,10 @@
 package com.reactnativecommunity.webview;
 
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.content.Context;
 
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.uimanager.UIManagerModule;
 
@@ -66,6 +68,9 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
@@ -132,7 +137,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected WebViewConfig mWebViewConfig;
   protected @Nullable WebView.PictureListener mPictureListener;
 
-  private OkHttpClient httpClient;
+  private final OkHttpClient httpClient;
 
   protected static class RNCWebViewClient extends WebViewClient {
 
@@ -470,7 +475,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean messagingEnabled = false;
     protected @Nullable RNCWebViewClient mRNCWebViewClient;
 
-
     protected class RNCWebViewBridge {
       RNCWebView mContext;
 
@@ -598,18 +602,19 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
-  public RNCWebViewManager() {
-    mWebViewConfig = new WebViewConfig() {
+  public RNCWebViewManager(ReactApplicationContext reactContext) {
+    this(reactContext, new WebViewConfig() {
       public void configWebView(WebView webView) {
       }
-    };
-
-    this.httpClient = new OkHttpClient.Builder().cookieJar(new OkHttpCookieJar()).build();
-
+    });
   }
 
-  public RNCWebViewManager(WebViewConfig webViewConfig) {
+  public RNCWebViewManager(ReactApplicationContext reactContext, WebViewConfig webViewConfig) {
     mWebViewConfig = webViewConfig;
+
+    Context context = reactContext.getApplicationContext();
+    PersistentCookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context));
+    this.httpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build();
   }
 
   @Override

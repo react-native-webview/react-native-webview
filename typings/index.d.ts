@@ -271,8 +271,7 @@ export interface IOSWebViewProps {
 	onUrlSchemeRequest?: (
 		event: WebViewUrlSchemeRequest
 	) =>
-
-		| Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
+		 Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
 }
 
 export interface AndroidWebViewProps {
@@ -365,6 +364,16 @@ export interface AndroidWebViewProps {
    * @platform android
    */
   mixedContentMode?: 'never' | 'always' | 'compatibility';
+
+  baseInterceptUrl?: string,
+
+   /**
+   * Intercept a url scheme request. Either return a response or return a new request.
+   */
+  onUrlSchemeRequest?: (
+    event: WebViewUrlSchemeRequest
+  ) =>
+     Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
 }
 
 export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidWebViewProps {

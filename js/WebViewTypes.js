@@ -164,24 +164,6 @@ export type WebViewNativeConfig = $ReadOnly<{|
    * @platform ios
    */
   viewManager?: ?Object,
-
-  /**
-   * Specify a url scheme to intercept.
-   */
-  urlScheme?: ?string,
-
-  /**
-   * Intercept a url scheme request. If you return a status, that means this is a response. If there
-    * is a method, that means that we should make the request from native code and pipe it. This is
-    * useful for requests such as images that won't encode well.
-   */
-  onUrlSchemeRequest?: (
-    event: WebViewUrlSchemeRequestEvent
-  ) =>
-    | Promise<
-      | {| type: "redirect", url: string, status: number, headers: { [string]: string }, body?: ?string |}
-      | {| type: "value", url: string, method: string, headers: { [string]: string }, body?: ?string |}
-    >,
 |}>;
 
 export type IOSWebViewProps = $ReadOnly<{|
@@ -315,7 +297,7 @@ export type IOSWebViewProps = $ReadOnly<{|
 	onUrlSchemeRequest?: (
 		event: WebViewUrlSchemeRequest
 	) =>
-		| Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>,
+		Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>,
 
 |}>;
 
@@ -424,8 +406,7 @@ export type AndroidWebViewProps = $ReadOnly<{|
   onUrlSchemeRequest?: (
     event: WebViewUrlSchemeRequest
   ) =>
-    | Promise<UrlSchemeResponse>
-    | Promise<UrlSchemeRedirect>,
+    Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>,
 |}>;
 
 export type WebViewSharedProps =  $ReadOnly<{|
