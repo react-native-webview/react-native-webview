@@ -2,24 +2,23 @@
 package com.reactnativecommunity.webview;
 
 import android.annotation.TargetApi;
-import android.app.ActivityManager;
 import android.content.Context;
 
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.uimanager.UIManagerModule;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
@@ -79,6 +78,7 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopUrlSchemeRequestEvent;
 import com.reactnativecommunity.webview.events.WebViewUrlSchemeResult;
 import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultError;
+import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultFile;
 import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultRedirect;
 import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultResponse;
 
@@ -148,8 +148,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     // This is a boolean that indicates whether or not the schemeUrlRequest feature is enabled.
     private boolean isOnUrlSchemeRequestEnabled = false;
 
-    // This is mapping from the Request IDs back to the response from Javascript.
-    private final Map<String, CompletableFuture<WebViewUrlSchemeResult>> futureMap = new HashMap<>();
+    // This is mapping from the Request IDs back to a queue. When an event comes in from Javascript
+    // it looks up the corresponding queue and puts the message into it. This then resumes
+    // request processing in shouldInterceptRequest.
+    private final Map<String, BlockingQueue<WebViewUrlSchemeResult>> requestQueueMap = new HashMap<>();
 
     // Eventually this should be configurable
     private final long SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS = 5000;
@@ -206,30 +208,35 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       String requestId = UUID.randomUUID().toString();
 
-      CompletableFuture<WebViewUrlSchemeResult> completableFuture = new CompletableFuture<>();
-
-      futureMap.put(requestId, completableFuture);
-      dispatchEvent(
-          webView,
-          new TopUrlSchemeRequestEvent(
-              webView.getId(),
-              requestId,
-              url,
-              request.getMethod(),
-              request.getRequestHeaders()
-          )
-      );
+      BlockingQueue<WebViewUrlSchemeResult> queue = new LinkedBlockingQueue<>(1);
 
       try {
-        WebViewUrlSchemeResult result = completableFuture.get(
+        requestQueueMap.put(requestId, queue);
+        dispatchEvent(
+            webView,
+            new TopUrlSchemeRequestEvent(
+                webView.getId(),
+                requestId,
+                url,
+                request.getMethod(),
+                request.getRequestHeaders()
+            )
+        );
+
+        WebViewUrlSchemeResult result = queue.poll(
                 SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
+        if (result == null) {
+          FLog.w(ReactConstants.TAG, "Timeout waiting for response from the server on '%s'", requestId);
+          return CustomWebResourceResponse.buildErrorResponse("Timeout waiting waiting for response for '" + requestId + "'");
+        }
+
         return handleUrlSchemeResult(result);
-      } catch(InterruptedException| TimeoutException | ExecutionException exn) {
-        FLog.w(ReactConstants.TAG, "Timeout waiting for response from the server on " + requestId, exn);
+      } catch(InterruptedException exn) {
+        FLog.w(ReactConstants.TAG, "Exception waiting for response from the server on '%s'", requestId, exn);
         return CustomWebResourceResponse.buildErrorResponse("Error waiting for response for '" + requestId + "'");
       } finally {
-        futureMap.remove(requestId);
+        requestQueueMap.remove(requestId);
       }
     }
 
@@ -347,7 +354,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
       if (args.size() != 1) {
-        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Received an invalid number of arguments" + args);
+        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Received an invalid number of arguments: " + args);
         return;
       }
 
@@ -364,17 +371,19 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         return;
       }
 
-      CompletableFuture future = this.futureMap.get(requestId);
+      BlockingQueue queue = requestQueueMap.get(requestId);
 
-      if (future == null) {
+      if (queue == null) {
         // This might not be an error if there is a timeout
-        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Missing future for '" + requestId + "'");
+        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Missing future for '%s'", requestId);
         return;
       }
 
       WebViewUrlSchemeResult result = WebViewUrlSchemeResult.Companion.from(argMap);
 
-      future.complete(result);
+      if (!queue.offer(result)) {
+        FLog.w(ReactConstants.TAG, "handleUrlSchemeResponse: Received two messages for '%s'", requestId);
+      }
     }
 
     private WebResourceResponse handleUrlSchemeResult(WebViewUrlSchemeResult result) {
@@ -387,7 +396,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         String bodyString = new JSONObject(body).toString();
 
           return new CustomWebResourceResponse(null,
-                  "utf-8", HttpURLConnection.HTTP_NOT_IMPLEMENTED,
+                  "utf-8", HttpURLConnection.HTTP_INTERNAL_ERROR,
                   new HashMap<>(),
                   new ByteArrayInputStream(bodyString.getBytes(StandardCharsets.UTF_8)));
       } else if (result instanceof  WebViewUrlSchemeResultResponse) {
@@ -395,8 +404,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         Map<String, String> headers = response.getHeaders();
 
         // Header keys are all lower cased since they are case insensitive.
-        String mimeType = headers.getOrDefault("content-type", "text/html");
-        // You can't include the charset in the mimetype, Android just renders
+        String mimeType = headers.get("content-type");
+        if (mimeType == null) {
+          mimeType = "text/html";
+        }
+        // You can't include the charset in the mimeType, Android will renders
         // this as a blank page:
         // https://stackoverflow.com/questions/15937063/webview-only-showing-raw-html-text-on-some-pages
         mimeType = mimeType.split(";")[0];
@@ -410,11 +422,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         Map<String, String> redirectHeaders = redirect.getHeaders();
 
         // application/x-www-form-urlencoded is the default media type from curl.
-        String mediaTypeString = redirectHeaders.getOrDefault("content-type", "application/x-www-form-urlencoded");
+        String mediaTypeString = redirectHeaders.get("content-type");
+        if (mediaTypeString == null) {
+          mediaTypeString = "application/x-www-form-urlencoded";
+        }
         okhttp3.MediaType mediaType = okhttp3.MediaType.get(mediaTypeString);
 
         okhttp3.Request.Builder builder = new okhttp3.Request.Builder()
-                .cacheControl(new okhttp3.CacheControl.Builder().noCache().build())
                 .url(redirect.getUrl())
                 .headers(okhttp3.Headers.of(redirectHeaders));
 
@@ -435,9 +449,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           okhttp3.MediaType contentType = responseBody.contentType();
 
           String encoding = null;
-          if (contentType == null || contentType.charset() == null) {
-            System.out.println("Unknown charset for the uri: '" + redirect.getUrl());
-          } else {
+          if (contentType != null && contentType.charset() != null) {
             encoding = contentType.charset().toString();
           }
 
@@ -457,12 +469,49 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                   responseHeaders,
                   responseBody.byteStream());
         } catch (IOException exn) {
+          // TODO: Should this return null, or return an error?
           FLog.w(ReactConstants.TAG, "Error fetching request from: '" + redirect.getUrl() + "'", exn);
+          return null;
+        }
+      } else if (result instanceof WebViewUrlSchemeResultFile) {
+        WebViewUrlSchemeResultFile file = (WebViewUrlSchemeResultFile)result;
+
+        Map<String, String> responseHeaders = file.getHeaders();
+
+        // Header keys are all lower cased since they are case insensitive.
+        String mediaTypeString= responseHeaders.get("content-type");
+        if (mediaTypeString == null) {
+          mediaTypeString = "text/html";
+        }
+
+        okhttp3.MediaType mediaType = okhttp3.MediaType.get(mediaTypeString);
+
+        String mimeType = null;
+        if (mediaType != null) {
+          // You can't include the charset in the mimetype, Android just renders
+          // this as a blank page:
+          // https://stackoverflow.com/questions/15937063/webview-only-showing-raw-html-text-on-some-pages
+          mimeType = mediaType.type() + "/" + mediaType.subtype();
+        }
+
+        String encoding = null;
+        if (mediaType != null && mediaType.charset() != null) {
+          encoding = mediaType.charset().toString();
+        }
+
+        try {
+          FileInputStream inputStream = new FileInputStream(file.getFile());
+          return new CustomWebResourceResponse(mimeType, encoding, HttpURLConnection.HTTP_OK,
+                  responseHeaders, inputStream);
+        } catch (FileNotFoundException exn) {
+          FLog.w(ReactConstants.TAG, "The file '" + file.getFile() + "' does not exist, ignoring", exn);
           return null;
         }
       }
 
+      FLog.w(ReactConstants.TAG, "Unknown type of response: '" + result + "'");
       return null;
+
     }
   }
 
