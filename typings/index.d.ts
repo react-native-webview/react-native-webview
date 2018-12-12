@@ -39,7 +39,7 @@ export interface WebViewError extends WebViewNativeEvent {
   readonly description: string;
 }
 
-export interface WebViewUrlSchemeRequest extends WebViewNativeEvent {
+export interface WebViewUrlSchemeRequest {
 	readonly url: string,
 	readonly method: string,
 	readonly headers: { [key: string]: string },
@@ -53,6 +53,8 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
+
+export type WebViewUrlSchemeRequestEvent = NativeSyntheticEvent<WebViewUrlSchemeRequest>;
 
 export type DataDetectorTypes =
   | 'phoneNumber'
@@ -269,8 +271,7 @@ export interface IOSWebViewProps {
 	onUrlSchemeRequest?: (
 		event: WebViewUrlSchemeRequest
 	) =>
-		| Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
-
+		 Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
 }
 
 export interface AndroidWebViewProps {
@@ -363,6 +364,16 @@ export interface AndroidWebViewProps {
    * @platform android
    */
   mixedContentMode?: 'never' | 'always' | 'compatibility';
+
+  baseInterceptUrl?: string,
+
+   /**
+   * Intercept a url scheme request. Either return a response or return a new request.
+   */
+  onUrlSchemeRequest?: (
+    event: WebViewUrlSchemeRequest
+  ) =>
+     Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
 }
 
 export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidWebViewProps {

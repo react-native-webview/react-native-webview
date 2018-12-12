@@ -557,10 +557,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 // Send event to React Native.
 - (void)handleUrlSchemeRequest:(NSDictionary *)req
 {
-  NSMutableDictionary *event = [self baseEvent];
-  [event addEntriesFromDictionary: req];
-  
-  _onUrlSchemeRequest(event);
+  _onUrlSchemeRequest(req);
 }
 
 

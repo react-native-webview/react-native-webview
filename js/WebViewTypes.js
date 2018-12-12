@@ -57,12 +57,11 @@ export type WebViewError = $ReadOnly<{|
 |}>;
 
 export type WebViewUrlSchemeRequest = $ReadOnly<{|
-	...WebViewNativeEvent,
 	url: string,
 	method: string,
 	headers: { [string]: string },
 	requestId: string,
-|}>
+|}>;
 
 export type WebViewEvent = SyntheticEvent<WebViewNativeEvent>;
 
@@ -298,7 +297,7 @@ export type IOSWebViewProps = $ReadOnly<{|
 	onUrlSchemeRequest?: (
 		event: WebViewUrlSchemeRequest
 	) =>
-		| Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>,
+		Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>,
 
 |}>;
 
@@ -392,6 +391,22 @@ export type AndroidWebViewProps = $ReadOnly<{|
    * @platform android
    */
   mixedContentMode?: ?('never' | 'always' | 'compatibility'),
+
+  /**
+   * A Base URL that is intercepted and sent through onUrlSchemeRequest. Android has a few issues
+   * with custom schemes, using a baseInterceptURL instead.
+   */
+  baseInterceptUrl?: ?string,
+
+  /**
+   * Intercept a url scheme request. If you return a status, that means this is a response. If there
+   * is a method, that means that we should make the request from native code and pipe it. This is
+   * useful for requests such as images that won't encode well.
+   */
+  onUrlSchemeRequest?: (
+    event: WebViewUrlSchemeRequest
+  ) =>
+    Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>,
 |}>;
 
 export type WebViewSharedProps =  $ReadOnly<{|

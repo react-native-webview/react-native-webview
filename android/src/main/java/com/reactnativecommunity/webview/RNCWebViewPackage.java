@@ -33,7 +33,7 @@ public class RNCWebViewPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-      manager = new RNCWebViewManager();
+      manager = new RNCWebViewManager(reactContext);
       manager.setPackage(this);
       return Arrays.<ViewManager>asList(manager);
     }
