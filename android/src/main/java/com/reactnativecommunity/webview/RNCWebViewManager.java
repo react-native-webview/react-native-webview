@@ -452,6 +452,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+    view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    FLog.w(ReactConstants.TAG, "Hello World from Margaret~~~~~~~~~~~~~~~~~~~~~");
   }
 
   @ReactProp(name = "overScrollMode")
