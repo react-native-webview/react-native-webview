@@ -1,57 +1,115 @@
 package com.reactnativecommunity.webview.events
 
-// Unable to find a Map of this anywhere else in the Java doc, copied from here
-// https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html
-val statusCodeMap = mapOf (
-        100 to "Continue",
-        101 to "Switching Protocols",
-        200 to "OK",
-        201 to "Created",
-        202 to "Accepted",
-        203 to "Non-Authoritative Information",
-        204 to "No Content",
-        205 to "Reset Content",
-        206 to "Partial Content",
-        300 to "Multiple Choices",
-        301 to "Moved Permanently",
-        302 to "Found",
-        303 to "See Other",
-        304 to "Not Modified",
-        305 to "Use Proxy",
-        307 to "Temporary Redirect",
-        400 to "Bad Request",
-        401 to "Unauthorized",
-        402 to "Payment Required",
-        403 to "Forbidden",
-        404 to "Not Found",
-        405 to "Method Not Allowed",
-        406 to "Not Acceptable",
-        407 to "Proxy Authentication Required",
-        408 to "Request Time-out",
-        409 to "Conflict",
-        410 to "Gone",
-        411 to "Length Required",
-        412 to "Precondition Failed",
-        413 to "Request Entity Too Large",
-        414 to "Request-URI Too Large",
-        415 to "Unsupported Media Type",
-        416 to "Requested range not satisfiable",
-        417 to "Expectation Failed",
-        500 to "Internal Server Error",
-        501 to "Not Implemented",
-        502 to "Bad Gateway",
-        503 to "Service Unavailable",
-        504 to "Gateway Time-out",
-        505 to "HTTP Version not supported"
-);
+import com.facebook.common.logging.FLog
+import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableType
+import com.facebook.react.common.ReactConstants
+import java.util.HashMap
 
 sealed class WebViewUrlSchemeResult {
-    fun reasonPhrase(status: Int): String {
-        return reasonPhrase(status, "Unknown")
-    }
+    companion object {
+        fun from(readableMap: ReadableMap): WebViewUrlSchemeResult {
+            try {
+                val responseMap = safeGetMap(readableMap, "response") ?: return WebViewUrlSchemeResultError("Missing required field response")
 
-    fun reasonPhrase(status: Int, defaultValue: String): String {
-        return statusCodeMap.getOrDefault(status, defaultValue)
+                val responseType = safeGetString(responseMap, "type") ?: return WebViewUrlSchemeResultError("Missing required field type")
+
+                when (responseType) {
+                    "redirect" -> {
+                        val url = safeGetString(responseMap, "url") ?: return WebViewUrlSchemeResultError("Missing required field url")
+                        val method = safeGetString(responseMap, "method") ?: return WebViewUrlSchemeResultError("Missing required field string")
+                        val headers = HashMap<String, String>()
+                        val headerMap = safeGetMap(responseMap, "headers")
+                                ?: return WebViewUrlSchemeResultError("Missing headers for a redirect")
+
+                        val iterator = headerMap.keySetIterator()
+                        while (iterator.hasNextKey()) {
+                            val key = iterator.nextKey()
+                            val keyValue = safeGetString(headerMap, key)
+                                    ?: return WebViewUrlSchemeResultError("Non-string header value for key: '$key'")
+
+                            // Lower Case headers for case insensitive search.
+                            headers[key.toLowerCase()] = keyValue
+                        }
+
+                        val body: String? = safeGetString(responseMap, "body")
+
+                        return WebViewUrlSchemeResultRedirect(url, method, headers, body)
+                    }
+
+                    "response" -> {
+                        val url = safeGetString(responseMap, "url") ?: return WebViewUrlSchemeResultError("Missing required field url")
+                        val status = safeGetInt(responseMap, "status") ?: return WebViewUrlSchemeResultError("Missing required field status")
+                        val headers = HashMap<String, String>()
+                        val headerMap = safeGetMap(responseMap, "headers") ?: return WebViewUrlSchemeResultError("Missing required field headers")
+
+                        val iterator = headerMap.keySetIterator()
+                        while (iterator.hasNextKey()) {
+                            val key = iterator.nextKey()
+                            val keyValue = safeGetString(headerMap, key)
+                                    ?: return WebViewUrlSchemeResultError("Non-string header value for key: '$key'")
+
+                            // Lower Case headers for case insensitive search.
+                            headers[key.toLowerCase()] = keyValue
+                        }
+
+                        val body: String? = safeGetString(responseMap, "body")
+
+                        return WebViewUrlSchemeResultResponse(url, status, headers, body)
+                    }
+
+                    "error" -> {
+                        val message = safeGetString(responseMap, "message") ?: "Error processing request"
+
+                        return WebViewUrlSchemeResultError(message)
+                    }
+
+                    else -> {
+                        return WebViewUrlSchemeResultError("Unknown type of message: '$responseType'")
+                    }
+                }
+            } catch (exn: Exception) {
+                FLog.w(ReactConstants.TAG, "Error converting response from onUrlSchemeRequest.", exn)
+
+                return WebViewUrlSchemeResultError("Error converting response")
+            }
+        }
+
+        fun safeGetString(readableMap: ReadableMap, key: String): String? {
+            if (!readableMap.hasKey(key)) {
+                return null
+            }
+
+            if (readableMap.getType(key) != ReadableType.String) {
+                return null
+            }
+
+            return readableMap.getString(key)
+        }
+
+        fun safeGetInt(readableMap: ReadableMap, key: String): Int? {
+            if (!readableMap.hasKey(key)) {
+                return null
+            }
+
+            if (readableMap.getType(key) != ReadableType.Number) {
+                return null
+            }
+
+            return readableMap.getInt(key)
+        }
+
+        fun safeGetMap(readableMap: ReadableMap, key: String): ReadableMap? {
+            if (!readableMap.hasKey(key)) {
+                return null
+            }
+
+            if (readableMap.getType(key) != ReadableType.Map) {
+                return null
+            }
+
+            return readableMap.getMap(key)
+        }
     }
 }
 
@@ -65,8 +123,4 @@ data class WebViewUrlSchemeResultRedirect(val url: String,
 data class WebViewUrlSchemeResultResponse(val url: String,
                                          val status: Int,
                                          val headers: Map<String, String>,
-                                         val body: String) : WebViewUrlSchemeResult() {
-    fun reasonPhrase(): String {
-        return reasonPhrase(status)
-    }
-}
+                                         val body: String?) : WebViewUrlSchemeResult()

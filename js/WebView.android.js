@@ -163,6 +163,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         onLoadingError={this.onLoadingError}
         onLoadingProgress={this.onLoadingProgress}
         onUrlSchemeRequest={this.onUrlSchemeRequest}
+        baseInterceptUrl={this.props.baseInterceptUrl}
         testID={this.props.testID}
         geolocationEnabled={this.props.geolocationEnabled}
         mediaPlaybackRequiresUserAction={

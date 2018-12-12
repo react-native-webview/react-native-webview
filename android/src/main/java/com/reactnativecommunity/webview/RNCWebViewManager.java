@@ -80,9 +80,6 @@ import com.reactnativecommunity.webview.events.WebViewUrlSchemeResultResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 /**
@@ -143,9 +140,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
     protected @Nullable List<Pattern> mOriginWhitelist;
 
-    // This is the custom url scheme that is proxied to onUrlSchemeRequestEnabled
-    private String urlScheme = null;
-
     // This is a boolean that indicates whether or not the schemeUrlRequest feature is enabled.
     private boolean isOnUrlSchemeRequestEnabled = false;
 
@@ -159,7 +153,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     private final OkHttpClient httpClient;
 
     // URL to intercept requests from the browser
-    private String baseInterceptURL;
+    private String baseInterceptUrl;
 
     protected RNCWebViewClient(OkHttpClient httpClient) {
       this.httpClient = httpClient;
@@ -191,55 +185,47 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest request) {
-      Uri uri = request.getUrl();
+      String url = request.getUrl().toString();
 
-      if (this.urlScheme == null) {
+      if (this.baseInterceptUrl == null) {
         return null;
       }
 
-//      if (!this.urlScheme.equals(uri.getScheme())) {
-//        return null;
-//      }
-
-      String host = uri.getHost();
-      int port = uri.getPort();
-
-      if (!"192.168.7.180".equals(host) || port != 3000) {
+      if (!this.isOnUrlSchemeRequestEnabled) {
         return null;
       }
 
-      if (this.isOnUrlSchemeRequestEnabled) {
-        String requestId = UUID.randomUUID().toString();
-
-        CompletableFuture<WebViewUrlSchemeResult> completableFuture = new CompletableFuture<>();
-
-        futureMap.put(requestId, completableFuture);
-        dispatchEvent(
-            webView,
-            new TopUrlSchemeRequestEvent(
-                webView.getId(),
-                requestId,
-                uri.toString(),
-                request.getMethod(),
-                request.getRequestHeaders()
-            )
-        );
-
-        try {
-          WebViewUrlSchemeResult result = completableFuture.get(
-                  SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-
-          WebResourceResponse response = handleUrlSchemeResult(result);
-          return response;
-        } catch(InterruptedException| TimeoutException | ExecutionException exn) {
-          // TODO: The default thing is probably to return a server not available error.
-          FLog.w(ReactConstants.TAG, "Timeout waiting for response from the server on " + requestId);
-        } finally {
-          futureMap.remove(requestId);
-        }
+      if (!url.startsWith(this.baseInterceptUrl)) {
+        return null;
       }
 
-      return null;
+      String requestId = UUID.randomUUID().toString();
+
+      CompletableFuture<WebViewUrlSchemeResult> completableFuture = new CompletableFuture<>();
+
+      futureMap.put(requestId, completableFuture);
+      dispatchEvent(
+          webView,
+          new TopUrlSchemeRequestEvent(
+              webView.getId(),
+              requestId,
+              url,
+              request.getMethod(),
+              request.getRequestHeaders()
+          )
+      );
+
+      try {
+        WebViewUrlSchemeResult result = completableFuture.get(
+                SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        return handleUrlSchemeResult(result);
+      } catch(InterruptedException| TimeoutException | ExecutionException exn) {
+        FLog.w(ReactConstants.TAG, "Timeout waiting for response from the server on " + requestId, exn);
+        return CustomWebResourceResponse.buildErrorResponse("Error waiting for response for '" + requestId + "'");
+      } finally {
+        futureMap.remove(requestId);
+      }
     }
 
     @Override
@@ -345,12 +331,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       this.isOnUrlSchemeRequestEnabled = isOnUrlSchemeRequestEnabled;
     }
 
-    public void setUrlScheme(String urlScheme) {
-      this.urlScheme = urlScheme;
-    }
-
-    public void setBaseInterceptURL(String baseInterceptURL) {
-      this.baseInterceptURL = baseInterceptURL;
+    public void setBaseInterceptUrl(String baseInterceptUrl) {
+      this.baseInterceptUrl = baseInterceptUrl;
     }
 
     public void handleUrlSchemeResponse(@Nullable ReadableArray args) {
@@ -385,69 +367,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         return;
       }
 
-      // TODO: If these conversions should fail, this should still complete the future with an error.
-      ReadableMap responseMap = argMap.getMap("response");
+      WebViewUrlSchemeResult result = WebViewUrlSchemeResult.Companion.from(argMap);
 
-      String responseType = responseMap.getString("type");
-      if (responseType.equals("error")) {
-        String message = responseMap.getString("message");
-
-        future.complete(new WebViewUrlSchemeResultError(message));
-        return;
-      } else if (responseType.equals("redirect")) {
-        String url = responseMap.getString("url");
-        String method = responseMap.getString("method");
-        Map<String, String> headers = new HashMap<>();
-        ReadableMap headerMap = responseMap.getMap("headers");
-        if (headerMap == null) {
-          future.complete(new WebViewUrlSchemeResultError("Missing headers for a redirect"));
-          return;
-        }
-
-        for (ReadableMapKeySetIterator iterator = headerMap.keySetIterator() ; iterator.hasNextKey() ; ) {
-          String key = iterator.nextKey();
-          String keyValue = headerMap.getString(key);
-          if (keyValue == null) {
-            future.complete(new WebViewUrlSchemeResultError("Non-string header value for key: '" + key + "'"));
-            return;
-          }
-          headers.put(key.toLowerCase(), keyValue);
-        }
-
-        String body = null;
-        if (responseMap.hasKey("body") && responseMap.getType("body") == ReadableType.String) {
-          body = responseMap.getString("body");
-        }
-
-        future.complete(new WebViewUrlSchemeResultRedirect(url, method, headers, body));
-
-      } else if (responseType.equals("response")) {
-        String url = responseMap.getString("url");
-        Integer status = responseMap.getInt("status");
-        Map<String, String> headers = new HashMap<>();
-        ReadableMap headerMap = responseMap.getMap("headers");
-        if (headerMap == null) {
-          future.complete(new WebViewUrlSchemeResultError("Missing headers for a redirect"));
-          return;
-        }
-
-        for (ReadableMapKeySetIterator iterator = headerMap.keySetIterator() ; iterator.hasNextKey() ; ) {
-          String key = iterator.nextKey();
-          String keyValue = headerMap.getString(key);
-          if (keyValue == null) {
-            future.complete(new WebViewUrlSchemeResultError("Non-string header value for key: '" + key + "'"));
-            return;
-          }
-          headers.put(key.toLowerCase(), keyValue);
-        }
-
-        String body = responseMap.getString("body");
-
-        future.complete(new WebViewUrlSchemeResultResponse(url, status, headers, body));
-      } else {
-        future.complete(new WebViewUrlSchemeResultError("Unknown type of message: '" + responseType + "'"));
-      }
-
+      future.complete(result);
     }
 
     private WebResourceResponse handleUrlSchemeResult(WebViewUrlSchemeResult result) {
@@ -459,9 +381,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         body.put("message", error.getMessage());
         String bodyString = new JSONObject(body).toString();
 
-          return new WebResourceResponse("application/json",
+          return new CustomWebResourceResponse(null,
                   "utf-8", HttpURLConnection.HTTP_NOT_IMPLEMENTED,
-                  result.reasonPhrase(HttpURLConnection.HTTP_NOT_IMPLEMENTED),
                   new HashMap<>(),
                   new ByteArrayInputStream(bodyString.getBytes(StandardCharsets.UTF_8)));
       } else if (result instanceof  WebViewUrlSchemeResultResponse) {
@@ -475,8 +396,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         // https://stackoverflow.com/questions/15937063/webview-only-showing-raw-html-text-on-some-pages
         mimeType = mimeType.split(";")[0];
 
-        return new WebResourceResponse(mimeType,
-                "UTF-8", response.getStatus(), response.reasonPhrase(),
+        return new CustomWebResourceResponse(mimeType,
+                "UTF-8", response.getStatus(),
                 headers,
                 new ByteArrayInputStream(response.getBody().getBytes(StandardCharsets.UTF_8)));
       } else if (result instanceof  WebViewUrlSchemeResultRedirect) {
@@ -492,7 +413,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 .url(redirect.getUrl())
                 .headers(okhttp3.Headers.of(redirectHeaders));
 
-
         String redirectBody = redirect.getBody();
         okhttp3.RequestBody body = null;
         if (redirectBody != null) {
@@ -506,7 +426,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           okhttp3.Response response = this.httpClient.newCall(request).execute();
 
           int status = response.code();
-          String reasonPhrase = response.message();
           okhttp3.ResponseBody responseBody = response.body();
           okhttp3.MediaType contentType = responseBody.contentType();
 
@@ -528,8 +447,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
             mimeType = contentType.type() + "/" + contentType.subtype();
           }
 
-          return new WebResourceResponse(mimeType,
-                  encoding, status, reasonPhrase,
+          return new CustomWebResourceResponse(mimeType,
+                  encoding, status,
                   responseHeaders,
                   responseBody.byteStream());
         } catch (IOException exn) {
@@ -989,25 +908,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
-  @ReactProp(name = "urlScheme")
-  public void setUrlScheme(
-    WebView webView,
-    String urlScheme) {
-
-    RNCWebViewClient client = ((RNCWebView) webView).getRNCWebViewClient();
-    if (client != null) {
-      client.setUrlScheme(urlScheme);
-    }
-  }
-
-  @ReactProp(name = "baseInterceptURL")
-  public void setBaseInterceptURL(
+  @ReactProp(name = "baseInterceptUrl")
+  public void setBaseInterceptUrl(
           WebView webView,
-          String baseInterceptURL) {
+          String baseInterceptUrl) {
 
     RNCWebViewClient client = ((RNCWebView) webView).getRNCWebViewClient();
     if (client != null) {
-      client.setBaseInterceptURL(baseInterceptURL);
+      client.setBaseInterceptUrl(baseInterceptUrl);
     }
   }
 
