@@ -271,7 +271,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
 
     return (
-      <View style={styles.container}>
+      <View style={styles.container} {...this.props}>
         {webView}
         {otherView}
       </View>
