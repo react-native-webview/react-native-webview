@@ -139,49 +139,30 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       this.props.onShouldStartLoadWithRequest,
     );
 
+    const nativeWebViewProps = {
+      ...this.props,
+      source: resolveAssetSource(source),
+      messagingEnabled: typeof this.props.onMessage === 'function',
+      onMessage: this.onMessage,
+      onShouldStartLoadWithRequest: onShouldStartLoadWithRequest,
+      onLoadingStart: this.onLoadingStart,
+      onLoadingFinish: this.onLoadingFinish,
+      onLoadingError: this.onLoadingError,
+      onLoadingProgress: this.onLoadingProgress,
+      ...nativeConfig.props,
+    };
+
     const webView = (
       <NativeWebView
+        {...nativeWebViewProps}
         ref={this.webViewRef}
         key="webViewKey"
         style={webViewStyles}
-        source={resolveAssetSource(source)}
-        scalesPageToFit={this.props.scalesPageToFit}
-        allowFileAccess={this.props.allowFileAccess}
-        injectedJavaScript={this.props.injectedJavaScript}
-        userAgent={this.props.userAgent}
-        javaScriptEnabled={this.props.javaScriptEnabled}
-        thirdPartyCookiesEnabled={this.props.thirdPartyCookiesEnabled}
-        domStorageEnabled={this.props.domStorageEnabled}
-        messagingEnabled={typeof this.props.onMessage === 'function'}
-        onMessage={this.onMessage}
-        overScrollMode={this.props.overScrollMode}
-        contentInset={this.props.contentInset}
-        automaticallyAdjustContentInsets={
-          this.props.automaticallyAdjustContentInsets
-        }
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-        onContentSizeChange={this.props.onContentSizeChange}
-        onLoadingStart={this.onLoadingStart}
-        onLoadingFinish={this.onLoadingFinish}
-        onLoadingError={this.onLoadingError}
-        onLoadingProgress={this.onLoadingProgress}
-        testID={this.props.testID}
-        geolocationEnabled={this.props.geolocationEnabled}
-        mediaPlaybackRequiresUserAction={
-          this.props.mediaPlaybackRequiresUserAction
-        }
-        allowUniversalAccessFromFileURLs={
-          this.props.allowUniversalAccessFromFileURLs
-        }
-        mixedContentMode={this.props.mixedContentMode}
-        saveFormDataDisabled={this.props.saveFormDataDisabled}
-        urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}
-        {...nativeConfig.props}
       />
     );
 
     return (
-      <View style={styles.container} {...this.props}>
+      <View style={styles.container}>
         {webView}
         {otherView}
       </View>
