@@ -39,6 +39,13 @@ export interface WebViewError extends WebViewNativeEvent {
   readonly description: string;
 }
 
+export interface WebViewUrlSchemeRequest {
+	readonly url: string,
+	readonly method: string,
+	readonly headers: { [key: string]: string },
+	readonly requestId: string,
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
@@ -46,6 +53,8 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
+
+export type WebViewUrlSchemeRequestEvent = NativeSyntheticEvent<WebViewUrlSchemeRequest>;
 
 export type DataDetectorTypes =
   | 'phoneNumber'
@@ -59,6 +68,29 @@ export type DataDetectorTypes =
   | 'all';
 
 export type OverScrollModeType = 'always' | 'content' | 'never';
+
+export type UrlSchemeResponse = {
+  type: "response"
+  url: string,
+  status: number,
+  headers: { [key: string]: string },
+  body?: string
+}
+
+export type UrlSchemeFile = {
+  type: "file"
+  file: string
+  url: string,
+  headers: { [key: string]: string },
+}
+
+export type UrlSchemeRedirect = {
+  type: "redirect"
+  url: string,
+  method: string,
+  headers: { [key: string]: string },
+  body?: string
+}
 
 export interface WebViewSourceUri {
   /**
@@ -227,6 +259,19 @@ export interface IOSWebViewProps {
    * @platform ios
    */
   allowsLinkPreview?: boolean;
+
+  /**
+	 * Specify a url scheme to intercept.
+	 */
+	urlScheme?: string;
+
+	/**
+	 * Intercept a url scheme request. Either return a response or return a new request.
+	 */
+	onUrlSchemeRequest?: (
+		event: WebViewUrlSchemeRequest
+	) =>
+		 Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
 }
 
 export interface AndroidWebViewProps {
@@ -319,6 +364,16 @@ export interface AndroidWebViewProps {
    * @platform android
    */
   mixedContentMode?: 'never' | 'always' | 'compatibility';
+
+  baseInterceptUrl?: string,
+
+   /**
+   * Intercept a url scheme request. Either return a response or return a new request.
+   */
+  onUrlSchemeRequest?: (
+    event: WebViewUrlSchemeRequest
+  ) =>
+     Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
 }
 
 export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidWebViewProps {

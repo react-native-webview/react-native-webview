@@ -25,7 +25,7 @@ android {
     compileSdkVersion rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : DEFAULT_COMPILE_SDK_VERSION
     buildToolsVersion rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
         versionCode 1
         versionName "1.0"
@@ -52,6 +52,8 @@ repositories {
         url 'https://maven.google.com/'
         name 'Google'
     }
+
+    maven { url "https://jitpack.io" }
 
     // Stolen from react-native-firebase, thanks dudes!
     def found = false
@@ -88,4 +90,5 @@ repositories {
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
 }

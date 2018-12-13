@@ -35,6 +35,7 @@ import type {
   WebViewSharedProps,
   WebViewSource,
   WebViewProgressEvent,
+  WebViewUrlSchemeRequest,
 } from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
@@ -292,6 +293,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         }
         dataDetectorTypes={this.props.dataDetectorTypes}
         allowsLinkPreview={this.props.allowsLinkPreview}
+        urlScheme={this.props.urlScheme}
+        onUrlSchemeRequest={this._onUrlSchemeRequest}
         {...nativeConfig.props}
       />
     );
@@ -443,6 +446,22 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   _onLoadingProgress = (event: WebViewProgressEvent) => {
     const {onLoadProgress} = this.props;
     onLoadProgress && onLoadProgress(event);
+  }
+
+  _onUrlSchemeRequest = (event: WebViewUrlSchemeRequestEvent) => {
+    const {onUrlSchemeRequest} = this.props;
+    if (!onUrlSchemeRequest) {
+      throw new Error("Must provide `onUrlSchemeRequest` if you provide `urlScheme`.");
+    }
+    const { requestId } = event.nativeEvent
+    onUrlSchemeRequest(event.nativeEvent)
+      .then((response) => {
+        UIManager.dispatchViewManagerCommand(
+          this.getWebViewHandle(),
+          this._getCommands().handleUrlSchemeResponse,
+          [{...response, requestId}],
+        );
+      })
   }
 
   componentDidUpdate(prevProps: WebViewSharedProps) {

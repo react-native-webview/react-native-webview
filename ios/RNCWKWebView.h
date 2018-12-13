@@ -8,6 +8,7 @@
 #import <React/RCTView.h>
 #import <React/RCTDefines.h>
 #import <WebKit/WebKit.h>
+#import "RNCWKSchemeHandler.h"
 
 @class RNCWKWebView;
 
@@ -40,6 +41,8 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL allowsBackForwardNavigationGestures;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, assign) BOOL allowsLinkPreview;
+@property (nonatomic, copy) NSString *urlScheme;
+@property (nonatomic, strong) RNCWKSchemeHandler* schemeHandler;
 
 - (void)postMessage:(NSString *)message;
 - (void)injectJavaScript:(NSString *)script;
@@ -47,5 +50,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)goBack;
 - (void)reload;
 - (void)stopLoading;
+- (void)handleUrlSchemeResponse:(NSDictionary *)resp;
+- (void)handleUrlSchemeRequest:(NSDictionary *)req;
 
 @end

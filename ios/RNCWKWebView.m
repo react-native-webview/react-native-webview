@@ -8,6 +8,7 @@
 #import "RNCWKWebView.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import "RNCWKSchemeHandler.h"
 
 #import "objc/runtime.h"
 
@@ -24,12 +25,13 @@ static NSString *const MessageHanderName = @"ReactNative";
 }
 @end
 
-@interface RNCWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
+@interface RNCWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol, RNCWKSchemeHandlerDelegate>
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
+@property (nonatomic, copy) RCTDirectEventBlock onUrlSchemeRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) WKWebView *webView;
 @end
@@ -105,6 +107,12 @@ static NSString *const MessageHanderName = @"ReactNative";
 #else
     wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
 #endif
+    
+    if (_urlScheme) {
+      self.schemeHandler = [[RNCWKSchemeHandler alloc] init];
+      [wkWebViewConfig setURLSchemeHandler:self.schemeHandler forURLScheme:_urlScheme];
+      self.schemeHandler.delegate = self;
+    }
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
     _webView.scrollView.delegate = self;
@@ -120,6 +128,7 @@ static NSString *const MessageHanderName = @"ReactNative";
     if (_userAgent) {
       _webView.customUserAgent = _userAgent;
     }
+    
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
       _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -544,4 +553,22 @@ static NSString *const MessageHanderName = @"ReactNative";
   _bounces = bounces;
   _webView.scrollView.bounces = bounces;
 }
+
+// Send event to React Native.
+- (void)handleUrlSchemeRequest:(NSDictionary *)req
+{
+  _onUrlSchemeRequest(req);
+}
+
+
+// Receive event to React Native.
+- (void)handleUrlSchemeResponse:(NSDictionary *)resp
+{
+  if (self.schemeHandler) {
+    [self.schemeHandler handleUrlSchemeResponse:resp];
+  } else {
+    RCTLogError(@"Calling handleUrlSchemeResponse without a scheme handler.");
+  }
+}
+
 @end
