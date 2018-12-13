@@ -234,44 +234,32 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       NativeWebView = NativeWebView || RNCUIWebView;
     }
 
+    const nativeWebViewProps = {
+      ...this.props,
+      source: resolveAssetSource(source),
+      decelerationRate: decelerationRate,
+      onLoadingStart: this._onLoadingStart,
+      onLoadingFinish: this._onLoadingFinish,
+      onLoadingError: this._onLoadingError,
+      onLoadingProgress: this._onLoadingProgress,
+      messagingEnabled: messagingEnabled,
+      onMessage: this._onMessage,
+      onShouldStartLoadWithRequest: onShouldStartLoadWithRequest,
+      scalesPageToFit: scalesPageToFit,
+      ...nativeConfig.props,
+    };
+
     const webView = (
       <NativeWebView
+        {...nativeWebViewProps}
         ref={this.webViewRef}
         key="webViewKey"
         style={webViewStyles}
-        source={resolveAssetSource(source)}
-        injectedJavaScript={this.props.injectedJavaScript}
-        bounces={this.props.bounces}
-        scrollEnabled={this.props.scrollEnabled}
-        pagingEnabled={this.props.pagingEnabled}
-        decelerationRate={decelerationRate}
-        contentInset={this.props.contentInset}
-        automaticallyAdjustContentInsets={
-          this.props.automaticallyAdjustContentInsets
-        }
-        hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
-        userAgent={this.props.userAgent}
-        onLoadingStart={this._onLoadingStart}
-        onLoadingFinish={this._onLoadingFinish}
-        onLoadingError={this._onLoadingError}
-        onLoadingProgress={this._onLoadingProgress}
-        messagingEnabled={messagingEnabled}
-        onMessage={this._onMessage}
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-        scalesPageToFit={scalesPageToFit}
-        allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}
-        mediaPlaybackRequiresUserAction={
-          this.props.mediaPlaybackRequiresUserAction
-        }
-        dataDetectorTypes={this.props.dataDetectorTypes}
-        allowsLinkPreview={this.props.allowsLinkPreview}
-        {...nativeConfig.props}
       />
     );
 
     return (
-      <View style={styles.container} {...this.props}>
+      <View style={styles.container}>
         {webView}
         {otherView}
       </View>
