@@ -25,7 +25,10 @@ import {
 import invariant from 'fbjs/lib/invariant';
 import keyMirror from 'fbjs/lib/keyMirror';
 
-import WebViewShared from './WebViewShared';
+import {
+  defaultOriginWhitelist,
+  createOnShouldStartLoadWithRequest,
+} from './WebViewShared';
 import type {
   WebViewEvent,
   WebViewError,
@@ -130,7 +133,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   static defaultProps = {
     useWebKit: true,
-    originWhitelist: WebViewShared.defaultOriginWhitelist,
+    originWhitelist: defaultOriginWhitelist,
   };
 
   static isFileUploadSupported = async () => {
@@ -204,40 +207,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
     const nativeConfig = this.props.nativeConfig || {};
 
-    let viewManager = nativeConfig.viewManager;
-
-    if (this.props.useWebKit) {
-      viewManager = viewManager || RNCWKWebViewManager;
-    } else {
-      viewManager = viewManager || RNCUIWebViewManager;
-    }
-
-    const compiledWhitelist = [
-      'about:blank',
-      ...(this.props.originWhitelist || []),
-    ].map(WebViewShared.originWhitelistToRegex);
-    const onShouldStartLoadWithRequest = event => {
-      let shouldStart = true;
-      const { url } = event.nativeEvent;
-      const origin = WebViewShared.extractOrigin(url);
-      const passesWhitelist = compiledWhitelist.some(x =>
-        new RegExp(x).test(origin),
-      );
-      shouldStart = shouldStart && passesWhitelist;
-      if (!passesWhitelist) {
-        Linking.openURL(url);
-      }
-      if (this.props.onShouldStartLoadWithRequest) {
-        shouldStart =
-          shouldStart &&
-          this.props.onShouldStartLoadWithRequest(event.nativeEvent);
-      }
-      invariant(viewManager != null, 'viewManager expected to be non-null');
-      viewManager.startLoadWithResult(
-        !!shouldStart,
-        event.nativeEvent.lockIdentifier,
-      );
-    };
+    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+      this.onShouldStartLoadWithRequestCallback,
+      this.props.originWhitelist,
+      this.props.onShouldStartLoadWithRequest,
+    );
 
     const decelerationRate = processDecelerationRate(
       this.props.decelerationRate,
@@ -441,9 +415,25 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   _onLoadingProgress = (event: WebViewProgressEvent) => {
-    const {onLoadProgress} = this.props;
+    const { onLoadProgress } = this.props;
     onLoadProgress && onLoadProgress(event);
-  }
+  };
+
+  onShouldStartLoadWithRequestCallback = (
+    shouldStart: boolean,
+    url: string,
+    lockIdentifier: number,
+  ) => {
+    let viewManager = (this.props.nativeConfig || {}).viewManager;
+
+    if (this.props.useWebKit) {
+      viewManager = viewManager || RNCWKWebViewManager;
+    } else {
+      viewManager = viewManager || RNCUIWebViewManager;
+    }
+    invariant(viewManager != null, 'viewManager expected to be non-null');
+    viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
+  };
 
   componentDidUpdate(prevProps: WebViewSharedProps) {
     if (!(prevProps.useWebKit && this.props.useWebKit)) {
