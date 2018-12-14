@@ -8,6 +8,7 @@
 #import "RNCWKWebView.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import <UIKit/UIKit.h>
 
 #import "objc/runtime.h"
 
@@ -338,6 +339,88 @@ static NSString *const MessageHanderName = @"ReactNative";
 }
 
 #pragma mark - WKNavigationDelegate methods
+
+/**
+* alert
+*/
+- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler 
+{ 
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        completionHandler();
+    }]];
+    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+
+}
+
+/**
+* confirm
+*/
+- (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        completionHandler(YES);
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        completionHandler(NO);
+    }]];
+    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+}
+
+/**
+* prompt
+*/
+- (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.textColor = [UIColor lightGrayColor];
+        textField.placeholder = defaultText;
+    }];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        completionHandler([[alert.textFields lastObject] text]);
+    }]];
+    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+}
+
+/**
+ * topViewController
+ */
+-(UIViewController *)topViewController{
+   UIViewController *controller = [self topViewControllerWithRootViewController:[self getCurrentWindow].rootViewController];
+   return controller;
+}
+
+/**
+ * topViewControllerWithRootViewController
+ */
+-(UIViewController *)topViewControllerWithRootViewController:(UIViewController *)viewController{
+  if (viewController==nil) return nil;
+  if (viewController.presentedViewController!=nil) {
+    return [self topViewControllerWithRootViewController:viewController.presentedViewController];
+  } else if ([viewController isKindOfClass:[UITabBarController class]]){
+    return [self topViewControllerWithRootViewController:[(UITabBarController *)viewController selectedViewController]];
+  } else if ([viewController isKindOfClass:[UINavigationController class]]){
+    return [self topViewControllerWithRootViewController:[(UINavigationController *)viewController visibleViewController]];
+  } else {
+    return viewController;
+  }
+}
+/**
+ * getCurrentWindow
+ */
+-(UIWindow *)getCurrentWindow{
+  UIWindow *window = [UIApplication sharedApplication].keyWindow;
+  if (window.windowLevel!=UIWindowLevelNormal) {
+    for (UIWindow *wid in [UIApplication sharedApplication].windows) {
+      if (window.windowLevel==UIWindowLevelNormal) {
+        window = wid;
+        break;
+      }
+    }
+  }
+  return window;
+}
+
 
 /**
  * Decides whether to allow or cancel a navigation.
