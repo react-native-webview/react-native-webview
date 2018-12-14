@@ -12,7 +12,6 @@
 
 #import "objc/runtime.h"
 
-static NSTimer *keyboardTimer;
 static NSString *const MessageHanderName = @"ReactNative";
 
 // runtime trick to remove WKWebView keyboard default toolbar
@@ -70,19 +69,6 @@ static NSString *const MessageHanderName = @"ReactNative";
     _scrollEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
-  }
-
-  // Workaround for a keyboard dismissal bug present in iOS 12
-  // https://openradar.appspot.com/radar?id=5018321736957952
-  if (@available(iOS 12.0, *)) {
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self
-      selector:@selector(keyboardWillHide)
-      name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self
-      selector:@selector(keyboardWillShow)
-      name:UIKeyboardWillShowNotification object:nil];
   }
   return self;
 }
@@ -143,27 +129,6 @@ static NSString *const MessageHanderName = @"ReactNative";
     }
 
     [super removeFromSuperview];
-}
-
--(void)keyboardWillHide
-{
-    keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
-    [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
-}
-
--(void)keyboardWillShow
-{
-    if (keyboardTimer != nil) {
-        [keyboardTimer invalidate];
-    }
-}
-
--(void)keyboardDisplacementFix
-{
-    // https://stackoverflow.com/a/9637807/824966
-    [UIView animateWithDuration:.25 animations:^{
-        self.webView.scrollView.contentOffset = CGPointMake(0, 0);
-    }];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
