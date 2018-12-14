@@ -512,8 +512,12 @@ static NSString *const MessageHanderName = @"ReactNative";
           thenCall: (void (^)(NSString*)) callback
 {
   [self.webView evaluateJavaScript: js completionHandler: ^(id result, NSError *error) {
-    if (error == nil && callback != nil) {
-      callback([NSString stringWithFormat:@"%@", result]);
+    if (error == nil) {
+      if (callback != nil) {
+        callback([NSString stringWithFormat:@"%@", result]);
+      }
+    } else {
+      RCTLogError(@"Error evaluating injectedJavaScript: This is possibly due to an unsupported return type. Try adding true to the end of your injectedJavaScript string.");
     }
   }];
 }
