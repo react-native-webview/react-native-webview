@@ -163,11 +163,6 @@ static NSString *const MessageHanderName = @"ReactNative";
     if (_userAgent) {
       _webView.customUserAgent = _userAgent;
     }
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-      _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-    }
-#endif
 
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
@@ -235,21 +230,6 @@ static NSString *const MessageHanderName = @"ReactNative";
       [self visitSource];
     }
   }
-}
-
-- (void)setContentInset:(UIEdgeInsets)contentInset
-{
-  _contentInset = contentInset;
-  [RCTView autoAdjustInsetsForView:self
-                    withScrollView:_webView.scrollView
-                      updateOffset:NO];
-}
-
-- (void)refreshContentInset
-{
-  [RCTView autoAdjustInsetsForView:self
-                    withScrollView:_webView.scrollView
-                      updateOffset:YES];
 }
 
 - (void)visitSource
