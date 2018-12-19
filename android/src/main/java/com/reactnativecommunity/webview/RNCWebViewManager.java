@@ -351,7 +351,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
       
       if (messagingEnabled && overwriteWindowPostMessage) {
-        reactWebView.overwritePostMessage();
+        overwritePostMessage();
       }
     }
 
