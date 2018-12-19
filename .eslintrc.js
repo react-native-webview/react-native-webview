@@ -22,8 +22,9 @@ module.exports = {
     // Remove this rule because we only destructure props, but never state
     'react/destructuring-assignment': 'off',
 
+    'no-unused-vars': 'error',
+    'typescript/no-unused-vars': 'error',
     'typescript/adjacent-overload-signatures': 'error',
-    'typescript/explicit-function-return-type': 'error',
     'typescript/no-angle-bracket-type-assertion': 'error',
     'typescript/no-empty-interface': 'error',
     'typescript/no-explicit-any': 'error',
@@ -33,8 +34,6 @@ module.exports = {
     'typescript/no-triple-slash-reference': 'error',
     'typescript/prefer-namespace-keyword': 'error',
     'typescript/type-annotation-spacing': 'error',
-
-    'no-unused-vars': 'off',
   },
   settings: {
     'import/resolver': {

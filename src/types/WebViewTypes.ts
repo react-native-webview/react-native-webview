@@ -48,6 +48,7 @@ export interface WebViewNavigation extends WebViewNativeEvent {
     | 'reload'
     | 'formresubmit'
     | 'other';
+  lockIdentifier?: number;
 }
 
 export interface WebViewMessage extends WebViewNativeEvent {
@@ -210,14 +211,6 @@ export interface IOSWebViewProps {
    * @platform ios
    */
   dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
-
-  /**
-   * Function that allows custom handling of any web view requests. Return
-   * `true` from the function to continue loading the request and `false`
-   * to stop loading.
-   * @platform ios
-   */
-  onShouldStartLoadWithRequest?: (event: WebViewIOSLoadRequestEvent) => any;
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -405,6 +398,16 @@ export interface WebViewSharedProps
    * Function that is invoked when the `WebView` loading starts or ends.
    */
   onNavigationStateChange?: (event: WebViewNavigation) => any;
+
+  /**
+   * Function that allows custom handling of any web view requests. Return
+   * `true` from the function to continue loading the request and `false`
+   * to stop loading.
+   * @platform ios
+   */
+  onShouldStartLoadWithRequest?: (
+    event: NativeSyntheticEvent<WebViewNavigation>,
+  ) => any;
 
   /**
    * A function that is invoked when the webview calls `window.postMessage`.

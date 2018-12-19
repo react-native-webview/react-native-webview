@@ -2,29 +2,34 @@ import React from 'react';
 
 import {
   ActivityIndicator,
+  Image,
+  requireNativeComponent,
   StyleSheet,
   UIManager,
   View,
-  requireNativeComponent,
   NativeModules,
-  Image,
-  NativeSyntheticEvent,
   findNodeHandle,
+  NativeSyntheticEvent,
 } from 'react-native';
 
 import invariant from 'invariant';
 
-import WebViewShared from './WebViewShared';
+import {
+  defaultOriginWhitelist,
+  createOnShouldStartLoadWithRequest,
+} from './WebViewShared';
 import {
   WebViewSourceUri,
   WebViewError,
   WebViewErrorEvent,
   WebViewMessageEvent,
   WebViewNavigationEvent,
+  WebViewProgressEvent,
   WebViewSharedProps,
   WebViewSource,
-  WebViewProgressEvent,
 } from './types/WebViewTypes';
+
+const RNCWebView = requireNativeComponent('RNCWebView');
 
 const styles = StyleSheet.create({
   container: {
@@ -59,7 +64,7 @@ const isWebViewUriSource = (
 ): source is WebViewSourceUri =>
   typeof source !== 'number' && !('html' in source);
 
-const defaultRenderLoading = (): React.ReactNode => (
+const defaultRenderLoading = () => (
   <View style={styles.loadingView}>
     <ActivityIndicator style={styles.loadingProgressBar} />
   </View>
@@ -70,15 +75,10 @@ type State = {
   lastErrorEvent: WebViewError | null;
 };
 
-const RNCWebView = requireNativeComponent('RNCWebView');
-
 /**
  * Renders a native WebView.
  */
-export default class WebView extends React.Component<
-  WebViewSharedProps,
-  State
-> {
+class WebView extends React.Component<WebViewSharedProps, State> {
   static defaultProps = {
     overScrollMode: 'always',
     javaScriptEnabled: true,
@@ -86,10 +86,10 @@ export default class WebView extends React.Component<
     scalesPageToFit: true,
     allowFileAccess: false,
     saveFormDataDisabled: false,
-    originWhitelist: WebViewShared.defaultOriginWhitelist,
+    originWhitelist: defaultOriginWhitelist,
   };
 
-  static isFileUploadSupported = async (): Promise<boolean> =>
+  static isFileUploadSupported = async () =>
     // native implementation should return "true" only for Android 5+
     NativeModules.RNCWebView.isFileUploadSupported();
 
@@ -102,7 +102,7 @@ export default class WebView extends React.Component<
 
   webViewRef = React.createRef<React.ComponentClass>();
 
-  goForward = (): void => {
+  goForward = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RNCWebView.Commands.goForward,
@@ -110,7 +110,7 @@ export default class WebView extends React.Component<
     );
   };
 
-  goBack = (): void => {
+  goBack = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RNCWebView.Commands.goBack,
@@ -118,7 +118,7 @@ export default class WebView extends React.Component<
     );
   };
 
-  reload = (): void => {
+  reload = () => {
     this.setState({
       viewState: WebViewState.LOADING,
     });
@@ -129,7 +129,7 @@ export default class WebView extends React.Component<
     );
   };
 
-  stopLoading = (): void => {
+  stopLoading = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RNCWebView.Commands.stopLoading,
@@ -137,7 +137,7 @@ export default class WebView extends React.Component<
     );
   };
 
-  postMessage = (data: string): void => {
+  postMessage = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RNCWebView.Commands.postMessage,
@@ -151,7 +151,7 @@ export default class WebView extends React.Component<
    * on pages with a Content Security Policy that disallows eval(). If you need that
    * functionality, look into postMessage/onMessage.
    */
-  injectJavaScript = (data: string): void => {
+  injectJavaScript = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RNCWebView.Commands.injectJavaScript,
@@ -163,7 +163,7 @@ export default class WebView extends React.Component<
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
    */
-  updateNavigationState = (event: WebViewNavigationEvent): void => {
+  updateNavigationState = (event: WebViewNavigationEvent) => {
     if (this.props.onNavigationStateChange) {
       this.props.onNavigationStateChange(event.nativeEvent);
     }
@@ -172,7 +172,7 @@ export default class WebView extends React.Component<
   getWebViewHandle = (): number | null =>
     findNodeHandle(this.webViewRef.current);
 
-  onLoadingStart = (event: WebViewNavigationEvent): void => {
+  onLoadingStart = (event: WebViewNavigationEvent) => {
     const { onLoadStart } = this.props;
     if (onLoadStart) {
       onLoadStart(event);
@@ -180,7 +180,7 @@ export default class WebView extends React.Component<
     this.updateNavigationState(event);
   };
 
-  onLoadingError = (event: WebViewErrorEvent): void => {
+  onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
     if (onError) {
@@ -191,14 +191,13 @@ export default class WebView extends React.Component<
     }
     // eslint-disable-next-line no-console
     console.warn('Encountered an error loading page', event.nativeEvent);
-
     this.setState({
       lastErrorEvent: event.nativeEvent,
       viewState: WebViewState.ERROR,
     });
   };
 
-  onLoadingFinish = (event: WebViewNavigationEvent): void => {
+  onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     if (onLoad) {
       onLoad(event);
@@ -212,23 +211,34 @@ export default class WebView extends React.Component<
     this.updateNavigationState(event);
   };
 
-  onMessage = (event: WebViewMessageEvent): void => {
+  onMessage = (event: WebViewMessageEvent) => {
     const { onMessage } = this.props;
     if (onMessage) {
       onMessage(event);
     }
   };
 
-  onLoadingProgress = (
-    event: NativeSyntheticEvent<WebViewProgressEvent>,
-  ): void => {
+  onLoadingProgress = (event: NativeSyntheticEvent<WebViewProgressEvent>) => {
     const { onLoadProgress } = this.props;
     if (onLoadProgress) {
       onLoadProgress(event);
     }
   };
 
-  render(): React.ReactNode {
+  onShouldStartLoadWithRequestCallback = (
+    shouldStart: boolean,
+    url: string,
+  ) => {
+    if (shouldStart) {
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        UIManager.RNCWebView.Commands.loadUrl,
+        [String(url)],
+      );
+    }
+  };
+
+  render() {
     let otherView = null;
 
     if (this.state.viewState === WebViewState.LOADING) {
@@ -247,7 +257,6 @@ export default class WebView extends React.Component<
         invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
       }
     } else if (this.state.viewState !== WebViewState.IDLE) {
-      // eslint-disable-next-line no-console
       console.error(
         `RNCWebView invalid state encountered: ${this.state.viewState}`,
       );
@@ -271,23 +280,23 @@ export default class WebView extends React.Component<
 
     if (isWebViewUriSource(source)) {
       if (source.method === 'POST' && source.headers) {
-        // eslint-disable-next-line no-console
         console.warn(
           'WebView: `source.headers` is not supported when using POST.',
         );
       } else if (source.method === 'GET' && source.body) {
-        // eslint-disable-next-line no-console
         console.warn('WebView: `source.body` is not supported when using GET.');
       }
     }
 
     const nativeConfig = this.props.nativeConfig || {};
 
-    const originWhitelist = (this.props.originWhitelist || []).map(
-      WebViewShared.originWhitelistToRegex,
-    );
-
     const NativeWebView = nativeConfig.component || RNCWebView;
+
+    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+      this.onShouldStartLoadWithRequestCallback,
+      this.props.originWhitelist,
+      this.props.onShouldStartLoadWithRequest,
+    );
 
     const webView = (
       <NativeWebView
@@ -309,6 +318,7 @@ export default class WebView extends React.Component<
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentSizeChange={this.props.onContentSizeChange}
         onLoadingStart={this.onLoadingStart}
         onLoadingFinish={this.onLoadingFinish}
@@ -322,7 +332,6 @@ export default class WebView extends React.Component<
         allowUniversalAccessFromFileURLs={
           this.props.allowUniversalAccessFromFileURLs
         }
-        originWhitelist={originWhitelist}
         mixedContentMode={this.props.mixedContentMode}
         saveFormDataDisabled={this.props.saveFormDataDisabled}
         urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}
@@ -338,3 +347,5 @@ export default class WebView extends React.Component<
     );
   }
 }
+
+export default WebView;
