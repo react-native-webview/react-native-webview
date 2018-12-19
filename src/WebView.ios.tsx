@@ -83,25 +83,29 @@ const styles = StyleSheet.create({
   },
 });
 
-enum WebViewState {
-  IDLE = 'IDLE',
-  LOADING = 'LOADING',
-  ERROR = 'ERROR',
-}
+const WebViewState: {
+  IDLE: 'IDLE';
+  LOADING: 'LOADING';
+  ERROR: 'ERROR';
+} = {
+  IDLE: 'IDLE',
+  LOADING: 'LOADING',
+  ERROR: 'ERROR',
+};
 
-enum NavigationType {
-  click = 'click',
-  formsubmit = 'formsubmit',
-  backforward = 'backforward',
-  reload = 'reload',
-  formresubmit = 'formresubmit',
-  other = 'other',
-}
+const NavigationType = {
+  click: 'click',
+  formsubmit: 'formsubmit',
+  backforward: 'backforward',
+  reload: 'reload',
+  formresubmit: 'formresubmit',
+  other: 'other',
+};
 
 const JSNavigationScheme = 'react-js-navigation';
 
 type State = {
-  viewState: WebViewState;
+  viewState: 'IDLE' | 'LOADING' | 'ERROR';
   lastErrorEvent: WebViewError | null;
 };
 

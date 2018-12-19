@@ -44,11 +44,15 @@ const styles = StyleSheet.create({
   },
 });
 
-enum WebViewState {
-  IDLE = 'IDLE',
-  LOADING = 'LOADING',
-  ERROR = 'ERROR',
-}
+const WebViewState: {
+  IDLE: 'IDLE';
+  LOADING: 'LOADING';
+  ERROR: 'ERROR';
+} = {
+  IDLE: 'IDLE',
+  LOADING: 'LOADING',
+  ERROR: 'ERROR',
+};
 
 const isWebViewUriSource = (
   source: WebViewSource,
@@ -62,7 +66,7 @@ const defaultRenderLoading = (): React.ReactNode => (
 );
 
 type State = {
-  viewState: WebViewState;
+  viewState: 'IDLE' | 'LOADING' | 'ERROR';
   lastErrorEvent: WebViewError | null;
 };
 
