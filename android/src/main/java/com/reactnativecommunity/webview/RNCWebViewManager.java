@@ -125,11 +125,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       if (!mLastLoadFailed) {
         RNCWebView reactWebView = (RNCWebView) webView;
-        reactWebView.callInjectedJavaScript();
 
-        if (messagingEnabled && overwriteWindowPostMessage) {
-          reactWebView.overwritePostMessage();
-        }
+        reactWebView.callInjectedJavaScript();
 
         emitFinishEvent(webView, url);
       }
@@ -351,6 +348,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           injectedJS != null &&
           !TextUtils.isEmpty(injectedJS)) {
         evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
+      }
+      
+      if (messagingEnabled && overwriteWindowPostMessage) {
+        reactWebView.overwritePostMessage();
       }
     }
 
