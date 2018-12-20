@@ -13,6 +13,15 @@
 
   // Set up the NSURLSession to hold cookies.
   NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+
+  NSDictionary *reactNativeWebViewConfig = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"ReactNativeWebView"];
+  NSString* groupContainerIdentifier = [reactNativeWebViewConfig objectForKey:@"GroupContainerIdentifier"];
+
+  if (nil != groupContainerIdentifier) {
+    NSHTTPCookieStorage* cookieStore = [NSHTTPCookieStorage sharedCookieStorageForGroupContainerIdentifier:groupContainerIdentifier];
+    configuration.HTTPCookieStorage = cookieStore;
+  }
+
   self.session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
 
   // Set up a map for saving tasks.
