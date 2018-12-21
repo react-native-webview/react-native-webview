@@ -50,7 +50,7 @@ class MyWeb extends Component {
 }
 ```
 
-### Add support for File Upload
+### Add support for File Upload / Download
 
 ##### iOS
 
@@ -76,12 +76,12 @@ Video recording:
 
 ##### Android
 
-Add permission in AndroidManifest.xml:
+Add permission in AndroidManifest.xml **(required for file download)**:
 ```xml
 <manifest ...>
   ......
 
-  <!-- this is required only for Android 4.1-5.1 (api 16-22)  -->
+  <!-- this is required for file downlod on all Android versions and for file upload on Android 4.1-5.1 (api 16-22)  -->
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
   ......
