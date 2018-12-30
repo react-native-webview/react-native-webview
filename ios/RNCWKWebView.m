@@ -119,6 +119,10 @@ static NSString *const MessageHanderName = @"ReactNative";
   }
 }
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (_scrollEnabled == NO) scrollView.contentOffset = CGPointZero;
+}
+
 - (void)removeFromSuperview
 {
     if (_webView) {
