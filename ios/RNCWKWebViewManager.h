@@ -5,7 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import <React/RCTViewManager.h>
+//#import <React/RCTViewManager.h>
+#import <React>
 
 @interface RNCWKWebViewManager : RCTViewManager
 @end

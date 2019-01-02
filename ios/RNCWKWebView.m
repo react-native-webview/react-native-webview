@@ -9,6 +9,7 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
 #import "objc/runtime.h"
 
@@ -32,6 +33,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, strong) WKUserScript * atStartScript;
 @end
 
 @implementation RNCWKWebView
@@ -106,6 +108,10 @@ static NSString *const MessageHanderName = @"ReactNative";
 
     if (_userAgent) {
       _webView.customUserAgent = _userAgent;
+    }
+      
+    if (_injectJavaScript) {
+      _webView.configuration.userContentController addUserScript:_atStartScript
     }
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
@@ -265,6 +271,14 @@ static NSString *const MessageHanderName = @"ReactNative";
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
   scrollView.decelerationRate = _decelerationRate;
+}
+
+- (void)setInjectJavaScript:(NSString *)injectJavaScript
+{
+  self.injectJavaScript = injectJavaScript
+  self.atStartScript = [[WKUserScript alloc] initWithSource:injectJavaScript
+                                                injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+                                             forMainFrameOnly:false];
 }
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled

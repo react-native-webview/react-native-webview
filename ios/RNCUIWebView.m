@@ -27,6 +27,7 @@ static NSString *const kPostMessageHost = @"postMessage";
 {
   UIWebView *_webView;
   NSString *_injectedJavaScript;
+  NSString *_injectJavaScript;
 }
 
 - (void)dealloc
