@@ -262,9 +262,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
           return webResponse;
         }
-      } catch (Exception err) {
-          Log.d("error", Log.getStackTraceString(err));
-      }
+      } catch (Exception err) {}
 
       return null;
     }
