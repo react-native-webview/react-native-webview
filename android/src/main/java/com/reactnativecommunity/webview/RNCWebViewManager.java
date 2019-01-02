@@ -3,19 +3,16 @@ package com.reactnativecommunity.webview;
 import android.annotation.TargetApi;
 import android.content.Context;
 import com.facebook.react.uimanager.UIManagerModule;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
+
+import java.io.ByteArrayInputStream;
 import javax.annotation.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Picture;
@@ -31,6 +28,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -52,21 +50,18 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
-import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import javax.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Manages instances of {@link WebView}
@@ -120,6 +115,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected @Nullable WebView.PictureListener mPictureListener;
 
   protected static class RNCWebViewClient extends WebViewClient {
+
+    private @Nullable WebResourceResponse temporaryResponse;
+    private @Nullable String injectedJavaScriptOnResponse;
+    private OkHttpClient okHttpClient = initOkHTTPClient();
 
     protected boolean mLastLoadFailed = false;
     protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
@@ -205,6 +204,119 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       return event;
     }
 
+
+    private OkHttpClient initOkHTTPClient() {
+      OkHttpClient client = new OkHttpClient.Builder()
+              .cookieJar(new RNCWebViewCookieJar())
+              .followRedirects(true)
+              .followSslRedirects(true)
+              .build();
+
+      return client;
+    }
+
+    @TargetApi(21)
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+      // No javascript to inject.
+      if (injectedJavaScriptOnResponse == null) {
+        return null;
+      }
+
+      if (!request.isForMainFrame() || !request.getMethod().equals("GET")) {
+        return null;
+      }
+
+      return interceptRequest(view, request);
+    }
+
+    @TargetApi(21)
+    private WebResourceResponse interceptRequest(WebView webView, WebResourceRequest webRequest) {
+      Request request = buildRequest(webView, webRequest);
+      String address = request.url().toString();
+
+      if (request == null || address.startsWith("data:")) {
+        return null;
+      }
+
+      try {
+        if (temporaryResponse != null) {
+          WebResourceResponse response = temporaryResponse;
+          temporaryResponse = null;
+
+          return response;
+        } else {
+          Response response = okHttpClient.newCall(request).execute();
+
+          String body = response.body() != null ? response.body().string() : "";
+          String injectedBody = injectJavaScript(body);
+
+          WebResourceResponse webResponse = buildWebResponse(response, injectedBody);
+
+          return webResponse;
+        }
+      } catch (Exception err) {}
+
+      return null;
+    }
+
+    @TargetApi(21)
+    @Nullable
+    private Request buildRequest(WebView webView, WebResourceRequest webRequest) {
+      try {
+        Request.Builder requestBuilder = new Request.Builder()
+                .header("User-Agent", webView.getSettings().getUserAgentString())
+                .url(webRequest.getUrl().toString());
+
+        for (Map.Entry<String, String> header: webRequest.getRequestHeaders().entrySet()) {
+          requestBuilder.addHeader(header.getKey(), header.getValue());
+        }
+
+        return requestBuilder.build();
+      } catch (Exception err) {}
+
+      return null;
+    }
+
+    private WebResourceResponse buildWebResponse(Response response, String body) {
+      ByteArrayInputStream data = new ByteArrayInputStream(body.getBytes());
+      HeaderParser headerParser = new HeaderParser();
+
+      String contentType = headerParser.getContentTypeHeader(response);
+      String charset = headerParser.getCharset(contentType);
+      String mimeType = headerParser.getMimeType(contentType);
+
+      return new WebResourceResponse(mimeType, charset, data);
+    }
+
+    private String injectJavaScript(String body) {
+      Integer injectionPosition = getInjectionPosition(body);
+
+      if (injectionPosition == -1) {
+        return body;
+      }
+
+      String beforePositionBody = body.substring(0, injectionPosition);
+      String afterPositionBody = body.substring(injectionPosition);
+
+      return beforePositionBody + injectedJavaScriptOnResponse + afterPositionBody;
+    }
+
+    private Integer getInjectionPosition(String body) {
+      Integer ieDetectTagIndex = body.toLowerCase().indexOf("<!--[if", 0);
+      Integer scriptTagIndex = body.toLowerCase().indexOf("<script", 0);
+
+      if (ieDetectTagIndex < 0) {
+        return scriptTagIndex;
+      }
+
+      return Math.min(scriptTagIndex, ieDetectTagIndex);
+    }
+
+    public void setInjectJavaScript(String script) {
+      injectedJavaScriptOnResponse = script;
+    }
+
     public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
       mUrlPrefixesForDefaultIntent = specialUrls;
     }
@@ -216,6 +328,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
    */
   protected static class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable String injectedJS;
+
     protected boolean messagingEnabled = false;
     protected @Nullable RNCWebViewClient mRNCWebViewClient;
 
@@ -270,6 +383,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setInjectedJavaScript(@Nullable String js) {
       injectedJS = js;
+    }
+
+    public void setInjectJavaScript(@Nullable String script) {
+      if (mRNCWebViewClient != null && script != null) {
+        mRNCWebViewClient.setInjectJavaScript(script);
+      }
     }
 
     protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
@@ -516,6 +635,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "injectedJavaScript")
   public void setInjectedJavaScript(WebView view, @Nullable String injectedJavaScript) {
     ((RNCWebView) view).setInjectedJavaScript(injectedJavaScript);
+  }
+
+  @ReactProp(name = "injectJavaScript")
+  public void setInjectJavaScript(WebView view, @Nullable String script) {
+    ((RNCWebView) view).setInjectJavaScript(script);
   }
 
   @ReactProp(name = "messagingEnabled")
