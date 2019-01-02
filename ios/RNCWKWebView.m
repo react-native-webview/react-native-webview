@@ -33,7 +33,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) WKWebView *webView;
-@property (nonatomic, strong) WKUserScript * atStartScript;
+@property (nonatomic, strong) WKUserScript *atStartScript;
 @end
 
 @implementation RNCWKWebView
@@ -84,6 +84,8 @@ static NSString *const MessageHanderName = @"ReactNative";
 
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     wkWebViewConfig.userContentController = [WKUserContentController new];
+      
+    [wkWebViewConfig.userContentController addUserScript:_atStartScript];
     [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHanderName];
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
@@ -94,7 +96,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 #else
     wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
 #endif
-
+      
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
     _webView.scrollView.delegate = self;
     _webView.UIDelegate = self;
@@ -110,9 +112,6 @@ static NSString *const MessageHanderName = @"ReactNative";
       _webView.customUserAgent = _userAgent;
     }
       
-    if (_injectJavaScript) {
-      _webView.configuration.userContentController addUserScript:_atStartScript
-    }
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
       _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -178,6 +177,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 
 - (void)setSource:(NSDictionary *)source
 {
+    NSLog(@"1");
   if (![_source isEqualToDictionary:source]) {
     _source = [source copy];
 
@@ -185,6 +185,13 @@ static NSString *const MessageHanderName = @"ReactNative";
       [self visitSource];
     }
   }
+}
+
+- (void)setInjectJavaScript:(NSString *)script
+{
+   _atStartScript = [[WKUserScript alloc] initWithSource:script
+                       injectionTime: WKUserScriptInjectionTimeAtDocumentStart
+                    forMainFrameOnly:false];
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
@@ -271,14 +278,6 @@ static NSString *const MessageHanderName = @"ReactNative";
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
   scrollView.decelerationRate = _decelerationRate;
-}
-
-- (void)setInjectJavaScript:(NSString *)injectJavaScript
-{
-  self.injectJavaScript = injectJavaScript
-  self.atStartScript = [[WKUserScript alloc] initWithSource:injectJavaScript
-                                                injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-                                             forMainFrameOnly:false];
 }
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled
