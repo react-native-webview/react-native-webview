@@ -17,7 +17,7 @@ public class HeaderParser {
         Matcher matcher = MIME_TYPE_RE.matcher(contentType);
 
         if (matcher.find()) {
-            return matcher.group(1);
+            return matcher.group(0);
         }
 
         return DEFAULT_MIME_TYPE;

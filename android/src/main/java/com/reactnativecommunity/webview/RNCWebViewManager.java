@@ -19,6 +19,7 @@ import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.ConsoleMessage;
@@ -118,10 +119,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     private @Nullable WebResourceResponse temporaryResponse;
     private @Nullable String injectedJavaScriptOnResponse;
+
     private OkHttpClient okHttpClient = initOkHTTPClient();
+    private String userAgentString;
 
     protected boolean mLastLoadFailed = false;
     protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
+
+    RNCWebViewClient(String userAgentString) {
+      this.userAgentString = userAgentString;
+    }
 
     @Override
     public void onPageFinished(WebView webView, String url) {
@@ -232,7 +239,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @TargetApi(21)
     private WebResourceResponse interceptRequest(WebView webView, WebResourceRequest webRequest) {
-      Request request = buildRequest(webView, webRequest);
+      Request request = buildRequest(webRequest);
       String address = request.url().toString();
 
       if (request == null || address.startsWith("data:")) {
@@ -255,17 +262,19 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
           return webResponse;
         }
-      } catch (Exception err) {}
+      } catch (Exception err) {
+          Log.d("error", Log.getStackTraceString(err));
+      }
 
       return null;
     }
 
     @TargetApi(21)
     @Nullable
-    private Request buildRequest(WebView webView, WebResourceRequest webRequest) {
+    private Request buildRequest(WebResourceRequest webRequest) {
       try {
         Request.Builder requestBuilder = new Request.Builder()
-                .header("User-Agent", webView.getSettings().getUserAgentString())
+                .header("User-Agent", this.userAgentString)
                 .url(webRequest.getUrl().toString());
 
         for (Map.Entry<String, String> header: webRequest.getRequestHeaders().entrySet()) {
@@ -299,7 +308,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       String beforePositionBody = body.substring(0, injectionPosition);
       String afterPositionBody = body.substring(injectionPosition);
 
-      return beforePositionBody + injectedJavaScriptOnResponse + afterPositionBody;
+      return beforePositionBody + this.wrapInjectJavaScript() + afterPositionBody;
+    }
+
+    private String wrapInjectJavaScript() {
+      return "<script type=\"text/javascript\">" + this.injectedJavaScriptOnResponse + "</script>";
     }
 
     private Integer getInjectionPosition(String body) {
@@ -756,7 +769,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
-    view.setWebViewClient(new RNCWebViewClient());
+    view.setWebViewClient(new RNCWebViewClient(view.getSettings().getUserAgentString()));
   }
 
   @Override
