@@ -177,7 +177,6 @@ static NSString *const MessageHanderName = @"ReactNative";
 
 - (void)setSource:(NSDictionary *)source
 {
-    NSLog(@"1");
   if (![_source isEqualToDictionary:source]) {
     _source = [source copy];
 
