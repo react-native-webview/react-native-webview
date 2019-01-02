@@ -28,7 +28,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL messagingEnabled;
 @property (nonatomic, copy) NSString *injectedJavaScript;
 @property (nonatomic, assign) BOOL scalesPageToFit;
-@property (nonatomic, copy) NSString injectJavaScript;
+@property (nonatomic, copy) NSString *injectJavaScript;
 
 - (void)goForward;
 - (void)goBack;

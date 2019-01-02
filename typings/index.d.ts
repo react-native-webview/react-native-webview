@@ -1,5 +1,11 @@
-import { ComponentType, ReactElement, ReactNode, Component } from 'react';
-import { Insets, NativeSyntheticEvent, StyleProp, ViewProps, ViewStyle } from 'react-native';
+import { ComponentType, ReactElement, ReactNode, Component } from "react";
+import {
+  Insets,
+  NativeSyntheticEvent,
+  StyleProp,
+  ViewProps,
+  ViewStyle
+} from "react-native";
 
 export interface WebViewNativeEvent {
   readonly url: string;
@@ -12,7 +18,13 @@ export interface WebViewNativeEvent {
 export interface WebViewIOSLoadRequestEvent extends WebViewNativeEvent {
   target: number;
   lockIdentifier: number;
-  navigationType: "click" | "formsubmit" | "backforward" | "reload" | "formresubmit" | "other";
+  navigationType:
+    | "click"
+    | "formsubmit"
+    | "backforward"
+    | "reload"
+    | "formresubmit"
+    | "other";
 }
 
 export interface WebViewProgressEvent extends WebViewNativeEvent {
@@ -21,12 +33,12 @@ export interface WebViewProgressEvent extends WebViewNativeEvent {
 
 export interface WebViewNavigation extends WebViewNativeEvent {
   readonly navigationType:
-    | 'click'
-    | 'formsubmit'
-    | 'backforward'
-    | 'reload'
-    | 'formresubmit'
-    | 'other';
+    | "click"
+    | "formsubmit"
+    | "backforward"
+    | "reload"
+    | "formresubmit"
+    | "other";
 }
 
 export interface WebViewMessage extends WebViewNativeEvent {
@@ -48,17 +60,17 @@ export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 
 export type DataDetectorTypes =
-  | 'phoneNumber'
-  | 'link'
-  | 'address'
-  | 'calendarEvent'
-  | 'trackingNumber'
-  | 'flightNumber'
-  | 'lookupSuggestion'
-  | 'none'
-  | 'all';
+  | "phoneNumber"
+  | "link"
+  | "address"
+  | "calendarEvent"
+  | "trackingNumber"
+  | "flightNumber"
+  | "lookupSuggestion"
+  | "none"
+  | "all";
 
-export type OverScrollModeType = 'always' | 'content' | 'never';
+export type OverScrollModeType = "always" | "content" | "never";
 
 export interface WebViewSourceUri {
   /**
@@ -76,7 +88,7 @@ export interface WebViewSourceUri {
    * Additional HTTP headers to send with the request.
    * NOTE: On Android, this can only be used with GET requests.
    */
-  headers?: {[key: string]: string};
+  headers?: { [key: string]: string };
 
   /**
    * The HTTP body to send with the request. This must be a valid
@@ -102,18 +114,18 @@ export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
 export interface WebViewNativeConfig {
   /*
-    * The native component used to render the WebView.
-    */
+   * The native component used to render the WebView.
+   */
   component?: ComponentType<WebViewSharedProps>;
   /*
-    * Set props directly on the native component WebView. Enables custom props which the
-    * original WebView doesn't pass through.
-    */
+   * Set props directly on the native component WebView. Enables custom props which the
+   * original WebView doesn't pass through.
+   */
   props?: any;
   /*
-    * Set the ViewManager to use for communication with the native side.
-    * @platform ios
-    */
+   * Set the ViewManager to use for communication with the native side.
+   * @platform ios
+   */
   viewManager?: any;
 }
 
@@ -142,7 +154,7 @@ export interface IOSWebViewProps {
    *   - fast: 0.99 (the default for iOS web view)
    * @platform ios
    */
-  decelerationRate?: 'fast' | 'normal' | number;
+  decelerationRate?: "fast" | "normal" | number;
 
   /**
    * Boolean value that determines whether scrolling is enabled in the
@@ -157,7 +169,7 @@ export interface IOSWebViewProps {
    * The default value is false.
    * @platform ios
    */
-  pagingEnabled?: boolean,
+  pagingEnabled?: boolean;
 
   /**
    * The amount by which the web view content is inset from the edges of
@@ -272,12 +284,12 @@ export interface AndroidWebViewProps {
   saveFormDataDisabled?: boolean;
 
   /*
-    * Used on Android only, controls whether the given list of URL prefixes should
-    * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
-    * default activity intent for those URL instead of loading it within the webview.
-    * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
-    * @platform android
-    */
+   * Used on Android only, controls whether the given list of URL prefixes should
+   * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
+   * default activity intent for those URL instead of loading it within the webview.
+   * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
+   * @platform android
+   */
   urlPrefixesForDefaultIntent?: string[];
 
   /**
@@ -318,10 +330,13 @@ export interface AndroidWebViewProps {
    * - `'compatibility'` -  WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
    * @platform android
    */
-  mixedContentMode?: 'never' | 'always' | 'compatibility';
+  mixedContentMode?: "never" | "always" | "compatibility";
 }
 
-export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidWebViewProps {
+export interface WebViewSharedProps
+  extends ViewProps,
+    IOSWebViewProps,
+    AndroidWebViewProps {
   /**
    * @Deprecated. Use `source` instead.
    */
@@ -339,7 +354,11 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
   /**
    * Function that returns a view to show if there's an error.
    */
-  renderError?: (errorDomain: string | undefined, errorCode: number, errorDesc: string) => ReactElement<any>; // view to show if there's an error
+  renderError?: (
+    errorDomain: string | undefined,
+    errorCode: number,
+    errorDesc: string
+  ) => ReactElement<any>; // view to show if there's an error
 
   /**
    * Function that returns a loading indicator.
@@ -438,6 +457,8 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
 
   style?: StyleProp<ViewStyle>;
   children?: ReactNode;
+
+  injectJavaScript?: string;
 }
 
 export class WebView extends Component<WebViewSharedProps> {
