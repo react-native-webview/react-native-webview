@@ -164,9 +164,7 @@ static NSString *const MessageHanderName = @"ReactNative";
       }
     } else if ([keyPath isEqual:@"title"]) {
       NSString * newTitle = _webView.title;
-      
-      NSLog(newTitle);
-      
+
       if (newTitle != _currentTitle) {
         NSMutableDictionary<NSString *, id> *event = [self baseEvent];
         _currentTitle = newTitle;
