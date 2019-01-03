@@ -1,7 +1,6 @@
 package com.reactnativecommunity.webview;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import com.facebook.react.uimanager.UIManagerModule;
 
 import java.io.ByteArrayInputStream;
@@ -57,6 +56,7 @@ import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -258,9 +258,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           String body = response.body() != null ? response.body().string() : "";
           String injectedBody = injectJavaScript(body);
 
-          WebResourceResponse webResponse = buildWebResponse(response, injectedBody);
-
-          return webResponse;
+          return buildWebResponse(response, injectedBody);
         }
       } catch (Exception err) {}
 
@@ -283,6 +281,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       } catch (Exception err) {}
 
       return null;
+    }
+
+    @TargetApi(21)
+    @Override
+    public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
+      super.doUpdateVisitedHistory(view, url, isReload);
+
+      if (!isReload) {
+        emitFinishEvent(view, url);
+      }
     }
 
     private WebResourceResponse buildWebResponse(Response response, String body) {
