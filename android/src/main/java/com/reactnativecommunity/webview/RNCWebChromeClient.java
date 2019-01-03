@@ -7,7 +7,9 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
@@ -22,6 +24,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.build.ReactBuildConfig;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 
+import static android.view.Window.DECOR_CAPTION_SHADE_DARK;
+
 public class RNCWebChromeClient extends WebChromeClient {
 
     private RNCWebViewManager context;
@@ -32,6 +36,8 @@ public class RNCWebChromeClient extends WebChromeClient {
     protected FrameLayout mFullscreenContainer;
     private int mOriginalOrientation;
     private int mOriginalSystemUiVisibility;
+
+    private int iNavColor;
 
 
     public RNCWebChromeClient(RNCWebViewManager context, ReactContext reactContext) {
@@ -93,14 +99,23 @@ public class RNCWebChromeClient extends WebChromeClient {
 
         Activity mActivity = reactContext.getCurrentActivity();
 
+        ((FrameLayout)mActivity.getWindow().getDecorView()).removeView(this.mCustomView);
+        mActivity.setRequestedOrientation(this.mOriginalOrientation);
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            mActivity.getWindow().setNavigationBarColor(iNavColor);
+        } else {
+            mActivity.getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
+            mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        ((FrameLayout)mActivity.getWindow().getDecorView()).removeView(this.mCustomView);
         this.mCustomView = null;
-        mActivity.getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
-        mActivity.setRequestedOrientation(this.mOriginalOrientation);
         this.mCustomViewCallback.onCustomViewHidden();
         this.mCustomViewCallback = null;
+
     }
 
     public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback) {
@@ -113,29 +128,50 @@ public class RNCWebChromeClient extends WebChromeClient {
 
         Activity mActivity = reactContext.getCurrentActivity();
 
-
         this.mOriginalSystemUiVisibility = mActivity.getWindow().getDecorView().getSystemUiVisibility();
         this.mOriginalOrientation = mActivity.getRequestedOrientation();
         this.mCustomViewCallback = paramCustomViewCallback;
 
         mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
-        ((FrameLayout)mActivity.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
+        ((FrameLayout)mActivity.getWindow().getDecorView()).addView(this.mCustomView,
+                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
-        int uiOptions = mActivity.getWindow().getDecorView().getSystemUiVisibility();
-        int newUiOptions = uiOptions;
-        boolean isImmersiveModeEnabled = ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
-        if (Build.VERSION.SDK_INT >= 14) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        if (Build.VERSION.SDK_INT >= 21) {
+            mActivity.getWindow().getDecorView().setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                    if (insets != null && mCustomView != null) {
+                        mCustomView.setPadding(0, 0, insets.getStableInsetRight(), insets.getStableInsetBottom());
+                    }
+                    return insets;
+                }
+            });
+
+            WindowInsets insets = mActivity.getWindow().getDecorView().getRootWindowInsets();
+            mCustomView.setPadding(0, 0, insets.getStableInsetRight(), insets.getStableInsetBottom());
+
+            iNavColor = mActivity.getWindow().getNavigationBarColor();
+            mActivity.getWindow().setNavigationBarColor(Color.BLACK);
         }
-        if (Build.VERSION.SDK_INT >= 16) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
+        else {
+            int uiOptions = mActivity.getWindow().getDecorView().getSystemUiVisibility();
+            int newUiOptions = uiOptions;
+            if (Build.VERSION.SDK_INT >= 14) {
+                newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+            }
+            if (Build.VERSION.SDK_INT >= 16) {
+                newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
+            }
+            if (Build.VERSION.SDK_INT >= 18) {
+                newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            }
+            mActivity.getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+            mActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-        if (Build.VERSION.SDK_INT >= 18) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        }
-        mActivity.getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
-        mActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 
     }
 
