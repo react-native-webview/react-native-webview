@@ -250,6 +250,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
+        onNavigationStateChange={this._updateNavigationState}
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
         allowsBackForwardNavigationGestures={
           this.props.allowsBackForwardNavigationGestures

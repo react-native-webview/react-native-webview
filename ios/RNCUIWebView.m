@@ -21,6 +21,9 @@ static NSString *const kPostMessageHost = @"postMessage";
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 
+// ADDED
+@property (nonatomic, copy) RCTDirectEventBlock onNavigationStateChange;
+
 @end
 
 @implementation RNCUIWebView
