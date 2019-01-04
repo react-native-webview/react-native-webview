@@ -34,6 +34,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.PermissionRequest;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -380,6 +381,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         return true;
       }
 
+      // Fix WebRTC permission request error.
+      @Override
+      public void onPermissionRequest(final PermissionRequest request) {
+          request.grant(request.getResources());
+      }
 
     @Override
     public void onProgressChanged(WebView webView, int newProgress) {
