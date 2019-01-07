@@ -105,3 +105,28 @@ WebView.isFileUploadSupported().then(res => {
 
 ```
 
+### Add support for File Download
+
+##### iOS
+
+For iOS, all you need to do is specify the permissions in your `ios/[project]/Info.plist` file:
+
+Save to gallery:
+```
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>Save pictures for certain activities.</string>
+```
+
+##### Android
+
+Add permission in AndroidManifest.xml:
+```xml
+<manifest ...>
+  ......
+
+  <!-- this is required to save files on Android  -->
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+  ......
+</manifest>
+```

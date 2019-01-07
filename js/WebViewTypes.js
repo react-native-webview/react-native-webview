@@ -233,6 +233,13 @@ export type IOSWebViewProps = $ReadOnly<{|
    */
   allowsBackForwardNavigationGestures?: ?boolean,
   /**
+   * A Boolean value indicating whether WebKit WebView should be created using a shared
+   * process pool, enabling WebViews to share cookies and localStorage between each other.
+   * Default is true but can be set to false for backwards compatibility.
+   * @platform ios
+   */
+  useSharedProcessPool?: ?boolean,
+  /**
    * The custom user agent string.
    */
   userAgent?: ?string,
