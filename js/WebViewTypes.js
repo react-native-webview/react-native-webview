@@ -395,7 +395,7 @@ export type WebViewSharedProps = $ReadOnly<{|
   /**
    * Function that is invoked when the `WebView` onScroll.
    */
-  onScroll: (event: WebViewErrorEvent) => mixed,
+  onScroll: (event: WebViewNavigationEvent) => mixed,
 
 
   /**
