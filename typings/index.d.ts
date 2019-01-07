@@ -365,6 +365,12 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
    * Function that is invoked when the `WebView` load fails.
    */
   onError?: (event: WebViewErrorEvent) => any;
+  
+  /**
+   * Function that is invoked when the `WebView` onScroll.
+   */
+  onScroll?: (event: WebViewNavigationEvent) => any;
+
 
   /**
    * Controls whether to adjust the content inset for web views that are
