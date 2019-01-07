@@ -18,7 +18,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 @end
 
-//添加
+//add UIScrollViewDelegate
 @interface RNCUIWebView : RCTView<UIScrollViewDelegate>
 
 @property (nonatomic, weak) id<RNCUIWebViewDelegate> delegate;
