@@ -116,7 +116,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_POST_MESSAGE = 5;
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
-  public static final int COMMAND_TEXT_ZOOM = 8;
 
   // Use `webView.loadUrl("about:blank")` to reliably reset the view
   // state and release page resources (including any running JavaScript).
@@ -208,7 +207,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       event.putString("title", webView.getTitle());
       event.putBoolean("canGoBack", webView.canGoBack());
       event.putBoolean("canGoForward", webView.canGoForward());
-      //添加-webview的高度
+      //get webview height
       event.putDouble("height", webView.getContentHeight());
       
       return event;
@@ -348,7 +347,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
     }
 
-    //添加开始-添加webview滚动
+    //webview onScroll
     @Override
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
       super.onScrollChanged(x, y, oldX, oldY);
@@ -424,7 +423,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         event.putBoolean("canGoBack", webView.canGoBack());
         event.putBoolean("canGoForward", webView.canGoForward());
         event.putDouble("progress", (float)newProgress/100);
-        //添加-webview的高度
+        //get webView height
         event.putDouble("height", webView.getContentHeight());
 
         dispatchEvent(
@@ -740,8 +739,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       case COMMAND_INJECT_JAVASCRIPT:
         RNCWebView reactWebView = (RNCWebView) root;
         if(!TextUtils.isEmpty(args.getString(0))){
+          //if first args is empty
           reactWebView.evaluateJavascriptWithFallback(args.getString(0));
         }else{
+          //set TextZoom
           root.getSettings().setTextZoom(args.getInt(1));
         }
         break;
