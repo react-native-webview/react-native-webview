@@ -20,7 +20,7 @@ static NSString *const kPostMessageHost = @"postMessage";
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
-//添加
+//add onScroll block
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 
 
@@ -45,7 +45,8 @@ static NSString *const kPostMessageHost = @"postMessage";
     _contentInset = UIEdgeInsetsZero;
     _webView = [[UIWebView alloc] initWithFrame:self.bounds];
     _webView.delegate = self;
-    _webView.scrollView.delegate = self;//添加
+    //set scrollview delegate
+    _webView.scrollView.delegate = self;
       
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
@@ -194,7 +195,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
                       updateOffset:YES];
 }
 
-//添加
+//delegate scrollViewDidScroll 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     
@@ -221,7 +222,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _onScroll(event);
     
 }
-//添加结束
 
 #pragma mark - UIWebViewDelegate methods
 
@@ -360,28 +360,25 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     ];
     [webView stringByEvaluatingJavaScriptFromString:source];
   }
-    //添加 计算webview高度
+    //get webview height
     CGFloat webViewHeight=[webView.scrollView contentSize].height;
-    //添加结束
 
   if (_injectedJavaScript != nil) {
     NSString *jsEvaluationValue = [webView stringByEvaluatingJavaScriptFromString:_injectedJavaScript];
 
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    //添加
+    //set webview height
     [event setValue: [NSNumber numberWithFloat:webViewHeight] forKey:@"height"];
-    //添加结束
     event[@"jsEvaluationValue"] = jsEvaluationValue;
 
     _onLoadingFinish(event);
   }
   // we only need the final 'finishLoad' call so only fire the event when we're actually done loading.
   else if (_onLoadingFinish && !webView.loading && ![webView.request.URL.absoluteString isEqualToString:@"about:blank"]) {
-      //添加
+      //_onLoadingFinish
       NSMutableDictionary *event = [self baseEvent];
       [event setValue: [NSNumber numberWithFloat:webViewHeight] forKey:@"height"];
       _onLoadingFinish(event);
-      //添加结束
 
   }
 }
