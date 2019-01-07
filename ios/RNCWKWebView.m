@@ -31,6 +31,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
+//add onScroll block
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 
 
@@ -270,7 +271,9 @@ static NSString *const MessageHanderName = @"ReactNative";
   scrollView.decelerationRate = _decelerationRate;
 }
 
-//添加
+/**
+* delegate scrollViewDidScroll 
+*/
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
 
@@ -550,13 +553,13 @@ static NSString *const MessageHanderName = @"ReactNative";
     ];
     [self evaluateJS: source thenCall: nil];
   }
-
+    //get webview height
     CGFloat webViewHeight=[webView.scrollView contentSize].height;
 
   if (_injectedJavaScript) {
     [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
         
-
+  
       NSMutableDictionary *event = [self baseEvent];
       [event setValue: [NSNumber numberWithFloat:webViewHeight] forKey:@"height"];
       event[@"jsEvaluationValue"] = jsEvaluationValue;
@@ -566,28 +569,11 @@ static NSString *const MessageHanderName = @"ReactNative";
     }];
   } else if (_onLoadingFinish) {
       NSMutableDictionary *eventTemp = [self baseEvent];
+       //get webview height
       [eventTemp setValue: [NSNumber numberWithDouble:webViewHeight]  forKey:@"height"];
       _onLoadingFinish(eventTemp);
 
-      //获取高度另一方法
-//      [webView evaluateJavaScript:@"document.body.scrollHeight"
-//                completionHandler:^(id result, NSError *_Nullable error) {
-//                    if(!error) {
-//
-//                        NSNumber*height = result;
-//
-//                        NSMutableDictionary *eventTemp = [self baseEvent];
-//                        [eventTemp setValue: height forKey:@"height"];
-//                        _onLoadingFinish(eventTemp);
-//                    }else{
-//                        NSMutableDictionary *eventTemp = [self baseEvent];
-//                        [eventTemp setValue: [NSNumber numberWithDouble:webViewHeight]  forKey:@"height"];
-//                        _onLoadingFinish(eventTemp);
-//                    }
-//                    //result 就是加载完成后 webView的实际高度
-//                    //获取后返回重新布局
-//            }];
-      
+  
       
   }
     
