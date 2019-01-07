@@ -363,6 +363,14 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       [data],
     );
   };
+  /**
+  * set textZoom. default is 100
+  */
+  textZoom = (data: number) => {
+    let scriptStr =
+      `document.getElementsByTagName('body')[0].style.webkitTextSizeAdjust= '${data}%'`
+    injectJavaScript(scriptStr)
+  };
 
   /**
    * We return an event with a bunch of fields including:
