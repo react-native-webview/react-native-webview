@@ -71,6 +71,10 @@ RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWKWebView) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, RNCWKWebView) {
+  view.useSharedProcessPool = json == nil ? true : [RCTConvert BOOL: json];
+}
+
 RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, RNCWKWebView) {
   view.scrollEnabled = json == nil ? true : [RCTConvert BOOL: json];
 }

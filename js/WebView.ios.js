@@ -134,6 +134,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   static defaultProps = {
     useWebKit: true,
     originWhitelist: defaultOriginWhitelist,
+    useSharedProcessPool: true,
   };
 
   static isFileUploadSupported = async () => {
@@ -265,6 +266,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.mediaPlaybackRequiresUserAction
         }
         dataDetectorTypes={this.props.dataDetectorTypes}
+        useSharedProcessPool={this.props.useSharedProcessPool}
         allowsLinkPreview={this.props.allowsLinkPreview}
         {...nativeConfig.props}
       />
