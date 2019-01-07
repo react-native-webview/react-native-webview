@@ -258,7 +258,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         onLoadingProgress={this._onLoadingProgress}
         messagingEnabled={messagingEnabled}
         onMessage={this._onMessage}
-        onScroll = {this._onScroll}  //添加滚动
+        onScroll = {this._onScroll}  
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         scalesPageToFit={scalesPageToFit}
         allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}
@@ -415,7 +415,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     onMessage && onMessage(event);
   };
 
-  //添加滚动
+  //onScroll function
   _onScroll = (event: WebViewMessageEvent) => {
     var {onScroll} = this.props;
     onScroll && onScroll(event);
