@@ -16,6 +16,7 @@ This document lays out the current public properties and methods for the React N
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
 - [`onLoadProgress`](Reference.md#onloadprogress)
+- [`onScroll`](Reference.md#onScroll)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`originWhitelist`](Reference.md#originwhitelist)
@@ -57,6 +58,7 @@ This document lays out the current public properties and methods for the React N
 - [`reload`](Reference.md#reload)
 - [`stopLoading`](Reference.md#stoploading)
 - [`injectJavaScript`](Reference.md#injectjavascriptstr)
+- [`textZoom`](Reference.md#textZoom)
 
 ---
 
@@ -149,6 +151,15 @@ Function that is invoked when the `WebView` load fails.
 ### `onLoad`
 
 Function that is invoked when the `WebView` has finished loading.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+---
+### `onScroll`
+
+Function that is invoked when the `WebView` onScroll
 
 | Type     | Required |
 | -------- | -------- |
@@ -596,6 +607,14 @@ injectJavaScript('... javascript string ...');
 ```
 
 Executes the JavaScript string.
+
+### `textZoom()`
+
+```javascript
+textZoom();
+```
+
+set webview text Zoom
 
 ## Other Docs
 
