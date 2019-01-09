@@ -44,6 +44,10 @@ This document lays out the current public properties and methods for the React N
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`allowFileAccess`](Reference.md#allowFileAccess)
+- [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
+- [`pagingEnabled`](Reference.md#pagingEnabled)
+- [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 
 ## Methods Index
 
@@ -108,7 +112,7 @@ Set this to provide JavaScript that will be injected into the web page when the 
 
 ### `mediaPlaybackRequiresUserAction`
 
-Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`.
+Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`. (Android API minimum version 17)
 
 | Type | Required |
 | ---- | -------- |
@@ -332,11 +336,11 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 ### `userAgent`
 
-Sets the user-agent for the `WebView`.
+Sets the user-agent for the `WebView`. This will only work for iOS if you are using WKWebView, not UIWebView (see https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent).
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| string | No       | Android  |
+| string | No       | Android, iOS WKWebView  |
 
 ---
 
@@ -495,6 +499,45 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
 
+---
+
+### `allowFileAccess`
+
+If true, this will allow access to the file system via `file://` URI's. The default value is `false`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+---
+
+### `saveFormDataDisabled`
+
+Sets whether the WebView should disable saving form data. The default value is `false`. This function does not have any effect from Android API level 26 onwards as there is an Autofill feature which stores form data.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+---
+
+### `pagingEnabled`
+
+If the value of this property is true, the scroll view stops on multiples of the scroll view’s bounds when the user scrolls. The default value is false.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+---
+
+### `allowsLinkPreview`
+
+A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is true; before that, the default value is false.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ## Methods
 
@@ -539,7 +582,7 @@ Stop loading the current page.
 ### `injectJavaScript(str)`
 
 ```javascript
-injectJavaScript("... javascript string ...");
+injectJavaScript('... javascript string ...');
 ```
 
 Executes the JavaScript string.

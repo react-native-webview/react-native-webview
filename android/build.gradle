@@ -1,22 +1,91 @@
-apply plugin: 'com.android.library'
+buildscript {
+    ext.kotlin_version = '1.2.71'
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
 
-def DEFAULT_COMPILE_SDK_VERSION             = 27
-def DEFAULT_BUILD_TOOLS_VERSION             = "27.0.3"
-def DEFAULT_MIN_SDK_VERSION                 = 16
-def DEFAULT_TARGET_SDK_VERSION              = 26
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+
+def DEFAULT_COMPILE_SDK_VERSION = 27
+def DEFAULT_BUILD_TOOLS_VERSION = "28.0.3"
+def DEFAULT_TARGET_SDK_VERSION = 27
 
 android {
-    compileSdkVersion rootProject.findProperty('compileSdkVersion') ?: DEFAULT_COMPILE_SDK_VERSION
-    buildToolsVersion rootProject.findProperty('buildToolsVersion') ?: DEFAULT_BUILD_TOOLS_VERSION
-
+    compileSdkVersion rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : DEFAULT_COMPILE_SDK_VERSION
+    buildToolsVersion rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
     defaultConfig {
-        minSdkVersion rootProject.findProperty('minSdkVersion') ?: DEFAULT_MIN_SDK_VERSION
-        targetSdkVersion rootProject.findProperty('targetSdkVersion') ?: DEFAULT_TARGET_SDK_VERSION
+        minSdkVersion 16
+        targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
         versionCode 1
         versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    productFlavors {
+    }
+    lintOptions {
+        disable 'GradleCompatible'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
+
+    // Stolen from react-native-firebase, thanks dudes!
+    def found = false
+    def parentDir = rootProject.projectDir
+    def reactNativeAndroidName = 'React Native (Node Modules)'
+
+    1.upto(4, {
+        if (found) return true
+        parentDir = parentDir.parentFile
+        def reactNativeAndroid = new File(
+                parentDir,
+                'node_modules/react-native/android'
+        )
+
+        if (reactNativeAndroid.exists()) {
+            maven {
+                url reactNativeAndroid.toString()
+                name reactNativeAndroidName
+            }
+
+            println "${project.name}: using React Native sources from ${reactNativeAndroid.toString()}"
+            found = true
+        }
+    })
+
+    if (!found) {
+        throw new GradleException(
+                "${project.name}: unable to locate React Native Android sources, " +
+                        "ensure you have you installed React Native as a dependency and try again."
+        )
     }
 }
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
