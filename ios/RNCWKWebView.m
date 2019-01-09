@@ -96,6 +96,8 @@ static NSString *const MessageHanderName = @"ReactNative";
     if(_sharedCookiesEnabled) {
         // More info to sending cookies with wkwebview: https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
         if (@available(iOS 11.0, *)) {
+          // Set Cookies in iOS 11 and above (https://forums.developer.apple.com/thread/97194)
+          wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
           NSArray<NSHTTPCookie*>* cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
           for(int i = 0; i < (int)[cookies count]; ++i)
           {
@@ -104,13 +106,6 @@ static NSString *const MessageHanderName = @"ReactNative";
           }
 
           _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-
-          // Hotfix: set cookies twice, otherwise they are not sent with first request
-          for(int i = 0; i < (int)[cookies count]; ++i)
-          {
-              NSHTTPCookie* currentCookie = cookies[i];
-              [_webView.configuration.websiteDataStore.httpCookieStore setCookie: currentCookie completionHandler: nil];
-          }
         }
         else
         {
