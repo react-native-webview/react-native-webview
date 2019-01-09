@@ -8,11 +8,12 @@
 #import "RNCWKWebView.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import "RNCWKProcessPoolManager.h"
 #import "NSURLRequest+HeaderHelpers.h"
+#import <UIKit/UIKit.h>
 
 #import "objc/runtime.h"
 
-static NSTimer *keyboardTimer;
 static NSString *const MessageHanderName = @"ReactNative";
 
 // runtime trick to remove WKWebView keyboard default toolbar
@@ -61,7 +62,6 @@ static NSString *const MessageHanderName = @"ReactNative";
   return _webkitAvailable;
 }
 
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
@@ -70,19 +70,6 @@ static NSString *const MessageHanderName = @"ReactNative";
     _scrollEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
-  }
-
-  // Workaround for a keyboard dismissal bug present in iOS 12
-  // https://openradar.appspot.com/radar?id=5018321736957952
-  if (@available(iOS 12.0, *)) {
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self
-      selector:@selector(keyboardWillHide)
-      name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self
-      selector:@selector(keyboardWillShow)
-      name:UIKeyboardWillShowNotification object:nil];
   }
   return self;
 }
@@ -95,6 +82,9 @@ static NSString *const MessageHanderName = @"ReactNative";
     };
 
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
+    if(self.useSharedProcessPool) {
+        wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
+    }
     wkWebViewConfig.userContentController = [WKUserContentController new];
     [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHanderName];
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
@@ -143,27 +133,6 @@ static NSString *const MessageHanderName = @"ReactNative";
     }
 
     [super removeFromSuperview];
-}
-
--(void)keyboardWillHide
-{
-    keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
-    [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
-}
-
--(void)keyboardWillShow
-{
-    if (keyboardTimer != nil) {
-        [keyboardTimer invalidate];
-    }
-}
-
--(void)keyboardDisplacementFix
-{
-    // https://stackoverflow.com/a/9637807/824966
-    [UIView animateWithDuration:.25 animations:^{
-        self.webView.scrollView.contentOffset = CGPointMake(0, 0);
-    }];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
@@ -341,6 +310,88 @@ static NSString *const MessageHanderName = @"ReactNative";
 #pragma mark - WKNavigationDelegate methods
 
 /**
+* alert
+*/
+- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        completionHandler();
+    }]];
+    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+
+}
+
+/**
+* confirm
+*/
+- (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        completionHandler(YES);
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        completionHandler(NO);
+    }]];
+    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+}
+
+/**
+* prompt
+*/
+- (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.textColor = [UIColor lightGrayColor];
+        textField.placeholder = defaultText;
+    }];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        completionHandler([[alert.textFields lastObject] text]);
+    }]];
+    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+}
+
+/**
+ * topViewController
+ */
+-(UIViewController *)topViewController{
+   UIViewController *controller = [self topViewControllerWithRootViewController:[self getCurrentWindow].rootViewController];
+   return controller;
+}
+
+/**
+ * topViewControllerWithRootViewController
+ */
+-(UIViewController *)topViewControllerWithRootViewController:(UIViewController *)viewController{
+  if (viewController==nil) return nil;
+  if (viewController.presentedViewController!=nil) {
+    return [self topViewControllerWithRootViewController:viewController.presentedViewController];
+  } else if ([viewController isKindOfClass:[UITabBarController class]]){
+    return [self topViewControllerWithRootViewController:[(UITabBarController *)viewController selectedViewController]];
+  } else if ([viewController isKindOfClass:[UINavigationController class]]){
+    return [self topViewControllerWithRootViewController:[(UINavigationController *)viewController visibleViewController]];
+  } else {
+    return viewController;
+  }
+}
+/**
+ * getCurrentWindow
+ */
+-(UIWindow *)getCurrentWindow{
+  UIWindow *window = [UIApplication sharedApplication].keyWindow;
+  if (window.windowLevel!=UIWindowLevelNormal) {
+    for (UIWindow *wid in [UIApplication sharedApplication].windows) {
+      if (window.windowLevel==UIWindowLevelNormal) {
+        window = wid;
+        break;
+      }
+    }
+  }
+  return window;
+}
+
+
+/**
  * Decides whether to allow or cancel a navigation.
  * @see https://fburl.com/42r9fxob
  */
@@ -445,8 +496,12 @@ static NSString *const MessageHanderName = @"ReactNative";
           thenCall: (void (^)(NSString*)) callback
 {
   [self.webView evaluateJavaScript: js completionHandler: ^(id result, NSError *error) {
-    if (error == nil && callback != nil) {
-      callback([NSString stringWithFormat:@"%@", result]);
+    if (error == nil) {
+      if (callback != nil) {
+        callback([NSString stringWithFormat:@"%@", result]);
+      }
+    } else {
+      RCTLogError(@"Error evaluating injectedJavaScript: This is possibly due to an unsupported return type. Try adding true to the end of your injectedJavaScript string.");
     }
   }];
 }
