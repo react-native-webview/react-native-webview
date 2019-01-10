@@ -2,6 +2,8 @@ package com.reactnativecommunity.webview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.Manifest;
+import android.support.v4.content.ContextCompat;
 import com.facebook.react.uimanager.UIManagerModule;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.Map;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Picture;
 import android.net.Uri;
@@ -384,7 +387,36 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       // Fix WebRTC permission request error.
       @Override
       public void onPermissionRequest(final PermissionRequest request) {
-          request.grant(request.getResources());
+        String[] requestedResources = request.getResources();
+        ArrayList<String> permissions = new ArrayList<>();
+        ArrayList<String> grantedPermissions = new ArrayList<String>();
+         for (int i = 0; i < requestedResources.length; i++) {
+          if (requestedResources[i].equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+            permissions.add(Manifest.permission.RECORD_AUDIO);
+          } else if (requestedResources[i].equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
+            permissions.add(Manifest.permission.CAMERA);
+          }
+          // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
+        }
+
+        for (int i = 0; i < permissions.size(); i++) {
+          if (ContextCompat.checkSelfPermission(reactContext, permissions.get(i)) != PackageManager.PERMISSION_GRANTED) {
+            continue;
+          }
+          if (permissions.get(i).equals(Manifest.permission.RECORD_AUDIO)) {
+            grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
+          } else if (permissions.get(i).equals(Manifest.permission.CAMERA)) {
+            grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+          }
+        }
+
+        if (grantedPermissions.isEmpty()) {
+          request.deny();
+        } else {
+          String[] grantedPermissionsArray = new String[grantedPermissions.size()];
+          grantedPermissionsArray = grantedPermissions.toArray(grantedPermissionsArray);
+          request.grant(grantedPermissionsArray);
+        }
       }
 
     @Override
