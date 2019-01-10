@@ -371,7 +371,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   textZoom = (data: number) => {
     let scriptStr =
       `document.getElementsByTagName('body')[0].style.webkitTextSizeAdjust= '${data}%'`
-    injectJavaScript(scriptStr)
+    this.injectJavaScript(scriptStr)
   };
 
   /**
