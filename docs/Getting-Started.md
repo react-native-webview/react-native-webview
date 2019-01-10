@@ -20,7 +20,21 @@ $ react-native link react-native-webview
 
 _NOTE: If you ever need to uninstall React Native WebView, run `react-native unlink react-native-webview` to unlink it._
 
-#### 3. Import the webview into your component
+#### 3. Android - Update your MainApplication.java 
+Add RNCWebViewPackage import statement like this 
+```import com.reactnativecommunity.webview.RNCWebViewPackage;```
+
+Next, add RNCWebViewPackage to getPackages() method 
+
+ ```protected List<ReactPackage> getPackages() {
+      // Add additional packages you require here
+      return Arrays.<ReactPackage>asList(
+        // eg. new RNCWebViewPackage()
+      );
+    }
+ ```
+
+#### 4. Import the webview into your component
 
 ```js
 import React, { Component } from 'react';
