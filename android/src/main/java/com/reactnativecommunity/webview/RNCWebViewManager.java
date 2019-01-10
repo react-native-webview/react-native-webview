@@ -23,7 +23,6 @@ import java.util.Map;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -126,7 +125,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static final String BLANK_URL = "about:blank";
 
   protected WebViewConfig mWebViewConfig;
-  protected @Nullable WebView.PictureListener mPictureListener;
 
   protected static class RNCWebViewClient extends WebViewClient {
 
@@ -227,6 +225,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected @Nullable String injectedJS;
     protected boolean messagingEnabled = false;
     protected @Nullable RNCWebViewClient mRNCWebViewClient;
+    protected boolean sendContentSizeChangeEvents = false;
+    public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
+      this.sendContentSizeChangeEvents = sendContentSizeChangeEvents;
+    }
+
 
     protected class RNCWebViewBridge {
       RNCWebView mContext;
@@ -265,6 +268,20 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public void onHostDestroy() {
       cleanupCallbacksAndDestroy();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int ow, int oh) {
+      if (sendContentSizeChangeEvents) {
+        dispatchEvent(
+          this,
+          new ContentSizeChangeEvent(
+            this.getId(),
+            w,
+            h
+          )
+        );
+      }
     }
 
     @Override
@@ -641,11 +658,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "onContentSizeChange")
   public void setOnContentSizeChange(WebView view, boolean sendContentSizeChangeEvents) {
-    if (sendContentSizeChangeEvents) {
-      view.setPictureListener(getPictureListener());
-    } else {
-      view.setPictureListener(null);
-    }
+    ((RNCWebView) view).setSendContentSizeChangeEvents(sendContentSizeChangeEvents);
   }
 
   @ReactProp(name = "mixedContentMode")
@@ -768,23 +781,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     super.onDropViewInstance(webView);
     ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RNCWebView) webView);
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
-  }
-
-  protected WebView.PictureListener getPictureListener() {
-    if (mPictureListener == null) {
-      mPictureListener = new WebView.PictureListener() {
-        @Override
-        public void onNewPicture(WebView webView, Picture picture) {
-          dispatchEvent(
-            webView,
-            new ContentSizeChangeEvent(
-              webView.getId(),
-              webView.getWidth(),
-              webView.getContentHeight()));
-        }
-      };
-    }
-    return mPictureListener;
   }
 
   protected static void dispatchEvent(WebView webView, Event event) {
