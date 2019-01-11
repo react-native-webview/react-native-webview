@@ -9,6 +9,12 @@ export interface WebViewNativeEvent {
   readonly canGoForward: boolean;
 }
 
+export interface WebViewIOSLoadRequestEvent extends WebViewNativeEvent {
+  target: number;
+  lockIdentifier: number;
+  navigationType: "click" | "formsubmit" | "backforward" | "reload" | "formresubmit" | "other";
+}
+
 export interface WebViewProgressEvent extends WebViewNativeEvent {
   readonly progress: number;
 }
@@ -146,6 +152,14 @@ export interface IOSWebViewProps {
   scrollEnabled?: boolean;
 
   /**
+   * If the value of this property is true, the scroll view stops on multiples
+   * of the scroll view’s bounds when the user scrolls.
+   * The default value is false.
+   * @platform ios
+   */
+  pagingEnabled?: boolean,
+
+  /**
    * The amount by which the web view content is inset from the edges of
    * the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
    * @platform ios
@@ -182,7 +196,7 @@ export interface IOSWebViewProps {
    * to stop loading.
    * @platform ios
    */
-  onShouldStartLoadWithRequest?: (event: WebViewNativeEvent) => any;
+  onShouldStartLoadWithRequest?: (event: WebViewIOSLoadRequestEvent) => any;
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -199,6 +213,20 @@ export interface IOSWebViewProps {
    * backward compatible.
    */
   hideKeyboardAccessoryView?: boolean;
+  /**
+   * If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
+   */
+  allowsBackForwardNavigationGestures?: boolean;
+
+  /**
+   * A Boolean value that determines whether pressing on a link
+   * displays a preview of the destination for the link.
+   *
+   * This property is available on devices that support 3D Touch.
+   * In iOS 10 and later, the default value is `true`; before that, the default value is `false`.
+   * @platform ios
+   */
+  allowsLinkPreview?: boolean;
 }
 
 export interface AndroidWebViewProps {
@@ -370,7 +398,7 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
    * Boolean value that forces the `WebView` to show the loading view
    * on the first load.
    */
-  startInLoadingState?: string;
+  startInLoadingState?: boolean;
 
   /**
    * Set this to provide JavaScript that will be injected into the web page
@@ -417,4 +445,6 @@ export class WebView extends Component<WebViewSharedProps> {
   public goBack: () => void;
   public reload: () => void;
   public stopLoading: () => void;
+  public postMessage: (msg: string) => void;
+  public injectJavaScript: (js: string) => void;
 }
