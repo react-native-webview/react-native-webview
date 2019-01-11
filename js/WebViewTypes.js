@@ -366,6 +366,11 @@ export type WebViewSharedProps = $ReadOnly<{|
   source?: ?WebViewSource,
 
   /**
+   * Does not store any data within the lifetime of the WebView.
+   */
+  incognito?: ?boolean,
+
+  /**
    * Function that returns a view to show if there's an error.
    */
   renderError: (

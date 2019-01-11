@@ -168,6 +168,15 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         'The allowsBackForwardNavigationGestures property is not supported when useWebKit = false',
       );
     }
+
+    if (
+      !this.props.useWebKit &&
+      this.props.incognito
+    ) {
+      console.warn(
+        'The incognito property is not supported when useWebKit = false',
+      );
+    }
   }
 
   render() {
@@ -252,6 +261,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         }
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
         allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+        incognito={this.props.incognito}
         userAgent={this.props.userAgent}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
@@ -443,6 +453,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     }
 
     this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this._showRedboxOnPropChanges(prevProps, 'incognito');
     this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
     this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
 
