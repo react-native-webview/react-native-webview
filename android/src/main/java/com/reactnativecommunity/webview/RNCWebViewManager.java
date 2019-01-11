@@ -272,6 +272,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     protected void onSizeChanged(int w, int h, int ow, int oh) {
+      super.onSizeChanged(w, h, ow, oh);
+
       if (sendContentSizeChangeEvents) {
         dispatchEvent(
           this,
@@ -492,15 +494,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         //Attempt to add cookie, if it exists
         URL urlObj = null;
-        try {  
+        try {
           urlObj = new URL(url);
           String baseUrl = urlObj.getProtocol() + "://" + urlObj.getHost();
-          String cookie = CookieManager.getInstance().getCookie(baseUrl);  
+          String cookie = CookieManager.getInstance().getCookie(baseUrl);
           request.addRequestHeader("Cookie", cookie);
           System.out.println("Got cookie for DownloadManager: " + cookie);
         } catch (MalformedURLException e) {
           System.out.println("Error getting cookie for DownloadManager: " + e.toString());
-          e.printStackTrace();  
+          e.printStackTrace();
         }
 
         //Finish setting up request
