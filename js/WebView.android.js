@@ -8,34 +8,33 @@
  * @flow
  */
 
-'use strict';
-
 import React from 'react';
 
-import ReactNative from 'react-native';
-import {
+import ReactNative, {
   ActivityIndicator,
+  Image,
+  requireNativeComponent,
   StyleSheet,
   UIManager,
   View,
-  Image,
-  requireNativeComponent
+  NativeModules
 } from 'react-native';
 
 import invariant from 'fbjs/lib/invariant';
 import keyMirror from 'fbjs/lib/keyMirror';
 
-import WebViewShared from './WebViewShared';
+import {
+  defaultOriginWhitelist,
+  createOnShouldStartLoadWithRequest,
+} from './WebViewShared';
 import type {
-  WebViewEvent,
   WebViewError,
   WebViewErrorEvent,
   WebViewMessageEvent,
-  WebViewNavigation,
   WebViewNavigationEvent,
+  WebViewProgressEvent,
   WebViewSharedProps,
   WebViewSource,
-  WebViewProgressEvent,
 } from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
@@ -68,11 +67,18 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     scalesPageToFit: true,
     allowFileAccess: false,
     saveFormDataDisabled: false,
-    originWhitelist: WebViewShared.defaultOriginWhitelist,
+    originWhitelist: defaultOriginWhitelist,
   };
 
+  static isFileUploadSupported = async () => {
+    // native implementation should return "true" only for Android 5+
+    return NativeModules.RNCWebView.isFileUploadSupported();
+  }
+
   state = {
-    viewState: this.props.startInLoadingState ? WebViewState.LOADING : WebViewState.IDLE,
+    viewState: this.props.startInLoadingState
+      ? WebViewState.LOADING
+      : WebViewState.IDLE,
     lastErrorEvent: null,
   };
 
@@ -125,11 +131,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
     const nativeConfig = this.props.nativeConfig || {};
 
-    const originWhitelist = (this.props.originWhitelist || []).map(
-      WebViewShared.originWhitelistToRegex,
-    );
-
     let NativeWebView = nativeConfig.component || RNCWebView;
+
+    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+      this.onShouldStartLoadWithRequestCallback,
+      this.props.originWhitelist,
+      this.props.onShouldStartLoadWithRequest,
+    );
 
     const webView = (
       <NativeWebView
@@ -151,6 +159,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentSizeChange={this.props.onContentSizeChange}
         onLoadingStart={this.onLoadingStart}
         onLoadingFinish={this.onLoadingFinish}
@@ -164,7 +173,6 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         allowUniversalAccessFromFileURLs={
           this.props.allowUniversalAccessFromFileURLs
         }
-        originWhitelist={originWhitelist}
         mixedContentMode={this.props.mixedContentMode}
         saveFormDataDisabled={this.props.saveFormDataDisabled}
         urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}
@@ -284,11 +292,24 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     const { onMessage } = this.props;
     onMessage && onMessage(event);
   };
-  
+
   onLoadingProgress = (event: WebViewProgressEvent) => {
-    const { onLoadProgress} = this.props;
+    const { onLoadProgress } = this.props;
     onLoadProgress && onLoadProgress(event);
-  }
+  };
+
+  onShouldStartLoadWithRequestCallback = (
+    shouldStart: boolean,
+    url: string,
+  ) => {
+    if (shouldStart) {
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        UIManager.RNCWebView.Commands.loadUrl,
+        [String(url)],
+      );
+    }
+  };
 }
 
 const RNCWebView = requireNativeComponent('RNCWebView');
