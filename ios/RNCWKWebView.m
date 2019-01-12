@@ -13,7 +13,7 @@
 
 #import "objc/runtime.h"
 
-static NSString *const MessageHandlerName = @"ReactNative";
+static NSString *const MessageHandlerName = @"ReactNativeWebview";
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -91,6 +91,13 @@ static NSString *const MessageHandlerName = @"ReactNative";
 
     if (_messagingEnabled) {
       [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHandlerName];
+
+      NSString *source = [NSString stringWithFormat:
+        @"window.ReactNativeWebview_postMessage = function (data) {"
+         "  window.webkit.messageHandlers.@.postMessage(String(data));"
+         "};", MessageHandlerName
+      ];
+      [self injectJavaScript: source];
     }
 
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
@@ -296,10 +303,10 @@ static NSString *const MessageHandlerName = @"ReactNative";
 {
   NSDictionary *eventInitDict = @{@"data": message};
   NSString *source = [NSString
-    stringWithFormat:@"document.dispatchEvent(new MessageEvent('message', %@));",
+    stringWithFormat:@"window.dispatchEvent(new MessageEvent('message', %@));",
     RCTJSONStringify(eventInitDict, NULL)
   ];
-  [self evaluateJS: source thenCall: nil];
+  [self injectJavaScript: source];
 }
 
 - (void)layoutSubviews
