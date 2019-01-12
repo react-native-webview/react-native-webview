@@ -36,6 +36,20 @@ jobs:
       - run:
           name: Run Tests
           command: yarn ci:test
+  android:
+    working_directory: ~/repo
+    docker:
+      - image: reactnativecommunity/react-native-android
+    steps:
+      - checkout
+      - run: yarn install
+      - run:
+          name: Build android sample
+          command: |
+            npm i -g envinfo && envinfo
+            cd Example/RNWebview
+            yarn install
+            cd android && chmod +x gradlew && ./gradlew assembleRelease
 
   publish:
     <<: *defaults
@@ -55,6 +69,7 @@ workflows:
   ci:
     jobs:
       - setup
+      - android
       - tests:
           requires:
             - setup

@@ -1,0 +1,5 @@
+rootProject.name = 'RNWebview'
+include ':react-native-webview'
+project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../../../android')
+
+include ':app'
