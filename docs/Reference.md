@@ -44,6 +44,7 @@ This document lays out the current public properties and methods for the React N
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
@@ -275,6 +276,16 @@ Boolean value that forces the `WebView` to show the loading view on the first lo
 
 ---
 
+### `style`
+
+A style object that allow you to customize the `WebView` style. Please not that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
+
+| Type  | Required |
+| ----- | -------- |
+| style | No       |
+
+---
+
 ### `decelerationRate`
 
 A floating-point number that determines how quickly the scroll view decelerates after the user lifts their finger. You may also use the string shortcuts `"normal"` and `"fast"` which match the underlying iOS settings for `UIScrollViewDecelerationRateNormal` and `UIScrollViewDecelerationRateFast` respectively:
@@ -498,6 +509,16 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
+
+---
+
+### `incognito`
+
+Does not store any data within the lifetime of the WebView.
+
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS WKWebView |
 
 ---
 
