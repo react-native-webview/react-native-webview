@@ -44,6 +44,11 @@ RCT_EXPORT_VIEW_PROPERTY(dataDetectorTypes, WKDataDetectorTypes)
 RCT_EXPORT_VIEW_PROPERTY(contentInset, UIEdgeInsets)
 RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustContentInsets, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(incognito, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(pagingEnabled, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(userAgent, NSString)
+RCT_EXPORT_VIEW_PROPERTY(allowsLinkPreview, BOOL)
 
 /**
  * Expose methods to enable messaging the webview.
@@ -66,6 +71,10 @@ RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)m
 
 RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWKWebView) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, RNCWKWebView) {
+  view.useSharedProcessPool = json == nil ? true : [RCTConvert BOOL: json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, RNCWKWebView) {

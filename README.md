@@ -2,11 +2,17 @@
 
 **React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
+> We just swapped out the React Native WebView in our app with the version from React Native Community. The swap took less than a day, required almost no code modifications, and is faster and CSS works better. Props to everyone in the community (including those at Infinite Red) that helped get that component split out.
+
+_Garrett McCullough, mobile engineer at Virta Health_
+
 ## Platforms Supported
 
 - [x] iOS (both UIWebView and WKWebView)
 - [x] Android
 - [ ] Windows 10 (coming soon)
+
+_Note: React Native WebView is not currently supported by Expo unless you "eject"._
 
 ## Versioning
 
@@ -26,29 +32,33 @@ Read our [Getting Started Guide](./docs/Getting-Started.md) for more.
 Import the `WebView` component from `react-native-webview` and use it like so:
 
 ```jsx
-import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, { Component } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { WebView } from "react-native-webview";
 
 // ...
 class MyWebComponent extends Component {
   render() {
     return (
       <WebView
-        source={{ uri: 'https://infinite.red/react-native' }}
+        source={{ uri: "https://infinite.red/react-native" }}
         style={{ marginTop: 20 }}
-        onLoadProgress={e=>console.log(e.nativeEvent.progress)}
+        onLoadProgress={e => console.log(e.nativeEvent.progress)}
       />
     );
   }
 }
 ```
 
-For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md).
+For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md). If you're interested in contributing, check out the [Contributing Guide](./docs/Contributing.md).
 
 ## Migrate from React Native core WebView to React Native WebView
 
 Simply install React Native WebView and then use it in place of the core WebView. Their APIs are currently identical, except that this package defaults `useWebKit={true}` unlike the built-in WebView.
+
+## Troubleshooting
+
+- If you're getting `Invariant Violation: Native component for "RNCWKWebView does not exist"` it likely means you forgot to run `react-native link` or there was some error with the linking process
 
 ### Contributor Notes
 
@@ -65,6 +75,7 @@ Simply install React Native WebView and then use it in place of the core WebView
 
 - [Jamon Holmgren](https://github.com/jamonholmgren) ([Twitter @jamonholmgren](https://twitter.com/jamonholmgren)) from [Infinite Red](https://infinite.red/react-native)
 - [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
+- [Empyrical](https://github.com/empyrical) ([Twitter @empyrical](https://twitter.com/empyrical))
 
 ## License
 

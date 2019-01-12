@@ -1,16 +1,17 @@
 package com.reactnativecommunity.webview.events;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
-public class TopLoadingProgressEvent extends Event<TopLoadingProgressEvent> {
-    public static final String EVENT_NAME = "topLoadingProgress";
-    private WritableMap mEventData;
+public class TopShouldStartLoadWithRequestEvent extends Event<TopMessageEvent> {
+    public static final String EVENT_NAME = "topShouldStartLoadWithRequest";
+    private final String mUrl;
 
-    public TopLoadingProgressEvent(int viewId, WritableMap eventData) {
+    public TopShouldStartLoadWithRequestEvent(int viewId, String url) {
         super(viewId);
-        mEventData = eventData;
+        mUrl = url;
     }
 
     @Override
@@ -31,6 +32,9 @@ public class TopLoadingProgressEvent extends Event<TopLoadingProgressEvent> {
 
     @Override
     public void dispatch(RCTEventEmitter rctEventEmitter) {
-        rctEventEmitter.receiveEvent(getViewTag(), getEventName(), mEventData);
+        WritableMap data = Arguments.createMap();
+        data.putString("url", mUrl);
+        data.putString("navigationType", "other");
+        rctEventEmitter.receiveEvent(getViewTag(), EVENT_NAME, data);
     }
 }
