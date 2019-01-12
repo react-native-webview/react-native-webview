@@ -48,6 +48,7 @@ android {
 repositories {
   mavenCentral()
   jcenter()
+  google()
 
   def found = false
   def defaultDir = null
