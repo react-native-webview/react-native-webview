@@ -92,7 +92,7 @@ static NSString *const MessageHandlerName = @"ReactNative";
     if (_messagingEnabled) {
       [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHandlerName];
     }
-    
+
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
     wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
@@ -513,34 +513,6 @@ static NSString *const MessageHandlerName = @"ReactNative";
   }];
 }
 
-// Start of legacy code which overwrites window.postMessage
-- (void)overwritePostMessage: (void (^)(NSString*)) callback
-{
-  NSString *source = [NSString stringWithFormat:
-    @"(function() {"
-      "window.originalPostMessage = window.postMessage;"
-      "window.postMessage = function(data, origin) {"
-        "window.originalPostMessage(data, origin);"
-        "window.webkit.messageHandlers.%@.postMessage(String(data));"
-      "};"
-    "})();",
-    MessageHandlerName
-  ];
-  [self evaluateJS: source thenCall: callback];
-}
-
-// TODO: figure out how to call restorePostMessage when the overwriteWindowPostMessage prop changes
-- (void)restorePostMessage: (void (^)(NSString*)) callback
-{
-  NSString *source = [NSString
-    @"(function() {"
-      "window.postMessage = window.originalPostMessage || window.postMessage;"
-    "})();"
-  ];
-  [self evaluateJS: source thenCall: callback];
-}
-// End of legacy code which overwrites window.postMessage
-
 /**
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
@@ -548,10 +520,6 @@ static NSString *const MessageHandlerName = @"ReactNative";
 - (void)      webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
-  if (_messagingEnabled && _overwriteWindowPostMessage) {
-    [self overwritePostMessage: nil];
-  }
-
   if (_injectedJavaScript) {
     [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
       NSMutableDictionary *event = [self baseEvent];

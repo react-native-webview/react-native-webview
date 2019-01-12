@@ -226,7 +226,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable String injectedJS;
     protected boolean messagingEnabled = false;
-    protected boolean overwriteWindowPostMessage = false;
     protected @Nullable RNCWebViewClient mRNCWebViewClient;
     protected boolean sendContentSizeChangeEvents = false;
     public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
@@ -345,47 +344,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           !TextUtils.isEmpty(injectedJS)) {
         evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
       }
-      
-      if (messagingEnabled && overwriteWindowPostMessage) {
-        overwritePostMessage();
-      }
     }
 
     public void onMessage(String message) {
       dispatchEvent(this, new TopMessageEvent(this.getId(), message));
     }
-
-    // Start of legacy code which overwrites window.postMessage
-    public void setOverwriteWindowPostMessage(boolean overwrite) {
-      if (overwriteWindowPostMessage == overwrite) {
-        return;
-      }
-
-      overwriteWindowPostMessage = overwrite;
-
-      if (messagingEnabled && overwriteWindowPostMessage) {
-        overwritePostMessage();
-      } else {
-        restorePostMessage();
-      }
-    }
-
-    public void overwritePostMessage() {
-      evaluateJavascriptWithFallback("(" +
-        "window.originalPostMessage = window.postMessage;" +
-        "window.postMessage = function(data, origin) {" +
-          "window.originalPostMessage(data, origin);" +
-          WEBVIEW_MESSAGE_HANDLER + HANDLER_NAME + ".postMessage(String(data));" +
-        "}" +
-      ")");
-    }
-
-    public void restorePostMessage() {
-      evaluateJavascriptWithFallback("(" +
-        "window.postMessage = window.originalPostMessage || window.postMessage;" +
-      ")");
-    }
-    // End of legacy code which overwrites window.postMessage
 
     protected void cleanupCallbacksAndDestroy() {
       setWebViewClient(null);
@@ -615,11 +578,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "messagingEnabled")
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
-  }
-
-  @ReactProp(name = "overwriteWindowPostMessage")
-  public void setOverwriteWindowPostMessage(WebView view, boolean overwrite) {
-    ((RNCWebView) view).setOverwriteWindowPostMessage(overwrite);
   }
 
   @ReactProp(name = "source")

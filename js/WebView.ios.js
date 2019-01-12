@@ -267,7 +267,6 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         onLoadingProgress={this._onLoadingProgress}
         onMessage={this._onMessage}
         messagingEnabled={typeof this.props.onMessage === 'function'}
-        overwriteWindowPostMessage={this.props.overwriteWindowPostMessage}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         scalesPageToFit={scalesPageToFit}
         allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}
