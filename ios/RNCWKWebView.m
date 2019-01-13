@@ -150,7 +150,7 @@ static NSString *const MessageHandlerName = @"ReactNativeWebview";
 - (void)removeFromSuperview
 {
     if (_webView) {
-        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
+        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
         _webView = nil;
