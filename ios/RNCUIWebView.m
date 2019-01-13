@@ -11,7 +11,7 @@
 
 NSString *const RNCJSNavigationScheme = @"react-js-navigation";
 
-static NSString *const kPostMessageHost = @"ReactNativeWebview_postMessage";
+static NSString *const MessageHandlerName = @"ReactNativeWebview";
 
 @interface RNCUIWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
 
@@ -236,7 +236,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     }
   }
 
-  if (isJSNavigation && [request.URL.host isEqualToString:kPostMessageHost]) {
+  if (isJSNavigation && [request.URL.host isEqualToString:MessageHandlerName]) {
     NSString *data = request.URL.query;
     data = [data stringByReplacingOccurrencesOfString:@"+" withString:@" "];
     data = [data stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -246,7 +246,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       @"data": data,
     }];
 
-    NSString *source = @"window.ReactNativeWebview_messageReceived();";
+    NSString *source = [NSString stringWithFormat:@"window.@.messageReceived();", MessageHandlerName];
 
     [_webView stringByEvaluatingJavaScriptFromString:source];
 
@@ -300,16 +300,17 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
        "    document.location = '%@://%@?' + encodeURIComponent(messageQueue.shift());"
        "  }"
 
-       "  window.ReactNativeWebview_postMessage = function (data) {"
-       "    messageQueue.push(String(data));"
-       "    processQueue();"
+       "  window.@ = {"
+       "    postMessage: function (data) {"
+       "      messageQueue.push(String(data));"
+       "      processQueue();"
+       "    },"
+       "    messageReceived: function () {"
+       "      messagePending = false;"
+       "      processQueue();"
+       "    }"
        "  };"
-
-       "  window.ReactNativeWebview_messageReceived = function () {"
-       "    messagePending = false;"
-       "    processQueue();"
-       "  };"
-       "})();", RNCJSNavigationScheme, kPostMessageHost
+       "})();", RNCJSNavigationScheme, MessageHandlerName, MessageHandlerName
     ];
     [webView stringByEvaluatingJavaScriptFromString:source];
   }
