@@ -93,9 +93,9 @@ static NSString *const MessageHandlerName = @"ReactNativeWebview";
       [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHandlerName];
 
       NSString *source = [NSString stringWithFormat:
-        @"window.@ = {"
+        @"window.%@ = {"
          "  postMessage: function (data) {"
-         "    window.webkit.messageHandlers.@.postMessage(String(data));"
+         "    window.webkit.messageHandlers.%@.postMessage(String(data));"
          "  }"
          "};", MessageHandlerName, MessageHandlerName
       ];

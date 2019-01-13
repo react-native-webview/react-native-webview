@@ -246,7 +246,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       @"data": data,
     }];
 
-    NSString *source = [NSString stringWithFormat:@"window.@.messageReceived();", MessageHandlerName];
+    NSString *source = [NSString stringWithFormat:@"window.%@.messageReceived();", MessageHandlerName];
 
     [_webView stringByEvaluatingJavaScriptFromString:source];
 
@@ -300,7 +300,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
        "    document.location = '%@://%@?' + encodeURIComponent(messageQueue.shift());"
        "  }"
 
-       "  window.@ = {"
+       "  window.%@ = {"
        "    postMessage: function (data) {"
        "      messageQueue.push(String(data));"
        "      processQueue();"
