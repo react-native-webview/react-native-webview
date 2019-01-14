@@ -112,6 +112,9 @@ public class RNCWebChromeClient extends WebChromeClient {
         mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        WindowInsets insets = mActivity.getWindow().getDecorView().getRootWindowInsets();
+        mCustomView.setPadding(0, 0, 0, 0);
+        
         this.mCustomView = null;
         this.mCustomViewCallback.onCustomViewHidden();
         this.mCustomViewCallback = null;
