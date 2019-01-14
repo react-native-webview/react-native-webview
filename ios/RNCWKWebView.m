@@ -125,6 +125,13 @@ static NSString *const MessageHanderName = @"ReactNative";
   }
 }
 
+// Update webview property when the component prop changes.
+- (void)setAllowsBackForwardNavigationGestures:(BOOL)allowsBackForwardNavigationGestures {
+  _allowsBackForwardNavigationGestures = allowsBackForwardNavigationGestures;
+  _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
+}
+
+
 - (void)removeFromSuperview
 {
     if (_webView) {
