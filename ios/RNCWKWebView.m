@@ -99,7 +99,9 @@ static NSString *const MessageHandlerName = @"ReactNativeWebview";
          "  }"
          "};", MessageHandlerName, MessageHandlerName
       ];
-      [self injectJavaScript: source];
+
+      WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+      [wkWebViewConfig.userContentController addUserScript:script];
     }
 
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
