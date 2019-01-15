@@ -137,8 +137,6 @@ static NSString *const MessageHandlerName = @"ReactNativeWebview";
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self visitSource];
-  } else if (_messagingEnabled) {
-    [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
   }
 }
 
