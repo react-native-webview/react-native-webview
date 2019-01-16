@@ -132,6 +132,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         RNCWebView reactWebView = (RNCWebView) webView;
         reactWebView.callInjectedJavaScript();
         reactWebView.linkBridge();
+        reactWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         emitFinishEvent(webView, url);
       }
     }
