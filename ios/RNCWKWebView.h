@@ -42,6 +42,8 @@
 @property (nonatomic, assign) BOOL useSharedProcessPool;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, assign) BOOL allowsLinkPreview;
+@property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
+@property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
 
 - (void)postMessage:(NSString *)message;
 - (void)injectJavaScript:(NSString *)script;

@@ -529,6 +529,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setJavaScriptEnabled(enabled);
   }
 
+  @ReactProp(name = "showsHorizontalScrollIndicator")
+  public void setShowsHorizontalScrollIndicator(WebView view, boolean enabled) {
+    view.setHorizontalScrollBarEnabled(enabled);
+  }
+
+  @ReactProp(name = "showsVerticalScrollIndicator")
+  public void setShowsVerticalScrollIndicator(WebView view, boolean enabled) {
+    view.setVerticalScrollBarEnabled(enabled);
+  }
+
   @ReactProp(name = "overScrollMode")
   public void setOverScrollMode(WebView view, String overScrollModeString) {
     Integer overScrollMode;
