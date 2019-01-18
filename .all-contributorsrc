@@ -23,6 +23,19 @@
         "doc",
         "infra"
       ]
+    },
+    {
+      "login": "jamonholmgren",
+      "name": "Jamon Holmgren",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1479215?v=4",
+      "profile": "https://jamonholmgren.com",
+      "contributions": [
+        "code",
+        "review",
+        "doc",
+        "example",
+        "question"
+      ]
     }
   ],
   "contributorsPerLine": 7
