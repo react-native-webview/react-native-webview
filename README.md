@@ -1,5 +1,5 @@
 # React Native WebView - a Modern, Cross-Platform WebView for React Native
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
 
 **React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
@@ -84,8 +84,8 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/all-contri
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
-| [<img src="https://avatars1.githubusercontent.com/u/6181446?v=4" width="100px;" alt="Thibault Malbranche"/><br /><sub><b>Thibault Malbranche</b></sub>](https://twitter.com/titozzz)<br />[💻](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Code") [🤔](#ideas-titozzz "Ideas, Planning, & Feedback") [👀](#review-titozzz "Reviewed Pull Requests") [🚧](#maintenance-titozzz "Maintenance") [⚠️](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Tests") [📖](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Documentation") [🚇](#infra-titozzz "Infrastructure (Hosting, Build-Tools, etc)") |
-| :---: |
+| [<img src="https://avatars1.githubusercontent.com/u/6181446?v=4" width="100px;" alt="Thibault Malbranche"/><br /><sub><b>Thibault Malbranche</b></sub>](https://twitter.com/titozzz)<br />[💻](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Code") [🤔](#ideas-titozzz "Ideas, Planning, & Feedback") [👀](#review-titozzz "Reviewed Pull Requests") [🚧](#maintenance-titozzz "Maintenance") [⚠️](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Tests") [📖](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Documentation") [🚇](#infra-titozzz "Infrastructure (Hosting, Build-Tools, etc)") | [<img src="https://avatars3.githubusercontent.com/u/1479215?v=4" width="100px;" alt="Jamon Holmgren"/><br /><sub><b>Jamon Holmgren</b></sub>](https://jamonholmgren.com)<br />[💻](https://github.com/react-native-community/react-native-webview/commits?author=jamonholmgren "Code") [👀](#review-jamonholmgren "Reviewed Pull Requests") [📖](https://github.com/react-native-community/react-native-webview/commits?author=jamonholmgren "Documentation") [💡](#example-jamonholmgren "Examples") [💬](#question-jamonholmgren "Answering Questions") |
+| :---: | :---: |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
