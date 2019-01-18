@@ -78,10 +78,6 @@ Simply install React Native WebView and then use it in place of the core WebView
 - [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
 - [Empyrical](https://github.com/empyrical) ([Twitter @empyrical](https://twitter.com/empyrical))
 
-## License
-
-MIT
-
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://github.com/all-contributors/all-contributors#emoji-key)):
@@ -93,3 +89,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/all-contri
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## License
+
+MIT
