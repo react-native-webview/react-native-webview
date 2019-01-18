@@ -63,6 +63,16 @@
         "ideas",
         "tool"
       ]
+    },
+    {
+      "login": "smathson",
+      "name": "Scott Mathson",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/932981?v=4",
+      "profile": "http://smathson.github.io",
+      "contributions": [
+        "code",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
