@@ -18,10 +18,11 @@
         "code",
         "ideas",
         "review",
+        "doc",
         "maintenance",
         "test",
-        "doc",
-        "infra"
+        "infra",
+        "question"
       ]
     },
     {
@@ -31,8 +32,11 @@
       "profile": "https://jamonholmgren.com",
       "contributions": [
         "code",
+        "ideas",
         "review",
         "doc",
+        "maintenance",
+        "test"
         "example",
         "question"
       ]
