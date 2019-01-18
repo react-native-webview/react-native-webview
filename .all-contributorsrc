@@ -51,6 +51,18 @@
         "review",
         "ideas"
       ]
+    },
+    {
+      "login": "Salakar",
+      "name": "Michael Diarmid",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/5347038?v=4",
+      "profile": "https://twitter.com/mikediarmid",
+      "contributions": [
+        "code",
+        "review",
+        "ideas",
+        "tool"
+      ]
     }
   ],
   "contributorsPerLine": 7
