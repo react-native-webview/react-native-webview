@@ -40,6 +40,17 @@
         "example",
         "question"
       ]
+    },
+    {
+      "login": "andreipfeiffer",
+      "name": "Andrei Pfeiffer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2570562?v=4",
+      "profile": "https://github.com/andreipfeiffer",
+      "contributions": [
+        "code",
+        "review",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7
