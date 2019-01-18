@@ -278,7 +278,7 @@ Boolean value that forces the `WebView` to show the loading view on the first lo
 
 ### `style`
 
-A style object that allow you to customize the `WebView` style. Please not that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
+A style object that allow you to customize the `WebView` style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
 
 | Type  | Required |
 | ----- | -------- |
