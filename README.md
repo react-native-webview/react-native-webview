@@ -1,4 +1,5 @@
 # React Native WebView - a Modern, Cross-Platform WebView for React Native
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
 
 **React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
@@ -76,6 +77,18 @@ Simply install React Native WebView and then use it in place of the core WebView
 - [Jamon Holmgren](https://github.com/jamonholmgren) ([Twitter @jamonholmgren](https://twitter.com/jamonholmgren)) from [Infinite Red](https://infinite.red/react-native)
 - [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
 - [Empyrical](https://github.com/empyrical) ([Twitter @empyrical](https://twitter.com/empyrical))
+
+## Contributors
+
+Thanks goes to these wonderful people ([emoji key](https://github.com/all-contributors/all-contributors#emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore -->
+| [<img src="https://avatars1.githubusercontent.com/u/6181446?v=4" width="100px;" alt="Thibault Malbranche"/><br /><sub><b>Thibault Malbranche</b></sub>](https://twitter.com/titozzz)<br />[💻](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Code") [🤔](#ideas-titozzz "Ideas, Planning, & Feedback") [👀](#review-titozzz "Reviewed Pull Requests") [🚧](#maintenance-titozzz "Maintenance") [⚠️](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Tests") [📖](https://github.com/react-native-community/react-native-webview/commits?author=titozzz "Documentation") [🚇](#infra-titozzz "Infrastructure (Hosting, Build-Tools, etc)") |
+| :---: |
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
 ## License
 

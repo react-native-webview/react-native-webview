@@ -1,0 +1,29 @@
+{
+  "projectName": "react-native-webview",
+  "projectOwner": "react-native-community",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "titozzz",
+      "name": "Thibault Malbranche",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6181446?v=4",
+      "profile": "https://twitter.com/titozzz",
+      "contributions": [
+        "code",
+        "ideas",
+        "review",
+        "maintenance",
+        "test",
+        "doc",
+        "infra"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
