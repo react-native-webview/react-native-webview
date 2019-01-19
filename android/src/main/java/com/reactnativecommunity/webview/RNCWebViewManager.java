@@ -2,6 +2,7 @@ package com.reactnativecommunity.webview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.view.inputmethod.InputMethodManager;
 import com.facebook.react.uimanager.UIManagerModule;
 import java.util.LinkedList;
 import java.util.List;
@@ -133,6 +134,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         reactWebView.callInjectedJavaScript();
         reactWebView.linkBridge();
         reactWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        reactWebView.setVerticalScrollBarEnabled(false);
         emitFinishEvent(webView, url);
       }
     }
@@ -578,6 +580,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     WebView view,
     @Nullable Boolean isGeolocationEnabled) {
     view.getSettings().setGeolocationEnabled(isGeolocationEnabled != null && isGeolocationEnabled);
+  }
+
+  @ReactProp(name = "autoFocus")
+  public void setAutoFocus(WebView root, boolean autoFocus) {
+    if (autoFocus) {
+      System.out.println("setAutoFocus");
+      root.requestFocus();
+      InputMethodManager imm = (InputMethodManager) root.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+    }
   }
 
   @Override
