@@ -292,7 +292,7 @@ export interface AndroidWebViewProps {
    * as Hardware Acceleration is a feature only for Android. The default value is `false`.
    * @platform android
    */
-  androidHardwareAccelerationDisabled?: ?boolean;
+  androidHardwareAccelerationDisabled?: boolean;
 
   /**
    * Boolean value to enable third party cookies in the `WebView`. Used on
