@@ -45,6 +45,7 @@ This document lays out the current public properties and methods for the React N
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
@@ -103,7 +104,7 @@ Controls whether to adjust the content inset for web views that are placed behin
 
 ### `injectedJavaScript`
 
-Set this to provide JavaScript that will be injected into the web page when the view loads.
+Set this to provide JavaScript that will be injected into the web page when the view loads. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
 
 | Type   | Required |
 | ------ | -------- |
@@ -273,6 +274,16 @@ Boolean value that forces the `WebView` to show the loading view on the first lo
 | Type | Required |
 | ---- | -------- |
 | bool | No       |
+
+---
+
+### `style`
+
+A style object that allow you to customize the `WebView` style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
+
+| Type  | Required |
+| ----- | -------- |
+| style | No       |
 
 ---
 
@@ -509,6 +520,16 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
+
+---
+
+### `incognito`
+
+Does not store any data within the lifetime of the WebView.
+
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS WKWebView |
 
 ---
 

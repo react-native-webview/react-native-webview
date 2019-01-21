@@ -134,6 +134,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   static defaultProps = {
     useWebKit: true,
     originWhitelist: defaultOriginWhitelist,
+    useSharedProcessPool: true,
   };
 
   static isFileUploadSupported = async () => {
@@ -165,6 +166,15 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     ) {
       console.warn(
         'The allowsBackForwardNavigationGestures property is not supported when useWebKit = false',
+      );
+    }
+
+    if (
+      !this.props.useWebKit &&
+      this.props.incognito
+    ) {
+      console.warn(
+        'The incognito property is not supported when useWebKit = false',
       );
     }
   }
@@ -251,6 +261,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         }
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
         allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+        incognito={this.props.incognito}
         userAgent={this.props.userAgent}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
@@ -265,6 +276,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.mediaPlaybackRequiresUserAction
         }
         dataDetectorTypes={this.props.dataDetectorTypes}
+        useSharedProcessPool={this.props.useSharedProcessPool}
         allowsLinkPreview={this.props.allowsLinkPreview}
         {...nativeConfig.props}
       />
@@ -441,6 +453,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     }
 
     this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this._showRedboxOnPropChanges(prevProps, 'incognito');
     this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
     this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
 

@@ -1,24 +1,32 @@
 
 package com.reactnativecommunity.webview;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.widget.Toast;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.modules.core.PermissionListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +45,9 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private ValueCallback<Uri> filePathCallbackLegacy;
   private ValueCallback<Uri[]> filePathCallback;
   private Uri outputFileUri;
+
+  private DownloadManager.Request downloadRequest;
+  private static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
 
   final String DEFAULT_MIME_TYPES = "*/*";
 
@@ -177,6 +188,37 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return true;
   }
 
+  public void setDownloadRequest(DownloadManager.Request request) {
+    this.downloadRequest = request;
+  }
+
+  public void downloadFile() {
+    DownloadManager dm = (DownloadManager) getCurrentActivity().getBaseContext().getSystemService(Context.DOWNLOAD_SERVICE);
+    String downloadMessage = "Downloading";
+
+    dm.enqueue(this.downloadRequest);
+
+    Toast.makeText(getCurrentActivity().getApplicationContext(), downloadMessage, Toast.LENGTH_LONG).show();
+  }
+
+  public boolean grantFileDownloaderPermissions() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      return true;
+    }
+
+    boolean result = true;
+    if (ContextCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+      result = false;
+    }
+
+    if (!result) {
+      PermissionAwareActivity activity = getPermissionAwareActivity();
+      activity.requestPermissions(new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, FILE_DOWNLOAD_PERMISSION_REQUEST, webviewFileDownloaderPermissionListener);
+    }
+
+    return result;
+  }
+
   public RNCWebViewPackage getPackage() {
     return this.aPackage;
   }
@@ -306,4 +348,34 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     // will be an array with one empty string element, afaik
     return arr.length == 0 || (arr.length == 1 && arr[0].length() == 0);
   }
+
+  private PermissionAwareActivity getPermissionAwareActivity() {
+    Activity activity = getCurrentActivity();
+    if (activity == null) {
+        throw new IllegalStateException("Tried to use permissions API while not attached to an Activity.");
+    } else if (!(activity instanceof PermissionAwareActivity)) {
+        throw new IllegalStateException("Tried to use permissions API but the host Activity doesn't implement PermissionAwareActivity.");
+    }
+    return (PermissionAwareActivity) activity;
+  }
+
+  private PermissionListener webviewFileDownloaderPermissionListener = new PermissionListener() {
+    @Override
+    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+      switch (requestCode) {
+        case FILE_DOWNLOAD_PERMISSION_REQUEST: {
+          // If request is cancelled, the result arrays are empty.
+          if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (downloadRequest != null) {
+              downloadFile();
+            }
+          } else {
+            Toast.makeText(getCurrentActivity().getApplicationContext(), "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.", Toast.LENGTH_LONG).show();
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+  };
 }
