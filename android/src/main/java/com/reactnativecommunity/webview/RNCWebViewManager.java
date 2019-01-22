@@ -547,6 +547,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "androidHardwareAccelerationDisabled")
+  public void setHardwareAccelerationDisabled(WebView view, boolean disabled) {
+    if (disabled) {
+      view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    }
+  }
+
   @ReactProp(name = "overScrollMode")
   public void setOverScrollMode(WebView view, String overScrollModeString) {
     Integer overScrollMode;
