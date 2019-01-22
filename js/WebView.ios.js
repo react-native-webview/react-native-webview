@@ -133,7 +133,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   static defaultProps = {
     useWebKit: true,
-    enableCache: true,
+    cacheEnabled: true,
     originWhitelist: defaultOriginWhitelist,
     useSharedProcessPool: true,
   };
@@ -141,7 +141,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   static isFileUploadSupported = async () => {
     // no native implementation for iOS, depends only on permissions
     return true;
-  }
+  };
 
   state = {
     viewState: this.props.startInLoadingState
@@ -170,10 +170,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       );
     }
 
-    if (
-      !this.props.useWebKit &&
-      this.props.incognito
-    ) {
+    if (!this.props.useWebKit && this.props.incognito) {
       console.warn(
         'The incognito property is not supported when useWebKit = false',
       );
@@ -255,13 +252,16 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         bounces={this.props.bounces}
         scrollEnabled={this.props.scrollEnabled}
         pagingEnabled={this.props.pagingEnabled}
+        cacheEnabled={this.props.cacheEnabled}
         decelerationRate={decelerationRate}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+        allowsBackForwardNavigationGestures={
+          this.props.allowsBackForwardNavigationGestures
+        }
         incognito={this.props.incognito}
         userAgent={this.props.userAgent}
         onLoadingStart={this._onLoadingStart}

@@ -491,7 +491,7 @@ export type WebViewSharedProps = $ReadOnly<{|
   /**
    * Should caching be enabled. Default is true.
    */
-  enableCache?: ?boolean,
+  cacheEnabled?: ?boolean,
 
   style?: ViewStyleProp,
   children: Node,

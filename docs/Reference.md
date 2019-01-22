@@ -48,7 +48,7 @@ This document lays out the current public properties and methods for the React N
 - [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
-- [`enableCache`](Reference.md#enableCache)
+- [`cacheEnabled`](Reference.md#cacheEnabled)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 
@@ -361,9 +361,9 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 Sets the user-agent for the `WebView`. This will only work for iOS if you are using WKWebView, not UIWebView (see https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent).
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| string | No       | Android, iOS WKWebView  |
+| Type   | Required | Platform               |
+| ------ | -------- | ---------------------- |
+| string | No       | Android, iOS WKWebView |
 
 ---
 
@@ -554,7 +554,7 @@ Sets whether the WebView should disable saving form data. The default value is `
 
 ---
 
-### `enableCache`
+### `cacheEnabled`
 
 Sets whether WebView & WKWebView should use browser caching.
 
@@ -581,7 +581,6 @@ A Boolean value that determines whether pressing on a link displays a preview of
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
-
 
 ## Methods
 
