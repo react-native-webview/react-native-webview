@@ -120,6 +120,28 @@ RCT_EXPORT_METHOD(goForward:(nonnull NSNumber *)reactTag)
   }];
 }
 
+RCT_EXPORT_METHOD(canGoBack:(nonnull NSNumber *)reactTag
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
+    RNCWKWebView *view = viewRegistry[reactTag];
+
+    resolve([NSNumber numberWithBool:[view canGoBack]]);
+  }];
+}
+
+RCT_EXPORT_METHOD(canGoForward:(nonnull NSNumber *)reactTag
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
+    RNCWKWebView *view = viewRegistry[reactTag];
+
+    resolve([NSNumber numberWithBool:[view canGoForward]]);
+  }];
+}
+
 RCT_EXPORT_METHOD(reload:(nonnull NSNumber *)reactTag)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {

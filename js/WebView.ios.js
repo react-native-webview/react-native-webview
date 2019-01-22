@@ -320,6 +320,22 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
   };
 
+
+  /**
+   * Indicating whether there is a back item in the back-forward list that can be navigated to
+   */
+  canGoBack = () => {
+    return RNCWKWebViewManager.canGoBack(this.getWebViewHandle());
+  };
+
+  /**
+   * Indicating whether there is a forward item in the back-forward list that can be navigated to
+   */
+  canGoForward = () => {
+    return RNCWKWebViewManager.canGoForward(this.getWebViewHandle());
+  };
+
+
   /**
    * Reloads the current page.
    */
