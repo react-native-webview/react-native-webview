@@ -334,9 +334,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     private Integer getInjectionPosition(String body) {
       Integer ieDetectTagIndex = body.toLowerCase().indexOf("<!--[if", 0);
       Integer scriptTagIndex = body.toLowerCase().indexOf("<script", 0);
+      Integer headTagClosingIndex = body.toLowerCase().indexOf("</head", 0);
+
+      if (ieDetectTagIndex < 0 && scriptTagIndex < 0) {
+        return headTagClosingIndex;
+      }
 
       if (ieDetectTagIndex < 0) {
-        return scriptTagIndex;
+        return scriptTagIndex
       }
 
       return Math.min(scriptTagIndex, ieDetectTagIndex);
