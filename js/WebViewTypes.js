@@ -314,6 +314,13 @@ export type AndroidWebViewProps = $ReadOnly<{|
   javaScriptEnabled?: ?boolean,
 
   /**
+   * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
+   * as Hardware Acceleration is a feature only for Android. The default value is `false`.
+   * @platform android
+   */
+  androidHardwareAccelerationDisabled?: ?boolean,
+
+  /**
    * Boolean value to enable third party cookies in the `WebView`. Used on
    * Android Lollipop and above only as third party cookies are enabled by
    * default on Android Kitkat and below and on iOS. The default value is `true`.
