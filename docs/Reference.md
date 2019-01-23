@@ -28,6 +28,7 @@ This document lays out the current public properties and methods for the React N
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
+- [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
 - [`userAgent`](Reference.md#useragent)
@@ -312,6 +313,16 @@ Boolean value to control whether DOM Storage is enabled. Used only in Android.
 ### `javaScriptEnabled`
 
 Boolean value to enable JavaScript in the `WebView`. Used on Android only as JavaScript is enabled by default on iOS. The default value is `true`.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
+---
+
+### `androidHardwareAccelerationDisabled`
+
+Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only as Hardware Acceleration is a feature only for Android. The default value is `false`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
