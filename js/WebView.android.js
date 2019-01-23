@@ -67,6 +67,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     scalesPageToFit: true,
     allowFileAccess: false,
     saveFormDataDisabled: false,
+    androidHardwareAccelerationDisabled: false,
     originWhitelist: defaultOriginWhitelist
   };
 
@@ -151,6 +152,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         injectJavaScript={this.props.injectJavaScript}
         userAgent={this.props.userAgent}
         javaScriptEnabled={this.props.javaScriptEnabled}
+        androidHardwareAccelerationDisabled={
+          this.props.androidHardwareAccelerationDisabled
+        }
         thirdPartyCookiesEnabled={this.props.thirdPartyCookiesEnabled}
         domStorageEnabled={this.props.domStorageEnabled}
         messagingEnabled={typeof this.props.onMessage === "function"}
