@@ -38,6 +38,7 @@
 @property (nonatomic, assign) BOOL automaticallyAdjustContentInsets;
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 @property (nonatomic, assign) BOOL allowsBackForwardNavigationGestures;
+@property (nonatomic, assign) BOOL incognito;
 @property (nonatomic, assign) BOOL useSharedProcessPool;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, assign) BOOL allowsLinkPreview;

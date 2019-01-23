@@ -81,6 +81,9 @@ static NSString *const MessageHanderName = @"ReactNative";
     };
 
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
+    if (_incognito) {
+      wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+    }
     if(self.useSharedProcessPool) {
         wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
@@ -121,6 +124,13 @@ static NSString *const MessageHanderName = @"ReactNative";
     [self visitSource];
   }
 }
+
+// Update webview property when the component prop changes.
+- (void)setAllowsBackForwardNavigationGestures:(BOOL)allowsBackForwardNavigationGestures {
+  _allowsBackForwardNavigationGestures = allowsBackForwardNavigationGestures;
+  _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
+}
+
 
 - (void)removeFromSuperview
 {
@@ -460,6 +470,13 @@ static NSString *const MessageHanderName = @"ReactNative";
       // a new URL in the WebView before the previous one came back. We can just
       // ignore these since they aren't real errors.
       // http://stackoverflow.com/questions/1024748/how-do-i-fix-nsurlerrordomain-error-999-in-iphone-3-0-os
+      return;
+    }
+
+    if ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102) {
+      // Error code 102 "Frame load interrupted" is raised by the WKWebView
+      // when the URL is from an http redirect. This is a common pattern when
+      // implementing OAuth with a WebView.
       return;
     }
 

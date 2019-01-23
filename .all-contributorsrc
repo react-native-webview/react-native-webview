@@ -1,0 +1,89 @@
+{
+  "projectName": "react-native-webview",
+  "projectOwner": "react-native-community",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "titozzz",
+      "name": "Thibault Malbranche",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6181446?v=4",
+      "profile": "https://twitter.com/titozzz",
+      "contributions": [
+        "code",
+        "ideas",
+        "review",
+        "doc",
+        "maintenance",
+        "test",
+        "infra",
+        "question"
+      ]
+    },
+    {
+      "login": "jamonholmgren",
+      "name": "Jamon Holmgren",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1479215?v=4",
+      "profile": "https://jamonholmgren.com",
+      "contributions": [
+        "code",
+        "ideas",
+        "review",
+        "doc",
+        "maintenance",
+        "test",
+        "example",
+        "question"
+      ]
+    },
+    {
+      "login": "andreipfeiffer",
+      "name": "Andrei Pfeiffer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2570562?v=4",
+      "profile": "https://github.com/andreipfeiffer",
+      "contributions": [
+        "code",
+        "review",
+        "ideas"
+      ]
+    },
+    {
+      "login": "Salakar",
+      "name": "Michael Diarmid",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/5347038?v=4",
+      "profile": "https://twitter.com/mikediarmid",
+      "contributions": [
+        "code",
+        "review",
+        "ideas",
+        "tool"
+      ]
+    },
+    {
+      "login": "smathson",
+      "name": "Scott Mathson",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/932981?v=4",
+      "profile": "http://smathson.github.io",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "YangXiaomei",
+      "name": "Margaret",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/8221990?v=4",
+      "profile": "https://github.com/YangXiaomei",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

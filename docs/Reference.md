@@ -28,6 +28,7 @@ This document lays out the current public properties and methods for the React N
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
+- [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
 - [`userAgent`](Reference.md#useragent)
@@ -44,6 +45,7 @@ This document lays out the current public properties and methods for the React N
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
@@ -277,7 +279,7 @@ Boolean value that forces the `WebView` to show the loading view on the first lo
 
 ### `style`
 
-A style object that allow you to customize the `WebView` style. Please not that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
+A style object that allow you to customize the `WebView` style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
 
 | Type  | Required |
 | ----- | -------- |
@@ -311,6 +313,16 @@ Boolean value to control whether DOM Storage is enabled. Used only in Android.
 ### `javaScriptEnabled`
 
 Boolean value to enable JavaScript in the `WebView`. Used on Android only as JavaScript is enabled by default on iOS. The default value is `true`.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
+---
+
+### `androidHardwareAccelerationDisabled`
+
+Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only as Hardware Acceleration is a feature only for Android. The default value is `false`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -508,6 +520,16 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
+
+---
+
+### `incognito`
+
+Does not store any data within the lifetime of the WebView.
+
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS WKWebView |
 
 ---
 
