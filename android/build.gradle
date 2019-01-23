@@ -1,9 +1,12 @@
 buildscript {
-  ext.kotlin_version = '1.2.71'
+  //Buildscript is evaluated before everything else so we can't use getExtOrDefault
+  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['ReactNativeWebview_kotlinVersion']
+
   repositories {
     google()
     jcenter()
   }
+
   dependencies {
     classpath 'com.android.tools.build:gradle:3.2.1'
     //noinspection DifferentKotlinGradleVersion
@@ -11,24 +14,23 @@ buildscript {
   }
 }
 
+def getExtOrDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNativeWebview_' + name]
+}
+
+def getExtOrIntegerDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['ReactNativeWebview_' + name]).toInteger()
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
-def DEFAULT_TARGET_SDK_VERSION = 27
-def DEFAULT_COMPILE_SDK_VERSION = 27
-def DEFAULT_BUILD_TOOLS_VERSION = "28.0.3"
-def DEFAULT_SUPPORT_LIB_VERSION = "28.0.0"
-
-def getExtOrDefault(name, defaultValue) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : defaultValue
-}
-
 android {
-  compileSdkVersion getExtOrDefault('compileSdkVersion', DEFAULT_COMPILE_SDK_VERSION)
-  buildToolsVersion getExtOrDefault('buildToolsVersion', DEFAULT_BUILD_TOOLS_VERSION)
+  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+  buildToolsVersion getExtOrDefault('buildToolsVersion')
   defaultConfig {
     minSdkVersion 16
-    targetSdkVersion getExtOrDefault('targetSdkVersion', DEFAULT_TARGET_SDK_VERSION)
+    targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
     versionCode 1
     versionName "1.0"
   }
@@ -117,7 +119,8 @@ repositories {
   }
 }
 
-def support_version = getExtOrDefault('supportLibVersion', DEFAULT_SUPPORT_LIB_VERSION)
+def support_version = getExtOrDefault('supportLibVersion')
+def kotlin_version = getExtOrDefault('kotlinVersion')
 
 dependencies {
   //noinspection GradleDynamicVersion
