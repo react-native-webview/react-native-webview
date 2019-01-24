@@ -490,6 +490,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           System.out.println("Falling back to URLUtil.guessFileName");
           fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
         }
+
+        if (fileName.isEmpty()) {
+          System.out.println("Filename is empty but no error from contentDisposition");
+          fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
+        }
+
         String downloadMessage = "Downloading " + fileName;
 
         //Attempt to add cookie, if it exists
