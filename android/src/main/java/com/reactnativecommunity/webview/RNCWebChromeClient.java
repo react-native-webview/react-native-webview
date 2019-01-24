@@ -39,6 +39,8 @@ public class RNCWebChromeClient extends WebChromeClient {
 
     private int iNavColor;
 
+    View.OnApplyWindowInsetsListener listener;
+
 
     public RNCWebChromeClient(RNCWebViewManager context, ReactContext reactContext) {
         this.context = context;
@@ -114,6 +116,8 @@ public class RNCWebChromeClient extends WebChromeClient {
 
         if (Build.VERSION.SDK_INT >= 21) {
             WindowInsets insets = mActivity.getWindow().getDecorView().getRootWindowInsets();
+            mActivity.getWindow().getDecorView().setOnApplyWindowInsetsListener(null);
+            this.listener = null;
             mCustomView.setPadding(0, 0, 0, 0);
         }
         
@@ -146,8 +150,20 @@ public class RNCWebChromeClient extends WebChromeClient {
             WindowInsets insets = mActivity.getWindow().getDecorView().getRootWindowInsets();
             mCustomView.setPadding(0, 0, insets.getStableInsetRight(), insets.getStableInsetBottom());
 
+            this.listener = new View.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                    mCustomView.setPadding(0, 0, insets.getStableInsetRight(), insets.getStableInsetBottom());
+                    return insets;
+                }
+            };
+            mActivity.getWindow().getDecorView().setOnApplyWindowInsetsListener(this.listener);
+
             iNavColor = mActivity.getWindow().getNavigationBarColor();
             mActivity.getWindow().setNavigationBarColor(Color.BLACK);
+
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            mActivity.getWindow().getDecorView().setSystemUiVisibility(uiOptions);
         }
         else {
             int uiOptions = mActivity.getWindow().getDecorView().getSystemUiVisibility();
