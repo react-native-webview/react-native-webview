@@ -137,8 +137,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       if (!mLastLoadFailed) {
         RNCWebView reactWebView = (RNCWebView) webView;
-        reactWebView.callInjectedJavaScript();
         reactWebView.linkBridge();
+        reactWebView.callInjectedJavaScript();
         emitFinishEvent(webView, url);
       }
     }
@@ -356,8 +356,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         }
 
         evaluateJavascriptWithFallback("(" +
-          "window.originalPostMessage = window.postMessage," +
-          "window.postMessage = function(data) {" +
+          "window.nativePostMessage = function(data) {" +
             BRIDGE_NAME + ".postMessage(String(data));" +
           "}" +
         ")");
