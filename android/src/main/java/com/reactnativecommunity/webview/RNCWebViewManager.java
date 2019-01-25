@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.ConsoleMessage;
@@ -253,6 +254,23 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
      */
     public RNCWebView(ThemedReactContext reactContext) {
       super(reactContext);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+
+      // Allow scrolling inside ScrollView
+      if (event.findPointerIndex(0) == -1) {
+        return super.onTouchEvent(event);
+      }
+
+      if (event.getPointerCount() >= 1) {
+        requestDisallowInterceptTouchEvent(true);
+      } else {
+        requestDisallowInterceptTouchEvent(false);
+      }
+
+      return super.onTouchEvent(event);
     }
 
     @Override
