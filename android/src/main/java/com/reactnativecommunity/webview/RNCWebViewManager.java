@@ -7,7 +7,6 @@ import com.facebook.react.uimanager.UIManagerModule;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -480,16 +479,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
-        //Try to extract filename from contentDisposition, otherwise guess using URLUtil
-        String fileName = "";
-        try {
-          fileName = contentDisposition.replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
-          fileName = URLDecoder.decode(fileName, "UTF-8");
-        } catch (Exception e) {
-          System.out.println("Error extracting filename from contentDisposition: " + e);
-          System.out.println("Falling back to URLUtil.guessFileName");
-          fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
-        }
+        String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
         String downloadMessage = "Downloading " + fileName;
 
         //Attempt to add cookie, if it exists
