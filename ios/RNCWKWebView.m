@@ -83,9 +83,11 @@ static NSString *const MessageHanderName = @"ReactNative";
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+    } else if (_cacheEnabled) {
+      wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
     }
     if(self.useSharedProcessPool) {
-        wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
+      wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
     wkWebViewConfig.userContentController = [WKUserContentController new];
     [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHanderName];

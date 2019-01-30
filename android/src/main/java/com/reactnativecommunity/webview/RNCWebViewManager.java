@@ -1,8 +1,10 @@
 package com.reactnativecommunity.webview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
+
 import com.facebook.react.uimanager.UIManagerModule;
 
 import java.net.MalformedURLException;
@@ -303,6 +305,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       return new RNCWebViewBridge(webView);
     }
 
+    @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
       if (messagingEnabled == enabled) {
         return;
@@ -517,6 +520,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "cacheEnabled")
+  public void setCacheEnabled(WebView view, boolean enabled) {
+    if (enabled) {
+      Context ctx = view.getContext();
+      if (ctx != null) {
+        view.getSettings().setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        view.getSettings().setAppCacheEnabled(true);
+      }
+    } else {
+      view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+      view.getSettings().setAppCacheEnabled(false);
+    }
   }
 
   @ReactProp(name = "androidHardwareAccelerationDisabled")
