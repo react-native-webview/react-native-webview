@@ -1,13 +1,14 @@
 package com.reactnativecommunity.webview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
+
 import com.facebook.react.uimanager.UIManagerModule;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -304,6 +305,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       return new RNCWebViewBridge(webView);
     }
 
+    @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
       if (messagingEnabled == enabled) {
         return;
@@ -480,16 +482,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
-        //Try to extract filename from contentDisposition, otherwise guess using URLUtil
-        String fileName = "";
-        try {
-          fileName = contentDisposition.replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
-          fileName = URLDecoder.decode(fileName, "UTF-8");
-        } catch (Exception e) {
-          System.out.println("Error extracting filename from contentDisposition: " + e);
-          System.out.println("Falling back to URLUtil.guessFileName");
-          fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
-        }
+        String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
         String downloadMessage = "Downloading " + fileName;
 
         //Attempt to add cookie, if it exists
@@ -527,6 +520,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "cacheEnabled")
+  public void setCacheEnabled(WebView view, boolean enabled) {
+    if (enabled) {
+      Context ctx = view.getContext();
+      if (ctx != null) {
+        view.getSettings().setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        view.getSettings().setAppCacheEnabled(true);
+      }
+    } else {
+      view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+      view.getSettings().setAppCacheEnabled(false);
+    }
   }
 
   @ReactProp(name = "androidHardwareAccelerationDisabled")
