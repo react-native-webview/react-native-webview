@@ -2,8 +2,6 @@
 
 This document lays out the current public properties and methods for the React Native WebView.
 
-> **Security Warning:** Currently, `onMessage` and `postMessage` do not allow specifying an origin. This can lead to cross-site scripting attacks if an unexpected document is loaded within a `WebView` instance. Please refer to the MDN documentation for [`Window.postMessage()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) for more details on the security implications of this.
-
 ## Props Index
 
 - [`source`](Reference.md#source)
@@ -48,6 +46,7 @@ This document lays out the current public properties and methods for the React N
 - [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
+- [`cacheEnabled`](Reference.md#cacheEnabled)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 
@@ -195,9 +194,9 @@ Function that is invoked when the `WebView` is loading.
 
 ### `onMessage`
 
-A function that is invoked when the webview calls `window.postMessage`. Setting this property will inject a `postMessage` global into your webview, but will still call pre-existing values of `postMessage`.
+Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`. Setting this property will inject this global into your webview.
 
-`window.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
+`window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
 
 | Type     | Required |
 | -------- | -------- |
@@ -360,9 +359,9 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 Sets the user-agent for the `WebView`. This will only work for iOS if you are using WKWebView, not UIWebView (see https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent).
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| string | No       | Android, iOS WKWebView  |
+| Type   | Required | Platform               |
+| ------ | -------- | ---------------------- |
+| string | No       | Android, iOS WKWebView |
 
 ---
 
@@ -550,6 +549,16 @@ Sets whether the WebView should disable saving form data. The default value is `
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | Android  |
+
+---
+
+### `cacheEnabled`
+
+Sets whether WebView & WKWebView should use browser caching.
+
+| Type    | Required | Default |
+| ------- | -------- | ------- |
+| boolean | No       | true    |
 
 ---
 
