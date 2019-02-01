@@ -11,7 +11,7 @@
 
 NSString *const RNCJSNavigationScheme = @"react-js-navigation";
 
-static NSString *const MessageHandlerName = @"ReactNativeWebview";
+static NSString *const MessageHandlerName = @"ReactNativeWebView";
 
 @interface RNCUIWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
 

@@ -109,7 +109,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
-  protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebview";
+  protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
 
   protected static final String HTTP_METHOD_POST = "POST";
 

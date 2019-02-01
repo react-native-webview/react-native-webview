@@ -194,9 +194,9 @@ Function that is invoked when the `WebView` is loading.
 
 ### `onMessage`
 
-Function that is invoked when the webview calls `window.ReactNativeWebview.postMessage`. Setting this property will inject this global into your webview.
+Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`. Setting this property will inject this global into your webview.
 
-`window.ReactNativeWebview.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
+`window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
 
 | Type     | Required |
 | -------- | -------- |
