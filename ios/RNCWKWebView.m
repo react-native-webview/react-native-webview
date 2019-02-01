@@ -107,6 +107,8 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
       wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
     wkWebViewConfig.userContentController = [WKUserContentController new];
+    
+    [wkWebViewConfig.userContentController addUserScript: _atStartScript];
 
     if (_messagingEnabled) {
       [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
