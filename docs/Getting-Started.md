@@ -12,11 +12,14 @@ $ npm install --save https://github.com/react-native-community/react-native-webv
 
 React Native modules that include native Objective-C, Swift, Java, or Kotlin code have to be "linked" so that the compiler knows to include them in the app.
 
-Thankfully, there's a way to do this from the terminal with one command:
-
+This module does not require any extra step after running the link command 🎉
 ```
 $ react-native link react-native-webview
 ```
+For Android manual installation, please refer to [this article](https://engineering.brigad.co/demystifying-react-native-modules-linking-964399ec731b) where you can find detailed step on how to link any react-native project.
+
+For iOS, while you can manually link the old way using [react-native own tutorial](https://facebook.github.io/react-native/docs/linking-libraries-ios), we find it easier to use cocoapods.
+If you wish to use cocoapods and haven't set it up yet, please instead refer to [that article](https://engineering.brigad.co/demystifying-react-native-modules-linking-ae6c017a6b4a).
 
 _NOTE: If you ever need to uninstall React Native WebView, run `react-native unlink react-native-webview` to unlink it._
 

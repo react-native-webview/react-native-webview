@@ -73,6 +73,17 @@ static NSString *const MessageHandlerName = @"ReactNativeWebview";
   return self;
 }
 
+/**
+ * See https://stackoverflow.com/questions/25713069/why-is-wkwebview-not-opening-links-with-target-blank/25853806#25853806 for details.
+ */
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
+{
+  if (!navigationAction.targetFrame.isMainFrame) {
+    [webView loadRequest:navigationAction.request];
+  }
+  return nil;
+}
+
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
@@ -83,9 +94,11 @@ static NSString *const MessageHandlerName = @"ReactNativeWebview";
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+    } else if (_cacheEnabled) {
+      wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
     }
     if(self.useSharedProcessPool) {
-        wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
+      wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
     wkWebViewConfig.userContentController = [WKUserContentController new];
 
