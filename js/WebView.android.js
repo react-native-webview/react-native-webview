@@ -17,7 +17,7 @@ import ReactNative, {
   StyleSheet,
   UIManager,
   View,
-  NativeModules
+  NativeModules,
 } from 'react-native';
 
 import invariant from 'fbjs/lib/invariant';
@@ -67,6 +67,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     scalesPageToFit: true,
     allowFileAccess: false,
     saveFormDataDisabled: false,
+    cacheEnabled: true,
     androidHardwareAccelerationDisabled: false,
     originWhitelist: defaultOriginWhitelist,
   };
@@ -74,7 +75,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   static isFileUploadSupported = async () => {
     // native implementation should return "true" only for Android 5+
     return NativeModules.RNCWebView.isFileUploadSupported();
-  }
+  };
 
   state = {
     viewState: this.props.startInLoadingState
@@ -151,10 +152,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         injectedJavaScript={this.props.injectedJavaScript}
         userAgent={this.props.userAgent}
         javaScriptEnabled={this.props.javaScriptEnabled}
-        androidHardwareAccelerationDisabled={this.props.androidHardwareAccelerationDisabled}
+        androidHardwareAccelerationDisabled={
+          this.props.androidHardwareAccelerationDisabled
+        }
         thirdPartyCookiesEnabled={this.props.thirdPartyCookiesEnabled}
         domStorageEnabled={this.props.domStorageEnabled}
         messagingEnabled={typeof this.props.onMessage === 'function'}
+        cacheEnabled={this.props.cacheEnabled}
         onMessage={this.onMessage}
         overScrollMode={this.props.overScrollMode}
         contentInset={this.props.contentInset}
