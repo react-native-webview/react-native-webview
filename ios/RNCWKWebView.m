@@ -177,10 +177,13 @@ static NSString *const MessageHanderName = @"ReactNative";
     // Additional viewport checks to prevent unintentional scrolls
     UIScrollView *scrollView = self.webView.scrollView;
     double maxContentOffset = scrollView.contentSize.height - scrollView.frame.size.height;
-    if(scrollView.contentOffset.y > maxContentOffset) {
+    if (maxContentOffset < 0) {
+        maxContentOffset = 0;
+    }
+    if (scrollView.contentOffset.y > maxContentOffset) {
       // https://stackoverflow.com/a/9637807/824966
       [UIView animateWithDuration:.25 animations:^{
-          self.webView.scrollView.contentOffset = CGPointMake(0, maxContentOffset);
+          scrollView.contentOffset = CGPointMake(0, maxContentOffset);
       }];
     }
 }
