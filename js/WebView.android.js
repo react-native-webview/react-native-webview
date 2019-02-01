@@ -157,9 +157,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         }
         thirdPartyCookiesEnabled={this.props.thirdPartyCookiesEnabled}
         domStorageEnabled={this.props.domStorageEnabled}
-        messagingEnabled={typeof this.props.onMessage === 'function'}
         cacheEnabled={this.props.cacheEnabled}
         onMessage={this.onMessage}
+        messagingEnabled={typeof this.props.onMessage === 'function'}
         overScrollMode={this.props.overScrollMode}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
