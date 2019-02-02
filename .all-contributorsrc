@@ -83,6 +83,16 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "jordansexton",
+      "name": "Jordan Sexton",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1173161?v=4",
+      "profile": "https://stylisted.com",
+      "contributions": [
+        "code",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
