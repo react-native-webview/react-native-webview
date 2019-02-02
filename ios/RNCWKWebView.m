@@ -628,7 +628,7 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
                         "window.webkit.messageHandlers.%@.postMessage(String(data));"
                         "};"
                         "})();",
-                        MessageHanderName
+                        MessageHandlerName
                         ];
     [self evaluateJS: source thenCall: nil];
   }
