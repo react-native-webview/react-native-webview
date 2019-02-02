@@ -343,7 +343,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
       if (ieDetectTagIndex < 0) {
-        return scriptTagIndex
+        return scriptTagIndex;
       }
 
       return Math.min(scriptTagIndex, ieDetectTagIndex);
