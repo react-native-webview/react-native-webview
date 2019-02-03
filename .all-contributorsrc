@@ -93,6 +93,17 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "MalcolmScruggs",
+      "name": "Malcolm Scruggs",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/22333355?v=4",
+      "profile": "https://github.com/MalcolmScruggs",
+      "contributions": [
+        "code",
+        "tool",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7
