@@ -11,11 +11,13 @@
   "version": "5.0.1",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
+    "test:js": "jest",
     "test:ios:flow": "flow check",
     "test:android:flow": "flow check --flowconfig-name .flowconfig.android",
     "ci:publish": "yarn semantic-release",
-    "ci:test": "yarn ci:test:flow",
+    "ci:test": "yarn ci:test:flow && yarn ci:test:js",
     "ci:test:flow": "yarn test:ios:flow && yarn test:android:flow",
+    "ci:test:js": "yarn test:js",
     "semantic-release": "semantic-release"
   },
   "peerDependencies": {
@@ -27,10 +29,14 @@
     "fbjs": "^0.8.17"
   },
   "devDependencies": {
+    "@babel/core": "^7.2.2",
     "@semantic-release/git": "7.0.5",
     "@types/react": "^16.4.18",
     "@types/react-native": "^0.57.6",
+    "babel-jest": "^24.0.0",
     "flow-bin": "^0.80.0",
+    "jest": "^24.0.0",
+    "metro-react-native-babel-preset": "^0.51.1",
     "react-native": "^0.57",
     "semantic-release": "15.10.3"
   },
