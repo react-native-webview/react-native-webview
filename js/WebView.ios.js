@@ -232,8 +232,6 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       source = { uri: this.props.url };
     }
 
-    const messagingEnabled = typeof this.props.onMessage === 'function';
-
     let NativeWebView = nativeConfig.component;
 
     if (this.props.useWebKit) {
@@ -268,8 +266,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         onLoadingFinish={this._onLoadingFinish}
         onLoadingError={this._onLoadingError}
         onLoadingProgress={this._onLoadingProgress}
-        messagingEnabled={messagingEnabled}
         onMessage={this._onMessage}
+        messagingEnabled={typeof this.props.onMessage === 'function'}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         scalesPageToFit={scalesPageToFit}
         allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}
