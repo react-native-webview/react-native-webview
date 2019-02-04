@@ -133,6 +133,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   static defaultProps = {
     useWebKit: true,
+    cacheEnabled: true,
     originWhitelist: defaultOriginWhitelist,
     useSharedProcessPool: true,
   };
@@ -140,7 +141,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   static isFileUploadSupported = async () => {
     // no native implementation for iOS, depends only on permissions
     return true;
-  }
+  };
 
   state = {
     viewState: this.props.startInLoadingState
@@ -169,10 +170,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       );
     }
 
-    if (
-      !this.props.useWebKit &&
-      this.props.incognito
-    ) {
+    if (!this.props.useWebKit && this.props.incognito) {
       console.warn(
         'The incognito property is not supported when useWebKit = false',
       );
@@ -234,8 +232,6 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       source = { uri: this.props.url };
     }
 
-    const messagingEnabled = typeof this.props.onMessage === 'function';
-
     let NativeWebView = nativeConfig.component;
 
     if (this.props.useWebKit) {
@@ -254,21 +250,24 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         bounces={this.props.bounces}
         scrollEnabled={this.props.scrollEnabled}
         pagingEnabled={this.props.pagingEnabled}
+        cacheEnabled={this.props.cacheEnabled}
         decelerationRate={decelerationRate}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+        allowsBackForwardNavigationGestures={
+          this.props.allowsBackForwardNavigationGestures
+        }
         incognito={this.props.incognito}
         userAgent={this.props.userAgent}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
         onLoadingError={this._onLoadingError}
         onLoadingProgress={this._onLoadingProgress}
-        messagingEnabled={messagingEnabled}
         onMessage={this._onMessage}
+        messagingEnabled={typeof this.props.onMessage === 'function'}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         scalesPageToFit={scalesPageToFit}
         allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}

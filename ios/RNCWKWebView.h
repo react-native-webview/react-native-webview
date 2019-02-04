@@ -41,6 +41,7 @@
 @property (nonatomic, assign) BOOL incognito;
 @property (nonatomic, assign) BOOL useSharedProcessPool;
 @property (nonatomic, copy) NSString *userAgent;
+@property (nonatomic, assign) BOOL cacheEnabled;
 @property (nonatomic, assign) BOOL allowsLinkPreview;
 
 - (void)postMessage:(NSString *)message;

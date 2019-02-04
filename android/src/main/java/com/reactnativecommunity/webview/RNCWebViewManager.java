@@ -1,15 +1,16 @@
 package com.reactnativecommunity.webview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.Manifest;
 import android.support.v4.content.ContextCompat;
+
 import com.facebook.react.uimanager.UIManagerModule;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -111,7 +112,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
-  protected static final String BRIDGE_NAME = "__REACT_WEB_VIEW_BRIDGE";
+  protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
 
   protected static final String HTTP_METHOD_POST = "POST";
 
@@ -140,8 +141,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       if (!mLastLoadFailed) {
         RNCWebView reactWebView = (RNCWebView) webView;
+
         reactWebView.callInjectedJavaScript();
-        reactWebView.linkBridge();
+
         emitFinishEvent(webView, url);
       }
     }
@@ -241,6 +243,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         mContext = c;
       }
 
+      /**
+       * This method is called whenever JavaScript running within the web view calls:
+       *   - window[JAVASCRIPT_INTERFACE].postMessage
+       */
       @JavascriptInterface
       public void postMessage(String message) {
         mContext.onMessage(message);
@@ -307,17 +313,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       return new RNCWebViewBridge(webView);
     }
 
+    @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
       if (messagingEnabled == enabled) {
         return;
       }
 
       messagingEnabled = enabled;
+
       if (enabled) {
-        addJavascriptInterface(createRNCWebViewBridge(this), BRIDGE_NAME);
-        linkBridge();
+        addJavascriptInterface(createRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
       } else {
-        removeJavascriptInterface(BRIDGE_NAME);
+        removeJavascriptInterface(JAVASCRIPT_INTERFACE);
       }
     }
 
@@ -340,30 +347,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           injectedJS != null &&
           !TextUtils.isEmpty(injectedJS)) {
         evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
-      }
-    }
-
-    public void linkBridge() {
-      if (messagingEnabled) {
-        if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-          // See isNative in lodash
-          String testPostMessageNative = "String(window.postMessage) === String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage')";
-          evaluateJavascript(testPostMessageNative, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
-              if (value.equals("true")) {
-                FLog.w(ReactConstants.TAG, "Setting onMessage on a WebView overrides existing values of window.postMessage, but a previous value was defined");
-              }
-            }
-          });
-        }
-
-        evaluateJavascriptWithFallback("(" +
-          "window.originalPostMessage = window.postMessage," +
-          "window.postMessage = function(data) {" +
-            BRIDGE_NAME + ".postMessage(String(data));" +
-          "}" +
-        ")");
       }
     }
 
@@ -517,16 +500,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
-        //Try to extract filename from contentDisposition, otherwise guess using URLUtil
-        String fileName = "";
-        try {
-          fileName = contentDisposition.replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
-          fileName = URLDecoder.decode(fileName, "UTF-8");
-        } catch (Exception e) {
-          System.out.println("Error extracting filename from contentDisposition: " + e);
-          System.out.println("Falling back to URLUtil.guessFileName");
-          fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
-        }
+        String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
         String downloadMessage = "Downloading " + fileName;
 
         //Attempt to add cookie, if it exists
@@ -564,6 +538,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "cacheEnabled")
+  public void setCacheEnabled(WebView view, boolean enabled) {
+    if (enabled) {
+      Context ctx = view.getContext();
+      if (ctx != null) {
+        view.getSettings().setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        view.getSettings().setAppCacheEnabled(true);
+      }
+    } else {
+      view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+      view.getSettings().setAppCacheEnabled(false);
+    }
+  }
+
+  @ReactProp(name = "androidHardwareAccelerationDisabled")
+  public void setHardwareAccelerationDisabled(WebView view, boolean disabled) {
+    if (disabled) {
+      view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    }
   }
 
   @ReactProp(name = "overScrollMode")
