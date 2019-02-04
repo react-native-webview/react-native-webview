@@ -41,7 +41,7 @@ import type {
 } from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
-
+let didWarnAboutUIWebViewUsage = false;
 // Imported from https://github.com/facebook/react-native/blob/master/Libraries/Components/ScrollView/processDecelerationRate.js
 function processDecelerationRate(decelerationRate) {
   if (decelerationRate === 'normal') {
@@ -153,6 +153,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   webViewRef = React.createRef();
 
   UNSAFE_componentWillMount() {
+    if (!this.props.useWebKit && !didWarnAboutUIWebViewUsage) {
+      didWarnAboutUIWebViewUsage = true;
+      console.warn(
+        'UIWebView is deprecated and will be removed soon, please use WKWebView (do not override useWebkit={true} prop),' +
+          ' more infos here: https://github.com/react-native-community/react-native-webview/issues/312',
+      );
+    }
     if (
       this.props.useWebKit === true &&
       this.props.scalesPageToFit !== undefined
