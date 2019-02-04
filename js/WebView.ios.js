@@ -156,7 +156,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     if (!this.props.useWebKit && !didWarnAboutUIWebViewUsage) {
       didWarnAboutUIWebViewUsage = true;
       console.warn(
-        'UIWebView is depracted and will be removed soon, please use WKWebView (do not override useWebkit prop),' +
+        'UIWebView is deprecated and will be removed soon, please use WKWebView (do not override useWebkit={true} prop),' +
           ' more infos here: https://github.com/react-native-community/react-native-webview/issues/312',
       );
     }
