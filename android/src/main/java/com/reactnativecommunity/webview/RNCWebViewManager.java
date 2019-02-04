@@ -286,7 +286,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 .url(webRequest.getUrl().toString());
 
         for (Map.Entry<String, String> header: webRequest.getRequestHeaders().entrySet()) {
-          requestBuilder.addHeader(header.getKey(), header.getValue());
+          requestBuilder = requestBuilder.addHeader(header.getKey(), header.getValue());
         }
 
         return requestBuilder.build();
