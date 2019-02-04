@@ -195,10 +195,12 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
   }
 
+  getCommands = () => UIManager.getViewManagerConfig("RNCWebView").Commands;
+
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.goForward,
+      this.getCommands().goForward,
       null
     );
   };
@@ -206,7 +208,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   goBack = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.goBack,
+      this.getCommands().goBack,
       null
     );
   };
@@ -217,7 +219,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     });
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.reload,
+      this.getCommands().reload,
       null
     );
   };
@@ -225,7 +227,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   stopLoading = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.stopLoading,
+      this.getCommands().stopLoading,
       null
     );
   };
@@ -233,7 +235,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   postMessage = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.postMessage,
+      this.getCommands().postMessage,
       [String(data)]
     );
   };
@@ -247,7 +249,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   injectJavaScript = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RNCWebView.Commands.injectJavaScript,
+      this.getCommands().injectJavaScript,
       [data]
     );
   };
@@ -312,7 +314,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     if (shouldStart) {
       UIManager.dispatchViewManagerCommand(
         this.getWebViewHandle(),
-        UIManager.RNCWebView.Commands.loadUrl,
+        this.getCommands().loadUrl,
         [String(url)]
       );
     }
