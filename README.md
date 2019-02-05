@@ -18,8 +18,6 @@ _Note: React Native WebView is not currently supported by Expo unless you "eject
 
 If you need the exact same WebView as the one from react-native, please use version **2.0.0**. Future versions will follow [semantic versioning](https://semver.org/).
 
-Please note that version >= 5.0.3 only support **react-native >=0.58**
-
 ## Getting Started
 
 ```
