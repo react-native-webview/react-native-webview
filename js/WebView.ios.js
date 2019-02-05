@@ -296,10 +296,17 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
   }
 
+  _getViewManagerConfig = viewManagerName => {
+    if (!UIManager.getViewManagerConfig) {
+      return UIManager[viewManagerName];
+    }
+    return UIManager.getViewManagerConfig(viewManagerName);
+  };
+
   _getCommands = () =>
     !this.props.useWebKit
-      ? UIManager.getViewManagerConfig('RNCUIWebView').Commands
-      : UIManager.getViewManagerConfig('RNCWKWebView').Commands;
+      ? this._getViewManagerConfig('RNCUIWebView').Commands
+      : this._getViewManagerConfig('RNCWKWebView').Commands;
 
   /**
    * Go forward one page in the web view's history.
