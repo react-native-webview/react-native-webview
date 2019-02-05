@@ -260,9 +260,9 @@ On iOS, when [`useWebKit=true`](Reference.md#usewebkit), this prop will not work
 
 Function that allows custom handling of any web view requests. Return `true` from the function to continue loading the request and `false` to stop loading.
 
-| Type     | Required | Platform |
-| -------- | -------- | -------- |
-| function | No       | iOS      |
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
 
 ---
 
