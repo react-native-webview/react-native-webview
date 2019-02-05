@@ -194,7 +194,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
   }
 
-  getViewManagerConfig = viewManagerName => {
+  getViewManagerConfig = (viewManagerName: string) => {
     if (!UIManager.getViewManagerConfig) {
       return UIManager[viewManagerName];
     }
