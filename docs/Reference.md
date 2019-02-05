@@ -281,6 +281,7 @@ The `request` object includes these properties:
 ```
 title
 url
+loading
 target
 canGoBack
 canGoForward
