@@ -264,6 +264,30 @@ Function that allows custom handling of any web view requests. Return `true` fro
 | -------- | -------- | -------- |
 | function | No       | iOS      |
 
+Example:
+
+```jsx
+<WebView
+  source={{ uri: "https://infinite.red" }}
+  onShouldStartLoadWithRequest={(request) => {
+    // Only allow navigating within this website
+    return request.url.startsWith("https://infinite.red")
+  }}
+/>
+```
+
+The `request` object includes these properties:
+
+```
+title
+url
+target
+canGoBack
+canGoForward
+lockIdentifier
+navigationType
+```
+
 ---
 
 ### `startInLoadingState`
