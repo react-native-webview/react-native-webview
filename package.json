@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "5.0.2",
+  "version": "5.0.5",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "test:js": "jest",
@@ -37,7 +37,7 @@
     "flow-bin": "^0.80.0",
     "jest": "^24.0.0",
     "metro-react-native-babel-preset": "^0.51.1",
-    "react-native": "^0.57",
+    "react-native": ">=0.57 <0.59",
     "semantic-release": "15.10.3"
   },
   "repository": {
