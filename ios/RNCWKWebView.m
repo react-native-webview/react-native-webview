@@ -13,6 +13,7 @@
 
 #import "objc/runtime.h"
 
+static NSTimer *keyboardTimer;
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
 
 // runtime trick to remove WKWebView keyboard default toolbar
@@ -70,6 +71,20 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
   }
+
+  // Workaround for a keyboard dismissal bug present in iOS 12
+  // https://openradar.appspot.com/radar?id=5018321736957952
+  if (@available(iOS 12.0, *)) {
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+      selector:@selector(keyboardWillHide)
+      name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+      selector:@selector(keyboardWillShow)
+      name:UIKeyboardWillShowNotification object:nil];
+  }
+
   return self;
 }
 
@@ -170,6 +185,33 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
     }
 
     [super removeFromSuperview];
+}
+
+-(void)keyboardWillHide
+{
+    keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
+    [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
+}
+-(void)keyboardWillShow
+{
+    if (keyboardTimer != nil) {
+        [keyboardTimer invalidate];
+    }
+}
+-(void)keyboardDisplacementFix
+{
+    // Additional viewport checks to prevent unintentional scrolls
+    UIScrollView *scrollView = self.webView.scrollView;
+    double maxContentOffset = scrollView.contentSize.height - scrollView.frame.size.height;
+    if (maxContentOffset < 0) {
+        maxContentOffset = 0;
+    }
+    if (scrollView.contentOffset.y > maxContentOffset) {
+      // https://stackoverflow.com/a/9637807/824966
+      [UIView animateWithDuration:.25 animations:^{
+          scrollView.contentOffset = CGPointMake(0, maxContentOffset);
+      }];
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
