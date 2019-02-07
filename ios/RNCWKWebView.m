@@ -13,7 +13,8 @@
 
 #import "objc/runtime.h"
 
-static NSString *const MessageHanderName = @"ReactNative";
+static NSTimer *keyboardTimer;
+static NSString *const MessageHandlerName = @"ReactNativeWebView";
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -70,7 +71,32 @@ static NSString *const MessageHanderName = @"ReactNative";
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
   }
+
+  // Workaround for a keyboard dismissal bug present in iOS 12
+  // https://openradar.appspot.com/radar?id=5018321736957952
+  if (@available(iOS 12.0, *)) {
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+      selector:@selector(keyboardWillHide)
+      name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+      selector:@selector(keyboardWillShow)
+      name:UIKeyboardWillShowNotification object:nil];
+  }
+
   return self;
+}
+
+/**
+ * See https://stackoverflow.com/questions/25713069/why-is-wkwebview-not-opening-links-with-target-blank/25853806#25853806 for details.
+ */
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
+{
+  if (!navigationAction.targetFrame.isMainFrame) {
+    [webView loadRequest:navigationAction.request];
+  }
+  return nil;
 }
 
 - (void)didMoveToWindow
@@ -83,12 +109,29 @@ static NSString *const MessageHanderName = @"ReactNative";
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+    } else if (_cacheEnabled) {
+      wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
     }
     if(self.useSharedProcessPool) {
-        wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
+      wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
     wkWebViewConfig.userContentController = [WKUserContentController new];
-    [wkWebViewConfig.userContentController addScriptMessageHandler: self name: MessageHanderName];
+
+    if (_messagingEnabled) {
+      [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
+
+      NSString *source = [NSString stringWithFormat:
+        @"window.%@ = {"
+         "  postMessage: function (data) {"
+         "    window.webkit.messageHandlers.%@.postMessage(String(data));"
+         "  }"
+         "};", MessageHandlerName, MessageHandlerName
+      ];
+
+      WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+      [wkWebViewConfig.userContentController addUserScript:script];
+    }
+
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
     wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
@@ -135,13 +178,40 @@ static NSString *const MessageHanderName = @"ReactNative";
 - (void)removeFromSuperview
 {
     if (_webView) {
-        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHanderName];
+        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
         _webView = nil;
     }
 
     [super removeFromSuperview];
+}
+
+-(void)keyboardWillHide
+{
+    keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
+    [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
+}
+-(void)keyboardWillShow
+{
+    if (keyboardTimer != nil) {
+        [keyboardTimer invalidate];
+    }
+}
+-(void)keyboardDisplacementFix
+{
+    // Additional viewport checks to prevent unintentional scrolls
+    UIScrollView *scrollView = self.webView.scrollView;
+    double maxContentOffset = scrollView.contentSize.height - scrollView.frame.size.height;
+    if (maxContentOffset < 0) {
+        maxContentOffset = 0;
+    }
+    if (scrollView.contentOffset.y > maxContentOffset) {
+      // https://stackoverflow.com/a/9637807/824966
+      [UIView animateWithDuration:.25 animations:^{
+          scrollView.contentOffset = CGPointMake(0, maxContentOffset);
+      }];
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
@@ -171,7 +241,7 @@ static NSString *const MessageHanderName = @"ReactNative";
 
 /**
  * This method is called whenever JavaScript running within the web view calls:
- *   - window.webkit.messageHandlers.[MessageHanderName].postMessage
+ *   - window.webkit.messageHandlers[MessageHandlerName].postMessage
  */
 - (void)userContentController:(WKUserContentController *)userContentController
        didReceiveScriptMessage:(WKScriptMessage *)message
@@ -240,7 +310,6 @@ static NSString *const MessageHanderName = @"ReactNative";
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
 {
-
     if (_webView == nil) {
         _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
         return;
@@ -251,6 +320,7 @@ static NSString *const MessageHanderName = @"ReactNative";
     }
 
     UIView* subview;
+
     for (UIView* view in _webView.scrollView.subviews) {
         if([[view.class description] hasPrefix:@"WK"])
             subview = view;
@@ -290,10 +360,10 @@ static NSString *const MessageHanderName = @"ReactNative";
 {
   NSDictionary *eventInitDict = @{@"data": message};
   NSString *source = [NSString
-    stringWithFormat:@"document.dispatchEvent(new MessageEvent('message', %@));",
+    stringWithFormat:@"window.dispatchEvent(new MessageEvent('message', %@));",
     RCTJSONStringify(eventInitDict, NULL)
   ];
-  [self evaluateJS: source thenCall: nil];
+  [self injectJavaScript: source];
 }
 
 - (void)layoutSubviews
@@ -507,7 +577,6 @@ static NSString *const MessageHanderName = @"ReactNative";
   }];
 }
 
-
 /**
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
@@ -515,35 +584,11 @@ static NSString *const MessageHanderName = @"ReactNative";
 - (void)      webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
-  if (_messagingEnabled) {
-    #if RCT_DEV
-
-    // Implementation inspired by Lodash.isNative.
-    NSString *isPostMessageNative = @"String(String(window.postMessage) === String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage'))";
-    [self evaluateJS: isPostMessageNative thenCall: ^(NSString *result) {
-      if (! [result isEqualToString:@"true"]) {
-        RCTLogError(@"Setting onMessage on a WebView overrides existing values of window.postMessage, but a previous value was defined");
-      }
-    }];
-    #endif
-
-    NSString *source = [NSString stringWithFormat:
-      @"(function() {"
-        "window.originalPostMessage = window.postMessage;"
-
-        "window.postMessage = function(data) {"
-          "window.webkit.messageHandlers.%@.postMessage(String(data));"
-        "};"
-      "})();",
-      MessageHanderName
-    ];
-    [self evaluateJS: source thenCall: nil];
-  }
-
   if (_injectedJavaScript) {
     [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
       NSMutableDictionary *event = [self baseEvent];
       event[@"jsEvaluationValue"] = jsEvaluationValue;
+
       if (self.onLoadingFinish) {
         self.onLoadingFinish(event);
       }
