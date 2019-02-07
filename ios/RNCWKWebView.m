@@ -332,31 +332,53 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
 
 - (void)visitSource
 {
-  // Check for a static html source first
-  NSString *html = [RCTConvert NSString:_source[@"html"]];
-  if (html) {
-    NSURL *baseURL = [RCTConvert NSURL:_source[@"baseUrl"]];
-    if (!baseURL) {
-      baseURL = [NSURL URLWithString:@"about:blank"];
+    // Check for a static html source first
+    NSString *html = [RCTConvert NSString:_source[@"html"]];
+    if (html) {
+        NSURL *baseURL = [RCTConvert NSURL:_source[@"baseUrl"]];
+        if (!baseURL) {
+            baseURL = [NSURL URLWithString:@"about:blank"];
+        }
+        [_webView loadHTMLString:html baseURL:baseURL];
+        return;
     }
-    [_webView loadHTMLString:html baseURL:baseURL];
-    return;
-  }
 
-  NSURLRequest *request = [RCTConvert NSURLRequest:_source];
-  // Because of the way React works, as pages redirect, we actually end up
-  // passing the redirect urls back here, so we ignore them if trying to load
-  // the same url. We'll expose a call to 'reload' to allow a user to load
-  // the existing page.
-  if ([request.URL isEqual:_webView.URL]) {
-    return;
-  }
-  if (!request.URL) {
-    // Clear the webview
-    [_webView loadHTMLString:@"" baseURL:nil];
-    return;
-  }
-  [_webView loadRequest:request];
+    NSURLRequest *request = [RCTConvert NSURLRequest:_source];
+    // Because of the way React works, as pages redirect, we actually end up
+    // passing the redirect urls back here, so we ignore them if trying to load
+    // the same url. We'll expose a call to 'reload' to allow a user to load
+    // the existing page.
+    if ([request.URL isEqual:_webView.URL]) {
+        return;
+    }
+    if (!request.URL) {
+        // Clear the webview
+        [_webView loadHTMLString:@"" baseURL:nil];
+        return;
+    }
+
+    //Manually add shared cookie to request header for iOS versions < 11
+    if(_sharedCookiesEnabled) {
+        if (@available(iOS 11.0, *)) {
+            // see WKWebView initialization for added cookies
+        } else {
+            NSMutableString* cookieHeader = [NSMutableString string];
+            for(NSHTTPCookie* cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
+            {
+                // TODO: escape cookies!
+                [cookieHeader appendString:cookie.name];
+                [cookieHeader appendString:@"="];
+                [cookieHeader appendString:cookie.value];
+                [cookieHeader appendString:@"; "];
+            }
+            
+            NSMutableURLRequest *mutableRequest = [request mutableCopy];
+            [mutableRequest addValue:cookieHeader forHTTPHeaderField:@"Cookie"];
+            request = [mutableRequest copy];
+        }
+    }
+    
+    [_webView loadRequest:request];
 }
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
@@ -674,6 +696,28 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
    * manually call [_webView loadRequest:request].
    */
   NSURLRequest *request = [RCTConvert NSURLRequest:self.source];
+    
+    //Manually add shared cookie to request header for iOS versions < 11
+    if(_sharedCookiesEnabled) {
+        if (@available(iOS 11.0, *)) {
+            // see WKWebView initialization for added cookies
+        } else {
+            NSMutableString* cookieHeader = [NSMutableString string];
+            for(NSHTTPCookie* cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
+            {
+                // TODO: escape cookies!
+                [cookieHeader appendString:cookie.name];
+                [cookieHeader appendString:@"="];
+                [cookieHeader appendString:cookie.value];
+                [cookieHeader appendString:@"; "];
+            }
+            
+            NSMutableURLRequest *mutableRequest = [request mutableCopy];
+            [mutableRequest addValue:cookieHeader forHTTPHeaderField:@"Cookie"];
+            request = [mutableRequest copy];
+        }
+    }
+    
   if (request.URL && !_webView.URL.absoluteString.length) {
     [_webView loadRequest:request];
   }
