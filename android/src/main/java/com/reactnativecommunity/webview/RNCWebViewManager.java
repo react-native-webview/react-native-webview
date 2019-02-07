@@ -5,12 +5,16 @@ import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
@@ -24,6 +28,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -137,7 +142,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   protected WebView createViewInstance(ThemedReactContext reactContext) {
     RNCWebView webView = createRNCWebViewInstance(reactContext);
-    webView.setWebChromeClient(new RNCWebChromeClient(reactContext));
+    webView.setWebChromeClient(new RNCWebChromeClient(reactContext, webView));
     reactContext.addLifecycleEventListener(webView);
     mWebViewConfig.configWebView(webView);
     WebSettings settings = webView.getSettings();
@@ -604,10 +609,52 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   protected static class RNCWebChromeClient extends WebChromeClient {
-    protected ReactContext mReactContext;
+    protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
+            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER);
 
-    public RNCWebChromeClient(ReactContext reactContext) {
+    protected ReactContext mReactContext;
+    protected View mWebView;
+
+    protected View mVideoView;
+    protected WebChromeClient.CustomViewCallback mCustomViewCallback;
+
+    public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
+      this.mWebView = webView;
+    }
+
+    @Override
+    public void onShowCustomView(View view, CustomViewCallback callback) {
+      if (mVideoView != null) {
+        callback.onCustomViewHidden();
+        return;
+      }
+
+      mVideoView = view;
+      mCustomViewCallback = callback;
+
+      mReactContext.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+      mVideoView.setBackgroundColor(Color.BLACK);
+      getRootView().addView(mVideoView, FULLSCREEN_LAYOUT_PARAMS);
+
+      mWebView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onHideCustomView() {
+      if (mVideoView == null) {
+        return;
+      }
+
+      mReactContext.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+      mVideoView.setVisibility(View.GONE);
+      getRootView().removeView(mVideoView);
+      mCustomViewCallback.onCustomViewHidden();
+
+      mVideoView = null;
+      mCustomViewCallback = null;
+
+      mWebView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -659,6 +706,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
       Intent intent = fileChooserParams.createIntent();
       return getModule(mReactContext).startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+    }
+
+    protected ViewGroup getRootView() {
+      return (ViewGroup) mReactContext.getCurrentActivity().findViewById(android.R.id.content);
     }
   }
 
