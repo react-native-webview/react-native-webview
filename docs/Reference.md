@@ -258,7 +258,9 @@ On iOS, when [`useWebKit=true`](Reference.md#usewebkit), this prop will not work
 
 ### `onShouldStartLoadWithRequest`
 
-Function that allows custom handling of any web view requests. Return `true` from the function to continue loading the request and `false` to stop loading.
+Function that allows custom handling of any web view requests. Return `true` from the function to continue loading the request and `false` to stop loading. 
+
+On Android, is not called on the first load.
 
 | Type     | Required |
 | -------- | -------- |
