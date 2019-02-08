@@ -157,7 +157,7 @@ Example:
  />
 ```
 
-The `error` is a SyntheticEvent that wraps a nativeEvent with these properties:
+Function passed to `onError` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
 
  ```
  canGoBack
@@ -171,6 +171,8 @@ The `error` is a SyntheticEvent that wraps a nativeEvent with these properties:
  title
  url
 ```
+> **_Note_**
+> Domain is only used on iOS
 
 ---
 
@@ -193,8 +195,17 @@ Example:
   }}
 />
 ```
-Function passed to onLoad is called with a SyntheticEvent
 
+Function passed to `onLoad` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+ ```
+ canGoBack
+ canGoForward
+ loading
+ target
+ title
+ url
+```
 
 ---
 
@@ -219,8 +230,17 @@ Example:
   }}
 />
 ```
-Function passed to onLoadEnd is called with a SyntheticEvent
 
+Function passed to `onLoadEnd` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+ ```
+ canGoBack
+ canGoForward
+ loading
+ target
+ title
+ url
+```
 
 ---
 
@@ -245,7 +265,17 @@ Example:
   }}
 />
 ```
-Function passed to onLoadStart is called with a SyntheticEvent
+
+Function passed to `onLoadStart` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+ ```
+ canGoBack
+ canGoForward
+ loading
+ target
+ title
+ url
+```
 
 ---
 
@@ -272,7 +302,18 @@ Example:
    }}
  />
 ```
-Function passed to onLoadProgress is called with a SyntheticEvent
+
+Function passed to `onLoadProgress` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+ ```
+ canGoBack
+ canGoForward
+ loading
+ progress
+ target
+ title
+ url
+```
 
 ---
 
@@ -318,6 +359,7 @@ The `navState` object includes these properties:
  title
  url
 ```
+
 ---
 
 ### `originWhitelist`
@@ -337,6 +379,7 @@ Example:
    originWhitelist={['https://*', 'git://*']}
  />
 ```
+
 ---
 
 ### `renderError`
@@ -357,7 +400,7 @@ Example:
  />
 ```
 
-The function passed to renderError will be called with the name of the error 
+The function passed to `renderError` will be called with the name of the error 
 
 ---
 
@@ -404,7 +447,7 @@ Function that allows custom handling of any web view requests. Return `true` fro
 
 Example:
 
- ```jsx
+```jsx
 <WebView
   source={{ uri: "https://infinite.red" }}
   onShouldStartLoadWithRequest={(request) => {
@@ -414,9 +457,9 @@ Example:
 />
 ```
 
- The `request` object includes these properties:
+The `request` object includes these properties:
 
- ```
+```
 title
 url
 loading
@@ -426,7 +469,7 @@ canGoForward
 lockIdentifier
 navigationType
 ```
- 
+
 ---
 
 ### `startInLoadingState`
