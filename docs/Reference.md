@@ -145,6 +145,15 @@ Function that is invoked when the `WebView` load fails.
 | -------- | -------- |
 | function | No       |
 
+```javascript
+<WebView
+   source={{ uri: "https://infinite.red" }}
+   onError={(error) => {
+     console.error(error)
+   }}
+ />
+```
+
 ---
 
 ### `onLoad`
@@ -212,6 +221,15 @@ Function that is invoked when the `WebView` loading starts or ends.
 | -------- | -------- |
 | function | No       |
 
+```javascript
+<WebView
+   source={{ uri: "https://infinite.red" }}
+   onNavigationStateChange={(navState) => {
+    // Keep track of going back navigation within component
+    this.canGoBack = navState.canGoBack;
+}} />
+```
+
 ---
 
 ### `originWhitelist`
@@ -222,6 +240,13 @@ List of origin strings to allow being navigated to. The strings allow wildcards 
 | ---------------- | -------- |
 | array of strings | No       |
 
+```javascript
+//only allow URIs that begin with https:// or git://
+<WebView
+   source={{ uri: "https://infinite.red" }}
+   originWhitelist={['https://*', 'git://*']}
+ />
+```
 ---
 
 ### `renderError`
@@ -232,6 +257,13 @@ Function that returns a view to show if there's an error.
 | -------- | -------- |
 | function | No       |
 
+```javascript
+<WebView
+   source={{ uri: "https://infinite.red" }}
+   renderError={() => <Error /> }
+ />
+```
+
 ---
 
 ### `renderLoading`
@@ -241,6 +273,14 @@ Function that returns a loading indicator. The startInLoadingState prop must be 
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
+
+```javascript
+<WebView
+   source={{ uri: "https://infinite.red" }}
+   startInLoadingState={true}
+   renderLoading={() => <Loading /> }
+ />
+```
 
 ---
 
@@ -264,6 +304,16 @@ Function that allows custom handling of any web view requests. Return `true` fro
 | -------- | -------- | -------- |
 | function | No       | iOS      |
 
+```javascript
+<WebView
+   source={{ uri: "https://infinite.red" }}
+   onShouldStartLoadWithRequest={(request) => {
+     // Only allow navigating within this website
+     return request.url.startsWith("https://infinite.red")
+   }}
+ />
+ ```
+ 
 ---
 
 ### `startInLoadingState`
