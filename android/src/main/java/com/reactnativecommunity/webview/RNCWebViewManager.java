@@ -353,6 +353,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       injectedJavaScriptOnResponse = script;
     }
 
+    public void setUserAgentString(String userAgent) { userAgentString = userAgent; }
+
     public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
       mUrlPrefixesForDefaultIntent = specialUrls;
     }
@@ -711,6 +713,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (userAgent != null) {
       // TODO(8496850): Fix incorrect behavior when property is unset (uA == null)
       view.getSettings().setUserAgentString(userAgent);
+
+      // Required because requests are intercepted and user agent is added in manually.
+      ((RNCWebView) view).getRNCWebViewClient().setUserAgentString(userAgent);
     }
   }
 
