@@ -145,13 +145,31 @@ Function that is invoked when the `WebView` load fails.
 | -------- | -------- |
 | function | No       |
 
-```javascript
+Example:
+
+```jsx
 <WebView
    source={{ uri: "https://infinite.red" }}
-   onError={(error) => {
-     console.error(error)
+   onError={(syntheticEvent) => {
+     const { nativeEvent } = syntheticEvent
+     console.warn('WebView error: ', nativeEvent)
    }}
  />
+```
+
+The `error` is a SyntheticEvent that wraps a nativeEvent with these properties:
+
+ ```
+ canGoBack
+ canGoForward
+ code
+ description
+ didFailProvisionalNavigation
+ domain
+ loading
+ target
+ title
+ url
 ```
 
 ---
@@ -221,7 +239,9 @@ Function that is invoked when the `WebView` loading starts or ends.
 | -------- | -------- |
 | function | No       |
 
-```javascript
+Example:
+
+```jsx
 <WebView
    source={{ uri: "https://infinite.red" }}
    onNavigationStateChange={(navState) => {
@@ -230,6 +250,17 @@ Function that is invoked when the `WebView` loading starts or ends.
 }} />
 ```
 
+The `navState` object includes these properties:
+
+ ```
+ canGoBack
+ canGoForward
+ loading
+ navigationType
+ target
+ title
+ url
+```
 ---
 
 ### `originWhitelist`
@@ -240,7 +271,9 @@ List of origin strings to allow being navigated to. The strings allow wildcards 
 | ---------------- | -------- |
 | array of strings | No       |
 
-```javascript
+Example:
+
+```jsx
 //only allow URIs that begin with https:// or git://
 <WebView
    source={{ uri: "https://infinite.red" }}
@@ -257,12 +290,17 @@ Function that returns a view to show if there's an error.
 | -------- | -------- |
 | function | No       |
 
-```javascript
+
+Example:
+
+```jsx
 <WebView
    source={{ uri: "https://infinite.red" }}
-   renderError={() => <Error /> }
+   renderError={(errorName) => <Error name={errorName} /> }
  />
 ```
+
+The function passed to renderError will be called with the name of the error 
 
 ---
 
@@ -274,7 +312,10 @@ Function that returns a loading indicator. The startInLoadingState prop must be 
 | -------- | -------- |
 | function | No       |
 
-```javascript
+
+Example:
+
+```jsx
 <WebView
    source={{ uri: "https://infinite.red" }}
    startInLoadingState={true}
@@ -304,15 +345,30 @@ Function that allows custom handling of any web view requests. Return `true` fro
 | -------- | -------- | -------- |
 | function | No       | iOS      |
 
-```javascript
+Example:
+
+ ```jsx
 <WebView
-   source={{ uri: "https://infinite.red" }}
-   onShouldStartLoadWithRequest={(request) => {
-     // Only allow navigating within this website
-     return request.url.startsWith("https://infinite.red")
-   }}
- />
+  source={{ uri: "https://infinite.red" }}
+  onShouldStartLoadWithRequest={(request) => {
+    // Only allow navigating within this website
+    return request.url.startsWith("https://infinite.red")
+  }}
+/>
+```
+
+ The `request` object includes these properties:
+
  ```
+title
+url
+loading
+target
+canGoBack
+canGoForward
+lockIdentifier
+navigationType
+```
  
 ---
 
