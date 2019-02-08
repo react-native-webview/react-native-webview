@@ -182,6 +182,20 @@ Function that is invoked when the `WebView` has finished loading.
 | -------- | -------- |
 | function | No       |
 
+Example:
+
+```jsx
+<WebView
+  source={{uri: 'https://infinite.red'}}
+  onLoad={(syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    this.url = nativeEvent.url;
+  }}
+/>
+```
+Function passed to onLoad is called with a SyntheticEvent
+
+
 ---
 
 ### `onLoadEnd`
@@ -192,6 +206,22 @@ Function that is invoked when the `WebView` load succeeds or fails.
 | -------- | -------- |
 | function | No       |
 
+
+Example:
+
+```jsx
+<WebView
+  source={{uri: 'https://infinite.red'}}
+  onLoadEnd={(syntheticEvent) => {
+    // update component to be aware of loading status
+    const { nativeEvent } = syntheticEvent;
+    this.isLoading = nativeEvent.loading;
+  }}
+/>
+```
+Function passed to onLoadEnd is called with a SyntheticEvent
+
+
 ---
 
 ### `onLoadStart`
@@ -201,6 +231,21 @@ Function that is invoked when the `WebView` starts loading.
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
+
+
+Example:
+
+```jsx
+<WebView
+  source={{uri: 'https://infinite.red'}}
+  onLoadStart={(syntheticEvent) => {
+    // update component to be aware of loading status
+    const { nativeEvent } = syntheticEvent;
+    this.isLoading = nativeEvent.loading;
+  }}
+/>
+```
+Function passed to onLoadStart is called with a SyntheticEvent
 
 ---
 
@@ -216,6 +261,18 @@ Function that is invoked when the `WebView` is loading.
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
+
+Example:
+
+```jsx
+<WebView
+   source={{ uri: "https://infinite.red" }}
+   onLoadProgress={({ nativeEvent }) => {
+     this.loadingProgress = nativeEvent.progress
+   }}
+ />
+```
+Function passed to onLoadProgress is called with a SyntheticEvent
 
 ---
 
@@ -389,6 +446,15 @@ A style object that allow you to customize the `WebView` style. Please note that
 | Type  | Required |
 | ----- | -------- |
 | style | No       |
+
+Example:
+
+```jsx
+<WebView
+   source={{ uri: "https://infinite.red" }}
+   style={{marginTop: 20}}
+ />
+```
 
 ---
 
