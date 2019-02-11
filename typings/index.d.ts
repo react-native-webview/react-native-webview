@@ -438,6 +438,12 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
   originWhitelist?: string[];
 
   /**
+   * Boolean value that determines whether caching is enabled in the
+   * `WebView`. The default value is `true` - i.e. caching is *enabled by default*
+   */
+  cacheEnabled?: boolean,
+
+  /**
    * Override the native component used to render the WebView. Enables a custom native
    * WebView which uses the same JavaScript as the original WebView.
    */
