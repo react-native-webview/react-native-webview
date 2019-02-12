@@ -44,6 +44,7 @@
 @property (nonatomic, assign) BOOL cacheEnabled;
 @property (nonatomic, assign) BOOL allowsLinkPreview;
 
++ (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 - (void)postMessage:(NSString *)message;
 - (void)injectJavaScript:(NSString *)script;
 - (void)goForward;

@@ -15,6 +15,7 @@
 
 static NSTimer *keyboardTimer;
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
+static NSURLCredential* clientAuthenticationCredential;
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -384,6 +385,25 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
     @"canGoForward" : @(_webView.canGoForward)
   };
   return [[NSMutableDictionary alloc] initWithDictionary: event];
+}
+
++ (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential {
+  clientAuthenticationCredential = credential;
+}
+
+- (void)                    webView:(WKWebView *)webView
+  didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+                  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler
+{
+  if (!clientAuthenticationCredential) {
+    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    return;
+  }
+  if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
+    completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
+  } else {
+    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+  }
 }
 
 #pragma mark - WKNavigationDelegate methods
