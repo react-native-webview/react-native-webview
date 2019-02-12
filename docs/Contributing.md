@@ -49,6 +49,7 @@ $ yarn add ../react-native-webview && react-native link react-native-webview
 - After pulling this repo and installing all dependencies, you can run flow on iOS and Android-specific files using the commands:
   - `yarn test:ios:flow` for iOS
   - `yarn test:android:flow` for Android
+- You can run Jest tests using the command: `yarn test:js`
 - If you want to add another React Native platform to this repository, you will need to create another `.flowconfig` for it. If your platform is `example`, copy the main flowconfig and rename it to `.flowconfig.example`. Then edit the config to ignore other platforms, and add `.*/*[.]example.js` to the ignore lists of the other platforms. Then add an entry to `package.json` like this:
   - `"test:example:flow": "flow check --flowconfig-name .flowconfig.example"`
 - Currently you need to install React Native 0.57 to be able to test these types - `flow check` will not pass against 0.56.

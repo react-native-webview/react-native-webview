@@ -14,7 +14,7 @@
 @protocol RNCWKWebViewDelegate <NSObject>
 
 - (BOOL)webView:(RNCWKWebView *)webView
-shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
+   shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
    withCallback:(RCTDirectEventBlock)callback;
 
 @end
@@ -38,7 +38,10 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL automaticallyAdjustContentInsets;
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 @property (nonatomic, assign) BOOL allowsBackForwardNavigationGestures;
+@property (nonatomic, assign) BOOL incognito;
+@property (nonatomic, assign) BOOL useSharedProcessPool;
 @property (nonatomic, copy) NSString *userAgent;
+@property (nonatomic, assign) BOOL cacheEnabled;
 @property (nonatomic, assign) BOOL allowsLinkPreview;
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;

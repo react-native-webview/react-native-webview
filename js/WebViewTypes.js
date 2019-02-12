@@ -10,12 +10,12 @@
 
 'use strict';
 
-import type {Node, Element, ComponentType} from 'react';
+import type { Node, Element, ComponentType } from 'react';
 
-import type {SyntheticEvent} from 'CoreEventTypes';
-import type {EdgeInsetsProp} from 'EdgeInsetsPropType';
-import type {ViewStyleProp} from 'StyleSheet';
-import type {ViewProps} from 'ViewPropTypes';
+import type { SyntheticEvent } from 'CoreEventTypes';
+import type { EdgeInsetsProp } from 'EdgeInsetsPropType';
+import type { ViewStyleProp } from 'StyleSheet';
+import type { ViewProps } from 'ViewPropTypes';
 
 export type WebViewNativeEvent = $ReadOnly<{|
   url: string,
@@ -23,12 +23,13 @@ export type WebViewNativeEvent = $ReadOnly<{|
   title: string,
   canGoBack: boolean,
   canGoForward: boolean,
+  lockIdentifier: number,
 |}>;
 
 export type WebViewProgressEvent = $ReadOnly<{|
-    ...WebViewNativeEvent,
-    progress: number,
-|}>
+  ...WebViewNativeEvent,
+  progress: number,
+|}>;
 
 export type WebViewNavigation = $ReadOnly<{|
   ...WebViewNativeEvent,
@@ -118,21 +119,25 @@ export type WebViewSourceHtml = $ReadOnly<{|
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
 export type WebViewNativeConfig = $ReadOnly<{|
-  /*
+  /**
    * The native component used to render the WebView.
    */
   component?: ComponentType<WebViewSharedProps>,
-  /*
+  /**
    * Set props directly on the native component WebView. Enables custom props which the
    * original WebView doesn't pass through.
    */
   props?: ?Object,
-  /*
+  /**
    * Set the ViewManager to use for communication with the native side.
    * @platform ios
    */
   viewManager?: ?Object,
 |}>;
+
+export type OnShouldStartLoadWithRequest = (
+  event: WebViewNavigation,
+) => boolean;
 
 export type IOSWebViewProps = $ReadOnly<{|
   /**
@@ -205,17 +210,7 @@ export type IOSWebViewProps = $ReadOnly<{|
    *
    * @platform ios
    */
-  dataDetectorTypes?:
-    | ?DataDetectorTypes
-    | $ReadOnlyArray<DataDetectorTypes>,
-
-  /**
-   * Function that allows custom handling of any web view requests. Return
-   * `true` from the function to continue loading the request and `false`
-   * to stop loading.
-   * @platform ios
-   */
-  onShouldStartLoadWithRequest?: (event: WebViewEvent) => mixed,
+  dataDetectorTypes?: ?DataDetectorTypes | $ReadOnlyArray<DataDetectorTypes>,
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -237,6 +232,13 @@ export type IOSWebViewProps = $ReadOnly<{|
    * back-forward list navigations.
    */
   allowsBackForwardNavigationGestures?: ?boolean,
+  /**
+   * A Boolean value indicating whether WebKit WebView should be created using a shared
+   * process pool, enabling WebViews to share cookies and localStorage between each other.
+   * Default is true but can be set to false for backwards compatibility.
+   * @platform ios
+   */
+  useSharedProcessPool?: ?boolean,
   /**
    * The custom user agent string.
    */
@@ -295,7 +297,7 @@ export type AndroidWebViewProps = $ReadOnly<{|
    */
   saveFormDataDisabled?: ?boolean,
 
-  /*
+  /**
    * Used on Android only, controls whether the given list of URL prefixes should
    * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
    * default activity intent for those URL instead of loading it within the webview.
@@ -310,6 +312,13 @@ export type AndroidWebViewProps = $ReadOnly<{|
    * @platform android
    */
   javaScriptEnabled?: ?boolean,
+
+  /**
+   * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
+   * as Hardware Acceleration is a feature only for Android. The default value is `false`.
+   * @platform android
+   */
+  androidHardwareAccelerationDisabled?: ?boolean,
 
   /**
    * Boolean value to enable third party cookies in the `WebView`. Used on
@@ -345,7 +354,7 @@ export type AndroidWebViewProps = $ReadOnly<{|
   mixedContentMode?: ?('never' | 'always' | 'compatibility'),
 |}>;
 
-export type WebViewSharedProps =  $ReadOnly<{|
+export type WebViewSharedProps = $ReadOnly<{|
   ...ViewProps,
   ...IOSWebViewProps,
   ...AndroidWebViewProps,
@@ -364,9 +373,18 @@ export type WebViewSharedProps =  $ReadOnly<{|
   source?: ?WebViewSource,
 
   /**
+   * Does not store any data within the lifetime of the WebView.
+   */
+  incognito?: ?boolean,
+
+  /**
    * Function that returns a view to show if there's an error.
    */
-  renderError: (errorDomain: ?string, errorCode: number, errorDesc: string) => Element<any>, // view to show if there's an error
+  renderError: (
+    errorDomain: ?string,
+    errorCode: number,
+    errorDesc: string,
+  ) => Element<any>, // view to show if there's an error
 
   /**
    * Function that returns a loading indicator.
@@ -406,13 +424,11 @@ export type WebViewSharedProps =  $ReadOnly<{|
   onNavigationStateChange?: (event: WebViewNavigation) => mixed,
 
   /**
-   * A function that is invoked when the webview calls `window.postMessage`.
-   * Setting this property will inject a `postMessage` global into your
-   * webview, but will still call pre-existing values of `postMessage`.
+   * Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`.
+   * Setting this property will inject this global into your webview.
    *
-   * `window.postMessage` accepts one argument, `data`, which will be
-   * available on the event object, `event.nativeEvent.data`. `data`
-   * must be a string.
+   * `window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be
+   * available on the event object, `event.nativeEvent.data`. `data` must be a string.
    */
   onMessage?: (event: WebViewMessageEvent) => mixed,
 
@@ -458,10 +474,22 @@ export type WebViewSharedProps =  $ReadOnly<{|
   originWhitelist?: $ReadOnlyArray<string>,
 
   /**
+   * Function that allows custom handling of any web view requests. Return
+   * `true` from the function to continue loading the request and `false`
+   * to stop loading. The `navigationType` is always `other` on android.
+   */
+  onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
+
+  /**
    * Override the native component used to render the WebView. Enables a custom native
    * WebView which uses the same JavaScript as the original WebView.
    */
   nativeConfig?: ?WebViewNativeConfig,
+
+  /**
+   * Should caching be enabled. Default is true.
+   */
+  cacheEnabled?: ?boolean,
 
   style?: ViewStyleProp,
   children: Node,
