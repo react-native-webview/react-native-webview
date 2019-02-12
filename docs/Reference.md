@@ -454,6 +454,26 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 
 ---
 
+### `showsHorizontalScrollIndicator`
+
+Boolean value that determines whether a horizontal scroll indicator is shown in the `WebView`. The default value is `true`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
+### `showsVerticalScrollIndicator`
+
+Boolean value that determines whether a vertical scroll indicator is shown in the `WebView`. The default value is `true`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
 ### `geolocationEnabled`
 
 Set whether Geolocation is enabled in the `WebView`. The default value is `false`. Used only in Android.

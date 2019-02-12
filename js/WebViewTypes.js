@@ -450,6 +450,18 @@ export type WebViewSharedProps = $ReadOnly<{|
   injectedJavaScript?: ?string,
 
   /**
+   * Boolean value that determines whether a horizontal scroll indicator is
+   * shown in the `WebView`. The default value is `true`.
+   */
+  showsHorizontalScrollIndicator?: ?boolean,
+
+  /**
+   * Boolean value that determines whether a vertical scroll indicator is
+   * shown in the `WebView`. The default value is `true`.
+   */
+  showsVerticalScrollIndicator?: ?boolean,
+
+  /**
    * Boolean that controls whether the web content is scaled to fit
    * the view and enables the user to change the scale. The default value
    * is `true`.

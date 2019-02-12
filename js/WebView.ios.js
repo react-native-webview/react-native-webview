@@ -284,6 +284,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         dataDetectorTypes={this.props.dataDetectorTypes}
         useSharedProcessPool={this.props.useSharedProcessPool}
         allowsLinkPreview={this.props.allowsLinkPreview}
+        showsHorizontalScrollIndicator={this.props.showsHorizontalScrollIndicator}
+        showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator}
         {...nativeConfig.props}
       />
     );
