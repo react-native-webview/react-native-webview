@@ -58,6 +58,7 @@ Simply install React Native WebView and then use it in place of the core WebView
 ## Troubleshooting
 
 - If you're getting `Invariant Violation: Native component for "RNCWKWebView does not exist"` it likely means you forgot to run `react-native link` or there was some error with the linking process
+- There's a [problem](https://stackoverflow.com/questions/52872045/rendering-webview-on-android-device-overlaps-previous-siblings-from-same-parent) on some Android devices where the webview could overlap previous siblings from same parent. To fix this, wrap the WebView in a View with style `overflow: hidden`.
 
 ## Contributing
 
