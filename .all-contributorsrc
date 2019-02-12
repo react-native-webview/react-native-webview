@@ -73,6 +73,55 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "YangXiaomei",
+      "name": "Margaret",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/8221990?v=4",
+      "profile": "https://github.com/YangXiaomei",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "jordansexton",
+      "name": "Jordan Sexton",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1173161?v=4",
+      "profile": "https://stylisted.com",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "MalcolmScruggs",
+      "name": "Malcolm Scruggs",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/22333355?v=4",
+      "profile": "https://github.com/MalcolmScruggs",
+      "contributions": [
+        "code",
+        "tool",
+        "test"
+      ]
+    },
+    {
+      "login": "Momazo7u7",
+      "name": "Momazo7u7",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/42069617?v=4",
+      "profile": "https://github.com/Momazo7u7",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "marconett",
+      "name": "Marco",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3315507?v=4",
+      "profile": "https://marco-nett.de",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
