@@ -43,8 +43,6 @@ static NSURLCredential* clientAuthenticationCredential;
   BOOL _savedHideKeyboardAccessoryView;
 }
 
-- (void)dealloc{}
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
@@ -71,6 +69,11 @@ static NSURLCredential* clientAuthenticationCredential;
   }
 
   return self;
+}
+
+- (void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 /**
@@ -164,6 +167,7 @@ static NSURLCredential* clientAuthenticationCredential;
         [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
+        _webView.scrollView.delegate = nil;
         _webView = nil;
     }
 
