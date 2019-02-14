@@ -43,26 +43,6 @@ static NSURLCredential* clientAuthenticationCredential;
   BOOL _savedHideKeyboardAccessoryView;
 }
 
-- (void)dealloc{}
-
-/**
- * See https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DisplayWebContent/Tasks/WebKitAvail.html.
- */
-+ (BOOL)dynamicallyLoadWebKitIfAvailable
-{
-  static BOOL _webkitAvailable=NO;
-  static dispatch_once_t onceToken;
-
-  dispatch_once(&onceToken, ^{
-    NSBundle *webKitBundle = [NSBundle bundleWithPath:@"/System/Library/Frameworks/WebKit.framework"];
-    if (webKitBundle) {
-      _webkitAvailable = [webKitBundle load];
-    }
-  });
-
-  return _webkitAvailable;
-}
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
@@ -91,6 +71,11 @@ static NSURLCredential* clientAuthenticationCredential;
   return self;
 }
 
+- (void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 /**
  * See https://stackoverflow.com/questions/25713069/why-is-wkwebview-not-opening-links-with-target-blank/25853806#25853806 for details.
  */
@@ -105,10 +90,6 @@ static NSURLCredential* clientAuthenticationCredential;
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
-    if (![[self class] dynamicallyLoadWebKitIfAvailable]) {
-      return;
-    };
-
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
@@ -186,6 +167,7 @@ static NSURLCredential* clientAuthenticationCredential;
         [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
+        _webView.scrollView.delegate = nil;
         _webView = nil;
     }
 
