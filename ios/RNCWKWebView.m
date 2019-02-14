@@ -143,57 +143,69 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
 #endif
 
     if(_sharedCookiesEnabled) {
-        // More info to sending cookies with wkwebview: https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
-        if (@available(iOS 11.0, *)) {
-          // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies (https://forums.developer.apple.com/thread/97194)
-          wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
-          NSArray<NSHTTPCookie*>* cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
-          for(int i = 0; i < (int)[cookies count]; ++i)
-          {
-              NSHTTPCookie* currentCookie = cookies[i];
-              [wkWebViewConfig.websiteDataStore.httpCookieStore setCookie: currentCookie completionHandler: nil];
-          }
-
-          _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+      // More info to sending cookies with WKWebView
+      // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
+      if (@available(iOS 11.0, *)) {
+        // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
+        // See also https://forums.developer.apple.com/thread/97194
+        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+        for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+          [wkWebViewConfig.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:nil];
         }
-        else
-        {
-          NSMutableString* script = [NSMutableString string];
+      } else {
+        NSMutableString *script = [NSMutableString string];
 
-          // Get the currently set cookie names in javascript
-          [script appendString: @"var cookieNames = document.cookie.split('; ').map(function(cookie) { return cookie.split('=')[0] } );\n"];
+        // Clear all existing cookies in a direct called function. This ensures that no
+        // javascript error will break the web content javascript.
+        // We keep this code here, if someone requires that Cookies are also removed within the
+        // the WebView and want to extends the current sharedCookiesEnabled option with an
+        // additional property.
+        // Generates JS: document.cookie = "key=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+        // for each cookie which is already available in the WebView context.
+        /*
+        [script appendString:@"(function () {\n"];
+        [script appendString:@"  var cookies = document.cookie.split('; ');\n"];
+        [script appendString:@"  for (var i = 0; i < cookies.length; i++) {\n"];
+        [script appendString:@"    if (cookies[i].indexOf('=') !== -1) {\n"];
+        [script appendString:@"      document.cookie = cookies[i].split('=')[0] + '=; Expires=Thu, 01 Jan 1970 00:00:01 GMT';\n"];
+        [script appendString:@"    }\n"];
+        [script appendString:@"  }\n"];
+        [script appendString:@"})();\n\n"];
+        */
 
-          for(NSHTTPCookie* cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
-          {
-              // Skip cookies that will break our script
-              if([cookie.value rangeOfString: @"'"].location != NSNotFound)
-              {
-                  continue;
-              }
-
-              NSString* javascriptCookieString = [NSString stringWithFormat: @"%@=%@;domain=%@;path=%@", cookie.name, cookie.value, cookie.domain, cookie.path ? cookie.path : @"/"];
-
-              // Create a line that appends this cookie to the web view's document's cookies
-              [script appendFormat: @"if (cookieNames.indexOf('%@') == -1) { document.cookie='%@'; };\n", cookie.name, javascriptCookieString];
+        // Set cookies in a direct called function. This ensures that no
+        // javascript error will break the web content javascript.
+          // Generates JS: document.cookie = "key=value; Path=/; Expires=Thu, 01 Jan 20xx 00:00:01 GMT;"
+        // for each cookie which is available in the application context.
+        [script appendString:@"(function () {\n"];
+        for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+          [script appendFormat:@"document.cookie = %@ + '=' + %@",
+            RCTJSONStringify(cookie.name, NULL),
+            RCTJSONStringify(cookie.value, NULL)];
+          if (cookie.path) {
+            [script appendFormat:@" + '; Path=' + %@", RCTJSONStringify(cookie.path, NULL)];
           }
-
-          WKUserContentController* userContentController = [[WKUserContentController alloc] init];
-          WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource: script
-                                                                injectionTime: WKUserScriptInjectionTimeAtDocumentStart
-                                                             forMainFrameOnly: NO];
-          [userContentController addUserScript: cookieInScript];
-
-          // Create a config out of that userContentController and specify it when we create our web view.
-          wkWebViewConfig.userContentController = userContentController;
-
-          _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+          if (cookie.expiresDate) {
+            [script appendFormat:@" + '; Expires=' + new Date(%f).toUTCString()",
+              cookie.expiresDate.timeIntervalSince1970 * 1000
+            ];
+          }
+          [script appendString:@";\n"];
         }
-    }
-    else
-    {
-        _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+        [script appendString:@"})();\n"];
+
+        WKUserContentController* userContentController = [[WKUserContentController alloc] init];
+        WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource:script
+                                                              injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+                                                           forMainFrameOnly:NO];
+        [userContentController addUserScript:cookieInScript];
+
+        // Create a config out of that userContentController and specify it when we create our web view.
+        wkWebViewConfig.userContentController = userContentController;
+      }
     }
 
+    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
     _webView.scrollView.delegate = self;
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
@@ -343,7 +355,7 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
         return;
     }
 
-    NSURLRequest *request = [RCTConvert NSURLRequest:_source];
+    NSURLRequest *request = [self requestForSource:_source];
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
     // the same url. We'll expose a call to 'reload' to allow a user to load
@@ -357,27 +369,6 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
         return;
     }
 
-    //Manually add shared cookie to request header for iOS versions < 11
-    if(_sharedCookiesEnabled) {
-        if (@available(iOS 11.0, *)) {
-            // see WKWebView initialization for added cookies
-        } else {
-            NSMutableString* cookieHeader = [NSMutableString string];
-            for(NSHTTPCookie* cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
-            {
-                // TODO: escape cookies!
-                [cookieHeader appendString:cookie.name];
-                [cookieHeader appendString:@"="];
-                [cookieHeader appendString:cookie.value];
-                [cookieHeader appendString:@"; "];
-            }
-            
-            NSMutableURLRequest *mutableRequest = [request mutableCopy];
-            [mutableRequest addValue:cookieHeader forHTTPHeaderField:@"Cookie"];
-            request = [mutableRequest copy];
-        }
-    }
-    
     [_webView loadRequest:request];
 }
 
@@ -695,33 +686,11 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
    * [_webView reload] doesn't reload the webpage. Therefore, we must
    * manually call [_webView loadRequest:request].
    */
-  NSURLRequest *request = [RCTConvert NSURLRequest:self.source];
-    
-    //Manually add shared cookie to request header for iOS versions < 11
-    if(_sharedCookiesEnabled) {
-        if (@available(iOS 11.0, *)) {
-            // see WKWebView initialization for added cookies
-        } else {
-            NSMutableString* cookieHeader = [NSMutableString string];
-            for(NSHTTPCookie* cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
-            {
-                // TODO: escape cookies!
-                [cookieHeader appendString:cookie.name];
-                [cookieHeader appendString:@"="];
-                [cookieHeader appendString:cookie.value];
-                [cookieHeader appendString:@"; "];
-            }
-            
-            NSMutableURLRequest *mutableRequest = [request mutableCopy];
-            [mutableRequest addValue:cookieHeader forHTTPHeaderField:@"Cookie"];
-            request = [mutableRequest copy];
-        }
-    }
-    
+  NSURLRequest *request = [self requestForSource:self.source];
+
   if (request.URL && !_webView.URL.absoluteString.length) {
     [_webView loadRequest:request];
-  }
-  else {
+  } else {
     [_webView reload];
   }
 }
@@ -736,4 +705,25 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
   _bounces = bounces;
   _webView.scrollView.bounces = bounces;
 }
+
+- (NSURLRequest *)requestForSource:(id)json {
+  NSURLRequest *request = [RCTConvert NSURLRequest:self.source];
+
+  // If sharedCookiesEnabled we automatically add all application cookies to the
+  // http request. This is automatically done on iOS 11+ in the WebView constructor.
+  // Se we need to manually add these shared cookies here only for iOS versions < 11.
+  if (_sharedCookiesEnabled) {
+    if (@available(iOS 11.0, *)) {
+      // see WKWebView initialization for added cookies
+    } else {
+      NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL];
+      NSDictionary<NSString *, NSString *> *cookieHeader = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
+      NSMutableURLRequest *mutableRequest = [request mutableCopy];
+      [mutableRequest setAllHTTPHeaderFields:cookieHeader];
+      return mutableRequest;
+    }
+  }
+  return request;
+}
+
 @end
