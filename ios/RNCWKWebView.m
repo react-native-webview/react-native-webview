@@ -172,6 +172,13 @@ static NSURLCredential* clientAuthenticationCredential;
   }
 }
 
+-(void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view{
+  BOOL isEnabled = !_disableBuiltInZoomControls;
+  
+  [[scrollView panGestureRecognizer] setEnabled:isEnabled];
+  [[scrollView pinchGestureRecognizer] setEnabled:isEnabled];
+}
+
 // Update webview property when the component prop changes.
 - (void)setAllowsBackForwardNavigationGestures:(BOOL)allowsBackForwardNavigationGestures {
   _allowsBackForwardNavigationGestures = allowsBackForwardNavigationGestures;
