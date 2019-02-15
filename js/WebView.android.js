@@ -180,6 +180,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         allowUniversalAccessFromFileURLs={
           this.props.allowUniversalAccessFromFileURLs
         }
+        disableBuiltInZoomControls={this.props.disableBuiltInZoomControls}
         mixedContentMode={this.props.mixedContentMode}
         saveFormDataDisabled={this.props.saveFormDataDisabled}
         urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}

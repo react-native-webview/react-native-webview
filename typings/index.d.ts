@@ -460,7 +460,7 @@ export interface WebViewSharedProps
    * Boolean value that determines whether caching is enabled in the
    * `WebView`. The default value is `true` - i.e. caching is *enabled by default*
    */
-  cacheEnabled?: boolean,
+  cacheEnabled?: boolean;
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
@@ -472,6 +472,7 @@ export interface WebViewSharedProps
   children?: ReactNode;
 
   injectJavaScript?: string;
+  disableBuiltInZoomControls?: boolean;
 }
 
 export class WebView extends Component<WebViewSharedProps> {

@@ -156,8 +156,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     if (!this.props.useWebKit && !didWarnAboutUIWebViewUsage) {
       didWarnAboutUIWebViewUsage = true;
       console.warn(
-        'UIWebView is deprecated and will be removed soon, please use WKWebView (do not override useWebkit={true} prop),' +
-          ' more infos here: https://github.com/react-native-community/react-native-webview/issues/312',
+        "UIWebView is deprecated and will be removed soon, please use WKWebView (do not override useWebkit={true} prop)," +
+          " more infos here: https://github.com/react-native-community/react-native-webview/issues/312"
       );
     }
     if (
@@ -283,10 +283,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         mediaPlaybackRequiresUserAction={
           this.props.mediaPlaybackRequiresUserAction
         }
+        disableBuiltInZoomControls={this.props.disableBuiltInZoomControls}
         dataDetectorTypes={this.props.dataDetectorTypes}
         useSharedProcessPool={this.props.useSharedProcessPool}
         allowsLinkPreview={this.props.allowsLinkPreview}
-        showsHorizontalScrollIndicator={this.props.showsHorizontalScrollIndicator}
+        showsHorizontalScrollIndicator={
+          this.props.showsHorizontalScrollIndicator
+        }
         showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator}
         {...nativeConfig.props}
       />
@@ -309,8 +312,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   _getCommands = () =>
     !this.props.useWebKit
-      ? this._getViewManagerConfig('RNCUIWebView').Commands
-      : this._getViewManagerConfig('RNCWKWebView').Commands;
+      ? this._getViewManagerConfig("RNCUIWebView").Commands
+      : this._getViewManagerConfig("RNCWKWebView").Commands;
 
   /**
    * Go forward one page in the web view's history.
