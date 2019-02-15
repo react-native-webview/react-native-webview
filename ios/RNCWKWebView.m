@@ -14,7 +14,9 @@
 
 #import "objc/runtime.h"
 
+static NSTimer *keyboardTimer;
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
+static NSURLCredential* clientAuthenticationCredential;
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -47,36 +49,37 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
   NSString *_currentTitle;
 }
 
-- (void)dealloc{}
-
-/**
- * See https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DisplayWebContent/Tasks/WebKitAvail.html.
- */
-+ (BOOL)dynamicallyLoadWebKitIfAvailable
-{
-  static BOOL _webkitAvailable=NO;
-  static dispatch_once_t onceToken;
-  
-  dispatch_once(&onceToken, ^{
-    NSBundle *webKitBundle = [NSBundle bundleWithPath:@"/System/Library/Frameworks/WebKit.framework"];
-    if (webKitBundle) {
-      _webkitAvailable = [webKitBundle load];
-    }
-  });
-  
-  return _webkitAvailable;
-}
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
     super.backgroundColor = [UIColor clearColor];
     _bounces = YES;
     _scrollEnabled = YES;
+    _showsHorizontalScrollIndicator = YES;
+    _showsVerticalScrollIndicator = YES;
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
   }
+
+  // Workaround for a keyboard dismissal bug present in iOS 12
+  // https://openradar.appspot.com/radar?id=5018321736957952
+  if (@available(iOS 12.0, *)) {
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+      selector:@selector(keyboardWillHide)
+      name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+      selector:@selector(keyboardWillShow)
+      name:UIKeyboardWillShowNotification object:nil];
+  }
+
   return self;
+}
+
+- (void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 /**
@@ -93,10 +96,6 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
-    if (![[self class] dynamicallyLoadWebKitIfAvailable]) {
-      return;
-    };
-    
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
@@ -144,6 +143,8 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
     _webView.scrollView.bounces = _bounces;
+    _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
+    _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.allowsLinkPreview = _allowsLinkPreview;
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
     
@@ -191,10 +192,39 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
     [_webView removeObserver:self forKeyPath:@"canGoBack"];
     
     [_webView removeFromSuperview];
+    
+    _webView.scrollView.delegate = nil;
     _webView = nil;
   }
   
   [super removeFromSuperview];
+}
+
+-(void)keyboardWillHide
+{
+    keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
+    [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
+}
+-(void)keyboardWillShow
+{
+    if (keyboardTimer != nil) {
+        [keyboardTimer invalidate];
+    }
+}
+-(void)keyboardDisplacementFix
+{
+    // Additional viewport checks to prevent unintentional scrolls
+    UIScrollView *scrollView = self.webView.scrollView;
+    double maxContentOffset = scrollView.contentSize.height - scrollView.frame.size.height;
+    if (maxContentOffset < 0) {
+        maxContentOffset = 0;
+    }
+    if (scrollView.contentOffset.y > maxContentOffset) {
+      // https://stackoverflow.com/a/9637807/824966
+      [UIView animateWithDuration:.25 animations:^{
+          scrollView.contentOffset = CGPointMake(0, maxContentOffset);
+      }];
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
@@ -383,6 +413,18 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
   _webView.scrollView.scrollEnabled = scrollEnabled;
 }
 
+- (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
+{
+    _showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+    _webView.scrollView.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+}
+
+- (void)setShowsVerticalScrollIndicator:(BOOL)showsVerticalScrollIndicator
+{
+    _showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+    _webView.scrollView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+}
+
 - (void)postMessage:(NSString *)message
 {
   NSDictionary *eventInitDict = @{@"data": message};
@@ -411,6 +453,25 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
                           @"canGoForward" : @(_webView.canGoForward)
                           };
   return [[NSMutableDictionary alloc] initWithDictionary: event];
+}
+
++ (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential {
+  clientAuthenticationCredential = credential;
+}
+
+- (void)                    webView:(WKWebView *)webView
+  didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+                  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler
+{
+  if (!clientAuthenticationCredential) {
+    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    return;
+  }
+  if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
+    completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
+  } else {
+    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+  }
 }
 
 #pragma mark - WKNavigationDelegate methods
