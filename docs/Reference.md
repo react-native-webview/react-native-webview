@@ -258,11 +258,13 @@ On iOS, when [`useWebKit=true`](Reference.md#usewebkit), this prop will not work
 
 ### `onShouldStartLoadWithRequest`
 
-Function that allows custom handling of any web view requests. Return `true` from the function to continue loading the request and `false` to stop loading.
+Function that allows custom handling of any web view requests. Return `true` from the function to continue loading the request and `false` to stop loading. 
 
-| Type     | Required | Platform |
-| -------- | -------- | -------- |
-| function | No       | iOS      |
+On Android, is not called on the first load.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
 
 ---
 
@@ -449,6 +451,26 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | iOS      |
+
+---
+
+### `showsHorizontalScrollIndicator`
+
+Boolean value that determines whether a horizontal scroll indicator is shown in the `WebView`. The default value is `true`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
+### `showsVerticalScrollIndicator`
+
+Boolean value that determines whether a vertical scroll indicator is shown in the `WebView`. The default value is `true`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
 
 ---
 

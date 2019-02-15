@@ -183,6 +183,10 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         mixedContentMode={this.props.mixedContentMode}
         saveFormDataDisabled={this.props.saveFormDataDisabled}
         urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}
+        showsHorizontalScrollIndicator={
+          this.props.showsHorizontalScrollIndicator
+        }
+        showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator}
         {...nativeConfig.props}
       />
     );
@@ -195,7 +199,14 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
   }
 
-  getCommands = () => UIManager.getViewManagerConfig("RNCWebView").Commands;
+  getViewManagerConfig = (viewManagerName: string) => {
+    if (!UIManager.getViewManagerConfig) {
+      return UIManager[viewManagerName];
+    }
+    return UIManager.getViewManagerConfig(viewManagerName);
+  };
+
+  getCommands = () => this.getViewManagerConfig("RNCWebView").Commands;
 
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
