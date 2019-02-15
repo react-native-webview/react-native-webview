@@ -122,6 +122,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "jeluard",
+      "name": "Julien Eluard",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/359723?v=4",
+      "profile": "https://github.com/jeluard",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
