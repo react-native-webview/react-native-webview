@@ -175,7 +175,6 @@ static NSURLCredential* clientAuthenticationCredential;
 -(void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view{
   BOOL isEnabled = !_disableBuiltInZoomControls;
   
-  [[scrollView panGestureRecognizer] setEnabled:isEnabled];
   [[scrollView pinchGestureRecognizer] setEnabled:isEnabled];
 }
 
