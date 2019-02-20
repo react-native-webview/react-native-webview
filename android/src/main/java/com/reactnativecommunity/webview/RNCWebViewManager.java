@@ -748,7 +748,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "disableBuiltInZoomControls")
   public void setDisableBuiltInZoomControls(WebView view, boolean disable) {
     view.getSettings().setBuiltInZoomControls(!disable);
-    view.getSettings().setSupportZoom(disable);
+    view.getSettings().setSupportZoom(!disable);
   }
 
   @ReactProp(name = "injectedJavaScript")
