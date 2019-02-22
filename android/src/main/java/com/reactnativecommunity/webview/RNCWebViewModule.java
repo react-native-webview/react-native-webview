@@ -250,7 +250,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       _acceptTypes = DEFAULT_MIME_TYPES;
     }
     if (acceptTypes.matches("\\.\\w+")) {
-      _acceptTypes = getMimeTypeFromExtension(types.replace(".", ""));
+      _acceptTypes = getMimeTypeFromExtension(acceptTypes.replace(".", ""));
     }
     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
