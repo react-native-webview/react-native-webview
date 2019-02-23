@@ -41,7 +41,7 @@ import type {
 } from './WebViewTypes';
 
 const resolveAssetSource = Image.resolveAssetSource;
-
+let didWarnAboutUIWebViewUsage = false;
 // Imported from https://github.com/facebook/react-native/blob/master/Libraries/Components/ScrollView/processDecelerationRate.js
 function processDecelerationRate(decelerationRate) {
   if (decelerationRate === 'normal') {
@@ -133,6 +133,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
   static defaultProps = {
     useWebKit: true,
+    cacheEnabled: true,
     originWhitelist: defaultOriginWhitelist,
     useSharedProcessPool: true,
   };
@@ -140,7 +141,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   static isFileUploadSupported = async () => {
     // no native implementation for iOS, depends only on permissions
     return true;
-  }
+  };
 
   state = {
     viewState: this.props.startInLoadingState
@@ -152,6 +153,13 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   webViewRef = React.createRef();
 
   UNSAFE_componentWillMount() {
+    if (!this.props.useWebKit && !didWarnAboutUIWebViewUsage) {
+      didWarnAboutUIWebViewUsage = true;
+      console.warn(
+        'UIWebView is deprecated and will be removed soon, please use WKWebView (do not override useWebkit={true} prop),' +
+          ' more infos here: https://github.com/react-native-community/react-native-webview/issues/312',
+      );
+    }
     if (
       this.props.useWebKit === true &&
       this.props.scalesPageToFit !== undefined
@@ -166,6 +174,12 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     ) {
       console.warn(
         'The allowsBackForwardNavigationGestures property is not supported when useWebKit = false',
+      );
+    }
+
+    if (!this.props.useWebKit && this.props.incognito) {
+      console.warn(
+        'The incognito property is not supported when useWebKit = false',
       );
     }
   }
@@ -225,8 +239,6 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       source = { uri: this.props.url };
     }
 
-    const messagingEnabled = typeof this.props.onMessage === 'function';
-
     let NativeWebView = nativeConfig.component;
 
     if (this.props.useWebKit) {
@@ -245,21 +257,25 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         bounces={this.props.bounces}
         scrollEnabled={this.props.scrollEnabled}
         pagingEnabled={this.props.pagingEnabled}
+        cacheEnabled={this.props.cacheEnabled}
         decelerationRate={decelerationRate}
         contentInset={this.props.contentInset}
         automaticallyAdjustContentInsets={
           this.props.automaticallyAdjustContentInsets
         }
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+        allowsBackForwardNavigationGestures={
+          this.props.allowsBackForwardNavigationGestures
+        }
+        incognito={this.props.incognito}
         userAgent={this.props.userAgent}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
         onLoadingError={this._onLoadingError}
         onLoadingProgress={this._onLoadingProgress}
-        messagingEnabled={messagingEnabled}
         onMessage={this._onMessage}
         onScroll = {this._onScroll}  
+        messagingEnabled={typeof this.props.onMessage === 'function'}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         scalesPageToFit={scalesPageToFit}
         allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}
@@ -269,6 +285,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         dataDetectorTypes={this.props.dataDetectorTypes}
         useSharedProcessPool={this.props.useSharedProcessPool}
         allowsLinkPreview={this.props.allowsLinkPreview}
+        showsHorizontalScrollIndicator={this.props.showsHorizontalScrollIndicator}
+        showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator}
         {...nativeConfig.props}
       />
     );
@@ -281,13 +299,17 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
   }
 
-  _getCommands() {
-    if (!this.props.useWebKit) {
-      return UIManager.RNCUIWebView.Commands;
+  _getViewManagerConfig = (viewManagerName: string) => {
+    if (!UIManager.getViewManagerConfig) {
+      return UIManager[viewManagerName];
     }
+    return UIManager.getViewManagerConfig(viewManagerName);
+  };
 
-    return UIManager.RNCWKWebView.Commands;
-  }
+  _getCommands = () =>
+    !this.props.useWebKit
+      ? this._getViewManagerConfig('RNCUIWebView').Commands
+      : this._getViewManagerConfig('RNCWKWebView').Commands;
 
   /**
    * Go forward one page in the web view's history.
@@ -458,6 +480,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     }
 
     this._showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this._showRedboxOnPropChanges(prevProps, 'incognito');
     this._showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
     this._showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
 

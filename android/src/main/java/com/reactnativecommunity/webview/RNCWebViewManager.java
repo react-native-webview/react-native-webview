@@ -1,13 +1,14 @@
 package com.reactnativecommunity.webview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
+
 import com.facebook.react.uimanager.UIManagerModule;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -24,7 +25,6 @@ import java.util.Map;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -114,7 +114,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
-  protected static final String BRIDGE_NAME = "__REACT_WEB_VIEW_BRIDGE";
+  protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
 
   protected static final String HTTP_METHOD_POST = "POST";
 
@@ -131,7 +131,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static final String BLANK_URL = "about:blank";
 
   protected WebViewConfig mWebViewConfig;
-  protected @Nullable WebView.PictureListener mPictureListener;
 
   protected static class RNCWebViewClient extends WebViewClient {
 
@@ -144,8 +143,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       if (!mLastLoadFailed) {
         RNCWebView reactWebView = (RNCWebView) webView;
+
         reactWebView.callInjectedJavaScript();
-        reactWebView.linkBridge();
+
         emitFinishEvent(webView, url);
       }
     }
@@ -235,6 +235,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected @Nullable String injectedJS;
     protected boolean messagingEnabled = false;
     protected @Nullable RNCWebViewClient mRNCWebViewClient;
+    protected boolean sendContentSizeChangeEvents = false;
+    public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
+      this.sendContentSizeChangeEvents = sendContentSizeChangeEvents;
+    }
+
 
     private final OnScrollDispatchHelper mOnScrollDispatchHelper = new OnScrollDispatchHelper();
 
@@ -246,6 +251,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         mContext = c;
       }
 
+      /**
+       * This method is called whenever JavaScript running within the web view calls:
+       *   - window[JAVASCRIPT_INTERFACE].postMessage
+       */
       @JavascriptInterface
       public void postMessage(String message) {
         mContext.onMessage(message);
@@ -279,6 +288,22 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
+    protected void onSizeChanged(int w, int h, int ow, int oh) {
+      super.onSizeChanged(w, h, ow, oh);
+
+      if (sendContentSizeChangeEvents) {
+        dispatchEvent(
+          this,
+          new ContentSizeChangeEvent(
+            this.getId(),
+            w,
+            h
+          )
+        );
+      }
+    }
+
+    @Override
     public void setWebViewClient(WebViewClient client) {
       super.setWebViewClient(client);
       mRNCWebViewClient = (RNCWebViewClient)client;
@@ -296,17 +321,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       return new RNCWebViewBridge(webView);
     }
 
+    @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
       if (messagingEnabled == enabled) {
         return;
       }
 
       messagingEnabled = enabled;
+
       if (enabled) {
-        addJavascriptInterface(createRNCWebViewBridge(this), BRIDGE_NAME);
-        linkBridge();
+        addJavascriptInterface(createRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
       } else {
-        removeJavascriptInterface(BRIDGE_NAME);
+        removeJavascriptInterface(JAVASCRIPT_INTERFACE);
       }
     }
 
@@ -376,7 +402,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                         this.getContentHeight()));
       }
     }
-
 
     public void onMessage(String message) {
       dispatchEvent(this, new TopMessageEvent(this.getId(), message));
@@ -497,29 +522,20 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
-        //Try to extract filename from contentDisposition, otherwise guess using URLUtil
-        String fileName = "";
-        try {
-          fileName = contentDisposition.replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
-          fileName = URLDecoder.decode(fileName, "UTF-8");
-        } catch (Exception e) {
-          System.out.println("Error extracting filename from contentDisposition: " + e);
-          System.out.println("Falling back to URLUtil.guessFileName");
-          fileName = URLUtil.guessFileName(url,contentDisposition,mimetype);
-        }
+        String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
         String downloadMessage = "Downloading " + fileName;
 
         //Attempt to add cookie, if it exists
         URL urlObj = null;
-        try {  
+        try {
           urlObj = new URL(url);
           String baseUrl = urlObj.getProtocol() + "://" + urlObj.getHost();
-          String cookie = CookieManager.getInstance().getCookie(baseUrl);  
+          String cookie = CookieManager.getInstance().getCookie(baseUrl);
           request.addRequestHeader("Cookie", cookie);
           System.out.println("Got cookie for DownloadManager: " + cookie);
         } catch (MalformedURLException e) {
           System.out.println("Error getting cookie for DownloadManager: " + e.toString());
-          e.printStackTrace();  
+          e.printStackTrace();
         }
 
         //Finish setting up request
@@ -550,6 +566,38 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "showsHorizontalScrollIndicator")
+  public void setShowsHorizontalScrollIndicator(WebView view, boolean enabled) {
+    view.setHorizontalScrollBarEnabled(enabled);
+  }
+
+  @ReactProp(name = "showsVerticalScrollIndicator")
+  public void setShowsVerticalScrollIndicator(WebView view, boolean enabled) {
+    view.setVerticalScrollBarEnabled(enabled);
+  }
+  
+  @ReactProp(name = "cacheEnabled")
+  public void setCacheEnabled(WebView view, boolean enabled) {
+    if (enabled) {
+      Context ctx = view.getContext();
+      if (ctx != null) {
+        view.getSettings().setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        view.getSettings().setAppCacheEnabled(true);
+      }
+    } else {
+      view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+      view.getSettings().setAppCacheEnabled(false);
+    }
+  }
+
+  @ReactProp(name = "androidHardwareAccelerationDisabled")
+  public void setHardwareAccelerationDisabled(WebView view, boolean disabled) {
+    if (disabled) {
+      view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    }
   }
 
   @ReactProp(name = "overScrollMode")
@@ -683,11 +731,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "onContentSizeChange")
   public void setOnContentSizeChange(WebView view, boolean sendContentSizeChangeEvents) {
-    if (sendContentSizeChangeEvents) {
-      view.setPictureListener(getPictureListener());
-    } else {
-      view.setPictureListener(null);
-    }
+    ((RNCWebView) view).setSendContentSizeChangeEvents(sendContentSizeChangeEvents);
   }
 
   @ReactProp(name = "mixedContentMode")
@@ -816,23 +860,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     super.onDropViewInstance(webView);
     ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RNCWebView) webView);
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
-  }
-
-  protected WebView.PictureListener getPictureListener() {
-    if (mPictureListener == null) {
-      mPictureListener = new WebView.PictureListener() {
-        @Override
-        public void onNewPicture(WebView webView, Picture picture) {
-          dispatchEvent(
-            webView,
-            new ContentSizeChangeEvent(
-              webView.getId(),
-              webView.getWidth(),
-              webView.getContentHeight()));
-        }
-      };
-    }
-    return mPictureListener;
   }
 
   protected static void dispatchEvent(WebView webView, Event event) {

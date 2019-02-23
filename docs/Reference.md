@@ -2,8 +2,6 @@
 
 This document lays out the current public properties and methods for the React Native WebView.
 
-> **Security Warning:** Currently, `onMessage` and `postMessage` do not allow specifying an origin. This can lead to cross-site scripting attacks if an unexpected document is loaded within a `WebView` instance. Please refer to the MDN documentation for [`Window.postMessage()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) for more details on the security implications of this.
-
 ## Props Index
 
 - [`source`](Reference.md#source)
@@ -29,6 +27,7 @@ This document lays out the current public properties and methods for the React N
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
+- [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
 - [`userAgent`](Reference.md#useragent)
@@ -45,8 +44,10 @@ This document lays out the current public properties and methods for the React N
 - [`html`](Reference.md#html)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
+- [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
+- [`cacheEnabled`](Reference.md#cacheEnabled)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 
@@ -204,9 +205,9 @@ Function that is invoked when the `WebView` is loading.
 
 ### `onMessage`
 
-A function that is invoked when the webview calls `window.postMessage`. Setting this property will inject a `postMessage` global into your webview, but will still call pre-existing values of `postMessage`.
+Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`. Setting this property will inject this global into your webview.
 
-`window.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
+`window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
 
 | Type     | Required |
 | -------- | -------- |
@@ -268,11 +269,13 @@ On iOS, when [`useWebKit=true`](Reference.md#usewebkit), this prop will not work
 
 ### `onShouldStartLoadWithRequest`
 
-Function that allows custom handling of any web view requests. Return `true` from the function to continue loading the request and `false` to stop loading.
+Function that allows custom handling of any web view requests. Return `true` from the function to continue loading the request and `false` to stop loading. 
 
-| Type     | Required | Platform |
-| -------- | -------- | -------- |
-| function | No       | iOS      |
+On Android, is not called on the first load.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
 
 ---
 
@@ -288,7 +291,7 @@ Boolean value that forces the `WebView` to show the loading view on the first lo
 
 ### `style`
 
-A style object that allow you to customize the `WebView` style. Please not that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
+A style object that allow you to customize the `WebView` style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
 
 | Type  | Required |
 | ----- | -------- |
@@ -329,6 +332,16 @@ Boolean value to enable JavaScript in the `WebView`. Used on Android only as Jav
 
 ---
 
+### `androidHardwareAccelerationDisabled`
+
+Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only as Hardware Acceleration is a feature only for Android. The default value is `false`.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
+---
+
 ### `mixedContentMode`
 
 Specifies the mixed content mode. i.e WebView will allow a secure origin to load content from any other origin.
@@ -359,9 +372,9 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 Sets the user-agent for the `WebView`. This will only work for iOS if you are using WKWebView, not UIWebView (see https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent).
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| string | No       | Android, iOS WKWebView  |
+| Type   | Required | Platform               |
+| ------ | -------- | ---------------------- |
+| string | No       | Android, iOS WKWebView |
 
 ---
 
@@ -452,6 +465,26 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 
 ---
 
+### `showsHorizontalScrollIndicator`
+
+Boolean value that determines whether a horizontal scroll indicator is shown in the `WebView`. The default value is `true`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
+### `showsVerticalScrollIndicator`
+
+Boolean value that determines whether a vertical scroll indicator is shown in the `WebView`. The default value is `true`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
 ### `geolocationEnabled`
 
 Set whether Geolocation is enabled in the `WebView`. The default value is `false`. Used only in Android.
@@ -522,6 +555,16 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 
 ---
 
+### `incognito`
+
+Does not store any data within the lifetime of the WebView.
+
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS WKWebView |
+
+---
+
 ### `allowFileAccess`
 
 If true, this will allow access to the file system via `file://` URI's. The default value is `false`.
@@ -539,6 +582,16 @@ Sets whether the WebView should disable saving form data. The default value is `
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | Android  |
+
+---
+
+### `cacheEnabled`
+
+Sets whether WebView & WKWebView should use browser caching.
+
+| Type    | Required | Default |
+| ------- | -------- | ------- |
+| boolean | No       | true    |
 
 ---
 
