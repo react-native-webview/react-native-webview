@@ -448,7 +448,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   };
 
   //onScroll function
-  _onScroll = (event: object) => {
+  _onScroll = (event: any) => {
     var {onScroll} = this.props;
     onScroll && onScroll(event);
   };
