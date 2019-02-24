@@ -376,7 +376,7 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
   /**
    * Function that is invoked when the `WebView` onScroll.
    */
-  onScroll?: (event: WebViewNavigationEvent) => any;
+  onScroll?: (event: any) => any;
 
 
   /**
