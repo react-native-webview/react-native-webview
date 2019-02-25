@@ -596,7 +596,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     setMixedContentMode(webView, "never");
 
     // This is disabled via the prop androidHardwareAccelerationDisabled
-    if (Build.Version.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
     // Fixes broken full-screen modals/galleries due to body height being 0.
