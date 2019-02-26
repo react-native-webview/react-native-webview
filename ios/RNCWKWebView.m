@@ -138,7 +138,7 @@ static NSURLCredential* clientAuthenticationCredential;
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
-    
+
     if (_userAgent) {
       _webView.customUserAgent = _userAgent;
     }
@@ -149,7 +149,7 @@ static NSURLCredential* clientAuthenticationCredential;
       }
     }
 #endif
-    
+
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self visitSource];
