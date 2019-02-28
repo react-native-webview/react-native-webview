@@ -562,7 +562,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "scalesPageToFit")
   public void setScalesPageToFit(WebView view, boolean enabled) {
-    view.getSettings().setUseWideViewPort(!enabled);
+    view.getSettings().setLoadWithOverviewMode(enabled);
+    view.getSettings().setUseWideViewPort(enabled);
   }
 
   @ReactProp(name = "domStorageEnabled")
