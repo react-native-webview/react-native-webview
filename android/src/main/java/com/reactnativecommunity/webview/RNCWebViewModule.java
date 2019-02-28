@@ -16,6 +16,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.widget.Toast;
@@ -248,6 +249,9 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     if (acceptTypes.isEmpty()) {
       _acceptTypes = DEFAULT_MIME_TYPES;
     }
+    if (acceptTypes.matches("\\.\\w+")) {
+      _acceptTypes = getMimeTypeFromExtension(acceptTypes.replace(".", ""));
+    }
     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
     intent.setType(_acceptTypes);
@@ -264,17 +268,27 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   private Boolean acceptsImages(String types) {
-    return types.isEmpty() || types.toLowerCase().contains("image");
+    String mimeType = types;
+    if (types.matches("\\.\\w+")) {
+        mimeType = getMimeTypeFromExtension(types.replace(".", ""));
+    }
+    return mimeType.isEmpty() || mimeType.toLowerCase().contains("image");
   }
   private Boolean acceptsImages(String[] types) {
-    return isArrayEmpty(types) || arrayContainsString(types, "image");
+    String[] mimeTypes = getAcceptedMimeType(types);
+    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image");
   }
 
   private Boolean acceptsVideo(String types) {
-    return types.isEmpty() || types.toLowerCase().contains("video");
+    String mimeType = types;
+    if (types.matches("\\.\\w+")) {
+        mimeType = getMimeTypeFromExtension(types.replace(".", ""));
+    }
+    return mimeType.isEmpty() || mimeType.toLowerCase().contains("video");
   }
   private Boolean acceptsVideo(String[] types) {
-    return isArrayEmpty(types) || arrayContainsString(types, "video");
+    String[] mimeTypes = getAcceptedMimeType(types);
+    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "video");
   }
 
   private Boolean arrayContainsString(String[] array, String pattern){
@@ -290,7 +304,26 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     if (isArrayEmpty(types)) {
         return new String[]{DEFAULT_MIME_TYPES};
     }
-    return types;
+    String[] mimeTypes = new String[types.length];
+    for (int i = 0; i < types.length; i++) {
+        String t = types[i];
+        // convert file extensions to mime types
+        if (t.matches("\\.\\w+")) {
+            String mimeType = getMimeTypeFromExtension(t.replace(".", ""));
+            mimeTypes[i] = mimeType;
+        } else {
+            mimeTypes[i] = t;
+        }
+    }
+    return mimeTypes;
+  }
+
+  private String getMimeTypeFromExtension(String extension) {
+    String type = null;
+    if (extension != null) {
+        type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+    }
+    return type;
   }
 
   private Uri getOutputUri(String intentType) {
