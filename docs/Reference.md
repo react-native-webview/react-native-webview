@@ -446,7 +446,7 @@ With the [new WebKit](Reference.md#usewebkit) implementation, we have three new 
 
 ### `scrollEnabled`
 
-Boolean value that determines whether scrolling is enabled in the `WebView`. The default value is `true`.
+Boolean value that determines whether scrolling is enabled in the `WebView`. The default value is `true`. Setting this to `false` will prevent the webview from moving the document body when the keyboard appears over an input.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |

@@ -341,6 +341,19 @@ static NSURLCredential* clientAuthenticationCredential;
 {
   _scrollEnabled = scrollEnabled;
   _webView.scrollView.scrollEnabled = scrollEnabled;
+
+  // Override the scrollView delegate to prevent scrolling.
+  if (!scrollEnabled) {
+    _webView.scrollView.delegate = self;
+  } else {
+    _webView.scrollView.delegate = _webView;
+  }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  // Don't allow scrolling the scrollView.
+  scrollView.bounds = _webView.bounds;
 }
 
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
