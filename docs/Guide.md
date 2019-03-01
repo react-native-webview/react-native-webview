@@ -43,9 +43,69 @@ class MyWeb extends Component {
   render() {
     return (
       <WebView
-        source={{uri: 'https://infinite.red/react-native'}}
+        source={{uri: 'https://facebook.github.io/react-native/'}}
       />
     );
+  }
+}
+```
+
+### Controlling navigation state changes
+
+Sometimes you want to intercept a user tapping on a link in your webview and do something different than navigating there in the webview. Here's some example code on how you might do that using the `onNavigationStateChange` function.
+
+```js
+import React, { Component } from 'react';
+import { WebView } from 'react-native-webview';
+
+class MyWeb extends Component {
+  webview = null;
+
+  render() {
+    return (
+      <WebView
+        ref={ref => (this.webview = ref)}
+        source={{uri: 'https://facebook.github.io/react-native/'}}
+        onNavigationStateChange={this.handleWebViewNavigationStateChange}
+      />
+    );
+  }
+
+  handleWebViewNavigationStateChange = newNavState => {
+    // newNavState looks something like this:
+    // {
+    //   url?: string;
+    //   title?: string;
+    //   loading?: boolean;
+    //   canGoBack?: boolean;
+    //   canGoForward?: boolean;
+    // }
+    const { url } = newNavState;
+    if (!url) return
+
+    // handle certain doctypes
+    if (url.includes('.pdf')) {
+      this.webview.stopLoading();
+      // open a modal with the PDF viewer
+    }
+
+    // one way to handle a successful form submit is via query strings
+    if (url.includes('?message=success')) {
+      this.webview.stopLoading();
+      // maybe close this view?
+    }
+
+    // one way to handle errors is via query string
+    if (url.includes('?errors=true')) {
+      this.webview.stopLoading();
+    }
+
+    // redirect somewhere else
+    if (url.includes('google.com')) {
+      const newURL = 'https://facebook.github.io/react-native/';
+      const redirectTo = 'window.location = "' + newURL + '"';
+      this.webview.injectJavaScript(redirectTo);
+    }
   }
 }
 ```
