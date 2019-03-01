@@ -18,7 +18,7 @@ _Note: React Native WebView is not currently supported by Expo unless you "eject
 
 ## Getting Started
 
-Read our [Getting Started Guide]. If any step seems unclear, please create a detailed issue.
+Read our [Getting Started Guide](docs/Getting-Started.md). If any step seems unclear, please create a detailed issue.
 
 ## Versioning
 
