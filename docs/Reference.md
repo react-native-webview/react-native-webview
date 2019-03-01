@@ -268,10 +268,10 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: "https://infinite.red" }}
+  source={{ uri: "https://facebook.github.io/react-native" }}
   onShouldStartLoadWithRequest={(request) => {
     // Only allow navigating within this website
-    return request.url.startsWith("https://infinite.red")
+    return request.url.startsWith("https://facebook.github.io/react-native")
   }}
 />
 ```
