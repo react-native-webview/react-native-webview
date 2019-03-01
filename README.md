@@ -35,6 +35,9 @@ This project follows [semantic versioning](https://semver.org/). We do not hesit
 
 - UIWebView removal
 - this.webView.postMessage() removal (never documented and less flexible than injectJavascript)
+- Typescript rewrite
+- Kotlin rewrite
+- Maybe Swift rewrite
 
 ## Usage
 
