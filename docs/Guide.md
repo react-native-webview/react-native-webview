@@ -43,7 +43,7 @@ class MyWeb extends Component {
   render() {
     return (
       <WebView
-        source={{uri: 'https://infinite.red/react-native'}}
+        source={{uri: 'https://facebook.github.io/react-native/'}}
       />
     );
   }
@@ -65,7 +65,7 @@ class MyWeb extends Component {
     return (
       <WebView
         ref={ref => (this.webview = ref)}
-        source={{uri: 'https://infinite.red/react-native'}}
+        source={{uri: 'https://facebook.github.io/react-native/'}}
         onNavigationStateChange={this.handleWebViewNavigationStateChange}
       />
     );
@@ -102,7 +102,7 @@ class MyWeb extends Component {
 
     // redirect somewhere else
     if (url.includes('google.com')) {
-      const newURL = 'https://infinite.red';
+      const newURL = 'https://facebook.github.io/react-native/';
       const redirectTo = 'window.location = "' + newURL + '"';
       this.webview.injectJavaScript(redirectTo);
     }
