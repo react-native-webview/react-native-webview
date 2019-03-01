@@ -268,6 +268,31 @@ On Android, is not called on the first load.
 | -------- | -------- |
 | function | No       |
 
+Example:
+
+```jsx
+<WebView
+  source={{ uri: "https://facebook.github.io/react-native" }}
+  onShouldStartLoadWithRequest={(request) => {
+    // Only allow navigating within this website
+    return request.url.startsWith("https://facebook.github.io/react-native")
+  }}
+/>
+```
+
+The `request` object includes these properties:
+
+```
+title
+url
+loading
+target
+canGoBack
+canGoForward
+lockIdentifier
+navigationType
+```
+
 ---
 
 ### `startInLoadingState`
