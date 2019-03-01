@@ -149,7 +149,7 @@ Example:
 
 ```jsx
 <WebView
-   source={{ uri: "https://infinite.red" }}
+   source={{ uri: "https://facebook.github.io/react-native" }}
    onError={(syntheticEvent) => {
      const { nativeEvent } = syntheticEvent
      console.warn('WebView error: ', nativeEvent)
@@ -188,7 +188,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{uri: 'https://infinite.red'}}
+  source={{uri: 'https://facebook.github.io/react-native'}}
   onLoad={(syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
     this.url = nativeEvent.url;
@@ -222,7 +222,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{uri: 'https://infinite.red'}}
+  source={{uri: 'https://facebook.github.io/react-native'}}
   onLoadEnd={(syntheticEvent) => {
     // update component to be aware of loading status
     const { nativeEvent } = syntheticEvent;
@@ -257,7 +257,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{uri: 'https://infinite.red'}}
+  source={{uri: 'https://facebook.github.io/react-native/='}}
   onLoadStart={(syntheticEvent) => {
     // update component to be aware of loading status
     const { nativeEvent } = syntheticEvent;
@@ -296,7 +296,7 @@ Example:
 
 ```jsx
 <WebView
-   source={{ uri: "https://infinite.red" }}
+   source={{ uri: "https://facebook.github.io/react-native" }}
    onLoadProgress={({ nativeEvent }) => {
      this.loadingProgress = nativeEvent.progress
    }}
@@ -341,7 +341,7 @@ Example:
 
 ```jsx
 <WebView
-   source={{ uri: "https://infinite.red" }}
+   source={{ uri: "https://facebook.github.io/react-native" }}
    onNavigationStateChange={(navState) => {
     // Keep track of going back navigation within component
     this.canGoBack = navState.canGoBack;
@@ -375,7 +375,7 @@ Example:
 ```jsx
 //only allow URIs that begin with https:// or git://
 <WebView
-   source={{ uri: "https://infinite.red" }}
+   source={{ uri: "https://facebook.github.io/react-native" }}
    originWhitelist={['https://*', 'git://*']}
  />
 ```
@@ -395,7 +395,7 @@ Example:
 
 ```jsx
 <WebView
-   source={{ uri: "https://infinite.red" }}
+   source={{ uri: "https://facebook.github.io/react-native" }}
    renderError={(errorName) => <Error name={errorName} /> }
  />
 ```
@@ -417,7 +417,7 @@ Example:
 
 ```jsx
 <WebView
-   source={{ uri: "https://infinite.red" }}
+   source={{ uri: "https://facebook.github.io/react-native" }}
    startInLoadingState={true}
    renderLoading={() => <Loading /> }
  />
@@ -449,10 +449,10 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: "https://infinite.red" }}
+  source={{ uri: "https://facebook.github.io/react-native" }}
   onShouldStartLoadWithRequest={(request) => {
     // Only allow navigating within this website
-    return request.url.startsWith("https://infinite.red")
+    return request.url.startsWith("https://facebook.github.io/react-native")
   }}
 />
 ```
@@ -494,7 +494,7 @@ Example:
 
 ```jsx
 <WebView
-   source={{ uri: "https://infinite.red" }}
+   source={{ uri: "https://facebook.github.io/react-native" }}
    style={{marginTop: 20}}
  />
 ```
