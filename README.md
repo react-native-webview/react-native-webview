@@ -3,9 +3,11 @@
 
 **React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
-> We just swapped out the React Native WebView in our app with the version from React Native Community. The swap took less than a day, required almost no code modifications, and is faster and CSS works better. Props to everyone in the community (including those at Infinite Red) that helped get that component split out.
+## Core Maintainers - Sponsoring companies
+_This project is maintained for free by these people using both their free time and their company work time._
 
-_Garrett McCullough, mobile engineer at Virta Health_
+- [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
+- [Jamon Holmgren](https://github.com/jamonholmgren) ([Twitter @jamonholmgren](https://twitter.com/jamonholmgren)) from [Infinite Red](https://infinite.red/react-native)
 
 ## Platforms Supported
 
@@ -14,18 +16,28 @@ _Garrett McCullough, mobile engineer at Virta Health_
 
 _Note: React Native WebView is not currently supported by Expo unless you "eject"._
 
-## Versioning
-
-If you need the exact same WebView as the one from react-native, please use version **2.0.0**. Future versions will follow [semantic versioning](https://semver.org/).
-
 ## Getting Started
 
-```
-$ yarn add react-native-webview
-$ react-native link react-native-webview
-```
+Read our [Getting Started Guide]. If any step seems unclear, please create a detailed issue.
 
-Read our [Getting Started Guide](./docs/Getting-Started.md) for more.
+## Versioning
+
+This project follows [semantic versioning](https://semver.org/). We do not hesitate to release breaking changes but they will be in a major version.
+
+**Breaking History:**
+
+- [2.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v2.0.0) - First release this is a replica of the core webview component
+- [3.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v3.0.0) - WKWebview: Add shared process pool so cookies and localStorage are shared across webviews in iOS (enabled by default).
+- [4.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v4.0.0) - Added cache (enabled by default).
+- [5.0.**1**](https://github.com/react-native-community/react-native-webview/releases/tag/v5.0.0) - Refactored the old postMessage implementation for communication from webview to native.
+
+**Upcoming:**
+
+- UIWebView removal
+- this.webView.postMessage() removal (never documented and less flexible than injectJavascript)
+- Typescript rewrite
+- Kotlin rewrite
+- Maybe Swift rewrite
 
 ## Usage
 
@@ -41,8 +53,7 @@ class MyWebComponent extends Component {
   render() {
     return (
       <WebView
-        source={{ uri: "https://infinite.red/react-native" }}
-        style={{ marginTop: 20 }}
+        source={{ uri: "https://facebook.github.io/react-native/" }}
       />
     );
   }
@@ -51,11 +62,7 @@ class MyWebComponent extends Component {
 
 For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md). If you're interested in contributing, check out the [Contributing Guide](./docs/Contributing.md).
 
-## Migrate from React Native core WebView to React Native WebView
-
-Simply install React Native WebView and then use it in place of the core WebView. Their APIs are currently identical, except that this package defaults `useWebKit={true}` unlike the built-in WebView.
-
-## Troubleshooting
+## Common issues
 
 - If you're getting `Invariant Violation: Native component for "RNCWKWebView does not exist"` it likely means you forgot to run `react-native link` or there was some error with the linking process
 - There's a [problem](https://stackoverflow.com/questions/52872045/rendering-webview-on-android-device-overlaps-previous-siblings-from-same-parent) on some Android devices where the webview could overlap previous siblings from same parent. To fix this, wrap the WebView in a View with style `overflow: hidden`.
@@ -63,12 +70,6 @@ Simply install React Native WebView and then use it in place of the core WebView
 ## Contributing
 
 See [Contributing.md](https://github.com/react-native-community/react-native-webview/blob/master/docs/Contributing.md)
-
-## Maintainers
-
-- [Jamon Holmgren](https://github.com/jamonholmgren) ([Twitter @jamonholmgren](https://twitter.com/jamonholmgren)) from [Infinite Red](https://infinite.red/react-native)
-- [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
-- [Empyrical](https://github.com/empyrical) ([Twitter @empyrical](https://twitter.com/empyrical))
 
 ## Contributors
 
