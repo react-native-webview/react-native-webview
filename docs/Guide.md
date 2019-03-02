@@ -204,7 +204,7 @@ To accomplish this, React Native WebView exposes three different options:
 
 1. React Native -> Web: The `injectedJavaScript` prop
 2. React Native -> Web: The `injectJavaScript` method
-3. Web -> React Native: The `postMessage` method
+3. Web -> React Native: The `postMessage` method and `onMessage` prop
 
 #### The `injectedJavaScript` prop
 
@@ -239,7 +239,7 @@ export default class App extends Component {
 
 This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds.
 
-![screenshot of Github repo](https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png)
+<img alt="screenshot of Github repo" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
 
 *Under the hood*
 
@@ -283,7 +283,7 @@ export default class App extends Component {
 
 After 3 seconds, this code turns the background blue:
 
-![Screenshot of app showing injected javascript](https://user-images.githubusercontent.com/1479215/53670433-93a98280-3c2f-11e9-85a5-0e4650993817.png)
+<img alt="Screenshot of app showing injected javascript" width="200" src="https://user-images.githubusercontent.com/1479215/53670433-93a98280-3c2f-11e9-85a5-0e4650993817.png" />
 
 *Under the hood*
 
@@ -334,5 +334,5 @@ export default class App extends Component {
 
 This code will result in this alert:
 
-![Alert showing communication from web page to React Native](https://user-images.githubusercontent.com/1479215/53671269-7e822300-3c32-11e9-9937-7ddc34ba8af3.png)
+<img alt="Alert showing communication from web page to React Native" width="200" src="https://user-images.githubusercontent.com/1479215/53671269-7e822300-3c32-11e9-9937-7ddc34ba8af3.png" />
 
