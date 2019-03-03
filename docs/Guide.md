@@ -8,6 +8,10 @@ _This guide is currently a work in progress._
 
 - [Basic Inline HTML](Guide.md#basic-inline-html)
 - [Basic URL Source](Guide.md#basic-url-source)
+- [Controlling navigation state changes](Guide.md#controlling-navigation-state-changes)
+- [Add support for File Upload](Guide.md#add-support-for-file-upload)
+- [Add support for File Download](Guide.md#add-support-for-file-download)
+- [Communicating between JS and Native](Guide.md#communicating-between-js-and-native)
 
 ### Basic inline HTML
 
@@ -180,6 +184,7 @@ Save to gallery:
 ##### Android
 
 Add permission in AndroidManifest.xml:
+
 ```xml
 <manifest ...>
   ......
@@ -190,3 +195,144 @@ Add permission in AndroidManifest.xml:
   ......
 </manifest>
 ```
+
+### Communicating between JS and Native
+
+You will often find yourself wanting to send messages to the web pages loaded by your webviews and also receiving messages back from those web pages.
+
+To accomplish this, React Native WebView exposes three different options:
+
+1. React Native -> Web: The `injectedJavaScript` prop
+2. React Native -> Web: The `injectJavaScript` method
+3. Web -> React Native: The `postMessage` method and `onMessage` prop
+
+#### The `injectedJavaScript` prop
+
+This is a script that runs immediately after the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away.
+
+```jsx
+import React, { Component } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+
+export default class App extends Component {
+  render() {
+    const runFirst = `
+      document.body.style.backgroundColor = 'red';
+      setTimeout(function() { window.alert('hi') }, 2000);
+      true; // note: this is required, or you'll sometimes get silent failures
+    `;
+    return (
+      <View style={{ flex: 1 }}>
+        <WebView
+          source={{
+            uri:
+              "https://github.com/react-native-community/react-native-webview"
+          }}
+          injectedJavaScript={runFirst}
+        />
+      </View>
+    );
+  }
+}
+```
+
+This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds.
+
+<img alt="screenshot of Github repo" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
+
+*Under the hood*
+
+> On iOS, `injectedJavaScript` runs a method on WKWebView called `evaluateJavaScript:completionHandler:`
+> On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
+
+#### The `injectJavaScript` method
+
+While convenient, the downside to the previously mentioned `injectedJavaScript` prop is that it only runs once. That's why we also expose a method on the webview ref called `injectJavaScript` (note the slightly different name!).
+
+```jsx
+import React, { Component } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+
+export default class App extends Component {
+  render() {
+    const run = `
+      document.body.style.backgroundColor = 'blue';
+      true;
+    `;
+
+    setTimeout(() => {
+      this.webref.injectJavaScript(run);
+    }, 3000);
+
+    return (
+      <View style={{ flex: 1 }}>
+        <WebView
+          ref={r => (this.webref = r)}
+          source={{
+            uri:
+              "https://github.com/react-native-community/react-native-webview"
+          }}
+        />
+      </View>
+    );
+  }
+}
+```
+
+After 3 seconds, this code turns the background blue:
+
+<img alt="Screenshot of app showing injected javascript" width="200" src="https://user-images.githubusercontent.com/1479215/53670433-93a98280-3c2f-11e9-85a5-0e4650993817.png" />
+
+*Under the hood*
+
+> On iOS, `injectJavaScript` calls WKWebView's `evaluateJS:andThen:`
+> On Android, `injectJavaScript` calls Android WebView's `evaluateJavascriptWithFallback` method
+
+#### The `window.ReactNativeWebView.postMessage` method and `onMessage` prop
+
+Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
+
+You _must_ set `onMessage` or the `window.ReactNativeWebView.postMessage` method will not be injected into the web page.
+
+`window.ReactNativeWebView.postMessage` only accepts one argument which must be a string.
+
+```jsx
+import React, { Component } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+
+export default class App extends Component {
+  render() {
+    const html = `
+      <html>
+      <head></head>
+      <body>
+        <script>
+          setTimeout(function () {
+            window.ReactNativeWebView.postMessage("Hello!")
+          }, 2000)
+        </script>
+      </body>
+      </html>
+    `;
+
+    return (
+      <View style={{ flex: 1 }}>
+        <WebView
+          source={{ html }}
+          onMessage={event => {
+            alert(event.nativeEvent.data);
+          }}
+        />
+      </View>
+    );
+  }
+}
+```
+
+This code will result in this alert:
+
+<img alt="Alert showing communication from web page to React Native" width="200" src="https://user-images.githubusercontent.com/1479215/53671269-7e822300-3c32-11e9-9937-7ddc34ba8af3.png" />
+

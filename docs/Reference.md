@@ -109,6 +109,8 @@ Set this to provide JavaScript that will be injected into the web page when the 
 | ------ | -------- |
 | string | No       |
 
+To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
+
 ---
 
 ### `mediaPlaybackRequiresUserAction`
@@ -328,6 +330,8 @@ Function that is invoked when the webview calls `window.ReactNativeWebView.postM
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
+
+To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
 ---
 
@@ -891,6 +895,8 @@ injectJavaScript('... javascript string ...');
 ```
 
 Executes the JavaScript string.
+
+To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
 ## Other Docs
 
