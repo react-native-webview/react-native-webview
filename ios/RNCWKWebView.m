@@ -148,7 +148,10 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
       if (@available(iOS 11.0, *)) {
         // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
         // See also https://forums.developer.apple.com/thread/97194
-        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+        // check if websiteDataStore has not been initialized before
+        if(!_incognito && !_cacheEnabled) {
+          wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+        }
         for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
           [wkWebViewConfig.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:nil];
         }
@@ -194,14 +197,10 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
         }
         [script appendString:@"})();\n"];
 
-        WKUserContentController* userContentController = [[WKUserContentController alloc] init];
         WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource:script
                                                               injectionTime:WKUserScriptInjectionTimeAtDocumentStart
                                                            forMainFrameOnly:NO];
-        [userContentController addUserScript:cookieInScript];
-
-        // Create a config out of that userContentController and specify it when we create our web view.
-        wkWebViewConfig.userContentController = userContentController;
+        [wkWebViewConfig.userContentController addUserScript:cookieInScript];
       }
     }
 
