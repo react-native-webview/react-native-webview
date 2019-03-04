@@ -295,6 +295,13 @@ export interface AndroidWebViewProps {
   javaScriptEnabled?: boolean;
 
   /**
+   * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
+   * as Hardware Acceleration is a feature only for Android. The default value is `false`.
+   * @platform android
+   */
+  androidHardwareAccelerationDisabled?: boolean;
+
+  /**
    * Boolean value to enable third party cookies in the `WebView`. Used on
    * Android Lollipop and above only as third party cookies are enabled by
    * default on Android Kitkat and below and on iOS. The default value is `true`.
@@ -436,6 +443,12 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
    * The default whitelisted origins are "http://*" and "https://*".
    */
   originWhitelist?: string[];
+
+  /**
+   * Boolean value that determines whether caching is enabled in the
+   * `WebView`. The default value is `true` - i.e. caching is *enabled by default*
+   */
+  cacheEnabled?: boolean,
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
