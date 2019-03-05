@@ -51,6 +51,7 @@ static NSURLCredential* clientAuthenticationCredential;
     _scrollEnabled = YES;
     _showsHorizontalScrollIndicator = YES;
     _showsVerticalScrollIndicator = YES;
+    _directionalLockEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
   }
@@ -135,6 +136,7 @@ static NSURLCredential* clientAuthenticationCredential;
     _webView.scrollView.bounces = _bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
+    _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
@@ -349,6 +351,12 @@ static NSURLCredential* clientAuthenticationCredential;
   if (!_scrollEnabled) {
     scrollView.bounds = _webView.bounds;
   }
+}
+
+- (void)setDirectionalLockEnabled:(BOOL)directionalLockEnabled
+{
+    _directionalLockEnabled = directionalLockEnabled;
+    _webView.scrollView.directionalLockEnabled = directionalLockEnabled;
 }
 
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator

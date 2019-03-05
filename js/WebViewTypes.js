@@ -253,6 +253,13 @@ export type IOSWebViewProps = $ReadOnly<{|
    * @platform ios
    */
   allowsLinkPreview?: ?boolean,
+
+  /**
+   * A Boolean value that determines whether scrolling is disabled in a particular direction.
+   * The default value is `true`.
+   * @platform ios
+   */
+  directionalLockEnabled?: ?boolean,
 |}>;
 
 export type AndroidWebViewProps = $ReadOnly<{|

@@ -85,6 +85,10 @@ RCT_CUSTOM_VIEW_PROPERTY(decelerationRate, CGFloat, RNCWKWebView) {
   view.decelerationRate = json == nil ? UIScrollViewDecelerationRateNormal : [RCTConvert CGFloat: json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(directionalLockEnabled, BOOL, RNCWKWebView) {
+    view.directionalLockEnabled = json == nil ? true : [RCTConvert BOOL: json];
+}
+
 RCT_CUSTOM_VIEW_PROPERTY(showsHorizontalScrollIndicator, BOOL, RNCWKWebView) {
   view.showsHorizontalScrollIndicator = json == nil ? true : [RCTConvert BOOL: json];
 }
