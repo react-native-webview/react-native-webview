@@ -1,7 +1,4 @@
 buildscript {
-  //Buildscript is evaluated before everything else so we can't use getExtOrDefault
-  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['ReactNativeWebView_kotlinVersion']
-
   repositories {
     google()
     jcenter()
@@ -9,8 +6,6 @@ buildscript {
 
   dependencies {
     classpath 'com.android.tools.build:gradle:3.2.1'
-    //noinspection DifferentKotlinGradleVersion
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
 }
 
@@ -23,7 +18,6 @@ def getExtOrIntegerDefault(name) {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 android {
   compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
@@ -120,11 +114,9 @@ repositories {
 }
 
 def support_version = getExtOrDefault('supportLibVersion')
-def kotlin_version = getExtOrDefault('kotlinVersion')
 
 dependencies {
   //noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "com.android.support:appcompat-v7:$support_version"
 }
