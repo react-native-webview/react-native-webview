@@ -454,6 +454,7 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
 }
 
 export class WebView extends Component<WebViewSharedProps> {
+  static isFileUploadSupported: () => Promise<boolean>;
   public goForward: () => void;
   public goBack: () => void;
   public reload: () => void;
