@@ -36,6 +36,7 @@ This document lays out the current public properties and methods for the React N
 - [`contentInset`](Reference.md#contentinset)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
+- [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
 - [`allowUniversalAccessFromFileURLs`](Reference.md#allowUniversalAccessFromFileURLs)
 - [`useWebKit`](Reference.md#usewebkit)
@@ -693,6 +694,17 @@ With the [new WebKit](Reference.md#usewebkit) implementation, we have three new 
 ### `scrollEnabled`
 
 Boolean value that determines whether scrolling is enabled in the `WebView`. The default value is `true`. Setting this to `false` will prevent the webview from moving the document body when the keyboard appears over an input.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS      |
+
+---
+
+### `directionalLockEnabled`
+
+A Boolean value that determines whether scrolling is disabled in a particular direction.
+The default value is `true`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |

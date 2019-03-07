@@ -152,6 +152,13 @@ export interface IOSWebViewProps {
   scrollEnabled?: boolean;
 
   /**
+   * A Boolean value that determines whether scrolling is disabled in a particular direction.
+   * The default value is `true`.
+   * @platform ios
+   */
+  directionalLockEnabled?: boolean;
+
+  /**
    * If the value of this property is true, the scroll view stops on multiples
    * of the scroll view’s bounds when the user scrolls.
    * The default value is false.
