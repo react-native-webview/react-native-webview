@@ -273,6 +273,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         onLoadingFinish={this._onLoadingFinish}
         onLoadingError={this._onLoadingError}
         onLoadingProgress={this._onLoadingProgress}
+        testID={this.props.testID}
         onMessage={this._onMessage}
         messagingEnabled={typeof this.props.onMessage === 'function'}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
