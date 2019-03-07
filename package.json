@@ -37,6 +37,7 @@
     "flow-bin": "^0.80.0",
     "jest": "^24.0.0",
     "metro-react-native-babel-preset": "^0.51.1",
+    "react": "16.6.3",
     "react-native": "^0.57.8",
     "semantic-release": "15.10.3"
   },
