@@ -150,6 +150,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         scalesPageToFit={this.props.scalesPageToFit}
         allowFileAccess={this.props.allowFileAccess}
         injectedJavaScript={this.props.injectedJavaScript}
+        injectedJavaScriptBeforeLoad={this.props.injectedJavaScriptBeforeLoad}
         userAgent={this.props.userAgent}
         javaScriptEnabled={this.props.javaScriptEnabled}
         androidHardwareAccelerationDisabled={
