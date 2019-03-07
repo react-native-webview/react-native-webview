@@ -449,6 +449,18 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
    */
   nativeConfig?: WebViewNativeConfig;
 
+  /**
+   * A Boolean value that controls whether the horizontal scroll indicator is visible
+   * The default value is `true`.
+   */
+  showsHorizontalScrollIndicator?: boolean;
+
+  /**
+   * A Boolean value that controls whether the vertical scroll indicator is visible
+   * The default value is `true`
+   */
+  showsVerticalScrollIndicator?: boolean;
+
   style?: StyleProp<ViewStyle>;
   children?: ReactNode;
 }
