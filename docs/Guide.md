@@ -203,8 +203,43 @@ You will often find yourself wanting to send messages to the web pages loaded by
 To accomplish this, React Native WebView exposes three different options:
 
 1. React Native -> Web: The `injectedJavaScript` prop
-2. React Native -> Web: The `injectJavaScript` method
-3. Web -> React Native: The `postMessage` method and `onMessage` prop
+2. React Native -> Web: The `injectedJavaScriptBeforeLoad` prop
+3. React Native -> Web: The `injectJavaScript` method
+4. Web -> React Native: The `postMessage` method and `onMessage` prop
+
+#### The `injectedJavaScriptBeforeLoad` prop
+
+This is a script that evaluates _prior_ to the web page document loading for the first time. It only runs once, even if the page is reloaded or navigated away.
+
+```jsx
+import React, { Component } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+
+export default class App extends Component {
+  render() {
+    const runFirst = `
+      // Add a listener prior to the document loading
+      document.addEventListener('load', function() {
+        window.alert('hi');
+      });
+      true; // note: this is required, or you'll sometimes get silent failures
+    `;
+
+    return (
+      <View style={{ flex: 1 }}>
+        <WebView
+          source={{
+            uri:
+              "https://github.com/react-native-community/react-native-webview"
+          }}
+          injectedJavaScriptBeforeLoad={runFirst}
+        />
+      </View>
+    );
+  }
+}
+```
 
 #### The `injectedJavaScript` prop
 

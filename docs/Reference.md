@@ -113,6 +113,16 @@ To learn more, read the [Communicating between JS and Native](Guide.md#communica
 
 ---
 
+### `injectedJavaScriptBeforeLoad`
+
+Set this to provide JavaScript that will be injected into the web page prior to the view loading. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+
+| Type   | Required |
+| ------ | -------- |
+| string | No       |
+
+---
+
 ### `mediaPlaybackRequiresUserAction`
 
 Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`. (Android API minimum version 17).
