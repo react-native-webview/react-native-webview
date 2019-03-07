@@ -314,6 +314,13 @@ export type AndroidWebViewProps = $ReadOnly<{|
   javaScriptEnabled?: ?boolean,
 
   /**
+   * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
+   * as Hardware Acceleration is a feature only for Android. The default value is `false`.
+   * @platform android
+   */
+  androidHardwareAccelerationDisabled?: ?boolean,
+
+  /**
    * Boolean value to enable third party cookies in the `WebView`. Used on
    * Android Lollipop and above only as third party cookies are enabled by
    * default on Android Kitkat and below and on iOS. The default value is `true`.
@@ -417,13 +424,11 @@ export type WebViewSharedProps = $ReadOnly<{|
   onNavigationStateChange?: (event: WebViewNavigation) => mixed,
 
   /**
-   * A function that is invoked when the webview calls `window.postMessage`.
-   * Setting this property will inject a `postMessage` global into your
-   * webview, but will still call pre-existing values of `postMessage`.
+   * Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`.
+   * Setting this property will inject this global into your webview.
    *
-   * `window.postMessage` accepts one argument, `data`, which will be
-   * available on the event object, `event.nativeEvent.data`. `data`
-   * must be a string.
+   * `window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be
+   * available on the event object, `event.nativeEvent.data`. `data` must be a string.
    */
   onMessage?: (event: WebViewMessageEvent) => mixed,
 
@@ -443,6 +448,18 @@ export type WebViewSharedProps = $ReadOnly<{|
    * when the view loads.
    */
   injectedJavaScript?: ?string,
+
+  /**
+   * Boolean value that determines whether a horizontal scroll indicator is
+   * shown in the `WebView`. The default value is `true`.
+   */
+  showsHorizontalScrollIndicator?: ?boolean,
+
+  /**
+   * Boolean value that determines whether a vertical scroll indicator is
+   * shown in the `WebView`. The default value is `true`.
+   */
+  showsVerticalScrollIndicator?: ?boolean,
 
   /**
    * Boolean that controls whether the web content is scaled to fit
@@ -480,6 +497,11 @@ export type WebViewSharedProps = $ReadOnly<{|
    * WebView which uses the same JavaScript as the original WebView.
    */
   nativeConfig?: ?WebViewNativeConfig,
+
+  /**
+   * Should caching be enabled. Default is true.
+   */
+  cacheEnabled?: ?boolean,
 
   style?: ViewStyleProp,
   children: Node,
