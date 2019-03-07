@@ -35,6 +35,7 @@ static NSURLCredential* clientAuthenticationCredential;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, strong) WKUserScript *atStartScript;
 @end
 
 @implementation RNCWKWebView
@@ -100,6 +101,10 @@ static NSURLCredential* clientAuthenticationCredential;
       wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
     wkWebViewConfig.userContentController = [WKUserContentController new];
+    
+    if (_atStartScript) {
+      [wkWebViewConfig.userContentController addUserScript: _atStartScript];
+    }
 
     if (_messagingEnabled) {
       [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
@@ -249,6 +254,11 @@ static NSURLCredential* clientAuthenticationCredential;
       [self visitSource];
     }
   }
+}
+
+- (void)setInjectedJavaScriptBeforeLoad:(NSString *)injectedJavaScriptBeforeLoad
+{
+  _atStartScript = [[WKUserScript alloc] initWithSource:injectedJavaScriptBeforeLoad injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:false];
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset

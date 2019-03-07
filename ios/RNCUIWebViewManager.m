@@ -31,6 +31,7 @@ RCT_REMAP_VIEW_PROPERTY(decelerationRate, _webView.scrollView.decelerationRate, 
 RCT_EXPORT_VIEW_PROPERTY(scalesPageToFit, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(messagingEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(injectedJavaScript, NSString)
+RCT_EXPORT_VIEW_PROPERTY(injectedJavaScriptBeforeLoad, NSString)
 RCT_EXPORT_VIEW_PROPERTY(contentInset, UIEdgeInsets)
 RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustContentInsets, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingStart, RCTDirectEventBlock)
