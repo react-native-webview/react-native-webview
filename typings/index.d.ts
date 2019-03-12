@@ -164,6 +164,13 @@ export interface IOSWebViewProps {
   scrollEnabled?: boolean;
 
   /**
+   * A Boolean value that determines whether scrolling is disabled in a particular direction.
+   * The default value is `true`.
+   * @platform ios
+   */
+  directionalLockEnabled?: boolean;
+
+  /**
    * If the value of this property is true, the scroll view stops on multiples
    * of the scroll view’s bounds when the user scrolls.
    * The default value is false.
@@ -468,6 +475,18 @@ export interface WebViewSharedProps
    */
   nativeConfig?: WebViewNativeConfig;
 
+  /**
+   * A Boolean value that controls whether the horizontal scroll indicator is visible
+   * The default value is `true`.
+   */
+  showsHorizontalScrollIndicator?: boolean;
+
+  /**
+   * A Boolean value that controls whether the vertical scroll indicator is visible
+   * The default value is `true`
+   */
+  showsVerticalScrollIndicator?: boolean;
+
   style?: StyleProp<ViewStyle>;
   children?: ReactNode;
 
@@ -476,6 +495,7 @@ export interface WebViewSharedProps
 }
 
 export class WebView extends Component<WebViewSharedProps> {
+  static isFileUploadSupported: () => Promise<boolean>;
   public goForward: () => void;
   public goBack: () => void;
   public reload: () => void;
