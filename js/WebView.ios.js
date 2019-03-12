@@ -291,6 +291,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.showsHorizontalScrollIndicator
         }
         showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator}
+        directionalLockEnabled={this.props.directionalLockEnabled}
         {...nativeConfig.props}
       />
     );
