@@ -478,6 +478,12 @@ export type WebViewSharedProps = $ReadOnly<{|
   scalesPageToFit?: ?boolean,
 
   /**
+   * Number that controls text zoom of the page in percent. The default value
+   * is `100`.
+   */
+  textZoom?: ?number,
+
+  /**
    * Boolean that determines whether HTML5 audio and video requires the user
    * to tap them before they start playing. The default value is `true`.
    */
