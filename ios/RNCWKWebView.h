@@ -45,6 +45,7 @@
 @property (nonatomic, assign) BOOL allowsLinkPreview;
 @property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
 @property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
+@property (nonatomic, assign) BOOL directionalLockEnabled;
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 - (void)postMessage:(NSString *)message;
