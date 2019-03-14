@@ -358,7 +358,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
 
   onShouldStartLoadWithRequestCallback = (
     shouldStart: boolean,
-    url: string,
+    _url: string,
     lockIdentifier: number,
   ) => {
     let viewManager = (this.props.nativeConfig || {}).viewManager;
