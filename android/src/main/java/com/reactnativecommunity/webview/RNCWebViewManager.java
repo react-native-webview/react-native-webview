@@ -5,17 +5,18 @@ import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -608,9 +609,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
-  protected static class RNCWebChromeClient extends WebChromeClient {
+  protected static class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
     protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
-            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER);
+      LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER);
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    protected static final int FULLSCREEN_SYSTEM_UI_VISIBILITY = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+      View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+      View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+      View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+      View.SYSTEM_UI_FLAG_FULLSCREEN |
+      View.SYSTEM_UI_FLAG_IMMERSIVE |
+      View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 
     protected ReactContext mReactContext;
     protected View mWebView;
@@ -633,11 +643,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       mVideoView = view;
       mCustomViewCallback = callback;
 
-      mReactContext.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        mVideoView.setSystemUiVisibility(FULLSCREEN_SYSTEM_UI_VISIBILITY);
+        mReactContext.getCurrentActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+      }
+
       mVideoView.setBackgroundColor(Color.BLACK);
       getRootView().addView(mVideoView, FULLSCREEN_LAYOUT_PARAMS);
-
       mWebView.setVisibility(View.GONE);
+
+      mReactContext.addLifecycleEventListener(this);
     }
 
     @Override
@@ -646,7 +661,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         return;
       }
 
-      mReactContext.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
       mVideoView.setVisibility(View.GONE);
       getRootView().removeView(mVideoView);
       mCustomViewCallback.onCustomViewHidden();
@@ -655,6 +669,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       mCustomViewCallback = null;
 
       mWebView.setVisibility(View.VISIBLE);
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+      }
+
+      mReactContext.removeLifecycleEventListener(this);
     }
 
     @Override
@@ -707,6 +727,19 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       Intent intent = fileChooserParams.createIntent();
       return getModule(mReactContext).startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
     }
+
+    @Override
+    public void onHostResume() {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mVideoView != null && mVideoView.getSystemUiVisibility() != FULLSCREEN_SYSTEM_UI_VISIBILITY) {
+        mVideoView.setSystemUiVisibility(FULLSCREEN_SYSTEM_UI_VISIBILITY);
+      }
+    }
+
+    @Override
+    public void onHostPause() { }
+
+    @Override
+    public void onHostDestroy() { }
 
     protected ViewGroup getRootView() {
       return (ViewGroup) mReactContext.getCurrentActivity().findViewById(android.R.id.content);
