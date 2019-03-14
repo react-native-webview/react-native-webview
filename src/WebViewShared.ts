@@ -9,12 +9,14 @@
  */
 
 import escapeStringRegexp from 'escape-string-regexp';
-import { Linking } from 'react-native';
-import type {
+import { Linking, UIManager as NotTypedUIManager } from 'react-native';
+import {
   WebViewNavigationEvent,
-  WebViewNavigation,
   OnShouldStartLoadWithRequest,
+  CustomUIManager,
 } from './WebViewTypes';
+
+const UIManager = NotTypedUIManager as CustomUIManager;
 
 const defaultOriginWhitelist = ['http://*', 'https://*'];
 
@@ -24,16 +26,14 @@ const extractOrigin = (url: string): string => {
 };
 
 const originWhitelistToRegex = (originWhitelist: string): string =>
-    `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}`;
+  `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}`;
 
-const passesWhitelist = (compiledWhitelist: Array<string>, url: string) => {
+const passesWhitelist = (compiledWhitelist: string[], url: string) => {
   const origin = extractOrigin(url);
   return compiledWhitelist.some(x => new RegExp(x).test(origin));
 };
 
-const compileWhitelist = (
-  originWhitelist: ?$ReadOnlyArray<string>,
-): Array<string> =>
+const compileWhitelist = (originWhitelist: string[]): string[] =>
   ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
 
 const createOnShouldStartLoadWithRequest = (
@@ -42,8 +42,8 @@ const createOnShouldStartLoadWithRequest = (
     url: string,
     lockIdentifier: number,
   ) => void,
-  originWhitelist: ?$ReadOnlyArray<string>,
-  onShouldStartLoadWithRequest: ?OnShouldStartLoadWithRequest,
+  originWhitelist: string[],
+  onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
   return ({ nativeEvent }: WebViewNavigationEvent) => {
     let shouldStart = true;
@@ -51,7 +51,7 @@ const createOnShouldStartLoadWithRequest = (
 
     if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
       Linking.openURL(url);
-      shouldStart = false
+      shouldStart = false;
     }
 
     if (onShouldStartLoadWithRequest) {
@@ -62,4 +62,17 @@ const createOnShouldStartLoadWithRequest = (
   };
 };
 
-export { defaultOriginWhitelist, createOnShouldStartLoadWithRequest };
+const getViewManagerConfig = (
+  viewManagerName: 'RNCUIWebView' | 'RNCWKWebView' | 'RNCWebView',
+) => {
+  if (!UIManager.getViewManagerConfig) {
+    return UIManager[viewManagerName];
+  }
+  return UIManager.getViewManagerConfig(viewManagerName);
+};
+
+export {
+  defaultOriginWhitelist,
+  createOnShouldStartLoadWithRequest,
+  getViewManagerConfig,
+};

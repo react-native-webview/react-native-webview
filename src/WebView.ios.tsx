@@ -4,99 +4,71 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @format
- * @flow
  */
 
 import React from 'react';
 import {
   ActivityIndicator,
-  Linking,
-  StyleSheet,
   Text,
-  UIManager,
+  UIManager as NotTypedUIManager,
   View,
   requireNativeComponent,
   NativeModules,
   Image,
   findNodeHandle,
+  ImageSourcePropType,
 } from 'react-native';
-
-import invariant from 'fbjs/lib/invariant';
-import keyMirror from 'fbjs/lib/keyMirror';
+import invariant from 'invariant';
 
 import {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
+  getViewManagerConfig,
 } from './WebViewShared';
-import type {
-  WebViewEvent,
-  WebViewError,
+import {
   WebViewErrorEvent,
   WebViewMessageEvent,
   WebViewNavigationEvent,
-  WebViewSharedProps,
-  WebViewSource,
   WebViewProgressEvent,
+  IOSWebViewProps,
+  DecelerationRateConstant,
+  NativeWebViewIOS,
+  ViewManager,
+  State,
+  CustomUIManager,
 } from './WebViewTypes';
+
+import styles from './WebView.styles';
+
+const UIManager = NotTypedUIManager as CustomUIManager;
 
 const resolveAssetSource = Image.resolveAssetSource;
 let didWarnAboutUIWebViewUsage = false;
 // Imported from https://github.com/facebook/react-native/blob/master/Libraries/Components/ScrollView/processDecelerationRate.js
-function processDecelerationRate(decelerationRate) {
+const processDecelerationRate = (
+  decelerationRate: DecelerationRateConstant | number | undefined,
+) => {
   if (decelerationRate === 'normal') {
     decelerationRate = 0.998;
   } else if (decelerationRate === 'fast') {
     decelerationRate = 0.99;
   }
   return decelerationRate;
-}
+};
 
-const RNCUIWebViewManager = NativeModules.RNCUIWebViewManager;
-const RNCWKWebViewManager = NativeModules.RNCWKWebViewManager;
-
-const BGWASH = 'rgba(255,255,255,0.8)';
-
-const WebViewState = keyMirror({
-  IDLE: null,
-  LOADING: null,
-  ERROR: null,
-});
-
-const NavigationType = keyMirror({
-  click: true,
-  formsubmit: true,
-  backforward: true,
-  reload: true,
-  formresubmit: true,
-  other: true,
-});
-
-const JSNavigationScheme = 'react-js-navigation';
-
-type State = {|
-  viewState: WebViewState,
-  lastErrorEvent: ?WebViewError,
-|};
-
-const DataDetectorTypes = [
-  'phoneNumber',
-  'link',
-  'address',
-  'calendarEvent',
-  'trackingNumber',
-  'flightNumber',
-  'lookupSuggestion',
-  'none',
-  'all',
-];
+const RNCUIWebViewManager = NativeModules.RNCUIWebViewManager as ViewManager;
+const RNCWKWebViewManager = NativeModules.RNCWKWebViewManager as ViewManager;
 
 const defaultRenderLoading = () => (
   <View style={styles.loadingView}>
     <ActivityIndicator />
   </View>
 );
-const defaultRenderError = (errorDomain, errorCode, errorDesc) => (
+const defaultRenderError = (
+  errorDomain: string | undefined,
+  errorCode: number,
+  errorDesc: string,
+) => (
   <View style={styles.errorContainer}>
     <Text style={styles.errorTextTitle}>Error loading page</Text>
     <Text style={styles.errorText}>{'Domain: ' + errorDomain}</Text>
@@ -105,32 +77,7 @@ const defaultRenderError = (errorDomain, errorCode, errorDesc) => (
   </View>
 );
 
-/**
- * `WebView` renders web content in a native view.
- *
- *```
- * import React, { Component } from 'react';
- * import { WebView } from 'react-native';
- *
- * class MyWeb extends Component {
- *   render() {
- *     return (
- *       <WebView
- *         source={{uri: 'https://github.com/facebook/react-native'}}
- *         style={{marginTop: 20}}
- *       />
- *     );
- *   }
- * }
- *```
- *
- * You can use this component to navigate back and forth in the web view's
- * history and configure various properties for the web content.
- */
-class WebView extends React.Component<WebViewSharedProps, State> {
-  static JSNavigationScheme = JSNavigationScheme;
-  static NavigationType = NavigationType;
-
+class WebView extends React.Component<IOSWebViewProps, State> {
   static defaultProps = {
     useWebKit: true,
     cacheEnabled: true,
@@ -143,14 +90,12 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     return true;
   };
 
-  state = {
-    viewState: this.props.startInLoadingState
-      ? WebViewState.LOADING
-      : WebViewState.IDLE,
+  state: State = {
+    viewState: this.props.startInLoadingState ? 'LOADING' : 'IDLE',
     lastErrorEvent: null,
   };
 
-  webViewRef = React.createRef();
+  webViewRef = React.createRef<NativeWebViewIOS>();
 
   UNSAFE_componentWillMount() {
     if (!this.props.useWebKit && !didWarnAboutUIWebViewUsage) {
@@ -185,108 +130,80 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   }
 
   render() {
+    const {
+      decelerationRate: decelerationRateProp,
+      nativeConfig = {},
+      onMessage,
+      onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+      originWhitelist,
+      renderError,
+      renderLoading,
+      scalesPageToFit = this.props.useWebKit ? undefined : true,
+      style,
+      useWebKit,
+      ...otherProps
+    } = this.props;
+
     let otherView = null;
 
-    let scalesPageToFit;
-
-    if (this.props.useWebKit) {
-      ({ scalesPageToFit } = this.props);
-    } else {
-      ({ scalesPageToFit = true } = this.props);
-    }
-
-    if (this.state.viewState === WebViewState.LOADING) {
-      otherView = (this.props.renderLoading || defaultRenderLoading)();
-    } else if (this.state.viewState === WebViewState.ERROR) {
+    if (this.state.viewState === 'LOADING') {
+      otherView = (renderLoading || defaultRenderLoading)();
+    } else if (this.state.viewState === 'ERROR') {
       const errorEvent = this.state.lastErrorEvent;
       invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
-      otherView = (this.props.renderError || defaultRenderError)(
+      otherView = (renderError || defaultRenderError)(
         errorEvent.domain,
         errorEvent.code,
         errorEvent.description,
       );
-    } else if (this.state.viewState !== WebViewState.IDLE) {
+    } else if (this.state.viewState !== 'IDLE') {
       console.error(
         'RNCWebView invalid state encountered: ' + this.state.viewState,
       );
     }
 
-    const webViewStyles = [styles.container, styles.webView, this.props.style];
+    const webViewStyles = [styles.container, styles.webView, style];
     if (
-      this.state.viewState === WebViewState.LOADING ||
-      this.state.viewState === WebViewState.ERROR
+      this.state.viewState === 'LOADING' ||
+      this.state.viewState === 'ERROR'
     ) {
       // if we're in either LOADING or ERROR states, don't show the webView
       webViewStyles.push(styles.hidden);
     }
 
-    const nativeConfig = this.props.nativeConfig || {};
-
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
-      this.props.originWhitelist,
-      this.props.onShouldStartLoadWithRequest,
+      originWhitelist,
+      onShouldStartLoadWithRequestProp,
     );
 
-    const decelerationRate = processDecelerationRate(
-      this.props.decelerationRate,
-    );
+    const decelerationRate = processDecelerationRate(decelerationRateProp);
 
-    let source: WebViewSource = this.props.source || {};
-    if (!this.props.source && this.props.html) {
-      source = { html: this.props.html };
-    } else if (!this.props.source && this.props.url) {
-      source = { uri: this.props.url };
-    }
+    let NativeWebView = nativeConfig.component as typeof NativeWebViewIOS;
 
-    let NativeWebView = nativeConfig.component;
-
-    if (this.props.useWebKit) {
-      NativeWebView = NativeWebView || RNCWKWebView;
+    if (useWebKit) {
+      NativeWebView = NativeWebViewIOS || RNCWKWebView;
     } else {
-      NativeWebView = NativeWebView || RNCUIWebView;
+      NativeWebView = NativeWebViewIOS || RNCUIWebView;
     }
 
     const webView = (
       <NativeWebView
-        ref={this.webViewRef}
-        key="webViewKey"
-        style={webViewStyles}
-        source={resolveAssetSource(source)}
-        injectedJavaScript={this.props.injectedJavaScript}
-        bounces={this.props.bounces}
-        scrollEnabled={this.props.scrollEnabled}
-        pagingEnabled={this.props.pagingEnabled}
-        cacheEnabled={this.props.cacheEnabled}
+        {...otherProps}
         decelerationRate={decelerationRate}
-        contentInset={this.props.contentInset}
-        automaticallyAdjustContentInsets={
-          this.props.automaticallyAdjustContentInsets
-        }
-        hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        allowsBackForwardNavigationGestures={
-          this.props.allowsBackForwardNavigationGestures
-        }
-        incognito={this.props.incognito}
-        userAgent={this.props.userAgent}
-        onLoadingStart={this._onLoadingStart}
-        onLoadingFinish={this._onLoadingFinish}
+        key="webViewKey"
+        messagingEnabled={typeof onMessage === 'function'}
         onLoadingError={this._onLoadingError}
+        onLoadingFinish={this._onLoadingFinish}
         onLoadingProgress={this._onLoadingProgress}
+        onLoadingStart={this._onLoadingStart}
         onMessage={this._onMessage}
-        messagingEnabled={typeof this.props.onMessage === 'function'}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        ref={this.webViewRef}
         scalesPageToFit={scalesPageToFit}
-        allowsInlineMediaPlayback={this.props.allowsInlineMediaPlayback}
-        mediaPlaybackRequiresUserAction={
-          this.props.mediaPlaybackRequiresUserAction
-        }
-        dataDetectorTypes={this.props.dataDetectorTypes}
-        useSharedProcessPool={this.props.useSharedProcessPool}
-        allowsLinkPreview={this.props.allowsLinkPreview}
-        showsHorizontalScrollIndicator={this.props.showsHorizontalScrollIndicator}
-        showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator}
-        directionalLockEnabled={this.props.directionalLockEnabled}
+        // TODO: find a better way to type this.
+        source={resolveAssetSource(this.props.source as ImageSourcePropType)}
+        style={webViewStyles}
         {...nativeConfig.props}
       />
     );
@@ -299,17 +216,10 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     );
   }
 
-  _getViewManagerConfig = (viewManagerName: string) => {
-    if (!UIManager.getViewManagerConfig) {
-      return UIManager[viewManagerName];
-    }
-    return UIManager.getViewManagerConfig(viewManagerName);
-  };
-
   _getCommands = () =>
     !this.props.useWebKit
-      ? this._getViewManagerConfig('RNCUIWebView').Commands
-      : this._getViewManagerConfig('RNCWKWebView').Commands;
+      ? getViewManagerConfig('RNCUIWebView').Commands
+      : getViewManagerConfig('RNCWKWebView').Commands;
 
   /**
    * Go forward one page in the web view's history.
@@ -337,7 +247,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
    * Reloads the current page.
    */
   reload = () => {
-    this.setState({ viewState: WebViewState.LOADING });
+    this.setState({ viewState: 'LOADING' });
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this._getCommands().reload,
@@ -402,7 +312,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
    * Returns the native `WebView` node.
    */
   getWebViewHandle = () => {
-    return findNodeHandle(this.webViewRef.current);
+    const nodeHandle = findNodeHandle(this.webViewRef.current);
+    invariant(nodeHandle != null, 'nodeHandle expected to be non-null');
+    return nodeHandle as number;
   };
 
   _onLoadingStart = (event: WebViewNavigationEvent) => {
@@ -420,7 +332,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
 
     this.setState({
       lastErrorEvent: event.nativeEvent,
-      viewState: WebViewState.ERROR,
+      viewState: 'ERROR',
     });
   };
 
@@ -429,7 +341,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
     this.setState({
-      viewState: WebViewState.IDLE,
+      viewState: 'IDLE',
     });
     this._updateNavigationState(event);
   };
@@ -460,7 +372,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
   };
 
-  componentDidUpdate(prevProps: WebViewSharedProps) {
+  componentDidUpdate(prevProps: IOSWebViewProps) {
     if (!(prevProps.useWebKit && this.props.useWebKit)) {
       return;
     }
@@ -477,7 +389,10 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     }
   }
 
-  _showRedboxOnPropChanges(prevProps, propName: string) {
+  _showRedboxOnPropChanges(
+    prevProps: IOSWebViewProps,
+    propName: keyof IOSWebViewProps,
+  ) {
     if (this.props[propName] !== prevProps[propName]) {
       console.error(
         `Changes to property ${propName} do nothing after the initial render.`,
@@ -486,43 +401,11 @@ class WebView extends React.Component<WebViewSharedProps, State> {
   }
 }
 
-const RNCUIWebView = requireNativeComponent('RNCUIWebView');
-const RNCWKWebView = requireNativeComponent('RNCWKWebView');
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BGWASH,
-  },
-  errorText: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  errorTextTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    marginBottom: 10,
-  },
-  hidden: {
-    height: 0,
-    flex: 0, // disable 'flex:1' when hiding a View
-  },
-  loadingView: {
-    backgroundColor: BGWASH,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 100,
-  },
-  webView: {
-    backgroundColor: '#ffffff',
-  },
-});
+const RNCUIWebView: typeof NativeWebViewIOS = requireNativeComponent(
+  'RNCUIWebView',
+);
+const RNCWKWebView: typeof NativeWebViewIOS = requireNativeComponent(
+  'RNCWKWebView',
+);
 
 module.exports = WebView;

@@ -25,21 +25,24 @@
     "react-native": ">=0.57 <0.59"
   },
   "dependencies": {
-    "escape-string-regexp": "^1.0.5",
-    "fbjs": "^0.8.17"
+    "escape-string-regexp": "1.0.5",
+    "invariant": "2.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@semantic-release/git": "7.0.5",
+    "@types/escape-string-regexp": "^1.0.0",
+    "@types/invariant": "^2.2.29",
     "@types/react": "^16.6.3",
-    "@types/react-native": "^0.57.8",
+    "@types/react-native": "0.57.40",
     "babel-jest": "^24.0.0",
     "flow-bin": "^0.80.0",
     "jest": "^24.0.0",
     "metro-react-native-babel-preset": "^0.51.1",
     "react": "16.6.3",
     "react-native": "^0.57.8",
-    "semantic-release": "15.10.3"
+    "semantic-release": "15.10.3",
+    "typescript": "^3.3.3333"
   },
   "repository": {
     "type": "git",
