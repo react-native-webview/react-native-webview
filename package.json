@@ -14,7 +14,8 @@
     "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
-    "build": "yarn tsc",
+    "build": "yarn tsc && yarn build-flow",
+    "build-flow": "bin/gen-flow.js index.d.ts > index.js.flow && bin/gen-flow.js lib/WebViewTypes.d.ts > lib/WebViewTypes.js.flow",
     "prepack": "yarn build",
     "test": "yarn jest"
   },
@@ -45,8 +46,10 @@
     "eslint-plugin-jsx-a11y": "6.2.1",
     "eslint-plugin-react": "7.12.4",
     "eslint-plugin-react-native": "3.6.0",
+    "flowgen": "^1.8.0",
     "jest": "24.5.0",
     "metro-react-native-babel-preset": "0.53.1",
+    "prettier": "^1.16.4",
     "react": "16.8.3",
     "react-native": "0.59.1",
     "semantic-release": "15.10.3",
@@ -63,6 +66,7 @@
     "lib",
     "index.js",
     "index.d.ts",
+    "index.js.flow",
     "react-native-webview.podspec"
   ]
 }

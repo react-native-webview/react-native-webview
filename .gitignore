@@ -54,3 +54,4 @@ android/gradlew
 android/gradlew.bat
 
 lib/
+*.js.flow
