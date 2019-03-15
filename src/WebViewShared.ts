@@ -4,8 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @format
- * @flow
  */
 
 import escapeStringRegexp from 'escape-string-regexp';
@@ -21,7 +19,7 @@ const UIManager = NotTypedUIManager as CustomUIManager;
 const defaultOriginWhitelist = ['http://*', 'https://*'];
 
 const extractOrigin = (url: string): string => {
-  const result = /^[A-Za-z][A-Za-z0-9\+\-\.]+:(\/\/)?[^/]*/.exec(url);
+  const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
   return result === null ? '' : result[0];
 };
 

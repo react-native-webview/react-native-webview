@@ -6,6 +6,8 @@
  *
  */
 
+/* eslint-disable react/no-multi-comp */
+
 import { ReactNode, ReactElement, Component } from 'react';
 import {
   NativeSyntheticEvent,
@@ -17,7 +19,7 @@ import {
   UIManagerStatic,
 } from 'react-native';
 
-interface WebViewCommands {
+export interface WebViewCommands {
   goForward: Function;
   goBack: Function;
   reload: Function;
@@ -35,8 +37,8 @@ export interface CustomUIManager extends UIManagerStatic {
   };
   dispatchViewManagerCommand: (
     viewHandle: number,
-    command: any,
-    params: any,
+    command: Function,
+    params: object | null,
   ) => void;
   RNCUIWebView: {
     Commands: WebViewCommands;
@@ -67,6 +69,7 @@ interface ErrorState extends BaseState {
 
 export type State = NormalState | ErrorState;
 
+// eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewIOSComponent extends Component<
   IOSNativeWebViewProps
 > {}
@@ -74,6 +77,7 @@ declare const NativeWebViewIOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewIOSComponent;
 export class NativeWebViewIOS extends NativeWebViewIOSBase {}
 
+// eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewAndroidComponent extends Component<
   AndroidNativeWebViewProps
 > {}
@@ -134,8 +138,8 @@ export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 
-export type DataDetectorTypes =
-  | 'phoneNumber'
+export type DataDetectorTypes
+  = | 'phoneNumber'
   | 'link'
   | 'address'
   | 'calendarEvent'
@@ -191,7 +195,7 @@ export interface ViewManager {
   startLoadWithResult: Function;
 }
 
-export type WebViewNativeConfig = {
+export interface WebViewNativeConfig {
   /**
    * The native component used to render the WebView.
    */
@@ -206,7 +210,7 @@ export type WebViewNativeConfig = {
    * @platform ios
    */
   viewManager?: ViewManager;
-};
+}
 
 export type OnShouldStartLoadWithRequest = (
   event: WebViewNavigation,
@@ -227,6 +231,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
   // TODO: find a better way to type this.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   source: any;
   userAgent?: string;
 }
@@ -511,12 +516,12 @@ export interface WebViewSharedProps extends ViewProps {
     errorDomain: string | undefined,
     errorCode: number,
     errorDesc: string,
-  ) => ReactElement<any>; // view to show if there's an error
+  ) => ReactElement; // view to show if there's an error
 
   /**
    * Function that returns a loading indicator.
    */
-  renderLoading: () => ReactElement<any>;
+  renderLoading: () => ReactElement;
 
   /**
    * Function that is invoked when the `WebView` has finished loading.

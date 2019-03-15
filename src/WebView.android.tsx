@@ -34,7 +34,10 @@ import styles from './WebView.styles';
 
 const UIManager = NotTypedUIManager as CustomUIManager;
 
-const resolveAssetSource = Image.resolveAssetSource;
+const RNCWebView = requireNativeComponent(
+  'RNCWebView',
+) as typeof NativeWebViewAndroid;
+const { resolveAssetSource } = Image;
 
 const defaultRenderLoading = () => (
   <View style={styles.loadingView}>
@@ -69,93 +72,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   };
 
   webViewRef = React.createRef<NativeWebViewAndroid>();
-
-  render() {
-    const {
-      onMessage,
-      onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-      originWhitelist,
-      renderError,
-      renderLoading,
-      source,
-      style,
-      nativeConfig = {},
-      ...otherProps
-    } = this.props;
-    let otherView = null;
-
-    if (this.state.viewState === 'LOADING') {
-      otherView = (renderLoading || defaultRenderLoading)();
-    } else if (this.state.viewState === 'ERROR') {
-      const errorEvent = this.state.lastErrorEvent;
-      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
-      otherView =
-        renderError &&
-        renderError(errorEvent.domain, errorEvent.code, errorEvent.description);
-    } else if (this.state.viewState !== 'IDLE') {
-      console.error(
-        'RNCWebView invalid state encountered: ' + this.state.viewState,
-      );
-    }
-
-    const webViewStyles = [styles.container, style];
-    if (
-      this.state.viewState === 'LOADING' ||
-      this.state.viewState === 'ERROR'
-    ) {
-      // if we're in either LOADING or ERROR states, don't show the webView
-      webViewStyles.push(styles.hidden);
-    }
-
-    if (
-      (source as WebViewUriSource).method === 'POST' &&
-      (source as WebViewUriSource).headers
-    ) {
-      console.warn(
-        'WebView: `source.headers` is not supported when using POST.',
-      );
-    } else if (
-      (source as WebViewUriSource).method === 'GET' &&
-      (source as WebViewUriSource).body
-    ) {
-      console.warn('WebView: `source.body` is not supported when using GET.');
-    }
-
-    let NativeWebView =
-      (nativeConfig.component as typeof NativeWebViewAndroid) || RNCWebView;
-
-    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
-      this.onShouldStartLoadWithRequestCallback,
-      originWhitelist,
-      onShouldStartLoadWithRequestProp,
-    );
-
-    const webView = (
-      <NativeWebView
-        {...otherProps}
-        key="webViewKey"
-        messagingEnabled={typeof onMessage === 'function'}
-        onLoadingError={this.onLoadingError}
-        onLoadingFinish={this.onLoadingFinish}
-        onLoadingProgress={this.onLoadingProgress}
-        onLoadingStart={this.onLoadingStart}
-        onMessage={this.onMessage}
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-        ref={this.webViewRef}
-        // TODO: find a better way to type this.
-        source={resolveAssetSource(source as ImageSourcePropType)}
-        style={webViewStyles}
-        {...nativeConfig.props}
-      />
-    );
-
-    return (
-      <View style={styles.container}>
-        {webView}
-        {otherView}
-      </View>
-    );
-  }
 
   getCommands = () => getViewManagerConfig('RNCWebView').Commands;
 
@@ -236,16 +152,22 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   };
 
   onLoadingStart = (event: WebViewNavigationEvent) => {
-    const onLoadStart = this.props.onLoadStart;
-    onLoadStart && onLoadStart(event);
+    const { onLoadStart } = this.props;
+    if (onLoadStart) {
+      onLoadStart(event);
+    }
     this.updateNavigationState(event);
   };
 
   onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
-    onError && onError(event);
-    onLoadEnd && onLoadEnd(event);
+    if (onError) {
+      onError(event);
+    }
+    if (onLoadEnd) {
+      onLoadEnd(event);
+    }
     console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
@@ -256,8 +178,12 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
-    onLoad && onLoad(event);
-    onLoadEnd && onLoadEnd(event);
+    if (onLoad) {
+      onLoad(event);
+    }
+    if (onLoadEnd) {
+      onLoadEnd(event);
+    }
     this.setState({
       viewState: 'IDLE',
     });
@@ -266,12 +192,16 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   onMessage = (event: WebViewMessageEvent) => {
     const { onMessage } = this.props;
-    onMessage && onMessage(event);
+    if (onMessage) {
+      onMessage(event);
+    }
   };
 
   onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress } = this.props;
-    onLoadProgress && onLoadProgress(event);
+    if (onLoadProgress) {
+      onLoadProgress(event);
+    }
   };
 
   onShouldStartLoadWithRequestCallback = (
@@ -286,10 +216,93 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       );
     }
   };
-}
 
-const RNCWebView = requireNativeComponent(
-  'RNCWebView',
-) as typeof NativeWebViewAndroid;
+  render() {
+    const {
+      onMessage,
+      onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+      originWhitelist,
+      renderError,
+      renderLoading,
+      source,
+      style,
+      nativeConfig = {},
+      ...otherProps
+    } = this.props;
+    let otherView = null;
+
+    if (this.state.viewState === 'LOADING') {
+      otherView = (renderLoading || defaultRenderLoading)();
+    } else if (this.state.viewState === 'ERROR') {
+      const errorEvent = this.state.lastErrorEvent;
+      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
+      otherView
+        = renderError
+        && renderError(errorEvent.domain, errorEvent.code, errorEvent.description);
+    } else if (this.state.viewState !== 'IDLE') {
+      console.error(
+        `RNCWebView invalid state encountered: ${this.state.viewState}`,
+      );
+    }
+
+    const webViewStyles = [styles.container, style];
+    if (
+      this.state.viewState === 'LOADING'
+      || this.state.viewState === 'ERROR'
+    ) {
+      // if we're in either LOADING or ERROR states, don't show the webView
+      webViewStyles.push(styles.hidden);
+    }
+
+    if (
+      (source as WebViewUriSource).method === 'POST'
+      && (source as WebViewUriSource).headers
+    ) {
+      console.warn(
+        'WebView: `source.headers` is not supported when using POST.',
+      );
+    } else if (
+      (source as WebViewUriSource).method === 'GET'
+      && (source as WebViewUriSource).body
+    ) {
+      console.warn('WebView: `source.body` is not supported when using GET.');
+    }
+
+    const NativeWebView
+      = (nativeConfig.component as typeof NativeWebViewAndroid) || RNCWebView;
+
+    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+      this.onShouldStartLoadWithRequestCallback,
+      originWhitelist,
+      onShouldStartLoadWithRequestProp,
+    );
+
+    const webView = (
+      <NativeWebView
+        {...otherProps}
+        key="webViewKey"
+        messagingEnabled={typeof onMessage === 'function'}
+        onLoadingError={this.onLoadingError}
+        onLoadingFinish={this.onLoadingFinish}
+        onLoadingProgress={this.onLoadingProgress}
+        onLoadingStart={this.onLoadingStart}
+        onMessage={this.onMessage}
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        ref={this.webViewRef}
+        // TODO: find a better way to type this.
+        source={resolveAssetSource(source as ImageSourcePropType)}
+        style={webViewStyles}
+        {...nativeConfig.props}
+      />
+    );
+
+    return (
+      <View style={styles.container}>
+        {webView}
+        {otherView}
+      </View>
+    );
+  }
+}
 
 module.exports = WebView;
