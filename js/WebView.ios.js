@@ -226,6 +226,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       this.onShouldStartLoadWithRequestCallback,
       this.props.originWhitelist,
       this.props.onShouldStartLoadWithRequest,
+      this.props.onOriginWhitelistFailed
     );
 
     const decelerationRate = processDecelerationRate(

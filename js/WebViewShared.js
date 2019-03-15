@@ -13,7 +13,7 @@ import { Linking } from 'react-native';
 import type {
   WebViewNavigationEvent,
   WebViewNavigation,
-  OnShouldStartLoadWithRequest,
+  OnShouldStartLoadWithRequest, OnOriginWhitelistFailed,
 } from './WebViewTypes';
 
 const defaultOriginWhitelist = ['http://*', 'https://*'];
@@ -44,13 +44,20 @@ const createOnShouldStartLoadWithRequest = (
   ) => void,
   originWhitelist: ?$ReadOnlyArray<string>,
   onShouldStartLoadWithRequest: ?OnShouldStartLoadWithRequest,
+  onOriginWhitelistFailed: ?OnOriginWhitelistFailed,
 ) => {
   return ({ nativeEvent }: WebViewNavigationEvent) => {
     let shouldStart = true;
     const { url, lockIdentifier } = nativeEvent;
 
     if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      Linking.openURL(url);
+      if(onOriginWhitelistFailed != null)
+      {
+        onOriginWhitelistFailed(nativeEvent)
+      }
+      else {
+        Linking.openURL(url);
+      }
       shouldStart = false
     }
 

@@ -136,8 +136,12 @@ export type WebViewNativeConfig = $ReadOnly<{|
 |}>;
 
 export type OnShouldStartLoadWithRequest = (
-  event: WebViewNavigation,
+    event: WebViewNavigation,
 ) => boolean;
+
+export type OnOriginWhitelistFailed = (
+    event: WebViewNavigation,
+) => void;
 
 export type IOSWebViewProps = $ReadOnly<{|
   /**
@@ -487,10 +491,17 @@ export type WebViewSharedProps = $ReadOnly<{|
    * List of origin strings to allow being navigated to. The strings allow
    * wildcards and get matched against *just* the origin (not the full URL).
    * If the user taps to navigate to a new page but the new page is not in
-   * this whitelist, we will open the URL in Safari.
+   * this whitelist, we will open the URL in Safari or can be overwritten
+   * with onOriginWhiteListFailed.
    * The default whitelisted origins are "http://*" and "https://*".
    */
   originWhitelist?: $ReadOnlyArray<string>,
+
+  /**
+   * Overrides default behaviour of opening urls, which are not
+   * whitelisted in originWhitelist
+   */
+  onOriginWhitelistFailed?: OnOriginWhitelistFailed,
 
   /**
    * Function that allows custom handling of any web view requests. Return

@@ -439,10 +439,17 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
    * List of origin strings to allow being navigated to. The strings allow
    * wildcards and get matched against *just* the origin (not the full URL).
    * If the user taps to navigate to a new page but the new page is not in
-   * this whitelist, we will open the URL in Safari.
+   * this whitelist, we will open the URL in Safari or can be overwritten
+   * with onOriginWhiteListFailed.
    * The default whitelisted origins are "http://*" and "https://*".
    */
   originWhitelist?: string[];
+
+  /**
+   * Overrides default behaviour of opening urls, which are not
+   * whitelisted in originWhitelist
+   */
+  onOriginWhitelistFailed?: (event: WebViewIOSLoadRequestEvent) => any;
 
   /**
    * Boolean value that determines whether caching is enabled in the
