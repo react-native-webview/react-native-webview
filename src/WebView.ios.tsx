@@ -391,9 +391,9 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     let NativeWebView = nativeConfig.component as typeof NativeWebViewIOS;
 
     if (useWebKit) {
-      NativeWebView = NativeWebViewIOS || RNCWKWebView;
+      NativeWebView = NativeWebView || RNCWKWebView;
     } else {
-      NativeWebView = NativeWebViewIOS || RNCUIWebView;
+      NativeWebView = NativeWebView || RNCUIWebView;
     }
 
     const webView = (
