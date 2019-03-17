@@ -10,8 +10,10 @@ _This guide is currently a work in progress._
 - [Basic URL Source](Guide.md#basic-url-source)
 - [Controlling navigation state changes](Guide.md#controlling-navigation-state-changes)
 - [Add support for File Upload](Guide.md#add-support-for-file-upload)
+- [Multiple files upload](Guide.md#multiple-files-upload)
 - [Add support for File Download](Guide.md#add-support-for-file-download)
 - [Communicating between JS and Native](Guide.md#communicating-between-js-and-native)
+
 
 ### Basic inline HTML
 
@@ -167,6 +169,18 @@ WebView.isFileUploadSupported().then(res => {
   }
 });
 
+```
+
+### Multiple Files Upload
+
+You can control __single__ or __multiple__ file selection by specifing the [`multiple`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#multiple) attribute on your `input` element:
+
+```
+// multiple file selection
+<input type="file" multiple />
+
+// single file selection
+<input type="file" />
 ```
 
 ### Add support for File Download
