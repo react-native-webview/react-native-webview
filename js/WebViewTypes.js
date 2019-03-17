@@ -450,6 +450,12 @@ export type WebViewSharedProps = $ReadOnly<{|
   injectedJavaScript?: ?string,
 
   /**
+   * Set this to provide JavaScript that will be injected into the web page
+   * prior to the view loading.
+   */
+  injectedJavaScriptBeforeLoad?: ?string,
+
+  /**
    * Boolean value that determines whether a horizontal scroll indicator is
    * shown in the `WebView`. The default value is `true`.
    */
