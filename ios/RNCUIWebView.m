@@ -27,7 +27,7 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
 {
   UIWebView *_webView;
   NSString *_injectedJavaScript;
-  NSString *_injectedJavaScriptBeforeLoad
+  NSString *_injectedJavaScriptBeforeLoad;
 }
 
 - (void)dealloc
