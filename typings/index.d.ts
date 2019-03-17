@@ -421,6 +421,12 @@ export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidW
   injectedJavaScript?: string;
 
   /**
+   * Set this to provide JavaScript that will be injected into the web page
+   * prior to the view loading.
+   */
+  injectedJavaScriptBeforeLoad?: string
+
+  /**
    * Boolean that controls whether the web content is scaled to fit
    * the view and enables the user to change the scale. The default value
    * is `true`.
