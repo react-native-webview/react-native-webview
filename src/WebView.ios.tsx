@@ -382,7 +382,8 @@ class WebView extends React.Component<IOSWebViewProps, State> {
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
-      originWhitelist,
+      // casting cause it's in the default props
+      originWhitelist as ReadonlyArray<string>,
       onShouldStartLoadWithRequestProp,
     );
 
@@ -426,4 +427,4 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   }
 }
 
-module.exports = WebView;
+export default WebView;

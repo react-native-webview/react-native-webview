@@ -8,7 +8,7 @@
 
 /* eslint-disable react/no-multi-comp */
 
-import { ReactNode, ReactElement, Component } from 'react';
+import { ReactElement, Component } from 'react';
 import {
   NativeSyntheticEvent,
   ViewStyle,
@@ -512,7 +512,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that returns a view to show if there's an error.
    */
-  renderError: (
+  renderError?: (
     errorDomain: string | undefined,
     errorCode: number,
     errorDesc: string,
@@ -521,27 +521,27 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that returns a loading indicator.
    */
-  renderLoading: () => ReactElement;
+  renderLoading?: () => ReactElement;
 
   /**
    * Function that is invoked when the `WebView` has finished loading.
    */
-  onLoad: (event: WebViewNavigationEvent) => void;
+  onLoad?: (event: WebViewNavigationEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` load succeeds or fails.
    */
-  onLoadEnd: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
+  onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` starts loading.
    */
-  onLoadStart: (event: WebViewNavigationEvent) => void;
+  onLoadStart?: (event: WebViewNavigationEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` load fails.
    */
-  onError: (event: WebViewErrorEvent) => void;
+  onError?: (event: WebViewErrorEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` loading starts or ends.
@@ -608,7 +608,7 @@ export interface WebViewSharedProps extends ViewProps {
    * this whitelist, we will open the URL in Safari.
    * The default whitelisted origins are "http://*" and "https://*".
    */
-  originWhitelist: ReadonlyArray<string>;
+  originWhitelist?: ReadonlyArray<string>;
 
   /**
    * Function that allows custom handling of any web view requests. Return
@@ -629,5 +629,4 @@ export interface WebViewSharedProps extends ViewProps {
   cacheEnabled?: boolean;
 
   style?: StyleProp<ViewStyle>;
-  children: ReactNode;
 }
