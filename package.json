@@ -58,6 +58,8 @@
     "url": "https://github.com/react-native-community/react-native-webview.git"
   },
   "files": [
+    "android",
+    "ios",
     "lib",
     "index.js",
     "index.d.ts"

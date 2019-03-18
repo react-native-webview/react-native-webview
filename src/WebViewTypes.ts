@@ -248,7 +248,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
   thirdPartyCookiesEnabled?: boolean;
-  urlPrefixesForDefaultIntent?: string[];
+  urlPrefixesForDefaultIntent?: ReadonlyArray<string>;
 }
 
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -258,7 +258,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   automaticallyAdjustContentInsets?: boolean;
   bounces?: boolean;
   contentInset?: ContentInsetProp;
-  dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
+  dataDetectorTypes?: DataDetectorTypes | ReadonlyArray<DataDetectorTypes>;
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
   hideKeyboardAccessoryView?: boolean;
@@ -352,7 +352,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    *
    * @platform ios
    */
-  dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
+  dataDetectorTypes?: DataDetectorTypes | ReadonlyArray<DataDetectorTypes>;
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -453,7 +453,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
    * @platform android
    */
-  urlPrefixesForDefaultIntent?: string[];
+  urlPrefixesForDefaultIntent?: ReadonlyArray<string>;
 
   /**
    * Boolean value to enable JavaScript in the `WebView`. Used on Android only
@@ -608,7 +608,7 @@ export interface WebViewSharedProps extends ViewProps {
    * this whitelist, we will open the URL in Safari.
    * The default whitelisted origins are "http://*" and "https://*".
    */
-  originWhitelist: string[];
+  originWhitelist: ReadonlyArray<string>;
 
   /**
    * Function that allows custom handling of any web view requests. Return

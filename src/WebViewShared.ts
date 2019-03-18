@@ -26,12 +26,17 @@ const extractOrigin = (url: string): string => {
 const originWhitelistToRegex = (originWhitelist: string): string =>
   `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}`;
 
-const passesWhitelist = (compiledWhitelist: string[], url: string) => {
+const passesWhitelist = (
+  compiledWhitelist: ReadonlyArray<string>,
+  url: string,
+) => {
   const origin = extractOrigin(url);
   return compiledWhitelist.some(x => new RegExp(x).test(origin));
 };
 
-const compileWhitelist = (originWhitelist: string[]): string[] =>
+const compileWhitelist = (
+  originWhitelist: ReadonlyArray<string>,
+): ReadonlyArray<string> =>
   ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
 
 const createOnShouldStartLoadWithRequest = (
@@ -40,7 +45,7 @@ const createOnShouldStartLoadWithRequest = (
     url: string,
     lockIdentifier: number,
   ) => void,
-  originWhitelist: string[],
+  originWhitelist: ReadonlyArray<string>,
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
   return ({ nativeEvent }: WebViewNavigationEvent) => {
