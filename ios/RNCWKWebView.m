@@ -454,8 +454,8 @@ static NSURLCredential* clientAuthenticationCredential;
  * topViewController
  */
 -(UIViewController *)topViewController{
-   UIViewController *controller = [self topViewControllerWithRootViewController:[self getCurrentWindow].rootViewController];
-   return controller;
+  UIViewController *controller = [self topViewControllerWithRootViewController:[self getCurrentWindow].rootViewController];
+  return controller;
 }
 
 /**
