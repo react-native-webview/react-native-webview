@@ -40,8 +40,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private static final int PICKER_LEGACY = 3;
   private static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
   final String DEFAULT_MIME_TYPES = "*/*";
-  private final ReactApplicationContext reactContext;
-  private RNCWebViewPackage aPackage;
   private ValueCallback<Uri> filePathCallbackLegacy;
   private ValueCallback<Uri[]> filePathCallback;
   private Uri outputFileUri;
@@ -68,7 +66,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   public RNCWebViewModule(ReactApplicationContext reactContext) {
     super(reactContext);
-    this.reactContext = reactContext;
     reactContext.addActivityEventListener(this);
   }
 
@@ -232,14 +229,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
 
     return result;
-  }
-
-  public RNCWebViewPackage getPackage() {
-    return this.aPackage;
-  }
-
-  public void setPackage(RNCWebViewPackage aPackage) {
-    this.aPackage = aPackage;
   }
 
   private Intent getPhotoIntent() {
