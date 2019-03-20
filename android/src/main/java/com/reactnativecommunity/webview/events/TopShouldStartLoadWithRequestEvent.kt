@@ -5,12 +5,15 @@ import com.facebook.react.uimanager.events.Event
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
 /**
- * Event emitted when there is a loading progress event.
+ * Event emitted when shouldOverrideUrlLoading is called
  */
-class TopLoadingProgressEvent(viewId: Int, private val mEventData: WritableMap) :
-  Event<TopLoadingProgressEvent>(viewId) {
+class TopShouldStartLoadWithRequestEvent(viewId: Int, private val mData: WritableMap) : Event<TopShouldStartLoadWithRequestEvent>(viewId) {
   companion object {
-    const val EVENT_NAME = "topLoadingProgress"
+    const val EVENT_NAME = "topShouldStartLoadWithRequest"
+  }
+
+  init {
+    mData.putString("navigationType", "other")
   }
 
   override fun getEventName(): String = EVENT_NAME
@@ -20,5 +23,5 @@ class TopLoadingProgressEvent(viewId: Int, private val mEventData: WritableMap) 
   override fun getCoalescingKey(): Short = 0
 
   override fun dispatch(rctEventEmitter: RCTEventEmitter) =
-    rctEventEmitter.receiveEvent(viewTag, eventName, mEventData)
+    rctEventEmitter.receiveEvent(viewTag, EVENT_NAME, mData)
 }

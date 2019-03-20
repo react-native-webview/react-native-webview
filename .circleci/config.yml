@@ -35,7 +35,7 @@ jobs:
 
       - run:
           name: Run Tests
-          command: yarn ci:test
+          command: yarn ci
 
   publish:
     <<: *defaults

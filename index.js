@@ -1,3 +1,4 @@
-import WebView from './js/WebView';
+import WebView from './lib/WebView';
 
 export { WebView };
+export default WebView;
