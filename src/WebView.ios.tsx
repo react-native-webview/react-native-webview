@@ -13,7 +13,6 @@ import {
 import invariant from 'invariant';
 
 import {
-  defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
   getViewManagerConfig,
 } from './WebViewShared';
@@ -82,7 +81,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   static defaultProps = {
     useWebKit: true,
     cacheEnabled: true,
-    originWhitelist: defaultOriginWhitelist,
     useSharedProcessPool: true,
   };
 
@@ -299,7 +297,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       viewManager = viewManager || RNCUIWebViewManager;
     }
     invariant(viewManager != null, 'viewManager expected to be non-null');
-    viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
+    viewManager.startLoadWithResult(shouldStart, lockIdentifier);
   };
 
   componentDidUpdate(prevProps: IOSWebViewProps) {
@@ -336,7 +334,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       nativeConfig = {},
       onMessage,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-      originWhitelist,
       renderError,
       renderLoading,
       scalesPageToFit = this.props.useWebKit ? undefined : true,
@@ -374,8 +371,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
-      // casting cause it's in the default props
-      originWhitelist as ReadonlyArray<string>,
       onShouldStartLoadWithRequestProp,
     );
 

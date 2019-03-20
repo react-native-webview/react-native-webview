@@ -182,7 +182,7 @@ export interface WebViewSourceHtml {
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
 export interface ViewManager {
-  startLoadWithResult: Function;
+  startLoadWithResult: (shouldStart: boolean, lockIdentifier: number) => void;
 }
 
 export interface WebViewNativeConfig {
@@ -590,15 +590,6 @@ export interface WebViewSharedProps extends ViewProps {
    * to tap them before they start playing. The default value is `true`.
    */
   mediaPlaybackRequiresUserAction?: boolean;
-
-  /**
-   * List of origin strings to allow being navigated to. The strings allow
-   * wildcards and get matched against *just* the origin (not the full URL).
-   * If the user taps to navigate to a new page but the new page is not in
-   * this whitelist, we will open the URL in Safari.
-   * The default whitelisted origins are "http://*" and "https://*".
-   */
-  originWhitelist?: ReadonlyArray<string>;
 
   /**
    * Function that allows custom handling of any web view requests. Return

@@ -14,7 +14,6 @@ import {
 import invariant from 'invariant';
 
 import {
-  defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
   getViewManagerConfig,
 } from './WebViewShared';
@@ -57,7 +56,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     saveFormDataDisabled: false,
     cacheEnabled: true,
     androidHardwareAccelerationDisabled: false,
-    originWhitelist: defaultOriginWhitelist,
   };
 
   static isFileUploadSupported = async () => {
@@ -207,20 +205,20 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     shouldStart: boolean,
     url: string,
   ) => {
-    if (shouldStart) {
-      UIManager.dispatchViewManagerCommand(
-        this.getWebViewHandle(),
-        this.getCommands().loadUrl,
-        [String(url)],
-      );
+    if (!shouldStart) {
+      return;
     }
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().loadUrl,
+      [String(url)],
+    );
   };
 
   render() {
     const {
       onMessage,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-      originWhitelist,
       renderError,
       renderLoading,
       source,
@@ -268,8 +266,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
-      // casting cause it's in the default props
-      originWhitelist as ReadonlyArray<string>,
       onShouldStartLoadWithRequestProp,
     );
 
