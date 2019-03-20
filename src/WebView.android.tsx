@@ -254,18 +254,14 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       webViewStyles.push(styles.hidden);
     }
 
-    if (
-      (source as WebViewUriSource).method === 'POST'
-      && (source as WebViewUriSource).headers
-    ) {
-      console.warn(
-        'WebView: `source.headers` is not supported when using POST.',
-      );
-    } else if (
-      (source as WebViewUriSource).method === 'GET'
-      && (source as WebViewUriSource).body
-    ) {
-      console.warn('WebView: `source.body` is not supported when using GET.');
+    if (source && 'method' in source) {
+      if (source.method === 'POST' && source.headers) {
+        console.warn(
+          'WebView: `source.headers` is not supported when using POST.',
+        );
+      } else if (source.method === 'GET' && source.body) {
+        console.warn('WebView: `source.body` is not supported when using GET.');
+      }
     }
 
     const NativeWebView
@@ -280,8 +276,8 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
     const webView = (
       <NativeWebView
-        {...otherProps}
         key="webViewKey"
+        {...otherProps}
         messagingEnabled={typeof onMessage === 'function'}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}

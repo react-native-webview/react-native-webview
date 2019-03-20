@@ -3,9 +3,7 @@
 import { ReactElement, Component } from 'react';
 import {
   NativeSyntheticEvent,
-  ViewStyle,
   ViewProps,
-  StyleProp,
   NativeMethodsMixin,
   Constructor,
   UIManagerStatic,
@@ -619,6 +617,4 @@ export interface WebViewSharedProps extends ViewProps {
    * Should caching be enabled. Default is true.
    */
   cacheEnabled?: boolean;
-
-  style?: StyleProp<ViewStyle>;
 }

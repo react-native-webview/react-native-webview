@@ -391,9 +391,9 @@ class WebView extends React.Component<IOSWebViewProps, State> {
 
     const webView = (
       <NativeWebView
+        key="webViewKey"
         {...otherProps}
         decelerationRate={decelerationRate}
-        key="webViewKey"
         messagingEnabled={typeof onMessage === 'function'}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
