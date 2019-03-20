@@ -105,7 +105,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   // state and release page resources (including any running JavaScript).
   protected static final String BLANK_URL = "about:blank";
   protected WebViewConfig mWebViewConfig;
-  private RNCWebViewPackage aPackage;
 
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -171,15 +170,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
       protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-        getModule().startPhotoPickerIntent(filePathCallback, acceptType);
+        getModule(reactContext).startPhotoPickerIntent(filePathCallback, acceptType);
       }
 
       protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-        getModule().startPhotoPickerIntent(filePathCallback, "");
+        getModule(reactContext).startPhotoPickerIntent(filePathCallback, "");
       }
 
       protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-        getModule().startPhotoPickerIntent(filePathCallback, acceptType);
+        getModule(reactContext).startPhotoPickerIntent(filePathCallback, acceptType);
       }
 
       @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -188,7 +187,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         String[] acceptTypes = fileChooserParams.getAcceptTypes();
         boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
         Intent intent = fileChooserParams.createIntent();
-        return getModule().startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+        return getModule(reactContext).startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
       }
     });
     reactContext.addLifecycleEventListener(webView);
@@ -218,7 +217,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-        RNCWebViewModule module = getModule();
+        RNCWebViewModule module = getModule(reactContext);
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
@@ -552,16 +551,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
   }
 
-  public RNCWebViewPackage getPackage() {
-    return this.aPackage;
-  }
-
-  public void setPackage(RNCWebViewPackage aPackage) {
-    this.aPackage = aPackage;
-  }
-
-  public RNCWebViewModule getModule() {
-    return this.aPackage.getModule();
+  public RNCWebViewModule getModule(ReactContext reactContext) {
+    return reactContext.getNativeModule(RNCWebViewModule.class);
   }
 
   protected static class RNCWebViewClient extends WebViewClient {
