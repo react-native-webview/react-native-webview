@@ -7,7 +7,6 @@ import {
   UIManager as NotTypedUIManager,
   View,
   NativeModules,
-  WebViewUriSource,
   ImageSourcePropType,
   findNodeHandle,
 } from 'react-native';
