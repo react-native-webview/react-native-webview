@@ -11,38 +11,58 @@
   "version": "5.3.1",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
-    "test:js": "jest",
-    "test:ios:flow": "flow check",
-    "test:android:flow": "flow check --flowconfig-name .flowconfig.android",
+    "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
-    "ci:test": "yarn ci:test:flow && yarn ci:test:js",
-    "ci:test:flow": "yarn test:ios:flow && yarn test:android:flow",
-    "ci:test:js": "yarn test:js",
-    "semantic-release": "semantic-release"
+    "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
+    "build": "yarn tsc",
+    "prepack": "yarn build",
+    "test": "yarn jest"
   },
   "peerDependencies": {
     "react": "^16.0",
-    "react-native": ">=0.57 <0.59"
+    "react-native": ">=0.57 <0.60"
   },
   "dependencies": {
-    "escape-string-regexp": "^1.0.5",
-    "fbjs": "^0.8.17"
+    "escape-string-regexp": "1.0.5",
+    "invariant": "2.2.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
+    "@babel/core": "7.3.4",
     "@semantic-release/git": "7.0.5",
-    "@types/react": "^16.6.3",
-    "@types/react-native": "^0.57.8",
+    "@types/escape-string-regexp": "1.0.0",
+    "@types/invariant": "^2.2.29",
+    "@types/jest": "24.0.11",
+    "@types/react": "16.8.8",
+    "@types/react-native": "0.57.40",
+    "@typescript-eslint/eslint-plugin": "1.4.2",
+    "@typescript-eslint/parser": "1.4.2",
+    "babel-eslint": "10.0.1",
     "babel-jest": "^24.0.0",
-    "flow-bin": "^0.80.0",
-    "jest": "^24.0.0",
-    "metro-react-native-babel-preset": "^0.51.1",
-    "react": "16.6.3",
-    "react-native": "^0.57.8",
-    "semantic-release": "15.10.3"
+    "eslint": "5.15.1",
+    "eslint-config-airbnb": "17.1.0",
+    "eslint-config-prettier": "4.1.0",
+    "eslint-plugin-import": "2.16.0",
+    "eslint-plugin-jsx-a11y": "6.2.1",
+    "eslint-plugin-react": "7.12.4",
+    "eslint-plugin-react-native": "3.6.0",
+    "jest": "24.5.0",
+    "metro-react-native-babel-preset": "0.53.1",
+    "react": "16.8.3",
+    "react-native": "0.59.1",
+    "semantic-release": "15.10.3",
+    "ts-jest": "24.0.0",
+    "typescript": "3.3.3333"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/react-native-community/react-native-webview.git"
-  }
+  },
+  "files": [
+    "android",
+    "ios",
+    "lib",
+    "index.js",
+    "index.d.ts",
+    "react-native-webview.podspec"
+  ]
 }
