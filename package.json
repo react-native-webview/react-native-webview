@@ -62,6 +62,7 @@
     "ios",
     "lib",
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "react-native-webview.podspec"
   ]
 }
