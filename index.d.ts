@@ -1,8 +1,35 @@
-import { ComponentType } from 'react';
+import { Component } from 'react';
 // eslint-disable-next-line
 import { IOSWebViewProps, AndroidWebViewProps } from './lib/WebViewTypes';
 
-declare const WebView: ComponentType<IOSWebViewProps & AndroidWebViewProps>;
+export class WebView extends Component<IOSWebViewProps & AndroidWebViewProps> {
+    /**
+     * Go back one page in the webview's history.
+     */
+    goBack: () => void;
 
-export { WebView };
-export default WebView;
+    /**
+     * Go forward one page in the webview's history.
+     */
+    goForward: () => void;
+
+    /**
+     * Reloads the current page.
+     */
+    reload: () => void;
+
+    /**
+     * Stop loading the current page.
+     */
+    stopLoading(): void;
+
+    /**
+     * Extra Native Component Config.
+     */
+    extraNativeComponentConfig: () => any;
+
+    /**
+     * Executes the JavaScript string.
+     */
+    injectJavaScript: (script: string) => void;
+};
