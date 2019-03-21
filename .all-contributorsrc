@@ -1,0 +1,147 @@
+{
+  "projectName": "react-native-webview",
+  "projectOwner": "react-native-community",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "titozzz",
+      "name": "Thibault Malbranche",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6181446?v=4",
+      "profile": "https://twitter.com/titozzz",
+      "contributions": [
+        "code",
+        "ideas",
+        "review",
+        "doc",
+        "maintenance",
+        "test",
+        "infra",
+        "question"
+      ]
+    },
+    {
+      "login": "jamonholmgren",
+      "name": "Jamon Holmgren",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1479215?v=4",
+      "profile": "https://jamonholmgren.com",
+      "contributions": [
+        "code",
+        "ideas",
+        "review",
+        "doc",
+        "maintenance",
+        "test",
+        "example",
+        "question"
+      ]
+    },
+    {
+      "login": "andreipfeiffer",
+      "name": "Andrei Pfeiffer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2570562?v=4",
+      "profile": "https://github.com/andreipfeiffer",
+      "contributions": [
+        "code",
+        "review",
+        "ideas"
+      ]
+    },
+    {
+      "login": "Salakar",
+      "name": "Michael Diarmid",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/5347038?v=4",
+      "profile": "https://twitter.com/mikediarmid",
+      "contributions": [
+        "code",
+        "review",
+        "ideas",
+        "tool"
+      ]
+    },
+    {
+      "login": "smathson",
+      "name": "Scott Mathson",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/932981?v=4",
+      "profile": "http://smathson.github.io",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "YangXiaomei",
+      "name": "Margaret",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/8221990?v=4",
+      "profile": "https://github.com/YangXiaomei",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "jordansexton",
+      "name": "Jordan Sexton",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1173161?v=4",
+      "profile": "https://stylisted.com",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "MalcolmScruggs",
+      "name": "Malcolm Scruggs",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/22333355?v=4",
+      "profile": "https://github.com/MalcolmScruggs",
+      "contributions": [
+        "code",
+        "tool",
+        "test"
+      ]
+    },
+    {
+      "login": "Momazo7u7",
+      "name": "Momazo7u7",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/42069617?v=4",
+      "profile": "https://github.com/Momazo7u7",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "marconett",
+      "name": "Marco",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3315507?v=4",
+      "profile": "https://marco-nett.de",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "jeluard",
+      "name": "Julien Eluard",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/359723?v=4",
+      "profile": "https://github.com/jeluard",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "CubeSugar",
+      "name": "Jian Wei",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/3667305?v=4",
+      "profile": "https://github.com/CubeSugar",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

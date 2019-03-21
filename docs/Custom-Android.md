@@ -1,12 +1,10 @@
-**NOTE: This document was imported from [the original WebView documentation](https://github.com/facebook/react-native-website/blob/7d3e9e120e38a7ba928f6b173eb98f88b6f2f85f/docs/custom-webview-android.md). While it may prove useful, it has not been adapted to React Native WebView yet.**
-
 While the built-in web view has a lot of features, it is not possible to handle every use-case in React Native. You can, however, extend the web view with native code without forking React Native or duplicating all the existing web view code.
 
 Before you do this, you should be familiar with the concepts in [native UI components](native-components-android). You should also familiarise yourself with the [native code for web views](https://github.com/facebook/react-native/blob/master/ReactAndroid/src/main/java/com/facebook/react/views/webview/ReactWebViewManager.java), as you will have to use this as a reference when implementing new features—although a deep understanding is not required.
 
 ## Native Code
 
-To get started, you'll need to create a subclass of `ReactWebViewManager`, `ReactWebView`, and `ReactWebViewClient`. In your view manager, you'll then need to override:
+To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `ReactWebViewClient`. In your view manager, you'll then need to override:
 
 * `createReactWebViewInstance`
 * `getName`
@@ -14,20 +12,20 @@ To get started, you'll need to create a subclass of `ReactWebViewManager`, `Reac
 
 ```java
 @ReactModule(name = CustomWebViewManager.REACT_CLASS)
-public class CustomWebViewManager extends ReactWebViewManager {
+public class CustomWebViewManager extends RNCWebViewManager {
   /* This name must match what we're referring to in JS */
   protected static final String REACT_CLASS = "RCTCustomWebView";
 
   protected static class CustomWebViewClient extends ReactWebViewClient { }
 
-  protected static class CustomWebView extends ReactWebView {
+  protected static class CustomWebView extends RNCWebView {
     public CustomWebView(ThemedReactContext reactContext) {
       super(reactContext);
     }
   }
 
   @Override
-  protected ReactWebView createReactWebViewInstance(ThemedReactContext reactContext) {
+  protected RNCWebView createRNCWebViewInstance(ThemedReactContext reactContext) {
     return new CustomWebView(reactContext);
   }
 
@@ -50,10 +48,10 @@ You'll need to follow the usual steps to [register the module](native-modules-an
 To add a new property, you'll need to add it to `CustomWebView`, and then expose it in `CustomWebViewManager`.
 
 ```java
-public class CustomWebViewManager extends ReactWebViewManager {
+public class CustomWebViewManager extends RNCWebViewManager {
   ...
 
-  protected static class CustomWebView extends ReactWebView {
+  protected static class CustomWebView extends RNCWebView {
     public CustomWebView(ThemedReactContext reactContext) {
       super(reactContext);
     }
@@ -107,7 +105,7 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 
 You can trigger the event in your web view client. You can hook existing handlers if your events are based on them.
 
-You should refer to [ReactWebViewManager.java](https://github.com/facebook/react-native/blob/master/ReactAndroid/src/main/java/com/facebook/react/views/webview/ReactWebViewManager.java) in the React Native codebase to see what handlers are available and how they are implemented. You can extend any methods here to provide extra functionality.
+You should refer to [RNCWebViewManager.java](https://github.com/react-native-community/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) in the react-native-webview codebase to see what handlers are available and how they are implemented. You can extend any methods here to provide extra functionality.
 
 ```java
 public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
@@ -131,7 +129,7 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 }
 
 // CustomWebViewManager.java
-protected static class CustomWebViewClient extends ReactWebViewClient {
+protected static class CustomWebViewClient extends RNCWebViewClient {
   @Override
   public boolean shouldOverrideUrlLoading(WebView view, String url) {
     boolean shouldOverride = super.shouldOverrideUrlLoading(view, url);
@@ -150,7 +148,7 @@ protected static class CustomWebViewClient extends ReactWebViewClient {
 Finally, you'll need to expose the events in `CustomWebViewManager` through `getExportedCustomDirectEventTypeConstants`. Note that currently, the default implementation returns `null`, but this may change in the future.
 
 ```java
-public class CustomWebViewManager extends ReactWebViewManager {
+public class CustomWebViewManager extends RNCWebViewManager {
   ...
 
   @Override
@@ -177,7 +175,8 @@ To get your native component, you must use `requireNativeComponent`: the same as
 
 ```javascript
 import React, {Component, PropTypes} from 'react';
-import {WebView, requireNativeComponent} from 'react-native';
+import {requireNativeComponent} from 'react-native';
+import {WebView} from 'react-native-webview';
 
 export default class CustomWebView extends Component {
   static propTypes = WebView.propTypes;
@@ -200,7 +199,7 @@ If you want to add custom props to your native component, you can use `nativeCon
 
 For events, the event handler must always be set to a function. This means it isn't safe to use the event handler directly from `this.props`, as the user might not have provided one. The standard approach is to create a event handler in your class, and then invoking the event handler given in `this.props` if it exists.
 
-If you are unsure how something should be implemented from the JS side, look at [WebView.android.js](https://github.com/facebook/react-native/blob/master/Libraries/Components/WebView/WebView.android.js) in the React Native source.
+If you are unsure how something should be implemented from the JS side, look at [WebView.android.js](https://github.com/react-native-community/react-native-webview/blob/master/js/WebView.android.js) in the React Native source.
 
 ```javascript
 export default class CustomWebView extends Component {
