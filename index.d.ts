@@ -2,7 +2,7 @@ import { Component } from 'react';
 // eslint-disable-next-line
 import { IOSWebViewProps, AndroidWebViewProps } from './lib/WebViewTypes';
 
-export class WebView extends Component<IOSWebViewProps & AndroidWebViewProps> {
+class WebView extends Component<IOSWebViewProps & AndroidWebViewProps> {
     /**
      * Go back one page in the webview's history.
      */
@@ -33,3 +33,6 @@ export class WebView extends Component<IOSWebViewProps & AndroidWebViewProps> {
      */
     injectJavaScript: (script: string) => void;
 };
+
+export {WebView};
+export default WebView;
