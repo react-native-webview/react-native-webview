@@ -56,6 +56,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     allowFileAccess: false,
     saveFormDataDisabled: false,
     cacheEnabled: true,
+    textZoom: 100,
     androidHardwareAccelerationDisabled: false,
     originWhitelist: defaultOriginWhitelist,
   };
@@ -226,6 +227,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       source,
       style,
       nativeConfig = {},
+      textZoom,
       ...otherProps
     } = this.props;
     let otherView = null;
@@ -283,6 +285,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         onLoadingProgress={this.onLoadingProgress}
         onLoadingStart={this.onLoadingStart}
         onMessage={this.onMessage}
+        textZoom={textZoom}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         ref={this.webViewRef}
         // TODO: find a better way to type this.
