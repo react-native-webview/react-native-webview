@@ -226,7 +226,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       source,
       style,
       nativeConfig = {},
-      textZoom,
       ...otherProps
     } = this.props;
     let otherView = null;
