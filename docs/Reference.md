@@ -16,7 +16,6 @@ This document lays out the current public properties and methods for the React N
 - [`onLoadProgress`](Reference.md#onloadprogress)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
-- [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
 - [`scalesPageToFit`](Reference.md#scalespagetofit)
@@ -365,26 +364,6 @@ navigationType
 target
 title
 url
-```
-
----
-
-### `originWhitelist`
-
-List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are "http://*" and "https://*".
-
-| Type             | Required |
-| ---------------- | -------- |
-| array of strings | No       |
-
-Example:
-
-```jsx
-//only allow URIs that begin with https:// or git://
-<WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
-  originWhitelist={['https://*', 'git://*']}
-/>
 ```
 
 ---
