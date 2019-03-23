@@ -1,5 +1,6 @@
 package com.reactnativecommunity.webview
 
+import android.os.Build;
 import android.webkit.WebViewDatabase
 
 import com.facebook.react.bridge.Arguments
@@ -24,8 +25,8 @@ class RNCWebViewDatabase(reactContext: ReactApplicationContext) : ReactContextBa
 
   @ReactMethod
   fun getHttpAuthUsernamePassword(host: String, realm: String, promise: Promise) =
-    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
-      promise.reject(UNSUPPORTED_CODE, "android version is too low")
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      promise.reject(UNSUPPORTED_CODE, UNSUPPORTED_MESSAGE)
     } else {
       try {
         WebViewDatabase.getInstance(this.reactApplicationContext)
@@ -44,7 +45,7 @@ class RNCWebViewDatabase(reactContext: ReactApplicationContext) : ReactContextBa
                                   userName: String,
                                   password: String,
                                   promise: Promise) =
-    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
       promise.reject(UNSUPPORTED_CODE, UNSUPPORTED_MESSAGE)
     } else {
       try {
@@ -56,20 +57,13 @@ class RNCWebViewDatabase(reactContext: ReactApplicationContext) : ReactContextBa
       }
     }
 
-
   @ReactMethod
-  fun hasHttpAuthUsernamePassword(promise: Promise) =
-    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
-      promise.reject(UNSUPPORTED_CODE, UNSUPPORTED_MESSAGE)
-    } else {
-      try {
-        WebViewDatabase.getInstance(this.reactApplicationContext)
-          .hasHttpAuthUsernamePassword().also(promise::resolve)
-      } catch (e: Throwable) {
-        promise.reject(e)
-      }
-
-    }
+  fun hasHttpAuthUsernamePassword(promise: Promise) = try {
+    WebViewDatabase.getInstance(this.reactApplicationContext)
+      .hasHttpAuthUsernamePassword().also(promise::resolve)
+  } catch (e: Throwable) {
+    promise.reject(e)
+  }
 
   @ReactMethod
   fun clearFormData(promise: Promise) = try {
@@ -90,6 +84,6 @@ class RNCWebViewDatabase(reactContext: ReactApplicationContext) : ReactContextBa
 
   companion object {
     private const val UNSUPPORTED_CODE = "UNSUPPORTED"
-    private const val UNSUPPORTED_MESSAGE = "android version is too low"
+    private const val UNSUPPORTED_MESSAGE = "Call require android API 26"
   }
 }
