@@ -30,7 +30,7 @@ class RNCWebViewDatabase(reactContext: ReactApplicationContext) : ReactContextBa
       try {
         WebViewDatabase.getInstance(this.reactApplicationContext)
           .getHttpAuthUsernamePassword(host, realm).also { result: Array<String>? ->
-            promise.resolve(if (result == null) null else Arguments.fromArray(result))
+            promise.resolve(result?.let(Arguments::fromArray))
           }
       } catch (e: Throwable) {
         promise.reject(e)
