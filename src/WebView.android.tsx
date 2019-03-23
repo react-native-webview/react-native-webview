@@ -117,7 +117,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     );
   };
 
-  clearFormData = async () => {
+  clearFormData = () => {
     UIManager.dispatchViewManagerCommand(
        this.getWebViewHandle(),
        this.getCommands().clearFormData,
