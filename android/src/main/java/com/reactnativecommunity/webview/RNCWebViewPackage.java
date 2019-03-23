@@ -6,13 +6,17 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class RNCWebViewPackage implements ReactPackage {
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-    return Collections.singletonList(new RNCWebViewModule(reactContext));
+    return Arrays.asList(
+      new RNCWebViewModule(reactContext),
+      new RNCWebViewDatabase(reactContext)
+    );
   }
 
   // Deprecated from RN 0.47
