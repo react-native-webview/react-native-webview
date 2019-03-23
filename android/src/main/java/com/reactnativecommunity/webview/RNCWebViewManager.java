@@ -96,6 +96,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_POST_MESSAGE = 5;
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
+
+  // android commands
+  public static final int COMMAND_CLEAR_FORM_DATA = 1000;
+  public static final int COMMAND_CLEAR_CACHE = 1001;
+  public static final int COMMAND_CLEAR_HISTORY = 1002;
+
   protected static final String REACT_CLASS = "RNCWebView";
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
@@ -485,15 +491,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @Override
   public @Nullable
   Map<String, Integer> getCommandsMap() {
-    return MapBuilder.of(
-      "goBack", COMMAND_GO_BACK,
-      "goForward", COMMAND_GO_FORWARD,
-      "reload", COMMAND_RELOAD,
-      "stopLoading", COMMAND_STOP_LOADING,
-      "postMessage", COMMAND_POST_MESSAGE,
-      "injectJavaScript", COMMAND_INJECT_JAVASCRIPT,
-      "loadUrl", COMMAND_LOAD_URL
-    );
+    return MapBuilder.<String, Integer>builder()
+      .put("goBack", COMMAND_GO_BACK)
+      .put("goForward", COMMAND_GO_FORWARD)
+      .put("reload", COMMAND_RELOAD)
+      .put("stopLoading", COMMAND_STOP_LOADING)
+      .put("postMessage", COMMAND_POST_MESSAGE)
+      .put("injectJavaScript", COMMAND_INJECT_JAVASCRIPT)
+      .put("loadUrl", COMMAND_LOAD_URL)
+      .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
+      .put("clearCache", COMMAND_CLEAR_CACHE)
+      .put( "clearHistory", COMMAND_CLEAR_HISTORY)
+      .build();
   }
 
   @Override
@@ -540,6 +549,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
         root.loadUrl(args.getString(0));
+        break;
+      case COMMAND_CLEAR_FORM_DATA:
+        root.clearFormData();
+        break;
+      case COMMAND_CLEAR_CACHE:
+        boolean includeDiskFiles = args != null && args.getBoolean(0);
+        root.clearCache(includeDiskFiles);
+        break;
+      case COMMAND_CLEAR_HISTORY:
+        root.clearHistory();
         break;
     }
   }

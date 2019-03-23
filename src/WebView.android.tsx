@@ -117,6 +117,30 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     );
   };
 
+  clearFormData = async () => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearFormData,
+       null,
+    );
+  }
+
+  clearCache = (includeDiskFiles: boolean) => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearCache,
+       [includeDiskFiles],
+    );
+  };
+
+  clearHistory = () => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearHistory,
+       null,
+    );
+  };
+
   /**
    * Injects a javascript string into the referenced WebView. Deliberately does not
    * return a response because using eval() to return a response breaks this method

@@ -17,6 +17,11 @@ export interface WebViewCommands {
   postMessage: Function;
   injectJavaScript: Function;
   loadUrl: Function;
+
+  // android commands
+  clearHistory: Function,
+  clearCache: Function,
+  clearFormData: Function
 }
 
 export interface CustomUIManager extends UIManagerStatic {
