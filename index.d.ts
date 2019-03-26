@@ -32,7 +32,12 @@ declare class WebView extends Component<IOSWebViewProps & AndroidWebViewProps> {
      * Executes the JavaScript string.
      */
     injectJavaScript: (script: string) => void;
+
+    /**
+     * Posts a message to the web view, which will emit a `message` event.
+     */
+    postMessage(data: string): void;
 }
 
-export {WebView};
+export { WebView };
 export default WebView;

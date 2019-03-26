@@ -59,6 +59,7 @@ This document lays out the current public properties and methods for the React N
 - [`reload`](Reference.md#reload)
 - [`stopLoading`](Reference.md#stoploading)
 - [`injectJavaScript`](Reference.md#injectjavascriptstr)
+- [`postMessage`](Reference.md#postmessagedata)
 
 ---
 
@@ -905,6 +906,16 @@ injectJavaScript('... javascript string ...');
 ```
 
 Executes the JavaScript string.
+
+To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
+
+### `postMessage(data)`
+
+```javascript
+postMessage('... some data to send ...');
+```
+
+Posts a message to the web view, which will emit a `message` event.
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 

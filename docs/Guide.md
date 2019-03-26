@@ -214,11 +214,12 @@ Add permission in AndroidManifest.xml:
 
 You will often find yourself wanting to send messages to the web pages loaded by your webviews and also receiving messages back from those web pages.
 
-To accomplish this, React Native WebView exposes three different options:
+To accomplish this, React Native WebView exposes four different options:
 
 1. React Native -> Web: The `injectedJavaScript` prop
 2. React Native -> Web: The `injectJavaScript` method
-3. Web -> React Native: The `postMessage` method and `onMessage` prop
+3. React Native -> Web: The `postMessage` method
+4. Web -> React Native: The `postMessage` method and `onMessage` prop
 
 #### The `injectedJavaScript` prop
 
@@ -304,9 +305,57 @@ After 3 seconds, this code turns the background blue:
 > On iOS, `injectJavaScript` calls WKWebView's `evaluateJS:andThen:`
 > On Android, `injectJavaScript` calls Android WebView's `evaluateJavascriptWithFallback` method
 
+#### The `postMessage` method
+
+Being able to inject JavaScript of your own is very useful but sometimes the web page will come with its own JavaScript that you want to communicate with by just generating an event and passing string data. For that use case there is the `postMessage` method,
+
+```jsx
+import React, { Component } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+
+export default class App extends Component {
+  render() {
+    const html = `
+      <html>
+      <head></head>
+      <body>
+        <h1 id="header" style="text-align: center; margin-top: 100px;">
+          No message received yet
+        </h1>
+
+        <script>
+          document.addEventListener('message', e => {
+            document.getElementById('header').innerHTML = 'Message Received: ' + e.data;
+          });
+        </script>
+      </body>
+      </html>
+    `;
+
+    setTimeout(() => {
+      this.webref.postMessage("Hello!");
+    }, 3000);
+
+    return (
+      <View style={{ flex: 1 }}>
+        <WebView
+          ref={r => (this.webref = r)}
+          source={{ html }}
+        />
+      </View>
+    );
+  }
+}
+```
+
+This code will result in the text within the WebView changing from `No message received yet` to `Message Received: Hello!` after 3 seconds:
+
+<img alt="Alert showing communication from React Native to web page" width="200" src="https://user-images.githubusercontent.com/1635228/54966603-e412c680-4fc8-11e9-97a2-8b244fb85e34.png" />
+
 #### The `window.ReactNativeWebView.postMessage` method and `onMessage` prop
 
-Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
+Being able to send JavaScript and messages to the web page is great, but what about when the web page wants to communicate back to your React Native code? This is where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
 
 You _must_ set `onMessage` or the `window.ReactNativeWebView.postMessage` method will not be injected into the web page.
 
@@ -346,7 +395,6 @@ export default class App extends Component {
 }
 ```
 
-This code will result in this alert:
+This code will result in this alert appearing after 2 seconds:
 
 <img alt="Alert showing communication from web page to React Native" width="200" src="https://user-images.githubusercontent.com/1479215/53671269-7e822300-3c32-11e9-9937-7ddc34ba8af3.png" />
-
