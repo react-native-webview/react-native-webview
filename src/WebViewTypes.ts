@@ -176,7 +176,7 @@ export interface WebViewSourceHtml {
   /**
    * The base URL to be used for any relative links in the HTML.
    */
-  baseUrl: string;
+  baseUrl?: string;
 }
 
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
