@@ -15,6 +15,7 @@
 
 static NSTimer *keyboardTimer;
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
+static NSURLCredential* clientAuthenticationCredential;
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -42,32 +43,15 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
   BOOL _savedHideKeyboardAccessoryView;
 }
 
-- (void)dealloc{}
-
-/**
- * See https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DisplayWebContent/Tasks/WebKitAvail.html.
- */
-+ (BOOL)dynamicallyLoadWebKitIfAvailable
-{
-  static BOOL _webkitAvailable=NO;
-  static dispatch_once_t onceToken;
-
-  dispatch_once(&onceToken, ^{
-    NSBundle *webKitBundle = [NSBundle bundleWithPath:@"/System/Library/Frameworks/WebKit.framework"];
-    if (webKitBundle) {
-      _webkitAvailable = [webKitBundle load];
-    }
-  });
-
-  return _webkitAvailable;
-}
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
     super.backgroundColor = [UIColor clearColor];
     _bounces = YES;
     _scrollEnabled = YES;
+    _showsHorizontalScrollIndicator = YES;
+    _showsVerticalScrollIndicator = YES;
+    _directionalLockEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
   }
@@ -88,6 +72,11 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
   return self;
 }
 
+- (void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 /**
  * See https://stackoverflow.com/questions/25713069/why-is-wkwebview-not-opening-links-with-target-blank/25853806#25853806 for details.
  */
@@ -102,10 +91,6 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
-    if (![[self class] dynamicallyLoadWebKitIfAvailable]) {
-      return;
-    };
-
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
@@ -211,6 +196,9 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
     _webView.scrollView.bounces = _bounces;
+    _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
+    _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
+    _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
@@ -243,6 +231,7 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
         [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
+        _webView.scrollView.delegate = nil;
         _webView = nil;
     }
 
@@ -419,6 +408,32 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
   _webView.scrollView.scrollEnabled = scrollEnabled;
 }
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  // Don't allow scrolling the scrollView.
+  if (!_scrollEnabled) {
+    scrollView.bounds = _webView.bounds;
+  }
+}
+
+- (void)setDirectionalLockEnabled:(BOOL)directionalLockEnabled
+{
+    _directionalLockEnabled = directionalLockEnabled;
+    _webView.scrollView.directionalLockEnabled = directionalLockEnabled;
+}
+
+- (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
+{
+    _showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+    _webView.scrollView.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+}
+
+- (void)setShowsVerticalScrollIndicator:(BOOL)showsVerticalScrollIndicator
+{
+    _showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+    _webView.scrollView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+}
+
 - (void)postMessage:(NSString *)message
 {
   NSDictionary *eventInitDict = @{@"data": message};
@@ -447,6 +462,25 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
     @"canGoForward" : @(_webView.canGoForward)
   };
   return [[NSMutableDictionary alloc] initWithDictionary: event];
+}
+
++ (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential {
+  clientAuthenticationCredential = credential;
+}
+
+- (void)                    webView:(WKWebView *)webView
+  didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+                  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler
+{
+  if (!clientAuthenticationCredential) {
+    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    return;
+  }
+  if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
+    completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
+  } else {
+    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+  }
 }
 
 #pragma mark - WKNavigationDelegate methods
