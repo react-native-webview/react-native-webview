@@ -184,7 +184,7 @@ static NSURLCredential* clientAuthenticationCredential;
 
         WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource:script
                                                               injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-                                                           forMainFrameOnly:NO];
+                                                           forMainFrameOnly:YES];
         [wkWebViewConfig.userContentController addUserScript:cookieInScript];
       }
     }
