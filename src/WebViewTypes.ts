@@ -384,14 +384,14 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * In iOS 10 and later, the default value is `true`; before that, the default value is `false`.
    * @platform ios
    */
-  allowsLinkPreview?: boolean,
+  allowsLinkPreview?: boolean;
 
   /**
    * Set true if shared cookies from HTTPCookieStorage should used for every load request in the
    * `RNCWKWebView`. The default value is `false`.
    * @platform ios
    */
-  sharedCookiesEnabled?: boolean,
+  sharedCookiesEnabled?: boolean;
 
   /**
    * A Boolean value that determines whether scrolling is disabled in a particular direction.
