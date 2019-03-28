@@ -237,6 +237,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   onContentSizeChange?: (event: WebViewEvent) => void;
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
+  textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
   urlPrefixesForDefaultIntent?: ReadonlyArray<string>;
 }
@@ -479,6 +480,12 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   userAgent?: string;
+
+  /**
+   * Sets number that controls text zoom of the page in percent.
+   * @platform android
+   */
+  textZoom?: number;
 
   /**
    * Specifies the mixed content mode. i.e WebView will allow a secure origin to load content from any other origin.

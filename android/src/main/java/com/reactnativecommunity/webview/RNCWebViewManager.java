@@ -318,6 +318,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "textZoom")
+  public void setTextZoom(WebView view, int value) {
+    view.getSettings().setTextZoom(value);
+  }
+
   @ReactProp(name = "scalesPageToFit")
   public void setScalesPageToFit(WebView view, boolean enabled) {
     view.getSettings().setLoadWithOverviewMode(enabled);
