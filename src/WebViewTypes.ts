@@ -481,9 +481,8 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   userAgent?: string;
 
-    /**
-   * Sets number that controls text zoom of the page in percent. The default value
-   * is `100`.
+  /**
+   * Sets number that controls text zoom of the page in percent.
    * @platform android
    */
   textZoom?: number;
