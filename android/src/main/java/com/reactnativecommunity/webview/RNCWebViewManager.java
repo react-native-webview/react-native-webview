@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -468,6 +469,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     WebView view,
     @Nullable Boolean isGeolocationEnabled) {
     view.getSettings().setGeolocationEnabled(isGeolocationEnabled != null && isGeolocationEnabled);
+  }
+
+  @ReactProp(name = "autoFocus")
+  public void setAutoFocus(WebView root, boolean autoFocus) {
+    if (autoFocus) {
+      root.requestFocus();
+      InputMethodManager imm = (InputMethodManager) root.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+    }
   }
 
   @Override
