@@ -1,9 +1,11 @@
 # React Native WebView - a Modern, Cross-Platform WebView for React Native
-[![star this repo](http://githubbadges.com/star.svg?user=react-native-community&repo=react-native-webview&style=flat)](https://github.com/react-native-community/react-native-webview) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors) [![Known Vulnerabilities](https://snyk.io/test/github/react-native-community/react-native-webview/badge.svg?style=flat-square)](https://snyk.io/test/github/react-native-community/react-native-webview) 
+
+[![star this repo](http://githubbadges.com/star.svg?user=react-native-community&repo=react-native-webview&style=flat)](https://github.com/react-native-community/react-native-webview) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors) [![Known Vulnerabilities](https://snyk.io/test/github/react-native-community/react-native-webview/badge.svg?style=flat-square)](https://snyk.io/test/github/react-native-community/react-native-webview)
 
 **React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
 ## Core Maintainers - Sponsoring companies
+
 _This project is maintained for free by these people using both their free time and their company work time._
 
 - [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
@@ -43,17 +45,15 @@ This project follows [semantic versioning](https://semver.org/). We do not hesit
 Import the `WebView` component from `react-native-webview` and use it like so:
 
 ```jsx
-import React, { Component } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { WebView } from "react-native-webview";
+import React, { Component } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 // ...
 class MyWebComponent extends Component {
   render() {
     return (
-      <WebView
-        source={{ uri: "https://facebook.github.io/react-native/" }}
-      />
+      <WebView source={{ uri: 'https://facebook.github.io/react-native/' }} />
     );
   }
 }
@@ -64,7 +64,6 @@ For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide
 ## Common issues
 
 - If you're getting `Invariant Violation: Native component for "RNCWKWebView does not exist"` it likely means you forgot to run `react-native link` or there was some error with the linking process
-- There's a [problem](https://stackoverflow.com/questions/52872045/rendering-webview-on-android-device-overlaps-previous-siblings-from-same-parent) on some Android devices where the webview could overlap previous siblings from same parent. To fix this, wrap the WebView in a View with style `overflow: hidden`.
 
 ## Contributing
 

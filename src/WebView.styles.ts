@@ -11,26 +11,28 @@ interface Styles {
   loadingProgressBar: ViewStyle;
 }
 
-const BGWASH = 'rgba(255,255,255,0.8)';
-
 const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
+    overflow: 'hidden',
+    backgroundColor: 'white',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: BGWASH,
+    backgroundColor: 'white',
   },
   hidden: {
     height: 0,
     flex: 0, // disable 'flex:1' when hiding a View
+    display: 'none',
   },
   loadingView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'white',
   },
   loadingProgressBar: {
     height: 20,
