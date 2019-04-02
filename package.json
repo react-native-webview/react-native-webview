@@ -50,7 +50,6 @@
     "react": "16.8.3",
     "react-native": "0.59.1",
     "semantic-release": "15.10.3",
-    "ts-jest": "24.0.0",
     "typescript": "3.3.3333"
   },
   "repository": {
