@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {
-  ActivityIndicator,
   Image,
   requireNativeComponent,
   UIManager as NotTypedUIManager,
@@ -17,6 +16,8 @@ import {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
   getViewManagerConfig,
+  defaultRenderError,
+  defaultRenderLoading,
 } from './WebViewShared';
 import {
   WebViewErrorEvent,
@@ -37,12 +38,6 @@ const RNCWebView = requireNativeComponent(
   'RNCWebView',
 ) as typeof NativeWebViewAndroid;
 const { resolveAssetSource } = Image;
-
-const defaultRenderLoading = () => (
-  <View style={styles.loadingView}>
-    <ActivityIndicator style={styles.loadingProgressBar} />
-  </View>
-);
 
 /**
  * Renders a native WebView.
@@ -228,6 +223,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       nativeConfig = {},
       ...otherProps
     } = this.props;
+
     let otherView = null;
 
     if (this.state.viewState === 'LOADING') {
@@ -235,16 +231,18 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     } else if (this.state.viewState === 'ERROR') {
       const errorEvent = this.state.lastErrorEvent;
       invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
-      otherView
-        = renderError
-        && renderError(errorEvent.domain, errorEvent.code, errorEvent.description);
+      otherView = (renderError || defaultRenderError)(
+        errorEvent.domain,
+        errorEvent.code,
+        errorEvent.description,
+      );
     } else if (this.state.viewState !== 'IDLE') {
       console.error(
         `RNCWebView invalid state encountered: ${this.state.viewState}`,
       );
     }
 
-    const webViewStyles = [styles.container, style];
+    const webViewStyles = [styles.container, styles.webView, style];
     if (
       this.state.viewState === 'LOADING'
       || this.state.viewState === 'ERROR'
