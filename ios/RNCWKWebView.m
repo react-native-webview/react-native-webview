@@ -294,7 +294,13 @@ static NSURLCredential* clientAuthenticationCredential;
     [_webView loadHTMLString:@"" baseURL:nil];
     return;
   }
-  [_webView loadRequest:request];
+  if (request.URL.host) {
+    [_webView loadRequest:request];
+  }
+  else {
+    [_webView loadFileURL:request.URL allowingReadAccessToURL:request.URL];
+  }
+
 }
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
