@@ -26,7 +26,6 @@ const styles = StyleSheet.create<Styles>({
   hidden: {
     height: 0,
     flex: 0, // disable 'flex:1' when hiding a View
-    display: 'none',
   },
   loadingView: {
     flex: 1,
