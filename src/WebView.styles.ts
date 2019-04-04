@@ -15,7 +15,6 @@ const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
     overflow: 'hidden',
-    backgroundColor: 'white',
   },
   errorContainer: {
     flex: 1,
