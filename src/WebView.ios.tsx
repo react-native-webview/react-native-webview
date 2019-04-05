@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  ActivityIndicator,
-  Text,
   UIManager as NotTypedUIManager,
   View,
   requireNativeComponent,
@@ -16,6 +14,8 @@ import {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
   getViewManagerConfig,
+  defaultRenderError,
+  defaultRenderLoading,
 } from './WebViewShared';
 import {
   WebViewErrorEvent,
@@ -58,24 +58,6 @@ const RNCUIWebView: typeof NativeWebViewIOS = requireNativeComponent(
 );
 const RNCWKWebView: typeof NativeWebViewIOS = requireNativeComponent(
   'RNCWKWebView',
-);
-
-const defaultRenderLoading = () => (
-  <View style={styles.loadingView}>
-    <ActivityIndicator />
-  </View>
-);
-const defaultRenderError = (
-  errorDomain: string | undefined,
-  errorCode: number,
-  errorDesc: string,
-) => (
-  <View style={styles.errorContainer}>
-    <Text style={styles.errorTextTitle}>Error loading page</Text>
-    <Text style={styles.errorText}>{`Domain: ${errorDomain}`}</Text>
-    <Text style={styles.errorText}>{`Error Code: ${errorCode}`}</Text>
-    <Text style={styles.errorText}>{`Description: ${errorDesc}`}</Text>
-  </View>
 );
 
 class WebView extends React.Component<IOSWebViewProps, State> {

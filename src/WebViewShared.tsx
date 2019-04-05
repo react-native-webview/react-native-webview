@@ -1,10 +1,18 @@
 import escapeStringRegexp from 'escape-string-regexp';
-import { Linking, UIManager as NotTypedUIManager } from 'react-native';
+import React from 'react';
+import {
+  Linking,
+  UIManager as NotTypedUIManager,
+  View,
+  ActivityIndicator,
+  Text,
+} from 'react-native';
 import {
   WebViewNavigationEvent,
   OnShouldStartLoadWithRequest,
   CustomUIManager,
 } from './WebViewTypes';
+import styles from './WebView.styles';
 
 const UIManager = NotTypedUIManager as CustomUIManager;
 
@@ -66,8 +74,28 @@ const getViewManagerConfig = (
   return UIManager.getViewManagerConfig(viewManagerName);
 };
 
+const defaultRenderLoading = () => (
+  <View style={styles.loadingView}>
+    <ActivityIndicator />
+  </View>
+);
+const defaultRenderError = (
+  errorDomain: string | undefined,
+  errorCode: number,
+  errorDesc: string,
+) => (
+  <View style={styles.errorContainer}>
+    <Text style={styles.errorTextTitle}>Error loading page</Text>
+    <Text style={styles.errorText}>{`Domain: ${errorDomain}`}</Text>
+    <Text style={styles.errorText}>{`Error Code: ${errorCode}`}</Text>
+    <Text style={styles.errorText}>{`Description: ${errorDesc}`}</Text>
+  </View>
+);
+
 export {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
   getViewManagerConfig,
+  defaultRenderLoading,
+  defaultRenderError,
 };
