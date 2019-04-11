@@ -11,7 +11,7 @@
 
 NSString *const RNCJSNavigationScheme = @"react-js-navigation";
 
-static NSString *const kPostMessageHost = @"postMessage";
+static NSString *const MessageHandlerName = @"ReactNativeWebView";
 
 @interface RNCUIWebView () <UIWebViewDelegate, RCTAutoInsetsProtocol>
 
@@ -86,7 +86,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     @"data": message,
   };
   NSString *source = [NSString
-    stringWithFormat:@"document.dispatchEvent(new MessageEvent('message', %@));",
+    stringWithFormat:@"window.dispatchEvent(new MessageEvent('message', %@));",
     RCTJSONStringify(eventInitDict, NULL)
   ];
   [_webView stringByEvaluatingJavaScriptFromString:source];
@@ -236,7 +236,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     }
   }
 
-  if (isJSNavigation && [request.URL.host isEqualToString:kPostMessageHost]) {
+  if (isJSNavigation && [request.URL.host isEqualToString:MessageHandlerName]) {
     NSString *data = request.URL.query;
     data = [data stringByReplacingOccurrencesOfString:@"+" withString:@" "];
     data = [data stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -246,7 +246,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       @"data": data,
     }];
 
-    NSString *source = @"document.dispatchEvent(new MessageEvent('message:received'));";
+    NSString *source = [NSString stringWithFormat:@"window.%@.messageReceived();", MessageHandlerName];
 
     [_webView stringByEvaluatingJavaScriptFromString:source];
 
@@ -289,40 +289,28 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
   if (_messagingEnabled) {
-    #if RCT_DEV
-    // See isNative in lodash
-    NSString *testPostMessageNative = @"String(window.postMessage) === String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage')";
-    BOOL postMessageIsNative = [
-      [webView stringByEvaluatingJavaScriptFromString:testPostMessageNative]
-      isEqualToString:@"true"
-    ];
-    if (!postMessageIsNative) {
-      RCTLogError(@"Setting onMessage on a WebView overrides existing values of window.postMessage, but a previous value was defined");
-    }
-    #endif
     NSString *source = [NSString stringWithFormat:
       @"(function() {"
-        "window.originalPostMessage = window.postMessage;"
+       "  var messageQueue = [];"
+       "  var messagePending = false;"
 
-        "var messageQueue = [];"
-        "var messagePending = false;"
+       "  function processQueue () {"
+       "    if (!messageQueue.length || messagePending) return;"
+       "    messagePending = true;"
+       "    document.location = '%@://%@?' + encodeURIComponent(messageQueue.shift());"
+       "  }"
 
-        "function processQueue() {"
-          "if (!messageQueue.length || messagePending) return;"
-          "messagePending = true;"
-          "window.location = '%@://%@?' + encodeURIComponent(messageQueue.shift());"
-        "}"
-
-        "window.postMessage = function(data) {"
-          "messageQueue.push(String(data));"
-          "processQueue();"
-        "};"
-
-        "document.addEventListener('message:received', function(e) {"
-          "messagePending = false;"
-          "processQueue();"
-        "});"
-      "})();", RNCJSNavigationScheme, kPostMessageHost
+       "  window.%@ = {"
+       "    postMessage: function (data) {"
+       "      messageQueue.push(String(data));"
+       "      processQueue();"
+       "    },"
+       "    messageReceived: function () {"
+       "      messagePending = false;"
+       "      processQueue();"
+       "    }"
+       "  };"
+       "})();", RNCJSNavigationScheme, MessageHandlerName, MessageHandlerName
     ];
     [webView stringByEvaluatingJavaScriptFromString:source];
   }

@@ -1,39 +1,30 @@
 package com.reactnativecommunity.webview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.DownloadManager;
 import android.content.Context;
-import com.facebook.react.uimanager.UIManagerModule;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
-import javax.annotation.Nullable;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.facebook.common.logging.FLog;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactContext;
@@ -42,56 +33,61 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
-import com.facebook.react.common.ReactConstants;
 import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
+import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
-import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
+import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 /**
  * Manages instances of {@link WebView}
- *
+ * <p>
  * Can accept following commands:
- *  - GO_BACK
- *  - GO_FORWARD
- *  - RELOAD
- *
+ * - GO_BACK
+ * - GO_FORWARD
+ * - RELOAD
+ * - LOAD_URL
+ * <p>
  * {@link WebView} instances could emit following direct events:
- *  - topLoadingFinish
- *  - topLoadingStart
- *  - topLoadingStart
- *  - topLoadingProgress
- *
+ * - topLoadingFinish
+ * - topLoadingStart
+ * - topLoadingStart
+ * - topLoadingProgress
+ * - topShouldStartLoadWithRequest
+ * <p>
  * Each event will carry the following properties:
- *  - target - view's react tag
- *  - url - url set for the webview
- *  - loading - whether webview is in a loading state
- *  - title - title of the current page
- *  - canGoBack - boolean, whether there is anything on a history stack to go back
- *  - canGoForward - boolean, whether it is possible to request GO_FORWARD command
+ * - target - view's react tag
+ * - url - url set for the webview
+ * - loading - whether webview is in a loading state
+ * - title - title of the current page
+ * - canGoBack - boolean, whether there is anything on a history stack to go back
+ * - canGoForward - boolean, whether it is possible to request GO_FORWARD command
  */
 @ReactModule(name = RNCWebViewManager.REACT_CLASS)
 public class RNCWebViewManager extends SimpleViewManager<WebView> {
-
-  protected static final String REACT_CLASS = "RNCWebView";
-  private RNCWebViewPackage aPackage;
-
-  protected static final String HTML_ENCODING = "UTF-8";
-  protected static final String HTML_MIME_TYPE = "text/html";
-  protected static final String BRIDGE_NAME = "__REACT_WEB_VIEW_BRIDGE";
-
-  protected static final String HTTP_METHOD_POST = "POST";
 
   public static final int COMMAND_GO_BACK = 1;
   public static final int COMMAND_GO_FORWARD = 2;
@@ -99,279 +95,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_STOP_LOADING = 4;
   public static final int COMMAND_POST_MESSAGE = 5;
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
-
+  public static final int COMMAND_LOAD_URL = 7;
+  protected static final String REACT_CLASS = "RNCWebView";
+  protected static final String HTML_ENCODING = "UTF-8";
+  protected static final String HTML_MIME_TYPE = "text/html";
+  protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
+  protected static final String HTTP_METHOD_POST = "POST";
   // Use `webView.loadUrl("about:blank")` to reliably reset the view
   // state and release page resources (including any running JavaScript).
   protected static final String BLANK_URL = "about:blank";
-
   protected WebViewConfig mWebViewConfig;
-  protected @Nullable WebView.PictureListener mPictureListener;
-
-  protected static class RNCWebViewClient extends WebViewClient {
-
-    protected boolean mLastLoadFailed = false;
-    protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
-    protected @Nullable List<Pattern> mOriginWhitelist;
-
-    @Override
-    public void onPageFinished(WebView webView, String url) {
-      super.onPageFinished(webView, url);
-
-      if (!mLastLoadFailed) {
-        RNCWebView reactWebView = (RNCWebView) webView;
-        reactWebView.callInjectedJavaScript();
-        reactWebView.linkBridge();
-        emitFinishEvent(webView, url);
-      }
-    }
-
-    @Override
-    public void onPageStarted(WebView webView, String url, Bitmap favicon) {
-      super.onPageStarted(webView, url, favicon);
-      mLastLoadFailed = false;
-
-      dispatchEvent(
-          webView,
-          new TopLoadingStartEvent(
-              webView.getId(),
-              createWebViewEvent(webView, url)));
-    }
-
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      if (url.equals(BLANK_URL)) return false;
-
-      // url blacklisting
-      if (mUrlPrefixesForDefaultIntent != null && mUrlPrefixesForDefaultIntent.size() > 0) {
-        ArrayList<Object> urlPrefixesForDefaultIntent =
-            mUrlPrefixesForDefaultIntent.toArrayList();
-        for (Object urlPrefix : urlPrefixesForDefaultIntent) {
-          if (url.startsWith((String) urlPrefix)) {
-            launchIntent(view.getContext(), url);
-            return true;
-          }
-        }
-      }
-
-      if (mOriginWhitelist != null && shouldHandleURL(mOriginWhitelist, url)) {
-        return false;
-      }
-
-      launchIntent(view.getContext(), url);
-      return true;
-    }
-
-    private void launchIntent(Context context, String url) {
-      try {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addCategory(Intent.CATEGORY_BROWSABLE);
-        context.startActivity(intent);
-      } catch (ActivityNotFoundException e) {
-        FLog.w(ReactConstants.TAG, "activity not found to handle uri scheme for: " + url, e);
-      }
-    }
-
-    private boolean shouldHandleURL(List<Pattern> originWhitelist, String url) {
-      Uri uri = Uri.parse(url);
-      String scheme = uri.getScheme() != null ? uri.getScheme() : "";
-      String authority = uri.getAuthority() != null ? uri.getAuthority() : "";
-      String urlToCheck = scheme + "://" + authority;
-      for (Pattern pattern : originWhitelist) {
-        if (pattern.matcher(urlToCheck).matches()) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    @Override
-    public void onReceivedError(
-        WebView webView,
-        int errorCode,
-        String description,
-        String failingUrl) {
-      super.onReceivedError(webView, errorCode, description, failingUrl);
-      mLastLoadFailed = true;
-
-      // In case of an error JS side expect to get a finish event first, and then get an error event
-      // Android WebView does it in the opposite way, so we need to simulate that behavior
-      emitFinishEvent(webView, failingUrl);
-
-      WritableMap eventData = createWebViewEvent(webView, failingUrl);
-      eventData.putDouble("code", errorCode);
-      eventData.putString("description", description);
-
-      dispatchEvent(
-          webView,
-          new TopLoadingErrorEvent(webView.getId(), eventData));
-    }
-
-    protected void emitFinishEvent(WebView webView, String url) {
-      dispatchEvent(
-          webView,
-          new TopLoadingFinishEvent(
-              webView.getId(),
-              createWebViewEvent(webView, url)));
-    }
-
-    protected WritableMap createWebViewEvent(WebView webView, String url) {
-      WritableMap event = Arguments.createMap();
-      event.putDouble("target", webView.getId());
-      // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
-      // like onPageFinished
-      event.putString("url", url);
-      event.putBoolean("loading", !mLastLoadFailed && webView.getProgress() != 100);
-      event.putString("title", webView.getTitle());
-      event.putBoolean("canGoBack", webView.canGoBack());
-      event.putBoolean("canGoForward", webView.canGoForward());
-      return event;
-    }
-
-    public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
-      mUrlPrefixesForDefaultIntent = specialUrls;
-    }
-
-    public void setOriginWhitelist(List<Pattern> originWhitelist) {
-      mOriginWhitelist = originWhitelist;
-    }
-  }
-
-  /**
-   * Subclass of {@link WebView} that implements {@link LifecycleEventListener} interface in order
-   * to call {@link WebView#destroy} on activity destroy event and also to clear the client
-   */
-  protected static class RNCWebView extends WebView implements LifecycleEventListener {
-    protected @Nullable String injectedJS;
-    protected boolean messagingEnabled = false;
-    protected @Nullable RNCWebViewClient mRNCWebViewClient;
-
-    protected class RNCWebViewBridge {
-      RNCWebView mContext;
-
-      RNCWebViewBridge(RNCWebView c) {
-        mContext = c;
-      }
-
-      @JavascriptInterface
-      public void postMessage(String message) {
-        mContext.onMessage(message);
-      }
-    }
-
-    /**
-     * WebView must be created with an context of the current activity
-     *
-     * Activity Context is required for creation of dialogs internally by WebView
-     * Reactive Native needed for access to ReactNative internal system functionality
-     *
-     */
-    public RNCWebView(ThemedReactContext reactContext) {
-      super(reactContext);
-    }
-
-    @Override
-    public void onHostResume() {
-      // do nothing
-    }
-
-    @Override
-    public void onHostPause() {
-      // do nothing
-    }
-
-    @Override
-    public void onHostDestroy() {
-      cleanupCallbacksAndDestroy();
-    }
-
-    @Override
-    public void setWebViewClient(WebViewClient client) {
-      super.setWebViewClient(client);
-      mRNCWebViewClient = (RNCWebViewClient)client;
-    }
-
-    public @Nullable RNCWebViewClient getRNCWebViewClient() {
-      return mRNCWebViewClient;
-    }
-
-    public void setInjectedJavaScript(@Nullable String js) {
-      injectedJS = js;
-    }
-
-    protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
-      return new RNCWebViewBridge(webView);
-    }
-
-    public void setMessagingEnabled(boolean enabled) {
-      if (messagingEnabled == enabled) {
-        return;
-      }
-
-      messagingEnabled = enabled;
-      if (enabled) {
-        addJavascriptInterface(createRNCWebViewBridge(this), BRIDGE_NAME);
-        linkBridge();
-      } else {
-        removeJavascriptInterface(BRIDGE_NAME);
-      }
-    }
-
-    protected void evaluateJavascriptWithFallback(String script) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        evaluateJavascript(script, null);
-        return;
-      }
-
-      try {
-        loadUrl("javascript:" + URLEncoder.encode(script, "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
-        // UTF-8 should always be supported
-        throw new RuntimeException(e);
-      }
-    }
-
-    public void callInjectedJavaScript() {
-      if (getSettings().getJavaScriptEnabled() &&
-          injectedJS != null &&
-          !TextUtils.isEmpty(injectedJS)) {
-        evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
-      }
-    }
-
-    public void linkBridge() {
-      if (messagingEnabled) {
-        if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-          // See isNative in lodash
-          String testPostMessageNative = "String(window.postMessage) === String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage')";
-          evaluateJavascript(testPostMessageNative, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
-              if (value.equals("true")) {
-                FLog.w(ReactConstants.TAG, "Setting onMessage on a WebView overrides existing values of window.postMessage, but a previous value was defined");
-              }
-            }
-          });
-        }
-
-        evaluateJavascriptWithFallback("(" +
-          "window.originalPostMessage = window.postMessage," +
-          "window.postMessage = function(data) {" +
-            BRIDGE_NAME + ".postMessage(String(data));" +
-          "}" +
-        ")");
-      }
-    }
-
-    public void onMessage(String message) {
-      dispatchEvent(this, new TopMessageEvent(this.getId(), message));
-    }
-
-    protected void cleanupCallbacksAndDestroy() {
-      setWebViewClient(null);
-      destroy();
-    }
-  }
 
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -382,6 +115,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   public RNCWebViewManager(WebViewConfig webViewConfig) {
     mWebViewConfig = webViewConfig;
+  }
+
+  protected static void dispatchEvent(WebView webView, Event event) {
+    ReactContext reactContext = (ReactContext) webView.getContext();
+    EventDispatcher eventDispatcher =
+      reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+    eventDispatcher.dispatchEvent(event);
   }
 
   @Override
@@ -408,21 +148,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
 
-    @Override
-    public void onProgressChanged(WebView webView, int newProgress) {
+      @Override
+      public void onProgressChanged(WebView webView, int newProgress) {
         super.onProgressChanged(webView, newProgress);
         WritableMap event = Arguments.createMap();
         event.putDouble("target", webView.getId());
         event.putString("title", webView.getTitle());
         event.putBoolean("canGoBack", webView.canGoBack());
         event.putBoolean("canGoForward", webView.canGoForward());
-        event.putDouble("progress", (float)newProgress/100);
+        event.putDouble("progress", (float) newProgress / 100);
         dispatchEvent(
-                  webView,
-                  new TopLoadingProgressEvent(
-                      webView.getId(),
-                      event));
-    }
+          webView,
+          new TopLoadingProgressEvent(
+            webView.getId(),
+            event));
+      }
 
       @Override
       public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -430,13 +170,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
       protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-        getModule().startPhotoPickerIntent(filePathCallback, acceptType);
+        getModule(reactContext).startPhotoPickerIntent(filePathCallback, acceptType);
       }
+
       protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-        getModule().startPhotoPickerIntent(filePathCallback, "");
+        getModule(reactContext).startPhotoPickerIntent(filePathCallback, "");
       }
+
       protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-        getModule().startPhotoPickerIntent(filePathCallback, acceptType);
+        getModule(reactContext).startPhotoPickerIntent(filePathCallback, acceptType);
       }
 
       @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -445,7 +187,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         String[] acceptTypes = fileChooserParams.getAcceptTypes();
         boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
         Intent intent = fileChooserParams.createIntent();
-        return getModule().startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+        return getModule(reactContext).startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
       }
     });
     reactContext.addLifecycleEventListener(webView);
@@ -465,13 +207,51 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     // Fixes broken full-screen modals/galleries due to body height being 0.
     webView.setLayoutParams(
-            new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT));
+      new LayoutParams(LayoutParams.MATCH_PARENT,
+        LayoutParams.MATCH_PARENT));
 
     setGeolocationEnabled(webView, false);
     if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
+
+    webView.setDownloadListener(new DownloadListener() {
+      public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+        RNCWebViewModule module = getModule(reactContext);
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+
+        String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
+        String downloadMessage = "Downloading " + fileName;
+
+        //Attempt to add cookie, if it exists
+        URL urlObj = null;
+        try {
+          urlObj = new URL(url);
+          String baseUrl = urlObj.getProtocol() + "://" + urlObj.getHost();
+          String cookie = CookieManager.getInstance().getCookie(baseUrl);
+          request.addRequestHeader("Cookie", cookie);
+          System.out.println("Got cookie for DownloadManager: " + cookie);
+        } catch (MalformedURLException e) {
+          System.out.println("Error getting cookie for DownloadManager: " + e.toString());
+          e.printStackTrace();
+        }
+
+        //Finish setting up request
+        request.addRequestHeader("User-Agent", userAgent);
+        request.setTitle(fileName);
+        request.setDescription(downloadMessage);
+        request.allowScanningByMediaScanner();
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+
+        module.setDownloadRequest(request);
+
+        if (module.grantFileDownloaderPermissions()) {
+          module.downloadFile();
+        }
+      }
+    });
 
     return webView;
   }
@@ -479,6 +259,38 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "showsHorizontalScrollIndicator")
+  public void setShowsHorizontalScrollIndicator(WebView view, boolean enabled) {
+    view.setHorizontalScrollBarEnabled(enabled);
+  }
+
+  @ReactProp(name = "showsVerticalScrollIndicator")
+  public void setShowsVerticalScrollIndicator(WebView view, boolean enabled) {
+    view.setVerticalScrollBarEnabled(enabled);
+  }
+
+  @ReactProp(name = "cacheEnabled")
+  public void setCacheEnabled(WebView view, boolean enabled) {
+    if (enabled) {
+      Context ctx = view.getContext();
+      if (ctx != null) {
+        view.getSettings().setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        view.getSettings().setAppCacheEnabled(true);
+      }
+    } else {
+      view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+      view.getSettings().setAppCacheEnabled(false);
+    }
+  }
+
+  @ReactProp(name = "androidHardwareAccelerationDisabled")
+  public void setHardwareAccelerationDisabled(WebView view, boolean disabled) {
+    if (disabled) {
+      view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    }
   }
 
   @ReactProp(name = "overScrollMode")
@@ -506,9 +318,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "textZoom")
+  public void setTextZoom(WebView view, int value) {
+    view.getSettings().setTextZoom(value);
+  }
+
   @ReactProp(name = "scalesPageToFit")
   public void setScalesPageToFit(WebView view, boolean enabled) {
-    view.getSettings().setUseWideViewPort(!enabled);
+    view.getSettings().setLoadWithOverviewMode(enabled);
+    view.getSettings().setUseWideViewPort(enabled);
   }
 
   @ReactProp(name = "domStorageEnabled")
@@ -557,7 +375,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         String html = source.getString("html");
         if (source.hasKey("baseUrl")) {
           view.loadDataWithBaseURL(
-              source.getString("baseUrl"), html, HTML_MIME_TYPE, HTML_ENCODING, null);
+            source.getString("baseUrl"), html, HTML_MIME_TYPE, HTML_ENCODING, null);
         } else {
           view.loadData(html, HTML_MIME_TYPE + "; charset=" + HTML_ENCODING, null);
         }
@@ -612,11 +430,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "onContentSizeChange")
   public void setOnContentSizeChange(WebView view, boolean sendContentSizeChangeEvents) {
-    if (sendContentSizeChangeEvents) {
-      view.setPictureListener(getPictureListener());
-    } else {
-      view.setPictureListener(null);
-    }
+    ((RNCWebView) view).setSendContentSizeChangeEvents(sendContentSizeChangeEvents);
   }
 
   @ReactProp(name = "mixedContentMode")
@@ -634,8 +448,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "urlPrefixesForDefaultIntent")
   public void setUrlPrefixesForDefaultIntent(
-      WebView view,
-      @Nullable ReadableArray urlPrefixesForDefaultIntent) {
+    WebView view,
+    @Nullable ReadableArray urlPrefixesForDefaultIntent) {
     RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
     if (client != null && urlPrefixesForDefaultIntent != null) {
       client.setUrlPrefixesForDefaultIntent(urlPrefixesForDefaultIntent);
@@ -656,20 +470,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setGeolocationEnabled(isGeolocationEnabled != null && isGeolocationEnabled);
   }
 
-  @ReactProp(name = "originWhitelist")
-  public void setOriginWhitelist(
-    WebView view,
-    @Nullable ReadableArray originWhitelist) {
-    RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
-    if (client != null && originWhitelist != null) {
-      List<Pattern> whiteList = new LinkedList<>();
-      for (int i = 0 ; i < originWhitelist.size() ; i++) {
-        whiteList.add(Pattern.compile(originWhitelist.getString(i)));
-      }
-      client.setOriginWhitelist(whiteList);
-    }
-  }
-
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -678,21 +478,27 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @Override
   public Map getExportedCustomDirectEventTypeConstants() {
-    MapBuilder.Builder builder = MapBuilder.builder();
-    builder.put("topLoadingProgress", MapBuilder.of("registrationName", "onLoadingProgress"));
-    return builder.build();
+    Map export = super.getExportedCustomDirectEventTypeConstants();
+    if (export == null) {
+      export = MapBuilder.newHashMap();
+    }
+    export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
+    export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
+    return export;
   }
 
   @Override
-  public @Nullable Map<String, Integer> getCommandsMap() {
+  public @Nullable
+  Map<String, Integer> getCommandsMap() {
     return MapBuilder.of(
-        "goBack", COMMAND_GO_BACK,
-        "goForward", COMMAND_GO_FORWARD,
-        "reload", COMMAND_RELOAD,
-        "stopLoading", COMMAND_STOP_LOADING,
-        "postMessage", COMMAND_POST_MESSAGE,
-        "injectJavaScript", COMMAND_INJECT_JAVASCRIPT
-      );
+      "goBack", COMMAND_GO_BACK,
+      "goForward", COMMAND_GO_FORWARD,
+      "reload", COMMAND_RELOAD,
+      "stopLoading", COMMAND_STOP_LOADING,
+      "postMessage", COMMAND_POST_MESSAGE,
+      "injectJavaScript", COMMAND_INJECT_JAVASCRIPT,
+      "loadUrl", COMMAND_LOAD_URL
+    );
   }
 
   @Override
@@ -719,13 +525,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
             "var event;" +
             "var data = " + eventInitDict.toString() + ";" +
             "try {" +
-              "event = new MessageEvent('message', data);" +
+            "event = new MessageEvent('message', data);" +
             "} catch (e) {" +
-              "event = document.createEvent('MessageEvent');" +
-              "event.initMessageEvent('message', true, true, data.data, data.origin, data.lastEventId, data.source);" +
+            "event = document.createEvent('MessageEvent');" +
+            "event.initMessageEvent('message', true, true, data.data, data.origin, data.lastEventId, data.source);" +
             "}" +
             "document.dispatchEvent(event);" +
-          "})();");
+            "})();");
         } catch (JSONException e) {
           throw new RuntimeException(e);
         }
@@ -733,6 +539,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       case COMMAND_INJECT_JAVASCRIPT:
         RNCWebView reactWebView = (RNCWebView) root;
         reactWebView.evaluateJavascriptWithFallback(args.getString(0));
+        break;
+      case COMMAND_LOAD_URL:
+        if (args == null) {
+          throw new RuntimeException("Arguments for loading an url are null!");
+        }
+        root.loadUrl(args.getString(0));
         break;
     }
   }
@@ -744,39 +556,244 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
   }
 
-  protected WebView.PictureListener getPictureListener() {
-    if (mPictureListener == null) {
-      mPictureListener = new WebView.PictureListener() {
-        @Override
-        public void onNewPicture(WebView webView, Picture picture) {
-          dispatchEvent(
-            webView,
-            new ContentSizeChangeEvent(
-              webView.getId(),
-              webView.getWidth(),
-              webView.getContentHeight()));
-        }
-      };
+  public RNCWebViewModule getModule(ReactContext reactContext) {
+    return reactContext.getNativeModule(RNCWebViewModule.class);
+  }
+
+  protected static class RNCWebViewClient extends WebViewClient {
+
+    protected boolean mLastLoadFailed = false;
+    protected @Nullable
+    ReadableArray mUrlPrefixesForDefaultIntent;
+
+    @Override
+    public void onPageFinished(WebView webView, String url) {
+      super.onPageFinished(webView, url);
+
+      if (!mLastLoadFailed) {
+        RNCWebView reactWebView = (RNCWebView) webView;
+
+        reactWebView.callInjectedJavaScript();
+
+        emitFinishEvent(webView, url);
+      }
     }
-    return mPictureListener;
+
+    @Override
+    public void onPageStarted(WebView webView, String url, Bitmap favicon) {
+      super.onPageStarted(webView, url, favicon);
+      mLastLoadFailed = false;
+
+      dispatchEvent(
+        webView,
+        new TopLoadingStartEvent(
+          webView.getId(),
+          createWebViewEvent(webView, url)));
+    }
+
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+      dispatchEvent(
+        view,
+        new TopShouldStartLoadWithRequestEvent(
+          view.getId(),
+          createWebViewEvent(view, url)));
+      return true;
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+      final String url = request.getUrl().toString();
+      return this.shouldOverrideUrlLoading(view, url);
+    }
+
+    @Override
+    public void onReceivedError(
+      WebView webView,
+      int errorCode,
+      String description,
+      String failingUrl) {
+      super.onReceivedError(webView, errorCode, description, failingUrl);
+      mLastLoadFailed = true;
+
+      // In case of an error JS side expect to get a finish event first, and then get an error event
+      // Android WebView does it in the opposite way, so we need to simulate that behavior
+      emitFinishEvent(webView, failingUrl);
+
+      WritableMap eventData = createWebViewEvent(webView, failingUrl);
+      eventData.putDouble("code", errorCode);
+      eventData.putString("description", description);
+
+      dispatchEvent(
+        webView,
+        new TopLoadingErrorEvent(webView.getId(), eventData));
+    }
+
+    protected void emitFinishEvent(WebView webView, String url) {
+      dispatchEvent(
+        webView,
+        new TopLoadingFinishEvent(
+          webView.getId(),
+          createWebViewEvent(webView, url)));
+    }
+
+    protected WritableMap createWebViewEvent(WebView webView, String url) {
+      WritableMap event = Arguments.createMap();
+      event.putDouble("target", webView.getId());
+      // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
+      // like onPageFinished
+      event.putString("url", url);
+      event.putBoolean("loading", !mLastLoadFailed && webView.getProgress() != 100);
+      event.putString("title", webView.getTitle());
+      event.putBoolean("canGoBack", webView.canGoBack());
+      event.putBoolean("canGoForward", webView.canGoForward());
+      return event;
+    }
+
+    public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
+      mUrlPrefixesForDefaultIntent = specialUrls;
+    }
   }
 
-  protected static void dispatchEvent(WebView webView, Event event) {
-    ReactContext reactContext = (ReactContext) webView.getContext();
-    EventDispatcher eventDispatcher =
-      reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-    eventDispatcher.dispatchEvent(event);
-  }
+  /**
+   * Subclass of {@link WebView} that implements {@link LifecycleEventListener} interface in order
+   * to call {@link WebView#destroy} on activity destroy event and also to clear the client
+   */
+  protected static class RNCWebView extends WebView implements LifecycleEventListener {
+    protected @Nullable
+    String injectedJS;
+    protected boolean messagingEnabled = false;
+    protected @Nullable
+    RNCWebViewClient mRNCWebViewClient;
+    protected boolean sendContentSizeChangeEvents = false;
 
-  public RNCWebViewPackage getPackage() {
-    return this.aPackage;
-  }
+    /**
+     * WebView must be created with an context of the current activity
+     * <p>
+     * Activity Context is required for creation of dialogs internally by WebView
+     * Reactive Native needed for access to ReactNative internal system functionality
+     */
+    public RNCWebView(ThemedReactContext reactContext) {
+      super(reactContext);
+    }
 
-  public void setPackage(RNCWebViewPackage aPackage) {
-    this.aPackage = aPackage;
-  }
+    public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
+      this.sendContentSizeChangeEvents = sendContentSizeChangeEvents;
+    }
 
-  public RNCWebViewModule getModule() {
-    return this.aPackage.getModule();
+    @Override
+    public void onHostResume() {
+      // do nothing
+    }
+
+    @Override
+    public void onHostPause() {
+      // do nothing
+    }
+
+    @Override
+    public void onHostDestroy() {
+      cleanupCallbacksAndDestroy();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int ow, int oh) {
+      super.onSizeChanged(w, h, ow, oh);
+
+      if (sendContentSizeChangeEvents) {
+        dispatchEvent(
+          this,
+          new ContentSizeChangeEvent(
+            this.getId(),
+            w,
+            h
+          )
+        );
+      }
+    }
+
+    @Override
+    public void setWebViewClient(WebViewClient client) {
+      super.setWebViewClient(client);
+      mRNCWebViewClient = (RNCWebViewClient) client;
+    }
+
+    public @Nullable
+    RNCWebViewClient getRNCWebViewClient() {
+      return mRNCWebViewClient;
+    }
+
+    public void setInjectedJavaScript(@Nullable String js) {
+      injectedJS = js;
+    }
+
+    protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
+      return new RNCWebViewBridge(webView);
+    }
+
+    @SuppressLint("AddJavascriptInterface")
+    public void setMessagingEnabled(boolean enabled) {
+      if (messagingEnabled == enabled) {
+        return;
+      }
+
+      messagingEnabled = enabled;
+
+      if (enabled) {
+        addJavascriptInterface(createRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
+      } else {
+        removeJavascriptInterface(JAVASCRIPT_INTERFACE);
+      }
+    }
+
+    protected void evaluateJavascriptWithFallback(String script) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        evaluateJavascript(script, null);
+        return;
+      }
+
+      try {
+        loadUrl("javascript:" + URLEncoder.encode(script, "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        // UTF-8 should always be supported
+        throw new RuntimeException(e);
+      }
+    }
+
+    public void callInjectedJavaScript() {
+      if (getSettings().getJavaScriptEnabled() &&
+        injectedJS != null &&
+        !TextUtils.isEmpty(injectedJS)) {
+        evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
+      }
+    }
+
+    public void onMessage(String message) {
+      dispatchEvent(this, new TopMessageEvent(this.getId(), message));
+    }
+
+    protected void cleanupCallbacksAndDestroy() {
+      setWebViewClient(null);
+      destroy();
+    }
+
+    protected class RNCWebViewBridge {
+      RNCWebView mContext;
+
+      RNCWebViewBridge(RNCWebView c) {
+        mContext = c;
+      }
+
+      /**
+       * This method is called whenever JavaScript running within the web view calls:
+       * - window[JAVASCRIPT_INTERFACE].postMessage
+       */
+      @JavascriptInterface
+      public void postMessage(String message) {
+        mContext.onMessage(message);
+      }
+    }
   }
 }
