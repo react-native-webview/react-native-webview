@@ -53,3 +53,5 @@ android/gradle
 android/gradlew
 android/gradlew.bat
 .watchmanconfig
+
+lib/
