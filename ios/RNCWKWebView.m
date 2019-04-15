@@ -127,6 +127,68 @@ static NSURLCredential* clientAuthenticationCredential;
     wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
 #endif
 
+    if(_sharedCookiesEnabled) {
+      // More info to sending cookies with WKWebView
+      // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
+      if (@available(iOS 11.0, *)) {
+        // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
+        // See also https://forums.developer.apple.com/thread/97194
+        // check if websiteDataStore has not been initialized before
+        if(!_incognito && !_cacheEnabled) {
+          wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+        }
+        for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+          [wkWebViewConfig.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:nil];
+        }
+      } else {
+        NSMutableString *script = [NSMutableString string];
+
+        // Clear all existing cookies in a direct called function. This ensures that no
+        // javascript error will break the web content javascript.
+        // We keep this code here, if someone requires that Cookies are also removed within the
+        // the WebView and want to extends the current sharedCookiesEnabled option with an
+        // additional property.
+        // Generates JS: document.cookie = "key=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+        // for each cookie which is already available in the WebView context.
+        /*
+        [script appendString:@"(function () {\n"];
+        [script appendString:@"  var cookies = document.cookie.split('; ');\n"];
+        [script appendString:@"  for (var i = 0; i < cookies.length; i++) {\n"];
+        [script appendString:@"    if (cookies[i].indexOf('=') !== -1) {\n"];
+        [script appendString:@"      document.cookie = cookies[i].split('=')[0] + '=; Expires=Thu, 01 Jan 1970 00:00:01 GMT';\n"];
+        [script appendString:@"    }\n"];
+        [script appendString:@"  }\n"];
+        [script appendString:@"})();\n\n"];
+        */
+
+        // Set cookies in a direct called function. This ensures that no
+        // javascript error will break the web content javascript.
+          // Generates JS: document.cookie = "key=value; Path=/; Expires=Thu, 01 Jan 20xx 00:00:01 GMT;"
+        // for each cookie which is available in the application context.
+        [script appendString:@"(function () {\n"];
+        for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+          [script appendFormat:@"document.cookie = %@ + '=' + %@",
+            RCTJSONStringify(cookie.name, NULL),
+            RCTJSONStringify(cookie.value, NULL)];
+          if (cookie.path) {
+            [script appendFormat:@" + '; Path=' + %@", RCTJSONStringify(cookie.path, NULL)];
+          }
+          if (cookie.expiresDate) {
+            [script appendFormat:@" + '; Expires=' + new Date(%f).toUTCString()",
+              cookie.expiresDate.timeIntervalSince1970 * 1000
+            ];
+          }
+          [script appendString:@";\n"];
+        }
+        [script appendString:@"})();\n"];
+
+        WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource:script
+                                                              injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+                                                           forMainFrameOnly:YES];
+        [wkWebViewConfig.userContentController addUserScript:cookieInScript];
+      }
+    }
+
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
     _webView.scrollView.delegate = self;
     _webView.UIDelegate = self;
@@ -270,37 +332,36 @@ static NSURLCredential* clientAuthenticationCredential;
 
 - (void)visitSource
 {
-  // Check for a static html source first
-  NSString *html = [RCTConvert NSString:_source[@"html"]];
-  if (html) {
-    NSURL *baseURL = [RCTConvert NSURL:_source[@"baseUrl"]];
-    if (!baseURL) {
-      baseURL = [NSURL URLWithString:@"about:blank"];
+    // Check for a static html source first
+    NSString *html = [RCTConvert NSString:_source[@"html"]];
+    if (html) {
+        NSURL *baseURL = [RCTConvert NSURL:_source[@"baseUrl"]];
+        if (!baseURL) {
+            baseURL = [NSURL URLWithString:@"about:blank"];
+        }
+        [_webView loadHTMLString:html baseURL:baseURL];
+        return;
     }
-    [_webView loadHTMLString:html baseURL:baseURL];
-    return;
-  }
 
-  NSURLRequest *request = [RCTConvert NSURLRequest:_source];
-  // Because of the way React works, as pages redirect, we actually end up
-  // passing the redirect urls back here, so we ignore them if trying to load
-  // the same url. We'll expose a call to 'reload' to allow a user to load
-  // the existing page.
-  if ([request.URL isEqual:_webView.URL]) {
-    return;
-  }
-  if (!request.URL) {
-    // Clear the webview
-    [_webView loadHTMLString:@"" baseURL:nil];
-    return;
-  }
-  if (request.URL.host) {
-    [_webView loadRequest:request];
-  }
-  else {
-    [_webView loadFileURL:request.URL allowingReadAccessToURL:request.URL];
-  }
-
+    NSURLRequest *request = [self requestForSource:_source];
+    // Because of the way React works, as pages redirect, we actually end up
+    // passing the redirect urls back here, so we ignore them if trying to load
+    // the same url. We'll expose a call to 'reload' to allow a user to load
+    // the existing page.
+    if ([request.URL isEqual:_webView.URL]) {
+        return;
+    }
+    if (!request.URL) {
+        // Clear the webview
+        [_webView loadHTMLString:@"" baseURL:nil];
+        return;
+    }
+    if (request.URL.host) {
+        [_webView loadRequest:request];
+    }
+    else {
+        [_webView loadFileURL:request.URL allowingReadAccessToURL:request.URL];
+    }
 }
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
@@ -662,11 +723,11 @@ static NSURLCredential* clientAuthenticationCredential;
    * [_webView reload] doesn't reload the webpage. Therefore, we must
    * manually call [_webView loadRequest:request].
    */
-  NSURLRequest *request = [RCTConvert NSURLRequest:self.source];
+  NSURLRequest *request = [self requestForSource:self.source];
+
   if (request.URL && !_webView.URL.absoluteString.length) {
     [_webView loadRequest:request];
-  }
-  else {
+  } else {
     [_webView reload];
   }
 }
@@ -681,4 +742,25 @@ static NSURLCredential* clientAuthenticationCredential;
   _bounces = bounces;
   _webView.scrollView.bounces = bounces;
 }
+
+- (NSURLRequest *)requestForSource:(id)json {
+  NSURLRequest *request = [RCTConvert NSURLRequest:self.source];
+
+  // If sharedCookiesEnabled we automatically add all application cookies to the
+  // http request. This is automatically done on iOS 11+ in the WebView constructor.
+  // Se we need to manually add these shared cookies here only for iOS versions < 11.
+  if (_sharedCookiesEnabled) {
+    if (@available(iOS 11.0, *)) {
+      // see WKWebView initialization for added cookies
+    } else {
+      NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL];
+      NSDictionary<NSString *, NSString *> *cookieHeader = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
+      NSMutableURLRequest *mutableRequest = [request mutableCopy];
+      [mutableRequest setAllHTTPHeaderFields:cookieHeader];
+      return mutableRequest;
+    }
+  }
+  return request;
+}
+
 @end
