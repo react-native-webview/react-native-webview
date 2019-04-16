@@ -532,6 +532,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           JSONObject eventInitDict = new JSONObject();
           eventInitDict.put("data", args.getString(0));
           reactWebView.evaluateJavascriptWithFallback("(function () {" +
+            "var event;" +
+            "var data = " + eventInitDict.toString() + ";" +
+            "try {" +
+            "event = new MessageEvent('message', data);" +
+            "} catch (e) {" +
+            "event = document.createEvent('MessageEvent');" +
+            "event.initMessageEvent('message', true, true, data.data, data.origin, data.lastEventId, data.source);" +
+            "}" +
+            "document.dispatchEvent(event);" +
+            "})();");
+        } catch (JSONException e) {
+          throw new RuntimeException(e);
         }
         break;
       case COMMAND_INJECT_JAVASCRIPT:
@@ -790,150 +802,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
    * to call {@link WebView#destroy} on activity destroy event and also to clear the client
    */
   protected static class RNCWebView extends WebView implements LifecycleEventListener {
-    protected @Nullable String injectedJS;
-    protected boolean messagingEnabled = false;
-    protected @Nullable RNCWebViewClient mRNCWebViewClient;
-    protected boolean sendContentSizeChangeEvents = false;
-    public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
-      this.sendContentSizeChangeEvents = sendContentSizeChangeEvents;
-    }
-
-
-    protected class RNCWebViewBridge {
-      RNCWebView mContext;
-
-      RNCWebViewBridge(RNCWebView c) {
-        mContext = c;
-      }
-
-      /**
-       * This method is called whenever JavaScript running within the web view calls:
-       *   - window[JAVASCRIPT_INTERFACE].postMessage
-       */
-      @JavascriptInterface
-      public void postMessage(String message) {
-        mContext.onMessage(message);
-      }
-    }
-
-    /**
-     * WebView must be created with an context of the current activity
-     *
-     * Activity Context is required for creation of dialogs internally by WebView
-     * Reactive Native needed for access to ReactNative internal system functionality
-     *
-     */
-    public RNCWebView(ThemedReactContext reactContext) {
-      super(reactContext);
-    }
-
-    @Override
-    public void onHostResume() {
-      // do nothing
-    }
-
-    @Override
-    public void onHostPause() {
-      // do nothing
-    }
-
-    @Override
-    public void onHostDestroy() {
-      cleanupCallbacksAndDestroy();
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int ow, int oh) {
-      super.onSizeChanged(w, h, ow, oh);
-
-      if (sendContentSizeChangeEvents) {
-        dispatchEvent(
-                this,
-                new ContentSizeChangeEvent(
-                        this.getId(),
-                        w,
-                        h
-                )
-        );
-      }
-    }
-
-    @Override
-    public void setWebViewClient(WebViewClient client) {
-      super.setWebViewClient(client);
-      mRNCWebViewClient = (RNCWebViewClient)client;
-    }
-
-    public @Nullable RNCWebViewClient getRNCWebViewClient() {
-      return mRNCWebViewClient;
-    }
-
-    public void setInjectedJavaScript(@Nullable String js) {
-      injectedJS = js;
-    }
-
-    public void setInjectedJavaScriptBeforeLoad(@Nullable String script) {
-      if (mRNCWebViewClient != null && script != null) {
-        mRNCWebViewClient.setInjectedJavaScriptBeforeLoad(script);
-      }
-    }
-
-    protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
-      return new RNCWebViewBridge(webView);
-    }
-
-    @SuppressLint("AddJavascriptInterface")
-    public void setMessagingEnabled(boolean enabled) {
-      if (messagingEnabled == enabled) {
-        return;
-      }
-
-      messagingEnabled = enabled;
-
-      if (enabled) {
-        addJavascriptInterface(createRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
-      } else {
-        removeJavascriptInterface(JAVASCRIPT_INTERFACE);
-      }
-    }
-
-    protected void evaluateJavascriptWithFallback(String script) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        evaluateJavascript(script, null);
-        return;
-      }
-
-      try {
-        loadUrl("javascript:" + URLEncoder.encode(script, "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
-        // UTF-8 should always be supported
-        throw new RuntimeException(e);
-      }
-    }
-
-    public void callInjectedJavaScript() {
-      if (getSettings().getJavaScriptEnabled() &&
-              injectedJS != null &&
-              !TextUtils.isEmpty(injectedJS)) {
-        evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
-      }
-    }
-
-    public void onMessage(String message) {
-      dispatchEvent(this, new TopMessageEvent(this.getId(), message));
-    }
-
-    protected void cleanupCallbacksAndDestroy() {
-      setWebViewClient(null);
-      destroy();
-    }
-  }
-
-  /**
-   * Subclass of {@link WebView} that implements {@link LifecycleEventListener} interface in order
-   * to call {@link WebView#destroy} on activity destroy event and also to clear the client
-   */
-  protected static class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String injectedJS;
     protected boolean messagingEnabled = false;
@@ -1040,6 +908,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         !TextUtils.isEmpty(injectedJS)) {
         evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
       }
+    }
+
+    public void setInjectedJavaScriptBeforeLoad(@Nullable String script) {		
+      if (mRNCWebViewClient != null && script != null) {		
+        mRNCWebViewClient.setInjectedJavaScriptBeforeLoad(script);		
+      }		
     }
 
     public void onMessage(String message) {
