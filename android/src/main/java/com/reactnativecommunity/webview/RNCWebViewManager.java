@@ -372,8 +372,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ((RNCWebView) view).setInjectedJavaScript(injectedJavaScript);
   }
 
-  @ReactProp(name = "injectedJavaScriptBeforeLoad")
-  public void setInjectedJavaScriptBeforeLoad(WebView view, @Nullable String script) {
+  @ReactProp(name = "injectedJavaScriptBeforeDocumentLoad")
+  public void setInjectedJavaScriptBeforeDocumentLoad(WebView view, @Nullable String script) {
     ((RNCWebView) view).setInjectedJavaScriptBeforeLoad(script);
   }
 
