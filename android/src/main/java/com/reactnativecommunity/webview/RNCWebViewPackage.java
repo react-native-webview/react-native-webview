@@ -1,44 +1,27 @@
-
 package com.reactnativecommunity.webview;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.facebook.react.ReactPackage;
+import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
-import com.facebook.react.bridge.JavaScriptModule;
+
+import java.util.Collections;
+import java.util.List;
 
 public class RNCWebViewPackage implements ReactPackage {
+  @Override
+  public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+    return Collections.singletonList(new RNCWebViewModule(reactContext));
+  }
 
-    private RNCWebViewManager manager;
-    private RNCWebViewModule module;
+  // Deprecated from RN 0.47
+  public List<Class<? extends JavaScriptModule>> createJSModules() {
+    return Collections.emptyList();
+  }
 
-    @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-      List<NativeModule> modulesList = new ArrayList<>();
-      module = new RNCWebViewModule(reactContext);
-      module.setPackage(this);
-      modulesList.add(module);
-      return modulesList;
-    }
-
-    // Deprecated from RN 0.47
-    public List<Class<? extends JavaScriptModule>> createJSModules() {
-      return Collections.emptyList();
-    }
-
-    @Override
-    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-      manager = new RNCWebViewManager();
-      manager.setPackage(this);
-      return Arrays.<ViewManager>asList(manager);
-    }
-
-    public RNCWebViewModule getModule() {
-      return module;
-    }
+  @Override
+  public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+    return Collections.singletonList(new RNCWebViewManager());
+  }
 }

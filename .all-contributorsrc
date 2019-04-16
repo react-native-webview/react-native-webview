@@ -141,6 +141,15 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "svbutko",
+      "name": "Sergei Butko",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/14828004?v=4",
+      "profile": "https://www.linkedin.com/in/svbutko/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
