@@ -388,11 +388,19 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   allowsLinkPreview?: boolean;
 
   /**
+   * Set true if shared cookies from HTTPCookieStorage should used for every load request in the
+   * `RNCWKWebView`. The default value is `false`.
+   * @platform ios
+   */
+  sharedCookiesEnabled?: boolean;
+
+  /**
    * A Boolean value that determines whether scrolling is disabled in a particular direction.
    * The default value is `true`.
    * @platform ios
    */
   directionalLockEnabled?: boolean;
+
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
