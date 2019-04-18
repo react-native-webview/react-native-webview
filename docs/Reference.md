@@ -50,6 +50,7 @@ This document lays out the current public properties and methods for the React N
 - [`cacheEnabled`](Reference.md#cacheEnabled)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
+- [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 
 ## Methods Index
 
@@ -477,31 +478,6 @@ lockIdentifier
 navigationType
 ```
 
-Example:
-
-```jsx
-<WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
-  onShouldStartLoadWithRequest={request => {
-    // Only allow navigating within this website
-    return request.url.startsWith('https://facebook.github.io/react-native');
-  }}
-/>
-```
-
-The `request` object includes these properties:
-
-```
-title
-url
-loading
-target
-canGoBack
-canGoForward
-lockIdentifier
-navigationType
-```
-
 ---
 
 ### `startInLoadingState`
@@ -853,6 +829,16 @@ If the value of this property is true, the scroll view stops on multiples of the
 ### `allowsLinkPreview`
 
 A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is true; before that, the default value is false.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+---
+
+### `sharedCookiesEnabled`
+
+Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the `RNCWKWebView`. The default value is `false`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
