@@ -554,6 +554,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         if (args == null) {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
+        root.loadUrl(args.getString(0));
         break;
     }
   }
@@ -570,8 +571,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   protected static class RNCWebViewClient extends WebViewClient {
-
-    private @Nullable WebResourceResponse temporaryResponse;
     private @Nullable String injectedJavaScriptOnResponse;
 
     private OkHttpClient okHttpClient = initOkHTTPClient();
@@ -706,19 +705,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
       try {
-        if (temporaryResponse != null) {
-          WebResourceResponse response = temporaryResponse;
-          temporaryResponse = null;
+        Response response = okHttpClient.newCall(request).execute();
 
-          return response;
-        } else {
-          Response response = okHttpClient.newCall(request).execute();
+        String body = response.body() != null ? response.body().string() : "";
+        String injectedBody = injectJavaScript(body);
 
-          String body = response.body() != null ? response.body().string() : "";
-          String injectedBody = injectJavaScript(body);
-
-          return buildWebResponse(response, injectedBody);
-        }
+        return buildWebResponse(response, injectedBody);
       } catch (Exception err) {}
 
       return null;
