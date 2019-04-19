@@ -34,6 +34,7 @@ static NSURLCredential* clientAuthenticationCredential;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
+@property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) WKWebView *webView;
 @end
 
@@ -356,6 +357,30 @@ static NSURLCredential* clientAuthenticationCredential;
   // Don't allow scrolling the scrollView.
   if (!_scrollEnabled) {
     scrollView.bounds = _webView.bounds;
+  }
+  else {
+    NSDictionary *event = @{
+      @"contentOffset": @{
+          @"x": @(scrollView.contentOffset.x),
+          @"y": @(scrollView.contentOffset.y)
+          },
+      @"contentInset": @{
+          @"top": @(scrollView.contentInset.top),
+          @"left": @(scrollView.contentInset.left),
+          @"bottom": @(scrollView.contentInset.bottom),
+          @"right": @(scrollView.contentInset.right)
+          },
+      @"contentSize": @{
+          @"width": @(scrollView.contentSize.width),
+          @"height": @(scrollView.contentSize.height)
+          },
+      @"layoutMeasurement": @{
+          @"width": @(scrollView.frame.size.width),
+          @"height": @(scrollView.frame.size.height)
+          },
+      @"zoomScale": @(scrollView.zoomScale ?: 1),
+      };
+    _onScroll(event);
   }
 }
 
