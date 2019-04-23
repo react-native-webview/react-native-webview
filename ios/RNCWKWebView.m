@@ -460,7 +460,7 @@ static NSURLCredential* clientAuthenticationCredential;
 {
   NSDictionary *event = @{
     @"url": _webView.URL.absoluteString ?: @"",
-    @"title": _webView.title,
+    @"title": _webView.title ?: @"",
     @"loading" : @(_webView.loading),
     @"canGoBack": @(_webView.canGoBack),
     @"canGoForward" : @(_webView.canGoForward)
