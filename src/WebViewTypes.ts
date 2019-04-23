@@ -212,6 +212,7 @@ export type OnShouldStartLoadWithRequest = (
 
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
+  incognito?: boolean;
   injectedJavaScript?: string;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
@@ -258,7 +259,6 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
   hideKeyboardAccessoryView?: boolean;
-  incognito?: boolean;
   pagingEnabled?: boolean;
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;

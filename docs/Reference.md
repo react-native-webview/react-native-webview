@@ -831,9 +831,9 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 
 Does not store any data within the lifetime of the WebView.
 
-| Type    | Required | Platform      |
-| ------- | -------- | ------------- |
-| boolean | No       | iOS WKWebView |
+| Type    | Required | Platform               |
+| ------- | -------- | ---------------------- |
+| boolean | No       | Android, iOS WKWebView |
 
 ---
 
