@@ -419,7 +419,7 @@ static NSURLCredential* clientAuthenticationCredential;
   if (!_scrollEnabled) {
     scrollView.bounds = _webView.bounds;
   }
-  else {
+  else if (_onScroll != nil) {
     NSDictionary *event = @{
       @"contentOffset": @{
           @"x": @(scrollView.contentOffset.x),
