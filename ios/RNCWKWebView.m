@@ -55,6 +55,7 @@ static NSURLCredential* clientAuthenticationCredential;
     _directionalLockEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
+    _savedKeyboardDisplayRequiresUserAction = YES;
   }
 
   // Workaround for a keyboard dismissal bug present in iOS 12
