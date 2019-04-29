@@ -42,6 +42,12 @@ static NSURLCredential* clientAuthenticationCredential;
   UIColor * _savedBackgroundColor;
   BOOL _savedHideKeyboardAccessoryView;
   BOOL _savedKeyboardDisplayRequiresUserAction;
+  
+  // Workaround for StatusBar appearance bug for iOS 12
+  // https://github.com/react-native-community/react-native-webview/issues/62
+  BOOL _isFullScreenVideoOpen;
+  UIStatusBarStyle _savedStatusBarStyle;
+  BOOL _savedStatusBarHidden;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -56,11 +62,13 @@ static NSURLCredential* clientAuthenticationCredential;
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
+    _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
+    _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
   }
 
-  // Workaround for a keyboard dismissal bug present in iOS 12
-  // https://openradar.appspot.com/radar?id=5018321736957952
   if (@available(iOS 12.0, *)) {
+    // Workaround for a keyboard dismissal bug present in iOS 12
+    // https://openradar.appspot.com/radar?id=5018321736957952
     [[NSNotificationCenter defaultCenter]
       addObserver:self
       selector:@selector(keyboardWillHide)
@@ -69,8 +77,12 @@ static NSURLCredential* clientAuthenticationCredential;
       addObserver:self
       selector:@selector(keyboardWillShow)
       name:UIKeyboardWillShowNotification object:nil];
+    
+    // Workaround for StatusBar appearance bug for iOS 12
+    // https://github.com/react-native-community/react-native-webview/issues/62
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleFullScreenVideoStatusBars) name:@"_MRMediaRemotePlayerSupportedCommandsDidChangeNotification" object:nil];
   }
-
+  
   return self;
 }
 
@@ -239,6 +251,24 @@ static NSURLCredential* clientAuthenticationCredential;
     }
 
     [super removeFromSuperview];
+}
+
+-(void)toggleFullScreenVideoStatusBars
+{
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  if (!_isFullScreenVideoOpen) {
+    _isFullScreenVideoOpen = YES;
+    RCTUnsafeExecuteOnMainQueueSync(^{
+      [RCTSharedApplication() setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+    });
+  } else {
+    _isFullScreenVideoOpen = NO;
+    RCTUnsafeExecuteOnMainQueueSync(^{
+      [RCTSharedApplication() setStatusBarHidden:_savedStatusBarHidden animated:YES];
+      [RCTSharedApplication() setStatusBarStyle:_savedStatusBarStyle animated:YES];
+    });
+  }
+#pragma clang diagnostic pop
 }
 
 -(void)keyboardWillHide
