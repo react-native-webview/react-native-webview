@@ -91,7 +91,7 @@ export interface WebViewNativeEvent {
   lockIdentifier: number;
 }
 
-export interface WebViewProgressEvent extends WebViewNativeEvent {
+export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
   progress: number;
 }
 
@@ -121,6 +121,8 @@ export interface WebViewError extends WebViewNativeEvent {
 }
 
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
+
+export type WebViewProgressEvent = NativeSyntheticEvent<WebViewNativeProgressEvent>;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 
