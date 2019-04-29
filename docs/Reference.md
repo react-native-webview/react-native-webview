@@ -42,6 +42,7 @@ This document lays out the current public properties and methods for the React N
 - [`useWebKit`](Reference.md#usewebkit)
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
+- [`keyboardDisplayRequiresUserAction`](Reference.md#keyboardDisplayRequiresUserAction)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`incognito`](Reference.md#incognito)
@@ -753,6 +754,16 @@ If true, use WKWebView instead of UIWebView.
 | Type   | Required |
 | ------ | -------- |
 | string | No       |
+
+---
+
+### `keyboardDisplayRequiresUserAction`
+
+If false, web content can programmatically display the keyboard when using the WKWebView. The default value is `true`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ---
 
