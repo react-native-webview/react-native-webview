@@ -216,6 +216,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onLoadingError: (event: WebViewErrorEvent) => void;
   onLoadingFinish: (event: WebViewNavigationEvent) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
+  onCanGoBackForwardChanged: (event: WebViewNavigationEvent) => void;
   onLoadingStart: (event: WebViewNavigationEvent) => void;
   onMessage: (event: WebViewMessageEvent) => void;
   onShouldStartLoadWithRequest: (event: WebViewNavigationEvent) => void;
@@ -580,6 +581,11 @@ export interface WebViewSharedProps extends ViewProps {
    * Function that is invoked when the `WebView` is loading.
    */
   onLoadProgress?: (event: WebViewProgressEvent) => void;
+
+  /**
+   * Function that is invoked when the canGoBack or canGoForward property of the webview history changes
+   */
+   onCanGoBackForwardChanged?: (event: WebViewEvent) => void;
 
   /**
    * Boolean value that forces the `WebView` to show the loading view

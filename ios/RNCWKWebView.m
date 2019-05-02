@@ -32,6 +32,7 @@ static NSURLCredential* clientAuthenticationCredential;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
+@property (nonatomic, copy) RCTDirectEventBlock onCanGoBackForwardChanged;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) WKWebView *webView;
@@ -215,6 +216,8 @@ static NSURLCredential* clientAuthenticationCredential;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
+    [_webView addObserver:self forKeyPath: @"canGoBack" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context: nil];
+    [_webView addObserver:self forKeyPath: @"canGoForward" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context: nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 
     if (_userAgent) {
@@ -245,6 +248,8 @@ static NSURLCredential* clientAuthenticationCredential;
     if (_webView) {
         [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+        [_webView removeObserver:self forKeyPath:@"canGoBack"];
+        [_webView removeObserver:self forKeyPath:@"canGoForward"];
         [_webView removeFromSuperview];
         _webView.scrollView.delegate = nil;
         _webView = nil;
@@ -304,6 +309,13 @@ static NSURLCredential* clientAuthenticationCredential;
              NSMutableDictionary<NSString *, id> *event = [self baseEvent];
             [event addEntriesFromDictionary:@{@"progress":[NSNumber numberWithDouble:self.webView.estimatedProgress]}];
             _onLoadingProgress(event);
+        }
+    } else if(([keyPath isEqual:@"canGoBack"] || [keyPath isEqual:@"canGoForward"]) && object == self.webView){
+        if (_onCanGoBackForwardChanged) {
+            NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+            event[@"navigationType"] = @"other";
+        
+            _onCanGoBackForwardChanged(event);
         }
     }else{
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];

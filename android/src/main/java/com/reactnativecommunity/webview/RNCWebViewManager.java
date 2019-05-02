@@ -42,6 +42,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.reactnativecommunity.webview.events.TopCanGoBackForwardChangedEvent;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
@@ -76,6 +77,7 @@ import javax.annotation.Nullable;
  * - topLoadingStart
  * - topLoadingStart
  * - topLoadingProgress
+ * - topCanGoBackForwardChanged
  * - topShouldStartLoadWithRequest
  * <p>
  * Each event will carry the following properties:
@@ -480,6 +482,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
     export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
+    export.put(TopCanGoBackForwardChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCanGoBackForwardChanged"));
     return export;
   }
 
@@ -559,6 +562,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static class RNCWebViewClient extends WebViewClient {
 
     protected boolean mLastLoadFailed = false;
+    protected boolean mLastCanGoBack = false;
+    protected boolean mLastCanGoForward = false;
+
     protected @Nullable
     ReadableArray mUrlPrefixesForDefaultIntent;
 
@@ -573,6 +579,29 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         emitFinishEvent(webView, url);
       }
+    }
+
+    @Override
+    public void doUpdateVisitedHistory(WebView webView, String url, boolean isReload) {
+      super.doUpdateVisitedHistory(webView, url, isReload);
+      boolean canGoBack = webView.canGoBack();
+      boolean canGoForward = webView.canGoForward();
+
+      if(canGoBack != mLastCanGoBack || canGoForward != mLastCanGoForward)
+      {
+         WritableMap eventData = createWebViewEvent(webView, url);
+         eventData.putString("navigationType", "other");
+
+         dispatchEvent( webView,
+                        new TopCanGoBackForwardChangedEvent(
+                        webView.getId(),
+                        eventData)
+                      );
+      }
+
+
+      mLastCanGoBack = canGoBack;
+      mLastCanGoForward = canGoForward;
     }
 
     @Override

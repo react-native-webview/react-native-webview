@@ -261,6 +261,10 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     }
   };
 
+  onCanGoBackForwardChanged = (event: WebViewNavigationEvent) => {
+    this.updateNavigationState(event)
+  };
+
   onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress } = this.props;
     if (onLoadProgress) {
@@ -380,6 +384,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
+        onCanGoBackForwardChanged={this.onCanGoBackForwardChanged}
         onLoadingStart={this.onLoadingStart}
         onMessage={this.onMessage}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
