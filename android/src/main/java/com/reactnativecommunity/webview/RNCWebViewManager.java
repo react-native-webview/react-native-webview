@@ -749,13 +749,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         evaluateJavascript(script, null);
         return;
       }
-
-      try {
-        loadUrl("javascript:" + URLEncoder.encode(script, "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
-        // UTF-8 should always be supported
-        throw new RuntimeException(e);
-      }
+      loadUrl("javascript:(function() {\n" + script + ";\n})();");
     }
 
     public void callInjectedJavaScript() {
