@@ -92,7 +92,7 @@ export interface WebViewNativeEvent {
   lockIdentifier: number;
 }
 
-export interface WebViewProgressEvent extends WebViewNativeEvent {
+export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
   progress: number;
 }
 
@@ -122,6 +122,8 @@ export interface WebViewError extends WebViewNativeEvent {
 }
 
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
+
+export type WebViewProgressEvent = NativeSyntheticEvent<WebViewNativeProgressEvent>;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 
@@ -403,6 +405,18 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    */
   directionalLockEnabled?: boolean;
 
+  /**
+   * A Boolean value indicating whether web content can programmatically display the keyboard.
+   *
+   * When this property is set to true, the user must explicitly tap the elements in the
+   * web view to display the keyboard (or other relevant input view) for that element.
+   * When set to false, a focus event on an element causes the input view to be displayed
+   * and associated with that element automatically.
+   *
+   * The default value is `true`.
+   * @platform ios
+   */
+  keyboardDisplayRequiresUserAction?: boolean;
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
