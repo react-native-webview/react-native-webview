@@ -14,7 +14,6 @@ _This guide is currently a work in progress._
 - [Add support for File Download](Guide.md#add-support-for-file-download)
 - [Communicating between JS and Native](Guide.md#communicating-between-js-and-native)
 
-
 ### Basic inline HTML
 
 The simplest way to use the WebView is to simply pipe in the HTML you want to display. Note that setting an `html` source requires the [originWhiteList](Reference.md#originWhiteList) property to be set to `['*']`.
@@ -48,9 +47,7 @@ import { WebView } from 'react-native-webview';
 class MyWeb extends Component {
   render() {
     return (
-      <WebView
-        source={{uri: 'https://facebook.github.io/react-native/'}}
-      />
+      <WebView source={{ uri: 'https://facebook.github.io/react-native/' }} />
     );
   }
 }
@@ -71,7 +68,7 @@ class MyWeb extends Component {
     return (
       <WebView
         ref={ref => (this.webview = ref)}
-        source={{uri: 'https://facebook.github.io/react-native/'}}
+        source={{ uri: 'https://facebook.github.io/react-native/' }}
         onNavigationStateChange={this.handleWebViewNavigationStateChange}
       />
     );
@@ -87,7 +84,7 @@ class MyWeb extends Component {
     //   canGoForward?: boolean;
     // }
     const { url } = newNavState;
-    if (!url) return
+    if (!url) return;
 
     // handle certain doctypes
     if (url.includes('.pdf')) {
@@ -112,9 +109,47 @@ class MyWeb extends Component {
       const redirectTo = 'window.location = "' + newURL + '"';
       this.webview.injectJavaScript(redirectTo);
     }
-  }
+  };
 }
 ```
+
+#### Intercepting hash URL changes
+
+While `onNavigationStateChange` will trigger on URL changes, it does not trigger when only the hash URL ("anchor") changes, e.g. from `https://example.com/users#list` to `https://example.com/users#help`.
+
+You can inject some JavaScript to wrap the history functions in order to intercept these hash URL changes.
+
+```jsx
+<WebView
+  source={{ uri: someURI }}
+  injectedJavaScript={`
+    (function() {
+      function wrap(fn) {
+        return function wrapper() {
+          var res = fn.apply(this, arguments);
+          window.ReactNativeWebView.postMessage('navigationStateChange');
+          return res;
+        }
+      }
+
+      history.pushState = wrap(history.pushState);
+      history.replaceState = wrap(history.replaceState);
+      window.addEventListener('popstate', function() {
+        window.ReactNativeWebView.postMessage('navigationStateChange');
+      });
+    })();
+
+    true;
+  `}
+  onMessage={({ nativeEvent: state }) => {
+    if (state.data === 'navigationStateChange') {
+      // Navigation state updated, can check state.canGoBack, etc.
+    }
+  }}
+/>
+```
+
+Thanks to [Janic Duplessis](https://github.com/react-native-community/react-native-webview/issues/24#issuecomment-483956651) for this workaround.
 
 ### Add support for File Upload
 
@@ -123,18 +158,21 @@ class MyWeb extends Component {
 For iOS, all you need to do is specify the permissions in your `ios/[project]/Info.plist` file:
 
 Photo capture:
+
 ```
 <key>NSCameraUsageDescription</key>
 <string>Take pictures for certain activities</string>
 ```
 
 Gallery selection:
+
 ```
 <key>NSPhotoLibraryUsageDescription</key>
 <string>Select pictures for certain activities</string>
 ```
 
 Video recording:
+
 ```
 <key>NSMicrophoneUsageDescription</key>
 <string>Need microphone access for recording videos</string>
@@ -143,6 +181,7 @@ Video recording:
 ##### Android
 
 Add permission in AndroidManifest.xml:
+
 ```xml
 <manifest ...>
   ......
@@ -173,7 +212,7 @@ WebView.isFileUploadSupported().then(res => {
 
 ### Multiple Files Upload
 
-You can control __single__ or __multiple__ file selection by specifing the [`multiple`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#multiple) attribute on your `input` element:
+You can control **single** or **multiple** file selection by specifing the [`multiple`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#multiple) attribute on your `input` element:
 
 ```
 // multiple file selection
@@ -190,6 +229,7 @@ You can control __single__ or __multiple__ file selection by specifing the [`mul
 For iOS, all you need to do is specify the permissions in your `ios/[project]/Info.plist` file:
 
 Save to gallery:
+
 ```
 <key>NSPhotoLibraryAddUsageDescription</key>
 <string>Save pictures for certain activities.</string>
@@ -225,9 +265,9 @@ To accomplish this, React Native WebView exposes three different options:
 This is a script that runs immediately after the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away.
 
 ```jsx
-import React, { Component } from "react";
-import { View } from "react-native";
-import { WebView } from "react-native-webview";
+import React, { Component } from 'react';
+import { View } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 export default class App extends Component {
   render() {
@@ -241,7 +281,7 @@ export default class App extends Component {
         <WebView
           source={{
             uri:
-              "https://github.com/react-native-community/react-native-webview"
+              'https://github.com/react-native-community/react-native-webview',
           }}
           injectedJavaScript={runFirst}
         />
@@ -255,7 +295,7 @@ This runs the JavaScript in the `runFirst` string once the page is loaded. In th
 
 <img alt="screenshot of Github repo" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
 
-*Under the hood*
+_Under the hood_
 
 > On iOS, `injectedJavaScript` runs a method on WKWebView called `evaluateJavaScript:completionHandler:`
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
@@ -265,9 +305,9 @@ This runs the JavaScript in the `runFirst` string once the page is loaded. In th
 While convenient, the downside to the previously mentioned `injectedJavaScript` prop is that it only runs once. That's why we also expose a method on the webview ref called `injectJavaScript` (note the slightly different name!).
 
 ```jsx
-import React, { Component } from "react";
-import { View } from "react-native";
-import { WebView } from "react-native-webview";
+import React, { Component } from 'react';
+import { View } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 export default class App extends Component {
   render() {
@@ -286,7 +326,7 @@ export default class App extends Component {
           ref={r => (this.webref = r)}
           source={{
             uri:
-              "https://github.com/react-native-community/react-native-webview"
+              'https://github.com/react-native-community/react-native-webview',
           }}
         />
       </View>
@@ -299,7 +339,7 @@ After 3 seconds, this code turns the background blue:
 
 <img alt="Screenshot of app showing injected javascript" width="200" src="https://user-images.githubusercontent.com/1479215/53670433-93a98280-3c2f-11e9-85a5-0e4650993817.png" />
 
-*Under the hood*
+_Under the hood_
 
 > On iOS, `injectJavaScript` calls WKWebView's `evaluateJS:andThen:`
 > On Android, `injectJavaScript` calls Android WebView's `evaluateJavascriptWithFallback` method
@@ -313,9 +353,9 @@ You _must_ set `onMessage` or the `window.ReactNativeWebView.postMessage` method
 `window.ReactNativeWebView.postMessage` only accepts one argument which must be a string.
 
 ```jsx
-import React, { Component } from "react";
-import { View } from "react-native";
-import { WebView } from "react-native-webview";
+import React, { Component } from 'react';
+import { View } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 export default class App extends Component {
   render() {
@@ -349,4 +389,3 @@ export default class App extends Component {
 This code will result in this alert:
 
 <img alt="Alert showing communication from web page to React Native" width="200" src="https://user-images.githubusercontent.com/1479215/53671269-7e822300-3c32-11e9-9937-7ddc34ba8af3.png" />
-
