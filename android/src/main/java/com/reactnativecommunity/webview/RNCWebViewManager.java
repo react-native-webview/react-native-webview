@@ -21,6 +21,7 @@ import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -42,6 +43,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
@@ -480,6 +482,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
     export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
+    export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
     return export;
   }
 
@@ -625,6 +628,24 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       dispatchEvent(
         webView,
         new TopLoadingErrorEvent(webView.getId(), eventData));
+    }
+
+    @Override
+    public void onReceivedHttpError(WebView webView, WebResourceRequest request, WebResourceResponse errorResponse) {
+      super.onReceivedHttpError(webView, request, errorResponse);
+      int statusCode = 0;
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        statusCode = errorResponse.getStatusCode();
+        if(statusCode >= 400 && statusCode < 600)
+        {
+          WritableMap eventData = createWebViewEvent(webView, request.getUrl().toString());
+          eventData.putDouble("statusCode", statusCode);
+
+          dispatchEvent(
+                  webView,
+                  new TopHttpErrorEvent(webView.getId(), eventData));
+        }
+      }
     }
 
     protected void emitFinishEvent(WebView webView, String url) {

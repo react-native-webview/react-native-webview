@@ -31,6 +31,7 @@ static NSURLCredential* clientAuthenticationCredential;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
+@property (nonatomic, copy) RCTDirectEventBlock onHttpError;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
@@ -716,6 +717,25 @@ static NSURLCredential* clientAuthenticationCredential;
 
   // Allow all navigation by default
   decisionHandler(WKNavigationResponsePolicyAllow);
+}
+
+-(void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
+{
+    if (_onHttpError) {
+       if([navigationResponse.response isKindOfClass: [NSHTTPURLResponse class]])
+       {
+           NSHTTPURLResponse* response = (NSHTTPURLResponse*)navigationResponse.response;
+            if(response.statusCode >= 400 && response.statusCode < 600)
+            {
+               NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+               [event addEntriesFromDictionary:@{@"statusCode": @(response.statusCode)}];
+               [event addEntriesFromDictionary:@{@"url": response.URL.absoluteString}];
+               _onHttpError(event);
+            }
+       }
+    }
+
+    decisionHandler(WKNavigationResponsePolicyAllow);
 }
 
 /**

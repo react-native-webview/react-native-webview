@@ -10,6 +10,7 @@ This document lays out the current public properties and methods for the React N
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
+- [`onHttpError`](Reference.md#onhttperror)
 - [`onLoad`](Reference.md#onload)
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
@@ -181,6 +182,39 @@ url
 
 > **_Note_**
 > Domain is only used on iOS
+
+### `onHttpError`
+
+Function that is invoked when the `WebView` receives an http error (Statuscode: 400 - 599)
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native/404' }}
+  onHttpError={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn('WebView http error: ', nativeEvent.statusCode);
+  }}
+/>
+```
+
+Function passed to `onError` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+
+```
+canGoBack
+canGoForward
+loading
+target
+statusCode
+title
+url
+```
 
 ---
 

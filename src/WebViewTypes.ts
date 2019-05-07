@@ -120,6 +120,11 @@ export interface WebViewError extends WebViewNativeEvent {
   description: string;
 }
 
+export interface WebViewHttpError extends WebViewNativeEvent {
+
+  statusCode: number;
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent = NativeSyntheticEvent<WebViewNativeProgressEvent>;
@@ -129,6 +134,8 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
+
+export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
 
 export type DataDetectorTypes
   = | 'phoneNumber'
@@ -561,6 +568,15 @@ export interface WebViewSharedProps extends ViewProps {
    * Function that is invoked when the `WebView` load fails.
    */
   onError?: (event: WebViewErrorEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` receives an http error (Statuscode: 400 - 599)
+   * ClientErrors: 4xx
+   * ServerErrors: 5xx
+   *
+   * works on ios and android >= 21 (Lollipop)
+   */
+  onHttpError?: (event: WebViewHttpErrorEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` loading starts or ends.
