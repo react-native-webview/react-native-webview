@@ -289,6 +289,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setHardwareAccelerationDisabled(WebView view, boolean disabled) {
     if (disabled) {
       view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    } else {
+      view.setLayerType(View.LAYER_TYPE_NONE, null);
     }
   }
 
