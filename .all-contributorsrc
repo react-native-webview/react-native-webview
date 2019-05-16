@@ -169,6 +169,16 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "dvicory",
+      "name": "Daniel Vicory",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1542454?v=4",
+      "profile": "https://bzfx.net",
+      "contributions": [
+        "code",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
