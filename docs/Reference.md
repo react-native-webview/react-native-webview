@@ -31,6 +31,7 @@ This document lays out the current public properties and methods for the React N
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
 - [`userAgent`](Reference.md#useragent)
 - [`applicationNameForUserAgent`](Reference.md#applicationNameForUserAgent)
+- [`allowsFullscreenVideo`](Reference.md#allowsfullscreenvideo)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
 - [`bounces`](Reference.md#bounces)
 - [`overScrollMode`](Reference.md#overscrollmode)
@@ -43,6 +44,7 @@ This document lays out the current public properties and methods for the React N
 - [`useWebKit`](Reference.md#usewebkit)
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
+- [`keyboardDisplayRequiresUserAction`](Reference.md#keyboardDisplayRequiresUserAction)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`incognito`](Reference.md#incognito)
@@ -113,6 +115,22 @@ Set this to provide JavaScript that will be injected into the web page when the 
 | string | No       |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
+
+Example:
+
+Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage)
+
+```jsx
+const INJECTED_JAVASCRIPT = `(function() {
+    window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
+})();`;
+
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  injectedJavaScript={INJECTED_JAVASCRIPT}
+  onMessage={this.onMessage}
+/>
+```
 
 ---
 
@@ -369,6 +387,8 @@ title
 url
 ```
 
+Note that this method will not be invoked on hash URL changes (e.g. from `https://example.com/users#list` to `https://example.com/users#help`). There is a workaround for this that is described [in the Guide](Guide.md#intercepting-hash-url-changes).
+
 ---
 
 ### `originWhitelist`
@@ -597,6 +617,14 @@ Append to the existing user-agent. Available on iOS WKWebView only. Setting `use
 | ------ | -------- | ------------- |
 | string | No       | iOS WKWebView |
 
+### `allowsFullscreenVideo`
+
+Boolean that determines whether videos are allowed to be played in fullscreen. The default value is `false`.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
 ---
 
 ### `allowsInlineMediaPlayback`
@@ -764,6 +792,16 @@ If true, use WKWebView instead of UIWebView.
 | Type   | Required |
 | ------ | -------- |
 | string | No       |
+
+---
+
+### `keyboardDisplayRequiresUserAction`
+
+If false, web content can programmatically display the keyboard when using the WKWebView. The default value is `true`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ---
 
