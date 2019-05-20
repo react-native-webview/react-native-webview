@@ -30,7 +30,10 @@ This project follows [semantic versioning](https://semver.org/). We do not hesit
 
 Current Version: ![version](https://img.shields.io/npm/v/react-native-webview.svg)
 
+yarn add react-native-webview@androidx
 - [6.0.**2**](https://github.com/react-native-community/react-native-webview/releases/tag/v6.0.2) - Update to AndroidX. Make sure to enable it in your project's `android/gradle.properties`. See [Getting Started Guide](docs/Getting-Started.md).
+
+yarn add react-native-webview
 - [5.0.**1**](https://github.com/react-native-community/react-native-webview/releases/tag/v5.0.0) - Refactored the old postMessage implementation for communication from webview to native.
 - [4.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v4.0.0) - Added cache (enabled by default).
 - [3.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v3.0.0) - WKWebview: Add shared process pool so cookies and localStorage are shared across webviews in iOS (enabled by default).
