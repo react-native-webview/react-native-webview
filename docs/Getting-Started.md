@@ -19,7 +19,10 @@ $ react-native link react-native-webview
 iOS:
 This module does not require any extra step after running the link command 🎉
 
-Android:
+Android - react-native-webview version <6:
+This module does not require any extra step after running the link command 🎉
+
+Android - react-native-webview version >=6.X.X:
 Please make sure AndroidX is enabled in your project by editting `android/gradle.properties` and adding 2 lines:
 
 ```
