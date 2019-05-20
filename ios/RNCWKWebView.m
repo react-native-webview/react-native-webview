@@ -142,6 +142,10 @@ static NSURLCredential* clientAuthenticationCredential;
     wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
 #endif
 
+    if (_applicationNameForUserAgent) {
+        wkWebViewConfig.applicationNameForUserAgent = [NSString stringWithFormat:@"%@ %@", wkWebViewConfig.applicationNameForUserAgent, _applicationNameForUserAgent];
+    }
+
     if(_sharedCookiesEnabled) {
       // More info to sending cookies with WKWebView
       // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
