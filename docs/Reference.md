@@ -30,6 +30,7 @@ This document lays out the current public properties and methods for the React N
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
 - [`userAgent`](Reference.md#useragent)
+- [`applicationNameForUserAgent`](Reference.md#applicationNameForUserAgent)
 - [`allowsFullscreenVideo`](Reference.md#allowsfullscreenvideo)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
 - [`bounces`](Reference.md#bounces)
@@ -607,6 +608,14 @@ Sets the user-agent for the `WebView`. This will only work for iOS if you are us
 | string | No       | Android, iOS WKWebView |
 
 ---
+
+### `applicationNameForUserAgent`
+
+Append to the existing user-agent. Available on iOS WKWebView only. Setting `userAgent` will override this.
+
+| Type   | Required | Platform      |
+| ------ | -------- | ------------- |
+| string | No       | iOS WKWebView |
 
 ### `allowsFullscreenVideo`
 
