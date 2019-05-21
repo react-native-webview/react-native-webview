@@ -7,6 +7,7 @@ import {
   NativeMethodsMixin,
   Constructor,
   UIManagerStatic,
+  NativeScrollEvent,
 } from 'react-native';
 
 export interface WebViewCommands {
@@ -213,6 +214,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   injectedJavaScript?: string;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
+  onScroll?: (event: NativeScrollEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
   onLoadingFinish: (event: WebViewNavigationEvent) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
@@ -541,6 +543,11 @@ export interface WebViewSharedProps extends ViewProps {
    * Function that returns a loading indicator.
    */
   renderLoading?: () => ReactElement;
+
+  /**
+   * Function that is invoked when the `WebView` scrolls.
+   */
+  onScroll?: (event: NativeScrollEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` has finished loading.
