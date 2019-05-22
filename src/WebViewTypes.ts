@@ -522,6 +522,11 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   mixedContentMode?: 'never' | 'always' | 'compatibility';
+  
+  /**
+   * Sets ability to open fullscreen videos on Android devices.
+  */
+  allowsFullscreenVideo?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {
