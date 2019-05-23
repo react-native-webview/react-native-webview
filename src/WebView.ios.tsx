@@ -63,6 +63,7 @@ const RNCWKWebView: typeof NativeWebViewIOS = requireNativeComponent(
 class WebView extends React.Component<IOSWebViewProps, State> {
   static defaultProps = {
     useWebKit: true,
+    javaScriptEnabled: true,
     cacheEnabled: true,
     originWhitelist: defaultOriginWhitelist,
     useSharedProcessPool: true,
