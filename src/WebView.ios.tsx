@@ -64,6 +64,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   static defaultProps = {
     useWebKit: true,
     cacheEnabled: true,
+    javaScriptEnabled: true,
     originWhitelist: defaultOriginWhitelist,
     useSharedProcessPool: true,
   };
