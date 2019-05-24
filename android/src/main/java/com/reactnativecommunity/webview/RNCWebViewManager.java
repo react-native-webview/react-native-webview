@@ -62,7 +62,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -183,20 +182,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
         String downloadMessage = "Downloading " + fileName;
 
-        //Attempt to add cookie, if it exists
-        URL urlObj = null;
-        try {
-          urlObj = new URL(url);
-          String baseUrl = urlObj.getProtocol() + "://" + urlObj.getHost();
-          String cookie = CookieManager.getInstance().getCookie(baseUrl);
-          request.addRequestHeader("Cookie", cookie);
-          System.out.println("Got cookie for DownloadManager: " + cookie);
-        } catch (MalformedURLException e) {
-          System.out.println("Error getting cookie for DownloadManager: " + e.toString());
-          e.printStackTrace();
+        // Add cookies if they exist
+        String cookies = CookieManager.getInstance().getCookie(url);
+        if (cookies.length() != 0) {
+          request.addRequestHeader("Cookie", cookies);
+          System.out.println("Cookies for DownloadManager: " + cookies);
         }
 
-        //Finish setting up request
+        // Finish setting up request
         request.addRequestHeader("User-Agent", userAgent);
         request.setTitle(fileName);
         request.setDescription(downloadMessage);
