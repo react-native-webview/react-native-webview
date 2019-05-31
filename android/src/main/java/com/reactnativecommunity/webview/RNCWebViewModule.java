@@ -250,29 +250,36 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   private Intent getFileChooserIntent(String acceptTypes) {
-    String _acceptTypes = acceptTypes;
-    if (acceptTypes.isEmpty()) {
-      _acceptTypes = DEFAULT_MIME_TYPES;
-    }
-    if (acceptTypes.matches("\\.\\w+")) {
+    String _acceptTypes = new String(acceptTypes);
+    if (_acceptTypes.matches("\\.\\w+")) {
       _acceptTypes = getMimeTypeFromExtension(acceptTypes.replace(".", ""));
     }
     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
-    intent.setType(_acceptTypes);
+    intent.setType("*/*");
+    if(_acceptTypes.isEmpty())
+      _acceptTypes = "*/*";
+    String acceptTypesArr[] = new String[]{_acceptTypes};
+    intent.putExtra(Intent.EXTRA_MIME_TYPES,acceptTypesArr);
     return intent;
   }
 
   private Intent getFileChooserIntent(String[] acceptTypes, boolean allowMultiple) {
+    String[] _acceptTypes = acceptTypes.clone();
     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
     intent.setType("*/*");
-    intent.putExtra(Intent.EXTRA_MIME_TYPES, getAcceptedMimeType(acceptTypes));
+    if(isArrayEmpty(_acceptTypes) )
+      _acceptTypes[0] = "*/*";
+    for(int i=0;i<_acceptTypes.length;i++){
+       Log.d("tim Debug",_acceptTypes[i] + _acceptTypes.length);
+    }
+    intent.putExtra(Intent.EXTRA_MIME_TYPES, _acceptTypes);
     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple);
     return intent;
   }
 
-  private Boolean acceptsImages(String types) {
+  private Boolean acceptsImages(String types) { 
     String mimeType = types;
     if (types.matches("\\.\\w+")) {
       mimeType = getMimeTypeFromExtension(types.replace(".", ""));
@@ -280,9 +287,9 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return mimeType.isEmpty() || mimeType.toLowerCase().contains("image");
   }
 
-  private Boolean acceptsImages(String[] types) {
+  private Boolean acceptsImages(String[] types) { 
     String[] mimeTypes = getAcceptedMimeType(types);
-    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image");
+    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image") || arrayContainsString(mimeTypes, "*/*"); 
   }
 
   private Boolean acceptsVideo(String types) {
@@ -295,7 +302,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private Boolean acceptsVideo(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "video");
+    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image") || arrayContainsString(mimeTypes, "*/*");
   }
 
   private Boolean arrayContainsString(String[] array, String pattern) {
