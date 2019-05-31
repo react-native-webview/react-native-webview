@@ -282,7 +282,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private Boolean acceptsImages(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image") || arrayContainsString(mimeTypes,"*/*"); //mimeTypes is never really empty it has */* in it if webpage input="file" does not have tag 'accept="image/*"'
+    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image");
   }
 
   private Boolean acceptsVideo(String types) {
@@ -295,7 +295,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private Boolean acceptsVideo(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image") || arrayContainsString(mimeTypes,"*/*"); //mimeTypes is never really empty it has */* in it if webpage input="file" does not have tag 'accept="image/*"'
+    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "video");
   }
 
   private Boolean arrayContainsString(String[] array, String pattern) {
