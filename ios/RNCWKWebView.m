@@ -574,6 +574,7 @@ static NSURLCredential* clientAuthenticationCredential;
 
   // Ensure webview takes the position and dimensions of RNCWKWebView
   _webView.frame = self.bounds;
+  _webView.scrollView.contentInset = _contentInset;
 }
 
 - (NSMutableDictionary<NSString *, id> *)baseEvent

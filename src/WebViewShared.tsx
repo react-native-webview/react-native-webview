@@ -75,7 +75,7 @@ const getViewManagerConfig = (
 };
 
 const defaultRenderLoading = () => (
-  <View style={styles.loadingView}>
+  <View style={styles.loadingOrErrorView}>
     <ActivityIndicator />
   </View>
 );
@@ -84,7 +84,7 @@ const defaultRenderError = (
   errorCode: number,
   errorDesc: string,
 ) => (
-  <View style={styles.errorContainer}>
+  <View style={styles.loadingOrErrorView}>
     <Text style={styles.errorTextTitle}>Error loading page</Text>
     <Text style={styles.errorText}>{`Domain: ${errorDomain}`}</Text>
     <Text style={styles.errorText}>{`Error Code: ${errorCode}`}</Text>
