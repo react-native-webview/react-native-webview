@@ -593,6 +593,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean mLastLoadFailed = false;
     protected @Nullable
     ReadableArray mUrlPrefixesForDefaultIntent;
+    protected boolean mIsFirstTime = true;
 
     @Override
     public void onPageFinished(WebView webView, String url) {
@@ -611,6 +612,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public void onPageStarted(WebView webView, String url, Bitmap favicon) {
       super.onPageStarted(webView, url, favicon);
       mLastLoadFailed = false;
+
+      if (mIsFirstTime) {
+        mIsFirstTime = false;
+        shouldOverrideUrlLoading(webView,url);
+      }
 
       dispatchEvent(
         webView,
