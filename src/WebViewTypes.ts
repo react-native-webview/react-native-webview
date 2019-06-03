@@ -376,6 +376,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   useSharedProcessPool?: boolean;
+
+  /**
+   * Append to the existing user-agent. Overriden if `userAgent` is set.
+   * @platform ios
+   */
+  applicationNameForUserAgent?: string;
+
   /**
    * The custom user agent string.
    */

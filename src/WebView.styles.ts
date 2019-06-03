@@ -2,11 +2,9 @@ import { StyleSheet, ViewStyle, TextStyle } from 'react-native';
 
 interface Styles {
   container: ViewStyle;
-  errorContainer: ViewStyle;
   errorText: TextStyle;
   errorTextTitle: TextStyle;
-  hidden: ViewStyle;
-  loadingView: ViewStyle;
+  loadingOrErrorView: ViewStyle;
   webView: ViewStyle;
   loadingProgressBar: ViewStyle;
 }
@@ -16,21 +14,14 @@ const styles = StyleSheet.create<Styles>({
     flex: 1,
     overflow: 'hidden',
   },
-  errorContainer: {
+  loadingOrErrorView: {
+    position: 'absolute',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
-  },
-  hidden: {
-    height: 0,
-    flex: 0, // disable 'flex:1' when hiding a View
-  },
-  loadingView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'white'
   },
   loadingProgressBar: {
     height: 20,

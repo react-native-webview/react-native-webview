@@ -346,13 +346,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
-    if (
-      this.state.viewState === 'LOADING'
-      || this.state.viewState === 'ERROR'
-    ) {
-      // if we're in either LOADING or ERROR states, don't show the webView
-      webViewStyles.push(styles.hidden);
-    }
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
