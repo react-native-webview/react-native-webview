@@ -156,7 +156,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     private final long SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS = 5000;
 
     // Shared client for forwarding all of the requests for onUrlSchemeRequest.
-    private final OkHttpClient httpClient;
+    private OkHttpClient httpClient;
 
     // URL to intercept requests from the browser
     private String baseInterceptUrl;
@@ -973,6 +973,57 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (client != null) {
       client.setBaseInterceptUrl(baseInterceptUrl);
     }
+  }
+
+  @ReactProp(name = "httpClientConfig")
+  public void setHttpClientConfig(
+    WebView webView,
+    ReadableMap httpClientConfig) {
+
+    RNCWebViewClient client = ((RNCWebView) webView).getRNCWebViewClient();
+
+    if (client == null || client.httpClient == null) {
+      return;
+    }
+
+    OkHttpClient.Builder builder = httpClient.newBuilder();
+
+    if (httpClientConfig.hasKey("followSslRedirects")) {
+      boolean followSslRedirects = httpClientConfig.getBoolean("followSslRedirects");
+      builder.followRedirects(followSslRedirects);
+    }
+
+    if (httpClientConfig.hasKey("followRedirects")) {
+      boolean followRedirects = httpClientConfig.getBoolean("followRedirects");
+      builder.followRedirects(followRedirects);
+    }
+
+    if (httpClientConfig.hasKey("retryOnConnectionFailure")) {
+      boolean retryOnConnectionFailure = httpClientConfig.getBoolean("retryOnConnectionFailure");
+      builder.followRedirects(retryOnConnectionFailure);
+    }
+
+    if (httpClientConfig.hasKey("connectTimeoutMs")) {
+      int connectTimeoutMs = httpClientConfig.getInt("connectTimeoutMs");
+      builder.connectTimeout(connectTimeoutMs, TimeUnit.MILLISECONDS);
+    }
+
+    if (httpClientConfig.hasKey("readTimeoutMs")) {
+      int readTimeout = httpClientConfig.getInt("readTimeoutMs");
+      builder.readTimeout(readTimeout, TimeUnit.MILLISECONDS);
+    }
+
+    if (httpClientConfig.hasKey("writeTimeoutMs")) {
+      int writeTimeout = httpClientConfig.getInt("writeTimeoutMs");
+      builder.writeTimeout(writeTimeout, TimeUnit.MILLISECONDS);
+    }
+
+    if (httpClientConfig.hasKey("pingIntervalMs")) {
+      int pingInterval = httpClientConfig.getInt("pingIntervalMs");
+      builder.pingInterval(pingInterval, TimeUnit.MILLISECONDS);
+    }
+
+    client.httpClient = builder.build();
   }
 
   @Override

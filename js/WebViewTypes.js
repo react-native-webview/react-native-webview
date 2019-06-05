@@ -407,6 +407,19 @@ export type AndroidWebViewProps = $ReadOnly<{|
     event: WebViewUrlSchemeRequest
   ) =>
     Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>,
+
+  /**
+   * Configuration for the HTTP Client that is used when using UrlSchemeRedirect.
+   */
+  httpClientConfig?: {|
+    followSslRedirects: ?boolean,
+    followRedirects: ?boolean,
+    retryOnConnectionFailure: ?boolean,
+    connectTimeoutMs: ?number,
+    readTimeoutMs: ?number,
+    writeTimeoutMs: ?number,
+    pingIntervalMs: ?number,
+  |}
 |}>;
 
 export type WebViewSharedProps =  $ReadOnly<{|

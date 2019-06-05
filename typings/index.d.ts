@@ -40,10 +40,10 @@ export interface WebViewError extends WebViewNativeEvent {
 }
 
 export interface WebViewUrlSchemeRequest {
-	readonly url: string,
-	readonly method: string,
-	readonly headers: { [key: string]: string },
-	readonly requestId: string,
+	readonly url: string;
+	readonly method: string;
+	readonly headers: { [key: string]: string };
+	readonly requestId: string;
 }
 
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
@@ -70,26 +70,26 @@ export type DataDetectorTypes =
 export type OverScrollModeType = 'always' | 'content' | 'never';
 
 export type UrlSchemeResponse = {
-  type: "response"
+  type: "response",
   url: string,
   status: number,
   headers: { [key: string]: string },
-  body?: string
+  body?: string,
 }
 
 export type UrlSchemeFile = {
-  type: "file"
-  file: string
+  type: "file",
+  file: string,
   url: string,
   headers: { [key: string]: string },
 }
 
 export type UrlSchemeRedirect = {
-  type: "redirect"
+  type: "redirect",
   url: string,
   method: string,
   headers: { [key: string]: string },
-  body?: string
+  body?: string,
 }
 
 export interface WebViewSourceUri {
@@ -189,7 +189,7 @@ export interface IOSWebViewProps {
    * The default value is false.
    * @platform ios
    */
-  pagingEnabled?: boolean,
+  pagingEnabled?: boolean;
 
   /**
    * The amount by which the web view content is inset from the edges of
@@ -365,7 +365,7 @@ export interface AndroidWebViewProps {
    */
   mixedContentMode?: 'never' | 'always' | 'compatibility';
 
-  baseInterceptUrl?: string,
+  baseInterceptUrl?: string;
 
    /**
    * Intercept a url scheme request. Either return a response or return a new request.
@@ -374,6 +374,16 @@ export interface AndroidWebViewProps {
     event: WebViewUrlSchemeRequest
   ) =>
      Promise<UrlSchemeResponse | UrlSchemeRedirect | UrlSchemeFile>;
+
+  httpClientConfig?: {
+    followSslRedirects?: boolean;
+    followRedirects?: boolean;
+    retryOnConnectionFailure?: boolean;
+    connectTimeoutMs?: number;
+    readTimeoutMs?: number;
+    writeTimeoutMs?: number;
+    pingIntervalMs?: number;
+  };
 }
 
 export interface WebViewSharedProps extends ViewProps, IOSWebViewProps, AndroidWebViewProps {
