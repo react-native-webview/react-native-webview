@@ -469,9 +469,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                   responseHeaders,
                   responseBody.byteStream());
         } catch (IOException exn) {
-          // TODO: Should this return null, or return an error?
           FLog.w(ReactConstants.TAG, "Error fetching request from: '" + redirect.getUrl() + "'", exn);
-          return null;
+
+          // This must return a non-null result, returning null will cause the WebView to
+          // make the request again without all of the metadata from this proxy.
+          return CustomWebResourceResponse.buildErrorResponse("Timeout waiting waiting for response for '" + redirect.getUrl() + "'");
         }
       } else if (result instanceof WebViewUrlSchemeResultFile) {
         WebViewUrlSchemeResultFile file = (WebViewUrlSchemeResultFile)result;
