@@ -70,6 +70,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
     allowFileAccess: false,
     saveFormDataDisabled: false,
     originWhitelist: WebViewShared.defaultOriginWhitelist,
+    httpClientConfig: {},
   };
 
   static isFileUploadSupported = async () => {
@@ -135,6 +136,8 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       WebViewShared.originWhitelistToRegex,
     );
 
+    const httpClientConfig = (this.props.httpClientConfig || {});
+
     let NativeWebView = nativeConfig.component || RNCWebView;
 
     const webView = (
@@ -177,6 +180,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
         saveFormDataDisabled={this.props.saveFormDataDisabled}
         urlPrefixesForDefaultIntent={this.props.urlPrefixesForDefaultIntent}
         {...nativeConfig.props}
+        httpClientConfig={httpClientConfig}
       />
     );
 

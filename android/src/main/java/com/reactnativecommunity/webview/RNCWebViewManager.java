@@ -59,7 +59,6 @@ import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.common.ReactConstants;
-import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -157,7 +156,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     private final long SHOULD_INTERCEPT_REQUEST_TIMEOUT_MS = 5000;
 
     // Shared client for forwarding all of the requests for onUrlSchemeRequest.
-    private final OkHttpClient httpClient;
+    private OkHttpClient httpClient;
 
     // URL to intercept requests from the browser
     private String baseInterceptUrl;
@@ -469,9 +468,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                   responseHeaders,
                   responseBody.byteStream());
         } catch (IOException exn) {
-          // TODO: Should this return null, or return an error?
           FLog.w(ReactConstants.TAG, "Error fetching request from: '" + redirect.getUrl() + "'", exn);
-          return null;
+
+          // This must return a non-null result, returning null will cause the WebView to
+          // make the request again without all of the metadata from this proxy.
+          return CustomWebResourceResponse.buildErrorResponse("Timeout waiting waiting for response for '" + redirect.getUrl() + "'");
         }
       } else if (result instanceof WebViewUrlSchemeResultFile) {
         WebViewUrlSchemeResultFile file = (WebViewUrlSchemeResultFile)result;
@@ -619,7 +620,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void linkBridge() {
       if (messagingEnabled) {
-        if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
           // See isNative in lodash
           String testPostMessageNative = "String(window.postMessage) === String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage')";
           evaluateJavascript(testPostMessageNative, new ValueCallback<String>() {
@@ -682,7 +683,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     webView.setWebChromeClient(new WebChromeClient() {
       @Override
       public boolean onConsoleMessage(ConsoleMessage message) {
-        if (ReactBuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
           return super.onConsoleMessage(message);
         }
         // Ignore console logs in non debug builds.
@@ -751,7 +752,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 LayoutParams.MATCH_PARENT));
 
     setGeolocationEnabled(webView, false);
-    if (true || ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
+    if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
@@ -971,6 +973,57 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (client != null) {
       client.setBaseInterceptUrl(baseInterceptUrl);
     }
+  }
+
+  @ReactProp(name = "httpClientConfig")
+  public void setHttpClientConfig(
+    WebView webView,
+    ReadableMap httpClientConfig) {
+
+    RNCWebViewClient client = ((RNCWebView) webView).getRNCWebViewClient();
+
+    if (client == null || client.httpClient == null) {
+      return;
+    }
+
+    OkHttpClient.Builder builder = httpClient.newBuilder();
+
+    if (httpClientConfig.hasKey("followSslRedirects")) {
+      boolean followSslRedirects = httpClientConfig.getBoolean("followSslRedirects");
+      builder.followRedirects(followSslRedirects);
+    }
+
+    if (httpClientConfig.hasKey("followRedirects")) {
+      boolean followRedirects = httpClientConfig.getBoolean("followRedirects");
+      builder.followRedirects(followRedirects);
+    }
+
+    if (httpClientConfig.hasKey("retryOnConnectionFailure")) {
+      boolean retryOnConnectionFailure = httpClientConfig.getBoolean("retryOnConnectionFailure");
+      builder.followRedirects(retryOnConnectionFailure);
+    }
+
+    if (httpClientConfig.hasKey("connectTimeoutMs")) {
+      int connectTimeoutMs = httpClientConfig.getInt("connectTimeoutMs");
+      builder.connectTimeout(connectTimeoutMs, TimeUnit.MILLISECONDS);
+    }
+
+    if (httpClientConfig.hasKey("readTimeoutMs")) {
+      int readTimeout = httpClientConfig.getInt("readTimeoutMs");
+      builder.readTimeout(readTimeout, TimeUnit.MILLISECONDS);
+    }
+
+    if (httpClientConfig.hasKey("writeTimeoutMs")) {
+      int writeTimeout = httpClientConfig.getInt("writeTimeoutMs");
+      builder.writeTimeout(writeTimeout, TimeUnit.MILLISECONDS);
+    }
+
+    if (httpClientConfig.hasKey("pingIntervalMs")) {
+      int pingInterval = httpClientConfig.getInt("pingIntervalMs");
+      builder.pingInterval(pingInterval, TimeUnit.MILLISECONDS);
+    }
+
+    client.httpClient = builder.build();
   }
 
   @Override
