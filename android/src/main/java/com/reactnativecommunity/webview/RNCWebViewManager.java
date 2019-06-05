@@ -59,7 +59,6 @@ import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.common.ReactConstants;
-import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -621,7 +620,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void linkBridge() {
       if (messagingEnabled) {
-        if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
           // See isNative in lodash
           String testPostMessageNative = "String(window.postMessage) === String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage')";
           evaluateJavascript(testPostMessageNative, new ValueCallback<String>() {
@@ -684,7 +683,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     webView.setWebChromeClient(new WebChromeClient() {
       @Override
       public boolean onConsoleMessage(ConsoleMessage message) {
-        if (ReactBuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
           return super.onConsoleMessage(message);
         }
         // Ignore console logs in non debug builds.
@@ -753,7 +752,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 LayoutParams.MATCH_PARENT));
 
     setGeolocationEnabled(webView, false);
-    if (true || ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
+    if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
