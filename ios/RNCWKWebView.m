@@ -14,6 +14,7 @@
 #import "objc/runtime.h"
 
 static NSTimer *keyboardTimer;
+static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
 
@@ -116,6 +117,36 @@ static NSURLCredential* clientAuthenticationCredential;
       wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
     wkWebViewConfig.userContentController = [WKUserContentController new];
+
+    // Shim the HTML5 history API:
+    [wkWebViewConfig.userContentController addScriptMessageHandler:self name:HistoryShimName];
+    NSString *source = [NSString stringWithFormat:
+      @"(function (history) {"
+        "function shim(name) {"
+          "return function() {"
+            "setTimeout(function () {"
+              "window.webkit.messageHandlers.%@.postMessage('');"
+            "}, 0);"
+            "return history[name].apply(history, arguments)"
+          "}"
+        "}"
+        "Object.defineProperty(window, 'history', {"
+          "configurable: true,"
+          "enumerable: true,"
+          "value: {"
+            "get length () { return history.length; },"
+            "get state () { return history.state; },"
+            "go: shim('go'),"
+            "back: shim('back'),"
+            "forward: shim('forward'),"
+            "pushState: shim('pushState'),"
+            "replaceState: shim('replaceState'),"
+          "}"
+        "});"
+      "})(window.history)", HistoryShimName
+    ];
+    WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+    [wkWebViewConfig.userContentController addUserScript:script];
 
     if (_messagingEnabled) {
       [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
@@ -335,10 +366,18 @@ static NSURLCredential* clientAuthenticationCredential;
 - (void)userContentController:(WKUserContentController *)userContentController
        didReceiveScriptMessage:(WKScriptMessage *)message
 {
-  if (_onMessage != nil) {
-    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    [event addEntriesFromDictionary: @{@"data": message.body}];
-    _onMessage(event);
+  if ([message.name isEqualToString:HistoryShimName]) {
+    if (_onLoadingFinish) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"navigationType": @"history"}];
+      _onLoadingFinish(event);
+    }
+  } else if ([message.name isEqualToString:MessageHandlerName]) {
+    if (_onMessage) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"data": message.body}];
+      _onMessage(event);
+    }
   }
 }
 
