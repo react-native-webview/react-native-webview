@@ -14,6 +14,7 @@
 #import "objc/runtime.h"
 
 static NSTimer *keyboardTimer;
+static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
 
@@ -116,6 +117,31 @@ static NSURLCredential* clientAuthenticationCredential;
       wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
     wkWebViewConfig.userContentController = [WKUserContentController new];
+
+    // Shim the HTML5 history API:
+    [wkWebViewConfig.userContentController addScriptMessageHandler:self name:HistoryShimName];
+    NSString *source = [NSString stringWithFormat:
+      @"(function(history) {\n"
+      "  function notify(type) {\n"
+      "    setTimeout(function() {\n"
+      "      window.webkit.messageHandlers.%@.postMessage(type)\n"
+      "    }, 0)\n"
+      "  }\n"
+      "  function shim(f) {\n"
+      "    return function pushState() {\n"
+      "      notify('other')\n"
+      "      return f.apply(history, arguments)\n"
+      "    }\n"
+      "  }\n"
+      "  history.pushState = shim(history.pushState)\n"
+      "  history.replaceState = shim(history.replaceState)\n"
+      "  window.addEventListener('popstate', function() {\n"
+      "    notify('backforward')\n"
+      "  })\n"
+      "})(window.history)\n", HistoryShimName
+    ];
+    WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+    [wkWebViewConfig.userContentController addUserScript:script];
 
     if (_messagingEnabled) {
       [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
@@ -335,10 +361,18 @@ static NSURLCredential* clientAuthenticationCredential;
 - (void)userContentController:(WKUserContentController *)userContentController
        didReceiveScriptMessage:(WKScriptMessage *)message
 {
-  if (_onMessage != nil) {
-    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    [event addEntriesFromDictionary: @{@"data": message.body}];
-    _onMessage(event);
+  if ([message.name isEqualToString:HistoryShimName]) {
+    if (_onLoadingFinish) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"navigationType": message.body}];
+      _onLoadingFinish(event);
+    }
+  } else if ([message.name isEqualToString:MessageHandlerName]) {
+    if (_onMessage) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"data": message.body}];
+      _onMessage(event);
+    }
   }
 }
 
