@@ -113,44 +113,6 @@ class MyWeb extends Component {
 }
 ```
 
-#### Intercepting hash URL changes
-
-While `onNavigationStateChange` will trigger on URL changes, it does not trigger when only the hash URL ("anchor") changes, e.g. from `https://example.com/users#list` to `https://example.com/users#help`.
-
-You can inject some JavaScript to wrap the history functions in order to intercept these hash URL changes.
-
-```jsx
-<WebView
-  source={{ uri: someURI }}
-  injectedJavaScript={`
-    (function() {
-      function wrap(fn) {
-        return function wrapper() {
-          var res = fn.apply(this, arguments);
-          window.ReactNativeWebView.postMessage('navigationStateChange');
-          return res;
-        }
-      }
-
-      history.pushState = wrap(history.pushState);
-      history.replaceState = wrap(history.replaceState);
-      window.addEventListener('popstate', function() {
-        window.ReactNativeWebView.postMessage('navigationStateChange');
-      });
-    })();
-
-    true;
-  `}
-  onMessage={({ nativeEvent: state }) => {
-    if (state.data === 'navigationStateChange') {
-      // Navigation state updated, can check state.canGoBack, etc.
-    }
-  }}
-/>
-```
-
-Thanks to [Janic Duplessis](https://github.com/react-native-community/react-native-webview/issues/24#issuecomment-483956651) for this workaround.
-
 ### Add support for File Upload
 
 ##### iOS
