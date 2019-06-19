@@ -179,6 +179,15 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "femiveys",
+      "name": "Femi Veys",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1252663?v=4",
+      "profile": "https://github.com/femiveys",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
