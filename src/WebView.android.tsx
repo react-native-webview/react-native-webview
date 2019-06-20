@@ -243,7 +243,12 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       );
     }
 
-    const webViewStyles = [styles.container, styles.webView, style];
+    const webViewStyles = [
+      styles.container,
+      styles.webView,
+      style,
+      this.state.viewState === 'LOADING' && styles.webViewLoading,
+    ];
 
     if (source && 'method' in source) {
       if (source.method === 'POST' && source.headers) {

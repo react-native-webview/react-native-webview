@@ -345,7 +345,12 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       );
     }
 
-    const webViewStyles = [styles.container, styles.webView, style];
+    const webViewStyles = [
+      styles.container,
+      styles.webView,
+      style,
+      this.state.viewState === 'LOADING' && styles.webViewLoading,
+    ];
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,

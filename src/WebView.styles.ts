@@ -6,6 +6,7 @@ interface Styles {
   errorTextTitle: TextStyle;
   loadingOrErrorView: ViewStyle;
   webView: ViewStyle;
+  webViewLoading: ViewStyle;
   loadingProgressBar: ViewStyle;
 }
 
@@ -38,6 +39,9 @@ const styles = StyleSheet.create<Styles>({
   },
   webView: {
     backgroundColor: '#ffffff',
+  },
+  webViewLoading: {
+    flex: 0,
   },
 });
 
