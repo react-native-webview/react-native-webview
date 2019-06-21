@@ -16,7 +16,7 @@ _This project is maintained for free by these people using both their free time 
 - [x] iOS (both UIWebView and WKWebView)
 - [x] Android
 
-_Note: React Native WebView is not currently supported by Expo unless you "eject"._
+_Note: Expo support for React Native WebView started with [Expo SDK v33.0.0](https://blog.expo.io/expo-sdk-v33-0-0-is-now-available-52d1c99dfe4c)._
 
 ## Getting Started
 
