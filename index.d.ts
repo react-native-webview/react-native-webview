@@ -34,6 +34,13 @@ declare class WebView extends Component<WebViewProps> {
      * Executes the JavaScript string.
      */
     injectJavaScript: (script: string) => void;
+    
+    
+    /**
+     * Posts a message that can be listened to by the page via
+     * `window.addEventListener`
+     */
+    postMessage: (data: string) => void;
 }
 
 export {WebView};
