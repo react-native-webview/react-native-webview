@@ -7,6 +7,12 @@ Here's how to get started quickly with the React Native WebView.
 ```
 $ yarn add react-native-webview
 ```
+ (or)
+ 
+ For npm use
+```
+$ npm install --save react-native-webview
+```
 
 #### 2. Link native dependencies
 

@@ -428,6 +428,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setGeolocationEnabled(isGeolocationEnabled != null && isGeolocationEnabled);
   }
 
+  @ReactProp(name = "onScroll")
+  public void setOnScroll(WebView view, boolean hasScrollEvent) {
+    ((RNCWebView) view).setHasScrollEvent(hasScrollEvent);
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -777,7 +782,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected @Nullable
     RNCWebViewClient mRNCWebViewClient;
     protected boolean sendContentSizeChangeEvents = false;
-    private final OnScrollDispatchHelper mOnScrollDispatchHelper = new OnScrollDispatchHelper();
+    private OnScrollDispatchHelper mOnScrollDispatchHelper;
+    protected boolean hasScrollEvent = false;
 
     /**
      * WebView must be created with an context of the current activity
@@ -791,6 +797,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
       this.sendContentSizeChangeEvents = sendContentSizeChangeEvents;
+    }
+
+    public void setHasScrollEvent(boolean hasScrollEvent) {
+      this.hasScrollEvent = hasScrollEvent;
     }
 
     @Override
@@ -886,6 +896,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
       super.onScrollChanged(x, y, oldX, oldY);
+
+      if (!hasScrollEvent) {
+        return;
+      }
+
+      if (mOnScrollDispatchHelper == null) {
+        mOnScrollDispatchHelper = new OnScrollDispatchHelper();
+      }
 
       if (mOnScrollDispatchHelper.onScrollChanged(x, y)) {
         ScrollEvent event = ScrollEvent.obtain(

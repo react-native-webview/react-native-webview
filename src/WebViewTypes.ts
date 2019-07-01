@@ -104,6 +104,7 @@ export interface WebViewNavigation extends WebViewNativeEvent {
     | 'reload'
     | 'formresubmit'
     | 'other';
+  mainDocumentURL?: string;
 }
 
 export type DecelerationRateConstant = 'normal' | 'fast';
@@ -376,6 +377,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   useSharedProcessPool?: boolean;
+
+  /**
+   * Append to the existing user-agent. Overriden if `userAgent` is set.
+   * @platform ios
+   */
+  applicationNameForUserAgent?: string;
+
   /**
    * The custom user agent string.
    */
@@ -522,6 +530,11 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   mixedContentMode?: 'never' | 'always' | 'compatibility';
+  
+  /**
+   * Sets ability to open fullscreen videos on Android devices.
+  */
+  allowsFullscreenVideo?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {
