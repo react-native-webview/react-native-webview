@@ -12,10 +12,28 @@ $ yarn add react-native-webview
 
 React Native modules that include native Objective-C, Swift, Java, or Kotlin code have to be "linked" so that the compiler knows to include them in the app.
 
-This module does not require any extra step after running the link command 🎉
 ```
 $ react-native link react-native-webview
 ```
+
+iOS:
+
+If using cocoapods in the `ios/` directory run
+
+```
+$ pod install
+```
+
+Android - react-native-webview version <6:
+This module does not require any extra step after running the link command 🎉
+
+Android - react-native-webview version >=6.X.X:
+Please make sure AndroidX is enabled in your project by editting `android/gradle.properties` and adding 2 lines:
+
+```
+$ react-native link react-native-webview
+```
+
 For Android manual installation, please refer to [this article](https://engineering.brigad.co/demystifying-react-native-modules-linking-964399ec731b) where you can find detailed step on how to link any react-native project.
 
 For iOS, while you can manually link the old way using [react-native own tutorial](https://facebook.github.io/react-native/docs/linking-libraries-ios), we find it easier to use cocoapods.
@@ -33,8 +51,8 @@ class MyWeb extends Component {
   render() {
     return (
       <WebView
-        source={{uri: 'https://infinite.red'}}
-        style={{marginTop: 20}}
+        source={{ uri: 'https://infinite.red' }}
+        style={{ marginTop: 20 }}
       />
     );
   }
