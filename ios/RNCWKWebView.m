@@ -398,7 +398,7 @@ static NSURLCredential* clientAuthenticationCredential;
         [_webView loadRequest:request];
     }
     else {
-        [_webView loadFileURL:request.URL allowingReadAccessToURL:request.URL];
+        [_webView loadFileURL:request.URL allowingReadAccessToURL:[request.URL URLByDeletingLastPathComponent]];
     }
 }
 
