@@ -130,7 +130,7 @@ const INJECTED_JAVASCRIPT = `(function() {
   source={{ uri: 'https://facebook.github.io/react-native' }}
   injectedJavaScript={INJECTED_JAVASCRIPT}
   onMessage={this.onMessage}
-/>
+/>;
 ```
 
 ---
@@ -750,6 +750,16 @@ Boolean value that determines whether a vertical scroll indicator is shown in th
 ### `geolocationEnabled`
 
 Set whether Geolocation is enabled in the `WebView`. The default value is `false`. Used only in Android.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
+---
+
+### `allowFileAccessFromFileURLs`
+
+Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
