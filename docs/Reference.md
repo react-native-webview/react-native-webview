@@ -394,7 +394,9 @@ Note that this method will not be invoked on hash URL changes (e.g. from `https:
 
 ### `originWhitelist`
 
-List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are "http://*" and "https://*".
+List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are `"http://*"` and `"https://*"`.
+
+For example, a URL like `"https://www.example.com/a/b"` has an origin of `"https://www.example.com"`. This will match patterns like `"https://*.com"`, `"*.example.com"`, or even just `"*"`, but it will not match patterns like `"git+https://*"` or `"*.co"`.
 
 | Type             | Required |
 | ---------------- | -------- |

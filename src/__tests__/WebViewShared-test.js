@@ -132,5 +132,39 @@ describe('WebViewShared', () => {
       expect(Linking.openURL).toHaveBeenLastCalledWith('FAKE+plus+https://www.example.com/');
       expect(loadRequest).toHaveBeenLastCalledWith(false, 'FAKE+plus+https://www.example.com/', 6);
     });
+
+    test('loadRequest with specific domains in whitelist', () => {
+      const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+        loadRequest,
+        ['https://*.example.co', 'https://example.co'],
+      );
+
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.co/page0', lockIdentifier: 0 } });
+      expect(Linking.openURL).toHaveBeenCalledTimes(0);
+      expect(loadRequest).toHaveBeenLastCalledWith(true, 'https://www.example.co/page0', 0);
+
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://a.b.c.example.co/page1', lockIdentifier: 1 } });
+      expect(Linking.openURL).toHaveBeenCalledTimes(0);
+      expect(loadRequest).toHaveBeenLastCalledWith(true, 'https://a.b.c.example.co/page1', 1);
+
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://example.co/page2', lockIdentifier: 2 } });
+      expect(Linking.openURL).toHaveBeenCalledTimes(0);
+      expect(loadRequest).toHaveBeenLastCalledWith(true, 'https://example.co/page2', 2);
+
+      // Wrong domain:
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/page3', lockIdentifier: 3 } });
+      expect(Linking.openURL).toHaveBeenLastCalledWith('https://www.example.com/page3');
+      expect(loadRequest).toHaveBeenLastCalledWith(false, 'https://www.example.com/page3', 3);
+
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.co.malicious.com', lockIdentifier: 4 } });
+      expect(Linking.openURL).toHaveBeenLastCalledWith('https://www.example.co.malicious.com');
+      expect(loadRequest).toHaveBeenLastCalledWith(false, 'https://www.example.co.malicious.com', 4);
+
+      // Wrong protocol:
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'http://www.example.co/page5', lockIdentifier: 5 } });
+      expect(Linking.openURL).toHaveBeenLastCalledWith('http://www.example.co/page5');
+      expect(loadRequest).toHaveBeenLastCalledWith(false, 'http://www.example.co/page5', 5);
+    });
+
   });
 });

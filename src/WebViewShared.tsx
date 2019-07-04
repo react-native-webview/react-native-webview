@@ -24,7 +24,7 @@ const extractOrigin = (url: string): string => {
 };
 
 const originWhitelistToRegex = (originWhitelist: string): string =>
-  `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}`;
+  `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`;
 
 const passesWhitelist = (
   compiledWhitelist: ReadonlyArray<string>,
