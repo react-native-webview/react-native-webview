@@ -229,6 +229,10 @@ export interface CommonNativeWebViewProps extends ViewProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   source: any;
   userAgent?: string;
+  /**
+   * Append to the existing user-agent. Overriden if `userAgent` is set.
+   */
+  applicationNameForUserAgent?: string;
 }
 
 export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
@@ -377,12 +381,6 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   useSharedProcessPool?: boolean;
-
-  /**
-   * Append to the existing user-agent. Overriden if `userAgent` is set.
-   * @platform ios
-   */
-  applicationNameForUserAgent?: string;
 
   /**
    * The custom user agent string.

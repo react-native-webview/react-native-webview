@@ -117,6 +117,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
+  protected @Nullable String mUserAgent = null;
+  protected @Nullable String mUserAgentWithApplicationName = null;
 
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -298,8 +300,34 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "userAgent")
   public void setUserAgent(WebView view, @Nullable String userAgent) {
     if (userAgent != null) {
-      // TODO(8496850): Fix incorrect behavior when property is unset (uA == null)
-      view.getSettings().setUserAgentString(userAgent);
+      mUserAgent = userAgent;
+    } else {
+      mUserAgent = null;
+    }
+    this.setUserAgentString(view);
+  }
+
+  @ReactProp(name = "applicationNameForUserAgent")
+  public void setApplicationNameForUserAgent(WebView view, @Nullable String applicationName) {
+    if(applicationName != null) {
+      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        String defaultUserAgent = WebSettings.getDefaultUserAgent(view.getContext());
+        mUserAgentWithApplicationName = defaultUserAgent + " " + applicationName;
+      }
+    } else {
+      mUserAgentWithApplicationName = null;
+    }
+    this.setUserAgentString(view);
+  }
+
+  protected void setUserAgentString(WebView view) {
+    if(mUserAgent != null) {
+      view.getSettings().setUserAgentString(mUserAgent);
+    } else if(mUserAgentWithApplicationName != null) {
+      view.getSettings().setUserAgentString(mUserAgentWithApplicationName);
+    } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      // handle unsets of `userAgent` prop as long as device is >= API 17
+      view.getSettings().setUserAgentString(WebSettings.getDefaultUserAgent(view.getContext()));
     }
   }
 

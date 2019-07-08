@@ -613,11 +613,21 @@ Sets the user-agent for the `WebView`. This will only work for iOS if you are us
 
 ### `applicationNameForUserAgent`
 
-Append to the existing user-agent. Available on iOS WKWebView only. Setting `userAgent` will override this.
+Append to the existing user-agent. This will only work for iOS if you are using WKWebView, not UIWebView. Setting `userAgent` will override this.
 
 | Type   | Required | Platform      |
 | ------ | -------- | ------------- |
-| string | No       | iOS WKWebView |
+| string | No       | Android, iOS WKWebView |
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  applicationNameForUserAgent={"DemoApp/1.1.0"}
+/>
+// Resulting User-Agent will look like:
+// Mozilla/5.0 (Linux; Android 8.1.0; Android SDK built for x86 Build/OSM1.180201.021; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/61.0.3163.98 Mobile Safari/537.36 DemoApp/1.1.0
+// Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 DemoApp/1.1.0
+```
 
 ### `allowsFullscreenVideo`
 
