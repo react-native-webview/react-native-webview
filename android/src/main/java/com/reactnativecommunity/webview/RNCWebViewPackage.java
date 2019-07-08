@@ -10,6 +10,18 @@ import java.util.Collections;
 import java.util.List;
 
 public class RNCWebViewPackage implements ReactPackage {
+
+  private WebViewConfig globalNativeConfiguration;
+
+  public RNCWebViewPackage(){
+    super();
+  }
+
+  public RNCWebViewPackage(WebViewConfig globalConfigurator){
+    super();
+    this.globalNativeConfiguration = globalConfigurator;
+  }
+
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     return Collections.singletonList(new RNCWebViewModule(reactContext));
@@ -22,6 +34,7 @@ public class RNCWebViewPackage implements ReactPackage {
 
   @Override
   public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-    return Collections.singletonList(new RNCWebViewManager());
+    RNCWebViewManager manager = globalNativeConfiguration != null ? new RNCWebViewManager(globalNativeConfiguration) : new RNCWebViewManager();
+    return Collections.singletonList(manager);
   }
 }

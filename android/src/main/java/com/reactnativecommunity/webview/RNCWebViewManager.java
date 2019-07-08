@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +63,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -151,7 +153,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     RNCWebView webView = createRNCWebViewInstance(reactContext);
     setupWebChromeClient(reactContext, webView);
     reactContext.addLifecycleEventListener(webView);
-    mWebViewConfig.configWebView(webView);
+
     WebSettings settings = webView.getSettings();
     settings.setBuiltInZoomControls(true);
     settings.setDisplayZoomControls(false);
@@ -212,6 +214,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
     });
 
+    mWebViewConfig.configWebView(webView);
     return webView;
   }
 
@@ -443,7 +446,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
-    view.setWebViewClient(new RNCWebViewClient());
+    if(view instanceof RNCWebView){
+      if(((RNCWebView) view).getRNCWebViewClient() == null) view.setWebViewClient(new RNCWebViewClient());
+    }
+    else{
+      view.setWebViewClient(new RNCWebViewClient());
+    }
   }
 
   @Override
@@ -588,7 +596,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
-  protected static class RNCWebViewClient extends WebViewClient {
+  public static class RNCWebViewClient extends WebViewClient {
 
     protected boolean mLastLoadFailed = false;
     protected @Nullable
