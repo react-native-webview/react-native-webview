@@ -53,7 +53,9 @@ const createOnShouldStartLoadWithRequest = (
     const { url, lockIdentifier } = nativeEvent;
 
     if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      Linking.openURL(url);
+      Linking.openURL(url).catch(
+           err => this.props.onError && this.props.onError(err),
+         );
       shouldStart = false;
     }
 
