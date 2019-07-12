@@ -119,12 +119,10 @@ repositories {
   }
 }
 
-def support_version = getExtOrDefault('supportLibVersion')
 def kotlin_version = getExtOrDefault('kotlinVersion')
 
 dependencies {
   //noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "com.android.support:appcompat-v7:$support_version"
 }
