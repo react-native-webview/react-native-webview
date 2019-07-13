@@ -13,7 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import androidx.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -69,6 +69,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -689,7 +690,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
       for (int i = 0; i < permissions.size(); i++) {
-        if (ContextCompat.checkSelfPermission(reactContext, permissions.get(i)) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(mReactContext, permissions.get(i)) != PackageManager.PERMISSION_GRANTED) {
           continue;
         }
         if (permissions.get(i).equals(Manifest.permission.RECORD_AUDIO)) {
