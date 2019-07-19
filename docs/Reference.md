@@ -54,6 +54,7 @@ This document lays out the current public properties and methods for the React N
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
+- [`textZoom`](Reference.md#textZoom)
 
 ## Methods Index
 
@@ -893,6 +894,22 @@ Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
+
+---
+
+### `textZoom`
+
+If the user has set a custom font size in the Android system, an undesirable scale of the site interface in WebView occurs.
+
+When setting the standard textZoom (100) parameter size, this undesirable effect disappears.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| number | No       | Android  |
+
+Example:
+
+`<WebView textZoom={100} />`
 
 ## Methods
 
