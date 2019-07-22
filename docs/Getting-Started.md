@@ -23,7 +23,11 @@ $ react-native link react-native-webview
 ```
 
 iOS:
-This module does not require any extra step after running the link command 🎉
+
+If using cocoapods in the `ios/` directory run
+```
+$ pod install
+```
 
 Android - react-native-webview version <6:
 This module does not require any extra step after running the link command 🎉
