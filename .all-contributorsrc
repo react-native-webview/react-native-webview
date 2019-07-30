@@ -150,6 +150,35 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "TMomemt",
+      "name": "TMomemt",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/42024947?v=4",
+      "profile": "https://github.com/TMomemt",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ericlewis",
+      "name": "Eric Lewis",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/674503?v=4",
+      "profile": "http://www.try.com",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "dvicory",
+      "name": "Daniel Vicory",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1542454?v=4",
+      "profile": "https://bzfx.net",
+      "contributions": [
+        "code",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7

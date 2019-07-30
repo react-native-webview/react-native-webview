@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  ActivityIndicator,
-  Text,
   UIManager as NotTypedUIManager,
   View,
   requireNativeComponent,
@@ -16,6 +14,8 @@ import {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
   getViewManagerConfig,
+  defaultRenderError,
+  defaultRenderLoading,
 } from './WebViewShared';
 import {
   WebViewErrorEvent,
@@ -58,24 +58,6 @@ const RNCUIWebView: typeof NativeWebViewIOS = requireNativeComponent(
 );
 const RNCWKWebView: typeof NativeWebViewIOS = requireNativeComponent(
   'RNCWKWebView',
-);
-
-const defaultRenderLoading = () => (
-  <View style={styles.loadingView}>
-    <ActivityIndicator />
-  </View>
-);
-const defaultRenderError = (
-  errorDomain: string | undefined,
-  errorCode: number,
-  errorDesc: string,
-) => (
-  <View style={styles.errorContainer}>
-    <Text style={styles.errorTextTitle}>Error loading page</Text>
-    <Text style={styles.errorText}>{`Domain: ${errorDomain}`}</Text>
-    <Text style={styles.errorText}>{`Error Code: ${errorCode}`}</Text>
-    <Text style={styles.errorText}>{`Description: ${errorDesc}`}</Text>
-  </View>
 );
 
 class WebView extends React.Component<IOSWebViewProps, State> {
@@ -364,13 +346,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
-    if (
-      this.state.viewState === 'LOADING'
-      || this.state.viewState === 'ERROR'
-    ) {
-      // if we're in either LOADING or ERROR states, don't show the webView
-      webViewStyles.push(styles.hidden);
-    }
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
@@ -400,6 +375,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         onLoadingProgress={this.onLoadingProgress}
         onLoadingStart={this.onLoadingStart}
         onMessage={this.onMessage}
+        onScroll={this.props.onScroll}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         ref={this.webViewRef}
         scalesPageToFit={scalesPageToFit}

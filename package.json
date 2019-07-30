@@ -2,20 +2,20 @@
   "name": "react-native-webview",
   "description": "React Native WebView component for iOS, Android, and Windows 10 (coming soon)",
   "main": "index.js",
-  "typings": "typings/index.d.ts",
+  "typings": "index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "contributors": [
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "5.4.2",
+  "version": "6.3.1",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
     "build": "yarn tsc",
-    "prepack": "yarn build",
+    "prepare": "yarn build",
     "test": "yarn jest"
   },
   "peerDependencies": {
@@ -50,7 +50,6 @@
     "react": "16.8.3",
     "react-native": "0.59.1",
     "semantic-release": "15.10.3",
-    "ts-jest": "24.0.0",
     "typescript": "3.3.3333"
   },
   "repository": {

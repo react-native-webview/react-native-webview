@@ -7,6 +7,7 @@ import {
   NativeMethodsMixin,
   Constructor,
   UIManagerStatic,
+  NativeScrollEvent,
 } from 'react-native';
 
 export interface WebViewCommands {
@@ -96,7 +97,7 @@ export interface WebViewNativeEvent {
   lockIdentifier: number;
 }
 
-export interface WebViewProgressEvent extends WebViewNativeEvent {
+export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
   progress: number;
 }
 
@@ -108,6 +109,7 @@ export interface WebViewNavigation extends WebViewNativeEvent {
     | 'reload'
     | 'formresubmit'
     | 'other';
+  mainDocumentURL?: string;
 }
 
 export type DecelerationRateConstant = 'normal' | 'fast';
@@ -126,6 +128,8 @@ export interface WebViewError extends WebViewNativeEvent {
 }
 
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
+
+export type WebViewProgressEvent = NativeSyntheticEvent<WebViewNativeProgressEvent>;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 
@@ -181,7 +185,7 @@ export interface WebViewSourceHtml {
   /**
    * The base URL to be used for any relative links in the HTML.
    */
-  baseUrl: string;
+  baseUrl?: string;
 }
 
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
@@ -216,6 +220,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   injectedJavaScript?: string;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
+  onScroll?: (event: NativeScrollEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
   onLoadingFinish: (event: WebViewNavigationEvent) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
@@ -242,6 +247,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   onContentSizeChange?: (event: WebViewEvent) => void;
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
+  textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
   urlPrefixesForDefaultIntent?: ReadonlyArray<string>;
 }
@@ -376,6 +382,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   useSharedProcessPool?: boolean;
+
+  /**
+   * Append to the existing user-agent. Overriden if `userAgent` is set.
+   * @platform ios
+   */
+  applicationNameForUserAgent?: string;
+
   /**
    * The custom user agent string.
    */
@@ -392,11 +405,31 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   allowsLinkPreview?: boolean;
 
   /**
+   * Set true if shared cookies from HTTPCookieStorage should used for every load request in the
+   * `RNCWKWebView`. The default value is `false`.
+   * @platform ios
+   */
+  sharedCookiesEnabled?: boolean;
+
+  /**
    * A Boolean value that determines whether scrolling is disabled in a particular direction.
    * The default value is `true`.
    * @platform ios
    */
   directionalLockEnabled?: boolean;
+
+  /**
+   * A Boolean value indicating whether web content can programmatically display the keyboard.
+   *
+   * When this property is set to true, the user must explicitly tap the elements in the
+   * web view to display the keyboard (or other relevant input view) for that element.
+   * When set to false, a focus event on an element causes the input view to be displayed
+   * and associated with that element automatically.
+   *
+   * The default value is `true`.
+   * @platform ios
+   */
+  keyboardDisplayRequiresUserAction?: boolean;
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
@@ -486,6 +519,12 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   userAgent?: string;
 
   /**
+   * Sets number that controls text zoom of the page in percent.
+   * @platform android
+   */
+  textZoom?: number;
+
+  /**
    * Specifies the mixed content mode. i.e WebView will allow a secure origin to load content from any other origin.
    *
    * Possible values for `mixedContentMode` are:
@@ -496,6 +535,11 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   mixedContentMode?: 'never' | 'always' | 'compatibility';
+  
+  /**
+   * Sets ability to open fullscreen videos on Android devices.
+  */
+  allowsFullscreenVideo?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {
@@ -517,6 +561,11 @@ export interface WebViewSharedProps extends ViewProps {
    * Function that returns a loading indicator.
    */
   renderLoading?: () => ReactElement;
+
+  /**
+   * Function that is invoked when the `WebView` scrolls.
+   */
+  onScroll?: (event: NativeScrollEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` has finished loading.
