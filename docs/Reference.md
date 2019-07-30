@@ -64,6 +64,9 @@ This document lays out the current public properties and methods for the React N
 - [`reload`](Reference.md#reload)
 - [`stopLoading`](Reference.md#stoploading)
 - [`injectJavaScript`](Reference.md#injectjavascriptstr)
+- [`clearFormData`](Reference.md#clearFormData)
+- [`clearCache`](Reference.md#clearCache)
+- [`clearHistory`](Reference.md#clearHistory)
 
 ---
 
