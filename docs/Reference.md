@@ -961,6 +961,32 @@ Executes the JavaScript string.
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
+### `clearFormData()`
+(android only)
+
+```javascript
+clearFormData();
+```
+Removes the autocomplete popup from the currently focused form field, if present. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearFormData())
+
+
+### `clearCache(bool)`
+(android only)
+```javascript
+clearCache(true);
+```
+
+Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean))
+
+
+### `clearHistory()`
+(android only)
+```javascript
+clearHistory();
+```
+
+Tells this WebView to clear its internal back/forward list. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearHistory())
+
 ## Other Docs
 
 Also check out our [Getting Started Guide](Getting-Started.md) and [In-Depth Guide](Guide.md).
