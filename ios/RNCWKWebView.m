@@ -643,12 +643,17 @@ static NSURLCredential* clientAuthenticationCredential;
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.textColor = [UIColor lightGrayColor];
-        textField.placeholder = defaultText;
+        textField.text = defaultText;
     }];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         completionHandler([[alert.textFields lastObject] text]);
-    }]];
+    }];
+    [alert addAction:okAction];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        completionHandler(nil);
+    }];
+    [alert addAction:cancelAction];
+    alert.preferredAction = okAction;
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 }
 
