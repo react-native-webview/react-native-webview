@@ -334,6 +334,23 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
   }
+   
+  @ReactProp(name = "incognito")
+  public void setIncognito(WebView view, boolean enabled) {
+    // Remove all previous cookies
+    CookieManager.getInstance().removeAllCookies(null);
+
+    // Disable caching
+    view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+    view.getSettings().setAppCacheEnabled(!enabled);
+    view.clearHistory();
+    view.clearCache(enabled);
+
+    // No form data or autofill enabled
+    view.clearFormData();
+    view.getSettings().setSavePassword(!enabled);
+    view.getSettings().setSaveFormData(!enabled);
+  }
 
   @ReactProp(name = "source")
   public void setSource(WebView view, @Nullable ReadableMap source) {
@@ -917,7 +934,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     public void onMessage(String message) {
-      dispatchEvent(this, new TopMessageEvent(this.getId(), message));
+      if (mRNCWebViewClient != null) {
+        WebView webView = this;
+        webView.post(new Runnable() {
+          @Override
+          public void run() {
+            WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, webView.getUrl());
+            data.putString("data", message);
+            dispatchEvent(webView, new TopMessageEvent(webView.getId(), data));
+          }
+        });
+      } else {
+        WritableMap eventData = Arguments.createMap();
+        eventData.putString("data", message);
+        dispatchEvent(this, new TopMessageEvent(this.getId(), eventData));
+      }
     }
 
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
