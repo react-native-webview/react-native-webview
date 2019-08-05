@@ -1,4 +1,4 @@
-// This files provides compatibility with out out tree platform.
+// This files provides compatibility without tree platform.
 import { WebView } from 'react-native';
 
 export { WebView };
