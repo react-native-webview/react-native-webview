@@ -994,6 +994,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         webView.post(new Runnable() {
           @Override
           public void run() {
+            if (mRNCWebViewClient == null) {
+              return;
+            }
             WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, webView.getUrl());
             data.putString("data", message);
             dispatchEvent(webView, new TopMessageEvent(webView.getId(), data));
