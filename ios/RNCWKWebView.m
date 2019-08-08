@@ -431,12 +431,22 @@ static NSURLCredential* clientAuthenticationCredential;
   
     NSOperatingSystemVersion iOS_11_3_0 = (NSOperatingSystemVersion){11, 3, 0};
     NSOperatingSystemVersion iOS_12_2_0 = (NSOperatingSystemVersion){12, 2, 0};
+    NSOperatingSystemVersion iOS_13_0_0 = (NSOperatingSystemVersion){13, 0, 0};
 
     Method method;
     IMP override;
-  
-    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_12_2_0]) {
-        // iOS 12.2.0 - Future
+
+    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_13_0_0]) {
+        // iOS 13.0.0 - Future
+        SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:activityStateChanges:userObject:");
+        method = class_getInstanceMethod(class, selector);
+        IMP original = method_getImplementation(method);
+        override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
+            ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
+        });
+    }
+    else if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_12_2_0]) {
+        // iOS 12.2.0 - iOS 13.0.0
         SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:changingActivityState:userObject:");
         method = class_getInstanceMethod(class, selector);
         IMP original = method_getImplementation(method);
@@ -648,12 +658,17 @@ static NSURLCredential* clientAuthenticationCredential;
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.textColor = [UIColor lightGrayColor];
-        textField.placeholder = defaultText;
+        textField.text = defaultText;
     }];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         completionHandler([[alert.textFields lastObject] text]);
-    }]];
+    }];
+    [alert addAction:okAction];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        completionHandler(nil);
+    }];
+    [alert addAction:cancelAction];
+    alert.preferredAction = okAction;
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 }
 
@@ -795,12 +810,11 @@ static NSURLCredential* clientAuthenticationCredential;
           thenCall: (void (^)(NSString*)) callback
 {
   [self.webView evaluateJavaScript: js completionHandler: ^(id result, NSError *error) {
-    if (error == nil) {
-      if (callback != nil) {
-        callback([NSString stringWithFormat:@"%@", result]);
-      }
-    } else {
-      RCTLogError(@"Error evaluating injectedJavaScript: This is possibly due to an unsupported return type. Try adding true to the end of your injectedJavaScript string.");
+    if (callback != nil) {
+      callback([NSString stringWithFormat:@"%@", result]);
+    }
+    if (error != nil) {
+      RCTLogWarn([NSString stringWithFormat:@"Error evaluating injectedJavaScript: This is possibly due to an unsupported return type. Try adding true to the end of your injectedJavaScript string. %@", error]);
     }
   }];
 }
