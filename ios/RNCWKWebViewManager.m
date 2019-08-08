@@ -51,6 +51,7 @@ RCT_EXPORT_VIEW_PROPERTY(userAgent, NSString)
 RCT_EXPORT_VIEW_PROPERTY(applicationNameForUserAgent, NSString)
 RCT_EXPORT_VIEW_PROPERTY(cacheEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsLinkPreview, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(allowingReadAccessToURL, NSString)
 
 /**
  * Expose methods to enable messaging the webview.
