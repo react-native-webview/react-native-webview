@@ -397,9 +397,9 @@ Note that this method will not be invoked on hash URL changes (e.g. from `https:
 
 Function that is invoked when the `WebView` content process is terminated.
 
-| Type     | Required |
-| -------- | -------- |
-| function | No       |
+| Type     | Required | Platform      |
+| -------- | -------- | ------------- |
+| function | No       | iOS WKWebView |
 
 Example:
 
