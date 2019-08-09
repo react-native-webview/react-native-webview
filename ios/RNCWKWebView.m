@@ -49,6 +49,10 @@ static NSURLCredential* clientAuthenticationCredential;
   BOOL _isFullScreenVideoOpen;
   UIStatusBarStyle _savedStatusBarStyle;
   BOOL _savedStatusBarHidden;
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+  UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
+#endif
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -65,6 +69,10 @@ static NSURLCredential* clientAuthenticationCredential;
     _savedKeyboardDisplayRequiresUserAction = YES;
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+    _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+#endif
   }
 
   if (@available(iOS 12.0, *)) {
@@ -227,7 +235,7 @@ static NSURLCredential* clientAuthenticationCredential;
     }
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-      _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
     }
 #endif
 
@@ -327,6 +335,22 @@ static NSURLCredential* clientAuthenticationCredential;
   _webView.scrollView.backgroundColor = backgroundColor;
   _webView.backgroundColor = backgroundColor;
 }
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+- (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior
+{
+    _savedContentInsetAdjustmentBehavior = behavior;
+    if (_webView == nil) {
+        return;
+    }
+
+    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+        CGPoint contentOffset = _webView.scrollView.contentOffset;
+        _webView.scrollView.contentInsetAdjustmentBehavior = behavior;
+        _webView.scrollView.contentOffset = contentOffset;
+    }
+}
+#endif
 
 /**
  * This method is called whenever JavaScript running within the web view calls:

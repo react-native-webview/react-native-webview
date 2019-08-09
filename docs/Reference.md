@@ -36,6 +36,7 @@ This document lays out the current public properties and methods for the React N
 - [`bounces`](Reference.md#bounces)
 - [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
+- [`contentInsetAdjustmentBehavior`](Reference.md#contentInsetAdjustmentBehavior)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
@@ -686,6 +687,23 @@ The amount by which the web view content is inset from the edges of the scroll v
 | Type                                                               | Required | Platform |
 | ------------------------------------------------------------------ | -------- | -------- |
 | object: {top: number, left: number, bottom: number, right: number} | No       | iOS      |
+
+---
+
+### `contentInsetAdjustmentBehavior`
+
+This property specifies how the safe area insets are used to modify the content area of the scroll view. The default value of this property is "never". Available on iOS 11 and later. Defaults to `never`.
+
+Possible values:
+
+- `automatic`
+- `scrollableAxes`
+- `never`
+- `always`
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
 
 ---
 

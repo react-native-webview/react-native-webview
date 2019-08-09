@@ -260,6 +260,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   automaticallyAdjustContentInsets?: boolean;
   bounces?: boolean;
   contentInset?: ContentInsetProp;
+  contentInsetAdjustmentBehavior?: 'automatic'| 'scrollableAxes' | 'never' | 'always';
   dataDetectorTypes?: DataDetectorTypes | ReadonlyArray<DataDetectorTypes>;
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
@@ -323,6 +324,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   automaticallyAdjustContentInsets?: boolean;
+
+  /**
+   * This property specifies how the safe area insets are used to modify the
+   * content area of the scroll view. The default value of this property is
+   * "never". Available on iOS 11 and later.
+   */
+  contentInsetAdjustmentBehavior?: 'automatic'| 'scrollableAxes' | 'never' | 'always'
 
   /**
    * The amount by which the web view content is inset from the edges of
