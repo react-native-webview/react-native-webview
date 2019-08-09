@@ -295,6 +295,13 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
   };
 
+  onContentProcessDidTerminate = (event: WebViewErrorEvent) => {
+    const { onContentProcessDidTerminate } = this.props;
+    if (onContentProcessDidTerminate) {
+      onContentProcessDidTerminate(event);
+    }
+  };
+
   componentDidUpdate(prevProps: IOSWebViewProps) {
     if (!(prevProps.useWebKit && this.props.useWebKit)) {
       return;
@@ -388,6 +395,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         onMessage={this.onMessage}
         onScroll={this.props.onScroll}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onContentProcessDidTerminate={this.onContentProcessDidTerminate}
         ref={this.webViewRef}
         scalesPageToFit={scalesPageToFit}
         // TODO: find a better way to type this.
