@@ -561,12 +561,6 @@ static NSURLCredential* clientAuthenticationCredential;
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
   // Don't allow scrolling the scrollView.
-  scrollView.bounds = _webView.bounds;
-}
-
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-  // Don't allow scrolling the scrollView.
   if (!_scrollEnabled) {
     scrollView.bounds = _webView.bounds;
   }
