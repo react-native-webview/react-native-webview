@@ -366,7 +366,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
     // Remove all previous cookies
-    CookieManager.getInstance().removeAllCookies(null);
+    CookieManager.getInstance().removeAllCookies();
 
     // Disable caching
     view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
