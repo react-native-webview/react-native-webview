@@ -490,6 +490,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setOnScroll(WebView view, boolean hasScrollEvent) {
     ((RNCWebView) view).setHasScrollEvent(hasScrollEvent);
   }
+  
+  @ReactProp(name = "useNativeResumeAndPauseLifecycleEvents")
+  public void setUseNativeResumeAndPauseLifecycleEvents(WebView view, boolean useHostResumeAndPause) {
+    // This prop will ensure no background activity will occur while playing any media in a webview
+    // In cases where this prop is not set and a media streaming is consumed inside the WebView,
+    // You might experience  "Device and Network abuse" policy problems in Play Store.
+    ((RNCWebView) view).setHasScrollEvent(useHostResumeAndPause);
+  }
+  
 
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
@@ -882,6 +891,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean sendContentSizeChangeEvents = false;
     private OnScrollDispatchHelper mOnScrollDispatchHelper;
     protected boolean hasScrollEvent = false;
+    protected boolean useHostResumeAndPause = false;
 
     /**
      * WebView must be created with an context of the current activity
@@ -900,14 +910,24 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public void setHasScrollEvent(boolean hasScrollEvent) {
       this.hasScrollEvent = hasScrollEvent;
     }
+    
+    public void setUseHostResumeAndPause(boolean useHostResumeAndPause) {
+      this.useHostResumeAndPause = useHostResumeAndPause;
+    }
 
     @Override
     public void onHostResume() {
+      if (useHostResumeAndPause) {
+        super.onResume();
+      }
       // do nothing
     }
 
     @Override
     public void onHostPause() {
+       if (useHostResumeAndPause) {
+        super.onPause();
+      }
       // do nothing
     }
 
