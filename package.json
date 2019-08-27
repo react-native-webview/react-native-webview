@@ -8,14 +8,14 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "6.1.0",
+  "version": "6.9.0",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
     "build": "yarn tsc",
-    "prepack": "yarn build",
+    "prepare": "yarn build",
     "test": "yarn jest"
   },
   "peerDependencies": {
