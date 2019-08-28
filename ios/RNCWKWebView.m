@@ -92,6 +92,8 @@ static NSURLCredential* clientAuthenticationCredential;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleFullScreenVideoStatusBars) name:@"_MRMediaRemotePlayerSupportedCommandsDidChangeNotification" object:nil];
   }
   
+  [self initWebView];
+  
   return self;
 }
 
@@ -111,9 +113,9 @@ static NSURLCredential* clientAuthenticationCredential;
   return nil;
 }
 
-- (void)didMoveToWindow
+- (void)initWebView
 {
-  if (self.window != nil && _webView == nil) {
+  if (_webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
