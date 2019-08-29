@@ -254,6 +254,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
 }
 
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
+  allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;
   allowsInlineMediaPlayback?: boolean;
   allowsLinkPreview?: boolean;
@@ -432,6 +433,18 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   keyboardDisplayRequiresUserAction?: boolean;
+
+  /**
+   * A String value that indicates which URLs the WebView's file can then
+   * reference in scripts, AJAX requests, and CSS imports. This is only used
+   * in `RNCWKWebView` for WebViews that are loaded with a source.uri set to a
+   * `'file://'` URL.
+   * 
+   * If not provided, the default is to only allow read access to the URL
+   * provided in source.uri itself.
+   * @platform ios
+   */
+  allowingReadAccessToURL?: string;
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
