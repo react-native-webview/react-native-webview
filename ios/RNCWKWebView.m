@@ -117,6 +117,11 @@ static NSURLCredential* clientAuthenticationCredential;
 {
   if (_webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
+    WKPreferences *prefs = [[WKPreferences alloc]init];
+    if (!_javaScriptEnabled) {
+      prefs.javaScriptEnabled = NO;
+      wkWebViewConfig.preferences = prefs;
+    }
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
     } else if (_cacheEnabled) {
@@ -379,6 +384,17 @@ static NSURLCredential* clientAuthenticationCredential;
   }
 }
 
+- (void)setAllowingReadAccessToURL:(NSString *)allowingReadAccessToURL
+{
+  if (![_allowingReadAccessToURL isEqualToString:allowingReadAccessToURL]) {
+    _allowingReadAccessToURL = [allowingReadAccessToURL copy];
+
+    if (_webView != nil) {
+      [self visitSource];
+    }
+  }
+}
+
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {
   _contentInset = contentInset;
@@ -424,7 +440,8 @@ static NSURLCredential* clientAuthenticationCredential;
         [_webView loadRequest:request];
     }
     else {
-        [_webView loadFileURL:request.URL allowingReadAccessToURL:request.URL];
+        NSURL* readAccessUrl = _allowingReadAccessToURL ? [NSURL URLWithString:_allowingReadAccessToURL] : request.URL;
+        [_webView loadFileURL:request.URL allowingReadAccessToURL:readAccessUrl];
     }
 }
 

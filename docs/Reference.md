@@ -42,6 +42,7 @@ This document lays out the current public properties and methods for the React N
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
 - [`allowUniversalAccessFromFileURLs`](Reference.md#allowUniversalAccessFromFileURLs)
+- [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
 - [`useWebKit`](Reference.md#usewebkit)
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
@@ -792,6 +793,16 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | Android  |
+
+---
+
+### `allowingReadAccessToURL`
+
+A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in `RNCWKWebView` for WebViews that are loaded with a source.uri set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in source.uri itself.
+
+| Type   | Required | Platform      |
+| ------ | -------- | ------------- |
+| string | No       | iOS WKWebView |
 
 ---
 
