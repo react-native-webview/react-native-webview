@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -589,6 +590,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected void setupWebChromeClient(ReactContext reactContext, WebView webView) {
     if (mAllowsFullscreenVideo) {
+      int initialRequestedOrientation = reactContext.getCurrentActivity().getRequestedOrientation();
       mWebChromeClient = new RNCWebChromeClient(reactContext, webView) {
         @Override
         public void onShowCustomView(View view, CustomViewCallback callback) {
@@ -599,6 +601,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
           mVideoView = view;
           mCustomViewCallback = callback;
+
+          mReactContext.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mVideoView.setSystemUiVisibility(FULLSCREEN_SYSTEM_UI_VISIBILITY);
@@ -630,6 +634,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
           }
+          mReactContext.getCurrentActivity().setRequestedOrientation(initialRequestedOrientation);
 
           mReactContext.removeLifecycleEventListener(this);
         }
