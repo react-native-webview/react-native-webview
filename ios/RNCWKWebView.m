@@ -115,6 +115,11 @@ static NSURLCredential* clientAuthenticationCredential;
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
+    WKPreferences *prefs = [[WKPreferences alloc]init];
+    if (!_javaScriptEnabled) {
+      prefs.javaScriptEnabled = NO;
+      wkWebViewConfig.preferences = prefs;
+    }
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
     } else if (_cacheEnabled) {

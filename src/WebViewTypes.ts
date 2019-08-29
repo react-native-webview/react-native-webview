@@ -499,13 +499,6 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   urlPrefixesForDefaultIntent?: ReadonlyArray<string>;
 
   /**
-   * Boolean value to enable JavaScript in the `WebView`. Used on Android only
-   * as JavaScript is enabled by default on iOS. The default value is `true`.
-   * @platform android
-   */
-  javaScriptEnabled?: boolean;
-
-  /**
    * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
    * as Hardware Acceleration is a feature only for Android. The default value is `false`.
    * @platform android
@@ -563,6 +556,13 @@ export interface WebViewSharedProps extends ViewProps {
    */
   source?: WebViewSource;
 
+  /**
+   * Boolean value to enable JavaScript in the `WebView`. Used on Android only
+   * as JavaScript is enabled by default on iOS. The default value is `true`.
+   * @platform android
+   */
+  javaScriptEnabled?: boolean;
+  
   /**
    * Function that returns a view to show if there's an error.
    */
