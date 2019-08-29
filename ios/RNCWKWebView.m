@@ -49,6 +49,10 @@ static NSURLCredential* clientAuthenticationCredential;
   BOOL _isFullScreenVideoOpen;
   UIStatusBarStyle _savedStatusBarStyle;
   BOOL _savedStatusBarHidden;
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+  UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
+#endif
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -65,6 +69,10 @@ static NSURLCredential* clientAuthenticationCredential;
     _savedKeyboardDisplayRequiresUserAction = YES;
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+    _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+#endif
   }
 
   if (@available(iOS 12.0, *)) {
@@ -227,7 +235,7 @@ static NSURLCredential* clientAuthenticationCredential;
     }
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-      _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
     }
 #endif
 
@@ -327,6 +335,22 @@ static NSURLCredential* clientAuthenticationCredential;
   _webView.scrollView.backgroundColor = backgroundColor;
   _webView.backgroundColor = backgroundColor;
 }
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+- (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior
+{
+    _savedContentInsetAdjustmentBehavior = behavior;
+    if (_webView == nil) {
+        return;
+    }
+
+    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+        CGPoint contentOffset = _webView.scrollView.contentOffset;
+        _webView.scrollView.contentInsetAdjustmentBehavior = behavior;
+        _webView.scrollView.contentOffset = contentOffset;
+    }
+}
+#endif
 
 /**
  * This method is called whenever JavaScript running within the web view calls:
@@ -438,12 +462,22 @@ static NSURLCredential* clientAuthenticationCredential;
   
     NSOperatingSystemVersion iOS_11_3_0 = (NSOperatingSystemVersion){11, 3, 0};
     NSOperatingSystemVersion iOS_12_2_0 = (NSOperatingSystemVersion){12, 2, 0};
+    NSOperatingSystemVersion iOS_13_0_0 = (NSOperatingSystemVersion){13, 0, 0};
 
     Method method;
     IMP override;
-  
-    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_12_2_0]) {
-        // iOS 12.2.0 - Future
+
+    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_13_0_0]) {
+        // iOS 13.0.0 - Future
+        SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:activityStateChanges:userObject:");
+        method = class_getInstanceMethod(class, selector);
+        IMP original = method_getImplementation(method);
+        override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
+            ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
+        });
+    }
+    else if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_12_2_0]) {
+        // iOS 12.2.0 - iOS 13.0.0
         SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:changingActivityState:userObject:");
         method = class_getInstanceMethod(class, selector);
         IMP original = method_getImplementation(method);
