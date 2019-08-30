@@ -62,7 +62,7 @@ import { WebView } from 'react-native-webview';
 class MyWebComponent extends Component {
   render() {
     return (
-      <WebView source={{ uri: 'https://facebook.github.io/react-native/' }} />
+      <WebView source={{ uri: 'https://facebook.github.io/react-native/' }} scalesPageToFit={true} />
     );
   }
 }
