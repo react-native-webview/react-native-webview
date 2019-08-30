@@ -43,7 +43,6 @@ This document lays out the current public properties and methods for the React N
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
 - [`allowUniversalAccessFromFileURLs`](Reference.md#allowUniversalAccessFromFileURLs)
 - [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
-- [`useWebKit`](Reference.md#usewebkit)
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
 - [`keyboardDisplayRequiresUserAction`](Reference.md#keyboardDisplayRequiresUserAction)
@@ -132,7 +131,7 @@ const INJECTED_JAVASCRIPT = `(function() {
   source={{ uri: 'https://facebook.github.io/react-native' }}
   injectedJavaScript={INJECTED_JAVASCRIPT}
   onMessage={this.onMessage}
-/>
+/>;
 ```
 
 ---
@@ -312,7 +311,6 @@ Function that is invoked when the `WebView` is loading.
 
 > **_Note_**
 >
-> On iOS, when useWebKit=false, this prop will not work.
 > On android, You can't get the url property, meaning that `event.nativeEvent.url` will be null.
 
 | Type     | Required |
@@ -459,11 +457,9 @@ Example:
 
 Boolean that controls whether the web content is scaled to fit the view and enables the user to change the scale. The default value is `true`.
 
-On iOS, when [`useWebKit=true`](Reference.md#usewebkit), this prop will not work.
-
-| Type | Required |
-| ---- | -------- |
-| bool | No       |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
 
 ---
 
@@ -605,26 +601,26 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 ### `userAgent`
 
-Sets the user-agent for the `WebView`. This will only work for iOS if you are using WKWebView, not UIWebView (see https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent).
+Sets the user-agent for the `WebView`.
 
-| Type   | Required | Platform               |
-| ------ | -------- | ---------------------- |
-| string | No       | Android, iOS WKWebView |
+| Type   | Required |
+| ------ | -------- |
+| string | No       |
 
 ---
 
 ### `applicationNameForUserAgent`
 
-Append to the existing user-agent. This will only work for iOS if you are using WKWebView, not UIWebView. Setting `userAgent` will override this.
+Append to the existing user-agent. Setting `userAgent` will override this.
 
-| Type   | Required | Platform      |
-| ------ | -------- | ------------- |
-| string | No       | Android, iOS WKWebView |
+| Type   | Required |
+| ------ | -------- |
+| string | No       |
 
 ```jsx
 <WebView
   source={{ uri: 'https://facebook.github.io/react-native' }}
-  applicationNameForUserAgent={"DemoApp/1.1.0"}
+  applicationNameForUserAgent={'DemoApp/1.1.0'}
 />
 // Resulting User-Agent will look like:
 // Mozilla/5.0 (Linux; Android 8.1.0; Android SDK built for x86 Build/OSM1.180201.021; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/61.0.3163.98 Mobile Safari/537.36 DemoApp/1.1.0
@@ -722,9 +718,6 @@ Possible values for `dataDetectorTypes` are:
 - `calendarEvent`
 - `none`
 - `all`
-
-With the [new WebKit](Reference.md#usewebkit) implementation, we have three new values:
-
 - `trackingNumber`
 - `flightNumber`
 - `lookupSuggestion`
@@ -798,21 +791,11 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 ### `allowingReadAccessToURL`
 
-A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in `RNCWKWebView` for WebViews that are loaded with a source.uri set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in source.uri itself.
+A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in for WebViews that are loaded with a source.uri set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in source.uri itself.
 
-| Type   | Required | Platform      |
-| ------ | -------- | ------------- |
-| string | No       | iOS WKWebView |
-
----
-
-### `useWebKit`
-
-If true, use WKWebView instead of UIWebView.
-
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
 
 ---
 
@@ -838,7 +821,7 @@ If true, use WKWebView instead of UIWebView.
 
 ### `keyboardDisplayRequiresUserAction`
 
-If false, web content can programmatically display the keyboard when using the WKWebView. The default value is `true`.
+If false, web content can programmatically display the keyboard. The default value is `true`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -848,7 +831,7 @@ If false, web content can programmatically display the keyboard when using the W
 
 ### `hideKeyboardAccessoryView`
 
-If true, this will hide the keyboard accessory view (< > and Done) when using the WKWebView.
+If true, this will hide the keyboard accessory view (< > and Done).
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -858,7 +841,7 @@ If true, this will hide the keyboard accessory view (< > and Done) when using th
 
 ### `allowsBackForwardNavigationGestures`
 
-If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
+If true, this will be able horizontal swipe gestures. The default value is `false`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -870,9 +853,9 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 
 Does not store any data within the lifetime of the WebView.
 
-| Type    | Required | Platform               |
-| ------- | -------- | ---------------------- |
-| boolean | No       | Android, iOS WKWebView |
+| Type    | Required |
+| ------- | -------- |
+| boolean | No       |
 
 ---
 
@@ -898,7 +881,7 @@ Sets whether the WebView should disable saving form data. The default value is `
 
 ### `cacheEnabled`
 
-Sets whether WebView & WKWebView should use browser caching.
+Sets whether WebView should use browser caching.
 
 | Type    | Required | Default |
 | ------- | -------- | ------- |
@@ -928,7 +911,7 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 ### `sharedCookiesEnabled`
 
-Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the `RNCWKWebView`. The default value is `false`.
+Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
