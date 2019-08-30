@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import "RNCWKWebView.h"
+#import "RNCWebView.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
@@ -27,7 +27,7 @@ static NSURLCredential* clientAuthenticationCredential;
 }
 @end
 
-@interface RNCWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
+@interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
@@ -38,12 +38,12 @@ static NSURLCredential* clientAuthenticationCredential;
 @property (nonatomic, copy) WKWebView *webView;
 @end
 
-@implementation RNCWKWebView
+@implementation RNCWebView
 {
   UIColor * _savedBackgroundColor;
   BOOL _savedHideKeyboardAccessoryView;
   BOOL _savedKeyboardDisplayRequiresUserAction;
-  
+
   // Workaround for StatusBar appearance bug for iOS 12
   // https://github.com/react-native-community/react-native-webview/issues/62
   BOOL _isFullScreenVideoOpen;
@@ -86,12 +86,12 @@ static NSURLCredential* clientAuthenticationCredential;
       addObserver:self
       selector:@selector(keyboardWillShow)
       name:UIKeyboardWillShowNotification object:nil];
-    
+
     // Workaround for StatusBar appearance bug for iOS 12
     // https://github.com/react-native-community/react-native-webview/issues/62
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleFullScreenVideoStatusBars) name:@"_MRMediaRemotePlayerSupportedCommandsDidChangeNotification" object:nil];
   }
-  
+
   return self;
 }
 
@@ -449,22 +449,22 @@ static NSURLCredential* clientAuthenticationCredential;
         _savedKeyboardDisplayRequiresUserAction = keyboardDisplayRequiresUserAction;
         return;
     }
-  
+
     if (_savedKeyboardDisplayRequiresUserAction == true) {
         return;
     }
-  
+
     UIView* subview;
-  
+
     for (UIView* view in _webView.scrollView.subviews) {
         if([[view.class description] hasPrefix:@"WK"])
             subview = view;
     }
-  
+
     if(subview == nil) return;
-  
+
     Class class = subview.class;
-  
+
     NSOperatingSystemVersion iOS_11_3_0 = (NSOperatingSystemVersion){11, 3, 0};
     NSOperatingSystemVersion iOS_12_2_0 = (NSOperatingSystemVersion){12, 2, 0};
     NSOperatingSystemVersion iOS_13_0_0 = (NSOperatingSystemVersion){13, 0, 0};
@@ -507,7 +507,7 @@ static NSURLCredential* clientAuthenticationCredential;
             ((void (*)(id, SEL, void*, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3);
         });
     }
-  
+
     method_setImplementation(method, override);
 }
 
@@ -623,7 +623,7 @@ static NSURLCredential* clientAuthenticationCredential;
 {
   [super layoutSubviews];
 
-  // Ensure webview takes the position and dimensions of RNCWKWebView
+  // Ensure webview takes the position and dimensions of RNCWebView
   _webView.frame = self.bounds;
   _webView.scrollView.contentInset = _contentInset;
 }

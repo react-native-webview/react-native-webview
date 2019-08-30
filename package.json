@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "6.11.1",
+  "version": "7.0.1",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "ci": "CI=true && yarn lint && yarn test",
@@ -20,7 +20,7 @@
   },
   "peerDependencies": {
     "react": "^16.0",
-    "react-native": ">=0.57 <0.60"
+    "react-native": ">=0.60 <0.62"
   },
   "dependencies": {
     "escape-string-regexp": "1.0.5",
@@ -48,7 +48,7 @@
     "jest": "24.5.0",
     "metro-react-native-babel-preset": "0.53.1",
     "react": "16.8.3",
-    "react-native": "0.59.1",
+    "react-native": "0.60.5",
     "semantic-release": "15.10.3",
     "typescript": "3.3.3333"
   },
