@@ -6,7 +6,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "RNCProcessPoolManager.h"
+#import "RNCWKProcessPoolManager.h"
 
 @interface RNCWKProcessPoolManager() {
     WKProcessPool *_sharedProcessPool;
