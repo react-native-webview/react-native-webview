@@ -344,6 +344,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setMediaPlaybackRequiresUserGesture(requires);
   }
 
+  @ReactProp(name = "allowFileAccessFromFileURLs")
+  public void setAllowFileAccessFromFileURLs(WebView view, boolean allow) {
+    view.getSettings().setAllowFileAccessFromFileURLs(allow);
+  }
+
   @ReactProp(name = "allowUniversalAccessFromFileURLs")
   public void setAllowUniversalAccessFromFileURLs(WebView view, boolean allow) {
     view.getSettings().setAllowUniversalAccessFromFileURLs(allow);
@@ -363,7 +368,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
   }
-   
+
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
     // Remove all previous cookies
