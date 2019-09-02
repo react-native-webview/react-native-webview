@@ -45,7 +45,7 @@ Current Version: ![version](https://img.shields.io/npm/v/react-native-webview.sv
 
 **Upcoming:**
 
-- this.webView.postMessage() removal (never documented and less flexible than injectJavascript)
+- this.webView.postMessage() removal (never documented and less flexible than injectJavascript) -> [how to migrate](https://github.com/react-native-community/react-native-webview/issues/809)
 - Kotlin rewrite
 - Maybe Swift rewrite
 
