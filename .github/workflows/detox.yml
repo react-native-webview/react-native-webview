@@ -8,10 +8,10 @@ jobs:
     steps:
       - name: Setup - Install Homebrew
         run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-      - name: Setup - Install Node
-        run: brew install --overwrite node
       - name: Setup - Install React Native CLI
         run: npm install -g react-native-cli
+      - name: Setup - Install Yarn
+        run: brew install yarn
       - name: Setup - Install NPM Dependencies
         run: yarn
       - name: Setup - Install CocoaPods CLI
