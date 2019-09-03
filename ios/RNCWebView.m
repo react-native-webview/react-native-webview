@@ -438,7 +438,11 @@ static NSURLCredential* clientAuthenticationCredential;
         [_webView loadRequest:request];
     }
     else {
-        NSURL* readAccessUrl = _allowingReadAccessToURL ? [NSURL URLWithString:_allowingReadAccessToURL] : request.URL;
+        NSURL* readAccessUrl = request.URL;
+        if(_allowingReadAccessToURL){
+            NSString *accessUrl = [_allowingReadAccessToURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            readAccessUrl = [RCTConvert NSURL:accessUrl];
+        }
         [_webView loadFileURL:request.URL allowingReadAccessToURL:readAccessUrl];
     }
 }
