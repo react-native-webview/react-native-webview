@@ -1,13 +1,12 @@
-workflow "Detox CI Tests" {
-  on = "push"
-}
+name: "Detox CI Tests"
+  on: "push"
 
 jobs:
   tests:
     name: "Running tests"
     runs-on: "macOS-latest"
     steps:
-    - name: Setup - Install Homebrew
+    - name: Setup
       run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     - name: Setup - Install Node
       run: brew install node
