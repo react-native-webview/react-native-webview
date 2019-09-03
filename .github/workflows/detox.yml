@@ -18,5 +18,7 @@ jobs:
         run: yarn
       - name: Setup - Install CocoaPods CLI
         run: sudo gem install cocoapods
+      - name: Setup - move up a directory
+        run: cd ..
       - name: Run tests
         run: yarn ci
