@@ -70,6 +70,8 @@ class MyWebComponent extends Component {
 
 For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md). If you're interested in contributing, check out the [Contributing Guide](./docs/Contributing.md).
 
+You can also [look at some examples](./examples).
+
 ## Common issues
 
 - If you're getting `Invariant Violation: Native component for "RNCWebView does not exist"` it likely means you forgot to run `react-native link` or there was some error with the linking process

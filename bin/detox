@@ -1,0 +1,21 @@
+#! /bin/bash
+
+# TODO: Check dependencies
+echo "TODO: Check dependencies"
+
+# Example App Setup
+cd examples/WebTest
+
+# Install NPM dependencies
+yarn
+
+# Jetify deps
+npm jetify
+
+# Install pods
+cd ios
+pod install
+cd ..
+
+# Run tests
+yarn detox

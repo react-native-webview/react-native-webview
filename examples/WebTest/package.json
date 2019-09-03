@@ -1,0 +1,45 @@
+{
+  "name": "WebTest",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "react-native start",
+    "test": "detox",
+    "detox-ios": "detox build --configuration ios.sim.debug && detox test --configuration ios.sim.debug",
+    "detox-android": "detox build --configuration android.emu.debug && detox test --configuration android.emu.debug",
+    "detox": "npm run detox-ios && npm run detox-android"
+  },
+  "dependencies": {
+    "react": "16.9.0",
+    "react-native": "0.61.0-rc.0",
+    "react-native-webview": "^7.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/runtime": "^7.5.5",
+    "babel-jest": "^24.9.0",
+    "detox": "^14.0.3",
+    "jest": "^24.9.0",
+    "metro-react-native-babel-preset": "^0.56.0"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "detox": {
+    "configurations": {
+      "ios.sim.debug": {
+        "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/WebTest.app",
+        "build": "xcodebuild -workspace ios/WebTest.xcworkspace -scheme WebTest -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
+        "type": "ios.simulator",
+        "name": "iPhone X, iOS 12.4"
+      },
+      "android.emu.debug": {
+        "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "type": "android.emulator",
+        "name": "Pixel_2_API_28"
+      }
+    },
+    "test-runner": "jest"
+  }
+}
