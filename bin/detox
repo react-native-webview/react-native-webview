@@ -9,8 +9,8 @@ cd examples/WebTest
 # Install NPM dependencies
 yarn
 
-# Jetify deps
-npm jetify
+# Jetify deps (sudo if it fails for CI)
+npx jetify || sudo npx jetify
 
 # Install pods
 cd ios
