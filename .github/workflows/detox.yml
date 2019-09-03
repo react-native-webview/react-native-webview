@@ -9,7 +9,7 @@ jobs:
       - name: Setup - Install Homebrew
         run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
       - name: Setup - Install Node
-        run: brew install node
+        run: brew install -f node
       - name: Setup - Install React Native CLI
         run: npm install -g react-native-cli
       - name: Setup - Install NPM Dependencies
