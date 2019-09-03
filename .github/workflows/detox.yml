@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Setup - Install Homebrew
         run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+      - name: Setup - Install Node
+        run: curl "https://nodejs.org/dist/latest/node-v12.9.1.pkg" > "$HOME/Downloads/node-v12.9.1.pkg" && sudo installer -store -pkg "$HOME/Downloads/node-v12.9.1.pkg" -target "/"
       - name: Setup - Install React Native CLI
         run: npm install -g react-native-cli
       - name: Setup - Install Yarn
