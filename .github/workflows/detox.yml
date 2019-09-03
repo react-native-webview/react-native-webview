@@ -1,12 +1,12 @@
 name: "Detox CI Tests"
-  on: "push"
+  on: [push]
 
 jobs:
   tests:
     name: "Running tests"
     runs-on: "macOS-latest"
     steps:
-    - name: Setup
+    - name: Setup - Install Homebrew
       run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     - name: Setup - Install Node
       run: brew install node
