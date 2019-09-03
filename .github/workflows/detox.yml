@@ -13,7 +13,7 @@ jobs:
       - name: Setup - Install React Native CLI
         run: npm install -g react-native-cli
       - name: Setup - Install Yarn
-        run: brew install yarn --without-dependencies
+        run: brew install yarn --ignore-dependencies
       - name: Setup - Install NPM Dependencies
         run: yarn
       - name: Setup - Install CocoaPods CLI
