@@ -11,12 +11,12 @@
   "version": "7.0.3",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
-    "ci": "CI=true && npm run lint && npm run test",
-    "ci:publish": "semantic-release",
-    "lint": "tsc --noEmit && eslint ./src --ext .ts,.tsx",
-    "build": "tsc",
-    "prepare": "npm run build",
-    "test": "jest"
+    "ci": "CI=true && yarn lint && yarn test",
+    "ci:publish": "yarn semantic-release",
+    "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
+    "build": "yarn tsc",
+    "prepare": "yarn build",
+    "test": "yarn jest"
   },
   "rn-docs": {
     "title": "Webview",
