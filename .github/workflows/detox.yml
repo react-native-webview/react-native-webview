@@ -9,9 +9,9 @@ jobs:
       - name: Setup - Install Android Emulator
         run: |
           touch ~/.android/repositories.cfg
-          # brew cask install android-sdk
+          brew cask install android-sdk
           # brew cask install intel-haxm
-          # sdkmanager --update
+          sdkmanager --update
           # export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
           echo "Debugging - sdkmanager"
           sdkmanager --help
