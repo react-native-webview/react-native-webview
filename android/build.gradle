@@ -53,7 +53,7 @@ repositories {
   jcenter()
   google()
 
-  // @rob do we need this?
+  // Needed to resolve okhttp library.
   maven { url "https://jitpack.io" }
 
   def found = false
