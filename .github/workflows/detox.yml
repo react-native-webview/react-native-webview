@@ -7,9 +7,6 @@ jobs:
     runs-on: 'macOS-latest'
     steps:
     - uses: actions/setup-java@v1
-      with:
-        java-version: '8.0.4' // The JDK version to make available on the path. Takes a whole or semver Jdk version, or 1.x syntax (e.g. 1.8 => Jdk 8.x)
-        architecture: x64 // (x64 or x86) - defaults to x64
       - name: Setup - Install Android Emulator
         run: |
           touch ~/.android/repositories.cfg
