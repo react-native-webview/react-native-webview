@@ -3,30 +3,14 @@ on: [push]
 
 jobs:
   tests:
-    name: 'Running tests'
+    name: 'Running Detox CI tests'
     runs-on: 'macOS-latest'
     steps:
-      - name: Setup - Install Homebrew
-        run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-      - name: Setup - Install Node
-        run: curl "https://nodejs.org/dist/latest/node-v12.9.1.pkg" > "$HOME/Downloads/node-v12.9.1.pkg" && sudo installer -store -pkg "$HOME/Downloads/node-v12.9.1.pkg" -target "/"
-      - name: Setup - Install React Native CLI
-        run: npm install -g react-native-cli
-      - name: Setup - Install Yarn
-        run: brew install yarn --ignore-dependencies
-      - name: Setup - Install NPM Dependencies
-        run: yarn
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.6
       - name: Setup - Install CocoaPods CLI
         run: sudo gem install cocoapods
-      - name: Setup - move up a directory
-        run: |
-          pwd
-          ls -al
-          cd ..
-          pwd
-          ls -al
       - name: Run tests
-        run: |
-          pwd
-          ls -al
-          yarn ci
+        run: npm run ci
