@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import "RNCWKWebView.h"
+#import "RNCWebView.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKSchemeHandler.h"
@@ -28,7 +28,7 @@ static NSURLCredential* clientAuthenticationCredential;
 }
 @end
 
-@interface RNCWKWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol, RNCWKSchemeHandlerDelegate>
+@interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol, RNCWKSchemeHandlerDelegate>
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
@@ -40,7 +40,7 @@ static NSURLCredential* clientAuthenticationCredential;
 @property (nonatomic, copy) WKWebView *webView;
 @end
 
-@implementation RNCWKWebView
+@implementation RNCWebView
 {
   UIColor * _savedBackgroundColor;
   BOOL _savedHideKeyboardAccessoryView;
@@ -117,6 +117,11 @@ static NSURLCredential* clientAuthenticationCredential;
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
+    WKPreferences *prefs = [[WKPreferences alloc]init];
+    if (!_javaScriptEnabled) {
+      prefs.javaScriptEnabled = NO;
+      wkWebViewConfig.preferences = prefs;
+    }
     if (_incognito) {
       wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
     } else if (_cacheEnabled) {
@@ -386,6 +391,17 @@ static NSURLCredential* clientAuthenticationCredential;
   }
 }
 
+- (void)setAllowingReadAccessToURL:(NSString *)allowingReadAccessToURL
+{
+  if (![_allowingReadAccessToURL isEqualToString:allowingReadAccessToURL]) {
+    _allowingReadAccessToURL = [allowingReadAccessToURL copy];
+
+    if (_webView != nil) {
+      [self visitSource];
+    }
+  }
+}
+
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {
   _contentInset = contentInset;
@@ -431,7 +447,8 @@ static NSURLCredential* clientAuthenticationCredential;
         [_webView loadRequest:request];
     }
     else {
-        [_webView loadFileURL:request.URL allowingReadAccessToURL:request.URL];
+        NSURL* readAccessUrl = _allowingReadAccessToURL ? [NSURL URLWithString:_allowingReadAccessToURL] : request.URL;
+        [_webView loadFileURL:request.URL allowingReadAccessToURL:readAccessUrl];
     }
 }
 
@@ -622,7 +639,7 @@ static NSURLCredential* clientAuthenticationCredential;
 {
   [super layoutSubviews];
 
-  // Ensure webview takes the position and dimensions of RNCWKWebView
+  // Ensure webview takes the position and dimensions of RNCWebView
   _webView.frame = self.bounds;
   _webView.scrollView.contentInset = _contentInset;
 }

@@ -5,14 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import "RNCWKWebViewManager.h"
+#import "RNCWebViewManager.h"
 
 #import <React/RCTUIManager.h>
 #import <React/RCTDefines.h>
-#import "RNCWKWebView.h"
+#import "RNCWebView.h"
 #import <WebKit/WebKit.h>
 
-@interface RNCWKWebViewManager () <RNCWKWebViewDelegate>
+@interface RNCWebViewManager () <RNCWebViewDelegate>
 @end
 
 @implementation RCTConvert (UIScrollView)
@@ -28,7 +28,7 @@ RCT_ENUM_CONVERTER(UIScrollViewContentInsetAdjustmentBehavior, (@{
 
 @end
 
-@implementation RNCWKWebViewManager
+@implementation RNCWebViewManager
 {
   NSConditionLock *_shouldStartLoadLock;
   BOOL _shouldStartLoad;
@@ -38,7 +38,7 @@ RCT_EXPORT_MODULE()
 
 - (UIView *)view
 {
-  RNCWKWebView *webView = [RNCWKWebView new];
+  RNCWebView *webView = [RNCWebView new];
   webView.delegate = self;
   return webView;
 }
@@ -51,6 +51,7 @@ RCT_EXPORT_VIEW_PROPERTY(onLoadingProgress, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onShouldStartLoadWithRequest, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onUrlSchemeRequest, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(injectedJavaScript, NSString)
+RCT_EXPORT_VIEW_PROPERTY(javaScriptEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaPlaybackRequiresUserAction, BOOL)
 #if WEBKIT_IOS_10_APIS_AVAILABLE
@@ -67,6 +68,7 @@ RCT_EXPORT_VIEW_PROPERTY(urlScheme, NSString)
 RCT_EXPORT_VIEW_PROPERTY(applicationNameForUserAgent, NSString)
 RCT_EXPORT_VIEW_PROPERTY(cacheEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsLinkPreview, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(allowingReadAccessToURL, NSString)
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
 RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentBehavior)
@@ -81,58 +83,58 @@ RCT_EXPORT_VIEW_PROPERTY(onScroll, RCTDirectEventBlock)
 
 RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)message)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
-    RNCWKWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWKWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view postMessage:message];
     }
   }];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWebView) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, RNCWebView) {
   view.useSharedProcessPool = json == nil ? true : [RCTConvert BOOL: json];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, RNCWebView) {
   view.scrollEnabled = json == nil ? true : [RCTConvert BOOL: json];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(sharedCookiesEnabled, BOOL, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(sharedCookiesEnabled, BOOL, RNCWebView) {
     view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(decelerationRate, CGFloat, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(decelerationRate, CGFloat, RNCWebView) {
   view.decelerationRate = json == nil ? UIScrollViewDecelerationRateNormal : [RCTConvert CGFloat: json];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(directionalLockEnabled, BOOL, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(directionalLockEnabled, BOOL, RNCWebView) {
     view.directionalLockEnabled = json == nil ? true : [RCTConvert BOOL: json];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(showsHorizontalScrollIndicator, BOOL, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(showsHorizontalScrollIndicator, BOOL, RNCWebView) {
   view.showsHorizontalScrollIndicator = json == nil ? true : [RCTConvert BOOL: json];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(showsVerticalScrollIndicator, BOOL, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(showsVerticalScrollIndicator, BOOL, RNCWebView) {
   view.showsVerticalScrollIndicator = json == nil ? true : [RCTConvert BOOL: json];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWKWebView) {
+RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebView) {
   view.keyboardDisplayRequiresUserAction = json == nil ? true : [RCTConvert BOOL: json];
 }
 
 RCT_EXPORT_METHOD(injectJavaScript:(nonnull NSNumber *)reactTag script:(NSString *)script)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
-    RNCWKWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWKWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view injectJavaScript:script];
     }
@@ -141,10 +143,10 @@ RCT_EXPORT_METHOD(injectJavaScript:(nonnull NSNumber *)reactTag script:(NSString
 
 RCT_EXPORT_METHOD(goBack:(nonnull NSNumber *)reactTag)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
-    RNCWKWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWKWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view goBack];
     }
@@ -153,10 +155,10 @@ RCT_EXPORT_METHOD(goBack:(nonnull NSNumber *)reactTag)
 
 RCT_EXPORT_METHOD(goForward:(nonnull NSNumber *)reactTag)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
-    RNCWKWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWKWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view goForward];
     }
@@ -165,10 +167,10 @@ RCT_EXPORT_METHOD(goForward:(nonnull NSNumber *)reactTag)
 
 RCT_EXPORT_METHOD(reload:(nonnull NSNumber *)reactTag)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
-    RNCWKWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWKWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view reload];
     }
@@ -177,10 +179,10 @@ RCT_EXPORT_METHOD(reload:(nonnull NSNumber *)reactTag)
 
 RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
-    RNCWKWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWKWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view stopLoading];
     }
@@ -189,7 +191,7 @@ RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
 
 #pragma mark - Exported synchronous methods
 
-- (BOOL)          webView:(RNCWKWebView *)webView
+- (BOOL)          webView:(RNCWebView *)webView
 shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
              withCallback:(RCTDirectEventBlock)callback
 {

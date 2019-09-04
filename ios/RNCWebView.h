@@ -10,19 +10,19 @@
 #import <WebKit/WebKit.h>
 #import "RNCWKSchemeHandler.h"
 
-@class RNCWKWebView;
+@class RNCWebView;
 
-@protocol RNCWKWebViewDelegate <NSObject>
+@protocol RNCWebViewDelegate <NSObject>
 
-- (BOOL)webView:(RNCWKWebView *)webView
+- (BOOL)webView:(RNCWebView *)webView
    shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
    withCallback:(RCTDirectEventBlock)callback;
 
 @end
 
-@interface RNCWKWebView : RCTView
+@interface RNCWebView : RCTView
 
-@property (nonatomic, weak) id<RNCWKWebViewDelegate> delegate;
+@property (nonatomic, weak) id<RNCWebViewDelegate> delegate;
 @property (nonatomic, copy) NSDictionary *source;
 @property (nonatomic, assign) BOOL messagingEnabled;
 @property (nonatomic, copy) NSString *injectedJavaScript;
@@ -46,12 +46,14 @@
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, copy) NSString *applicationNameForUserAgent;
 @property (nonatomic, assign) BOOL cacheEnabled;
+@property (nonatomic, assign) BOOL javaScriptEnabled;
 @property (nonatomic, assign) BOOL allowsLinkPreview;
 @property (nonatomic, copy) NSString *urlScheme;
 @property (nonatomic, strong) RNCWKSchemeHandler* schemeHandler;
 @property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
 @property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
 @property (nonatomic, assign) BOOL directionalLockEnabled;
+@property (nonatomic, copy) NSString *allowingReadAccessToURL;
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 - (void)postMessage:(NSString *)message;
