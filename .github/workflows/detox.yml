@@ -6,20 +6,21 @@ jobs:
     name: 'Running tests'
     runs-on: 'macOS-latest'
     steps:
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '8.0.4' // The JDK version to make available on the path. Takes a whole or semver Jdk version, or 1.x syntax (e.g. 1.8 => Jdk 8.x)
+        architecture: x64 // (x64 or x86) - defaults to x64
       - name: Setup - Install Android Emulator
         run: |
           touch ~/.android/repositories.cfg
+          brew cask install homebrew/cask-versions/adoptopenjdk8
           brew cask install android-sdk
+          export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
           # brew cask install intel-haxm
           sdkmanager --update
-          # export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
-          echo "Debugging - sdkmanager"
           sdkmanager --help
-          # yes | sdkmanager "platform-tools" "platforms;android-28" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;28.0.3" "system-images;android-28;google_apis;x86" "emulator"
-          echo "Done - sdkmanager"
-          echo "Debugging - avdmanager"
-          # avdmanager create avd -n test -k "system-images;android-28;google_apis;x86"
-          echo "Done."
+          yes | sdkmanager "platform-tools" "platforms;android-28" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;28.0.3" "system-images;android-28;google_apis;x86" "emulator"
+          avdmanager create avd -n test -k "system-images;android-28;google_apis;x86"
       - name: List Android Emulators
         run: emulator -list-avds
       - name: List iOS Simulators
