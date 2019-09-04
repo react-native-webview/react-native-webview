@@ -72,7 +72,7 @@ repositories {
       name androidSourcesName
     }
 
-    logger.quiet(":${project.name}:reactNativeAndroidRoot ${defaultDir.canonicalPath}")
+    logger.info(":${project.name}:reactNativeAndroidRoot ${defaultDir.canonicalPath}")
     found = true
   } else {
     def parentDir = rootProject.projectDir
@@ -97,7 +97,7 @@ repositories {
           name androidSourcesName
         }
 
-        logger.quiet(":${project.name}:reactNativeAndroidRoot ${androidPrebuiltBinaryDir.canonicalPath}")
+        logger.info(":${project.name}:reactNativeAndroidRoot ${androidPrebuiltBinaryDir.canonicalPath}")
         found = true
       } else if (androidSourcesDir.exists()) {
         maven {
@@ -105,7 +105,7 @@ repositories {
           name androidSourcesName
         }
 
-        logger.quiet(":${project.name}:reactNativeAndroidRoot ${androidSourcesDir.canonicalPath}")
+        logger.info(":${project.name}:reactNativeAndroidRoot ${androidSourcesDir.canonicalPath}")
         found = true
       }
     })
