@@ -12,6 +12,19 @@ jobs:
           node-version: 12.6
       - name: Setup - Install Homebrew
         run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+      - name: Setup - Install Android Emulator
+        run: |
+          touch ~/.android/repositories.cfg
+          brew cask install android-sdk
+          brew cask install intel-haxm
+          sdkmanager --update
+          export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
+          yes | sdkmanager "platform-tools" "platforms;android-27" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;27.0.0" "system-images;android-27;google_apis;x86" "emulator"
+          yes | avdmanager create avd -n test -k "system-images;android-27;google_apis;x86" --tag google_apis
+      - name: List Android Emulators
+        run: emulator -list-avds
+      - name: List iOS Simulators
+        run: xcrun simctl list
       - name: Setup - Install Yarn
         run: brew install yarn --ignore-dependencies
       - name: Setup - Install NPM Dependencies
@@ -24,20 +37,5 @@ jobs:
           brew install applesimutils
           yarn global add react-native-cli
           yarn global add detox-cli
-      - name: Setup - Install Android Emulator
-        run: |
-          touch ~/.android/repositories.cfg 
-          brew cask install caskroom/versions/java8
-          brew cask install android-sdk
-          brew cask install intel-haxm
-          sdkmanager --update
-          export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
-          sdkmanager "platform-tools" "platforms;android-27" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;27.0.0" "system-images;android-27;google_apis;x86" "emulator"
-          avdmanager create avd -n test -k "system-images;android-27;google_apis;x86" --tag google_apis
-          emulator -avd test
-      - name: List Android Emulators
-        run: emulator -list-avds
-      - name: List iOS Simulators
-        run: xcrun simctl list
       - name: Run tests
         run: yarn ci
