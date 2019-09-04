@@ -153,7 +153,7 @@ export type DataDetectorTypes =
 export type OverScrollModeType = 'always' | 'content' | 'never';
 
 
-export type UrlSchemeResponse = {
+export interface UrlSchemeResponse {
   type: "response"
   url: string,
   status: number,
@@ -161,14 +161,14 @@ export type UrlSchemeResponse = {
   body?: string
 };
 
- export type UrlSchemeFile = {
+ export interface UrlSchemeFile {
   type: "file"
   file: string
   url: string,
   headers: { [key: string]: string },
 };
 
- export type UrlSchemeRedirect = {
+ export interface UrlSchemeRedirect {
   type: "redirect"
   url: string,
   method: string,
