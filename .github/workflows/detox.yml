@@ -6,6 +6,10 @@ jobs:
     name: 'Running tests'
     runs-on: 'macOS-latest'
     steps:
+      - name: List Android Emulators
+        run: emulator -list-avds
+      - name: List iOS Simulators
+        run: xcrun simctl list
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
