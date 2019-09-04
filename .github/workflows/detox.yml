@@ -8,13 +8,17 @@ jobs:
     steps:
       - name: Setup - Install Android Emulator
         run: |
-          # touch ~/.android/repositories.cfg
+          touch ~/.android/repositories.cfg
           # brew cask install android-sdk
           # brew cask install intel-haxm
           # sdkmanager --update
           # export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
+          echo "Debugging - sdkmanager"
           yes | sdkmanager "platform-tools" "platforms;android-28" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;28.0.3" "system-images;android-28;google_apis;x86" "emulator"
+          echo "Done - sdkmanager"
+          echo "Debugging - avdmanager"
           avdmanager create avd -n test -k "system-images;android-28;google_apis;x86"
+          echo "Done."
       - name: List Android Emulators
         run: emulator -list-avds
       - name: List iOS Simulators
