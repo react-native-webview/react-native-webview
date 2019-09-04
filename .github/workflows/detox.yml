@@ -6,7 +6,6 @@ jobs:
     name: 'Running tests'
     runs-on: 'macOS-latest'
     steps:
-    - uses: actions/setup-java@v1
       - name: Setup - Install Android Emulator
         run: |
           touch ~/.android/repositories.cfg
