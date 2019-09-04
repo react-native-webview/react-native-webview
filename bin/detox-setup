@@ -17,5 +17,5 @@ cd ios
 pod install
 cd ..
 
-# Run tests
-yarn detox
+# Return to root
+cd ../..

@@ -1,9 +1,9 @@
-name: 'Detox CI Tests'
+name: 'Detox CI Tests - Android'
 on: [push]
 
 jobs:
   tests:
-    name: 'Running tests'
+    name: 'Running Android detox tests'
     runs-on: 'macOS-latest'
     steps:
       - name: Setup - Install Android SDK
@@ -22,8 +22,6 @@ jobs:
         run: avdmanager create avd -n test -k "system-images;android-28;google_apis;x86"
       - name: List Android Emulators
         run: emulator -list-avds
-      - name: List iOS Simulators
-        run: xcrun simctl list
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
@@ -34,8 +32,6 @@ jobs:
         run: brew install yarn --ignore-dependencies
       - name: Setup - Install NPM Dependencies
         run: yarn
-      - name: Setup - Install CocoaPods CLI
-        run: sudo gem install cocoapods
       - name: Setup - Install Detox and deps
         run: |
           brew tap wix/brew
@@ -43,4 +39,4 @@ jobs:
           yarn global add react-native-cli
           yarn global add detox-cli
       - name: Run tests
-        run: yarn ci
+        run: yarn ci:android

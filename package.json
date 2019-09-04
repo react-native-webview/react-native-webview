@@ -11,7 +11,10 @@
   "version": "7.0.3",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
-    "ci": "CI=true && yarn lint && yarn test && ./bin/detox",
+    "ci": "CI=true && yarn lint && yarn test",
+    "ci:setup": "./bin/detox-setup",
+    "ci:ios": "CI=true && cd examples/WebTest && yarn detox-ios && cd -",
+    "ci:android": "CI=true && cd examples/WebTest && yarn detox-android && cd -",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
     "build": "yarn tsc",

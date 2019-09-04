@@ -1,0 +1,32 @@
+name: 'Detox CI Tests - iOS'
+on: [push]
+
+jobs:
+  tests:
+    name: 'Running iOS Detox tests'
+    runs-on: 'macOS-latest'
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.6
+      - name: Setup - Install Homebrew
+        run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+      - name: Setup - Install Yarn
+        run: brew install yarn --ignore-dependencies
+      - name: Setup - Install NPM Dependencies
+        run: yarn
+      - name: Setup - Install CocoaPods CLI
+        run: sudo gem install cocoapods
+      - name: Setup - Install Detox and deps
+        run: |
+          brew tap wix/brew
+          brew install applesimutils
+          yarn global add react-native-cli
+          yarn global add detox-cli
+      - name: List iOS Simulators
+        run: xcrun simctl list
+      - name: Prepare Example App
+        run: yarn ci:setup
+      - name: Run tests
+        run: yarn ci:ios
