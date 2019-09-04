@@ -18,6 +18,10 @@
     "prepare": "yarn build",
     "test": "yarn jest"
   },
+  "rn-docs": {
+    "title": "Webview",
+    "type": "Component"
+  },
   "peerDependencies": {
     "react": "^16.0",
     "react-native": ">=0.60 <0.62"
