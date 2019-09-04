@@ -6,10 +6,6 @@ jobs:
     name: 'Running tests'
     runs-on: 'macOS-latest'
     steps:
-      - name: List Android Emulators
-        run: emulator -list-avds
-      - name: List iOS Simulators
-        run: xcrun simctl list
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
@@ -28,5 +24,25 @@ jobs:
           brew install applesimutils
           yarn global add react-native-cli
           yarn global add detox-cli
+      - name: Setup - Install Android Emulator
+        run: |
+          cwd=$(pwd)
+          cd $ANDROID_HOME/tools/bin
+          yes | ./sdkmanager emulator
+          export PATH="${ANDROID_HOME}/emulator:${PATH}"
+          ./sdkmanager "system-images;android-25;google_apis;x86"
+          yes | ./sdkmanager --licenses
+          ./avdmanager list device
+          ./avdmanager create avd -n test -k "system-images;android-25;google_apis;x86"
+          cd $ANDROID_HOME/tools
+          sudo apt-get install cpu-checker
+          kvm-ok
+          sudo apt-get install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils
+          ./emulator -avd test
+          cd $cwd
+      - name: List Android Emulators
+        run: emulator -list-avds
+      - name: List iOS Simulators
+        run: xcrun simctl list
       - name: Run tests
         run: yarn ci
