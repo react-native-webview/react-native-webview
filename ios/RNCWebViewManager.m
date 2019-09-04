@@ -225,10 +225,10 @@ RCT_EXPORT_METHOD(startLoadWithResult:(BOOL)result lockIdentifier:(NSInteger)loc
 
 RCT_EXPORT_METHOD(handleUrlSchemeResponse:(nonnull NSNumber *)reactTag result:(NSDictionary *)resp)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
-    RNCWKWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWKWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view handleUrlSchemeResponse:resp];
     }
