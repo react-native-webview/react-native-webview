@@ -1,0 +1,20 @@
+name: 'Detox CI Tests'
+on: [push]
+
+jobs:
+  tests:
+    name: 'Running tests'
+    runs-on: 'macOS-latest'
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 12.6
+      - name: Setup - Install Yarn
+        run: YARN_GPG=NO curl -o- -L https://yarnpkg.com/install.sh | bash
+      - name: Setup - Install NPM Dependencies
+        run: yarn
+      - name: Setup - Install CocoaPods CLI
+        run: sudo gem install cocoapods
+      - name: Run tests
+        run: yarn ci
