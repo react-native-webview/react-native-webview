@@ -11,28 +11,20 @@ import {
 } from 'react-native';
 
 export interface WebViewCommands {
-  goForward: Function;
-  goBack: Function;
-  reload: Function;
-  stopLoading: Function;
-  postMessage: Function;
-  injectJavaScript: Function;
-  loadUrl: Function;
-  requestFocus: Function;
+  goForward: number;
+  goBack: number;
+  reload: number;
+  stopLoading: number;
+  postMessage: number;
+  injectJavaScript: number;
+  loadUrl: number;
+  requestFocus: number;
 }
 
 export interface CustomUIManager extends UIManagerStatic {
   getViewManagerConfig: (
     name: string,
   ) => {
-    Commands: WebViewCommands;
-  };
-  dispatchViewManagerCommand: (
-    viewHandle: number,
-    command: Function,
-    params: object | null,
-  ) => void;
-  RNCWebView: {
     Commands: WebViewCommands;
   };
 }
