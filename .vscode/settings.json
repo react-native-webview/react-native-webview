@@ -5,5 +5,20 @@
     "javascriptreact",
     "typescript",
     "typescriptreact"
-  ]
+  ],
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#6e6ff5",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#f9a6a6",
+    "activityBarBadge.foreground": "#15202b",
+    "titleBar.activeBackground": "#3e3ff2",
+    "titleBar.inactiveBackground": "#3e3ff299",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveForeground": "#e7e7e799",
+    "statusBar.background": "#3e3ff2",
+    "statusBarItem.hoverBackground": "#6e6ff5",
+    "statusBar.foreground": "#e7e7e7"
+  },
+  "peacock.color": "#3e3ff2"
 }
