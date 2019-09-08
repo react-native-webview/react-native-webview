@@ -235,6 +235,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
 export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   allowFileAccess?: boolean;
   scalesPageToFit?: boolean;
+  allowFileAccessFromFileURLs?: boolean;
   allowUniversalAccessFromFileURLs?: boolean;
   androidHardwareAccelerationDisabled?: boolean;
   domStorageEnabled?: boolean;
