@@ -22,6 +22,7 @@ import {
   WebViewMessageEvent,
   WebViewNavigationEvent,
   WebViewProgressEvent,
+  WebViewTerminatedEvent,
   IOSWebViewProps,
   DecelerationRateConstant,
   NativeWebViewIOS,
@@ -295,7 +296,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
   };
 
-  onContentProcessDidTerminate = (event: WebViewErrorEvent) => {
+  onContentProcessDidTerminate = (event: WebViewTerminatedEvent) => {
     const { onContentProcessDidTerminate } = this.props;
     if (onContentProcessDidTerminate) {
       onContentProcessDidTerminate(event);
