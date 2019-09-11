@@ -282,8 +282,8 @@ static NSURLCredential* clientAuthenticationCredential;
   } else {
     _isFullScreenVideoOpen = NO;
     RCTUnsafeExecuteOnMainQueueSync(^{
-      [RCTSharedApplication() setStatusBarHidden:_savedStatusBarHidden animated:YES];
-      [RCTSharedApplication() setStatusBarStyle:_savedStatusBarStyle animated:YES];
+      [RCTSharedApplication() setStatusBarHidden:self->_savedStatusBarHidden animated:YES];
+      [RCTSharedApplication() setStatusBarStyle:self->_savedStatusBarStyle animated:YES];
     });
   }
 #pragma clang diagnostic pop
@@ -712,8 +712,8 @@ static NSURLCredential* clientAuthenticationCredential;
  * topViewController
  */
 -(UIViewController *)topViewController{
-   UIViewController *controller = [self topViewControllerWithRootViewController:[self getCurrentWindow].rootViewController];
-   return controller;
+    UIViewController *controller = [self topViewControllerWithRootViewController:[self getCurrentWindow].rootViewController];
+    return controller;
 }
 
 /**
@@ -783,7 +783,7 @@ static NSURLCredential* clientAuthenticationCredential;
     if (![self.delegate webView:self
       shouldStartLoadForRequest:event
                    withCallback:_onShouldStartLoadWithRequest]) {
-      decisionHandler(WKNavigationResponsePolicyCancel);
+      decisionHandler(WKNavigationActionPolicyCancel);
       return;
     }
   }
@@ -802,7 +802,7 @@ static NSURLCredential* clientAuthenticationCredential;
   }
 
   // Allow all navigation by default
-  decisionHandler(WKNavigationResponsePolicyAllow);
+  decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 /**
@@ -850,7 +850,7 @@ static NSURLCredential* clientAuthenticationCredential;
       callback([NSString stringWithFormat:@"%@", result]);
     }
     if (error != nil) {
-      RCTLogWarn([NSString stringWithFormat:@"Error evaluating injectedJavaScript: This is possibly due to an unsupported return type. Try adding true to the end of your injectedJavaScript string. %@", error]);
+      RCTLogWarn(@"%@", [NSString stringWithFormat:@"Error evaluating injectedJavaScript: This is possibly due to an unsupported return type. Try adding true to the end of your injectedJavaScript string. %@", error]);
     }
   }];
 }
