@@ -1,6 +1,6 @@
 buildscript {
   //Buildscript is evaluated before everything else so we can't use getExtOrDefault
-  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['ReactNativeWebview_kotlinVersion']
+  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['ReactNativeWebView_kotlinVersion']
 
   repositories {
     google()
@@ -15,11 +15,11 @@ buildscript {
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNativeWebview_' + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNativeWebView_' + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['ReactNativeWebview_' + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['ReactNativeWebView_' + name]).toInteger()
 }
 
 apply plugin: 'com.android.library'
@@ -72,7 +72,7 @@ repositories {
       name androidSourcesName
     }
 
-    logger.quiet(":${project.name}:reactNativeAndroidRoot ${defaultDir.canonicalPath}")
+    logger.info(":${project.name}:reactNativeAndroidRoot ${defaultDir.canonicalPath}")
     found = true
   } else {
     def parentDir = rootProject.projectDir
@@ -97,7 +97,7 @@ repositories {
           name androidSourcesName
         }
 
-        logger.quiet(":${project.name}:reactNativeAndroidRoot ${androidPrebuiltBinaryDir.canonicalPath}")
+        logger.info(":${project.name}:reactNativeAndroidRoot ${androidPrebuiltBinaryDir.canonicalPath}")
         found = true
       } else if (androidSourcesDir.exists()) {
         maven {
@@ -105,7 +105,7 @@ repositories {
           name androidSourcesName
         }
 
-        logger.quiet(":${project.name}:reactNativeAndroidRoot ${androidSourcesDir.canonicalPath}")
+        logger.info(":${project.name}:reactNativeAndroidRoot ${androidSourcesDir.canonicalPath}")
         found = true
       }
     })
@@ -119,12 +119,10 @@ repositories {
   }
 }
 
-def support_version = getExtOrDefault('supportLibVersion')
 def kotlin_version = getExtOrDefault('kotlinVersion')
 
 dependencies {
   //noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "com.android.support:appcompat-v7:$support_version"
 }
