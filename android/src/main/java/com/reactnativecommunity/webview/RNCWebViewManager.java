@@ -256,7 +256,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "androidHardwareAccelerationDisabled")
   public void setHardwareAccelerationDisabled(WebView view, boolean disabled) {
-    if (disabled) {
+    if (disabled || !view.isHardwareAccelerated()) {
       view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     } else {
       view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
