@@ -15,7 +15,8 @@ jobs:
         run: |
           # brew cask install intel-haxm
           touch ~/.android/repositories.cfg
-          sdkmanager --update
+          yes | sdkmanager --licenses
+          yes | sdkmanager --update || exit 0
       - name: Setup - Install Platform tools
         run: yes | sdkmanager "platform-tools"
       - name: Setup - Install Android Platform
