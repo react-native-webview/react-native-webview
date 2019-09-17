@@ -53,6 +53,7 @@
 @property (nonatomic, copy) NSString *allowingReadAccessToURL;
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
++ (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
 - (void)postMessage:(NSString *)message;
 - (void)injectJavaScript:(NSString *)script;
 - (void)goForward;
