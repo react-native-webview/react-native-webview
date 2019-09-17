@@ -8,10 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */; };
-		E914DBF6214474710071092B /* RNCUIWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E914DBF3214474710071092B /* RNCUIWebViewManager.m */; };
-		E914DBF7214474710071092B /* RNCUIWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E914DBF4214474710071092B /* RNCUIWebView.m */; };
-		E91B351D21446E6C00F9801F /* RNCWKWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351B21446E6C00F9801F /* RNCWKWebViewManager.m */; };
-		E91B351E21446E6C00F9801F /* RNCWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351C21446E6C00F9801F /* RNCWKWebView.m */; };
+		E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351B21446E6C00F9801F /* RNCWebViewManager.m */; };
+		E91B351E21446E6C00F9801F /* RNCWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351C21446E6C00F9801F /* RNCWebView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,14 +28,10 @@
 		134814201AA4EA6300B7C361 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNCWKProcessPoolManager.m; sourceTree = "<group>"; };
 		3515965F21A3C87E00623BFA /* RNCWKProcessPoolManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCWKProcessPoolManager.h; sourceTree = "<group>"; };
-		E914DBF2214474710071092B /* RNCUIWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCUIWebView.h; sourceTree = "<group>"; };
-		E914DBF3214474710071092B /* RNCUIWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCUIWebViewManager.m; sourceTree = "<group>"; };
-		E914DBF4214474710071092B /* RNCUIWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCUIWebView.m; sourceTree = "<group>"; };
-		E914DBF5214474710071092B /* RNCUIWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCUIWebViewManager.h; sourceTree = "<group>"; };
-		E91B351921446E6C00F9801F /* RNCWKWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCWKWebViewManager.h; sourceTree = "<group>"; };
-		E91B351A21446E6C00F9801F /* RNCWKWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCWKWebView.h; sourceTree = "<group>"; };
-		E91B351B21446E6C00F9801F /* RNCWKWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCWKWebViewManager.m; sourceTree = "<group>"; };
-		E91B351C21446E6C00F9801F /* RNCWKWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCWKWebView.m; sourceTree = "<group>"; };
+		E91B351921446E6C00F9801F /* RNCWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCWebViewManager.h; sourceTree = "<group>"; };
+		E91B351A21446E6C00F9801F /* RNCWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCWebView.h; sourceTree = "<group>"; };
+		E91B351B21446E6C00F9801F /* RNCWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCWebViewManager.m; sourceTree = "<group>"; };
+		E91B351C21446E6C00F9801F /* RNCWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCWebView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,14 +56,10 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				E914DBF2214474710071092B /* RNCUIWebView.h */,
-				E914DBF4214474710071092B /* RNCUIWebView.m */,
-				E914DBF5214474710071092B /* RNCUIWebViewManager.h */,
-				E914DBF3214474710071092B /* RNCUIWebViewManager.m */,
-				E91B351A21446E6C00F9801F /* RNCWKWebView.h */,
-				E91B351C21446E6C00F9801F /* RNCWKWebView.m */,
-				E91B351921446E6C00F9801F /* RNCWKWebViewManager.h */,
-				E91B351B21446E6C00F9801F /* RNCWKWebViewManager.m */,
+				E91B351A21446E6C00F9801F /* RNCWebView.h */,
+				E91B351C21446E6C00F9801F /* RNCWebView.m */,
+				E91B351921446E6C00F9801F /* RNCWebViewManager.h */,
+				E91B351B21446E6C00F9801F /* RNCWebViewManager.m */,
 				3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */,
 				3515965F21A3C87E00623BFA /* RNCWKProcessPoolManager.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
@@ -112,7 +102,7 @@
 			};
 			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "RNCWebView" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -132,10 +122,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E91B351D21446E6C00F9801F /* RNCWKWebViewManager.m in Sources */,
-				E914DBF7214474710071092B /* RNCUIWebView.m in Sources */,
-				E914DBF6214474710071092B /* RNCUIWebViewManager.m in Sources */,
-				E91B351E21446E6C00F9801F /* RNCWKWebView.m in Sources */,
+				E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */,
+				E91B351E21446E6C00F9801F /* RNCWebView.m in Sources */,
 				3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -227,10 +215,10 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../node_modules/react-native/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
+					"$(SRCROOT)/../node_modules/react-native/React/**",
 					"$(SRCROOT)/../../react-native/React/**",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -243,10 +231,10 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../node_modules/react-native/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
+					"$(SRCROOT)/../node_modules/react-native/React/**",
 					"$(SRCROOT)/../../react-native/React/**",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
