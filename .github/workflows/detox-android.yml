@@ -16,7 +16,9 @@ jobs:
           # brew cask install intel-haxm
           touch ~/.android/repositories.cfg
           sdkmanager --update
-      - name: Setup - Install Android Platform tools
+      - name: Setup - Install Platform tools
+        run: yes | sdkmanager "platform-tools"
+      - name: Setup - Install Android Platform
         run: yes | sdkmanager "platforms;android-28"
       - name: Setup - Install Android build tools 28.0.3
         run: yes | sdkmanager "build-tools;28.0.3"
@@ -24,8 +26,6 @@ jobs:
         run: yes | sdkmanager "system-images;android-28;google_apis;x86"
       - name: Setup - Install Android emulator library
         run: yes | sdkmanager "emulator"
-      - name: Setup - Install Android emulator
-        run: yes | sdkmanager "platform-tools"
       - name: Setup - Install Android 28
         run: avdmanager create avd -n test -k "system-images;android-28;google_apis;x86"
       - name: List Android Emulators
