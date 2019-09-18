@@ -15,7 +15,6 @@ import invariant from 'invariant';
 import {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
-  getViewManagerConfig,
   defaultRenderError,
   defaultRenderLoading,
 } from './WebViewShared';
@@ -68,7 +67,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   webViewRef = React.createRef<NativeWebViewAndroid>();
 
-  getCommands = () => getViewManagerConfig('RNCWebView').Commands;
+  getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
 
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
@@ -101,6 +100,14 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().stopLoading,
+      null,
+    );
+  };
+
+  requestFocus = () => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().requestFocus,
       null,
     );
   };
