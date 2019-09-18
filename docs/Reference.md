@@ -14,6 +14,7 @@ This document lays out the current public properties and methods for the React N
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
 - [`onLoadProgress`](Reference.md#onloadprogress)
+- [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`originWhitelist`](Reference.md#originwhitelist)
@@ -339,6 +340,46 @@ target
 title
 url
 ```
+
+---
+
+### `onHttpError`
+
+Function that is invoked when the `WebView` receives an http error.
+> **_Note_**
+> Android API minimum level 23.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  onHttpError={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn('WebView received error status code: ', nativeEvent.statusCode);
+  }}
+/>
+```
+
+Function passed to `onHttpError` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+description
+loading
+statusCode
+target
+title
+url
+```
+
+> **_Note_**
+> Description is only used on Android
 
 ---
 
