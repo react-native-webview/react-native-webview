@@ -90,7 +90,7 @@ The object passed to `source` can have either of the following shapes:
 _Note that using static HTML requires the WebView property [originWhiteList](Reference.md#originWhiteList) to `['*']`. For some content, such as video embeds (e.g. Twitter or Facebook posts with video), the baseUrl needs to be set for the video playback to work_
 
 - `html` (string) - A static HTML page to display in the WebView.
-- `baseUrl` (string) - The base URL to be used for any relative links in the HTML.
+- `baseUrl` (string) - The base URL to be used for any relative links in the HTML. This is also used for the origin header with CORS requests made from the WebView. See [Android WebView Docs](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL)
 
 | Type   | Required |
 | ------ | -------- |
