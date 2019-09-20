@@ -20,10 +20,17 @@ module.exports = {
     // Remove this rule because we only destructure props, but never state
     'react/destructuring-assignment': 'off',
     'react/prop-types': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/static-property-placement': 'off',
+    'react/state-in-constructor': 'off',
     '@typescript-eslint/adjacent-overload-signatures': 'error',
-    '@typescript-eslint/array-type': ['error', 'array'],
+    '@typescript-eslint/array-type': [
+      'error',
+      {
+        default: 'array',
+      },
+    ],
     '@typescript-eslint/generic-type-naming': ['error', '^[a-zA-Z]+$'],
-    '@typescript-eslint/no-angle-bracket-type-assertion': 'error',
     '@typescript-eslint/no-array-constructor': 'error',
     '@typescript-eslint/no-empty-interface': 'error',
     '@typescript-eslint/no-explicit-any': 'error',
@@ -32,10 +39,18 @@ module.exports = {
     '@typescript-eslint/no-misused-new': 'error',
     '@typescript-eslint/no-namespace': 'error',
     '@typescript-eslint/no-non-null-assertion': 'error',
-    '@typescript-eslint/no-object-literal-type-assertion': 'error',
+    '@typescript-eslint/consistent-type-assertions': [
+      'error',
+      {
+        assertionStyle: 'as',
+      },
+    ],
     '@typescript-eslint/no-parameter-properties': 'error',
     '@typescript-eslint/no-this-alias': 'error',
-    '@typescript-eslint/no-triple-slash-reference': 'error',
+    '@typescript-eslint/triple-slash-reference': [
+      'error',
+      { path: 'never', types: 'never', lib: 'never' },
+    ],
     '@typescript-eslint/no-type-alias': [
       'error',
       {
@@ -48,7 +63,10 @@ module.exports = {
       'error',
       { ignoreRestSiblings: true },
     ],
-    '@typescript-eslint/prefer-interface': 'error',
+    '@typescript-eslint/consistent-type-definitions': [
+      'error',
+      'interface',
+    ],
     '@typescript-eslint/prefer-namespace-keyword': 'error',
     '@typescript-eslint/type-annotation-spacing': 'error',
   },
