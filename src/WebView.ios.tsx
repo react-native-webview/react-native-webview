@@ -27,12 +27,12 @@ import {
   NativeWebViewIOS,
   ViewManager,
   State,
-  CustomUIManager,
+  RNCWebViewUIManager,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as CustomUIManager;
+const UIManager = NotTypedUIManager as RNCWebViewUIManager;
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -83,7 +83,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().goForward,
-      null,
     );
   };
 
@@ -94,7 +93,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().goBack,
-      null,
     );
   };
 
@@ -106,7 +104,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().reload,
-      null,
     );
   };
 
@@ -117,7 +114,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().stopLoading,
-      null,
     );
   };
 
@@ -128,7 +124,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().requestFocus,
-      null,
     );
   };
 
@@ -309,7 +304,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
       // casting cause it's in the default props
-      originWhitelist as ReadonlyArray<string>,
+      originWhitelist as readonly string[],
       onShouldStartLoadWithRequestProp,
     );
 

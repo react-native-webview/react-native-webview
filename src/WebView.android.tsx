@@ -27,12 +27,12 @@ import {
   AndroidWebViewProps,
   NativeWebViewAndroid,
   State,
-  CustomUIManager,
+  RNCWebViewUIManager,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as CustomUIManager;
+const UIManager = NotTypedUIManager as RNCWebViewUIManager;
 
 const RNCWebView = requireNativeComponent(
   'RNCWebView',
@@ -74,7 +74,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().goForward,
-      null,
     );
   };
 
@@ -82,7 +81,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().goBack,
-      null,
     );
   };
 
@@ -93,7 +91,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().reload,
-      null,
     );
   };
 
@@ -101,7 +98,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().stopLoading,
-      null,
     );
   };
 
@@ -109,7 +105,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().requestFocus,
-      null,
     );
   };
 
@@ -276,7 +271,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
       // casting cause it's in the default props
-      originWhitelist as ReadonlyArray<string>,
+      originWhitelist as readonly string[],
       onShouldStartLoadWithRequestProp,
     );
 
