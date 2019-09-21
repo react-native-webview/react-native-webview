@@ -82,6 +82,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().goForward,
+      undefined,
     );
   };
 
@@ -92,6 +93,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().goBack,
+      undefined,
     );
   };
 
@@ -103,6 +105,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().reload,
+      undefined,
     );
   };
 
@@ -113,6 +116,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().stopLoading,
+      undefined,
     );
   };
 
@@ -123,6 +127,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       this.getCommands().requestFocus,
+      undefined,
     );
   };
 
