@@ -18,6 +18,7 @@ import {
 } from './WebViewShared';
 import {
   WebViewErrorEvent,
+  WebViewHttpErrorEvent,
   WebViewMessageEvent,
   WebViewNavigationEvent,
   WebViewProgressEvent,
@@ -207,6 +208,13 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     });
   };
 
+  onHttpError = (event: WebViewHttpErrorEvent) => {
+    const { onHttpError } = this.props;
+    if (onHttpError) {
+      onHttpError(event);
+    }
+  }
+
   onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     if (onLoad) {
@@ -321,6 +329,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
         onLoadingStart={this.onLoadingStart}
+        onHttpError={this.onHttpError}
         onMessage={this.onMessage}
         onScroll={this.props.onScroll}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}

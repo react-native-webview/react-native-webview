@@ -33,6 +33,7 @@ static NSURLCredential* clientAuthenticationCredential;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
+@property (nonatomic, copy) RCTDirectEventBlock onHttpError;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) WKWebView *webView;
@@ -803,6 +804,34 @@ static NSURLCredential* clientAuthenticationCredential;
   }
 
   // Allow all navigation by default
+  decisionHandler(WKNavigationResponsePolicyAllow);
+}
+
+/**
+ * Decides whether to allow or cancel a navigation after its response is known.
+ * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview?language=objc
+ */
+- (void)                    webView:(WKWebView *)webView
+  decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse
+                    decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
+{
+  if (_onHttpError && navigationResponse.forMainFrame) {
+    if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
+      NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
+      NSInteger statusCode = response.statusCode;
+
+      if (statusCode >= 400) {
+        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+        [event addEntriesFromDictionary: @{
+          @"url": response.URL.absoluteString,
+          @"statusCode": @(statusCode)
+        }];
+
+        _onHttpError(event);
+      }
+    }
+  }  
+
   decisionHandler(WKNavigationResponsePolicyAllow);
 }
 
