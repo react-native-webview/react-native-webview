@@ -222,6 +222,7 @@ static NSURLCredential* clientAuthenticationCredential;
     }
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    [self setBackgroundColor: _savedBackgroundColor];
     _webView.scrollView.delegate = self;
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
@@ -838,8 +839,6 @@ static NSURLCredential* clientAuthenticationCredential;
     }];
     _onLoadingError(event);
   }
-
-  [self setBackgroundColor: _savedBackgroundColor];
 }
 
 - (void)evaluateJS:(NSString *)js
@@ -874,8 +873,6 @@ static NSURLCredential* clientAuthenticationCredential;
   } else if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
   }
-
-  [self setBackgroundColor: _savedBackgroundColor];
 }
 
 - (void)injectJavaScript:(NSString *)script
