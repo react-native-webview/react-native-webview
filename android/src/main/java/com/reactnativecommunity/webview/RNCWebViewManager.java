@@ -16,6 +16,7 @@ import android.os.Environment;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -57,6 +59,7 @@ import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
+import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
@@ -104,6 +107,7 @@ import javax.annotation.Nullable;
 @ReactModule(name = RNCWebViewManager.REACT_CLASS)
 public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
+  public static String activeUrl = null;
   public static final int COMMAND_GO_BACK = 1;
   public static final int COMMAND_GO_FORWARD = 2;
   public static final int COMMAND_RELOAD = 3;
@@ -256,10 +260,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "androidHardwareAccelerationDisabled")
   public void setHardwareAccelerationDisabled(WebView view, boolean disabled) {
-    if (disabled) {
+    ReactContext reactContext = (ReactContext) view.getContext();
+    final boolean isHardwareAccelerated = (reactContext.getCurrentActivity().getWindow()
+        .getAttributes().flags & WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED) != 0;
+    if (disabled || !isHardwareAccelerated) {
       view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     } else {
-      view.setLayerType(View.LAYER_TYPE_NONE, null);
+      view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
   }
 
@@ -363,7 +370,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
   }
-   
+
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
     // Remove all previous cookies
@@ -511,6 +518,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
+    export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
     return export;
   }
 
@@ -686,6 +694,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+      activeUrl = url;
       dispatchEvent(
         view,
         new TopShouldStartLoadWithRequestEvent(
@@ -722,6 +731,25 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       dispatchEvent(
         webView,
         new TopLoadingErrorEvent(webView.getId(), eventData));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onReceivedHttpError(
+      WebView webView,
+      WebResourceRequest request,
+      WebResourceResponse errorResponse) {
+      super.onReceivedHttpError(webView, request, errorResponse);
+
+      if (request.isForMainFrame()) {
+        WritableMap eventData = createWebViewEvent(webView, request.getUrl().toString());
+        eventData.putInt("statusCode", errorResponse.getStatusCode());
+        eventData.putString("description", errorResponse.getReasonPhrase());
+
+        dispatchEvent(
+          webView,
+          new TopHttpErrorEvent(webView.getId(), eventData));
+      }
     }
 
     protected void emitFinishEvent(WebView webView, String url) {
@@ -821,9 +849,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public void onProgressChanged(WebView webView, int newProgress) {
       super.onProgressChanged(webView, newProgress);
+      final String url = webView.getUrl();
+      if (
+        url != null
+        && activeUrl != null
+        && !url.equals(activeUrl)
+      ) {
+        return;
+      }
       WritableMap event = Arguments.createMap();
       event.putDouble("target", webView.getId());
       event.putString("title", webView.getTitle());
+      event.putString("url", url);
       event.putBoolean("canGoBack", webView.canGoBack());
       event.putBoolean("canGoForward", webView.canGoForward());
       event.putDouble("progress", (float) newProgress / 100);
@@ -908,6 +945,23 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setHasScrollEvent(boolean hasScrollEvent) {
       this.hasScrollEvent = hasScrollEvent;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+
+      // Allow scrolling inside ScrollView
+      if (event.findPointerIndex(0) == -1) {
+        return super.onTouchEvent(event);
+      }
+
+      if (event.getPointerCount() >= 1) {
+        requestDisallowInterceptTouchEvent(true);
+      } else {
+        requestDisallowInterceptTouchEvent(false);
+      }
+
+      return super.onTouchEvent(event);
     }
 
     @Override
