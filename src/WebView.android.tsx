@@ -61,6 +61,8 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     return NativeModules.RNCWebView.isFileUploadSupported();
   };
 
+  startUrl: string | null = null;
+
   state: State = {
     viewState: this.props.startInLoadingState ? 'LOADING' : 'IDLE',
     lastErrorEvent: null,
@@ -156,6 +158,8 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   onLoadingStart = (event: WebViewNavigationEvent) => {
     const { onLoadStart } = this.props;
+    const { nativeEvent: { url } } = event;
+    this.startUrl = url;
     if (onLoadStart) {
       onLoadStart(event);
     }
@@ -188,15 +192,18 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
+    const { nativeEvent: { url } } = event;
     if (onLoad) {
       onLoad(event);
     }
     if (onLoadEnd) {
       onLoadEnd(event);
     }
-    this.setState({
-      viewState: 'IDLE',
-    });
+    if (url === this.startUrl) {
+      this.setState({
+        viewState: 'IDLE',
+      });
+    }
     this.updateNavigationState(event);
   };
 
@@ -209,6 +216,12 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress } = this.props;
+    const { nativeEvent: { progress } } = event;
+    if (progress === 1) {
+      this.setState({
+        viewState: 'IDLE',
+      });
+    }
     if (onLoadProgress) {
       onLoadProgress(event);
     }
