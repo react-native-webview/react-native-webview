@@ -1,4 +1,4 @@
-/* eslint-disable react/no-multi-comp */
+/* eslint-disable react/no-multi-comp, max-classes-per-file */
 
 import { ReactElement, Component } from 'react';
 import {
@@ -11,28 +11,20 @@ import {
 } from 'react-native';
 
 export interface WebViewCommands {
-  goForward: Function;
-  goBack: Function;
-  reload: Function;
-  stopLoading: Function;
-  postMessage: Function;
-  injectJavaScript: Function;
-  loadUrl: Function;
-  requestFocus: Function;
+  goForward: number;
+  goBack: number;
+  reload: number;
+  stopLoading: number;
+  postMessage: number;
+  injectJavaScript: number;
+  loadUrl: number;
+  requestFocus: number;
 }
 
-export interface CustomUIManager extends UIManagerStatic {
+export interface RNCWebViewUIManager extends UIManagerStatic {
   getViewManagerConfig: (
-    name: string,
+    name: 'RNCWebView',
   ) => {
-    Commands: WebViewCommands;
-  };
-  dispatchViewManagerCommand: (
-    viewHandle: number,
-    command: Function,
-    params: object | null,
-  ) => void;
-  RNCWebView: {
     Commands: WebViewCommands;
   };
 }
@@ -117,6 +109,11 @@ export interface WebViewError extends WebViewNativeEvent {
   description: string;
 }
 
+export interface WebViewHttpError extends WebViewNativeEvent {
+  description: string;
+  statusCode: number;
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent = NativeSyntheticEvent<
@@ -128,6 +125,10 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
+
+export type WebViewTerminatedEvent = NativeSyntheticEvent<WebViewNativeEvent>;
+
+export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
 
 export type DataDetectorTypes =
   | 'phoneNumber'
@@ -218,6 +219,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onLoadingFinish: (event: WebViewNavigationEvent) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
   onLoadingStart: (event: WebViewNavigationEvent) => void;
+  onHttpError: (event: WebViewHttpErrorEvent) => void;
   onMessage: (event: WebViewMessageEvent) => void;
   onShouldStartLoadWithRequest: (event: WebViewNavigationEvent) => void;
   showsHorizontalScrollIndicator?: boolean;
@@ -247,7 +249,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   saveFormDataDisabled?: boolean;
   textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
-  urlPrefixesForDefaultIntent?: ReadonlyArray<string>;
+  urlPrefixesForDefaultIntent?: readonly string[];
 }
 
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -263,13 +265,14 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
     | 'scrollableAxes'
     | 'never'
     | 'always';
-  dataDetectorTypes?: DataDetectorTypes | ReadonlyArray<DataDetectorTypes>;
+  dataDetectorTypes?: DataDetectorTypes | readonly DataDetectorTypes[];
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
   hideKeyboardAccessoryView?: boolean;
   pagingEnabled?: boolean;
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;
+  onContentProcessDidTerminate: (event: WebViewTerminatedEvent) => void;
 }
 
 export interface IOSWebViewProps extends WebViewSharedProps {
@@ -361,7 +364,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    *
    * @platform ios
    */
-  dataDetectorTypes?: DataDetectorTypes | ReadonlyArray<DataDetectorTypes>;
+  dataDetectorTypes?: DataDetectorTypes | readonly DataDetectorTypes[];
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -443,6 +446,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   allowingReadAccessToURL?: string;
+
+  /**
+   * Function that is invoked when the WebKit WebView content process gets terminated.
+   * @platform ios
+   */
+  onContentProcessDidTerminate: (event: WebViewTerminatedEvent) => void;
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
@@ -501,7 +510,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
    * @platform android
    */
-  urlPrefixesForDefaultIntent?: ReadonlyArray<string>;
+  urlPrefixesForDefaultIntent?: readonly string[];
 
   /**
    * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
@@ -608,6 +617,12 @@ export interface WebViewSharedProps extends ViewProps {
   onError?: (event: WebViewErrorEvent) => void;
 
   /**
+   * Function that is invoked when the `WebView` receives an error status code.
+   * Works on iOS and Android (minimum API level 23).
+   */
+  onHttpError?: (event: WebViewHttpErrorEvent) => void;
+
+  /**
    * Function that is invoked when the `WebView` loading starts or ends.
    */
   onNavigationStateChange?: (event: WebViewNavigation) => void;
@@ -663,7 +678,7 @@ export interface WebViewSharedProps extends ViewProps {
    * this whitelist, we will open the URL in Safari.
    * The default whitelisted origins are "http://*" and "https://*".
    */
-  originWhitelist?: ReadonlyArray<string>;
+  originWhitelist?: readonly string[];
 
   /**
    * Function that allows custom handling of any web view requests. Return

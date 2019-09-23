@@ -14,8 +14,10 @@ This document lays out the current public properties and methods for the React N
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
 - [`onLoadProgress`](Reference.md#onloadprogress)
+- [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
+- [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
@@ -91,7 +93,7 @@ The object passed to `source` can have either of the following shapes:
 _Note that using static HTML requires the WebView property [originWhiteList](Reference.md#originWhiteList) to `['*']`. For some content, such as video embeds (e.g. Twitter or Facebook posts with video), the baseUrl needs to be set for the video playback to work_
 
 - `html` (string) - A static HTML page to display in the WebView.
-- `baseUrl` (string) - The base URL to be used for any relative links in the HTML.
+- `baseUrl` (string) - The base URL to be used for any relative links in the HTML. This is also used for the origin header with CORS requests made from the WebView. See [Android WebView Docs](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL)
 
 | Type   | Required |
 | ------ | -------- |
@@ -310,10 +312,6 @@ url
 
 Function that is invoked when the `WebView` is loading.
 
-> **_Note_**
->
-> On android, You can't get the url property, meaning that `event.nativeEvent.url` will be null.
-
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
@@ -340,6 +338,46 @@ target
 title
 url
 ```
+
+---
+
+### `onHttpError`
+
+Function that is invoked when the `WebView` receives an http error.
+> **_Note_**
+> Android API minimum level 23.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  onHttpError={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn('WebView received error status code: ', nativeEvent.statusCode);
+  }}
+/>
+```
+
+Function passed to `onHttpError` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+description
+loading
+statusCode
+target
+title
+url
+```
+
+> **_Note_**
+> Description is only used on Android
 
 ---
 
@@ -390,6 +428,40 @@ url
 ```
 
 Note that this method will not be invoked on hash URL changes (e.g. from `https://example.com/users#list` to `https://example.com/users#help`). There is a workaround for this that is described [in the Guide](Guide.md#intercepting-hash-url-changes).
+
+---
+
+### `onContentProcessDidTerminate`
+
+Function that is invoked when the `WebView` content process is terminated.
+
+| Type     | Required | Platform      |
+| -------- | -------- | ------------- |
+| function | No       | iOS WKWebView |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  onContentProcessDidTerminate={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn('Content process terminated, reloading', nativeEvent);
+    this.refs.webview.reload()
+  }}
+/>
+```
+
+Function passed to onContentProcessDidTerminate is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+loading
+target
+title
+url
+```
 
 ---
 
