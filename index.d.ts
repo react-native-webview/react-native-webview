@@ -2,6 +2,8 @@ import { Component } from 'react';
 // eslint-disable-next-line
 import { IOSWebViewProps, AndroidWebViewProps } from './lib/WebViewTypes';
 
+export { WebViewMessageEvent, WebViewNavigation } from "./lib/WebViewTypes";
+
 export type WebViewProps = IOSWebViewProps & AndroidWebViewProps;
 
 declare class WebView extends Component<WebViewProps> {
@@ -34,6 +36,11 @@ declare class WebView extends Component<WebViewProps> {
      * Executes the JavaScript string.
      */
     injectJavaScript: (script: string) => void;
+
+    /**
+     * Focuses on WebView redered page.
+     */
+    requestFocus: () => void;
 }
 
 export {WebView};

@@ -137,10 +137,39 @@ Once these are exposed, you can reference them in your custom web view class.
 If you open webpages that needs a Client Certificate for Authentication, you can create a credential and pass it to the webview:
 
 ```
-[RNCWKWebView setClientAuthenticationCredential:credential];
+[RNCWebView setClientAuthenticationCredential:credential];
 ```
 
 This can be paired with a call from Javascript to pass a string label for the certificate stored in keychain and use native calls to fetch the certificate to create a credential object. This call can be made anywhere that makes sense for your application (e.g. as part of the user authentication stack). The only requirement is to make this call before displaying any webviews.
+
+### Allowing custom CAs (Certifica Authorities) and enabling SSL Pinning
+
+If you need to connect to a server which has a self signed certificate, or want to perform SSL Pinning on the webview requests, you need to pass a dictionary with the host as the key, and the certificate as the value of each item:
+
+
+```objc
+-(void)installCerts {
+
+  // Get the bundle where the certificates in DER format are present.
+  NSBundle *bundle = [NSBundle mainBundle];
+  
+  NSMutableDictionary* certMap = [NSMutableDictionary new];
+
+  NSData *rootCertData = [NSData dataWithContentsOfFile:[bundle pathForResource:@"example_ca" ofType:@"der"]];
+
+  SecCertificateRef certificate = SecCertificateCreateWithData(NULL, (CFDataRef) rootCertData);
+   
+  OSStatus err = SecItemAdd((CFDictionaryRef) [NSDictionary dictionaryWithObjectsAndKeys:(id) kSecClassCertificate, kSecClass, certificate, kSecValueRef, nil], NULL);
+  
+  [certMap setObject:(__bridge id _Nonnull)(certificate) forKey:@"example.com"];
+
+  [RNCWebView setCustomCertificatesForHost:certMap];
+}
+
+```
+
+Multiple hosts can be added to the directionary, and only one certificate for a host is allowed. The verification will succeed if any of the certificates in the chain of the request matches the one defined for the request's host.
+
 
 ## JavaScript Interface
 
