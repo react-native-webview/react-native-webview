@@ -16,6 +16,7 @@
 static NSTimer *keyboardTimer;
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
+static NSDictionary* customCertificatesForHost;
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -33,8 +34,10 @@ static NSURLCredential* clientAuthenticationCredential;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
+@property (nonatomic, copy) RCTDirectEventBlock onHttpError;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
+@property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 @property (nonatomic, copy) WKWebView *webView;
 @end
 
@@ -222,6 +225,7 @@ static NSURLCredential* clientAuthenticationCredential;
     }
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    [self setBackgroundColor: _savedBackgroundColor];
     _webView.scrollView.delegate = self;
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
@@ -644,19 +648,44 @@ static NSURLCredential* clientAuthenticationCredential;
   clientAuthenticationCredential = credential;
 }
 
++ (void)setCustomCertificatesForHost:(nullable NSDictionary*)certificates {
+    customCertificatesForHost = certificates;
+}
+
 - (void)                    webView:(WKWebView *)webView
   didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
                   completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler
 {
-  if (!clientAuthenticationCredential) {
+    NSString* host = nil;
+    if (webView.URL != nil) {
+        host = webView.URL.host;
+    }
+    if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
+        completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
+        return;
+    }
+    if ([[challenge protectionSpace] serverTrust] != nil && customCertificatesForHost != nil && host != nil) {
+        SecCertificateRef localCertificate = (__bridge SecCertificateRef)([customCertificatesForHost objectForKey:host]);
+        if (localCertificate != nil) {
+            NSData *localCertificateData = (NSData*) CFBridgingRelease(SecCertificateCopyData(localCertificate));
+            SecTrustRef trust = [[challenge protectionSpace] serverTrust];
+            long count = SecTrustGetCertificateCount(trust);
+            for (long i = 0; i < count; i++) {
+                SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(trust, i);
+                if (serverCertificate == nil) { continue; }
+                NSData *serverCertificateData = (NSData *) CFBridgingRelease(SecCertificateCopyData(serverCertificate));
+                if ([serverCertificateData isEqualToData:localCertificateData]) {
+                    NSURLCredential *useCredential = [NSURLCredential credentialForTrust:trust];
+                    if (challenge.sender != nil) {
+                        [challenge.sender useCredential:useCredential forAuthenticationChallenge:challenge];
+                    }
+                    completionHandler(NSURLSessionAuthChallengeUseCredential, useCredential);
+                    return;
+                }
+            }
+        }
+    }
     completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
-    return;
-  }
-  if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
-    completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
-  } else {
-    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
-  }
 }
 
 #pragma mark - WKNavigationDelegate methods
@@ -806,6 +835,47 @@ static NSURLCredential* clientAuthenticationCredential;
 }
 
 /**
+ * Called when the web view’s content process is terminated.
+ * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi?language=objc
+ */
+- (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
+{
+  RCTLogWarn(@"Webview Process Terminated");
+  if (_onContentProcessDidTerminate) {
+    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    _onContentProcessDidTerminate(event);
+  }
+}
+
+/**
+ * Decides whether to allow or cancel a navigation after its response is known.
+ * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview?language=objc
+ */
+- (void)                    webView:(WKWebView *)webView
+  decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse
+                    decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
+{
+  if (_onHttpError && navigationResponse.forMainFrame) {
+    if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
+      NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
+      NSInteger statusCode = response.statusCode;
+
+      if (statusCode >= 400) {
+        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+        [event addEntriesFromDictionary: @{
+          @"url": response.URL.absoluteString,
+          @"statusCode": @(statusCode)
+        }];
+
+        _onHttpError(event);
+      }
+    }
+  }  
+
+  decisionHandler(WKNavigationResponsePolicyAllow);
+}
+
+/**
  * Called when an error occurs while the web view is loading content.
  * @see https://fburl.com/km6vqenw
  */
@@ -838,8 +908,6 @@ static NSURLCredential* clientAuthenticationCredential;
     }];
     _onLoadingError(event);
   }
-
-  [self setBackgroundColor: _savedBackgroundColor];
 }
 
 - (void)evaluateJS:(NSString *)js
@@ -874,8 +942,6 @@ static NSURLCredential* clientAuthenticationCredential;
   } else if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
   }
-
-  [self setBackgroundColor: _savedBackgroundColor];
 }
 
 - (void)injectJavaScript:(NSString *)script
