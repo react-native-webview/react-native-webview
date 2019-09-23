@@ -17,6 +17,7 @@ This document lays out the current public properties and methods for the React N
 - [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
+- [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
@@ -430,6 +431,40 @@ url
 ```
 
 Note that this method will not be invoked on hash URL changes (e.g. from `https://example.com/users#list` to `https://example.com/users#help`). There is a workaround for this that is described [in the Guide](Guide.md#intercepting-hash-url-changes).
+
+---
+
+### `onContentProcessDidTerminate`
+
+Function that is invoked when the `WebView` content process is terminated.
+
+| Type     | Required | Platform      |
+| -------- | -------- | ------------- |
+| function | No       | iOS WKWebView |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  onContentProcessDidTerminate={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn('Content process terminated, reloading', nativeEvent);
+    this.refs.webview.reload()
+  }}
+/>
+```
+
+Function passed to onContentProcessDidTerminate is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+loading
+target
+title
+url
+```
 
 ---
 

@@ -22,6 +22,7 @@ import {
   WebViewMessageEvent,
   WebViewNavigationEvent,
   WebViewProgressEvent,
+  WebViewTerminatedEvent,
   IOSWebViewProps,
   DecelerationRateConstant,
   NativeWebViewIOS,
@@ -255,6 +256,13 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
   };
 
+  onContentProcessDidTerminate = (event: WebViewTerminatedEvent) => {
+    const { onContentProcessDidTerminate } = this.props;
+    if (onContentProcessDidTerminate) {
+      onContentProcessDidTerminate(event);
+    }
+  };
+
   componentDidUpdate(prevProps: IOSWebViewProps) {
     this.showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
     this.showRedboxOnPropChanges(prevProps, 'incognito');
@@ -333,6 +341,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         onMessage={this.onMessage}
         onScroll={this.props.onScroll}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onContentProcessDidTerminate={this.onContentProcessDidTerminate}
         ref={this.webViewRef}
         // TODO: find a better way to type this.
         source={resolveAssetSource(this.props.source as ImageSourcePropType)}
