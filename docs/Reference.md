@@ -14,6 +14,7 @@ This document lays out the current public properties and methods for the React N
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
 - [`onLoadProgress`](Reference.md#onloadprogress)
+- [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
@@ -91,7 +92,7 @@ The object passed to `source` can have either of the following shapes:
 _Note that using static HTML requires the WebView property [originWhiteList](Reference.md#originWhiteList) to `['*']`. For some content, such as video embeds (e.g. Twitter or Facebook posts with video), the baseUrl needs to be set for the video playback to work_
 
 - `html` (string) - A static HTML page to display in the WebView.
-- `baseUrl` (string) - The base URL to be used for any relative links in the HTML.
+- `baseUrl` (string) - The base URL to be used for any relative links in the HTML. This is also used for the origin header with CORS requests made from the WebView. See [Android WebView Docs](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL)
 
 | Type   | Required |
 | ------ | -------- |
@@ -340,6 +341,46 @@ target
 title
 url
 ```
+
+---
+
+### `onHttpError`
+
+Function that is invoked when the `WebView` receives an http error.
+> **_Note_**
+> Android API minimum level 23.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  onHttpError={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn('WebView received error status code: ', nativeEvent.statusCode);
+  }}
+/>
+```
+
+Function passed to `onHttpError` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+description
+loading
+statusCode
+target
+title
+url
+```
+
+> **_Note_**
+> Description is only used on Android
 
 ---
 
