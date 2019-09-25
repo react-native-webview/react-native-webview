@@ -5,11 +5,12 @@ import com.facebook.react.uimanager.events.Event
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
 /**
- * Event emitted when there is an error in loading.
+ * Event emitted when a http error is received from the server.
  */
-class TopMessageEvent(viewId: Int, private val mEventData: WritableMap) : Event<TopMessageEvent>(viewId) {
+class TopHttpErrorEvent(viewId: Int, private val mEventData: WritableMap) :
+  Event<TopHttpErrorEvent>(viewId) {
   companion object {
-    const val EVENT_NAME = "topMessage"
+    const val EVENT_NAME = "topHttpError"
   }
 
   override fun getEventName(): String = EVENT_NAME
@@ -18,7 +19,7 @@ class TopMessageEvent(viewId: Int, private val mEventData: WritableMap) : Event<
 
   override fun getCoalescingKey(): Short = 0
 
-  override fun dispatch(rctEventEmitter: RCTEventEmitter) {
-    rctEventEmitter.receiveEvent(viewTag, EVENT_NAME, mEventData)
-  }
+  override fun dispatch(rctEventEmitter: RCTEventEmitter) =
+    rctEventEmitter.receiveEvent(viewTag, eventName, mEventData)
+
 }

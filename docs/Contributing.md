@@ -45,5 +45,4 @@ $ yarn add ../react-native-webview && react-native link react-native-webview
 ## Notes
 
 - We use TypeScript.
-- We don't intend to support UIWebView and will remove it soon.
 - After pulling this repo and installing all dependencies, you can run tests using the command: `yarn ci`
