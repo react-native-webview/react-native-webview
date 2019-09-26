@@ -68,6 +68,7 @@ static NSDictionary* customCertificatesForHost;
     _showsVerticalScrollIndicator = YES;
     _directionalLockEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
+    _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
@@ -278,6 +279,9 @@ static NSDictionary* customCertificatesForHost;
 -(void)toggleFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  if (!_autoManageStatusBarEnabled) {
+    return;
+  }
   if (!_isFullScreenVideoOpen) {
     _isFullScreenVideoOpen = YES;
     RCTUnsafeExecuteOnMainQueueSync(^{
@@ -870,7 +874,7 @@ static NSDictionary* customCertificatesForHost;
         _onHttpError(event);
       }
     }
-  }  
+  }
 
   decisionHandler(WKNavigationResponsePolicyAllow);
 }

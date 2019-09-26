@@ -58,6 +58,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
+- [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 
 ## Methods Index
 
@@ -343,6 +344,7 @@ url
 ### `onHttpError`
 
 Function that is invoked when the `WebView` receives an http error.
+
 > **_Note_**
 > Android API minimum level 23.
 
@@ -357,7 +359,10 @@ Example:
   source={{ uri: 'https://facebook.github.io/react-native' }}
   onHttpError={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
-    console.warn('WebView received error status code: ', nativeEvent.statusCode);
+    console.warn(
+      'WebView received error status code: ',
+      nativeEvent.statusCode,
+    );
   }}
 />
 ```
@@ -446,7 +451,7 @@ Example:
   onContentProcessDidTerminate={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
     console.warn('Content process terminated, reloading', nativeEvent);
-    this.refs.webview.reload()
+    this.refs.webview.reload();
   }}
 />
 ```
@@ -1004,6 +1009,20 @@ When setting the standard textZoom (100) parameter size, this undesirable effect
 Example:
 
 `<WebView textZoom={100} />`
+
+---
+
+### `autoManageStatusBarEnabled`
+
+If the user watch fullscreen video in WebView then StatusBar will be light. The default value is `true`.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| number | No       | iOS      |
+
+Example:
+
+`<WebView autoManageStatusBarEnabled={false} />`
 
 ## Methods
 
