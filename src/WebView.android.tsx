@@ -249,6 +249,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       renderLoading,
       source,
       style,
+      containerStyle,
       nativeConfig = {},
       ...otherProps
     } = this.props;
@@ -272,6 +273,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
+    const webViewContainerStyle = [styles.container, containerStyle];
 
     if (source && 'method' in source) {
       if (source.method === 'POST' && source.headers) {
@@ -314,7 +316,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     );
 
     return (
-      <View style={styles.container}>
+      <View style={webViewContainerStyle}>
         {webView}
         {otherView}
       </View>
