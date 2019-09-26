@@ -92,7 +92,15 @@ static NSDictionary* customCertificatesForHost;
 
     // Workaround for StatusBar appearance bug for iOS 12
     // https://github.com/react-native-community/react-native-webview/issues/62
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleFullScreenVideoStatusBars) name:@"_MRMediaRemotePlayerSupportedCommandsDidChangeNotification" object:nil];
+      [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(showFullScreenVideoStatusBars)
+                                                   name:UIWindowDidBecomeVisibleNotification
+                                                 object:nil];
+
+      [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(hideFullScreenVideoStatusBars)
+                                                   name:UIWindowDidBecomeHiddenNotification
+                                                 object:nil];
   }
 
   return self;
@@ -275,21 +283,24 @@ static NSDictionary* customCertificatesForHost;
     [super removeFromSuperview];
 }
 
--(void)toggleFullScreenVideoStatusBars
+-(void)showFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  if (!_isFullScreenVideoOpen) {
     _isFullScreenVideoOpen = YES;
     RCTUnsafeExecuteOnMainQueueSync(^{
       [RCTSharedApplication() setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
     });
-  } else {
+#pragma clang diagnostic pop
+}
+
+-(void)hideFullScreenVideoStatusBars
+{
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     _isFullScreenVideoOpen = NO;
     RCTUnsafeExecuteOnMainQueueSync(^{
       [RCTSharedApplication() setStatusBarHidden:self->_savedStatusBarHidden animated:YES];
       [RCTSharedApplication() setStatusBarStyle:self->_savedStatusBarStyle animated:YES];
     });
-  }
 #pragma clang diagnostic pop
 }
 
