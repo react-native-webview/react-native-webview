@@ -20,11 +20,22 @@ static NSDictionary* customCertificatesForHost;
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
-@interface _SwizzleHelperWK : NSObject @end
+@interface _SwizzleHelperWK : UIView
+@property (nonatomic, copy) WKWebView *webView;
+@end
 @implementation _SwizzleHelperWK
 -(id)inputAccessoryView
 {
-  return nil;
+    if (_webView == nil) {
+        return nil;
+    }
+
+    if ([_webView respondsToSelector:@selector(inputAssistantItem)]) {
+        UITextInputAssistantItem *inputAssistantItem = [_webView inputAssistantItem];
+        inputAssistantItem.leadingBarButtonGroups = @[];
+        inputAssistantItem.trailingBarButtonGroups = @[];
+    }
+    return nil;
 }
 @end
 
