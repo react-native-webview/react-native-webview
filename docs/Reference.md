@@ -55,6 +55,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`cacheEnabled`](Reference.md#cacheEnabled)
+- [`cacheMode`](Reference.md#cacheMode)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
@@ -982,6 +983,22 @@ Sets whether WebView should use browser caching.
 | Type    | Required | Default |
 | ------- | -------- | ------- |
 | boolean | No       | true    |
+
+---
+
+### `cacheMode`
+
+Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed. When navigating back, content is not revalidated, instead the content is just retrieved from the cache. This property allows the client to override this behavior.
+
+Possible values are:
+- `LOAD_DEFAULT` - Default cache usage mode. If the navigation type doesn't impose any specific behavior, use cached resources when they are available and not expired, otherwise load resources from the network.
+- `LOAD_CACHE_ELSE_NETWORK` - Use cached resources when they are available, even if they have expired. Otherwise load resources from the network.
+- `LOAD_NO_CACHE` - Don't use the cache, load from the network.
+- `LOAD_CACHE_ONLY` - Don't use the network, load from the cache. 
+ 
+| Type    | Required | Default      | Platform |
+| ------- | -------- | -------------| -------- |
+| string  | No       | LOAD_DEFAULT | Android  |
 
 ---
 
