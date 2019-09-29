@@ -25,6 +25,7 @@ This document lays out the current public properties and methods for the React N
 - [`onShouldStartLoadWithRequest`](Reference.md#onshouldstartloadwithrequest)
 - [`startInLoadingState`](Reference.md#startinloadingstate)
 - [`style`](Reference.md#style)
+- [`containerStyle`](Reference.md#containerStyle)
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
@@ -343,6 +344,7 @@ url
 ### `onHttpError`
 
 Function that is invoked when the `WebView` receives an http error.
+
 > **_Note_**
 > Android API minimum level 23.
 
@@ -357,7 +359,10 @@ Example:
   source={{ uri: 'https://facebook.github.io/react-native' }}
   onHttpError={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
-    console.warn('WebView received error status code: ', nativeEvent.statusCode);
+    console.warn(
+      'WebView received error status code: ',
+      nativeEvent.statusCode,
+    );
   }}
 />
 ```
@@ -446,7 +451,7 @@ Example:
   onContentProcessDidTerminate={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
     console.warn('Content process terminated, reloading', nativeEvent);
-    this.refs.webview.reload()
+    this.refs.webview.reload();
   }}
 />
 ```
@@ -597,6 +602,25 @@ Example:
 <WebView
   source={{ uri: 'https://facebook.github.io/react-native' }}
   style={{ marginTop: 20 }}
+/>
+```
+
+---
+
+### `containerStyle`
+
+A style object that allow you to customize the `WebView` container style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
+
+| Type  | Required |
+| ----- | -------- |
+| style | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  containerStyle={{ marginTop: 20 }}
 />
 ```
 

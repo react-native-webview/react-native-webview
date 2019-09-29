@@ -4,6 +4,8 @@ import { ReactElement, Component } from 'react';
 import {
   NativeSyntheticEvent,
   ViewProps,
+  StyleProp,
+  ViewStyle,
   NativeMethodsMixin,
   Constructor,
   UIManagerStatic,
@@ -575,6 +577,11 @@ export interface WebViewSharedProps extends ViewProps {
    * @platform android
    */
   javaScriptEnabled?: boolean;
+
+  /**
+   * Stylesheet object to set the style of the container view.
+   */
+  containerStyle?: StyleProp<ViewStyle>;
 
   /**
    * Function that returns a view to show if there's an error.
