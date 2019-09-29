@@ -44,6 +44,7 @@ This document lays out the current public properties and methods for the React N
 - [`scrollEnabled`](Reference.md#scrollenabled)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
+- [`allowFileAccessFromFileURLs`](Reference.md#allowFileAccessFromFileURLs)
 - [`allowUniversalAccessFromFileURLs`](Reference.md#allowUniversalAccessFromFileURLs)
 - [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
 - [`url`](Reference.md#url)
@@ -869,6 +870,16 @@ Boolean value that determines whether a vertical scroll indicator is shown in th
 ### `geolocationEnabled`
 
 Set whether Geolocation is enabled in the `WebView`. The default value is `false`. Used only in Android.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
+---
+
+### `allowFileAccessFromFileURLs`
+
+ Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
