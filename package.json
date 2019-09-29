@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "7.2.8",
+  "version": "7.3.0",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "ci": "CI=true && yarn lint && yarn test",
