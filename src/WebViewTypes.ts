@@ -4,6 +4,8 @@ import { ReactElement, Component } from 'react';
 import {
   NativeSyntheticEvent,
   ViewProps,
+  StyleProp,
+  ViewStyle,
   NativeMethodsMixin,
   Constructor,
   UIManagerStatic,
@@ -143,6 +145,8 @@ export type DataDetectorTypes =
 
 export type OverScrollModeType = 'always' | 'content' | 'never';
 
+export type CacheMode = 'LOAD_DEFAULT' | 'LOAD_CACHE_ONLY' | 'LOAD_CACHE_ELSE_NETWORK' | 'LOAD_NO_CACHE';
+
 export interface WebViewSourceUri {
   /**
    * The URI to load in the `WebView`. Can be a local or remote file.
@@ -235,6 +239,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
 }
 
 export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
+  cacheMode?: CacheMode;
   allowFileAccess?: boolean;
   scalesPageToFit?: boolean;
   allowFileAccessFromFileURLs?: boolean;
@@ -459,6 +464,19 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   onContentSizeChange?: (event: WebViewEvent) => void;
 
   /**
+   * https://developer.android.com/reference/android/webkit/WebSettings.html#setCacheMode(int)
+   * Set the cacheMode. Possible values are:
+   * 
+   * - `'LOAD_DEFAULT'` (default)
+   * - `'LOAD_CACHE_ELSE_NETWORK'`
+   * - `'LOAD_NO_CACHE'`
+   * - `'LOAD_CACHE_ONLY'`
+   *
+   * @platform android
+   */
+  cacheMode?: CacheMode;
+
+  /**
    * https://developer.android.com/reference/android/view/View#OVER_SCROLL_NEVER
    * Sets the overScrollMode. Possible values are:
    *
@@ -585,6 +603,11 @@ export interface WebViewSharedProps extends ViewProps {
    * @platform android
    */
   javaScriptEnabled?: boolean;
+
+  /**
+   * Stylesheet object to set the style of the container view.
+   */
+  containerStyle?: StyleProp<ViewStyle>;
 
   /**
    * Function that returns a view to show if there's an error.

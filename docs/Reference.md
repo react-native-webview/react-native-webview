@@ -25,6 +25,7 @@ This document lays out the current public properties and methods for the React N
 - [`onShouldStartLoadWithRequest`](Reference.md#onshouldstartloadwithrequest)
 - [`startInLoadingState`](Reference.md#startinloadingstate)
 - [`style`](Reference.md#style)
+- [`containerStyle`](Reference.md#containerStyle)
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
@@ -55,6 +56,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`cacheEnabled`](Reference.md#cacheEnabled)
+- [`cacheMode`](Reference.md#cacheMode)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
@@ -344,6 +346,7 @@ url
 ### `onHttpError`
 
 Function that is invoked when the `WebView` receives an http error.
+
 > **_Note_**
 > Android API minimum level 23.
 
@@ -358,7 +361,10 @@ Example:
   source={{ uri: 'https://facebook.github.io/react-native' }}
   onHttpError={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
-    console.warn('WebView received error status code: ', nativeEvent.statusCode);
+    console.warn(
+      'WebView received error status code: ',
+      nativeEvent.statusCode,
+    );
   }}
 />
 ```
@@ -447,7 +453,7 @@ Example:
   onContentProcessDidTerminate={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
     console.warn('Content process terminated, reloading', nativeEvent);
-    this.refs.webview.reload()
+    this.refs.webview.reload();
   }}
 />
 ```
@@ -598,6 +604,25 @@ Example:
 <WebView
   source={{ uri: 'https://facebook.github.io/react-native' }}
   style={{ marginTop: 20 }}
+/>
+```
+
+---
+
+### `containerStyle`
+
+A style object that allow you to customize the `WebView` container style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
+
+| Type  | Required |
+| ----- | -------- |
+| style | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  containerStyle={{ marginTop: 20 }}
 />
 ```
 
@@ -969,6 +994,22 @@ Sets whether WebView should use browser caching.
 | Type    | Required | Default |
 | ------- | -------- | ------- |
 | boolean | No       | true    |
+
+---
+
+### `cacheMode`
+
+Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed. When navigating back, content is not revalidated, instead the content is just retrieved from the cache. This property allows the client to override this behavior.
+
+Possible values are:
+- `LOAD_DEFAULT` - Default cache usage mode. If the navigation type doesn't impose any specific behavior, use cached resources when they are available and not expired, otherwise load resources from the network.
+- `LOAD_CACHE_ELSE_NETWORK` - Use cached resources when they are available, even if they have expired. Otherwise load resources from the network.
+- `LOAD_NO_CACHE` - Don't use the cache, load from the network.
+- `LOAD_CACHE_ONLY` - Don't use the network, load from the cache. 
+ 
+| Type    | Required | Default      | Platform |
+| ------- | -------- | -------------| -------- |
+| string  | No       | LOAD_DEFAULT | Android  |
 
 ---
 

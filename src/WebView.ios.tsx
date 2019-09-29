@@ -291,6 +291,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       renderError,
       renderLoading,
       style,
+      containerStyle,
       ...otherProps
     } = this.props;
 
@@ -313,6 +314,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
+    const webViewContainerStyle = [styles.container, containerStyle];
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
@@ -351,7 +353,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     );
 
     return (
-      <View style={styles.container}>
+      <View style={webViewContainerStyle}>
         {webView}
         {otherView}
       </View>

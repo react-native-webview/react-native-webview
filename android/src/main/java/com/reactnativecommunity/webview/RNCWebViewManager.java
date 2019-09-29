@@ -257,6 +257,27 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "cacheMode")
+  public void setCacheMode(WebView view, String cacheModeString) {
+    Integer cacheMode;
+    switch (cacheModeString) {
+      case "LOAD_CACHE_ONLY":
+        cacheMode = WebSettings.LOAD_CACHE_ONLY;
+        break;
+      case "LOAD_CACHE_ELSE_NETWORK":
+        cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK;
+        break;  
+      case "LOAD_NO_CACHE":
+        cacheMode = WebSettings.LOAD_NO_CACHE;
+        break;
+      case "LOAD_DEFAULT":
+      default:
+        cacheMode = WebSettings.LOAD_DEFAULT;
+        break;
+    }
+    view.getSettings().setCacheMode(cacheMode);
+  }
+
   @ReactProp(name = "androidHardwareAccelerationDisabled")
   public void setHardwareAccelerationDisabled(WebView view, boolean disabled) {
     ReactContext reactContext = (ReactContext) view.getContext();
