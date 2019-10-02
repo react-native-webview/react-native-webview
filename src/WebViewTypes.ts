@@ -12,22 +12,13 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 
-export interface WebViewCommands {
-  goForward: number;
-  goBack: number;
-  reload: number;
-  stopLoading: number;
-  postMessage: number;
-  injectJavaScript: number;
-  loadUrl: number;
-  requestFocus: number;
-}
+type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
 
 export interface RNCWebViewUIManager extends UIManagerStatic {
   getViewManagerConfig: (
-    name: 'RNCWebView',
+    name: string,
   ) => {
-    Commands: WebViewCommands;
+    Commands: { [key in WebViewCommands]: number };
   };
 }
 
@@ -52,18 +43,18 @@ export type State = NormalState | ErrorState;
 // eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewIOSComponent extends Component<
   IOSNativeWebViewProps
-> {}
+  > { }
 declare const NativeWebViewIOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewIOSComponent;
-export class NativeWebViewIOS extends NativeWebViewIOSBase {}
+export class NativeWebViewIOS extends NativeWebViewIOSBase { }
 
 // eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewAndroidComponent extends Component<
   AndroidNativeWebViewProps
-> {}
+  > { }
 declare const NativeWebViewAndroidBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewAndroidComponent;
-export class NativeWebViewAndroid extends NativeWebViewAndroidBase {}
+export class NativeWebViewAndroid extends NativeWebViewAndroidBase { }
 
 export interface ContentInsetProp {
   top?: number;
@@ -87,12 +78,12 @@ export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
 
 export interface WebViewNavigation extends WebViewNativeEvent {
   navigationType:
-    | 'click'
-    | 'formsubmit'
-    | 'backforward'
-    | 'reload'
-    | 'formresubmit'
-    | 'other';
+  | 'click'
+  | 'formsubmit'
+  | 'backforward'
+  | 'reload'
+  | 'formresubmit'
+  | 'other';
   mainDocumentURL?: string;
 }
 
@@ -266,10 +257,10 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   bounces?: boolean;
   contentInset?: ContentInsetProp;
   contentInsetAdjustmentBehavior?:
-    | 'automatic'
-    | 'scrollableAxes'
-    | 'never'
-    | 'always';
+  | 'automatic'
+  | 'scrollableAxes'
+  | 'never'
+  | 'always';
   dataDetectorTypes?: DataDetectorTypes | readonly DataDetectorTypes[];
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
@@ -335,10 +326,10 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * "never". Available on iOS 11 and later.
    */
   contentInsetAdjustmentBehavior?:
-    | 'automatic'
-    | 'scrollableAxes'
-    | 'never'
-    | 'always';
+  | 'automatic'
+  | 'scrollableAxes'
+  | 'never'
+  | 'always';
 
   /**
    * The amount by which the web view content is inset from the edges of
@@ -466,7 +457,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   /**
    * https://developer.android.com/reference/android/webkit/WebSettings.html#setCacheMode(int)
    * Set the cacheMode. Possible values are:
-   * 
+   *
    * - `'LOAD_DEFAULT'` (default)
    * - `'LOAD_CACHE_ELSE_NETWORK'`
    * - `'LOAD_NO_CACHE'`
@@ -501,15 +492,15 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-  
+
   /**
-   * Boolean that sets whether JavaScript running in the context of a file 
-   * scheme URL should be allowed to access content from other file scheme URLs. 
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from other file scheme URLs.
    * Including accessing content from other file scheme URLs
    * @platform android
    */
   allowFileAccessFromFileURLs?: boolean;
-  
+
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from any origin.
