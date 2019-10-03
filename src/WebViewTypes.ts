@@ -12,22 +12,13 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 
-export interface WebViewCommands {
-  goForward: number;
-  goBack: number;
-  reload: number;
-  stopLoading: number;
-  postMessage: number;
-  injectJavaScript: number;
-  loadUrl: number;
-  requestFocus: number;
-}
+type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
 
 export interface RNCWebViewUIManager extends UIManagerStatic {
   getViewManagerConfig: (
-    name: 'RNCWebView',
+    name: string,
   ) => {
-    Commands: WebViewCommands;
+    Commands: { [key in WebViewCommands]: number };
   };
 }
 
