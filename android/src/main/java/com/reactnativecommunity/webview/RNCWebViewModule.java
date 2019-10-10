@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import android.util.Log;
@@ -20,6 +22,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.widget.Toast;
 
+import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -32,19 +35,29 @@ import com.facebook.react.modules.core.PermissionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
 @ReactModule(name = RNCWebViewModule.MODULE_NAME)
 public class RNCWebViewModule extends ReactContextBaseJavaModule implements ActivityEventListener {
   public static final String MODULE_NAME = "RNCWebView";
-  private static final int PICKER = 1;
   private static final int PICKER_LEGACY = 3;
+  private static final int OPEN_CAMERA = 4;
+  private static final int SELECT_FILE = 5;
   private static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
+  private static final int CAMERA_PERMISSION_REQUEST = 2;
+
   final String DEFAULT_MIME_TYPES = "*/*";
+  final String TAKE_PHOTO = "Take a photo…";
+  final String TAKE_VIDEO = "Record a video…";
+  final String CHOOSE_FILE = "Choose an existing file…";
+  final String CANCEL = "Cancel";
+
   private ValueCallback<Uri> filePathCallbackLegacy;
   private ValueCallback<Uri[]> filePathCallback;
   private Uri outputFileUri;
+  private String intentTypeAfterPermissionGranted;
   private DownloadManager.Request downloadRequest;
   private PermissionListener webviewFileDownloaderPermissionListener = new PermissionListener() {
     @Override
@@ -60,6 +73,16 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
             Toast.makeText(getCurrentActivity().getApplicationContext(), "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.", Toast.LENGTH_LONG).show();
           }
           return true;
+        }
+        case CAMERA_PERMISSION_REQUEST: {
+          if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startCamera(intentTypeAfterPermissionGranted);
+            break;
+          }
+          else {
+            filePathCallback.onReceiveValue(null);
+            break;
+          }
         }
       }
       return false;
@@ -99,26 +122,27 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     // the camera activity doesn't properly return the filename* (I think?) so we use
     // this filename instead
     switch (requestCode) {
-      case PICKER:
-        if (resultCode != RESULT_OK) {
-          if (filePathCallback != null) {
-            filePathCallback.onReceiveValue(null);
-          }
+      case PICKER_LEGACY:
+        Uri pickerResult = resultCode != Activity.RESULT_OK ? null : data == null ? outputFileUri : data.getData();
+        filePathCallbackLegacy.onReceiveValue(pickerResult);
+        break;
+      case OPEN_CAMERA:
+        if (resultCode == RESULT_OK) {
+          filePathCallback.onReceiveValue(new Uri[] { outputFileUri });
         } else {
-          Uri result[] = this.getSelectedFiles(data, resultCode);
-          if (result != null) {
-            filePathCallback.onReceiveValue(result);
-          } else {
-            filePathCallback.onReceiveValue(new Uri[]{outputFileUri});
-          }
+          filePathCallback.onReceiveValue(null);
         }
         break;
-      case PICKER_LEGACY:
-        Uri result = resultCode != Activity.RESULT_OK ? null : data == null ? outputFileUri : data.getData();
-        filePathCallbackLegacy.onReceiveValue(result);
+      case SELECT_FILE:
+        if (resultCode == RESULT_OK && data != null) {
+          Uri result[] = this.getSelectedFiles(data, resultCode);
+          filePathCallback.onReceiveValue(result);
+        } else {
+          filePathCallback.onReceiveValue(null);
+        }
         break;
-
     }
+
     filePathCallback = null;
     filePathCallbackLegacy = null;
     outputFileUri = null;
@@ -175,29 +199,68 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
   }
 
+//  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//  public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
+//    filePathCallback = callback;
+//
+//    ArrayList<Parcelable> extraIntents = new ArrayList<>();
+//    if (acceptsImages(acceptTypes)) {
+//      extraIntents.add(getPhotoIntent());
+//    }
+//    if (acceptsVideo(acceptTypes)) {
+//      extraIntents.add(getVideoIntent());
+//    }
+//
+//    Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
+//
+//    Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+//    chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
+//    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
+//
+//    if (chooserIntent.resolveActivity(getCurrentActivity().getPackageManager()) != null) {
+//      getCurrentActivity().startActivityForResult(chooserIntent, PICKER);
+//    } else {
+//      Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
+//    }
+//
+//    return true;
+//  }
+
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
     filePathCallback = callback;
+    final CharSequence[] items = getDialogItems(acceptTypes);
 
-    ArrayList<Parcelable> extraIntents = new ArrayList<>();
-    if (acceptsImages(acceptTypes)) {
-      extraIntents.add(getPhotoIntent());
-    }
-    if (acceptsVideo(acceptTypes)) {
-      extraIntents.add(getVideoIntent());
-    }
+    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getCurrentActivity());
+    builder.setTitle("Upload file:");
 
-    Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
+    // this gets called when the user:
+    // 1. chooses "Cancel"
+    // 2. presses "Back button"
+    // 3. taps outside the dialog
+    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+      @Override
+      public void onCancel(DialogInterface dialog) {
+        // we need to tell the callback we cancelled
+        filePathCallback.onReceiveValue(null);
+      }
+    });
 
-    Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-    chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
-    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
-
-    if (chooserIntent.resolveActivity(getCurrentActivity().getPackageManager()) != null) {
-      getCurrentActivity().startActivityForResult(chooserIntent, PICKER);
-    } else {
-      Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
-    }
+    builder.setItems(items, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int item) {
+        if (items[item].equals(TAKE_PHOTO)) {
+          startCamera(MediaStore.ACTION_IMAGE_CAPTURE);
+        } else if (items[item].equals(TAKE_VIDEO)) {
+          startCamera(MediaStore.ACTION_VIDEO_CAPTURE);
+        } else if (items[item].equals(CHOOSE_FILE)) {
+          startFileChooser(acceptTypes, allowMultiple);
+        } else if (items[item].equals(CANCEL)) {
+          dialog.cancel();
+        }
+      }
+    });
+    builder.show();
 
     return true;
   }
@@ -231,6 +294,58 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
 
     return result;
+  }
+
+  private CharSequence[] getDialogItems(String[] types) {
+    List<String> listItems = new ArrayList<String>();
+
+    if (acceptsImages(types)) {
+      listItems.add(TAKE_PHOTO);
+    }
+    if (acceptsVideo(types)) {
+      listItems.add(TAKE_VIDEO);
+    }
+
+    listItems.add(CHOOSE_FILE);
+    listItems.add(CANCEL);
+
+    return listItems.toArray(new CharSequence[listItems.size()]);
+  }
+
+  private void startCamera(String intentType) {
+    if (permissionsGranted()) {
+      Intent intent = new Intent();
+
+      if (MediaStore.ACTION_IMAGE_CAPTURE.equals(intentType)) {
+        intent = getPhotoIntent();
+      } else if (MediaStore.ACTION_VIDEO_CAPTURE.equals(intentType)) {
+        intent = getPhotoIntent();
+      }
+
+      getCurrentActivity().startActivityForResult(intent, OPEN_CAMERA);
+    } else {
+      intentTypeAfterPermissionGranted = intentType;
+      requestPermissions();
+    }
+  }
+
+  private void requestPermissions() {
+    if (getCurrentActivity() instanceof ReactActivity) {
+      ((ReactActivity) getCurrentActivity()).requestPermissions(new String[]{ Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST, webviewFileDownloaderPermissionListener);
+    }
+    else {
+      ((PermissionAwareActivity) getCurrentActivity()).requestPermissions(new String[]{ Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST, webviewFileDownloaderPermissionListener);
+    }
+  }
+
+  private boolean permissionsGranted() {
+    return ActivityCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+  }
+
+
+  private void startFileChooser(String[] acceptTypes, boolean allowMultiple) {
+    Intent fileChooserIntent = getFileChooserIntent(acceptTypes, allowMultiple);
+    getCurrentActivity().startActivityForResult(fileChooserIntent, SELECT_FILE);
   }
 
   private Intent getPhotoIntent() {
