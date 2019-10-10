@@ -199,33 +199,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
   }
 
-//  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-//  public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
-//    filePathCallback = callback;
-//
-//    ArrayList<Parcelable> extraIntents = new ArrayList<>();
-//    if (acceptsImages(acceptTypes)) {
-//      extraIntents.add(getPhotoIntent());
-//    }
-//    if (acceptsVideo(acceptTypes)) {
-//      extraIntents.add(getVideoIntent());
-//    }
-//
-//    Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
-//
-//    Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-//    chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
-//    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
-//
-//    if (chooserIntent.resolveActivity(getCurrentActivity().getPackageManager()) != null) {
-//      getCurrentActivity().startActivityForResult(chooserIntent, PICKER);
-//    } else {
-//      Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
-//    }
-//
-//    return true;
-//  }
-
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
     filePathCallback = callback;
