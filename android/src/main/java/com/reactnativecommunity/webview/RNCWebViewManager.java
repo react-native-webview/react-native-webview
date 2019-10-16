@@ -700,6 +700,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         RNCWebView reactWebView = (RNCWebView) webView;
 
         reactWebView.callInjectedJavaScript();
+        reactWebView.linkBridge();
 
         emitFinishEvent(webView, url);
       }
@@ -1033,6 +1034,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       if (enabled) {
         addJavascriptInterface(createRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
+        linkBridge();
       } else {
         removeJavascriptInterface(JAVASCRIPT_INTERFACE);
       }
@@ -1057,6 +1059,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         injectedJS != null &&
         !TextUtils.isEmpty(injectedJS)) {
         evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
+      }
+    }
+
+    public void linkBridge() {
+      if (messagingEnabled) {
+        loadUrl("javascript:(" +
+          "window.originalPostMessage = window.postMessage," +
+          "window.postMessage = function(data) {" +
+            JAVASCRIPT_INTERFACE + ".postMessage(String(data));" +
+          "}" +
+        ")");
       }
     }
 

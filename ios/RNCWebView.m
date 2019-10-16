@@ -156,12 +156,8 @@ static NSDictionary* customCertificatesForHost;
       [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
 
       NSString *source = [NSString stringWithFormat:
-        @"window.originalPostMessage = window.postMessage;"
-         "window.postMessage = function (data, targetOrigin,  transfer) {"
+        @"window.postMessage = function (data) {"
          "    window.webkit.messageHandlers.%@.postMessage(String(data));"
-         "    if (typeof targetOrigin !== 'undefined') {"
-         "      window.originalPostMessage(data, targetOrigin, transfer);"
-         "    }"
          "};", MessageHandlerName
       ];
 
