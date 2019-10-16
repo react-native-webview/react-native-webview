@@ -961,9 +961,9 @@ If true, this will be able horizontal swipe gestures. The default value is `fals
 
 Does not store any data within the lifetime of the WebView.
 
-| Type    | Required |
-| ------- | -------- |
-| boolean | No       |
+| Type    | Required |Platform |
+| ------- | -------- |-------- |
+| boolean | No       |iOS      |
 
 ---
 
