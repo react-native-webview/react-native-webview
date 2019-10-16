@@ -156,11 +156,13 @@ static NSDictionary* customCertificatesForHost;
       [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
 
       NSString *source = [NSString stringWithFormat:
-        @"window.%@ = {"
-         "  postMessage: function (data) {"
+        @"window.originalPostMessage = window.postMessage;"
+         "window.postMessage = function (data, targetOrigin,  transfer) {"
          "    window.webkit.messageHandlers.%@.postMessage(String(data));"
-         "  }"
-         "};", MessageHandlerName, MessageHandlerName
+         "    if (typeof targetOrigin !== 'undefined') {"
+         "      window.originalPostMessage(data, targetOrigin, transfer);"
+         "    }"
+         "};", MessageHandlerName
       ];
 
       WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
