@@ -243,6 +243,26 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
   };
 
+  /**
+   * Adds onPause and onResume methods to be used in React Native
+   */
+
+  onPause = () => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().onPause,
+      undefined
+    );
+  };
+
+  onResume = () => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().onResume,
+      undefined
+    );
+  };
+
   render() {
     const {
       onMessage,
