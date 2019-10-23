@@ -41,6 +41,16 @@ declare class WebView extends Component<WebViewProps> {
      * Focuses on WebView redered page.
      */
     requestFocus: () => void;
+        
+    /**
+     * Pause the webview
+     */
+    onPause: () => void;
+
+    /**
+     * Resume the webview
+     */
+    onResume: () => void;
 }
 
 export {WebView};
