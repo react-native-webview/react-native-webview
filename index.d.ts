@@ -31,6 +31,11 @@ declare class WebView extends Component<WebViewProps> {
     extraNativeComponentConfig: () => any;
 
     /**
+     * Change the color of the selection tool
+     */
+    setSelectionColor: (hexColor: string) => void;
+
+    /**
      * Executes the JavaScript string.
      */
     injectJavaScript: (script: string) => void;
