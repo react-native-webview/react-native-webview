@@ -51,6 +51,14 @@ static NSURLCredential* clientAuthenticationCredential;
   BOOL _savedStatusBarHidden;
 }
 
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1]; // bypass '#' character
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
+}
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
@@ -83,8 +91,17 @@ static NSURLCredential* clientAuthenticationCredential;
     // https://github.com/react-native-community/react-native-webview/issues/62
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleFullScreenVideoStatusBars) name:@"_MRMediaRemotePlayerSupportedCommandsDidChangeNotification" object:nil];
   }
-  
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideMenu) name:UIMenuControllerDidShowMenuNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideMenu) name:UIMenuControllerWillShowMenuNotification object:nil];
   return self;
+}
+
+- (void)hideMenu
+{
+  [[UIMenuController sharedMenuController] setMenuVisible:NO animated:NO];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [[UIMenuController sharedMenuController] setMenuVisible:NO animated:NO];
+  });
 }
 
 - (void)dealloc
@@ -821,6 +838,11 @@ static NSURLCredential* clientAuthenticationCredential;
   }
 
   [self setBackgroundColor: _savedBackgroundColor];
+}
+
+- (void)setSelectionColor:(NSString *)hexColor
+{
+    _webView.tintColor = [self colorFromHexString:hexColor];
 }
 
 - (void)injectJavaScript:(NSString *)script

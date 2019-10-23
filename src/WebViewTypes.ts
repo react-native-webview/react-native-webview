@@ -16,6 +16,7 @@ export interface WebViewCommands {
   reload: Function;
   stopLoading: Function;
   postMessage: Function;
+  setSelectionColor: Function;
   injectJavaScript: Function;
   loadUrl: Function;
 }

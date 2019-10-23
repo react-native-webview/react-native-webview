@@ -52,6 +52,7 @@
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 - (void)postMessage:(NSString *)message;
+- (void)setSelectionColor:(NSString *)hexColor;
 - (void)injectJavaScript:(NSString *)script;
 - (void)goForward;
 - (void)goBack;
