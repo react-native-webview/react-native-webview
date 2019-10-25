@@ -10,16 +10,26 @@
 		3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */; };
 		E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351B21446E6C00F9801F /* RNCWebViewManager.m */; };
 		E91B351E21446E6C00F9801F /* RNCWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351C21446E6C00F9801F /* RNCWebView.m */; };
+		FA3FFD6D2362A14A00B5B551 /* RNCWebView.h in Copy Files */ = {isa = PBXBuildFile; fileRef = E91B351A21446E6C00F9801F /* RNCWebView.h */; };
+		FA3FFD6E2362A14A00B5B551 /* RNCWebViewManager.h in Copy Files */ = {isa = PBXBuildFile; fileRef = E91B351921446E6C00F9801F /* RNCWebViewManager.h */; };
+		FA3FFD6F2362A14A00B5B551 /* RNCWKProcessPoolManager.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 3515965F21A3C87E00623BFA /* RNCWKProcessPoolManager.h */; };
+		FA3FFD712362A17300B5B551 /* RNCWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = E91B351A21446E6C00F9801F /* RNCWebView.h */; };
+		FA3FFD722362A17300B5B551 /* RNCWebViewManager.h in Headers */ = {isa = PBXBuildFile; fileRef = E91B351921446E6C00F9801F /* RNCWebViewManager.h */; };
+		FA3FFD732362A17400B5B551 /* RNCWKProcessPoolManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 3515965F21A3C87E00623BFA /* RNCWKProcessPoolManager.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		58B511D91A9E6C8500147676 /* CopyFiles */ = {
+		58B511D91A9E6C8500147676 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
+				FA3FFD6D2362A14A00B5B551 /* RNCWebView.h in Copy Files */,
+				FA3FFD6E2362A14A00B5B551 /* RNCWebViewManager.h in Copy Files */,
+				FA3FFD6F2362A14A00B5B551 /* RNCWKProcessPoolManager.h in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -68,14 +78,28 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		FA3FFD702362A16A00B5B551 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA3FFD712362A17300B5B551 /* RNCWebView.h in Headers */,
+				FA3FFD722362A17300B5B551 /* RNCWebViewManager.h in Headers */,
+				FA3FFD732362A17400B5B551 /* RNCWKProcessPoolManager.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		58B511DA1A9E6C8500147676 /* RNCWebView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNCWebView" */;
 			buildPhases = (
+				FA3FFD702362A16A00B5B551 /* Headers */,
+				58B511D91A9E6C8500147676 /* Copy Files */,
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
-				58B511D91A9E6C8500147676 /* CopyFiles */,
 			);
 			buildRules = (
 			);
