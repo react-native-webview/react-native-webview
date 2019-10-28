@@ -232,6 +232,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setJavaScriptEnabled(enabled);
   }
 
+  @ReactProp(name = "minimumFontSize")
+  public void setMinimumFontSize(WebView view, int fontSize) {
+    view.getSettings().setMinimumFontSize(fontSize);
+  }
+
   @ReactProp(name = "showsHorizontalScrollIndicator")
   public void setShowsHorizontalScrollIndicator(WebView view, boolean enabled) {
     view.setHorizontalScrollBarEnabled(enabled);
