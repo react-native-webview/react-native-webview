@@ -61,6 +61,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
+- [`minimumFontSize`](Reference.md#minimumFontSize)
 
 ## Methods Index
 
@@ -1056,6 +1057,20 @@ When setting the standard textZoom (100) parameter size, this undesirable effect
 Example:
 
 `<WebView textZoom={100} />`
+
+---
+
+### `minimumFontSize`
+
+Android enforces a minimum font size based on this value. Default value is 8. If you are using smaller font sizes and are having trouble fitting the whole window onto one screen, try setting this to a smaller value. 
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| number | No       | Android  |
+
+Example:
+
+`<WebView minimumFontSize={1} />`
 
 ## Methods
 
