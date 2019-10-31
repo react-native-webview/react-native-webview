@@ -346,7 +346,7 @@ _Under the hood_
 
 #### The `window.ReactNativeWebView.postMessage` method and `onMessage` prop
 
-Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
+Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This is where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
 
 You _must_ set `onMessage` or the `window.ReactNativeWebView.postMessage` method will not be injected into the web page.
 
