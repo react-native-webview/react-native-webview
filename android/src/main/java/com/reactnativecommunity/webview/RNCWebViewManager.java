@@ -109,6 +109,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_POST_MESSAGE = 5;
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
+  public static final int COMMAND_SET_SELECTION_COLOR = 8;
   protected static final String REACT_CLASS = "RNCWebView";
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
@@ -465,7 +466,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @Override
   public @Nullable
   Map<String, Integer> getCommandsMap() {
-    return MapBuilder.of(
+    Map<String, Integer> map = MapBuilder.of(
       "goBack", COMMAND_GO_BACK,
       "goForward", COMMAND_GO_FORWARD,
       "reload", COMMAND_RELOAD,
@@ -474,6 +475,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       "injectJavaScript", COMMAND_INJECT_JAVASCRIPT,
       "loadUrl", COMMAND_LOAD_URL
     );
+    map.put("setSelectionColor", COMMAND_SET_SELECTION_COLOR);
+    return map;
   }
 
   @Override
@@ -510,6 +513,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         } catch (JSONException e) {
           throw new RuntimeException(e);
         }
+        break;
+      case COMMAND_SET_SELECTION_COLOR:
         break;
       case COMMAND_INJECT_JAVASCRIPT:
         RNCWebView reactWebView = (RNCWebView) root;
