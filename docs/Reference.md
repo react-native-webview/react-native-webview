@@ -85,9 +85,9 @@ The object passed to `source` can have either of the following shapes:
 
 **Load uri**
 
-- `uri` (string) - The URI to load in the `WebView`. Can be a local or remote file.
+- `uri` (string) - The URI to load in the `WebView`. Can be a local or remote file, and can be changed with React state or props to navigate to a new page.
 - `method` (string) - The HTTP Method to use. Defaults to GET if not specified. On Android, the only supported methods are GET and POST.
-- `headers` (object) - Additional HTTP headers to send with the request. On Android, this can only be used with GET requests.
+- `headers` (object) - Additional HTTP headers to send with the request. On Android, this can only be used with GET requests. See the [Guide](Guide.md#setting-custom-headers) for more information on setting custom headers.
 - `body` (string) - The HTTP body to send with the request. This must be a valid UTF-8 string, and will be sent exactly as specified, with no additional encoding (e.g. URL-escaping or base64) applied. On Android, this can only be used with POST requests.
 
 **Static HTML**
@@ -689,7 +689,7 @@ Possible values for `mixedContentMode` are:
 
 ### `thirdPartyCookiesEnabled`
 
-Boolean value to enable third party cookies in the `WebView`. Used on Android Lollipop and above only as third party cookies are enabled by default on Android Kitkat and below and on iOS. The default value is `true`.
+Boolean value to enable third party cookies in the `WebView`. Used on Android Lollipop and above only as third party cookies are enabled by default on Android Kitkat and below and on iOS. The default value is `true`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -879,7 +879,7 @@ Set whether Geolocation is enabled in the `WebView`. The default value is `false
 
 ### `allowFileAccessFromFileURLs`
 
- Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
+Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -1002,14 +1002,15 @@ Sets whether WebView should use browser caching.
 Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed. When navigating back, content is not revalidated, instead the content is just retrieved from the cache. This property allows the client to override this behavior.
 
 Possible values are:
+
 - `LOAD_DEFAULT` - Default cache usage mode. If the navigation type doesn't impose any specific behavior, use cached resources when they are available and not expired, otherwise load resources from the network.
 - `LOAD_CACHE_ELSE_NETWORK` - Use cached resources when they are available, even if they have expired. Otherwise load resources from the network.
 - `LOAD_NO_CACHE` - Don't use the cache, load from the network.
-- `LOAD_CACHE_ONLY` - Don't use the network, load from the cache. 
- 
-| Type    | Required | Default      | Platform |
-| ------- | -------- | -------------| -------- |
-| string  | No       | LOAD_DEFAULT | Android  |
+- `LOAD_CACHE_ONLY` - Don't use the network, load from the cache.
+
+| Type   | Required | Default      | Platform |
+| ------ | -------- | ------------ | -------- |
+| string | No       | LOAD_DEFAULT | Android  |
 
 ---
 
@@ -1035,7 +1036,7 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 ### `sharedCookiesEnabled`
 
-Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`.
+Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
