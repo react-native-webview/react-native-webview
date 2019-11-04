@@ -13,6 +13,7 @@ _This guide is currently a work in progress._
 - [Multiple files upload](Guide.md#multiple-files-upload)
 - [Add support for File Download](Guide.md#add-support-for-file-download)
 - [Communicating between JS and Native](Guide.md#communicating-between-js-and-native)
+- [Working with custom headers, sessions, and cookies](Guide.md#working-with-custom-headers-sessions-and-cookies)
 
 ### Basic inline HTML
 
