@@ -421,8 +421,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         view.loadDataWithBaseURL(baseUrl, html, HTML_MIME_TYPE, HTML_ENCODING, null);
         return;
       }
-      if (source.hasKey("uri")) {
-        String url = source.getString("uri");
+      if (source.hasKey("uri") || source.hasKey("url")) {
+        String url = source.getString("uri") || source.getString("url");
         String previousUrl = view.getUrl();
         if (previousUrl != null && previousUrl.equals(url)) {
           return;
