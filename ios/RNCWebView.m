@@ -89,37 +89,7 @@ static NSDictionary* customCertificatesForHost;
 #endif
   }
 
-  if (@available(iOS 12.0, *)) {
-    // Workaround for a keyboard dismissal bug present in iOS 12
-    // https://openradar.appspot.com/radar?id=5018321736957952
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self
-      selector:@selector(keyboardWillHide)
-      name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self
-      selector:@selector(keyboardWillShow)
-      name:UIKeyboardWillShowNotification object:nil];
-
-    // Workaround for StatusBar appearance bug for iOS 12
-    // https://github.com/react-native-community/react-native-webview/issues/62
-      [[NSNotificationCenter defaultCenter] addObserver:self
-                                               selector:@selector(showFullScreenVideoStatusBars)
-                                                   name:UIWindowDidBecomeVisibleNotification
-                                                 object:nil];
-
-      [[NSNotificationCenter defaultCenter] addObserver:self
-                                               selector:@selector(hideFullScreenVideoStatusBars)
-                                                   name:UIWindowDidBecomeHiddenNotification
-                                                 object:nil];
-  }
-
   return self;
-}
-
-- (void)dealloc
-{
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 /**
@@ -136,6 +106,31 @@ static NSDictionary* customCertificatesForHost;
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
+    if (@available(iOS 12.0, *)) {
+      // Workaround for a keyboard dismissal bug present in iOS 12
+      // https://openradar.appspot.com/radar?id=5018321736957952
+      [[NSNotificationCenter defaultCenter]
+        addObserver:self
+        selector:@selector(keyboardWillHide)
+        name:UIKeyboardWillHideNotification object:nil];
+      [[NSNotificationCenter defaultCenter]
+        addObserver:self
+        selector:@selector(keyboardWillShow)
+        name:UIKeyboardWillShowNotification object:nil];
+
+      // Workaround for StatusBar appearance bug for iOS 12
+      // https://github.com/react-native-community/react-native-webview/issues/62
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                selector:@selector(showFullScreenVideoStatusBars)
+                                                    name:UIWindowDidBecomeVisibleNotification
+                                                  object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                selector:@selector(hideFullScreenVideoStatusBars)
+                                                    name:UIWindowDidBecomeHiddenNotification
+                                                  object:nil];
+    }
+    
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     WKPreferences *prefs = [[WKPreferences alloc]init];
     if (!_javaScriptEnabled) {
@@ -278,20 +273,6 @@ static NSDictionary* customCertificatesForHost;
 - (void)setAllowsBackForwardNavigationGestures:(BOOL)allowsBackForwardNavigationGestures {
   _allowsBackForwardNavigationGestures = allowsBackForwardNavigationGestures;
   _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
-}
-
-
-- (void)removeFromSuperview
-{
-    if (_webView) {
-        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
-        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
-        [_webView removeFromSuperview];
-        _webView.scrollView.delegate = nil;
-        _webView = nil;
-    }
-
-    [super removeFromSuperview];
 }
 
 -(void)showFullScreenVideoStatusBars
@@ -1026,6 +1007,18 @@ static NSDictionary* customCertificatesForHost;
     }
   }
   return request;
+}
+
+- (void)invalidate
+{
+    if (_webView) {
+        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
+        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [_webView removeFromSuperview];
+        _webView.scrollView.delegate = nil;
+        _webView = nil;
+    }
 }
 
 @end

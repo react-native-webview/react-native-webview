@@ -8,6 +8,7 @@
 #import <React/RCTView.h>
 #import <React/RCTDefines.h>
 #import <WebKit/WebKit.h>
+#import <React/RCTInvalidating.h>
 
 @class RNCWebView;
 
@@ -19,7 +20,7 @@
 
 @end
 
-@interface RNCWebView : RCTView
+@interface RNCWebView : RCTView<RCTInvalidating>
 
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
