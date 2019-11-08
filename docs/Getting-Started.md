@@ -27,6 +27,7 @@ $ react-native link react-native-webview
 iOS:
 
 If using cocoapods in the `ios/` directory run
+
 ```
 $ pod install
 ```
@@ -38,8 +39,7 @@ Android - react-native-webview version >=6.X.X:
 Please make sure AndroidX is enabled in your project by editting `android/gradle.properties` and adding 2 lines:
 
 ```
-android.useAndroidX=true
-android.enableJetifier=true
+$ react-native link react-native-webview
 ```
 
 For Android manual installation, please refer to [this article](https://engineering.brigad.co/demystifying-react-native-modules-linking-964399ec731b) where you can find detailed step on how to link any react-native project.

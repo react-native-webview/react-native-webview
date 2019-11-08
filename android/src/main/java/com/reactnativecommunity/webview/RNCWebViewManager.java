@@ -16,7 +16,11 @@ import android.os.Environment;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
+import android.view.ActionMode;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -115,6 +119,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
   public static final int COMMAND_FOCUS = 8;
+  public static final int COMMAND_SET_SELECTION_COLOR = 9;
   protected static final String REACT_CLASS = "RNCWebView";
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
@@ -555,6 +560,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       "loadUrl", COMMAND_LOAD_URL
     );
     map.put("requestFocus", COMMAND_FOCUS);
+    map.put("setSelectionColor", COMMAND_SET_SELECTION_COLOR);
     return map;
   }
 
@@ -592,6 +598,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         } catch (JSONException e) {
           throw new RuntimeException(e);
         }
+        break;
+      case COMMAND_SET_SELECTION_COLOR:
         break;
       case COMMAND_INJECT_JAVASCRIPT:
         RNCWebView reactWebView = (RNCWebView) root;
@@ -958,6 +966,33 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
      */
     public RNCWebView(ThemedReactContext reactContext) {
       super(reactContext);
+    }
+
+    @Override
+    public ActionMode startActionMode(ActionMode.Callback callback, int type) {
+      return this.dummyActionMode();
+    }
+
+    @Override
+    public ActionMode startActionMode(ActionMode.Callback callback) {
+      return this.dummyActionMode();
+    }
+
+    public ActionMode dummyActionMode() {
+      return new ActionMode() {
+        @Override public void setTitle(CharSequence title) {}
+        @Override public void setTitle(int resId) {}
+        @Override public void setSubtitle(CharSequence subtitle) {}
+        @Override public void setSubtitle(int resId) {}
+        @Override public void setCustomView(View view) {}
+        @Override public void invalidate() {}
+        @Override public void finish() {}
+        @Override public Menu getMenu() { return null; }
+        @Override public CharSequence getTitle() { return null; }
+        @Override public CharSequence getSubtitle() { return null; }
+        @Override public View getCustomView() { return null; }
+        @Override public MenuInflater getMenuInflater() { return null; }
+      };
     }
 
     public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {

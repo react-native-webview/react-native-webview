@@ -724,6 +724,11 @@ Append to the existing user-agent. Setting `userAgent` will override this.
 // Mozilla/5.0 (Linux; Android 8.1.0; Android SDK built for x86 Build/OSM1.180201.021; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/61.0.3163.98 Mobile Safari/537.36 DemoApp/1.1.0
 // Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 DemoApp/1.1.0
 ```
+Append to the existing user-agent. Available on iOS WKWebView only. Setting `userAgent` will override this.
+
+| Type   | Required | Platform      |
+| ------ | -------- | ------------- |
+| string | No       | iOS WKWebView |
 
 ### `allowsFullscreenVideo`
 

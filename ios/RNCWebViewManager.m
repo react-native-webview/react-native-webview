@@ -128,6 +128,18 @@ RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebView) {
   view.keyboardDisplayRequiresUserAction = json == nil ? true : [RCTConvert BOOL: json];
 }
 
+RCT_EXPORT_METHOD(setSelectionColor:(nonnull NSNumber *)reactTag hexColor:(NSString *)hexColor)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
+    RNCWKWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWKWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+    } else {
+      [view setSelectionColor:hexColor];
+    }
+  }];
+}
+
 RCT_EXPORT_METHOD(injectJavaScript:(nonnull NSNumber *)reactTag script:(NSString *)script)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {

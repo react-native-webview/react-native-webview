@@ -124,6 +124,18 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   };
 
   /**
+   * Change the color of the selection tool, use only by Perlego for the highlight
+   * works only with hex color formated like this '#000000'
+   */
+  setSelectionColor = (data: string) => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().setSelectionColor,
+      [data],
+    );
+  };
+
+  /**
    * Injects a javascript string into the referenced WebView. Deliberately does not
    * return a response because using eval() to return a response breaks this method
    * on pages with a Content Security Policy that disallows eval(). If you need that
