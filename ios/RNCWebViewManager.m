@@ -130,10 +130,10 @@ RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebView) {
 
 RCT_EXPORT_METHOD(setSelectionColor:(nonnull NSNumber *)reactTag hexColor:(NSString *)hexColor)
 {
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWKWebView *> *viewRegistry) {
-    RNCWKWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWKWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWKWebView, got: %@", view);
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view setSelectionColor:hexColor];
     }
