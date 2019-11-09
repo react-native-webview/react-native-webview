@@ -15,6 +15,6 @@ jobs:
       - name: Setup - Install NPM Dependencies
         run: yarn
       - name: Setup - Install CocoaPods CLI
-        run: sudo gem install cocoapods
+        run: sudo gem install cocoapods -v 1.8.4
       - name: Run tests
         run: yarn ci
