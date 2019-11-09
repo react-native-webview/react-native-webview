@@ -1,20 +1,11 @@
 import escapeStringRegexp from 'escape-string-regexp';
 import React from 'react';
-import {
-  Linking,
-  UIManager as NotTypedUIManager,
-  View,
-  ActivityIndicator,
-  Text,
-} from 'react-native';
+import { Linking, View, ActivityIndicator, Text } from 'react-native';
 import {
   WebViewNavigationEvent,
   OnShouldStartLoadWithRequest,
-  CustomUIManager,
 } from './WebViewTypes';
 import styles from './WebView.styles';
-
-const UIManager = NotTypedUIManager as CustomUIManager;
 
 const defaultOriginWhitelist = ['http://*', 'https://*'];
 
@@ -27,7 +18,7 @@ const originWhitelistToRegex = (originWhitelist: string): string =>
   `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}`;
 
 const passesWhitelist = (
-  compiledWhitelist: ReadonlyArray<string>,
+  compiledWhitelist: readonly string[],
   url: string,
 ) => {
   const origin = extractOrigin(url);
@@ -35,8 +26,8 @@ const passesWhitelist = (
 };
 
 const compileWhitelist = (
-  originWhitelist: ReadonlyArray<string>,
-): ReadonlyArray<string> =>
+  originWhitelist: readonly string[],
+): readonly string[] =>
   ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
 
 const createOnShouldStartLoadWithRequest = (
@@ -45,7 +36,7 @@ const createOnShouldStartLoadWithRequest = (
     url: string,
     lockIdentifier: number,
   ) => void,
-  originWhitelist: ReadonlyArray<string>,
+  originWhitelist: readonly string[],
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
   return ({ nativeEvent }: WebViewNavigationEvent) => {
@@ -63,15 +54,6 @@ const createOnShouldStartLoadWithRequest = (
 
     loadRequest(shouldStart, url, lockIdentifier);
   };
-};
-
-const getViewManagerConfig = (
-  viewManagerName: 'RNCUIWebView' | 'RNCWKWebView' | 'RNCWebView',
-) => {
-  if (!UIManager.getViewManagerConfig) {
-    return UIManager[viewManagerName];
-  }
-  return UIManager.getViewManagerConfig(viewManagerName);
 };
 
 const defaultRenderLoading = () => (
@@ -95,7 +77,6 @@ const defaultRenderError = (
 export {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
-  getViewManagerConfig,
   defaultRenderLoading,
   defaultRenderError,
 };
