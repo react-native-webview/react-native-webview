@@ -13,6 +13,7 @@ _This guide is currently a work in progress._
 - [Multiple files upload](Guide.md#multiple-files-upload)
 - [Add support for File Download](Guide.md#add-support-for-file-download)
 - [Communicating between JS and Native](Guide.md#communicating-between-js-and-native)
+- [Working with custom headers, sessions, and cookies](Guide.md#working-with-custom-headers-sessions-and-cookies)
 
 ### Basic inline HTML
 
@@ -297,7 +298,7 @@ This runs the JavaScript in the `runFirst` string once the page is loaded. In th
 
 _Under the hood_
 
-> On iOS, `injectedJavaScript` runs a method on WKWebView called `evaluateJavaScript:completionHandler:`
+> On iOS, `injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
 
 #### The `injectJavaScript` method
@@ -341,12 +342,12 @@ After 3 seconds, this code turns the background blue:
 
 _Under the hood_
 
-> On iOS, `injectJavaScript` calls WKWebView's `evaluateJS:andThen:`
+> On iOS, `injectJavaScript` calls WebView's `evaluateJS:andThen:`
 > On Android, `injectJavaScript` calls Android WebView's `evaluateJavascriptWithFallback` method
 
 #### The `window.ReactNativeWebView.postMessage` method and `onMessage` prop
 
-Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
+Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This is where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
 
 You _must_ set `onMessage` or the `window.ReactNativeWebView.postMessage` method will not be injected into the web page.
 
@@ -389,3 +390,92 @@ export default class App extends Component {
 This code will result in this alert:
 
 <img alt="Alert showing communication from web page to React Native" width="200" src="https://user-images.githubusercontent.com/1479215/53671269-7e822300-3c32-11e9-9937-7ddc34ba8af3.png" />
+
+### Working with custom headers, sessions, and cookies
+
+#### Setting Custom Headers
+
+In React Native WebView, you can set a custom header like this:
+
+```jsx
+<WebView
+  source={{
+    uri: 'http://example.com',
+    headers: {
+      'my-custom-header-key': 'my-custom-header-value',
+    },
+  }}
+/>
+```
+
+This will set the header on the first load, but not on subsequent page navigations.
+
+In order to work around this, you can track the current URL, intercept new page loads, and navigate to them yourself ([original credit for this technique to Chirag Shah from Big Binary](https://blog.bigbinary.com/2016/07/26/passing-request-headers-on-each-webview-request-in-react-native.html)):
+
+```jsx
+const CustomHeaderWebView = props => {
+  const { uri, onLoadStart, ...restProps } = props;
+  const [currentURI, setURI] = useState(props.source.uri);
+  const newSource = { ...props.source, uri: currentURI };
+
+  return (
+    <WebView
+      {...restProps}
+      source={newSource}
+      onShouldStartLoadWithRequest={request => {
+        // If we're loading the current URI, allow it to load
+        if (request.url === currentURI) return true;
+        // We're loading a new URL -- change state first
+        setURI(request.url);
+        return false;
+      }}
+    />
+  );
+};
+
+<CustomHeaderWebView
+  source={{
+    uri: 'http://example.com',
+    headers: {
+      'my-custom-header-key': 'my-custom-header-value',
+    },
+  }}
+/>;
+```
+
+#### Managing Cookies
+
+You can set cookies on the React Native side using the [react-native-cookies](https://github.com/joeferraro/react-native-cookies) package.
+
+When you do, you'll likely want to enable the [sharedCookiesEnabled](Reference#sharedCookiesEnabled) prop as well.
+
+```jsx
+const App = () => {
+  return (
+    <WebView
+      source={{ uri: 'http://example.com' }}
+      sharedCookiesEnabled={true}
+    />
+  );
+};
+```
+
+If you'd like to send custom cookies in the WebView itself, you can do so in a custom header, like this:
+
+```jsx
+const App = () => {
+  return (
+    <WebView
+      source={{
+        uri: 'http://example.com',
+        headers: {
+          Cookie: 'cookie1=asdf; cookie2=dfasdfdas',
+        },
+      }}
+      sharedCookiesEnabled={true}
+    />
+  );
+};
+```
+
+Note that these cookies will only be sent on the first request unless you use the technique above for [setting custom headers on each page load](#Setting-Custom-Headers).
