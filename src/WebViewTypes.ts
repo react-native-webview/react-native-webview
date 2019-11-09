@@ -18,16 +18,16 @@ type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
 
 
-interface RNCWebViewUIManager<Commands> extends UIManagerStatic {
+interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (
       name: string,
   ) => {
-    Commands: Commands;
+    Commands: {[key in Commands]: number};
   };
 }
 
-export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<{[key in WebViewCommands | AndroidWebViewCommands]: number}>
-export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<{[key in WebViewCommands]: number}>
+export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<WebViewCommands | AndroidWebViewCommands>
+export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>
 
 
 
