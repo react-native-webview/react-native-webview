@@ -14,15 +14,22 @@ import {
 
 type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
 
-type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData'
+type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
-export interface RNCWebViewUIManager extends UIManagerStatic {
+
+
+interface RNCWebViewUIManager<Commands> extends UIManagerStatic {
   getViewManagerConfig: (
-    name: string,
+      name: string,
   ) => {
-    Commands: { [key in WebViewCommands]: number };
+    Commands: Commands;
   };
 }
+
+export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<{[key in WebViewCommands | AndroidWebViewCommands]: number}>
+export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<{[key in WebViewCommands]: number}>
+
+
 
 type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
 
