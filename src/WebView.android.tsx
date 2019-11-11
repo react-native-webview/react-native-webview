@@ -278,7 +278,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     const webViewStyles = [styles.container, styles.webView, style];
     const webViewContainerStyle = [styles.container, containerStyle];
 
-    if (source && 'method' in source) {
+    if (typeof source !== "number" && source && 'method' in source) {
       if (source.method === 'POST' && source.headers) {
         console.warn(
           'WebView: `source.headers` is not supported when using POST.',
