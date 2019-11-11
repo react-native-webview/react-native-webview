@@ -14,8 +14,10 @@ This document lays out the current public properties and methods for the React N
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
 - [`onLoadProgress`](Reference.md#onloadprogress)
+- [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
+- [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
@@ -23,6 +25,7 @@ This document lays out the current public properties and methods for the React N
 - [`onShouldStartLoadWithRequest`](Reference.md#onshouldstartloadwithrequest)
 - [`startInLoadingState`](Reference.md#startinloadingstate)
 - [`style`](Reference.md#style)
+- [`containerStyle`](Reference.md#containerStyle)
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
@@ -36,12 +39,14 @@ This document lays out the current public properties and methods for the React N
 - [`bounces`](Reference.md#bounces)
 - [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
+- [`contentInsetAdjustmentBehavior`](Reference.md#contentInsetAdjustmentBehavior)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
+- [`allowFileAccessFromFileURLs`](Reference.md#allowFileAccessFromFileURLs)
 - [`allowUniversalAccessFromFileURLs`](Reference.md#allowUniversalAccessFromFileURLs)
-- [`useWebKit`](Reference.md#usewebkit)
+- [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
 - [`keyboardDisplayRequiresUserAction`](Reference.md#keyboardDisplayRequiresUserAction)
@@ -51,6 +56,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`cacheEnabled`](Reference.md#cacheEnabled)
+- [`cacheMode`](Reference.md#cacheMode)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
@@ -79,9 +85,9 @@ The object passed to `source` can have either of the following shapes:
 
 **Load uri**
 
-- `uri` (string) - The URI to load in the `WebView`. Can be a local or remote file.
+- `uri` (string) - The URI to load in the `WebView`. Can be a local or remote file, and can be changed with React state or props to navigate to a new page.
 - `method` (string) - The HTTP Method to use. Defaults to GET if not specified. On Android, the only supported methods are GET and POST.
-- `headers` (object) - Additional HTTP headers to send with the request. On Android, this can only be used with GET requests.
+- `headers` (object) - Additional HTTP headers to send with the request. On Android, this can only be used with GET requests. See the [Guide](Guide.md#setting-custom-headers) for more information on setting custom headers.
 - `body` (string) - The HTTP body to send with the request. This must be a valid UTF-8 string, and will be sent exactly as specified, with no additional encoding (e.g. URL-escaping or base64) applied. On Android, this can only be used with POST requests.
 
 **Static HTML**
@@ -89,7 +95,7 @@ The object passed to `source` can have either of the following shapes:
 _Note that using static HTML requires the WebView property [originWhiteList](Reference.md#originWhiteList) to `['*']`. For some content, such as video embeds (e.g. Twitter or Facebook posts with video), the baseUrl needs to be set for the video playback to work_
 
 - `html` (string) - A static HTML page to display in the WebView.
-- `baseUrl` (string) - The base URL to be used for any relative links in the HTML.
+- `baseUrl` (string) - The base URL to be used for any relative links in the HTML. This is also used for the origin header with CORS requests made from the WebView. See [Android WebView Docs](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL)
 
 | Type   | Required |
 | ------ | -------- |
@@ -130,7 +136,7 @@ const INJECTED_JAVASCRIPT = `(function() {
   source={{ uri: 'https://facebook.github.io/react-native' }}
   injectedJavaScript={INJECTED_JAVASCRIPT}
   onMessage={this.onMessage}
-/>
+/>;
 ```
 
 ---
@@ -308,11 +314,6 @@ url
 
 Function that is invoked when the `WebView` is loading.
 
-> **_Note_**
->
-> On iOS, when useWebKit=false, this prop will not work.
-> On android, You can't get the url property, meaning that `event.nativeEvent.url` will be null.
-
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
@@ -339,6 +340,50 @@ target
 title
 url
 ```
+
+---
+
+### `onHttpError`
+
+Function that is invoked when the `WebView` receives an http error.
+
+> **_Note_**
+> Android API minimum level 23.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  onHttpError={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn(
+      'WebView received error status code: ',
+      nativeEvent.statusCode,
+    );
+  }}
+/>
+```
+
+Function passed to `onHttpError` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+description
+loading
+statusCode
+target
+title
+url
+```
+
+> **_Note_**
+> Description is only used on Android
 
 ---
 
@@ -389,6 +434,40 @@ url
 ```
 
 Note that this method will not be invoked on hash URL changes (e.g. from `https://example.com/users#list` to `https://example.com/users#help`). There is a workaround for this that is described [in the Guide](Guide.md#intercepting-hash-url-changes).
+
+---
+
+### `onContentProcessDidTerminate`
+
+Function that is invoked when the `WebView` content process is terminated.
+
+| Type     | Required | Platform      |
+| -------- | -------- | ------------- |
+| function | No       | iOS WKWebView |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  onContentProcessDidTerminate={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn('Content process terminated, reloading', nativeEvent);
+    this.refs.webview.reload();
+  }}
+/>
+```
+
+Function passed to onContentProcessDidTerminate is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+loading
+target
+title
+url
+```
 
 ---
 
@@ -457,11 +536,9 @@ Example:
 
 Boolean that controls whether the web content is scaled to fit the view and enables the user to change the scale. The default value is `true`.
 
-On iOS, when [`useWebKit=true`](Reference.md#usewebkit), this prop will not work.
-
-| Type | Required |
-| ---- | -------- |
-| bool | No       |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
 
 ---
 
@@ -532,6 +609,25 @@ Example:
 
 ---
 
+### `containerStyle`
+
+A style object that allow you to customize the `WebView` container style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
+
+| Type  | Required |
+| ----- | -------- |
+| style | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  containerStyle={{ marginTop: 20 }}
+/>
+```
+
+---
+
 ### `decelerationRate`
 
 A floating-point number that determines how quickly the scroll view decelerates after the user lifts their finger. You may also use the string shortcuts `"normal"` and `"fast"` which match the underlying iOS settings for `UIScrollViewDecelerationRateNormal` and `UIScrollViewDecelerationRateFast` respectively:
@@ -593,7 +689,7 @@ Possible values for `mixedContentMode` are:
 
 ### `thirdPartyCookiesEnabled`
 
-Boolean value to enable third party cookies in the `WebView`. Used on Android Lollipop and above only as third party cookies are enabled by default on Android Kitkat and below and on iOS. The default value is `true`.
+Boolean value to enable third party cookies in the `WebView`. Used on Android Lollipop and above only as third party cookies are enabled by default on Android Kitkat and below and on iOS. The default value is `true`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -603,21 +699,31 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 ### `userAgent`
 
-Sets the user-agent for the `WebView`. This will only work for iOS if you are using WKWebView, not UIWebView (see https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent).
+Sets the user-agent for the `WebView`.
 
-| Type   | Required | Platform               |
-| ------ | -------- | ---------------------- |
-| string | No       | Android, iOS WKWebView |
+| Type   | Required |
+| ------ | -------- |
+| string | No       |
 
 ---
 
 ### `applicationNameForUserAgent`
 
-Append to the existing user-agent. Available on iOS WKWebView only. Setting `userAgent` will override this.
+Append to the existing user-agent. Setting `userAgent` will override this.
 
-| Type   | Required | Platform      |
-| ------ | -------- | ------------- |
-| string | No       | iOS WKWebView |
+| Type   | Required |
+| ------ | -------- |
+| string | No       |
+
+```jsx
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  applicationNameForUserAgent={'DemoApp/1.1.0'}
+/>
+// Resulting User-Agent will look like:
+// Mozilla/5.0 (Linux; Android 8.1.0; Android SDK built for x86 Build/OSM1.180201.021; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/61.0.3163.98 Mobile Safari/537.36 DemoApp/1.1.0
+// Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 DemoApp/1.1.0
+```
 
 ### `allowsFullscreenVideo`
 
@@ -679,6 +785,23 @@ The amount by which the web view content is inset from the edges of the scroll v
 
 ---
 
+### `contentInsetAdjustmentBehavior`
+
+This property specifies how the safe area insets are used to modify the content area of the scroll view. The default value of this property is "never". Available on iOS 11 and later. Defaults to `never`.
+
+Possible values:
+
+- `automatic`
+- `scrollableAxes`
+- `never`
+- `always`
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
+
+---
+
 ### `dataDetectorTypes`
 
 Determines the types of data converted to clickable URLs in the web view's content. By default only phone numbers are detected.
@@ -693,9 +816,6 @@ Possible values for `dataDetectorTypes` are:
 - `calendarEvent`
 - `none`
 - `all`
-
-With the [new WebKit](Reference.md#usewebkit) implementation, we have three new values:
-
 - `trackingNumber`
 - `flightNumber`
 - `lookupSuggestion`
@@ -757,6 +877,16 @@ Set whether Geolocation is enabled in the `WebView`. The default value is `false
 
 ---
 
+### `allowFileAccessFromFileURLs`
+
+Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
+---
+
 ### `allowUniversalAccessFromFileURLs`
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin. Including accessing content from other file scheme URLs. The default value is `false`.
@@ -767,13 +897,13 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 ---
 
-### `useWebKit`
+### `allowingReadAccessToURL`
 
-If true, use WKWebView instead of UIWebView.
+A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in for WebViews that are loaded with a source.uri set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in source.uri itself.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
 
 ---
 
@@ -799,7 +929,7 @@ If true, use WKWebView instead of UIWebView.
 
 ### `keyboardDisplayRequiresUserAction`
 
-If false, web content can programmatically display the keyboard when using the WKWebView. The default value is `true`.
+If false, web content can programmatically display the keyboard. The default value is `true`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -809,7 +939,7 @@ If false, web content can programmatically display the keyboard when using the W
 
 ### `hideKeyboardAccessoryView`
 
-If true, this will hide the keyboard accessory view (< > and Done) when using the WKWebView.
+If true, this will hide the keyboard accessory view (< > and Done).
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -819,7 +949,7 @@ If true, this will hide the keyboard accessory view (< > and Done) when using th
 
 ### `allowsBackForwardNavigationGestures`
 
-If true, this will be able horizontal swipe gestures when using the WKWebView. The default value is `false`.
+If true, this will be able horizontal swipe gestures. The default value is `false`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -831,9 +961,9 @@ If true, this will be able horizontal swipe gestures when using the WKWebView. T
 
 Does not store any data within the lifetime of the WebView.
 
-| Type    | Required | Platform      |
-| ------- | -------- | ------------- |
-| boolean | No       | iOS WKWebView |
+| Type    | Required |
+| ------- | -------- |
+| boolean | No       |
 
 ---
 
@@ -859,11 +989,28 @@ Sets whether the WebView should disable saving form data. The default value is `
 
 ### `cacheEnabled`
 
-Sets whether WebView & WKWebView should use browser caching.
+Sets whether WebView should use browser caching.
 
 | Type    | Required | Default |
 | ------- | -------- | ------- |
 | boolean | No       | true    |
+
+---
+
+### `cacheMode`
+
+Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed. When navigating back, content is not revalidated, instead the content is just retrieved from the cache. This property allows the client to override this behavior.
+
+Possible values are:
+
+- `LOAD_DEFAULT` - Default cache usage mode. If the navigation type doesn't impose any specific behavior, use cached resources when they are available and not expired, otherwise load resources from the network.
+- `LOAD_CACHE_ELSE_NETWORK` - Use cached resources when they are available, even if they have expired. Otherwise load resources from the network.
+- `LOAD_NO_CACHE` - Don't use the cache, load from the network.
+- `LOAD_CACHE_ONLY` - Don't use the network, load from the cache.
+
+| Type   | Required | Default      | Platform |
+| ------ | -------- | ------------ | -------- |
+| string | No       | LOAD_DEFAULT | Android  |
 
 ---
 
@@ -889,7 +1036,7 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 ### `sharedCookiesEnabled`
 
-Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the `RNCWKWebView`. The default value is `false`.
+Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
