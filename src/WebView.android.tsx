@@ -27,12 +27,12 @@ import {
   AndroidWebViewProps,
   NativeWebViewAndroid,
   State,
-  RNCWebViewUIManager,
+  RNCWebViewUIManagerAndroid,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManager;
+const UIManager = NotTypedUIManager as RNCWebViewUIManagerAndroid;
 
 const RNCWebView = requireNativeComponent(
   'RNCWebView',
@@ -120,6 +120,30 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       this.getWebViewHandle(),
       this.getCommands().postMessage,
       [String(data)],
+    );
+  };
+
+  clearFormData = () => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearFormData,
+        undefined,
+    );
+  }
+
+  clearCache = (includeDiskFiles: boolean) => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearCache,
+       [includeDiskFiles],
+    );
+  };
+
+  clearHistory = () => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearHistory,
+        undefined,
     );
   };
 
