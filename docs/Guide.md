@@ -8,6 +8,7 @@ _This guide is currently a work in progress._
 
 - [Basic Inline HTML](Guide.md#basic-inline-html)
 - [Basic URL Source](Guide.md#basic-url-source)
+- [Loading local HTML files](Guide.md#loading-local-html-files)
 - [Controlling navigation state changes](Guide.md#controlling-navigation-state-changes)
 - [Add support for File Upload](Guide.md#add-support-for-file-upload)
 - [Multiple files upload](Guide.md#multiple-files-upload)
@@ -49,6 +50,40 @@ class MyWeb extends Component {
   render() {
     return (
       <WebView source={{ uri: 'https://facebook.github.io/react-native/' }} />
+    );
+  }
+}
+```
+
+### Loading local HTML files
+
+Sometimes you would have bundled an HTML file along with the app and would like to load the HTML asset into your WebView. To do this on iOS, you can just import the html file like any other asset as shown below.
+
+```js
+import React, { Component } from 'react';
+import { WebView } from 'react-native-webview';
+
+const myHtmlFile = require("./my-asset-folder/local-site.html");
+
+class MyWeb extends Component {
+  render() {
+    return (
+      <WebView source={myHtmlFile} />
+    );
+  }
+}
+```
+
+However on Android, you need to place the HTML file inside your android project's asset directory. For example, if `local-site.html` is your HTML file and you'd like to load it into the webview, you should move the file to your project's android asset directory which is `your-project/android/src/main/assets/`. Then you can load the html file as shown in the following code block
+
+```js
+import React, { Component } from 'react';
+import { WebView } from 'react-native-webview';
+
+class MyWeb extends Component {
+  render() {
+    return (
+      <WebView source={{ uri: "file:///android_asset/local-site.html" }} />
     );
   }
 }
