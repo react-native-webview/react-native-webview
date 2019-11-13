@@ -73,7 +73,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearFormData`](Reference.md#clearFormData)
 - [`clearCache`](Reference.md#clearCache)
 - [`clearHistory`](Reference.md#clearHistory)
-
+- [`requestFocus`](Reference.md#requestFocus)
 ---
 
 # Reference
@@ -1110,6 +1110,14 @@ injectJavaScript('... javascript string ...');
 Executes the JavaScript string.
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
+
+### `requestFocus()`
+
+```javascript
+requestFocus();
+```
+
+Request the webView to ask for focus. (People working on TV apps might want having a look at this!)
 
 ### `clearFormData()`
 (android only)
