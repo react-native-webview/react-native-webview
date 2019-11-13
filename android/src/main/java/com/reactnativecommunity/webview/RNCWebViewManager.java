@@ -1020,7 +1020,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public void setWebViewClient(WebViewClient client) {
       super.setWebViewClient(client);
-      mRNCWebViewClient = (RNCWebViewClient) client;
+      if (client instanceof RNCWebViewClient) {
+        mRNCWebViewClient = (RNCWebViewClient) client;
+      }
     }
 
     public @Nullable
