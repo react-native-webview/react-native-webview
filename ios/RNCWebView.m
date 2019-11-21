@@ -165,6 +165,12 @@ static NSDictionary* customCertificatesForHost;
 
       WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
       [wkWebViewConfig.userContentController addUserScript:script];
+        
+      if (_injectedJavaScript) {
+        // If user has provided an injectedJavascript prop, execute it at the start of the document
+        WKUserScript *injectedScript = [[WKUserScript alloc] initWithSource:_injectedJavaScript injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+        [wkWebViewConfig.userContentController addUserScript:injectedScript];
+      }
     }
 
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
@@ -949,19 +955,10 @@ static NSDictionary* customCertificatesForHost;
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
  */
-- (void)      webView:(WKWebView *)webView
+- (void)webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
-  if (_injectedJavaScript) {
-    [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
-      NSMutableDictionary *event = [self baseEvent];
-      event[@"jsEvaluationValue"] = jsEvaluationValue;
-
-      if (self.onLoadingFinish) {
-        self.onLoadingFinish(event);
-      }
-    }];
-  } else if (_onLoadingFinish) {
+  if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
   }
 }
