@@ -643,6 +643,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       int initialRequestedOrientation = reactContext.getCurrentActivity().getRequestedOrientation();
       mWebChromeClient = new RNCWebChromeClient(reactContext, webView) {
         @Override
+        public Bitmap getDefaultVideoPoster() {
+          return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
+        }
+        
+        @Override
         public void onShowCustomView(View view, CustomViewCallback callback) {
           if (mVideoView != null) {
             callback.onCustomViewHidden();
@@ -694,7 +699,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       if (mWebChromeClient != null) {
         mWebChromeClient.onHideCustomView();
       }
-      mWebChromeClient = new RNCWebChromeClient(reactContext, webView);
+      mWebChromeClient = new RNCWebChromeClient(reactContext, webView) {
+        @Override
+        public Bitmap getDefaultVideoPoster() {
+          return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
+        }
+      };
       webView.setWebChromeClient(mWebChromeClient);
     }
   }
