@@ -40,6 +40,7 @@
 @property (nonatomic, assign) BOOL keyboardDisplayRequiresUserAction;
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 @property (nonatomic, assign) BOOL allowsBackForwardNavigationGestures;
+@property (nonatomic, assign) BOOL allowFileAccessFromFileURLs;
 @property (nonatomic, assign) BOOL incognito;
 @property (nonatomic, assign) BOOL useSharedProcessPool;
 @property (nonatomic, copy) NSString * _Nullable userAgent;

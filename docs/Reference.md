@@ -884,9 +884,9 @@ Set whether Geolocation is enabled in the `WebView`. The default value is `false
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | Android  |
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
 
 ---
 

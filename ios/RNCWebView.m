@@ -151,7 +151,7 @@ static NSDictionary* customCertificatesForHost;
       wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
     }
     wkWebViewConfig.userContentController = [WKUserContentController new];
-
+      
     if (_messagingEnabled) {
       [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
 
@@ -241,6 +241,10 @@ static NSDictionary* customCertificatesForHost;
                                                            forMainFrameOnly:YES];
         [wkWebViewConfig.userContentController addUserScript:cookieInScript];
       }
+    }
+      
+    if (_allowFileAccessFromFileURLs) {
+        [wkWebViewConfig.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
     }
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
