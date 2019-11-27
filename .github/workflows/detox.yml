@@ -13,8 +13,8 @@ jobs:
       - name: Setup - Install Yarn
         run: YARN_GPG=NO curl -o- -L https://yarnpkg.com/install.sh | bash
       - name: Setup - Install NPM Dependencies
-        run: yarn
+        run: yarn --frozen-lockfile
       - name: Setup - Install CocoaPods CLI
-        run: sudo gem install cocoapods
+        run: sudo gem install cocoapods -v 1.8.4
       - name: Run tests
         run: yarn ci
