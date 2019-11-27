@@ -1,4 +1,4 @@
-# React Native WebView - a Modern, Cross-Platform WebView for React Native
+# React Native WebView - Um moderno, multiplataforma WebView para React Native
 
 [![star this repo](http://githubbadges.com/star.svg?user=react-native-community&repo=react-native-webview&style=flat)](https://github.com/react-native-community/react-native-webview)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
@@ -6,52 +6,53 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/react-native-community/react-native-webview/badge.svg?style=flat-square)](https://snyk.io/test/github/react-native-community/react-native-webview)
 <a href="https://www.npmjs.com/package/react-native-webview"><img src="https://img.shields.io/npm/v/react-native-webview.svg"></a>
 
-**React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
+**React Native WebView** é um moderno, bem apoiado, e multiplataforma WebView para React Native. É projetado para substituir o WebView embutido(que sera [removido do core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
-## Core Maintainers - Sponsoring companies
+## Mantenedores principais - Empresas Patrocinadoras
 
-_This project is maintained for free by these people using both their free time and their company work time._
+_Esse projeto é mantido gratuitamente por essas pessoas usando ambos seu tempo livre e tempo de trabalho na empresa._
 
 - [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
 - [Jamon Holmgren](https://github.com/jamonholmgren) ([Twitter @jamonholmgren](https://twitter.com/jamonholmgren)) from [Infinite Red](https://infinite.red/react-native)
 
-## Platforms Supported
+## Plataformas suportadas
 
 - [x] iOS
 - [x] Android
 
-_Note: Expo support for React Native WebView started with [Expo SDK v33.0.0](https://blog.expo.io/expo-sdk-v33-0-0-is-now-available-52d1c99dfe4c)._
+_Nota: O suporte da Expo para o React Native WebView começou com [Expo SDK v33.0.0](https://blog.expo.io/expo-sdk-v33-0-0-is-now-available-52d1c99dfe4c)._
 
-## Getting Started
+## Começando
 
-Read our [Getting Started Guide](docs/Getting-Started.md). If any step seems unclear, please create a detailed issue.
+Leia nosso [Getting Started Guide](docs/Getting-Started.md). Se algum passo não ficou claro, por favor, crie um issue detalhado.
 
-## Versioning
+## Versionamento
 
-This project follows [semantic versioning](https://semver.org/). We do not hesitate to release breaking changes but they will be in a major version.
+Esse projeto segue [versionamento semântico](https://semver.org/). Não hesitamos em lançar as alterações mais recentes, mas elas estarão em uma versão principal.
 
-**Breaking History:**
+**Histórico:**
 
-Current Version: ![version](https://img.shields.io/npm/v/react-native-webview.svg)
+Versão atual: ![version](https://img.shields.io/npm/v/react-native-webview.svg)
 
-- [7.0.1](https://github.com/react-native-community/react-native-webview/releases/tag/v7.0.1) - Removed UIWebView
+- [7.0.1](https://github.com/react-native-community/react-native-webview/releases/tag/v7.0.1) - UIWebView removido
 
-- [6.0.**2**](https://github.com/react-native-community/react-native-webview/releases/tag/v6.0.2) - Update to AndroidX. Make sure to enable it in your project's `android/gradle.properties`. See [Getting Started Guide](docs/Getting-Started.md).
+- [6.0.**2**](https://github.com/react-native-community/react-native-webview/releases/tag/v6.0.2) - Update para AndroidX. Tenha certeza de habilitar no `android/gradle.properties` do seu projeto. Veja o [Getting Started Guide](docs/Getting-Started.md).
 
-- [5.0.**1**](https://github.com/react-native-community/react-native-webview/releases/tag/v5.0.0) - Refactored the old postMessage implementation for communication from webview to native.
-- [4.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v4.0.0) - Added cache (enabled by default).
-- [3.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v3.0.0) - WKWebview: Add shared process pool so cookies and localStorage are shared across webviews in iOS (enabled by default).
-- [2.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v2.0.0) - First release this is a replica of the core webview component
+- [5.0.**1**](https://github.com/react-native-community/react-native-webview/releases/tag/v5.0.0) - Refatorou a antiga implementação postMessage para comunicação da visualização da webview para nativa.
+- [4.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v4.0.0) - Cache adicionada(habilitada por padrão).
+- [3.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v3.0.0) - WKWebview: Adicionado um pool de processos compartilhados para que os cookies e o localStorage sejam compartilhados nas webviews no iOS (habilitadas por padrão)
+- [2.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v2.0.0) - Primeiro lançamento, esta é uma réplica do componente principal do webview.
 
-**Upcoming:**
+**Seguinte:**
 
-- this.webView.postMessage() removal (never documented and less flexible than injectJavascript) -> [how to migrate](https://github.com/react-native-community/react-native-webview/issues/809)
-- Kotlin rewrite
-- Maybe Swift rewrite
+- remoção do this.webView.postMessage() (
+  nunca documentado e menos flexível que o injectJavascript) -> [Como migrar](https://github.com/react-native-community/react-native-webview/issues/809)
+- Reescrita em Kotlin
+- talvez reescrita em Swift
 
-## Usage
+## Uso
 
-Import the `WebView` component from `react-native-webview` and use it like so:
+Importe o componente `WebView` de `react-native-webview` e use assim:
 
 ```jsx
 import React, { Component } from 'react';
@@ -68,19 +69,19 @@ class MyWebComponent extends Component {
 }
 ```
 
-For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md). If you're interested in contributing, check out the [Contributing Guide](./docs/Contributing.md).
+Para mais informações, leia a [API Reference](./docs/Reference.md) e o [Guia](./docs/Guide.md). Se você está interessado em contribuir, confira o [Guia de contribuição](./docs/Contributing.md).
 
-## Common issues
+## Problemas comuns
 
-- If you're getting `Invariant Violation: Native component for "RNCWebView does not exist"` it likely means you forgot to run `react-native link` or there was some error with the linking process
+- Se você está recebendo `Invariant Violation: Native component for "RNCWebView does not exist"` provavelmente significa que você esqueceu de rodar `react-native link` ou houve algum erro no processo de linking.
 
-## Contributing
+## Contribuindo
 
-See [Contributing.md](https://github.com/react-native-community/react-native-webview/blob/master/docs/Contributing.md)
+Veja [Contributing.md](https://github.com/react-native-community/react-native-webview/blob/master/docs/Contributing.md)
 
-## Contributors
+## Contribuidores
 
-Thanks goes to these wonderful people ([emoji key](https://github.com/all-contributors/all-contributors#emoji-key-)):
+Obrigado vai a essas pessoas maravilhosas ([emoji key](https://github.com/all-contributors/all-contributors#emoji-key-)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
@@ -88,14 +89,14 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/all-contri
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+Esse projeto segue a especificação [all-contributors](https://github.com/all-contributors/all-contributors). Contribuições de qualquer tipo são bem-vindas!
 
-## License
+## Licença
 
 MIT
 
 ## Traduções
 
-This readme is available in:
+Esse readme está disponível em:
 
-- [Brazilian portuguese](docs/README.portuguese.md)
+- [Inglês](../README.md)
