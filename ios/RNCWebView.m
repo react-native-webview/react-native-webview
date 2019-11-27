@@ -462,7 +462,7 @@ static NSDictionary* customCertificatesForHost;
     }
     if (request.URL.host) {
         NSString *path = [request.URL path];
-                   NSString *extension = [path pathExtension];
+        NSString *extension = [path pathExtension];
         NSString* absolutePath = request.URL.absoluteString;
         if (@available(iOS 13, *) && [extension caseInsensitiveCompare:@"pdf"] == NSOrderedSame) {
             NSData *pdfData = [NSData dataWithContentsOfURL:request.URL];
