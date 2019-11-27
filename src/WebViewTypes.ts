@@ -14,13 +14,22 @@ import {
 
 type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
 
-export interface RNCWebViewUIManager extends UIManagerStatic {
+type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
+
+
+
+interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (
-    name: string,
+      name: string,
   ) => {
-    Commands: { [key in WebViewCommands]: number };
+    Commands: {[key in Commands]: number};
   };
 }
+
+export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<WebViewCommands | AndroidWebViewCommands>
+export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>
+
+
 
 type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
 
@@ -457,7 +466,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   /**
    * https://developer.android.com/reference/android/webkit/WebSettings.html#setCacheMode(int)
    * Set the cacheMode. Possible values are:
-   * 
+   *
    * - `'LOAD_DEFAULT'` (default)
    * - `'LOAD_CACHE_ELSE_NETWORK'`
    * - `'LOAD_NO_CACHE'`
@@ -492,15 +501,15 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-  
+
   /**
-   * Boolean that sets whether JavaScript running in the context of a file 
-   * scheme URL should be allowed to access content from other file scheme URLs. 
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from other file scheme URLs.
    * Including accessing content from other file scheme URLs
    * @platform android
    */
   allowFileAccessFromFileURLs?: boolean;
-  
+
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from any origin.
