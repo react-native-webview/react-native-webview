@@ -70,7 +70,10 @@ This document lays out the current public properties and methods for the React N
 - [`reload`](Reference.md#reload)
 - [`stopLoading`](Reference.md#stoploading)
 - [`injectJavaScript`](Reference.md#injectjavascriptstr)
-
+- [`clearFormData`](Reference.md#clearFormData)
+- [`clearCache`](Reference.md#clearCache)
+- [`clearHistory`](Reference.md#clearHistory)
+- [`requestFocus`](Reference.md#requestFocus)
 ---
 
 # Reference
@@ -1107,6 +1110,40 @@ injectJavaScript('... javascript string ...');
 Executes the JavaScript string.
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
+
+### `requestFocus()`
+
+```javascript
+requestFocus();
+```
+
+Request the webView to ask for focus. (People working on TV apps might want having a look at this!)
+
+### `clearFormData()`
+(android only)
+
+```javascript
+clearFormData();
+```
+Removes the autocomplete popup from the currently focused form field, if present. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearFormData())
+
+
+### `clearCache(bool)`
+(android only)
+```javascript
+clearCache(true);
+```
+
+Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean))
+
+
+### `clearHistory()`
+(android only)
+```javascript
+clearHistory();
+```
+
+Tells this WebView to clear its internal back/forward list. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearHistory())
 
 ## Other Docs
 
