@@ -256,6 +256,7 @@ static NSDictionary* customCertificatesForHost;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
+    [_webView addObserver:self forKeyPath:@"URL" options:NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 
     if (_userAgent) {
@@ -286,6 +287,7 @@ static NSDictionary* customCertificatesForHost;
     if (_webView) {
         [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+        [_webView removeObserver:self forKeyPath:@"URL"];
         [_webView removeFromSuperview];
         _webView.scrollView.delegate = nil;
         _webView = nil;
@@ -348,6 +350,10 @@ static NSDictionary* customCertificatesForHost;
              NSMutableDictionary<NSString *, id> *event = [self baseEvent];
             [event addEntriesFromDictionary:@{@"progress":[NSNumber numberWithDouble:self.webView.estimatedProgress]}];
             _onLoadingProgress(event);
+        }
+    }else if([keyPath isEqual:@"URL"] && object == self.webView){
+        if(_onLoadingFinish){
+            _onLoadingFinish([self baseEvent]);
         }
     }else{
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
