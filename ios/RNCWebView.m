@@ -138,8 +138,16 @@ static NSDictionary* customCertificatesForHost;
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     WKPreferences *prefs = [[WKPreferences alloc]init];
+    BOOL _prefsUsed = NO;
     if (!_javaScriptEnabled) {
       prefs.javaScriptEnabled = NO;
+      _prefsUsed = YES;
+    }
+    if (_allowFileAccessFromFileURLs) {
+      [prefs setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
+      _prefsUsed = YES;
+    }
+    if (_prefsUsed) {
       wkWebViewConfig.preferences = prefs;
     }
     if (_incognito) {
