@@ -119,7 +119,7 @@ Controls whether to adjust the content inset for web views that are placed behin
 
 ### `injectedJavaScript`
 
-Set this to provide JavaScript that will be injected into the web page when the view loads. Make sure the string evaluates to a valid type (true works) and doesn't otherwise throw an exception.
+Set this to provide JavaScript that will be injected into the web page when the view loads. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
 
 | Type   | Required |
 | ------ | -------- |

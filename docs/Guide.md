@@ -367,7 +367,7 @@ export default class App extends Component {
 }
 ```
 
-This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNative` will be set to true before the web code executes. 
+This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes. 
 
 #### The `injectJavaScript` method
 

@@ -958,7 +958,16 @@ static NSDictionary* customCertificatesForHost;
 - (void)webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
-  if (_onLoadingFinish) {
+   if (_injectedJavaScript) {
+     [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
+       NSMutableDictionary *event = [self baseEvent];
+       event[@"jsEvaluationValue"] = jsEvaluationValue;
+
+       if (self.onLoadingFinish) {
+         self.onLoadingFinish(event);
+       }
+     }];
+   } else if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
   }
 }
