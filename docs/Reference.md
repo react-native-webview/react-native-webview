@@ -7,6 +7,7 @@ This document lays out the current public properties and methods for the React N
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
+- [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedJavaScriptBeforeContentLoaded)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
@@ -138,6 +139,35 @@ const INJECTED_JAVASCRIPT = `(function() {
 <WebView
   source={{ uri: 'https://facebook.github.io/react-native' }}
   injectedJavaScript={INJECTED_JAVASCRIPT}
+  onMessage={this.onMessage}
+/>;
+```
+
+---
+
+### `injectedJavaScriptBeforeContentLoaded`
+
+Set this to provide JavaScript that will be injected into the web page after the document element is created, but before any other content is loaded. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+On iOS, see [WKUserScriptInjectionTimeAtDocumentStart](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
+
+| Type   | Required |
+| ------ | -------- |
+| string | No       |
+
+To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
+
+Example:
+
+Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage)
+
+```jsx
+const INJECTED_JAVASCRIPT = `(function() {
+    window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
+})();`;
+
+<WebView
+  source={{ uri: 'https://facebook.github.io/react-native' }}
+  injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
   onMessage={this.onMessage}
 />;
 ```
