@@ -420,6 +420,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "source")
   public void setSource(WebView view, @Nullable ReadableMap source) {
+    // INFO: ensure all other props has been set
+    view.post(new Runnable() {
+      @Override
+      public void run() {
+        loadSource(view, source);
+      }
+    });
+  }
+
+  private void loadSource(WebView view, @Nullable ReadableMap source) {
     if (source != null) {
       if (source.hasKey("html")) {
         String html = source.getString("html");
