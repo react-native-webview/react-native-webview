@@ -133,8 +133,16 @@ static NSDictionary* customCertificatesForHost;
     
     WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
     WKPreferences *prefs = [[WKPreferences alloc]init];
+    BOOL _prefsUsed = NO;
     if (!_javaScriptEnabled) {
       prefs.javaScriptEnabled = NO;
+      _prefsUsed = YES;
+    }
+    if (_allowFileAccessFromFileURLs) {
+      [prefs setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
+      _prefsUsed = YES;
+    }
+    if (_prefsUsed) {
       wkWebViewConfig.preferences = prefs;
     }
     if (_incognito) {
@@ -160,6 +168,12 @@ static NSDictionary* customCertificatesForHost;
 
       WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
       [wkWebViewConfig.userContentController addUserScript:script];
+        
+      if (_injectedJavaScriptBeforeContentLoaded) {
+        // If user has provided an injectedJavascript prop, execute it at the start of the document
+        WKUserScript *injectedScript = [[WKUserScript alloc] initWithSource:_injectedJavaScriptBeforeContentLoaded injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+        [wkWebViewConfig.userContentController addUserScript:injectedScript];
+      }
     }
 
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
@@ -930,19 +944,19 @@ static NSDictionary* customCertificatesForHost;
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
  */
-- (void)      webView:(WKWebView *)webView
+- (void)webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
-  if (_injectedJavaScript) {
-    [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
-      NSMutableDictionary *event = [self baseEvent];
-      event[@"jsEvaluationValue"] = jsEvaluationValue;
+   if (_injectedJavaScript) {
+     [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
+       NSMutableDictionary *event = [self baseEvent];
+       event[@"jsEvaluationValue"] = jsEvaluationValue;
 
-      if (self.onLoadingFinish) {
-        self.onLoadingFinish(event);
-      }
-    }];
-  } else if (_onLoadingFinish) {
+       if (self.onLoadingFinish) {
+         self.onLoadingFinish(event);
+       }
+     }];
+   } else if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
   }
 }
