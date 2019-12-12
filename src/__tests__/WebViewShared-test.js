@@ -102,7 +102,9 @@ describe('WebViewShared', () => {
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith('invalid://example.com/');
-      expect(loadRequest).toHaveBeenLastCalledWith(true, 'invalid://example.com/', 1);
+      // We don't expect the URL to have been loaded in the WebView because it
+      // is not in the origin whitelist
+      expect(loadRequest).toHaveBeenLastCalledWith(false, 'invalid://example.com/', 1);
     });
 
     test('loadRequest with false onShouldStartLoadWithRequest override is called', async () => {

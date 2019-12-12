@@ -54,9 +54,7 @@ const createOnShouldStartLoadWithRequest = (
         console.warn('Error opening URL: ', e);
       });
       shouldStart = false;
-    }
-
-    if (onShouldStartLoadWithRequest) {
+    } else if (onShouldStartLoadWithRequest) {
       shouldStart = onShouldStartLoadWithRequest(nativeEvent);
     }
 
