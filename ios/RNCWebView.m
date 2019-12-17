@@ -962,7 +962,7 @@ static NSDictionary* customCertificatesForHost;
       return;
     }
 
-    if ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102) {
+    if ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102 || [error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 101) {
       // Error code 102 "Frame load interrupted" is raised by the WKWebView
       // when the URL is from an http redirect. This is a common pattern when
       // implementing OAuth with a WebView.
