@@ -162,7 +162,8 @@ static NSDictionary* customCertificatesForHost;
     wkWebViewConfig.userContentController = [WKUserContentController new];
 
     // Shim the HTML5 history API:
-    [wkWebViewConfig.userContentController addScriptMessageHandler:self name:HistoryShimName];
+    [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+                                                              name:HistoryShimName];
     NSString *source = [NSString stringWithFormat:
       @"(function(history) {\n"
       "  function notify(type) {\n"
@@ -187,7 +188,8 @@ static NSDictionary* customCertificatesForHost;
     [wkWebViewConfig.userContentController addUserScript:script];
 
     if (_messagingEnabled) {
-      [wkWebViewConfig.userContentController addScriptMessageHandler:self name:MessageHandlerName];
+      [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+                                                                name:MessageHandlerName];
 
       NSString *source = [NSString stringWithFormat:
         @"window.%@ = {"
@@ -1077,3 +1079,20 @@ static NSDictionary* customCertificatesForHost;
 }
 
 @end
+
+@implementation RNCWeakScriptMessageDelegate
+
+- (instancetype)initWithDelegate:(id<WKScriptMessageHandler>)scriptDelegate {
+    self = [super init];
+    if (self) {
+        _scriptDelegate = scriptDelegate;
+    }
+    return self;
+}
+
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
+    [self.scriptDelegate userContentController:userContentController didReceiveScriptMessage:message];
+}
+
+@end
+
