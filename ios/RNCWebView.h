@@ -19,6 +19,11 @@
 
 @end
 
+@interface RNCWeakScriptMessageDelegate : NSObject<WKScriptMessageHandler>
+@property (nonatomic, weak) id<WKScriptMessageHandler> scriptDelegate;
+- (instancetype)initWithDelegate:(id<WKScriptMessageHandler>)scriptDelegate;
+@end
+
 @interface RNCWebView : RCTView
 
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
