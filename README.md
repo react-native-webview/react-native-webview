@@ -1,6 +1,6 @@
 # React Native WebView - a Modern, Cross-Platform WebView for React Native
 
-[![star this repo](http://githubbadges.com/star.svg?user=react-native-community&repo=react-native-webview&style=flat-square)](https://github.com/react-native-community/react-native-webview)
+[![star this repo](http://githubbadges.com/star.svg?user=react-native-community&repo=react-native-webview&style=flat)](https://github.com/react-native-community/react-native-webview)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors)
 [![Known Vulnerabilities](https://snyk.io/test/github/react-native-community/react-native-webview/badge.svg?style=flat-square)](https://snyk.io/test/github/react-native-community/react-native-webview)
