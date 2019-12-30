@@ -52,15 +52,30 @@ export type State = NormalState | ErrorState;
 // eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewIOSComponent extends Component<
   IOSNativeWebViewProps
-> {}
+> {
+  /** 
+   * Required to allow createAnimatedComponent() to hook up to the underlying NativeWebView rather than its wrapping View.
+   * @see: Discussion: https://twitter.com/LinguaBrowse/status/1211375582073761799?s=20
+   * @see: Implementation: https://github.com/facebook/react-native/blob/8ddf231306e3bd85be718940d04f11d23b570a62/Libraries/Lists/VirtualizedList.js#L515-L521
+   */
+  getScrollableNode(): number | null;
+}
 declare const NativeWebViewIOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewIOSComponent;
-export class NativeWebViewIOS extends NativeWebViewIOSBase {}
+export class NativeWebViewIOS extends NativeWebViewIOSBase {
+}
 
 // eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewAndroidComponent extends Component<
   AndroidNativeWebViewProps
-> {}
+> {
+  /** 
+   * Required to allow createAnimatedComponent() to hook up to the underlying NativeWebView rather than its wrapping View.
+   * @see: Discussion: https://twitter.com/LinguaBrowse/status/1211375582073761799?s=20
+   * @see: Implementation: https://github.com/facebook/react-native/blob/8ddf231306e3bd85be718940d04f11d23b570a62/Libraries/Lists/VirtualizedList.js#L515-L521
+   */
+  getScrollableNode(): number | null;
+}
 declare const NativeWebViewAndroidBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewAndroidComponent;
 export class NativeWebViewAndroid extends NativeWebViewAndroidBase {}
