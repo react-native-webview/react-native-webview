@@ -9,7 +9,7 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
-#import <UIKit/UIKit.h>
+#import <React/RCTUIKit.h>
 
 #import "objc/runtime.h"
 
@@ -19,6 +19,7 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
+#if !TARGET_OS_OSX
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
 @interface _SwizzleHelperWK : UIView
@@ -39,8 +40,13 @@ static NSDictionary* customCertificatesForHost;
     return nil;
 }
 @end
+#endif // !TARGET_OS_OSX
 
-@interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
+@interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler,
+#if !TARGET_OS_OSX
+    UIScrollViewDelegate,
+#endif // !TARGET_OS_OSX
+    RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
@@ -55,14 +61,16 @@ static NSDictionary* customCertificatesForHost;
 
 @implementation RNCWebView
 {
-  UIColor * _savedBackgroundColor;
+  RCTUIColor * _savedBackgroundColor;
   BOOL _savedHideKeyboardAccessoryView;
   BOOL _savedKeyboardDisplayRequiresUserAction;
 
   // Workaround for StatusBar appearance bug for iOS 12
   // https://github.com/react-native-community/react-native-webview/issues/62
   BOOL _isFullScreenVideoOpen;
+#if !TARGET_OS_OSX
   UIStatusBarStyle _savedStatusBarStyle;
+#endif // !TARGET_OS_OSX
   BOOL _savedStatusBarHidden;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
@@ -73,7 +81,7 @@ static NSDictionary* customCertificatesForHost;
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
-    super.backgroundColor = [UIColor clearColor];
+    super.backgroundColor = [RCTUIColor clearColor];
     _bounces = YES;
     _scrollEnabled = YES;
     _showsHorizontalScrollIndicator = YES;
@@ -82,14 +90,17 @@ static NSDictionary* customCertificatesForHost;
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
+#if !TARGET_OS_OSX
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
+#endif // !TARGET_OS_OSX
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 #endif
   }
 
+#if !TARGET_OS_OSX
   if (@available(iOS 12.0, *)) {
     // Workaround for a keyboard dismissal bug present in iOS 12
     // https://openradar.appspot.com/radar?id=5018321736957952
@@ -114,7 +125,7 @@ static NSDictionary* customCertificatesForHost;
                                                    name:UIWindowDidBecomeHiddenNotification
                                                  object:nil];
   }
-
+#endif // !TARGET_OS_OSX
   return self;
 }
 
@@ -209,6 +220,7 @@ static NSDictionary* customCertificatesForHost;
       }
     }
 
+#if !TARGET_OS_OSX
     wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
     wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
@@ -218,6 +230,7 @@ static NSDictionary* customCertificatesForHost;
 #else
     wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
 #endif
+#endif // !TARGET_OS_OSX
 
     if (_applicationNameForUserAgent) {
         wkWebViewConfig.applicationNameForUserAgent = [NSString stringWithFormat:@"%@ %@", wkWebViewConfig.applicationNameForUserAgent, _applicationNameForUserAgent];
@@ -287,15 +300,19 @@ static NSDictionary* customCertificatesForHost;
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
     [self setBackgroundColor: _savedBackgroundColor];
+#if !TARGET_OS_OSX
     _webView.scrollView.delegate = self;
+#endif // !TARGET_OS_OSX
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
+#if !TARGET_OS_OSX
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
     _webView.scrollView.bounces = _bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
+#endif // !TARGET_OS_OSX
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
@@ -329,13 +346,16 @@ static NSDictionary* customCertificatesForHost;
         [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
+#if !TARGET_OS_OSX
         _webView.scrollView.delegate = nil;
+#endif // !TARGET_OS_OSX
         _webView = nil;
     }
 
     [super removeFromSuperview];
 }
 
+#if !TARGET_OS_OSX
 -(void)showFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -383,6 +403,7 @@ static NSDictionary* customCertificatesForHost;
       }];
     }
 }
+#endif // !TARGET_OS_OSX
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
     if ([keyPath isEqual:@"estimatedProgress"] && object == self.webView) {
@@ -396,7 +417,7 @@ static NSDictionary* customCertificatesForHost;
     }
 }
 
-- (void)setBackgroundColor:(UIColor *)backgroundColor
+- (void)setBackgroundColor:(RCTUIColor *)backgroundColor
 {
   _savedBackgroundColor = backgroundColor;
   if (_webView == nil) {
@@ -404,9 +425,11 @@ static NSDictionary* customCertificatesForHost;
   }
 
   CGFloat alpha = CGColorGetAlpha(backgroundColor.CGColor);
+#if !TARGET_OS_OSX
   self.opaque = _webView.opaque = (alpha == 1.0);
   _webView.scrollView.backgroundColor = backgroundColor;
   _webView.backgroundColor = backgroundColor;
+#endif // !TARGET_OS_OSX
 }
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
@@ -473,14 +496,22 @@ static NSDictionary* customCertificatesForHost;
 {
   _contentInset = contentInset;
   [RCTView autoAdjustInsetsForView:self
+#if !TARGET_OS_OSX
                     withScrollView:_webView.scrollView
+#else
+                    withScrollView:nil
+#endif // !TARGET_OS_OSX
                       updateOffset:NO];
 }
 
 - (void)refreshContentInset
 {
   [RCTView autoAdjustInsetsForView:self
+#if !TARGET_OS_OSX
                     withScrollView:_webView.scrollView
+#else
+                    withScrollView:nil
+#endif // !TARGET_OS_OSX
                       updateOffset:YES];
 }
 
@@ -519,6 +550,7 @@ static NSDictionary* customCertificatesForHost;
     }
 }
 
+#if !TARGET_OS_OSX
 -(void)setKeyboardDisplayRequiresUserAction:(BOOL)keyboardDisplayRequiresUserAction
 {
     if (_webView == nil) {
@@ -623,19 +655,24 @@ static NSDictionary* customCertificatesForHost;
 
     object_setClass(subview, newClass);
 }
+#endif // !TARGET_OS_OSX
 
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+- (void)scrollViewWillBeginDragging:(RCTUIScrollView *)scrollView
 {
+#if !TARGET_OS_OSX
   scrollView.decelerationRate = _decelerationRate;
+#endif // !TARGET_OS_OSX
 }
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled
 {
   _scrollEnabled = scrollEnabled;
+#if !TARGET_OS_OSX
   _webView.scrollView.scrollEnabled = scrollEnabled;
+#endif // !TARGET_OS_OSX
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+- (void)scrollViewDidScroll:(RCTUIScrollView *)scrollView
 {
   // Don't allow scrolling the scrollView.
   if (!_scrollEnabled) {
@@ -670,19 +707,25 @@ static NSDictionary* customCertificatesForHost;
 - (void)setDirectionalLockEnabled:(BOOL)directionalLockEnabled
 {
     _directionalLockEnabled = directionalLockEnabled;
+#if !TARGET_OS_OSX
     _webView.scrollView.directionalLockEnabled = directionalLockEnabled;
+#endif // !TARGET_OS_OSX
 }
 
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
 {
     _showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+#if !TARGET_OS_OSX
     _webView.scrollView.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+#endif // !TARGET_OS_OSX
 }
 
 - (void)setShowsVerticalScrollIndicator:(BOOL)showsVerticalScrollIndicator
 {
     _showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+#if !TARGET_OS_OSX
     _webView.scrollView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+#endif // !TARGET_OS_OSX
 }
 
 - (void)postMessage:(NSString *)message
@@ -701,7 +744,9 @@ static NSDictionary* customCertificatesForHost;
 
   // Ensure webview takes the position and dimensions of RNCWebView
   _webView.frame = self.bounds;
+#if !TARGET_OS_OSX
   _webView.scrollView.contentInset = _contentInset;
+#endif // !TARGET_OS_OSX
 }
 
 - (NSMutableDictionary<NSString *, id> *)baseEvent
@@ -767,18 +812,22 @@ static NSDictionary* customCertificatesForHost;
 */
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
+#if !TARGET_OS_OSX
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         completionHandler();
     }]];
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
-
+#else
+  // TODO
+#endif // !TARGET_OS_OSX
 }
 
 /**
 * confirm
 */
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
+#if !TARGET_OS_OSX
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         completionHandler(YES);
@@ -787,12 +836,16 @@ static NSDictionary* customCertificatesForHost;
         completionHandler(NO);
     }]];
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+#else
+  // TODO
+#endif // !TARGET_OS_OSX
 }
 
 /**
 * prompt
 */
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
+#if !TARGET_OS_OSX
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.text = defaultText;
@@ -807,8 +860,12 @@ static NSDictionary* customCertificatesForHost;
     [alert addAction:cancelAction];
     alert.preferredAction = okAction;
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+#else
+  // TODO
+#endif // !TARGET_OS_OSX
 }
 
+#if !TARGET_OS_OSX
 /**
  * topViewController
  */
@@ -847,7 +904,7 @@ static NSDictionary* customCertificatesForHost;
   }
   return window;
 }
-
+#endif // !TARGET_OS_OSX
 
 /**
  * Decides whether to allow or cancel a navigation.
@@ -1055,7 +1112,9 @@ static NSDictionary* customCertificatesForHost;
 - (void)setBounces:(BOOL)bounces
 {
   _bounces = bounces;
+#if !TARGET_OS_OSX
   _webView.scrollView.bounces = bounces;
+#endif // !TARGET_OS_OSX
 }
 
 - (NSURLRequest *)requestForSource:(id)json {

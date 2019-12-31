@@ -17,7 +17,7 @@ const HTML = `
 <!DOCTYPE html>\n
 <html>
   <head>
-    <title>Hello Static World</title>
+    <title>Hello World</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=320, user-scalable=no">
     <style type="text/css">
@@ -36,7 +36,7 @@ const HTML = `
     </style>
   </head>
   <body>
-    <h1>Hello Static World</h1>
+    <h1>Hello World</h1>
   </body>
 </html>
 `;

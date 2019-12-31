@@ -20,6 +20,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
+		38116A3723BBECFB00ACE311 /* libRNCWebView-macOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38116A3623BBECFB00ACE311 /* libRNCWebView-macOS.a */; };
 		38C1421623BBE5B500902604 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C1421523BBE5B500902604 /* main.m */; };
 		38C1421823BBE65C00902604 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C1421723BBE65C00902604 /* AppDelegate.m */; };
 		38C1421C23BBE70D00902604 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C1421B23BBE70D00902604 /* ViewController.m */; };
@@ -141,6 +142,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = 3D383D621EBD27B9005632C8;
 			remoteInfo = "double-conversion-tvOS";
+		};
+		38116A3523BBECFB00ACE311 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DC5395A220F2C940035D3A3 /* RNCWebView.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 38116A3323BBECB700ACE311;
+			remoteInfo = "RNCWebView-macOS";
+		};
+		38116A6E23BBED1000ACE311 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DC5395A220F2C940035D3A3 /* RNCWebView.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 38116A2923BBECB700ACE311;
+			remoteInfo = "RNCWebView-macOS";
 		};
 		38C1417523BBE33000902604 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -491,6 +506,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38116A3723BBECFB00ACE311 /* libRNCWebView-macOS.a in Frameworks */,
 				38C1422523BBEC1D00902604 /* libRCTAnimation.a in Frameworks */,
 				38C1422423BBEB8300902604 /* libRCTText.a in Frameworks */,
 				38C1422323BBEB6400902604 /* libRCTNetwork.a in Frameworks */,
@@ -637,6 +653,7 @@
 			isa = PBXGroup;
 			children = (
 				3DC5398C220F2C940035D3A3 /* libRNCWebView.a */,
+				38116A3623BBECFB00ACE311 /* libRNCWebView-macOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -757,6 +774,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				38116A6F23BBED1000ACE311 /* PBXTargetDependency */,
 			);
 			name = "RNCWebViewExample-macOS";
 			productName = "Hello World";
@@ -939,6 +957,13 @@
 			fileType = archive.ar;
 			path = "libdouble-conversion.a";
 			remoteRef = 2DF0FFE82056DD460020B375 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		38116A3623BBECFB00ACE311 /* libRNCWebView-macOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRNCWebView-macOS.a";
+			remoteRef = 38116A3523BBECFB00ACE311 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		38C1417623BBE33000902604 /* libRCTActionSheet.a */ = {
@@ -1308,6 +1333,11 @@
 			isa = PBXTargetDependency;
 			name = RNCWebView;
 			targetProxy = 1990B95122398FC4009E5EA1 /* PBXContainerItemProxy */;
+		};
+		38116A6F23BBED1000ACE311 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "RNCWebView-macOS";
+			targetProxy = 38116A6E23BBED1000ACE311 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

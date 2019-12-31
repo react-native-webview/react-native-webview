@@ -35,7 +35,7 @@ RCT_ENUM_CONVERTER(UIScrollViewContentInsetAdjustmentBehavior, (@{
 
 RCT_EXPORT_MODULE()
 
-- (UIView *)view
+- (RCTUIView *)view
 {
   RNCWebView *webView = [RNCWebView new];
   webView.delegate = self;
@@ -110,9 +110,11 @@ RCT_CUSTOM_VIEW_PROPERTY(sharedCookiesEnabled, BOOL, RNCWebView) {
     view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
 
+#if !TARGET_OS_OSX
 RCT_CUSTOM_VIEW_PROPERTY(decelerationRate, CGFloat, RNCWebView) {
   view.decelerationRate = json == nil ? UIScrollViewDecelerationRateNormal : [RCTConvert CGFloat: json];
 }
+#endif // !TARGET_OS_OSX
 
 RCT_CUSTOM_VIEW_PROPERTY(directionalLockEnabled, BOOL, RNCWebView) {
     view.directionalLockEnabled = json == nil ? true : [RCTConvert BOOL: json];
