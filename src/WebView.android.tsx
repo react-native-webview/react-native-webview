@@ -76,11 +76,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
    * @see: Implementation: https://github.com/facebook/react-native/blob/8ddf231306e3bd85be718940d04f11d23b570a62/Libraries/Lists/VirtualizedList.js#L515-L521
    */
   getScrollableNode = () => {
-    if (this.webViewRef.current && this.webViewRef.current.getScrollableNode) {
-      return this.webViewRef.current.getScrollableNode();
-    } else {
-      return findNodeHandle(this.webViewRef.current);
-    }
+    return this.webViewRef.current;
   };
 
   getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
