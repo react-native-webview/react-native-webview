@@ -2,7 +2,7 @@
   "include": ["src/*"],
   "compilerOptions": {
     "baseUrl": "./src/",
-    "jsx": "react-native",
+    "jsx": "react",
     "module": "esnext",
     "moduleResolution": "node",
     "lib": ["es2017"],
