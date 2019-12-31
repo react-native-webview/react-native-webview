@@ -54,7 +54,7 @@
     "jest": "24.9.0",
     "metro-react-native-babel-preset": "0.54.1",
     "react": "16.6.3",
-    "react-native": "0.60.5",
+    "react-native": "git://github.com/microsoft/react-native",
     "semantic-release": "15.13.24",
     "typescript": "3.6.2"
   },
