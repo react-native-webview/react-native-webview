@@ -19,24 +19,24 @@ import {
   Button,
 } from 'react-native';
 
-import InlineWebView from './examples/InlineWebView';
 import Alerts from './examples/Alerts';
+import Scrolling from './examples/Scrolling';
 
 const TESTS = {
-  InlineWebView: {
-    title: 'Inline HTML WebView',
-    testId: 'inline-webview',
-    description: 'Inline HTML WebView',
-    render() {
-      return <InlineWebView />;
-    },
-  },
   Alerts: {
     title: 'Alerts',
     testId: 'alerts',
     description: 'Alerts tests',
     render() {
       return <Alerts />;
+    },
+  },
+  Scrolling: {
+    title: 'Scrolling',
+    testId: 'scrolling',
+    description: 'Scrolling event test',
+    render() {
+      return <Scrolling />;
     },
   },
 };
@@ -47,7 +47,7 @@ type State = {restarting: boolean, currentTest: Object};
 export default class App extends Component<Props, State> {
   state = {
     restarting: false,
-    currentTest: TESTS.InlineWebView,
+    currentTest: TESTS.Alerts,
   };
 
   _simulateRestart = () => {
@@ -78,14 +78,14 @@ export default class App extends Component<Props, State> {
 
         <View style={styles.testPickerContainer}>
           <Button
-            testID="testType_inlineWebView"
-            title="InlineWebView"
-            onPress={() => this._changeTest('InlineWebView')}
-          />
-          <Button
             testID="testType_alerts"
             title="Alerts"
             onPress={() => this._changeTest('Alerts')}
+          />
+          <Button
+            testID="testType_scrolling"
+            title="Scrolling"
+            onPress={() => this._changeTest('Scrolling')}
           />
         </View>
 

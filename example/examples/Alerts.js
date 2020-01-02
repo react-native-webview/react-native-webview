@@ -27,12 +27,6 @@ const HTML = `
         font: 62.5% arial, sans-serif;
         background: #ccc;
       }
-      h1 {
-        padding: 45px;
-        margin: 0;
-        text-align: center;
-        color: #33f;
-      }
     </style>
   </head>
   <body>
