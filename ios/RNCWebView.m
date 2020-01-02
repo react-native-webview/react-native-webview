@@ -42,6 +42,21 @@ static NSDictionary* customCertificatesForHost;
 @end
 #endif // !TARGET_OS_OSX
 
+#if TARGET_OS_OSX
+@interface RNCWKWebView : WKWebView
+@end
+@implementation RNCWKWebView
+- (void)scrollWheel:(NSEvent *)theEvent {
+  RNCWebView *rncWebView = (RNCWebView *)[self superview];
+  if (![rncWebView scrollEnabled]) {
+    [[self nextResponder] scrollWheel:theEvent];
+    return;
+  }
+  [super scrollWheel:theEvent];
+}
+@end
+#endif // TARGET_OS_OSX
+
 @interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler,
 #if !TARGET_OS_OSX
     UIScrollViewDelegate,
@@ -56,7 +71,11 @@ static NSDictionary* customCertificatesForHost;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
+#if !TARGET_OS_OSX
 @property (nonatomic, copy) WKWebView *webView;
+#else
+@property (nonatomic, copy) RNCWKWebView *webView;
+#endif // !TARGET_OS_OSX
 @end
 
 @implementation RNCWebView
@@ -298,7 +317,12 @@ static NSDictionary* customCertificatesForHost;
       }
     }
 
+#if !TARGET_OS_OSX
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+#else
+    _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+#endif // !TARGET_OS_OSX
+
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = self;
