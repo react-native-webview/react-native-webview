@@ -9,7 +9,7 @@
  */
 
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Button, Text, View} from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -40,10 +40,14 @@ const HTML = `
 `;
 
 type Props = {};
-type State = { lastScrollEvent: string };
+type State = {
+  scrollEnabled: boolean,
+  lastScrollEvent: string
+};
 
 export default class Scrolling extends Component<Props, State> {
   state = {
+    scrollEnabled: true,
     lastScrollEvent: ''
   };
 
@@ -55,15 +59,20 @@ export default class Scrolling extends Component<Props, State> {
           source={{html: HTML}}
           automaticallyAdjustContentInsets={false}
           onScroll={this._onScroll}
+          scrollEnabled={this.state.scrollEnabled}
         />
       </View>
+      <Button
+        title={this.state.scrollEnabled ? 'Scroll enabled' : 'Scroll disabled'}
+        onPress={() => this.setState({scrollEnabled: !this.state.scrollEnabled})}
+      />
       <Text>Last scroll event:</Text>
       <Text>{this.state.lastScrollEvent}</Text>
       </View>
     );
   }
 
-  _onScroll = info => {
-    this.setState({ lastScrollEvent: JSON.stringify(info.nativeEvent) });
+  _onScroll = event => {
+    this.setState({lastScrollEvent: JSON.stringify(event.nativeEvent)});
   }
 }
