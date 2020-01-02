@@ -34,6 +34,8 @@ This project follows [semantic versioning](https://semver.org/). We do not hesit
 
 Current Version: ![version](https://img.shields.io/npm/v/react-native-webview.svg)
 
+- [8.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v8.0.0) - onNavigationStateChange now triggers with hash url changes
+
 - [7.0.1](https://github.com/react-native-community/react-native-webview/releases/tag/v7.0.1) - Removed UIWebView
 
 - [6.0.**2**](https://github.com/react-native-community/react-native-webview/releases/tag/v6.0.2) - Update to AndroidX. Make sure to enable it in your project's `android/gradle.properties`. See [Getting Started Guide](docs/Getting-Started.md).
