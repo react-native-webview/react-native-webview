@@ -707,7 +707,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static class RNCWebViewClient extends WebViewClient {
 
     protected boolean mLastLoadFailed = false;
-    protected boolean mIsFirstLoad = true;
     protected @Nullable
     ReadableArray mUrlPrefixesForDefaultIntent;
 
@@ -729,11 +728,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       super.onPageStarted(webView, url, favicon);
       mLastLoadFailed = false;
 
-      if (mIsFirstLoad) {
-        RNCWebView reactWebView = (RNCWebView) webView;
-        reactWebView.callInjectedJavaScriptBeforeContentLoaded();  
-      }
-      mIsFirstLoad = false;      
+      RNCWebView reactWebView = (RNCWebView) webView;
+      reactWebView.callInjectedJavaScriptBeforeContentLoaded();       
 
       dispatchEvent(
         webView,
