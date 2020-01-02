@@ -810,16 +810,16 @@ static NSDictionary* customCertificatesForHost;
 #pragma mark - WKNavigationDelegate methods
 
 /**
-* alert
-*/
+ * alert
+ */
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
 #if !TARGET_OS_OSX
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        completionHandler();
-    }]];
-    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+  UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    completionHandler();
+  }]];
+  [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
   [alert setMessageText:message];
@@ -830,18 +830,18 @@ static NSDictionary* customCertificatesForHost;
 }
 
 /**
-* confirm
-*/
+ * confirm
+ */
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
 #if !TARGET_OS_OSX
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        completionHandler(YES);
-    }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        completionHandler(NO);
-    }]];
-    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+  UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    completionHandler(YES);
+  }]];
+  [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    completionHandler(NO);
+  }]];
+  [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
   [alert setMessageText:message];
@@ -855,28 +855,28 @@ static NSDictionary* customCertificatesForHost;
 }
 
 /**
-* prompt
-*/
+ * prompt
+ */
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
 #if !TARGET_OS_OSX
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
-    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.text = defaultText;
-    }];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        completionHandler([[alert.textFields lastObject] text]);
-    }];
-    [alert addAction:okAction];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        completionHandler(nil);
-    }];
-    [alert addAction:cancelAction];
-    alert.preferredAction = okAction;
-    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+  UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
+  [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+    textField.text = defaultText;
+  }];
+  UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    completionHandler([[alert.textFields lastObject] text]);
+  }];
+  [alert addAction:okAction];
+  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    completionHandler(nil);
+  }];
+  [alert addAction:cancelAction];
+  alert.preferredAction = okAction;
+  [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
   [alert setMessageText:prompt];
-  
+
   const NSRect RCTSingleTextFieldFrame = NSMakeRect(0.0, 0.0, 275.0, 22.0);
   NSTextField *textField = [[NSTextField alloc] initWithFrame:RCTSingleTextFieldFrame];
   textField.cell.scrollable = YES;
