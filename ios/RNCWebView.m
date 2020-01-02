@@ -429,6 +429,8 @@ static NSDictionary* customCertificatesForHost;
   self.opaque = _webView.opaque = (alpha == 1.0);
   _webView.scrollView.backgroundColor = backgroundColor;
   _webView.backgroundColor = backgroundColor;
+#else
+  // TODO
 #endif // !TARGET_OS_OSX
 }
 
@@ -819,7 +821,11 @@ static NSDictionary* customCertificatesForHost;
     }]];
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 #else
-  // TODO
+  NSAlert *alert = [[NSAlert alloc] init];
+  [alert setMessageText:message];
+  [alert beginSheetModalForWindow:[NSApp keyWindow] completionHandler:^(__unused NSModalResponse response){
+    completionHandler();
+  }];
 #endif // !TARGET_OS_OSX
 }
 
@@ -837,7 +843,14 @@ static NSDictionary* customCertificatesForHost;
     }]];
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 #else
-  // TODO
+  NSAlert *alert = [[NSAlert alloc] init];
+  [alert setMessageText:message];
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"OK button")];
+  [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button")];
+  void (^callbacksHandlers)(NSModalResponse response) = ^void(NSModalResponse response) {
+    completionHandler(response == NSAlertFirstButtonReturn);
+  };
+  [alert beginSheetModalForWindow:[NSApp keyWindow] completionHandler:callbacksHandlers];
 #endif // !TARGET_OS_OSX
 }
 
@@ -861,7 +874,27 @@ static NSDictionary* customCertificatesForHost;
     alert.preferredAction = okAction;
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 #else
-  // TODO
+  NSAlert *alert = [[NSAlert alloc] init];
+  [alert setMessageText:prompt];
+  
+  const NSRect RCTSingleTextFieldFrame = NSMakeRect(0.0, 0.0, 275.0, 22.0);
+  NSTextField *textField = [[NSTextField alloc] initWithFrame:RCTSingleTextFieldFrame];
+  textField.cell.scrollable = YES;
+  if (@available(macOS 10.11, *)) {
+    textField.maximumNumberOfLines = 1;
+  }
+  textField.stringValue = defaultText;
+  [alert setAccessoryView:textField];
+
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"OK button")];
+  [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button")];
+  [alert beginSheetModalForWindow:[NSApp keyWindow] completionHandler:^(NSModalResponse response) {
+    if (response == NSAlertFirstButtonReturn) {
+      completionHandler([textField stringValue]);
+    } else {
+      completionHandler(nil);
+    }
+  }];
 #endif // !TARGET_OS_OSX
 }
 

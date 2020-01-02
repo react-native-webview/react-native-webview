@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 
 import InlineWebView from './examples/InlineWebView';
+import Alerts from './examples/Alerts';
 
 const TESTS = {
   InlineWebView: {
@@ -28,6 +29,14 @@ const TESTS = {
     description: 'Inline HTML WebView',
     render() {
       return <InlineWebView />;
+    },
+  },
+  Alerts: {
+    title: 'Alerts',
+    testId: 'alerts',
+    description: 'Alerts tests',
+    render() {
+      return <Alerts />;
     },
   },
 };
@@ -69,14 +78,14 @@ export default class App extends Component<Props, State> {
 
         <View style={styles.testPickerContainer}>
           <Button
-            testID="testType_getSetClear"
-            title="Get/Set/Clear"
-            onPress={() => this._changeTest('GetSetClear')}
+            testID="testType_inlineWebView"
+            title="InlineWebView"
+            onPress={() => this._changeTest('InlineWebView')}
           />
           <Button
-            testID="testType_mergeItem"
-            title="Merge Item"
-            onPress={() => this._changeTest('MergeItem')}
+            testID="testType_alerts"
+            title="Alerts"
+            onPress={() => this._changeTest('Alerts')}
           />
         </View>
 
