@@ -449,12 +449,19 @@ static NSDictionary* customCertificatesForHost;
   }
 
   CGFloat alpha = CGColorGetAlpha(backgroundColor.CGColor);
+  BOOL opaque = (alpha == 1.0);
 #if !TARGET_OS_OSX
-  self.opaque = _webView.opaque = (alpha == 1.0);
+  self.opaque = _webView.opaque = opaque;
   _webView.scrollView.backgroundColor = backgroundColor;
   _webView.backgroundColor = backgroundColor;
 #else
-  // TODO
+  // https://stackoverflow.com/questions/40007753/macos-wkwebview-background-transparency
+  NSOperatingSystemVersion version = { 10, 12, 0 };
+  if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:version]) {
+    [_webView setValue:@(opaque) forKey: @"drawsBackground"];
+  } else {
+    [_webView setValue:@(!opaque) forKey: @"drawsTransparentBackground"];
+  }
 #endif // !TARGET_OS_OSX
 }
 

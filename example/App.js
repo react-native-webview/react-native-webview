@@ -21,6 +21,7 @@ import {
 
 import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
+import Background from './examples/Background';
 
 const TESTS = {
   Alerts: {
@@ -37,6 +38,14 @@ const TESTS = {
     description: 'Scrolling event test',
     render() {
       return <Scrolling />;
+    },
+  },
+  Background: {
+    title: 'Background',
+    testId: 'background',
+    description: 'Background color test',
+    render() {
+      return <Background />;
     },
   },
 };
@@ -86,6 +95,11 @@ export default class App extends Component<Props, State> {
             testID="testType_scrolling"
             title="Scrolling"
             onPress={() => this._changeTest('Scrolling')}
+          />
+          <Button
+            testID="testType_background"
+            title="Background"
+            onPress={() => this._changeTest('Background')}
           />
         </View>
 

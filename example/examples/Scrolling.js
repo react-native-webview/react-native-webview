@@ -54,20 +54,20 @@ export default class Scrolling extends Component<Props, State> {
   render() {
     return (
       <View>
-      <View style={{ height: 120 }}>
-        <WebView
-          source={{html: HTML}}
-          automaticallyAdjustContentInsets={false}
-          onScroll={this._onScroll}
-          scrollEnabled={this.state.scrollEnabled}
+        <View style={{ height: 120 }}>
+          <WebView
+            source={{html: HTML}}
+            automaticallyAdjustContentInsets={false}
+            onScroll={this._onScroll}
+            scrollEnabled={this.state.scrollEnabled}
+          />
+        </View>
+        <Button
+          title={this.state.scrollEnabled ? 'Scroll enabled' : 'Scroll disabled'}
+          onPress={() => this.setState({scrollEnabled: !this.state.scrollEnabled})}
         />
-      </View>
-      <Button
-        title={this.state.scrollEnabled ? 'Scroll enabled' : 'Scroll disabled'}
-        onPress={() => this.setState({scrollEnabled: !this.state.scrollEnabled})}
-      />
-      <Text>Last scroll event:</Text>
-      <Text>{this.state.lastScrollEvent}</Text>
+        <Text>Last scroll event:</Text>
+        <Text>{this.state.lastScrollEvent}</Text>
       </View>
     );
   }
