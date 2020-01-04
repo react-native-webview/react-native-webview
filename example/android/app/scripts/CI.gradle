@@ -1,0 +1,25 @@
+// Fetch all dependencies upfront
+task fetchDependencies() {
+    description 'Download all dependencies to the Gradle cache'
+    group 'android'
+    doLast {
+        project.rootProject.allprojects.each { subProject ->
+            subProject.buildscript.configurations.each {config ->
+                if(config.canBeResolved) {
+                    config.files
+                }
+            }
+            subProject.configurations.each {config ->
+                if(config.canBeResolved) {
+                    // DefaultLenientConfiguration$ArtifactResolveException
+                    try {
+                        config.files
+                    } catch(e) {
+                        println e
+                    }
+
+                }
+            }
+        }
+    }
+}
