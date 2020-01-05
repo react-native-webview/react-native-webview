@@ -962,7 +962,7 @@ static NSDictionary* customCertificatesForHost;
 - (void)setInjectedJavaScript:(NSString *)script {
   _injectedJavaScript = script;
   
-  self.atStartScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
+  self.atEndScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
       injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
     forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
   
@@ -972,7 +972,7 @@ static NSDictionary* customCertificatesForHost;
 - (void)setInjectedJavaScriptBeforeContentLoaded:(NSString *)script {
   _injectedJavaScriptBeforeContentLoaded = script;
   
-  self.atEndScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
+  self.atStartScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
        injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
   
