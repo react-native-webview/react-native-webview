@@ -51,6 +51,9 @@ static NSDictionary* customCertificatesForHost;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 @property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, strong) WKUserScript *postMessageScript;
+@property (nonatomic, strong) WKUserScript *atStartScript;
+@property (nonatomic, strong) WKUserScript *atEndScript;
 @end
 
 @implementation RNCWebView
@@ -84,6 +87,10 @@ static NSDictionary* customCertificatesForHost;
     _savedKeyboardDisplayRequiresUserAction = YES;
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
+    _injectedJavaScript = nil;
+    _injectedJavaScriptForMainFrameOnly = YES;
+    _injectedJavaScriptBeforeContentLoaded = nil;
+    _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -163,50 +170,8 @@ static NSDictionary* customCertificatesForHost;
   // Shim the HTML5 history API:
   [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                             name:HistoryShimName];
-  NSString *source = [NSString stringWithFormat:
-    @"(function(history) {\n"
-    "  function notify(type) {\n"
-    "    setTimeout(function() {\n"
-    "      window.webkit.messageHandlers.%@.postMessage(type)\n"
-    "    }, 0)\n"
-    "  }\n"
-    "  function shim(f) {\n"
-    "    return function pushState() {\n"
-    "      notify('other')\n"
-    "      return f.apply(history, arguments)\n"
-    "    }\n"
-    "  }\n"
-    "  history.pushState = shim(history.pushState)\n"
-    "  history.replaceState = shim(history.replaceState)\n"
-    "  window.addEventListener('popstate', function() {\n"
-    "    notify('backforward')\n"
-    "  })\n"
-    "})(window.history)\n", HistoryShimName
-  ];
-  WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
-  [wkWebViewConfig.userContentController addUserScript:script];
 
-  if (_messagingEnabled) {
-    [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
-                                                              name:MessageHandlerName];
-
-    NSString *source = [NSString stringWithFormat:
-      @"window.%@ = {"
-       "  postMessage: function (data) {"
-       "    window.webkit.messageHandlers.%@.postMessage(String(data));"
-       "  }"
-       "};", MessageHandlerName, MessageHandlerName
-    ];
-
-    WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
-    [wkWebViewConfig.userContentController addUserScript:script];
-      
-    if (_injectedJavaScriptBeforeContentLoaded) {
-      // If user has provided an injectedJavascript prop, execute it at the start of the document
-      WKUserScript *injectedScript = [[WKUserScript alloc] initWithSource:_injectedJavaScriptBeforeContentLoaded injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
-      [wkWebViewConfig.userContentController addUserScript:injectedScript];
-    }
-  }
+  [self resetupScripts];
 
   wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
@@ -220,68 +185,6 @@ static NSDictionary* customCertificatesForHost;
 
   if (_applicationNameForUserAgent) {
       wkWebViewConfig.applicationNameForUserAgent = [NSString stringWithFormat:@"%@ %@", wkWebViewConfig.applicationNameForUserAgent, _applicationNameForUserAgent];
-  }
-
-  if(_sharedCookiesEnabled) {
-    // More info to sending cookies with WKWebView
-    // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
-    if (@available(iOS 11.0, *)) {
-      // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
-      // See also https://forums.developer.apple.com/thread/97194
-      // check if websiteDataStore has not been initialized before
-      if(!_incognito && !_cacheEnabled) {
-        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
-      }
-      for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
-        [wkWebViewConfig.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:nil];
-      }
-    } else {
-      NSMutableString *script = [NSMutableString string];
-
-      // Clear all existing cookies in a direct called function. This ensures that no
-      // javascript error will break the web content javascript.
-      // We keep this code here, if someone requires that Cookies are also removed within the
-      // the WebView and want to extends the current sharedCookiesEnabled option with an
-      // additional property.
-      // Generates JS: document.cookie = "key=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;"
-      // for each cookie which is already available in the WebView context.
-      /*
-      [script appendString:@"(function () {\n"];
-      [script appendString:@"  var cookies = document.cookie.split('; ');\n"];
-      [script appendString:@"  for (var i = 0; i < cookies.length; i++) {\n"];
-      [script appendString:@"    if (cookies[i].indexOf('=') !== -1) {\n"];
-      [script appendString:@"      document.cookie = cookies[i].split('=')[0] + '=; Expires=Thu, 01 Jan 1970 00:00:01 GMT';\n"];
-      [script appendString:@"    }\n"];
-      [script appendString:@"  }\n"];
-      [script appendString:@"})();\n\n"];
-      */
-
-      // Set cookies in a direct called function. This ensures that no
-      // javascript error will break the web content javascript.
-        // Generates JS: document.cookie = "key=value; Path=/; Expires=Thu, 01 Jan 20xx 00:00:01 GMT;"
-      // for each cookie which is available in the application context.
-      [script appendString:@"(function () {\n"];
-      for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
-        [script appendFormat:@"document.cookie = %@ + '=' + %@",
-          RCTJSONStringify(cookie.name, NULL),
-          RCTJSONStringify(cookie.value, NULL)];
-        if (cookie.path) {
-          [script appendFormat:@" + '; Path=' + %@", RCTJSONStringify(cookie.path, NULL)];
-        }
-        if (cookie.expiresDate) {
-          [script appendFormat:@" + '; Expires=' + new Date(%f).toUTCString()",
-            cookie.expiresDate.timeIntervalSince1970 * 1000
-          ];
-        }
-        [script appendString:@";\n"];
-      }
-      [script appendString:@"})();\n"];
-
-      WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource:script
-                                                            injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-                                                         forMainFrameOnly:YES];
-      [wkWebViewConfig.userContentController addUserScript:cookieInScript];
-    }
   }
   
   return wkWebViewConfig;
@@ -1062,6 +965,166 @@ static NSDictionary* customCertificatesForHost;
 {
   _bounces = bounces;
   _webView.scrollView.bounces = bounces;
+}
+
+
+- (void)setInjectedJavaScript:(NSString *)script {
+  _injectedJavaScript = script;
+  
+  self.atStartScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
+      injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+    forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
+  
+  [self resetupScripts];
+}
+
+- (void)setInjectedJavaScriptBeforeContentLoaded:(NSString *)script {
+  _injectedJavaScriptBeforeContentLoaded = script;
+  
+  self.atEndScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
+       injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
+    forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
+  
+  [self resetupScripts];
+}
+
+- (void)setInjectedJavaScriptForMainFrameOnly:(BOOL)inject {
+  _injectedJavaScriptForMainFrameOnly = inject;
+  [self setInjectedJavaScript:_injectedJavaScript];
+}
+
+- (void)setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly:(BOOL)inject {
+  _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = inject;
+  [self setInjectedJavaScriptBeforeContentLoaded:_injectedJavaScriptBeforeContentLoaded];
+}
+
+- (void)setMessagingEnabled:(BOOL)messagingEnabled {
+  _messagingEnabled = messagingEnabled;
+  
+  self.postMessageScript = _messagingEnabled ?
+  [
+   [WKUserScript alloc]
+   initWithSource: [
+                    NSString
+                    stringWithFormat:
+                    @"window.%@ = {"
+                    "  postMessage: function (data) {"
+                    "    window.webkit.messageHandlers.%@.postMessage(String(data));"
+                    "  }"
+                    "};", MessageHandlerName, MessageHandlerName
+                    ]
+   injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+   /* This was previously YES, but I'm following react-native-wkwebview's approach on this;
+    * It's very useful to be able to inject postMessage into iframes. */
+   forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly
+   ] :
+  nil;
+  
+  [self resetupScripts];
+}
+
+- (void)resetupScripts {
+  [_webView.configuration.userContentController removeAllUserScripts];
+  [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
+  
+  NSString *html5HistoryAPIShimSource = [NSString stringWithFormat:
+    @"(function(history) {\n"
+    "  function notify(type) {\n"
+    "    setTimeout(function() {\n"
+    "      window.webkit.messageHandlers.%@.postMessage(type)\n"
+    "    }, 0)\n"
+    "  }\n"
+    "  function shim(f) {\n"
+    "    return function pushState() {\n"
+    "      notify('other')\n"
+    "      return f.apply(history, arguments)\n"
+    "    }\n"
+    "  }\n"
+    "  history.pushState = shim(history.pushState)\n"
+    "  history.replaceState = shim(history.replaceState)\n"
+    "  window.addEventListener('popstate', function() {\n"
+    "    notify('backforward')\n"
+    "  })\n"
+    "})(window.history)\n", HistoryShimName
+  ];
+  WKUserScript *script = [[WKUserScript alloc] initWithSource:html5HistoryAPIShimSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+  [_webView.configuration.userContentController addUserScript:script];
+  
+  if(_sharedCookiesEnabled) {
+    // More info to sending cookies with WKWebView
+    // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
+    if (@available(iOS 11.0, *)) {
+      // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
+      // See also https://forums.developer.apple.com/thread/97194
+      // check if websiteDataStore has not been initialized before
+      if(!_incognito && !_cacheEnabled) {
+        _webView.configuration.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+      }
+      for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+        [_webView.configuration.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:nil];
+      }
+    } else {
+      NSMutableString *script = [NSMutableString string];
+
+      // Clear all existing cookies in a direct called function. This ensures that no
+      // javascript error will break the web content javascript.
+      // We keep this code here, if someone requires that Cookies are also removed within the
+      // the WebView and want to extends the current sharedCookiesEnabled option with an
+      // additional property.
+      // Generates JS: document.cookie = "key=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+      // for each cookie which is already available in the WebView context.
+      /*
+      [script appendString:@"(function () {\n"];
+      [script appendString:@"  var cookies = document.cookie.split('; ');\n"];
+      [script appendString:@"  for (var i = 0; i < cookies.length; i++) {\n"];
+      [script appendString:@"    if (cookies[i].indexOf('=') !== -1) {\n"];
+      [script appendString:@"      document.cookie = cookies[i].split('=')[0] + '=; Expires=Thu, 01 Jan 1970 00:00:01 GMT';\n"];
+      [script appendString:@"    }\n"];
+      [script appendString:@"  }\n"];
+      [script appendString:@"})();\n\n"];
+      */
+
+      // Set cookies in a direct called function. This ensures that no
+      // javascript error will break the web content javascript.
+        // Generates JS: document.cookie = "key=value; Path=/; Expires=Thu, 01 Jan 20xx 00:00:01 GMT;"
+      // for each cookie which is available in the application context.
+      [script appendString:@"(function () {\n"];
+      for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+        [script appendFormat:@"document.cookie = %@ + '=' + %@",
+          RCTJSONStringify(cookie.name, NULL),
+          RCTJSONStringify(cookie.value, NULL)];
+        if (cookie.path) {
+          [script appendFormat:@" + '; Path=' + %@", RCTJSONStringify(cookie.path, NULL)];
+        }
+        if (cookie.expiresDate) {
+          [script appendFormat:@" + '; Expires=' + new Date(%f).toUTCString()",
+            cookie.expiresDate.timeIntervalSince1970 * 1000
+          ];
+        }
+        [script appendString:@";\n"];
+      }
+      [script appendString:@"})();\n"];
+
+      WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource:script
+                                                            injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+                                                         forMainFrameOnly:YES];
+      [_webView.configuration.userContentController addUserScript:cookieInScript];
+    }
+  }
+  
+  if(_messagingEnabled){
+    if (self.postMessageScript){
+      [_webView.configuration.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+                                                                       name:MessageHandlerName];
+      [_webView.configuration.userContentController addUserScript:self.postMessageScript];
+    }
+    if (self.atStartScript) {
+      [_webView.configuration.userContentController addUserScript:self.atStartScript];
+    }
+    if (self.atEndScript) {
+      [_webView.configuration.userContentController addUserScript:self.atEndScript];
+    }
+  }
 }
 
 - (NSURLRequest *)requestForSource:(id)json {
