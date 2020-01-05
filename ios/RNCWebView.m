@@ -959,10 +959,10 @@ static NSDictionary* customCertificatesForHost;
 }
 
 
-- (void)setInjectedJavaScript:(NSString *)script {
-  _injectedJavaScript = script;
+- (void)setInjectedJavaScript:(NSString *)source {
+  _injectedJavaScript = source;
   
-  self.atEndScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
+  self.atEndScript = source == nil ? nil : [[WKUserScript alloc] initWithSource:source
       injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
     forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
   
@@ -971,10 +971,10 @@ static NSDictionary* customCertificatesForHost;
   }
 }
 
-- (void)setInjectedJavaScriptBeforeContentLoaded:(NSString *)script {
-  _injectedJavaScriptBeforeContentLoaded = script;
+- (void)setInjectedJavaScriptBeforeContentLoaded:(NSString *)source {
+  _injectedJavaScriptBeforeContentLoaded = source;
   
-  self.atStartScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
+  self.atStartScript = source == nil ? nil : [[WKUserScript alloc] initWithSource:source
        injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
   
@@ -983,13 +983,13 @@ static NSDictionary* customCertificatesForHost;
   }
 }
 
-- (void)setInjectedJavaScriptForMainFrameOnly:(BOOL)inject {
-  _injectedJavaScriptForMainFrameOnly = inject;
+- (void)setInjectedJavaScriptForMainFrameOnly:(BOOL)mainFrameOnly {
+  _injectedJavaScriptForMainFrameOnly = mainFrameOnly;
   [self setInjectedJavaScript:_injectedJavaScript];
 }
 
-- (void)setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly:(BOOL)inject {
-  _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = inject;
+- (void)setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly:(BOOL)mainFrameOnly {
+  _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = mainFrameOnly;
   [self setInjectedJavaScriptBeforeContentLoaded:_injectedJavaScriptBeforeContentLoaded];
 }
 
