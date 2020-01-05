@@ -1009,9 +1009,10 @@ static NSDictionary* customCertificatesForHost;
                     "};", MessageHandlerName, MessageHandlerName
                     ]
    injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-   /* This was previously YES, but I'm following react-native-wkwebview's approach on this;
-    * It's very useful to be able to inject postMessage into iframes. */
-   forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly
+   /* TODO: For a separate (minor) PR: use logic like this (as react-native-wkwebview does) so that messaging can be used in all frames if desired.
+    *       I am keeping it as YES for consistency with previous behaviour. */
+   // forMainFrameOnly:_messagingEnabledForMainFrameOnly
+   forMainFrameOnly:YES
    ] :
   nil;
   
@@ -1115,6 +1116,7 @@ static NSDictionary* customCertificatesForHost;
                                                                        name:MessageHandlerName];
       [_webView.configuration.userContentController addUserScript:self.postMessageScript];
     }
+    // FIXME: For a separate (minor) PR: these two shouldn't be gated by messagingEnabled; just keeping consistency with previous behaviour.
     if (self.atStartScript) {
       [_webView.configuration.userContentController addUserScript:self.atStartScript];
     }
