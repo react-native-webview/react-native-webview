@@ -171,7 +171,7 @@ static NSDictionary* customCertificatesForHost;
   [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                             name:HistoryShimName];
 
-  [self resetupScripts];
+  [self resetupScripts:wkWebViewConfig];
 
   wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
@@ -966,7 +966,7 @@ static NSDictionary* customCertificatesForHost;
       injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
     forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
   
-  [self resetupScripts];
+  [self resetupScripts:_webView.configuration];
 }
 
 - (void)setInjectedJavaScriptBeforeContentLoaded:(NSString *)script {
@@ -976,7 +976,7 @@ static NSDictionary* customCertificatesForHost;
        injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
   
-  [self resetupScripts];
+  [self resetupScripts:_webView.configuration];
 }
 
 - (void)setInjectedJavaScriptForMainFrameOnly:(BOOL)inject {
@@ -1011,10 +1011,10 @@ static NSDictionary* customCertificatesForHost;
    ] :
   nil;
   
-  [self resetupScripts];
+  [self resetupScripts:_webView.configuration];
 }
 
-- (void)resetupScripts {
+- (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
   [_webView.configuration.userContentController removeAllUserScripts];
   [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
   
