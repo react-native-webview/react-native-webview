@@ -19,15 +19,33 @@ import {
   Button,
 } from 'react-native';
 
-import InlineWebView from './examples/InlineWebView';
+import Alerts from './examples/Alerts';
+import Scrolling from './examples/Scrolling';
+import Background from './examples/Background';
 
 const TESTS = {
-  InlineWebView: {
-    title: 'Inline HTML WebView',
-    testId: 'inline-webview',
-    description: 'Inline HTML WebView',
+  Alerts: {
+    title: 'Alerts',
+    testId: 'alerts',
+    description: 'Alerts tests',
     render() {
-      return <InlineWebView />;
+      return <Alerts />;
+    },
+  },
+  Scrolling: {
+    title: 'Scrolling',
+    testId: 'scrolling',
+    description: 'Scrolling event test',
+    render() {
+      return <Scrolling />;
+    },
+  },
+  Background: {
+    title: 'Background',
+    testId: 'background',
+    description: 'Background color test',
+    render() {
+      return <Background />;
     },
   },
 };
@@ -38,7 +56,7 @@ type State = {restarting: boolean, currentTest: Object};
 export default class App extends Component<Props, State> {
   state = {
     restarting: false,
-    currentTest: TESTS.InlineWebView,
+    currentTest: TESTS.Alerts,
   };
 
   _simulateRestart = () => {
@@ -69,14 +87,19 @@ export default class App extends Component<Props, State> {
 
         <View style={styles.testPickerContainer}>
           <Button
-            testID="testType_getSetClear"
-            title="Get/Set/Clear"
-            onPress={() => this._changeTest('GetSetClear')}
+            testID="testType_alerts"
+            title="Alerts"
+            onPress={() => this._changeTest('Alerts')}
           />
           <Button
-            testID="testType_mergeItem"
-            title="Merge Item"
-            onPress={() => this._changeTest('MergeItem')}
+            testID="testType_scrolling"
+            title="Scrolling"
+            onPress={() => this._changeTest('Scrolling')}
+          />
+          <Button
+            testID="testType_background"
+            title="Background"
+            onPress={() => this._changeTest('Background')}
           />
         </View>
 
