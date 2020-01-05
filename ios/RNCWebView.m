@@ -966,7 +966,9 @@ static NSDictionary* customCertificatesForHost;
       injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
     forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
   
-  [self resetupScripts:_webView.configuration];
+  if(_webView != nil){
+    [self resetupScripts:_webView.configuration];
+  }
 }
 
 - (void)setInjectedJavaScriptBeforeContentLoaded:(NSString *)script {
@@ -976,7 +978,9 @@ static NSDictionary* customCertificatesForHost;
        injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
   
-  [self resetupScripts:_webView.configuration];
+  if(_webView != nil){
+    [self resetupScripts:_webView.configuration];
+  }
 }
 
 - (void)setInjectedJavaScriptForMainFrameOnly:(BOOL)inject {
@@ -1011,7 +1015,9 @@ static NSDictionary* customCertificatesForHost;
    ] :
   nil;
   
-  [self resetupScripts:_webView.configuration];
+  if(_webView != nil){
+    [self resetupScripts:_webView.configuration];
+  }
 }
 
 - (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
