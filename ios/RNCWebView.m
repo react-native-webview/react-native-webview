@@ -911,16 +911,7 @@ static NSDictionary* customCertificatesForHost;
 - (void)webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
-   if (_injectedJavaScript) {
-     [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {
-       NSMutableDictionary *event = [self baseEvent];
-       event[@"jsEvaluationValue"] = jsEvaluationValue;
-
-       if (self.onLoadingFinish) {
-         self.onLoadingFinish(event);
-       }
-     }];
-   } else if (_onLoadingFinish) {
+  if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
   }
 }
@@ -972,7 +963,7 @@ static NSDictionary* customCertificatesForHost;
   _injectedJavaScript = script;
   
   self.atStartScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
-      injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+      injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
     forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
   
   [self resetupScripts];
@@ -982,7 +973,7 @@ static NSDictionary* customCertificatesForHost;
   _injectedJavaScriptBeforeContentLoaded = script;
   
   self.atEndScript = script == nil ? nil : [[WKUserScript alloc] initWithSource:script
-       injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
+       injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
   
   [self resetupScripts];
