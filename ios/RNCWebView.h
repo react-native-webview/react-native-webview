@@ -29,6 +29,7 @@
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
 @property (nonatomic, assign) BOOL messagingEnabled;
+@property (nonatomic, copy) NSArray  * _Nullable messageHandlers;
 @property (nonatomic, copy) NSString * _Nullable injectedJavaScript;
 @property (nonatomic, copy) NSString * _Nullable injectedJavaScriptBeforeContentLoaded;
 @property (nonatomic, assign) BOOL scrollEnabled;

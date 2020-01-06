@@ -79,6 +79,7 @@ RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInse
  * Expose methods to enable messaging the webview.
  */
 RCT_EXPORT_VIEW_PROPERTY(messagingEnabled, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(messageHandlers, NSArray)
 RCT_EXPORT_VIEW_PROPERTY(onMessage, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onScroll, RCTDirectEventBlock)
 

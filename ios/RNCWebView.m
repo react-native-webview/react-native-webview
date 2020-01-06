@@ -188,6 +188,12 @@ static NSDictionary* customCertificatesForHost;
     [wkWebViewConfig.userContentController addUserScript:script];
 
     if (_messagingEnabled) {
+        for (NSString *handler in _messageHandlers)
+        {
+            [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+            name:handler];
+        }
+        
       [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                                 name:MessageHandlerName];
 
@@ -942,7 +948,7 @@ static NSDictionary* customCertificatesForHost;
         _onHttpError(event);
       }
     }
-  }  
+  }
 
   decisionHandler(WKNavigationResponsePolicyAllow);
 }
