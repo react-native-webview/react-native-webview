@@ -453,7 +453,9 @@ static NSDictionary* customCertificatesForHost;
   } else {
     if (_onMessage) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-      [event addEntriesFromDictionary: @{@"data":    message.body}];
+      if (message.body) {
+        [event addEntriesFromDictionary: @{@"data":  message.body}];
+      }
       [event addEntriesFromDictionary: @{@"handler": message.name}];
       _onMessage(event);
     }
