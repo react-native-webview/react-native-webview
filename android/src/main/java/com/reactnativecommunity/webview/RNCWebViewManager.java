@@ -609,7 +609,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         if (args == null) {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
-        root.loadUrl(args.getString(0));
+        HashMap<String, String> headerMap = new HashMap<>();
+        headerMap.put("referer", root.getUrl());
+        
+        root.loadUrl(args.getString(0), headerMap);
         break;
       case COMMAND_FOCUS:
         root.requestFocus();
