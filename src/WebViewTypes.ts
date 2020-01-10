@@ -736,4 +736,9 @@ export interface WebViewSharedProps extends ViewProps {
    * Should caching be enabled. Default is true.
    */
   cacheEnabled?: boolean;
+
+  /**
+   * Append to the existing user-agent. Overriden if `userAgent` is set.
+   */
+  applicationNameForUserAgent?: string;
 }
