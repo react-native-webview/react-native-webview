@@ -129,6 +129,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   // Use `webView.loadUrl("about:blank")` to reliably reset the view
   // state and release page resources (including any running JavaScript).
   protected static final String BLANK_URL = "about:blank";
+  
+  // Intent urls are a type of deeplinks which start with: intent://
+  private static final String INTENT_URL_PREFIX = "intent://";
+  
   protected WebViewConfig mWebViewConfig;
 
   protected RNCWebChromeClient mWebChromeClient = null;
@@ -740,15 +744,83 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           createWebViewEvent(webView, url)));
     }
 
+
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      activeUrl = url;
-      dispatchEvent(
-        view,
-        new TopShouldStartLoadWithRequestEvent(
-          view.getId(),
-          createWebViewEvent(view, url)));
+      if (url.equals(BLANK_URL)) return false;
+
+      // url blacklisting
+      if (mUrlPrefixesForDefaultIntent != null && mUrlPrefixesForDefaultIntent.size() > 0) {
+        ArrayList<Object> urlPrefixesForDefaultIntent = mUrlPrefixesForDefaultIntent.toArrayList();
+        for (Object urlPrefix : urlPrefixesForDefaultIntent) {
+          if (url.startsWith((String) urlPrefix)) {
+            launchIntent(view.getContext(), url);
+            return true;
+          }
+        }
+      }
+
+      if (mOriginWhitelist != null && shouldHandleURL(mOriginWhitelist, url)) {
+        return false;
+      }
+
+      launchIntent(view.getContext(), url);
       return true;
+    }
+
+
+    private void launchIntent(Context context, String url) {
+      Intent intent = null;
+
+      // URLs starting with 'intent://' require special handling.
+      if (url.startsWith(INTENT_URL_PREFIX)) {
+        try {
+          intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+        } catch (URISyntaxException e) {
+          FLog.e(ReactConstants.TAG, "Can't parse intent:// URI", e);
+        }
+      }
+
+      if (intent != null) {
+        // This is needed to prevent security issue where non-exported activities from the same process can be started with intent:// URIs.
+        // See: T10607927/S136245
+        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+        intent.setComponent(null);
+        intent.setSelector(null);
+
+        PackageManager packageManager = context.getPackageManager();
+        ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (info != null) {
+            // App is installed.
+            context.startActivity(intent);
+        } else {
+            String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl));
+        }
+      } else {
+        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+      }
+
+      try {
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+        context.startActivity(intent);
+      } catch (ActivityNotFoundException e) {
+        FLog.w(ReactConstants.TAG, "activity not found to handle uri scheme for: " + url, e);
+      }
+    }
+
+    private boolean shouldHandleURL(List<Pattern> originWhitelist, String url) {
+      Uri uri = Uri.parse(url);
+      String scheme = uri.getScheme() != null ? uri.getScheme() : "";
+      String authority = uri.getAuthority() != null ? uri.getAuthority() : "";
+      String urlToCheck = scheme + "://" + authority;
+      for (Pattern pattern : originWhitelist) {
+        if (pattern.matcher(urlToCheck).matches()) {
+          return true;
+        }
+      }
+      return false;
     }
 
 
