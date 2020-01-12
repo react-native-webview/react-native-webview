@@ -147,6 +147,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected boolean mAllowsFullscreenVideo = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
+  protected @Nullable List<Pattern> mOriginWhitelist;
 
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -903,6 +904,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
       mUrlPrefixesForDefaultIntent = specialUrls;
+    }
+    public void setOriginWhitelist(List<Pattern> originWhitelist) {
+      mOriginWhitelist = originWhitelist;
     }
   }
 
