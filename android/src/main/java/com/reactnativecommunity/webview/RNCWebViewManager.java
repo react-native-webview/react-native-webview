@@ -147,7 +147,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected boolean mAllowsFullscreenVideo = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
-  // protected @Nullable List<Pattern> mOriginWhitelist;
 
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -769,10 +768,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         }
       }
 
-      // if (mOriginWhitelist != null && shouldHandleURL(mOriginWhitelist, url)) {
-      //   return false;
-      // }
-
       launchIntent(view.getContext(), url);
       return true;
     }
@@ -905,9 +900,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
       mUrlPrefixesForDefaultIntent = specialUrls;
     }
-    // public void setOriginWhitelist(List<Pattern> originWhitelist) {
-    //   mOriginWhitelist = originWhitelist;
-    // }
   }
 
   protected static class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
