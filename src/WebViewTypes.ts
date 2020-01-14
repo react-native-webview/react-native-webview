@@ -590,6 +590,11 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Sets ability to open fullscreen videos on Android devices.
    */
   allowsFullscreenVideo?: boolean;
+
+  /**
+   * Ignore Ssl errors.
+   */
+  ignoreSslErrors?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {

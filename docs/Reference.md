@@ -1091,6 +1091,14 @@ Example:
 
 `<WebView textZoom={100} />`
 
+### `ignoreSslErrors`
+
+Ignore Ssl errors encountered in the webview. 
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android      |
+
 ## Methods
 
 ### `extraNativeComponentConfig()`
