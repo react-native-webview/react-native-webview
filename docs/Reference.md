@@ -1095,6 +1095,8 @@ Example:
 
 Ignore Ssl errors encountered in the webview. 
 
+Works only in debug mode.
+
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | Android      |
