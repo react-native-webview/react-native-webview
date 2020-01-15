@@ -725,7 +725,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-      if (ReactBuildConfig.DEBUG && mignoreSslErrors) {
+      if (BuildConfig.DEBUG && mignoreSslErrors) {
         handler.proceed();
       }
 
