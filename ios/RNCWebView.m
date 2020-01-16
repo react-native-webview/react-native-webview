@@ -168,7 +168,7 @@ static NSDictionary* customCertificatesForHost;
   wkWebViewConfig.userContentController = [WKUserContentController new];
 
   // Shim the HTML5 history API:
-  [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+  [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self] name:HistoryShimName];
 
   [self resetupScripts:wkWebViewConfig];
 
