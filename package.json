@@ -12,7 +12,7 @@
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "start-macos": "node node_modules/react-native-macos/local-cli/cli.js start --reset-cache --verbose --use-react-native-macos --config=metro.config.macos.js",
+    "start-macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
     "start:android": "react-native run-android --root example/",
     "start:ios": "react-native run-ios --project-path example/ios --scheme RNCWebViewExample",
     "build:e2e:ios": "detox build -c ios",
