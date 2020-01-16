@@ -4,9 +4,11 @@
  */
 
 const blacklist = require('metro-config/src/defaults/blacklist');
+const path = require('path')
 
 module.exports = {
   resolver: {
-    blacklistRE: blacklist([/node_modules\/react-native-macos\/.*/])
+    platforms: ['macos', 'ios', 'android'],
+    blacklistRE: blacklist([/node_modules\/react-native\/.*/])
   },
 };
