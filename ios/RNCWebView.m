@@ -18,14 +18,20 @@ static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
+static BOOL isServerTrustEvaluationDisabled = NO;
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
-@interface _SwizzleHelperWK : UIView
+
+@interface _SwizzleHelperWK: UIView
+
 @property (nonatomic, copy) WKWebView *webView;
+
 @end
+
 @implementation _SwizzleHelperWK
--(id)inputAccessoryView
+
+- (id)inputAccessoryView
 {
     if (_webView == nil) {
         return nil;
@@ -38,9 +44,11 @@ static NSDictionary* customCertificatesForHost;
     }
     return nil;
 }
+
 @end
 
 @interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate, RCTAutoInsetsProtocol>
+
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
@@ -51,6 +59,7 @@ static NSDictionary* customCertificatesForHost;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 @property (nonatomic, copy) WKWebView *webView;
+
 @end
 
 @implementation RNCWebView
@@ -323,7 +332,8 @@ static NSDictionary* customCertificatesForHost;
 }
 
 // Update webview property when the component prop changes.
-- (void)setAllowsBackForwardNavigationGestures:(BOOL)allowsBackForwardNavigationGestures {
+- (void)setAllowsBackForwardNavigationGestures:(BOOL)allowsBackForwardNavigationGestures
+{
   _allowsBackForwardNavigationGestures = allowsBackForwardNavigationGestures;
   _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 }
@@ -342,7 +352,7 @@ static NSDictionary* customCertificatesForHost;
     [super removeFromSuperview];
 }
 
--(void)showFullScreenVideoStatusBars
+- (void)showFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     _isFullScreenVideoOpen = YES;
@@ -352,7 +362,7 @@ static NSDictionary* customCertificatesForHost;
 #pragma clang diagnostic pop
 }
 
--(void)hideFullScreenVideoStatusBars
+- (void)hideFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     _isFullScreenVideoOpen = NO;
@@ -363,18 +373,20 @@ static NSDictionary* customCertificatesForHost;
 #pragma clang diagnostic pop
 }
 
--(void)keyboardWillHide
+- (void)keyboardWillHide
 {
     keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
     [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
 }
--(void)keyboardWillShow
+
+- (void)keyboardWillShow
 {
     if (keyboardTimer != nil) {
         [keyboardTimer invalidate];
     }
 }
--(void)keyboardDisplacementFix
+
+- (void)keyboardDisplacementFix
 {
     // Additional viewport checks to prevent unintentional scrolls
     UIScrollView *scrollView = self.webView.scrollView;
@@ -390,7 +402,8 @@ static NSDictionary* customCertificatesForHost;
     }
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
+{
     if ([keyPath isEqual:@"estimatedProgress"] && object == self.webView) {
         if(_onLoadingProgress){
              NSMutableDictionary<NSString *, id> *event = [self baseEvent];
@@ -525,7 +538,7 @@ static NSDictionary* customCertificatesForHost;
     }
 }
 
--(void)setKeyboardDisplayRequiresUserAction:(BOOL)keyboardDisplayRequiresUserAction
+- (void)setKeyboardDisplayRequiresUserAction:(BOOL)keyboardDisplayRequiresUserAction
 {
     if (_webView == nil) {
         _savedKeyboardDisplayRequiresUserAction = keyboardDisplayRequiresUserAction;
@@ -593,7 +606,7 @@ static NSDictionary* customCertificatesForHost;
     method_setImplementation(method, override);
 }
 
--(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
+- (void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
 {
     if (_webView == nil) {
         _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
@@ -722,43 +735,56 @@ static NSDictionary* customCertificatesForHost;
   return [[NSMutableDictionary alloc] initWithDictionary: event];
 }
 
-+ (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential {
++ (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential
+{
   clientAuthenticationCredential = credential;
 }
 
-+ (void)setCustomCertificatesForHost:(nullable NSDictionary*)certificates {
++ (void)setCustomCertificatesForHost:(nullable NSDictionary*)certificates
+{
     customCertificatesForHost = certificates;
 }
 
-- (void)                    webView:(WKWebView *)webView
-  didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
-                  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler
++ (void)disableServerTrustEvaluation
 {
-    NSString* host = nil;
-    if (webView.URL != nil) {
-        host = webView.URL.host;
-    }
-    if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
+    isServerTrustEvaluationDisabled = YES;
+}
+
+- (void)webView:(WKWebView *)webView
+didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nulable))completionHandler
+{
+    NSURLProtectionSpace *protectionSpace = challenge.protectionSpace;
+    NSString *authenticationMethod = protectionSpace.authenticationMethod;
+    
+    if (authenticationMethod == NSURLAuthenticationMethodClientCertificate) {
         completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
         return;
     }
-    if ([[challenge protectionSpace] serverTrust] != nil && customCertificatesForHost != nil && host != nil) {
-        SecCertificateRef localCertificate = (__bridge SecCertificateRef)([customCertificatesForHost objectForKey:host]);
-        if (localCertificate != nil) {
-            NSData *localCertificateData = (NSData*) CFBridgingRelease(SecCertificateCopyData(localCertificate));
-            SecTrustRef trust = [[challenge protectionSpace] serverTrust];
-            long count = SecTrustGetCertificateCount(trust);
-            for (long i = 0; i < count; i++) {
-                SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(trust, i);
-                if (serverCertificate == nil) { continue; }
-                NSData *serverCertificateData = (NSData *) CFBridgingRelease(SecCertificateCopyData(serverCertificate));
-                if ([serverCertificateData isEqualToData:localCertificateData]) {
-                    NSURLCredential *useCredential = [NSURLCredential credentialForTrust:trust];
-                    if (challenge.sender != nil) {
-                        [challenge.sender useCredential:useCredential forAuthenticationChallenge:challenge];
+    
+    SecTrustRef trust = protectionSpace.serverTrust;
+    if (authenticationMethod == NSURLAuthenticationMethodServerTrust && trust != nil) {
+        if (isServerTrustEvaluationDisabled) {
+            NSURLCredential *useCredential = [NSURLCredential credentialForTrust:trust];
+            completionHandler(NSURLSessionAuthChallengeUseCredential, useCredential);
+            return;
+        }
+        
+        NSString *host = webView.URL.host;
+        if(host != nil && customCertificatesForHost != nil) {
+            SecCertificateRef localCertificate = (__bridge SecCertificateRef)([customCertificatesForHost objectForKey:host]);
+            if (localCertificate != nil) {
+                NSData *localCertificateData = (NSData*) CFBridgingRelease(SecCertificateCopyData(localCertificate));
+                CFIndex count = SecTrustGetCertificateCount(trust);
+                for (CFIndex i = 0; i < count; i++) {
+                    SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(trust, i);
+                    if (serverCertificate == nil) { continue; }
+                    NSData *serverCertificateData = (NSData *) CFBridgingRelease(SecCertificateCopyData(serverCertificate));
+                    if ([serverCertificateData isEqualToData:localCertificateData]) {
+                        NSURLCredential *useCredential = [NSURLCredential credentialForTrust:trust];
+                        completionHandler(NSURLSessionAuthChallengeUseCredential, useCredential);
+                        return;
                     }
-                    completionHandler(NSURLSessionAuthChallengeUseCredential, useCredential);
-                    return;
                 }
             }
         }
@@ -778,13 +804,13 @@ static NSDictionary* customCertificatesForHost;
         completionHandler();
     }]];
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
-
 }
 
 /**
 * confirm
 */
-- (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
+- (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler
+{
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         completionHandler(YES);
@@ -798,7 +824,8 @@ static NSDictionary* customCertificatesForHost;
 /**
 * prompt
 */
-- (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
+- (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler
+{
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.text = defaultText;
@@ -818,7 +845,8 @@ static NSDictionary* customCertificatesForHost;
 /**
  * topViewController
  */
--(UIViewController *)topViewController{
+- (UIViewController *)topViewController
+{
     UIViewController *controller = [self topViewControllerWithRootViewController:[self getCurrentWindow].rootViewController];
     return controller;
 }
@@ -826,7 +854,7 @@ static NSDictionary* customCertificatesForHost;
 /**
  * topViewControllerWithRootViewController
  */
--(UIViewController *)topViewControllerWithRootViewController:(UIViewController *)viewController{
+- (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)viewController{
   if (viewController==nil) return nil;
   if (viewController.presentedViewController!=nil) {
     return [self topViewControllerWithRootViewController:viewController.presentedViewController];
@@ -841,7 +869,7 @@ static NSDictionary* customCertificatesForHost;
 /**
  * getCurrentWindow
  */
--(UIWindow *)getCurrentWindow{
+- (UIWindow *)getCurrentWindow{
   UIWindow *window = [UIApplication sharedApplication].keyWindow;
   if (window.windowLevel!=UIWindowLevelNormal) {
     for (UIWindow *wid in [UIApplication sharedApplication].windows) {
@@ -957,9 +985,9 @@ static NSDictionary* customCertificatesForHost;
  * Called when an error occurs while the web view is loading content.
  * @see https://fburl.com/km6vqenw
  */
-- (void)               webView:(WKWebView *)webView
-  didFailProvisionalNavigation:(WKNavigation *)navigation
-                     withError:(NSError *)error
+- (void)webView:(WKWebView *)webView
+didFailProvisionalNavigation:(WKNavigation *)navigation
+      withError:(NSError *)error
 {
   if (_onLoadingError) {
     if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) {
@@ -1006,7 +1034,7 @@ static NSDictionary* customCertificatesForHost;
  * @see https://fburl.com/rtys6jlb
  */
 - (void)webView:(WKWebView *)webView
-  didFinishNavigation:(WKNavigation *)navigation
+didFinishNavigation:(WKNavigation *)navigation
 {
    if (_injectedJavaScript) {
      [self evaluateJS: _injectedJavaScript thenCall: ^(NSString *jsEvaluationValue) {

@@ -61,6 +61,7 @@
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
++ (void)disableServerTrustEvaluation;
 - (void)postMessage:(NSString *_Nullable)message;
 - (void)injectJavaScript:(NSString *_Nullable)script;
 - (void)goForward;

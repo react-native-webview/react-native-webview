@@ -148,7 +148,7 @@ If you need to connect to a server which has a self signed certificate, or want 
 
 
 ```objc
--(void)installCerts {
+- (void)installCerts {
 
   // Get the bundle where the certificates in DER format are present.
   NSBundle *bundle = [NSBundle mainBundle];
@@ -158,18 +158,26 @@ If you need to connect to a server which has a self signed certificate, or want 
   NSData *rootCertData = [NSData dataWithContentsOfFile:[bundle pathForResource:@"example_ca" ofType:@"der"]];
 
   SecCertificateRef certificate = SecCertificateCreateWithData(NULL, (CFDataRef) rootCertData);
-   
-  OSStatus err = SecItemAdd((CFDictionaryRef) [NSDictionary dictionaryWithObjectsAndKeys:(id) kSecClassCertificate, kSecClass, certificate, kSecValueRef, nil], NULL);
   
   [certMap setObject:(__bridge id _Nonnull)(certificate) forKey:@"example.com"];
 
   [RNCWebView setCustomCertificatesForHost:certMap];
+  
+  CFRelease(certificate);
 }
 
 ```
 
-Multiple hosts can be added to the directionary, and only one certificate for a host is allowed. The verification will succeed if any of the certificates in the chain of the request matches the one defined for the request's host.
+Multiple hosts can be added to the dictionary and only one certificate for a host is allowed. The verification will succeed if any of the certificates in the chain of the request matches the one defined for the request's host.
 
+Additionally, you can disable server trust evaluation invoking the following method:
+
+```objc
+[RNCWebView disableServerTrustEvaluation];
+```
+
+This means that the verification will succeed independently from the certificate sent by the server.
+As a rule of thumb, don't use the above API in production but just for testing purposes.
 
 ## JavaScript Interface
 
