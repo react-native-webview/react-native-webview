@@ -13,7 +13,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start:android": "react-native run-android --root example/",
-    "start:ios": "react-native run-ios --project-path example/ios --scheme RNCWebViewExample",
+    "start:ios": "react-native run-ios --project-path example/ios --scheme example",
     "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
