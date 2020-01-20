@@ -319,11 +319,11 @@ static NSDictionary* customCertificatesForHost;
   return wkWebViewConfig;
 }
 
-#if !TARGET_OS_OSX
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
+#if !TARGET_OS_OSX
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #else
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
