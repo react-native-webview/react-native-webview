@@ -8,15 +8,13 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "8.0.2",
+  "version": "8.0.4",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start-macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
     "start:android": "react-native run-android --root example/",
-    "start:ios": "react-native run-ios --project-path example/ios --scheme RNCWebViewExample",
-    "build:e2e:ios": "detox build -c ios",
-    "build:e2e:android": "detox build -c android",
+    "start:ios": "react-native run-ios --project-path example/ios --scheme example",
     "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
@@ -29,7 +27,7 @@
     "type": "Component"
   },
   "peerDependencies": {
-    "react": "^16.8",
+    "react": "^16.9",
     "react-native": ">=0.60 <0.62"
   },
   "dependencies": {
@@ -42,7 +40,7 @@
     "@semantic-release/git": "7.0.16",
     "@types/invariant": "^2.2.30",
     "@types/jest": "24.0.18",
-    "@types/react": "16.8.6",
+    "@types/react": "16.8.8",
     "@types/react-native": "0.60.11",
     "@typescript-eslint/eslint-plugin": "2.1.0",
     "@typescript-eslint/parser": "2.1.0",
@@ -58,8 +56,8 @@
     "eslint-plugin-react-native": "3.7.0",
     "jest": "24.9.0",
     "metro-react-native-babel-preset": "0.54.1",
-    "react": "16.6.3",
-    "react-native": "0.60.5",
+    "react": "16.9.0",
+    "react-native": "0.61.5",
     "react-native-macos": "git://github.com/microsoft/react-native",
     "semantic-release": "15.13.24",
     "typescript": "3.6.2"

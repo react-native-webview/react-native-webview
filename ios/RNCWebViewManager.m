@@ -14,19 +14,6 @@
 @interface RNCWebViewManager () <RNCWebViewDelegate>
 @end
 
-@implementation RCTConvert (UIScrollView)
-
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-RCT_ENUM_CONVERTER(UIScrollViewContentInsetAdjustmentBehavior, (@{
-                                                                  @"automatic": @(UIScrollViewContentInsetAdjustmentAutomatic),
-                                                                  @"scrollableAxes": @(UIScrollViewContentInsetAdjustmentScrollableAxes),
-                                                                  @"never": @(UIScrollViewContentInsetAdjustmentNever),
-                                                                  @"always": @(UIScrollViewContentInsetAdjustmentAlways),
-                                                                  }), UIScrollViewContentInsetAdjustmentNever, integerValue)
-#endif
-
-@end
-
 @implementation RNCWebViewManager
 {
   NSConditionLock *_shouldStartLoadLock;

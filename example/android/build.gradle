@@ -2,37 +2,37 @@
 
 buildscript {
     ext {
-        kotlinVersion = '1.3.10'
         buildToolsVersion = "28.0.3"
-        minSdkVersion = 19
+        minSdkVersion = 16
         compileSdkVersion = 28
         targetSdkVersion = 28
-        supportLibVersion = "28.0.0"
-        detoxKotlinVersion = kotlinVersion
     }
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath("com.android.tools.build:gradle:3.4.2")
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
 allprojects {
     repositories {
         mavenLocal()
-        google()
-        jcenter()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url "$rootDir/../../node_modules/react-native/android"
-            }
+            url("$rootDir/../../node_modules/react-native/android")
+        }
         maven {
             // Android JSC is installed from npm
-            url "$rootDir/../../node_modules/jsc-android/dist"
+            url("$rootDir/../../node_modules/jsc-android/dist")
         }
-        maven { url "$rootDir/../../node_modules/detox/Detox-android" }
+
+        google()
+        jcenter()
+        maven { url 'https://jitpack.io' }
     }
 }
