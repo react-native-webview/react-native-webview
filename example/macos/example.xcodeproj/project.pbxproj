@@ -454,17 +454,17 @@
 		00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTVibration.xcodeproj; path = "../../node_modules/react-native-macos/Libraries/Vibration/RCTVibration.xcodeproj"; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../../node_modules/react-native-macos/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../../node_modules/react-native-macos/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* RNCWebViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RNCWebViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RNCWebViewExample/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = RNCWebViewExample/AppDelegate.m; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = example.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = example/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = example/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RNCWebViewExample/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RNCWebViewExample/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = RNCWebViewExample/main.m; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = example/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = example/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = example/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../../node_modules/react-native-macos/React/React.xcodeproj"; sourceTree = "<group>"; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		38C1417223BBE33000902604 /* RNCWebViewExample-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "RNCWebViewExample-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		38C141D123BBE33000902604 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "RNCWebViewExample-macOS/Info.plist"; sourceTree = "<absolute>"; };
+		38C1417223BBE33000902604 /* example-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "example-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		38C141D123BBE33000902604 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "example-macOS/Info.plist"; sourceTree = "<absolute>"; };
 		38C1421523BBE5B500902604 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		38C1421723BBE65C00902604 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		38C1421923BBE66C00902604 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -579,7 +579,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* RNCWebViewExample */ = {
+		13B07FAE1A68108700A75B9A /* example */ = {
 			isa = PBXGroup;
 			children = (
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
@@ -590,7 +590,7 @@
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
-			name = RNCWebViewExample;
+			name = example;
 			sourceTree = "<group>";
 		};
 		146834001AC3E56700842450 /* Products */ = {
@@ -635,7 +635,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		38C141D223BBE3E600902604 /* RNCWebViewExample-macOS */ = {
+		38C141D223BBE3E600902604 /* example-macOS */ = {
 			isa = PBXGroup;
 			children = (
 				38C141D123BBE33000902604 /* Info.plist */,
@@ -646,7 +646,7 @@
 				38C1421B23BBE70D00902604 /* ViewController.m */,
 				38C1422123BBE98D00902604 /* Main.storyboard */,
 			);
-			path = "RNCWebViewExample-macOS";
+			path = "example-macOS";
 			sourceTree = "<group>";
 		};
 		3DC5395B220F2C940035D3A3 /* Products */ = {
@@ -710,8 +710,8 @@
 			isa = PBXGroup;
 			children = (
 				3DC5395A220F2C940035D3A3 /* RNCWebView.xcodeproj */,
-				13B07FAE1A68108700A75B9A /* RNCWebViewExample */,
-				38C141D223BBE3E600902604 /* RNCWebViewExample-macOS */,
+				13B07FAE1A68108700A75B9A /* example */,
+				38C141D223BBE3E600902604 /* example-macOS */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
@@ -724,8 +724,8 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* RNCWebViewExample.app */,
-				38C1417223BBE33000902604 /* RNCWebViewExample-macOS.app */,
+				13B07F961A680F5B00A75B9A /* example.app */,
+				38C1417223BBE33000902604 /* example-macOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -743,9 +743,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* RNCWebViewExample */ = {
+		13B07F861A680F5B00A75B9A /* example */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "RNCWebViewExample" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "example" */;
 			buildPhases = (
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
@@ -757,14 +757,14 @@
 			dependencies = (
 				1990B95222398FC4009E5EA1 /* PBXTargetDependency */,
 			);
-			name = RNCWebViewExample;
+			name = example;
 			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* RNCWebViewExample.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* example.app */;
 			productType = "com.apple.product-type.application";
 		};
-		38C1415723BBE33000902604 /* RNCWebViewExample-macOS */ = {
+		38C1415723BBE33000902604 /* example-macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 38C1416F23BBE33000902604 /* Build configuration list for PBXNativeTarget "RNCWebViewExample-macOS" */;
+			buildConfigurationList = 38C1416F23BBE33000902604 /* Build configuration list for PBXNativeTarget "example-macOS" */;
 			buildPhases = (
 				38C1415A23BBE33000902604 /* Sources */,
 				38C1415D23BBE33000902604 /* Frameworks */,
@@ -776,9 +776,9 @@
 			dependencies = (
 				38116A6F23BBED1000ACE311 /* PBXTargetDependency */,
 			);
-			name = "RNCWebViewExample-macOS";
+			name = "example-macOS";
 			productName = "Hello World";
-			productReference = 38C1417223BBE33000902604 /* RNCWebViewExample-macOS.app */;
+			productReference = 38C1417223BBE33000902604 /* example-macOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -790,7 +790,7 @@
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = Facebook;
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "RNCWebViewExample" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "example" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -854,8 +854,8 @@
 			);
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* RNCWebViewExample */,
-				38C1415723BBE33000902604 /* RNCWebViewExample-macOS */,
+				13B07F861A680F5B00A75B9A /* example */,
+				38C1415723BBE33000902604 /* example-macOS */,
 			);
 		};
 /* End PBXProject section */
@@ -1348,7 +1348,7 @@
 				13B07FB21A68108700A75B9A /* Base */,
 			);
 			name = LaunchScreen.xib;
-			path = RNCWebViewExample;
+			path = example;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -1360,7 +1360,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				INFOPLIST_FILE = RNCWebViewExample/Info.plist;
+				INFOPLIST_FILE = example/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1368,7 +1368,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = RNCWebViewExample;
+				PRODUCT_NAME = example;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1378,7 +1378,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_FILE = RNCWebViewExample/Info.plist;
+				INFOPLIST_FILE = example/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1386,7 +1386,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = RNCWebViewExample;
+				PRODUCT_NAME = example;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -1397,7 +1397,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				INFOPLIST_FILE = "RNCWebViewExample-macos/Info.plist";
+				INFOPLIST_FILE = "example-macos/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
@@ -1418,7 +1418,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_FILE = "RNCWebViewExample-macos/Info.plist";
+				INFOPLIST_FILE = "example-macos/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
@@ -1536,7 +1536,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "RNCWebViewExample" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -1545,7 +1545,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		38C1416F23BBE33000902604 /* Build configuration list for PBXNativeTarget "RNCWebViewExample-macOS" */ = {
+		38C1416F23BBE33000902604 /* Build configuration list for PBXNativeTarget "example-macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				38C1417023BBE33000902604 /* Debug */,
@@ -1554,7 +1554,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "RNCWebViewExample" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

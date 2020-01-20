@@ -11,6 +11,5 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate>
 
 @property (nonatomic, strong) UIWindow *window;
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *memoryStorage;
 
 @end
