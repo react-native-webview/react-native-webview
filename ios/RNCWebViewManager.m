@@ -22,7 +22,11 @@
 
 RCT_EXPORT_MODULE()
 
+#if !TARGET_OS_OSX
+- (UIView *)view
+#else
 - (RCTUIView *)view
+#endif // !TARGET_OS_OSX
 {
   RNCWebView *webView = [RNCWebView new];
   webView.delegate = self;

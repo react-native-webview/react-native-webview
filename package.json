@@ -59,7 +59,7 @@
     "metro-react-native-babel-preset": "0.54.1",
     "react": "16.9.0",
     "react-native": "0.61.5",
-    "react-native-macos": "git://github.com/microsoft/react-native",
+    "react-native-macos": "git://github.com/microsoft/react-native#v0.60.0-microsoft.40",
     "semantic-release": "15.13.24",
     "typescript": "3.6.2"
   },

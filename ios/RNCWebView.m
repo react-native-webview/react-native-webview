@@ -9,7 +9,11 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#if !TARGET_OS_OSX
+#import <UIKit/UIKit.h>
+#else
 #import <React/RCTUIKit.h>
+#endif // !TARGET_OS_OSX
 
 #import "objc/runtime.h"
 
@@ -80,7 +84,11 @@ static NSDictionary* customCertificatesForHost;
 
 @implementation RNCWebView
 {
+#if !TARGET_OS_OSX
+  UIColor * _savedBackgroundColor;
+#else
   RCTUIColor * _savedBackgroundColor;
+#endif // !TARGET_OS_OSX
   BOOL _savedHideKeyboardAccessoryView;
   BOOL _savedKeyboardDisplayRequiresUserAction;
 
@@ -100,7 +108,11 @@ static NSDictionary* customCertificatesForHost;
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
+    #if !TARGET_OS_OSX
+    super.backgroundColor = [UIColor clearColor];
+    #else
     super.backgroundColor = [RCTUIColor clearColor];
+    #endif // !TARGET_OS_OSX
     _bounces = YES;
     _scrollEnabled = YES;
     _showsHorizontalScrollIndicator = YES;
@@ -447,7 +459,11 @@ static NSDictionary* customCertificatesForHost;
     }
 }
 
+#if !TARGET_OS_OSX
+- (void)setBackgroundColor:(UIColor *)backgroundColor
+#else
 - (void)setBackgroundColor:(RCTUIColor *)backgroundColor
+#endif // !TARGET_OS_OSX
 {
   _savedBackgroundColor = backgroundColor;
   if (_webView == nil) {
@@ -696,7 +712,11 @@ static NSDictionary* customCertificatesForHost;
 }
 #endif // !TARGET_OS_OSX
 
+#if !TARGET_OS_OSX
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+#else
 - (void)scrollViewWillBeginDragging:(RCTUIScrollView *)scrollView
+#endif // !TARGET_OS_OSX
 {
 #if !TARGET_OS_OSX
   scrollView.decelerationRate = _decelerationRate;
@@ -711,7 +731,11 @@ static NSDictionary* customCertificatesForHost;
 #endif // !TARGET_OS_OSX
 }
 
+#if !TARGET_OS_OSX
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+#else
 - (void)scrollViewDidScroll:(RCTUIScrollView *)scrollView
+#endif // !TARGET_OS_OSX
 {
   // Don't allow scrolling the scrollView.
   if (!_scrollEnabled) {
