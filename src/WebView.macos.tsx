@@ -23,17 +23,17 @@ import {
   WebViewNavigationEvent,
   WebViewProgressEvent,
   WebViewTerminatedEvent,
-  IOSWebViewProps,
+  MacOSWebViewProps,
   DecelerationRateConstant,
-  NativeWebViewIOS,
+  NativeWebViewMacOS,
   ViewManager,
   State,
-  RNCWebViewUIManagerIOS,
+  RNCWebViewUIManagerMacOS,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManagerIOS;
+const UIManager = NotTypedUIManager as RNCWebViewUIManagerMacOS;
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -50,11 +50,11 @@ const processDecelerationRate = (
 
 const RNCWebViewManager = NativeModules.RNCWebViewManager as ViewManager;
 
-const RNCWebView: typeof NativeWebViewIOS = requireNativeComponent(
+const RNCWebView: typeof NativeWebViewMacOS = requireNativeComponent(
   'RNCWebView',
 );
 
-class WebView extends React.Component<IOSWebViewProps, State> {
+class WebView extends React.Component<MacOSWebViewProps, State> {
   static defaultProps = {
     javaScriptEnabled: true,
     cacheEnabled: true,
@@ -63,7 +63,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   };
 
   static isFileUploadSupported = async () => {
-    // no native implementation for iOS, depends only on permissions
+    // no native implementation for macOS, depends only on permissions
     return true;
   };
 
@@ -72,7 +72,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     lastErrorEvent: null,
   };
 
-  webViewRef = React.createRef<NativeWebViewIOS>();
+  webViewRef = React.createRef<NativeWebViewMacOS>();
 
   // eslint-disable-next-line react/sort-comp
   getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
@@ -263,7 +263,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     }
   };
 
-  componentDidUpdate(prevProps: IOSWebViewProps) {
+  componentDidUpdate(prevProps: MacOSWebViewProps) {
     this.showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
     this.showRedboxOnPropChanges(prevProps, 'incognito');
     this.showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
@@ -271,8 +271,8 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   }
 
   showRedboxOnPropChanges(
-    prevProps: IOSWebViewProps,
-    propName: keyof IOSWebViewProps,
+    prevProps: MacOSWebViewProps,
+    propName: keyof MacOSWebViewProps,
   ) {
     if (this.props[propName] !== prevProps[propName]) {
       console.error(
@@ -326,7 +326,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     const decelerationRate = processDecelerationRate(decelerationRateProp);
 
     const NativeWebView
-      = (nativeConfig.component as typeof NativeWebViewIOS | undefined)
+      = (nativeConfig.component as typeof NativeWebViewMacOS | undefined)
       || RNCWebView;
 
     const webView = (
