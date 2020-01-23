@@ -24,7 +24,6 @@ import {
   WebViewProgressEvent,
   WebViewTerminatedEvent,
   MacOSWebViewProps,
-  DecelerationRateConstant,
   NativeWebViewMacOS,
   ViewManager,
   State,
@@ -36,17 +35,6 @@ import styles from './WebView.styles';
 const UIManager = NotTypedUIManager as RNCWebViewUIManagerMacOS;
 
 const { resolveAssetSource } = Image;
-const processDecelerationRate = (
-  decelerationRate: DecelerationRateConstant | number | undefined,
-) => {
-  let newDecelerationRate = decelerationRate;
-  if (newDecelerationRate === 'normal') {
-    newDecelerationRate = 0.998;
-  } else if (newDecelerationRate === 'fast') {
-    newDecelerationRate = 0.99;
-  }
-  return newDecelerationRate;
-};
 
 const RNCWebViewManager = NativeModules.RNCWebViewManager as ViewManager;
 
@@ -267,7 +255,6 @@ class WebView extends React.Component<MacOSWebViewProps, State> {
     this.showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
     this.showRedboxOnPropChanges(prevProps, 'incognito');
     this.showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
-    this.showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
   }
 
   showRedboxOnPropChanges(
@@ -283,7 +270,6 @@ class WebView extends React.Component<MacOSWebViewProps, State> {
 
   render() {
     const {
-      decelerationRate: decelerationRateProp,
       nativeConfig = {},
       onMessage,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
@@ -323,8 +309,6 @@ class WebView extends React.Component<MacOSWebViewProps, State> {
       onShouldStartLoadWithRequestProp,
     );
 
-    const decelerationRate = processDecelerationRate(decelerationRateProp);
-
     const NativeWebView
       = (nativeConfig.component as typeof NativeWebViewMacOS | undefined)
       || RNCWebView;
@@ -333,7 +317,6 @@ class WebView extends React.Component<MacOSWebViewProps, State> {
       <NativeWebView
         key="webViewKey"
         {...otherProps}
-        decelerationRate={decelerationRate}
         messagingEnabled={typeof onMessage === 'function'}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
