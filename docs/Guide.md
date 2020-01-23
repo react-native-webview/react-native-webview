@@ -303,6 +303,12 @@ _Under the hood_
 
 This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing. 
 
+> Android Compatibility: Applications targeting Build.VERSION_CODES.N or later, JavaScript state from an empty WebView is no longer persisted across navigations like loadUrl(java.lang.String). 
+For example, global variables and functions defined before calling loadUrl(java.lang.String) will not exist in the loaded page. 
+Applications should use addJavascriptInterface(Object, String) instead to persist JavaScript objects across navigations.
+
+
+
 ```jsx
 import React, { Component } from 'react';
 import { View } from 'react-native';
