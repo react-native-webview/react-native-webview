@@ -149,44 +149,6 @@ class MyWeb extends Component {
 }
 ```
 
-#### Intercepting hash URL changes
-
-While `onNavigationStateChange` will trigger on URL changes, it does not trigger when only the hash URL ("anchor") changes, e.g. from `https://example.com/users#list` to `https://example.com/users#help`.
-
-You can inject some JavaScript to wrap the history functions in order to intercept these hash URL changes.
-
-```jsx
-<WebView
-  source={{ uri: someURI }}
-  injectedJavaScript={`
-    (function() {
-      function wrap(fn) {
-        return function wrapper() {
-          var res = fn.apply(this, arguments);
-          window.ReactNativeWebView.postMessage('navigationStateChange');
-          return res;
-        }
-      }
-
-      history.pushState = wrap(history.pushState);
-      history.replaceState = wrap(history.replaceState);
-      window.addEventListener('popstate', function() {
-        window.ReactNativeWebView.postMessage('navigationStateChange');
-      });
-    })();
-
-    true;
-  `}
-  onMessage={({ nativeEvent: state }) => {
-    if (state.data === 'navigationStateChange') {
-      // Navigation state updated, can check state.canGoBack, etc.
-    }
-  }}
-/>
-```
-
-Thanks to [Janic Duplessis](https://github.com/react-native-community/react-native-webview/issues/24#issuecomment-483956651) for this workaround.
-
 ### Add support for File Upload
 
 ##### iOS
@@ -335,6 +297,39 @@ _Under the hood_
 
 > On iOS, `injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
+
+
+#### The `injectedJavaScriptBeforeContentLoaded` prop
+
+This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing. 
+
+```jsx
+import React, { Component } from 'react';
+import { View } from 'react-native';
+import { WebView } from 'react-native-webview';
+
+export default class App extends Component {
+  render() {
+    const runFirst = `
+      window.isNativeApp = true;
+      true; // note: this is required, or you'll sometimes get silent failures
+    `;
+    return (
+      <View style={{ flex: 1 }}>
+        <WebView
+          source={{
+            uri:
+              'https://github.com/react-native-community/react-native-webview',
+          }}
+          injectedJavaScriptBeforeContentLoaded={runFirst}
+        />
+      </View>
+    );
+  }
+}
+```
+
+This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes. 
 
 #### The `injectJavaScript` method
 

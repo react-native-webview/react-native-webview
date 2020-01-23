@@ -14,19 +14,6 @@
 @interface RNCWebViewManager () <RNCWebViewDelegate>
 @end
 
-@implementation RCTConvert (UIScrollView)
-
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-RCT_ENUM_CONVERTER(UIScrollViewContentInsetAdjustmentBehavior, (@{
-                                                                  @"automatic": @(UIScrollViewContentInsetAdjustmentAutomatic),
-                                                                  @"scrollableAxes": @(UIScrollViewContentInsetAdjustmentScrollableAxes),
-                                                                  @"never": @(UIScrollViewContentInsetAdjustmentNever),
-                                                                  @"always": @(UIScrollViewContentInsetAdjustmentAlways),
-                                                                  }), UIScrollViewContentInsetAdjustmentNever, integerValue)
-#endif
-
-@end
-
 @implementation RNCWebViewManager
 {
   NSConditionLock *_shouldStartLoadLock;
@@ -51,7 +38,9 @@ RCT_EXPORT_VIEW_PROPERTY(onHttpError, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onShouldStartLoadWithRequest, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onContentProcessDidTerminate, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(injectedJavaScript, NSString)
+RCT_EXPORT_VIEW_PROPERTY(injectedJavaScriptBeforeContentLoaded, NSString)
 RCT_EXPORT_VIEW_PROPERTY(javaScriptEnabled, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(allowFileAccessFromFileURLs, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaPlaybackRequiresUserAction, BOOL)
 #if WEBKIT_IOS_10_APIS_AVAILABLE
