@@ -71,6 +71,7 @@
   "files": [
     "android",
     "ios",
+    "macos",
     "lib",
     "index.js",
     "index.d.ts",
