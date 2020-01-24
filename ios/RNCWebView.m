@@ -200,12 +200,12 @@ static NSDictionary* customCertificatesForHost;
 
     WKUserScript *script = [[WKUserScript alloc] initWithSource:source injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
     [wkWebViewConfig.userContentController addUserScript:script];
-      
-    if (_injectedJavaScriptBeforeContentLoaded) {
-      // If user has provided an injectedJavascript prop, execute it at the start of the document
-      WKUserScript *injectedScript = [[WKUserScript alloc] initWithSource:_injectedJavaScriptBeforeContentLoaded injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
-      [wkWebViewConfig.userContentController addUserScript:injectedScript];
-    }
+  }
+
+  if (_injectedJavaScriptBeforeContentLoaded) {
+    // If user has provided an injectedJavascript prop, execute it at the start of the document
+    WKUserScript *injectedScript = [[WKUserScript alloc] initWithSource:_injectedJavaScriptBeforeContentLoaded injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+    [wkWebViewConfig.userContentController addUserScript:injectedScript];
   }
 
   wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
