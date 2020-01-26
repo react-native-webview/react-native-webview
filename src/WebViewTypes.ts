@@ -20,7 +20,7 @@ type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (
-      name: string,
+    name: string,
   ) => {
     Commands: {[key in Commands]: number};
   };
@@ -216,6 +216,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
   incognito?: boolean;
   injectedJavaScript?: string;
+  injectedJavaScriptBeforeContentLoaded?: string;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
   onScroll?: (event: NativeScrollEvent) => void;
@@ -501,7 +502,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-
+  
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from other file scheme URLs.
@@ -684,6 +685,12 @@ export interface WebViewSharedProps extends ViewProps {
    * when the view loads.
    */
   injectedJavaScript?: string;
+
+  /**
+   * Set this to provide JavaScript that will be injected into the web page
+   * once the webview is initialized but before the view loads any content.
+   */
+  injectedJavaScriptBeforeContentLoaded?: string;
 
   /**
    * Boolean value that determines whether a horizontal scroll indicator is
