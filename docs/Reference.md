@@ -150,9 +150,9 @@ const INJECTED_JAVASCRIPT = `(function() {
 Set this to provide JavaScript that will be injected into the web page after the document element is created, but before any other content is loaded. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
 On iOS, see [WKUserScriptInjectionTimeAtDocumentStart](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
 
-| Type   | Required |
-| ------ | -------- |
-| string | No       |
+|  Type  | Required | Platform |
+|  ----  | -------- | -------- |
+| string | No       | iOS      |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
