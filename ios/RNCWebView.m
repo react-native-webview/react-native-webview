@@ -548,28 +548,22 @@ static NSDictionary* customCertificatesForHost;
   }
 }
 
+#if !TARGET_OS_OSX
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {
   _contentInset = contentInset;
   [RCTView autoAdjustInsetsForView:self
-#if !TARGET_OS_OSX
                     withScrollView:_webView.scrollView
-#else
-                    withScrollView:nil
-#endif // !TARGET_OS_OSX
                       updateOffset:NO];
 }
 
 - (void)refreshContentInset
 {
   [RCTView autoAdjustInsetsForView:self
-#if !TARGET_OS_OSX
                     withScrollView:_webView.scrollView
-#else
-                    withScrollView:nil
-#endif // !TARGET_OS_OSX
                       updateOffset:YES];
 }
+#endif // !TARGET_OS_OSX
 
 - (void)visitSource
 {
@@ -711,9 +705,7 @@ static NSDictionary* customCertificatesForHost;
 
     object_setClass(subview, newClass);
 }
-#endif // !TARGET_OS_OSX
 
-#if !TARGET_OS_OSX
 // UIScrollViewDelegate method
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
@@ -762,31 +754,25 @@ static NSDictionary* customCertificatesForHost;
     _onScroll(event);
   }
 }
-#endif // !TARGET_OS_OSX
 
 - (void)setDirectionalLockEnabled:(BOOL)directionalLockEnabled
 {
     _directionalLockEnabled = directionalLockEnabled;
-#if !TARGET_OS_OSX
     _webView.scrollView.directionalLockEnabled = directionalLockEnabled;
-#endif // !TARGET_OS_OSX
 }
 
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
 {
     _showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
-#if !TARGET_OS_OSX
     _webView.scrollView.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
-#endif // !TARGET_OS_OSX
 }
 
 - (void)setShowsVerticalScrollIndicator:(BOOL)showsVerticalScrollIndicator
 {
     _showsVerticalScrollIndicator = showsVerticalScrollIndicator;
-#if !TARGET_OS_OSX
     _webView.scrollView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
-#endif // !TARGET_OS_OSX
 }
+#endif // !TARGET_OS_OSX
 
 - (void)postMessage:(NSString *)message
 {
