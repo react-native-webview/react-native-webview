@@ -1186,13 +1186,13 @@ static NSDictionary* customCertificatesForHost;
   [_webView stopLoading];
 }
 
+#if !TARGET_OS_OSX
 - (void)setBounces:(BOOL)bounces
 {
   _bounces = bounces;
-#if !TARGET_OS_OSX
   _webView.scrollView.bounces = bounces;
-#endif // !TARGET_OS_OSX
 }
+#endif // !TARGET_OS_OSX
 
 - (NSURLRequest *)requestForSource:(id)json {
   NSURLRequest *request = [RCTConvert NSURLRequest:self.source];
