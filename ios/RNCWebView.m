@@ -52,6 +52,7 @@ static NSDictionary* customCertificatesForHost;
 @implementation RNCWKWebView
 - (void)scrollWheel:(NSEvent *)theEvent {
   RNCWebView *rncWebView = (RNCWebView *)[self superview];
+  RCTAssert([rncWebView isKindOfClass:[rncWebView class]], @"superview must be an RNCWebView");
   if (![rncWebView scrollEnabled]) {
     [[self nextResponder] scrollWheel:theEvent];
     return;
@@ -713,15 +714,12 @@ static NSDictionary* customCertificatesForHost;
 #endif // !TARGET_OS_OSX
 
 #if !TARGET_OS_OSX
+// UIScrollViewDelegate method
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-#else
-- (void)scrollViewWillBeginDragging:(RCTUIScrollView *)scrollView
-#endif // !TARGET_OS_OSX
 {
-#if !TARGET_OS_OSX
   scrollView.decelerationRate = _decelerationRate;
-#endif // !TARGET_OS_OSX
 }
+#endif // !TARGET_OS_OSX
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled
 {
@@ -732,10 +730,8 @@ static NSDictionary* customCertificatesForHost;
 }
 
 #if !TARGET_OS_OSX
+// UIScrollViewDelegate method
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
-#else
-- (void)scrollViewDidScroll:(RCTUIScrollView *)scrollView
-#endif // !TARGET_OS_OSX
 {
   // Don't allow scrolling the scrollView.
   if (!_scrollEnabled) {
@@ -766,6 +762,7 @@ static NSDictionary* customCertificatesForHost;
     _onScroll(event);
   }
 }
+#endif // !TARGET_OS_OSX
 
 - (void)setDirectionalLockEnabled:(BOOL)directionalLockEnabled
 {
