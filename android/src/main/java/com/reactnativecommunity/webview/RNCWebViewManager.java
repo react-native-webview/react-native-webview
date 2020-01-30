@@ -748,7 +748,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         new TopShouldStartLoadWithRequestEvent(
           view.getId(),
           createWebViewEvent(view, url)));
-      return super.shouldOverrideUrlLoading(view,url);
+      return true;
     }
 
 
