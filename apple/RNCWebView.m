@@ -937,6 +937,10 @@ static NSDictionary* customCertificatesForHost;
       @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
       @"navigationType": navigationTypes[@(navigationType)]
     }];
+    NSString *referer = [request valueForHTTPHeaderField:@"referer"];
+    if (referer) {
+      [event setObject:referer forKey:@"referer"];
+    }
     if (![self.delegate webView:self
       shouldStartLoadForRequest:event
                    withCallback:_onShouldStartLoadWithRequest]) {

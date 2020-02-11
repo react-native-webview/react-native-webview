@@ -111,6 +111,7 @@ export interface WebViewNavigation extends WebViewNativeEvent {
     | 'formresubmit'
     | 'other';
   mainDocumentURL?: string;
+  referer?: string;
 }
 
 export interface FileDownload {

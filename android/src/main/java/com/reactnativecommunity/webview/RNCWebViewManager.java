@@ -640,7 +640,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
         ((RNCWebView) root).progressChangedFilter.setWaitingForCommandLoadUrl(false);
-        root.loadUrl(args.getString(0));
+        String url = args.getString(0);
+        HashMap<String, String> headerMap = new HashMap<>();
+        // try to add referer header when navigate to a new url
+        String refererUrl = ((RNCWebView) root).progressChangedFilter.getRefererUrl();
+        if (refererUrl != null &&
+          // "no-referrer-when-downgrade" policy is the default behavior
+          // https://www.w3.org/TR/referrer-policy/#referrer-policy-no-referrer-when-downgrade
+          (!refererUrl.startsWith("https://") || url.startsWith("https://"))
+        ) {
+          headerMap.put("referer", refererUrl);
+        }
+        root.loadUrl(url, headerMap);
         break;
       case COMMAND_FOCUS:
         root.requestFocus();
@@ -771,7 +782,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       mLastLoadFailed = false;
 
       RNCWebView reactWebView = (RNCWebView) webView;
-      reactWebView.callInjectedJavaScriptBeforeContentLoaded();       
+      reactWebView.callInjectedJavaScriptBeforeContentLoaded();
 
       dispatchEvent(
         webView,
@@ -782,13 +793,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      progressChangedFilter.setWaitingForCommandLoadUrl(true);
-      dispatchEvent(
-        view,
-        new TopShouldStartLoadWithRequestEvent(
-          view.getId(),
-          createWebViewEvent(view, url)));
-      return true;
+      // cannot tell if it's a server side redirect or not on Android M 6.0 and below,
+      // always set it to false let referer being updated.
+      // it may cause issue on some cases with multiple consecutive redirects:
+      // https://github.com/react-native-community/react-native-webview/pull/1200#issuecomment-650983886
+      // but it's already the best try to get the other more common cases work.
+      // There is a js side workaround to address such multiple consecutive redirects on Android 6.0 and below.
+      return this.shouldOverrideUrlLoading(view, url, false);
     }
 
 
@@ -796,7 +807,32 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
       final String url = request.getUrl().toString();
-      return this.shouldOverrideUrlLoading(view, url);
+      final boolean isRedirect = request.isRedirect();
+      return this.shouldOverrideUrlLoading(view, url, isRedirect);
+    }
+
+    protected boolean shouldOverrideUrlLoading(WebView view, String url, boolean isRedirect) {
+      progressChangedFilter.setWaitingForCommandLoadUrl(true);
+      // Update referer url if it's not a server-side redirect or no previous referer url
+      if (!isRedirect || progressChangedFilter.getRefererUrl() == null) {
+        progressChangedFilter.setRefererUrl(view.getUrl());
+      }
+
+      WritableMap event = createWebViewEvent(view, url);
+      // put referer into event params to let client to choose whether or not to include in in custom headers
+      // check out more details about set custom headers at:
+      // https://github.com/react-native-community/react-native-webview/blob/master/docs/Guide.md#setting-custom-headers
+      String refererUrl = progressChangedFilter.getRefererUrl();
+      if (refererUrl != null) {
+        event.putString("referer", refererUrl);
+      }
+
+      dispatchEvent(
+        view,
+        new TopShouldStartLoadWithRequestEvent(
+          view.getId(),
+          event));
+      return true;
     }
 
     @Override
@@ -828,11 +864,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           case SslError.SSL_UNTRUSTED:
             description = "The certificate authority is not trusted";
             break;
-          default: 
+          default:
             description = "Unknown SSL Error";
             break;
         }
-        
+
         description = descriptionPrefix + description;
 
         this.onReceivedError(
@@ -842,7 +878,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           failingUrl
         );
     }
-    
+
     @Override
     public void onReceivedError(
       WebView webView,
@@ -1357,6 +1393,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     protected static class ProgressChangedFilter {
       private boolean waitingForCommandLoadUrl = false;
+      private @Nullable String refererUrl = null;
 
       public void setWaitingForCommandLoadUrl(boolean isWaiting) {
         waitingForCommandLoadUrl = isWaiting;
@@ -1365,6 +1402,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       public boolean isWaitingForCommandLoadUrl() {
         return waitingForCommandLoadUrl;
       }
+
+      public void setRefererUrl(String url) {
+        refererUrl = url;
+      }
+
+      public String getRefererUrl() { return refererUrl; }
     }
   }
 }
