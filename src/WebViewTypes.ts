@@ -266,6 +266,13 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   urlPrefixesForDefaultIntent?: readonly string[];
 }
 
+export enum ContentInsetAdjustmentBehavior {
+  automatic = 'automatic',
+  scrollableAxes = 'scrollableAxes',
+  never = 'never',
+  always = 'always'
+};
+
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;
@@ -274,11 +281,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   automaticallyAdjustContentInsets?: boolean;
   bounces?: boolean;
   contentInset?: ContentInsetProp;
-  contentInsetAdjustmentBehavior?:
-    | 'automatic'
-    | 'scrollableAxes'
-    | 'never'
-    | 'always';
+  contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
   dataDetectorTypes?: DataDetectorTypes | readonly DataDetectorTypes[];
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
@@ -297,11 +300,7 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   automaticallyAdjustContentInsets?: boolean;
   bounces?: boolean;
   contentInset?: ContentInsetProp;
-  contentInsetAdjustmentBehavior?:
-    | 'automatic'
-    | 'scrollableAxes'
-    | 'never'
-    | 'always';
+  contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
   directionalLockEnabled?: boolean;
   hideKeyboardAccessoryView?: boolean;
   pagingEnabled?: boolean;
@@ -364,11 +363,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * content area of the scroll view. The default value of this property is
    * "never". Available on iOS 11 and later.
    */
-  contentInsetAdjustmentBehavior?:
-    | 'automatic'
-    | 'scrollableAxes'
-    | 'never'
-    | 'always';
+  contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
 
   /**
    * The amount by which the web view content is inset from the edges of
@@ -530,11 +525,7 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
    * content area of the scroll view. The default value of this property is
    * "never". Available on iOS 11 and later.
    */
-  contentInsetAdjustmentBehavior?:
-    | 'automatic'
-    | 'scrollableAxes'
-    | 'never'
-    | 'always';
+  contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
 
   /**
    * The amount by which the web view content is inset from the edges of
