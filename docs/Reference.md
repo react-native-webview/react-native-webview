@@ -474,9 +474,9 @@ Note that this method will not be invoked on hash URL changes (e.g. from `https:
 
 Function that is invoked when the `WebView` content process is terminated.
 
-| Type     | Required | Platform      |
-| -------- | -------- | ------------- |
-| function | No       | iOS WKWebView |
+| Type     | Required | Platform                |
+| -------- | -------- | ----------------------- |
+| function | No       | iOS and macOS WKWebView |
 
 Example:
 
@@ -863,9 +863,9 @@ Possible values for `dataDetectorTypes` are:
 
 Boolean value that determines whether scrolling is enabled in the `WebView`. The default value is `true`. Setting this to `false` will prevent the webview from moving the document body when the keyboard appears over an input.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | iOS      |
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | iOS and macOS |
 
 ---
 
@@ -934,9 +934,9 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in for WebViews that are loaded with a source.uri set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in source.uri itself.
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| string | No       | iOS      |
+| Type   | Required | Platform      |
+| ------ | -------- | ------------- |
+| string | No       | iOS and macOS |
 
 ---
 
@@ -984,9 +984,9 @@ If true, this will hide the keyboard accessory view (< > and Done).
 
 If true, this will be able horizontal swipe gestures. The default value is `false`.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type    | Required | Platform          |
+| ------- | -------- | ----------------- |
+| boolean | No       | iOS and macOS     |
 
 ---
 
@@ -1061,9 +1061,9 @@ If the value of this property is true, the scroll view stops on multiples of the
 
 A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is true; before that, the default value is false.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type    | Required | Platform          |
+| ------- | -------- | ----------------- |
+| boolean | No       | iOS and macOS     |
 
 ---
 
@@ -1071,9 +1071,9 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type    | Required | Platform          |
+| ------- | -------- | ----------------- |
+| boolean | No       | iOS and macOS     |
 
 ---
 
