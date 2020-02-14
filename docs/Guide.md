@@ -74,7 +74,7 @@ class MyWeb extends Component {
 }
 ```
 
-However on Android, you need to place the HTML file inside your android project's asset directory. For example, if `local-site.html` is your HTML file and you'd like to load it into the webview, you should move the file to your project's android asset directory which is `your-project/android/src/main/assets/`. Then you can load the html file as shown in the following code block
+However on Android, you need to place the HTML file inside your android project's asset directory. For example, if `local-site.html` is your HTML file and you'd like to load it into the webview, you should move the file to your project's android asset directory which is `your-project/android/app/src/main/assets/`. Then you can load the html file as shown in the following code block
 
 ```js
 import React, { Component } from 'react';
