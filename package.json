@@ -1,5 +1,5 @@
 {
-  "name": "webview",
+  "name": "@react-native-community/webview",
   "description": "React Native WebView component for iOS, Android, and macOS",
   "main": "index.js",
   "typings": "index.d.ts",

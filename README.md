@@ -55,12 +55,12 @@ Current Version: ![version](https://img.shields.io/npm/v/webview.svg)
 
 ## Usage
 
-Import the `WebView` component from `webview` and use it like so:
+Import the `WebView` component from `@react-native-community/webview` and use it like so:
 
 ```jsx
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { WebView } from 'webview';
+import { WebView } from '@react-native-community/webview';
 
 // ...
 class MyWebComponent extends Component {

@@ -176,7 +176,7 @@ To get your native component, you must use `requireNativeComponent`: the same as
 ```javascript
 import React, {Component, PropTypes} from 'react';
 import {requireNativeComponent} from 'react-native';
-import {WebView} from 'webview';
+import {WebView} from '@react-native-community/webview';
 
 export default class CustomWebView extends Component {
   static propTypes = WebView.propTypes;

@@ -57,7 +57,7 @@ Importe o componente `WebView` de `webview` e use assim:
 ```jsx
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { WebView } from 'webview';
+import { WebView } from '@react-native-community/webview';
 
 // ...
 class MyWebComponent extends Component {
