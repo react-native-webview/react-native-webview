@@ -39,4 +39,4 @@ If applicable, add screenshots to help explain your problem.
  - OS:
  - OS version:
  - react-native version:
- - react-native-webview version:
+ - webview version:

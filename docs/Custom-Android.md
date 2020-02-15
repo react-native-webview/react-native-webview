@@ -105,7 +105,7 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 
 You can trigger the event in your web view client. You can hook existing handlers if your events are based on them.
 
-You should refer to [RNCWebViewManager.java](https://github.com/react-native-community/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) in the react-native-webview codebase to see what handlers are available and how they are implemented. You can extend any methods here to provide extra functionality.
+You should refer to [RNCWebViewManager.java](https://github.com/react-native-community/webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) in the webview codebase to see what handlers are available and how they are implemented. You can extend any methods here to provide extra functionality.
 
 ```java
 public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
@@ -176,7 +176,7 @@ To get your native component, you must use `requireNativeComponent`: the same as
 ```javascript
 import React, {Component, PropTypes} from 'react';
 import {requireNativeComponent} from 'react-native';
-import {WebView} from 'react-native-webview';
+import {WebView} from 'webview';
 
 export default class CustomWebView extends Component {
   static propTypes = WebView.propTypes;
@@ -199,7 +199,7 @@ If you want to add custom props to your native component, you can use `nativeCon
 
 For events, the event handler must always be set to a function. This means it isn't safe to use the event handler directly from `this.props`, as the user might not have provided one. The standard approach is to create a event handler in your class, and then invoking the event handler given in `this.props` if it exists.
 
-If you are unsure how something should be implemented from the JS side, look at [WebView.android.js](https://github.com/react-native-community/react-native-webview/blob/master/js/WebView.android.js) in the React Native source.
+If you are unsure how something should be implemented from the JS side, look at [WebView.android.js](https://github.com/react-native-community/webview/blob/master/js/WebView.android.js) in the React Native source.
 
 ```javascript
 export default class CustomWebView extends Component {
