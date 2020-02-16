@@ -41,15 +41,36 @@ If you wish to use CocoaPods and haven't set it up yet, please instead refer to 
 
 ### Android:
 
-Android - react-native-webview version <6:
-This module does not require any extra step after running the link command 🎉
+#### react-native-webview version < 6:
+This module does not require any extra step after running the link command. 🎉
 
-Android - react-native-webview version >=6.X.X:
+#### react-native-webview version >= 6.X.X:
 Please make sure AndroidX is enabled in your project by editting `android/gradle.properties` and adding 2 lines:
 
 ```
 android.useAndroidX=true
 android.enableJetifier=true
+```
+
+If you receive the following error when building:
+
+```
+More than one file was found with OS independent path 'lib/x86/libc++_shared.so'
+```
+
+Make sure that the following exists in your `android/app/build.gradle` file (which exists by default in react-native 0.62 projects):
+
+```
+android {
+  ...
+  packagingOptions {
+    pickFirst "lib/armeabi-v7a/libc++_shared.so"
+    pickFirst "lib/arm64-v8a/libc++_shared.so"
+    pickFirst "lib/x86/libc++_shared.so"
+    pickFirst "lib/x86_64/libc++_shared.so"
+  }
+  ...
+}
 ```
 
 For Android manual installation, please refer to [this article](https://engineering.brigad.co/demystifying-react-native-modules-linking-964399ec731b) where you can find detailed step on how to link any react-native project.

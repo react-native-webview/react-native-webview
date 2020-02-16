@@ -39,6 +39,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
+import com.facebook.common.logging.FLog;
+import com.facebook.react.bridge.JavaScriptContextHolder;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.scroll.OnScrollDispatchHelper;
@@ -69,6 +71,7 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
+import com.reactnativecommunity.webview.jsi.WebViewJsiInterface;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,6 +113,7 @@ import javax.annotation.Nullable;
  */
 @ReactModule(name = RNCWebViewManager.REACT_CLASS)
 public class RNCWebViewManager extends SimpleViewManager<WebView> {
+  private static final String TAG = "RNCWebViewManager";
 
   public static final int COMMAND_GO_BACK = 1;
   public static final int COMMAND_GO_FORWARD = 2;
@@ -425,6 +429,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "messagingModuleName")
   public void setMessagingModuleName(WebView view, String moduleName) {
     ((RNCWebView) view).setMessagingModuleName(moduleName);
+  }
+
+  @ReactProp(name = "jsiOnShouldStartLoadWithRequestKey")
+  public void setJsiOnShouldStartLoadWithRequestKey(WebView view, String key) {
+    RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
+    if (client != null && key != null) {
+      client.setJsiOnShouldStartLoadWithRequestKey(key);
+    }
   }
 
   @ReactProp(name = "incognito")
@@ -745,7 +757,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean mLastLoadFailed = false;
     protected @Nullable
     ReadableArray mUrlPrefixesForDefaultIntent;
+    protected WebViewJsiInterface mWebViewJsiInterface = new WebViewJsiInterface();
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
+    protected @Nullable String jsiOnShouldStartLoadWithRequestKey;
     protected @Nullable String ignoreErrFailedForThisURL = null;
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
@@ -782,13 +796,38 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      progressChangedFilter.setWaitingForCommandLoadUrl(true);
-      dispatchEvent(
-        view,
-        new TopShouldStartLoadWithRequestEvent(
-          view.getId(),
-          createWebViewEvent(view, url)));
-      return true;
+      JavaScriptContextHolder jsContext = ((ReactContext)view.getContext()).getJavaScriptContextHolder();
+      if (jsContext.get() != 0 && jsiOnShouldStartLoadWithRequestKey != null) {
+        synchronized(jsContext) {
+          try {
+            boolean loading = !mLastLoadFailed && view.getProgress() != 100;
+            String title = view.getTitle();
+            boolean canGoBack = view.canGoBack();
+            boolean canGoForward = view.canGoForward();
+            boolean result = ! mWebViewJsiInterface.onShouldStartLoadWithRequest(
+              jsContext.get(),
+              jsiOnShouldStartLoadWithRequestKey,
+              url,
+              loading,
+              title,
+              canGoBack,
+              canGoForward
+            );
+            return result;
+          } catch (Exception e) {
+            FLog.e(TAG, "Couldn't use native JSI/JNI synchronous call for onShouldStartLoadWithRequest, allowing load to happen", e);
+            return false;
+          }
+        }
+      } else {
+        FLog.w(TAG, "Couldn't use native JSI/JNI synchronous call for onShouldStartLoadWithRequest due to missing JS runtime or native key, falling back to old event-and-load");
+        dispatchEvent(
+          view,
+          new TopShouldStartLoadWithRequestEvent(
+            view.getId(),
+            createWebViewEvent(view, url)));
+        return true;
+      }
     }
 
 
@@ -926,6 +965,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
       progressChangedFilter = filter;
+    }
+
+    public void setJsiOnShouldStartLoadWithRequestKey(String key) {
+      jsiOnShouldStartLoadWithRequestKey = key;
     }
   }
 
@@ -1088,6 +1131,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean messagingEnabled = false;
     protected @Nullable
     String messagingModuleName;
+    protected @Nullable
+    String jsiOnShouldStartLoadWithRequestKey;
     protected @Nullable
     RNCWebViewClient mRNCWebViewClient;
     protected @Nullable

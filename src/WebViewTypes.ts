@@ -235,6 +235,16 @@ export type OnShouldStartLoadWithRequest = (
   event: WebViewNavigation,
 ) => boolean;
 
+export interface WebViewJsiEvent {
+  url: string;
+  loading: boolean;
+  title: string;
+  canGoBack: boolean;
+  canGoForward: boolean;
+}
+
+export type JsiOnShouldStartLoadWithRequest = (arg0: WebViewJsiEvent) => boolean;
+
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
   incognito?: boolean;
@@ -282,6 +292,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
   messagingModuleName?: string;
+  jsiOnShouldStartLoadWithRequestKey?: string;
   readonly urlPrefixesForDefaultIntent?: string[];
 }
 
@@ -721,7 +732,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-  
+
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from other file scheme URLs.
