@@ -74,7 +74,7 @@ class MyWeb extends Component {
 }
 ```
 
-However on Android, you need to place the HTML file inside your android project's asset directory. For example, if `local-site.html` is your HTML file and you'd like to load it into the webview, you should move the file to your project's android asset directory which is `your-project/android/src/main/assets/`. Then you can load the html file as shown in the following code block
+However on Android, you need to place the HTML file inside your android project's asset directory. For example, if `local-site.html` is your HTML file and you'd like to load it into the webview, you should move the file to your project's android asset directory which is `your-project/android/app/src/main/assets/`. Then you can load the html file as shown in the following code block
 
 ```js
 import React, { Component } from 'react';
@@ -475,7 +475,7 @@ const CustomHeaderWebView = props => {
 
 #### Managing Cookies
 
-You can set cookies on the React Native side using the [react-native-cookies](https://github.com/joeferraro/react-native-cookies) package.
+You can set cookies on the React Native side using the [@react-native-community/cookies](https://github.com/react-native-community/cookies) package.
 
 When you do, you'll likely want to enable the [sharedCookiesEnabled](Reference#sharedCookiesEnabled) prop as well.
 
