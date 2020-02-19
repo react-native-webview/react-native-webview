@@ -59,7 +59,7 @@ export default class Injection extends Component<Props, State> {
         <Text>Before injection, the main frame's background is the browser's default value (transparent or white) and each frame has its natural colour.</Text>
         <Text>1) At injection time "beforeContentLoaded", a variable will be set in each frame to set 'orange' as the "colour to be used".</Text>
         <Text>2) At injection time "afterContentLoaded", that variable will be read, and thus the colour orange will be injected into all frames.</Text>
-        <Text>✅ If all frames become orange, then multi-frame injection is supported and both injection times are supported.</Text>
+        <Text>✅ If the main frame, iframe_0, and iframe_1 all become orange, then multi-frame injection is supported and both injection times are supported.</Text>
         <Text>❌ If no frames become orange, then only one (or neither) of the injection times are supported, or even injection into the main frame is failing.</Text>
         <Text>❌ If only the main frame becomes orange, then multi-frame injection is not supported.</Text>
       </ScrollView>
