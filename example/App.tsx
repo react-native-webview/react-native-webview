@@ -14,6 +14,7 @@ import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
 import Uploads from './examples/Uploads';
+import Injection from './examples/Injection';
 
 const TESTS = {
   Alerts: {
@@ -46,6 +47,14 @@ const TESTS = {
     description: 'Upload test',
     render() {
       return <Uploads />;
+    },
+  },
+  Injection: {
+    title: 'Injection',
+    testId: 'injection',
+    description: 'Injection test',
+    render() {
+      return <Injection />;
     },
   },
 };
@@ -100,6 +109,11 @@ export default class App extends Component<Props, State> {
             testID="testType_background"
             title="Background"
             onPress={() => this._changeTest('Background')}
+          />
+          <Button
+            testID="testType_injection"
+            title="Injection"
+            onPress={() => this._changeTest('Injection')}
           />
           {Platform.OS === 'android' && <Button
             testID="testType_uploads"
