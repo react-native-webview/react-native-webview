@@ -56,7 +56,7 @@ export default class Injection extends Component<Props, State> {
           </View>
         </View>
         <Text>This test presents three iframes: iframe_0 (yellow); iframe_1 (pink); and iframe_2 (transparent, because its 'X-Frame-Options' is set to 'SAMEORIGIN').</Text>
-        <Text>Before injection, the webpage's background is the browser's default value (transparent or white) and each frame has its natural colour.</Text>
+        <Text>Before injection, the main frame's background is the browser's default value (transparent or white) and each frame has its natural colour.</Text>
         <Text>1) At injection time "beforeContentLoaded", a variable will be set in each frame to set 'orange' as the "colour to be used".</Text>
         <Text>2) At injection time "afterContentLoaded", that variable will be read, and thus the colour orange will be injected into all frames.</Text>
         <Text>✅ If all frames become orange, then multi-frame injection is supported and both injection times are supported.</Text>
