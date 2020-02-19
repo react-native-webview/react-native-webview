@@ -35,9 +35,7 @@ Esse projeto segue [versionamento semântico](https://semver.org/). Não hesitam
 Versão atual: ![version](https://img.shields.io/npm/v/webview.svg)
 
 - [7.0.1](https://github.com/react-native-community/webview/releases/tag/v7.0.1) - UIWebView removido
-
-- [6.0.**2**](https://github.com/react-native-community/webview/releases/tag/v6.0.2) - Update para AndroidX. Tenha certeza de habilitar no `android/gradle.properties` do seu projeto. Veja o [Getting Started Guide](docs/Getting-Started.md).
-
+- [6.0.**2**](https://github.com/react-native-community/webview/releases/tag/v6.0.2) - Update para AndroidX. Tenha certeza de habilitar no `android/gradle.properties` do seu projeto. Veja o [Getting Started Guide](https://github.com/react-native-community/react-native-webview/blob/master/docs/Getting-Started.md).
 - [5.0.**1**](https://github.com/react-native-community/webview/releases/tag/v5.0.0) - Refatorou a antiga implementação postMessage para comunicação da visualização da webview para nativa.
 - [4.0.0](https://github.com/react-native-community/webview/releases/tag/v4.0.0) - Cache adicionada(habilitada por padrão).
 - [3.0.0](https://github.com/react-native-community/webview/releases/tag/v3.0.0) - WKWebview: Adicionado um pool de processos compartilhados para que os cookies e o localStorage sejam compartilhados nas webviews no iOS (habilitadas por padrão)
