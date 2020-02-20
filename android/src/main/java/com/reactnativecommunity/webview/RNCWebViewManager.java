@@ -397,6 +397,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ((RNCWebView) view).setInjectedJavaScriptBeforeContentLoaded(injectedJavaScriptBeforeContentLoaded);
   }
 
+  @ReactProp(name = "injectedJavaScriptForMainFrameOnly")
+  public void setInjectedJavaScriptForMainFrameOnly(WebView view, boolean enabled) {
+    ((RNCWebView) view).setInjectedJavaScriptForMainFrameOnly(enabled);
+  }
+
+  @ReactProp(name = "injectedJavaScriptBeforeContentLoadedForMainFrameOnly")
+  public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(WebView view, boolean enabled) {
+    ((RNCWebView) view).setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(enabled);
+  }
+
   @ReactProp(name = "messagingEnabled")
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
@@ -981,6 +991,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     String injectedJS;
     protected @Nullable
     String injectedJSBeforeContentLoaded;
+
+    /**
+     * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
+     * than the main frame, so these two properties are mostly here just for parity with iOS & macOS.
+     */
+    protected boolean injectedJavaScriptForMainFrameOnly = true;
+    protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
+
     protected boolean messagingEnabled = false;
     protected @Nullable
     RNCWebViewClient mRNCWebViewClient;
@@ -1056,6 +1074,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setInjectedJavaScriptBeforeContentLoaded(@Nullable String js) {
       injectedJSBeforeContentLoaded = js;
+    }
+
+    public void setInjectedJavaScriptForMainFrameOnly(boolean enabled) {
+      injectedJavaScriptForMainFrameOnly = enabled;
+    }
+
+    public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(boolean enabled) {
+      injectedJavaScriptBeforeContentLoadedForMainFrameOnly = enabled;
     }
 
     protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {

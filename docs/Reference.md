@@ -7,7 +7,9 @@ This document lays out the current public properties and methods for the React N
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
-- [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedJavaScriptBeforeContentLoaded)
+- [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded)
+- [`injectedJavaScriptForMainFrameOnly`](Reference.md#injectedjavascriptformainframeonly)
+- [`injectedJavaScriptBeforeContentLoadedForMainFrameOnly`](Reference.md#injectedjavascriptbeforecontentloadedformainframeonly)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
@@ -171,6 +173,30 @@ const INJECTED_JAVASCRIPT = `(function() {
   onMessage={this.onMessage}
 />;
 ```
+
+---
+
+### `injectedJavaScriptForMainFrameOnly`
+
+If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
+
+If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| bool | No       | iOS and macOS (only `true` supported for Android) |
+
+---
+
+### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`
+
+If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+
+If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| bool | No       | iOS and macOS (only `true` supported for Android) |
 
 ---
 
