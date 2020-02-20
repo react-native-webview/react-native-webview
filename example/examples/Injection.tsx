@@ -65,12 +65,13 @@ export default class Injection extends Component<Props, State> {
 
               if(head){
                 declareSuccessBeforeContentLoaded(head);
+              } else {
+                window.self.document.addEventListener("DOMContentLoaded", function (event) {
+                  const head = (window.self.document.head || window.self.document.getElementsByTagName('head')[0]);
+                  declareSuccessBeforeContentLoaded(head);
+                });
               }
 
-              window.self.document.addEventListener("DOMContentLoaded", function (event) {
-                const head = (window.self.document.head || window.self.document.getElementsByTagName('head')[0]);
-                declareSuccessBeforeContentLoaded(head);
-              });
               `}
               
               injectedJavaScriptForMainFrameOnly={false}
