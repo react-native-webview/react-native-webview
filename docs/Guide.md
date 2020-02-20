@@ -191,6 +191,12 @@ Add permission in AndroidManifest.xml:
 </manifest>
 ```
 
+###### Camera option availability in uploading for Android
+
+If the file input indicates that images or video is desired with [`accept`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept), then the WebView will attempt to provide options to the user to use their camera to take a picture or video.
+
+Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app *can* request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, it is up to the developer to request camera permission before a file upload directly using the camera is necessary.
+
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
 File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
@@ -301,7 +307,7 @@ _Under the hood_
 
 #### The `injectedJavaScriptBeforeContentLoaded` prop
 
-This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing. 
+This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing.
 
 ```jsx
 import React, { Component } from 'react';
@@ -329,7 +335,7 @@ export default class App extends Component {
 }
 ```
 
-This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes. 
+This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes.
 
 #### The `injectJavaScript` method
 
