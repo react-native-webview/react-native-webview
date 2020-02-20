@@ -74,7 +74,7 @@ class MyWeb extends Component {
 }
 ```
 
-However on Android, you need to place the HTML file inside your android project's asset directory. For example, if `local-site.html` is your HTML file and you'd like to load it into the webview, you should move the file to your project's android asset directory which is `your-project/android/src/main/assets/`. Then you can load the html file as shown in the following code block
+However on Android, you need to place the HTML file inside your android project's asset directory. For example, if `local-site.html` is your HTML file and you'd like to load it into the webview, you should move the file to your project's android asset directory which is `your-project/android/app/src/main/assets/`. Then you can load the html file as shown in the following code block
 
 ```js
 import React, { Component } from 'react';
@@ -191,6 +191,12 @@ Add permission in AndroidManifest.xml:
 </manifest>
 ```
 
+###### Camera option availability in uploading for Android
+
+If the file input indicates that images or video is desired with [`accept`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept), then the WebView will attempt to provide options to the user to use their camera to take a picture or video.
+
+Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app *can* request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, it is up to the developer to request camera permission before a file upload directly using the camera is necessary.
+
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
 File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
@@ -301,7 +307,7 @@ _Under the hood_
 
 #### The `injectedJavaScriptBeforeContentLoaded` prop
 
-This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing. 
+This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing.
 
 > Android Compatibility: Applications targeting Build.VERSION_CODES.N or later, JavaScript state from an empty WebView is no longer persisted across navigations like loadUrl(java.lang.String). 
 For example, global variables and functions defined before calling loadUrl(java.lang.String) will not exist in the loaded page. 
@@ -335,7 +341,7 @@ export default class App extends Component {
 }
 ```
 
-This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes. 
+This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes.
 
 #### The `injectJavaScript` method
 
@@ -481,7 +487,7 @@ const CustomHeaderWebView = props => {
 
 #### Managing Cookies
 
-You can set cookies on the React Native side using the [react-native-cookies](https://github.com/joeferraro/react-native-cookies) package.
+You can set cookies on the React Native side using the [@react-native-community/cookies](https://github.com/react-native-community/cookies) package.
 
 When you do, you'll likely want to enable the [sharedCookiesEnabled](Reference#sharedCookiesEnabled) prop as well.
 
