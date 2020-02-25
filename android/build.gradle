@@ -1,21 +1,22 @@
 buildscript {
-  //Buildscript is evaluated before everything else so we can't use getExtOrDefault
-  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['ReactNativeWebView_kotlinVersion']
-
-  repositories {
-    google()
-    jcenter()
+  ext.getExtOrDefault = {name ->
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNativeWebView_' + name]
   }
 
-  dependencies {
-    classpath 'com.android.tools.build:gradle:3.2.1'
-    //noinspection DifferentKotlinGradleVersion
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-  }
-}
+  // The Android Gradle plugin is only required when opening the android folder stand-alone.
+  // This avoids unnecessary downloads and potential conflicts when the library is included as a
+  // module dependency in an application project.
+  if (project == rootProject) {
+    repositories {
+      google()
+      jcenter()
+    }
 
-def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNativeWebView_' + name]
+    dependencies {
+      classpath("com.android.tools.build:gradle:3.6.0")
+      classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}")
+    }
+  }
 }
 
 def getExtOrIntegerDefault(name) {
