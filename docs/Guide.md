@@ -48,9 +48,7 @@ import { WebView } from 'react-native-webview';
 
 class MyWeb extends Component {
   render() {
-    return (
-      <WebView source={{ uri: 'https://facebook.github.io/react-native/' }} />
-    );
+    return <WebView source={{ uri: 'https://reactnative.dev/' }} />;
   }
 }
 ```
@@ -63,13 +61,11 @@ Sometimes you would have bundled an HTML file along with the app and would like 
 import React, { Component } from 'react';
 import { WebView } from 'react-native-webview';
 
-const myHtmlFile = require("./my-asset-folder/local-site.html");
+const myHtmlFile = require('./my-asset-folder/local-site.html');
 
 class MyWeb extends Component {
   render() {
-    return (
-      <WebView source={myHtmlFile} />
-    );
+    return <WebView source={myHtmlFile} />;
   }
 }
 ```
@@ -83,7 +79,7 @@ import { WebView } from 'react-native-webview';
 class MyWeb extends Component {
   render() {
     return (
-      <WebView source={{ uri: "file:///android_asset/local-site.html" }} />
+      <WebView source={{ uri: 'file:///android_asset/local-site.html' }} />
     );
   }
 }
@@ -104,7 +100,7 @@ class MyWeb extends Component {
     return (
       <WebView
         ref={ref => (this.webview = ref)}
-        source={{ uri: 'https://facebook.github.io/react-native/' }}
+        source={{ uri: 'https://reactnative.dev/' }}
         onNavigationStateChange={this.handleWebViewNavigationStateChange}
       />
     );
@@ -141,7 +137,7 @@ class MyWeb extends Component {
 
     // redirect somewhere else
     if (url.includes('google.com')) {
-      const newURL = 'https://facebook.github.io/react-native/';
+      const newURL = 'https://reactnative.dev/';
       const redirectTo = 'window.location = "' + newURL + '"';
       this.webview.injectJavaScript(redirectTo);
     }
@@ -195,7 +191,7 @@ Add permission in AndroidManifest.xml:
 
 If the file input indicates that images or video is desired with [`accept`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept), then the WebView will attempt to provide options to the user to use their camera to take a picture or video.
 
-Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app *can* request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, it is up to the developer to request camera permission before a file upload directly using the camera is necessary.
+Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app _can_ request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, it is up to the developer to request camera permission before a file upload directly using the camera is necessary.
 
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
@@ -303,7 +299,6 @@ _Under the hood_
 
 > On iOS, `injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
-
 
 #### The `injectedJavaScriptBeforeContentLoaded` prop
 
