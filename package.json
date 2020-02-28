@@ -1,6 +1,6 @@
 {
   "name": "react-native-webview",
-  "description": "React Native WebView component for iOS, Android, and Windows 10 (coming soon)",
+  "description": "React Native WebView component for iOS, Android, and macOS",
   "main": "index.js",
   "typings": "index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
@@ -8,12 +8,13 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "8.0.6",
+  "version": "8.1.2",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start:android": "react-native run-android --root example/",
     "start:ios": "react-native run-ios --project-path example/ios --scheme example",
+    "start:macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
     "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
@@ -36,6 +37,8 @@
   "devDependencies": {
     "@babel/core": "7.4.5",
     "@babel/runtime": "7.4.5",
+    "@react-native-community/cli-platform-ios": "^3.0.0",
+    "@react-native-community/cli-platform-android": "^3.0.0",
     "@semantic-release/git": "7.0.16",
     "@types/invariant": "^2.2.30",
     "@types/jest": "24.0.18",
@@ -57,6 +60,7 @@
     "metro-react-native-babel-preset": "0.54.1",
     "react": "16.9.0",
     "react-native": "0.61.5",
+    "react-native-macos": "0.60.0-microsoft.49",
     "semantic-release": "15.13.24",
     "typescript": "3.6.2"
   },
@@ -67,6 +71,7 @@
   "files": [
     "android",
     "ios",
+    "macos",
     "lib",
     "index.js",
     "index.d.ts",
