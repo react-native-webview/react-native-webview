@@ -977,6 +977,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean messagingEnabled = false;
     protected @Nullable
     RNCWebViewClient mRNCWebViewClient;
+    protected @Nullable
+    CatalystInstance mCatalystInstance;
     protected boolean sendContentSizeChangeEvents = false;
     private OnScrollDispatchHelper mOnScrollDispatchHelper;
     protected boolean hasScrollEvent = false;
@@ -1051,6 +1053,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       return new RNCWebViewBridge(webView);
     }
 
+    protected void createCatalystInstance() {
+      ReactContext reactContext = (ReactContext) this.getContext();
+
+      if (reactContext != null) {
+        mCatalystInstance = reactContext.getCatalystInstance();
+      }
+    }
+
     @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
       if (messagingEnabled == enabled) {
@@ -1061,6 +1071,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       if (enabled) {
         addJavascriptInterface(createRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
+        this.createCatalystInstance();
       } else {
         removeJavascriptInterface(JAVASCRIPT_INTERFACE);
       }
@@ -1103,8 +1114,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
             WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, webView.getUrl());
             data.putString("data", message);
 
-            if (reactContext != null) {
-              mContext.sendDirectMessage(reactContext, data);
+            if (mCatalystInstance != null) {
+              mContext.sendDirectMessage(data);
             } else {
               dispatchEvent(webView, new TopMessageEvent(webView.getId(), data));
             }
@@ -1114,24 +1125,22 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         WritableMap eventData = Arguments.createMap();
         eventData.putString("data", message);
 
-        if (reactContext != null) {
-          this.sendDirectMessage(reactContext, eventData);
+        if (mCatalystInstance != null) {
+          this.sendDirectMessage(eventData);
         } else {
           dispatchEvent(this, new TopMessageEvent(this.getId(), eventData));
         }
       }
     }
 
-    protected void sendDirectMessage(ReactContext reactContext, WritableMap data) {
-      CatalystInstance catalystInstance = reactContext.getCatalystInstance();
-
+    protected void sendDirectMessage(WritableMap data) {
       WritableNativeMap event = new WritableNativeMap();
       event.putMap("nativeEvent", data);
 
       WritableNativeArray params = new WritableNativeArray();
       params.pushMap(event);
 
-      catalystInstance.callFunction("WebViewMessageHandler", "onMessage", params);
+      mCatalystInstance.callFunction("WebViewMessageHandler", "onMessage", params);
     }
 
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
