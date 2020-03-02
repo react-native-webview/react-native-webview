@@ -20,6 +20,7 @@ _This project is maintained for free by these people using both their free time 
 
 - [x] iOS
 - [x] Android
+- [x] macOS
 
 _Note: Expo support for React Native WebView started with [Expo SDK v33.0.0](https://blog.expo.io/expo-sdk-v33-0-0-is-now-available-52d1c99dfe4c)._
 
@@ -64,9 +65,7 @@ import { WebView } from 'react-native-webview';
 // ...
 class MyWebComponent extends Component {
   render() {
-    return (
-      <WebView source={{ uri: 'https://facebook.github.io/react-native/' }} />
-    );
+    return <WebView source={{ uri: 'https://reactnative.dev/' }} />;
   }
 }
 ```

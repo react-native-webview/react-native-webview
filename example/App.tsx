@@ -7,11 +7,13 @@ import {
   View,
   Keyboard,
   Button,
+  Platform,
 } from 'react-native';
 
 import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
+import Uploads from './examples/Uploads';
 
 const TESTS = {
   Alerts: {
@@ -36,6 +38,14 @@ const TESTS = {
     description: 'Background color test',
     render() {
       return <Background />;
+    },
+  },
+  Uploads: {
+    title: 'Uploads',
+    testId: 'uploads',
+    description: 'Upload test',
+    render() {
+      return <Uploads />;
     },
   },
 };
@@ -91,6 +101,11 @@ export default class App extends Component<Props, State> {
             title="Background"
             onPress={() => this._changeTest('Background')}
           />
+          {Platform.OS === 'android' && <Button
+            testID="testType_uploads"
+            title="Uploads"
+            onPress={() => this._changeTest('Uploads')}
+          />}
         </View>
 
         {restarting ? null : (

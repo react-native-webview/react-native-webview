@@ -75,6 +75,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearCache`](Reference.md#clearCache)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
+
 ---
 
 # Reference
@@ -137,7 +138,7 @@ const INJECTED_JAVASCRIPT = `(function() {
 })();`;
 
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   injectedJavaScript={INJECTED_JAVASCRIPT}
   onMessage={this.onMessage}
 />;
@@ -166,7 +167,7 @@ const INJECTED_JAVASCRIPT = `(function() {
 })();`;
 
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
   onMessage={this.onMessage}
 />;
@@ -214,7 +215,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   onError={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
     console.warn('WebView error: ', nativeEvent);
@@ -254,7 +255,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   onLoad={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
     this.url = nativeEvent.url;
@@ -287,7 +288,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   onLoadEnd={syntheticEvent => {
     // update component to be aware of loading status
     const { nativeEvent } = syntheticEvent;
@@ -321,7 +322,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native/=' }}
+  source={{ uri: 'https://reactnative.dev/=' }}
   onLoadStart={syntheticEvent => {
     // update component to be aware of loading status
     const { nativeEvent } = syntheticEvent;
@@ -355,7 +356,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   onLoadProgress={({ nativeEvent }) => {
     this.loadingProgress = nativeEvent.progress;
   }}
@@ -391,7 +392,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   onHttpError={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
     console.warn(
@@ -446,7 +447,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   onNavigationStateChange={navState => {
     // Keep track of going back navigation within component
     this.canGoBack = navState.canGoBack;
@@ -474,15 +475,15 @@ Note that this method will not be invoked on hash URL changes (e.g. from `https:
 
 Function that is invoked when the `WebView` content process is terminated.
 
-| Type     | Required | Platform      |
-| -------- | -------- | ------------- |
-| function | No       | iOS WKWebView |
+| Type     | Required | Platform                |
+| -------- | -------- | ----------------------- |
+| function | No       | iOS and macOS WKWebView |
 
 Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   onContentProcessDidTerminate={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
     console.warn('Content process terminated, reloading', nativeEvent);
@@ -517,7 +518,7 @@ Example:
 ```jsx
 //only allow URIs that begin with https:// or git://
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   originWhitelist={['https://*', 'git://*']}
 />
 ```
@@ -536,7 +537,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   renderError={errorName => <Error name={errorName} />}
 />
 ```
@@ -557,7 +558,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   startInLoadingState={true}
   renderLoading={() => <Loading />}
 />
@@ -589,10 +590,10 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   onShouldStartLoadWithRequest={request => {
     // Only allow navigating within this website
-    return request.url.startsWith('https://facebook.github.io/react-native');
+    return request.url.startsWith('https://reactnative.dev');
   }}
 />
 ```
@@ -635,7 +636,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   style={{ marginTop: 20 }}
 />
 ```
@@ -654,7 +655,7 @@ Example:
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   containerStyle={{ marginTop: 20 }}
 />
 ```
@@ -750,7 +751,7 @@ Append to the existing user-agent. Setting `userAgent` will override this.
 
 ```jsx
 <WebView
-  source={{ uri: 'https://facebook.github.io/react-native' }}
+  source={{ uri: 'https://reactnative.dev' }}
   applicationNameForUserAgent={'DemoApp/1.1.0'}
 />
 // Resulting User-Agent will look like:
@@ -863,9 +864,9 @@ Possible values for `dataDetectorTypes` are:
 
 Boolean value that determines whether scrolling is enabled in the `WebView`. The default value is `true`. Setting this to `false` will prevent the webview from moving the document body when the keyboard appears over an input.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | iOS      |
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | iOS and macOS |
 
 ---
 
@@ -934,9 +935,9 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in for WebViews that are loaded with a source.uri set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in source.uri itself.
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| string | No       | iOS      |
+| Type   | Required | Platform      |
+| ------ | -------- | ------------- |
+| string | No       | iOS and macOS |
 
 ---
 
@@ -984,9 +985,9 @@ If true, this will hide the keyboard accessory view (< > and Done).
 
 If true, this will be able horizontal swipe gestures. The default value is `false`.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS and macOS |
 
 ---
 
@@ -1061,9 +1062,9 @@ If the value of this property is true, the scroll view stops on multiples of the
 
 A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is true; before that, the default value is false.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS and macOS |
 
 ---
 
@@ -1071,9 +1072,9 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS and macOS |
 
 ---
 
@@ -1150,30 +1151,34 @@ requestFocus();
 Request the webView to ask for focus. (People working on TV apps might want having a look at this!)
 
 ### `clearFormData()`
+
 (android only)
 
 ```javascript
 clearFormData();
 ```
-Removes the autocomplete popup from the currently focused form field, if present. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearFormData())
 
+Removes the autocomplete popup from the currently focused form field, if present. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearFormData()>)
 
 ### `clearCache(bool)`
+
 (android only)
+
 ```javascript
 clearCache(true);
 ```
 
-Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean))
-
+Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
 
 ### `clearHistory()`
+
 (android only)
+
 ```javascript
 clearHistory();
 ```
 
-Tells this WebView to clear its internal back/forward list. [developer.android.com reference](https://developer.android.com/reference/android/webkit/WebView.html#clearHistory())
+Tells this WebView to clear its internal back/forward list. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearHistory()>)
 
 ## Other Docs
 
