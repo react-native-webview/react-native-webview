@@ -363,6 +363,7 @@ static NSDictionary* customCertificatesForHost;
 
   CGFloat alpha = CGColorGetAlpha(backgroundColor.CGColor);
   self.opaque = _webView.opaque = (alpha == 1.0);
+  _webView.opaque = false;
   _webView.scrollView.backgroundColor = backgroundColor;
   _webView.backgroundColor = backgroundColor;
 }
