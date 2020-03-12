@@ -44,6 +44,14 @@ $ yarn start:macos
 
 The Metro Bundler will now be running in the Terminal for react-native-macos.  In XCode select the `example-macos` target and Run.
 
+#### For Windows:
+```
+$ yarn start:windows
+$ open example/windows/WebViewWindows.sln and click run button.
+```
+
+The Metro Bundler will now be running in the Terminal for react-native-windows and the example app will be install and started
+
 ### Testing in a new `react-native init` project
 
 In a new `react-native init` project, do this:
