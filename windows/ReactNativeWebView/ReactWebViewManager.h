@@ -4,11 +4,11 @@
 #pragma once
 #include "winrt/Microsoft.ReactNative.h"
 #include "NativeModules.h"
+#include "ReactWebView.h"
 
 namespace winrt::ReactNativeWebView::implementation {
     
     enum class WebViewCommands : int32_t { GoForward = 0, GoBack = 1,  Reload = 2, StopLoading = 3, InjectJavaScript = 4 };
-    enum class WebViewSourceType {Uri, Html, Unset};
 
     class ReactWebViewManager : public winrt::implements<
         ReactWebViewManager,
@@ -49,22 +49,8 @@ namespace winrt::ReactNativeWebView::implementation {
             winrt::Microsoft::ReactNative::IJSValueReader const& commandArgsReader) noexcept;
 
     private:
-        winrt::Windows::UI::Xaml::Controls::WebView m_webView{ nullptr };
+        winrt::ReactNativeWebView::ReactWebView m_reactWebView{ nullptr };
         winrt::Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
-        WebViewSourceType m_sourceType{ WebViewSourceType::Unset };
-        winrt::Windows::UI::Xaml::Controls::WebView::NavigationStarting_revoker m_navigationStartingRevoker{};
-        winrt::Windows::UI::Xaml::Controls::WebView::NavigationCompleted_revoker m_navigationCompletedRevoker{};
-        winrt::Windows::UI::Xaml::Controls::WebView::NavigationFailed_revoker m_navigationFailedRevoker{};
-        winrt::Windows::UI::Xaml::Controls::WebView::ScriptNotify_revoker m_scriptNotifyRevoker{};
 
-        void RegisterEvents();
-        void WriteWebViewNavigationEventArg(winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter);
-        void OnNavigationStarting(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationStartingEventArgs const& args);
-        void OnNavigationCompleted(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationCompletedEventArgs const& args);
-        void OnNavigationFailed(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationFailedEventArgs const& args);
-        void OnScriptNotify(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::NotifyEventArgs const& args);
-
-        winrt::Windows::Foundation::IAsyncAction InjectJavaScript(winrt::hstring javaScript);
-        winrt::Windows::UI::Color ColorFromHex(int64_t const hex);
     };
 } // namespace winrt::ReactWebView::implementation
