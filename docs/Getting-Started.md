@@ -60,6 +60,35 @@ Cocoapod and autolinking is not yet support for react-native macOS but is coming
 
 The method is nearly identical to the [manual linking method for iOS](https://reactnative.dev/docs/linking-libraries-ios#manual-linking) except that you will include the `node_modules/react-native-webview/macos/RNCWebView.xcodeproj` project in your main project and link the `RNCWebView-macOS.a` library.
 
+### Windows:
+
+Autolinking is not yet supported for ReactNativeWindows. Make following additions to the given files manually:
+
+#### **windows/myapp.sln**
+
+Add the `ReactNativeWebView` project to your solution.
+
+1. Open the solution in Visual Studio 2019
+2. Right-click Solution icon in Solution Explorer > Add > Existing Project
+   Select `node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj`
+
+#### **windows/myapp/myapp.vcxproj**
+
+Add a reference to `ReactNativeWebView` to your main application project. From Visual Studio 2019:
+
+1. Right-click main application project > Add > Reference...
+  Check `ReactNativeWebView` from Solution Projects.
+
+2. Modify files below to add the package providers to your main application project
+
+#### **pch.h**
+
+Add `#include "winrt/ReactNativeWebView.h"`.
+
+#### **app.cpp**
+
+Add `PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider());` before `InitializeComponent();`.
+
 ## 3. Import the webview into your component
 
 ```js
