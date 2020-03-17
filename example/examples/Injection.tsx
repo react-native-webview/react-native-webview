@@ -57,7 +57,7 @@ export default class Injection extends Component<Props, State> {
               if(typeof window.top.injectedIframesBeforeContentLoaded === "undefined"){
                 window.top.injectedIframesBeforeContentLoaded = [];
               }
-              window.self.colourToUse = "green";
+              window.self.colourToUse = "orange";
               if(window.self === window.top){
                 console.log("Was window.top. window.frames.length is:", window.frames.length);
                 window.self.numberOfFramesAtBeforeContentLoaded = window.frames.length;
