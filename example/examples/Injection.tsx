@@ -140,12 +140,12 @@ export default class Injection extends Component<Props, State> {
         </View>
         <Text>This test presents three iframes: iframe_0 (yellow); iframe_1 (pink); and iframe_2 (transparent, because its 'X-Frame-Options' is set to 'SAMEORIGIN').</Text>
         <Text>Before injection, the main frame's background is the browser's default value (transparent or white) and each frame has its natural colour.</Text>
-        {/*<Text>1a) At injection time "beforeContentLoaded", a variable will be set in each frame to set 'green' as the "colour to be used".</Text>*/}
+        {/*<Text>1a) At injection time "beforeContentLoaded", a variable will be set in each frame to set 'orange' as the "colour to be used".</Text>*/}
         {/*<Text>1b) Also upon "beforeContentLoaded", a style element to change the text "beforeContentLoaded failed" -> "beforeContentLoaded succeeded" will be applied as soon as the head has loaded.</Text>*/}
-        {/*<Text>2a) At injection time "afterContentLoaded", that variable will be read – if present, the colour green will be injected into all frames. Otherwise, cyan.</Text>*/}
+        {/*<Text>2a) At injection time "afterContentLoaded", that variable will be read – if present, the colour orange will be injected into all frames. Otherwise, cyan.</Text>*/}
         {/*<Text>2b) Also upon "afterContentLoaded", a style element to change the text "afterContentLoaded failed" -> "afterContentLoaded succeeded" will be applied as soon as the head has loaded.</Text>*/}
-        <Text>✅ If the main frame becomes green, then top-frame injection both beforeContentLoaded and afterContentLoaded is supported.</Text>
-        <Text>✅ If iframe_0, and iframe_1 become green, then multi-frame injection beforeContentLoaded and afterContentLoaded is supported.</Text>
+        <Text>✅ If the main frame becomes orange, then top-frame injection both beforeContentLoaded and afterContentLoaded is supported.</Text>
+        <Text>✅ If iframe_0, and iframe_1 become orange, then multi-frame injection beforeContentLoaded and afterContentLoaded is supported.</Text>
         <Text>✅ If the two texts say "beforeContentLoaded on the top frame succeeded!" and "afterContentLoaded on the top frame succeeded!", then both injection times are supported at least on the main frame.</Text>
         <Text>⚠️ If either of the two iframes become coloured cyan, then for that given frame, JS injection succeeded after the content loaded, but didn't occur before the content loaded - please note that for iframes, this may not be a test failure, as it is not clear whether we would expect iframes to support an injection time of beforeContentLoaded anyway.</Text>
         <Text>⚠️ If "Names of iframes that called beforeContentLoaded: " is [], then see above.</Text>
