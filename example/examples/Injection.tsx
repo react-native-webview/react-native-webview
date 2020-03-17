@@ -72,6 +72,7 @@ export default class Injection extends Component<Props, State> {
                 });
               }
 
+              1
               `}
               
               injectedJavaScriptForMainFrameOnly={false}
@@ -91,7 +92,8 @@ export default class Injection extends Component<Props, State> {
                 window.self.document.body.style.backgroundColor = window.self.colourToUse;
               } else {
                 window.self.document.body.style.backgroundColor = "cyan";
-              } 
+              }
+              2
               `}
             />
           </View>
