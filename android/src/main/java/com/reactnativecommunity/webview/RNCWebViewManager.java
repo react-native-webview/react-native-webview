@@ -16,7 +16,6 @@ import android.os.Environment;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -749,8 +748,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       super.onPageStarted(webView, url, favicon);
       mLastLoadFailed = false;
 
-      Log.i("RNCWebView", "onPageStarted");
-
       RNCWebView reactWebView = (RNCWebView) webView;
       reactWebView.callInjectedJavaScriptBeforeContentLoaded();       
 
@@ -1108,17 +1105,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     protected void evaluateJavascriptWithFallback(String script) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        Log.i("RNCWebView", "exceeds kitkat");
-        evaluateJavascript(script, new ValueCallback<String>() {
-          @Override
-          public void onReceiveValue(String s) {
-            Log.i("RNCWebView", "onReceiveValue: " + s);
-          }
-        });
+        evaluateJavascript(script, null);
         return;
       }
-
-      Log.i("RNCWebView", "need url");
 
       try {
         loadUrl("javascript:" + URLEncoder.encode(script, "UTF-8"));
@@ -1132,17 +1121,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       if (getSettings().getJavaScriptEnabled() &&
         injectedJS != null &&
         !TextUtils.isEmpty(injectedJS)) {
-        evaluateJavascriptWithFallback(injectedJS);
+        evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
       }
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
-      Log.i("RNCWebView", "[callInjectedJavaScriptBeforeContentLoaded] " + injectedJSBeforeContentLoaded);
       if (getSettings().getJavaScriptEnabled() &&
       injectedJSBeforeContentLoaded != null &&
       !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
-        Log.i("RNCWebView", "evaluateJavascriptWithFallback");
-        evaluateJavascriptWithFallback(injectedJSBeforeContentLoaded);
+        evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
       }
     }
 
