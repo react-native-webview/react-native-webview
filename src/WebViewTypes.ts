@@ -299,6 +299,8 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+  injectedJavaScriptForMainFrameOnly?: boolean;
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -495,6 +497,20 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+
+  /**
+   * If `true` (default), loads the `injectedJavaScript` only into the main frame.
+   * If `false`, loads it into all frames (e.g. iframes).
+   * @platform ios
+  */
+  injectedJavaScriptForMainFrameOnly?: boolean;
+
+  /**
+   * If `true` (default), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+   * If `false`, loads it into all frames (e.g. iframes).
+   * @platform ios
+  */
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
