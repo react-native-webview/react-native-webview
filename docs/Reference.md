@@ -122,11 +122,15 @@ Controls whether to adjust the content inset for web views that are placed behin
 
 ### `injectedJavaScript`
 
-Set this to provide JavaScript that will be injected into the web page when the view loads. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+Set this to provide JavaScript that will be injected into the web page after the document finishes loading, but before other subresources finish loading.
+
+Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+
+On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc)
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| string | No       | iOS, Andrdoid, macOS
+| string | No       | iOS, Android, macOS
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
@@ -150,18 +154,21 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ### `injectedJavaScriptBeforeContentLoaded`
 
-Set this to provide JavaScript that will be injected into the web page after the document element is created, but before any other content is loaded. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
-On iOS, see [WKUserScriptInjectionTimeAtDocumentStart](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
+Set this to provide JavaScript that will be injected into the web page after the document element is created, but before other subresources finish loading.
+
+Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+
+On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| string | No       | iOS, Android, macOS |
+| string | No       | iOS, macOS |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
 Example:
 
-Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage)
+Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.ReactNativeWebView.postMessage` *will* be available at this time.
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
