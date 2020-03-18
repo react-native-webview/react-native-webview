@@ -288,7 +288,6 @@ static NSDictionary* customCertificatesForHost;
 - (void)removeFromSuperview
 {
     if (_webView) {
-        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
 #if !TARGET_OS_OSX
