@@ -7,11 +7,14 @@ import {
   View,
   Keyboard,
   Button,
+  Platform,
 } from 'react-native';
 
 import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
+import Uploads from './examples/Uploads';
+import Injection from './examples/Injection';
 
 const TESTS = {
   Alerts: {
@@ -36,6 +39,22 @@ const TESTS = {
     description: 'Background color test',
     render() {
       return <Background />;
+    },
+  },
+  Uploads: {
+    title: 'Uploads',
+    testId: 'uploads',
+    description: 'Upload test',
+    render() {
+      return <Uploads />;
+    },
+  },
+  Injection: {
+    title: 'Injection',
+    testId: 'injection',
+    description: 'Injection test',
+    render() {
+      return <Injection />;
     },
   },
 };
@@ -91,6 +110,16 @@ export default class App extends Component<Props, State> {
             title="Background"
             onPress={() => this._changeTest('Background')}
           />
+          <Button
+            testID="testType_injection"
+            title="Injection"
+            onPress={() => this._changeTest('Injection')}
+          />
+          {Platform.OS === 'android' && <Button
+            testID="testType_uploads"
+            title="Uploads"
+            onPress={() => this._changeTest('Uploads')}
+          />}
         </View>
 
         {restarting ? null : (

@@ -48,9 +48,7 @@ import { WebView } from 'react-native-webview';
 
 class MyWeb extends Component {
   render() {
-    return (
-      <WebView source={{ uri: 'https://facebook.github.io/react-native/' }} />
-    );
+    return <WebView source={{ uri: 'https://reactnative.dev/' }} />;
   }
 }
 ```
@@ -63,13 +61,11 @@ Sometimes you would have bundled an HTML file along with the app and would like 
 import React, { Component } from 'react';
 import { WebView } from 'react-native-webview';
 
-const myHtmlFile = require("./my-asset-folder/local-site.html");
+const myHtmlFile = require('./my-asset-folder/local-site.html');
 
 class MyWeb extends Component {
   render() {
-    return (
-      <WebView source={myHtmlFile} />
-    );
+    return <WebView source={myHtmlFile} />;
   }
 }
 ```
@@ -83,7 +79,7 @@ import { WebView } from 'react-native-webview';
 class MyWeb extends Component {
   render() {
     return (
-      <WebView source={{ uri: "file:///android_asset/local-site.html" }} />
+      <WebView source={{ uri: 'file:///android_asset/local-site.html' }} />
     );
   }
 }
@@ -104,7 +100,7 @@ class MyWeb extends Component {
     return (
       <WebView
         ref={ref => (this.webview = ref)}
-        source={{ uri: 'https://facebook.github.io/react-native/' }}
+        source={{ uri: 'https://reactnative.dev/' }}
         onNavigationStateChange={this.handleWebViewNavigationStateChange}
       />
     );
@@ -141,7 +137,7 @@ class MyWeb extends Component {
 
     // redirect somewhere else
     if (url.includes('google.com')) {
-      const newURL = 'https://facebook.github.io/react-native/';
+      const newURL = 'https://reactnative.dev/';
       const redirectTo = 'window.location = "' + newURL + '"';
       this.webview.injectJavaScript(redirectTo);
     }
@@ -190,6 +186,12 @@ Add permission in AndroidManifest.xml:
   ......
 </manifest>
 ```
+
+###### Camera option availability in uploading for Android
+
+If the file input indicates that images or video is desired with [`accept`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept), then the WebView will attempt to provide options to the user to use their camera to take a picture or video.
+
+Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app _can_ request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, it is up to the developer to request camera permission before a file upload directly using the camera is necessary.
 
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
@@ -291,17 +293,18 @@ export default class App extends Component {
 
 This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds.
 
+By setting `injectedJavaScriptForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform.
+
 <img alt="screenshot of Github repo" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
 
 _Under the hood_
 
-> On iOS, `injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`
+> On iOS, ~~`injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentEnd`. As a consequence, `injectedJavaScript` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
-
 
 #### The `injectedJavaScriptBeforeContentLoaded` prop
 
-This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing. 
+This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing.
 
 ```jsx
 import React, { Component } from 'react';
@@ -329,7 +332,12 @@ export default class App extends Component {
 }
 ```
 
-This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes. 
+This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes.
+
+By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform. Howver, although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
+
+> On iOS, ~~`injectedJavaScriptBeforeContentLoaded` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentStart`. As a consequence, `injectedJavaScriptBeforeContentLoaded` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
+> On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
 
 #### The `injectJavaScript` method
 
