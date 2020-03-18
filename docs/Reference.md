@@ -7,7 +7,9 @@ This document lays out the current public properties and methods for the React N
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
-- [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedJavaScriptBeforeContentLoaded)
+- [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded)
+- [`injectedJavaScriptForMainFrameOnly`](Reference.md#injectedjavascriptformainframeonly)
+- [`injectedJavaScriptBeforeContentLoadedForMainFrameOnly`](Reference.md#injectedjavascriptbeforecontentloadedformainframeonly)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
@@ -120,11 +122,15 @@ Controls whether to adjust the content inset for web views that are placed behin
 
 ### `injectedJavaScript`
 
-Set this to provide JavaScript that will be injected into the web page when the view loads. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+Set this to provide JavaScript that will be injected into the web page after the document finishes loading, but before other subresources finish loading.
+
+Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+
+On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc)
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| string | No       | iOS, Andrdoid, macOS
+| string | No       | iOS, Android, macOS
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
@@ -148,18 +154,21 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ### `injectedJavaScriptBeforeContentLoaded`
 
-Set this to provide JavaScript that will be injected into the web page after the document element is created, but before any other content is loaded. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
-On iOS, see [WKUserScriptInjectionTimeAtDocumentStart](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
+Set this to provide JavaScript that will be injected into the web page after the document element is created, but before other subresources finish loading.
+
+Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+
+On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| string | No       | iOS, Android, macOS |
+| string | No       | iOS, macOS |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
 Example:
 
-Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage)
+Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.ReactNativeWebView.postMessage` *will* be available at this time.
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
@@ -172,6 +181,32 @@ const INJECTED_JAVASCRIPT = `(function() {
   onMessage={this.onMessage}
 />;
 ```
+
+---
+
+### `injectedJavaScriptForMainFrameOnly`
+
+If `true` (default), loads the `injectedJavaScript` only into the main frame.
+
+If `false`, loads it into all frames (e.g. iframes).
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| bool | No       | iOS, macOS       |
+
+---
+
+### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`
+
+If `true` (default), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+
+If `false`, loads it into all frames (e.g. iframes).
+
+Warning: although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| bool | No       | iOS, macOS       |
 
 ---
 
