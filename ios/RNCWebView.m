@@ -1060,12 +1060,16 @@ static NSDictionary* customCertificatesForHost;
 
 -(void)appDidBecomeActive
 {
-    [self forceIgnoreSilentHardwareSwitch:false];
+    if (_ignoreSilentHardwareSwitch) {
+      [self forceIgnoreSilentHardwareSwitch:false];
+    }
 }
 
 -(void)appWillResignActive
 {
+  if (_ignoreSilentHardwareSwitch) {
     [self disableIgnoreSilentSwitch];
+  }
 }
 
 /**
@@ -1075,7 +1079,9 @@ static NSDictionary* customCertificatesForHost;
 - (void)webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
+  if (_ignoreSilentHardwareSwitch) {
     [self forceIgnoreSilentHardwareSwitch:true];
+  }
     
   if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
