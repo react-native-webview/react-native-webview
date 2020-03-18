@@ -64,6 +64,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
+- [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 
 ## Methods Index
 
@@ -1126,6 +1127,16 @@ When setting the standard textZoom (100) parameter size, this undesirable effect
 Example:
 
 `<WebView textZoom={100} />`
+
+### `ignoreSilentHardwareSwitch`
+
+(ios only)
+
+When set to true the hardware silent switch is ignored. Default: `false`
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ## Methods
 
