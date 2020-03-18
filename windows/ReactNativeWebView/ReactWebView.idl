@@ -1,0 +1,7 @@
+namespace ReactNativeWebView{
+    [default_interface]
+    runtimeclass ReactWebView : Windows.UI.Xaml.Controls.UserControl{
+        ReactWebView(Microsoft.ReactNative.IReactContext context);
+        Windows.UI.Xaml.Controls.WebView GetView();
+    };
+} // namespace ReactNativeWebView

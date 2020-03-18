@@ -1,14 +1,14 @@
 While the built-in web view has a lot of features, it is not possible to handle every use-case in React Native. You can, however, extend the web view with native code without forking React Native or duplicating all the existing web view code.
 
-Before you do this, you should be familiar with the concepts in [native UI components](https://facebook.github.io/react-native/docs/native-components-android). You should also familiarise yourself with the [native code for web views](https://github.com/facebook/react-native/blob/master/ReactAndroid/src/main/java/com/facebook/react/views/webview/ReactWebViewManager.java), as you will have to use this as a reference when implementing new features—although a deep understanding is not required.
+Before you do this, you should be familiar with the concepts in [native UI components](https://reactnative.dev/docs/native-components-android). You should also familiarise yourself with the [native code for web views](https://github.com/facebook/react-native/blob/master/ReactAndroid/src/main/java/com/facebook/react/views/webview/ReactWebViewManager.java), as you will have to use this as a reference when implementing new features—although a deep understanding is not required.
 
 ## Native Code
 
 To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `ReactWebViewClient`. In your view manager, you'll then need to override:
 
-* `createReactWebViewInstance`
-* `getName`
-* `addEventEmitters`
+- `createReactWebViewInstance`
+- `getName`
+- `addEventEmitters`
 
 ```java
 @ReactModule(name = CustomWebViewManager.REACT_CLASS)
@@ -168,22 +168,22 @@ public class CustomWebViewManager extends RNCWebViewManager {
 
 To use your custom web view, you'll need to create a class for it. Your class must:
 
-* Export all the prop types from `WebView.propTypes`
-* Return a `WebView` component with the prop `nativeConfig.component` set to your native component (see below)
+- Export all the prop types from `WebView.propTypes`
+- Return a `WebView` component with the prop `nativeConfig.component` set to your native component (see below)
 
 To get your native component, you must use `requireNativeComponent`: the same as for regular custom components. However, you must pass in an extra third argument, `WebView.extraNativeComponentConfig`. This third argument contains prop types that are only required for native code.
 
 ```javascript
-import React, {Component, PropTypes} from 'react';
-import {requireNativeComponent} from 'react-native';
-import {WebView} from 'react-native-webview';
+import React, { Component, PropTypes } from 'react';
+import { requireNativeComponent } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 export default class CustomWebView extends Component {
   static propTypes = WebView.propTypes;
 
   render() {
     return (
-      <WebView {...this.props} nativeConfig={{component: RCTCustomWebView}} />
+      <WebView {...this.props} nativeConfig={{ component: RCTCustomWebView }} />
     );
   }
 }
@@ -191,7 +191,7 @@ export default class CustomWebView extends Component {
 const RCTCustomWebView = requireNativeComponent(
   'RCTCustomWebView',
   CustomWebView,
-  WebView.extraNativeComponentConfig
+  WebView.extraNativeComponentConfig,
 );
 ```
 
@@ -213,8 +213,8 @@ export default class CustomWebView extends Component {
     finalUrl: 'about:blank',
   };
 
-  _onNavigationCompleted = (event) => {
-    const {onNavigationCompleted} = this.props;
+  _onNavigationCompleted = event => {
+    const { onNavigationCompleted } = this.props;
     onNavigationCompleted && onNavigationCompleted(event);
   };
 
@@ -249,6 +249,6 @@ const RCTCustomWebView = requireNativeComponent(
       ...WebView.extraNativeComponentConfig.nativeOnly,
       onScrollToBottom: true,
     },
-  }
+  },
 );
 ```

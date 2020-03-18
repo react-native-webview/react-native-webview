@@ -18,7 +18,7 @@ fi
 # React Native installed?
 if ! [ -x "$(command -v react-native)" ]; then
   echo 'Error: React Native is not installed.' >&2
-  echo 'Go here: https://facebook.github.io/react-native/docs/getting-started.html' >&2
+  echo 'Go here: https://reactnative.dev/docs/getting-started.html' >&2
   echo 'Use the "Building Projects With Native Code" option.'
   exit 1
 fi
