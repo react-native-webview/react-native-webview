@@ -293,11 +293,13 @@ export default class App extends Component {
 
 This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds.
 
+By setting `injectedJavaScriptForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform.
+
 <img alt="screenshot of Github repo" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
 
 _Under the hood_
 
-> On iOS, `injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`
+> On iOS, ~~`injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentEnd`. As a consequence, `injectedJavaScript` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
 
 #### The `injectedJavaScriptBeforeContentLoaded` prop
@@ -331,6 +333,11 @@ export default class App extends Component {
 ```
 
 This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes.
+
+By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform. Howver, although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
+
+> On iOS, ~~`injectedJavaScriptBeforeContentLoaded` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentStart`. As a consequence, `injectedJavaScriptBeforeContentLoaded` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
+> On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
 
 #### The `injectJavaScript` method
 
