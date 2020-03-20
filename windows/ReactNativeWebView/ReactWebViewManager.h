@@ -8,7 +8,7 @@
 
 namespace winrt::ReactNativeWebView::implementation {
     
-    enum class WebViewCommands : int32_t { GoForward = 0, GoBack = 1,  Reload = 2, StopLoading = 3, InjectJavaScript = 4 };
+    enum class WebViewCommands : int32_t { GoForward = 0, GoBack = 1,  Reload = 2, StopLoading = 3, InjectJavaScript = 4, PostMessage = 5 };
 
     class ReactWebViewManager : public winrt::implements<
         ReactWebViewManager,

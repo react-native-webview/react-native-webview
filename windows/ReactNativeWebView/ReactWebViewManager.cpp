@@ -80,7 +80,7 @@ namespace winrt::ReactNativeWebView::implementation {
                     }
                 }
                 else if (propertyName == "backgroundColor") {
-                    auto color = propertyValue.To<winrt::Color>();
+                    auto color = propertyValue.As<winrt::Color>();
                     webView.DefaultBackgroundColor(color.A==0 ? winrt::Colors::Transparent() : color);
                 }
             }
@@ -109,6 +109,7 @@ namespace winrt::ReactNativeWebView::implementation {
         commands.Insert(L"reload", static_cast<int32_t>(WebViewCommands::Reload));
         commands.Insert(L"stopLoading", static_cast<int32_t>(WebViewCommands::StopLoading));
         commands.Insert(L"injectJavaScript", static_cast<int32_t>(WebViewCommands::InjectJavaScript));
+        commands.Insert(L"postMessage", static_cast<int32_t>(WebViewCommands::PostMessage));
         return commands.GetView();
     }
 
@@ -135,7 +136,12 @@ namespace winrt::ReactNativeWebView::implementation {
                     webView.Stop();
                     break;
                 case static_cast<int64_t>(WebViewCommands::InjectJavaScript) :
+                    commandArgsReader.GetNextArrayItem();
                     webView.InvokeScriptAsync(L"eval", { commandArgsReader.GetString() });
+                    break;
+                case static_cast<int64_t>(WebViewCommands::PostMessage) :
+                     commandArgsReader.GetNextArrayItem();
+                     m_reactWebView.PostMessage(commandArgsReader.GetString());
                     break;
             }
         }
