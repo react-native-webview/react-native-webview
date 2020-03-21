@@ -64,6 +64,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
+- [`pullToRefreshEnabled`](Reference.md#pullToRefreshEnabled)
 
 ## Methods Index
 
@@ -1126,6 +1127,16 @@ When setting the standard textZoom (100) parameter size, this undesirable effect
 Example:
 
 `<WebView textZoom={100} />`
+
+---
+
+### `pullToRefreshEnabled`
+
+Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ## Methods
 

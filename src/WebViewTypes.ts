@@ -511,6 +511,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
   */
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
+
+  /**
+   * Boolean value that determines whether a pull to refresh gesture is
+   * available in the `WebView`. The default value is `false`
+   *
+  */
+  pullToRefreshEnabled?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
