@@ -61,6 +61,7 @@
 @property (nonatomic, assign) BOOL directionalLockEnabled;
 @property (nonatomic, copy) NSString * _Nullable allowingReadAccessToURL;
 @property (nonatomic, assign) BOOL pullToRefreshEnabled;
+@property (nonatomic, weak) UIRefreshControl * refreshControl;
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
@@ -70,6 +71,7 @@
 - (void)goBack;
 - (void)reload;
 - (void)stopLoading;
+- (void)addPullToRefreshControl;
 - (void)pullToRefresh:(UIRefreshControl *)refreshControl;
 
 @end

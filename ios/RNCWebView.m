@@ -117,7 +117,6 @@ static NSDictionary* customCertificatesForHost;
     #else
     super.backgroundColor = [RCTUIColor clearColor];
     #endif // !TARGET_OS_OSX
-    _pullToRefreshEnabled = NO;
     _bounces = YES;
     _scrollEnabled = YES;
     _showsHorizontalScrollIndicator = YES;
@@ -253,9 +252,7 @@ static NSDictionary* customCertificatesForHost;
     _webView.navigationDelegate = self;
 #if !TARGET_OS_OSX
     if (_pullToRefreshEnabled) {
-        UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-        [_webView.scrollView addSubview: refreshControl];
-        [refreshControl addTarget:self action:@selector(pullToRefresh:) forControlEvents: UIControlEventValueChanged];
+        [self addPullToRefreshControl];
     }
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
@@ -289,7 +286,6 @@ static NSDictionary* customCertificatesForHost;
   _allowsBackForwardNavigationGestures = allowsBackForwardNavigationGestures;
   _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 }
-
 
 - (void)removeFromSuperview
 {
@@ -1080,11 +1076,32 @@ static NSDictionary* customCertificatesForHost;
   }
 }
 
+- (void)addPullToRefreshControl
+{
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    _refreshControl = refreshControl;
+    [_webView.scrollView addSubview: refreshControl];
+    [refreshControl addTarget:self action:@selector(pullToRefresh:) forControlEvents: UIControlEventValueChanged];
+}
+
 - (void)pullToRefresh:(UIRefreshControl *)refreshControl
 {
     [self reload];
     [refreshControl endRefreshing];
 }
+
+#if !TARGET_OS_OSX
+- (void)setPullToRefreshEnabled:(BOOL)pullToRefreshEnabled
+{
+    _pullToRefreshEnabled = pullToRefreshEnabled;
+    
+    if (pullToRefreshEnabled) {
+        [self addPullToRefreshControl];
+    } else {
+        [_refreshControl removeFromSuperview];
+    }
+}
+#endif // !TARGET_OS_OSX
 
 - (void)stopLoading
 {
@@ -1098,17 +1115,6 @@ static NSDictionary* customCertificatesForHost;
   _webView.scrollView.bounces = bounces;
 }
 #endif // !TARGET_OS_OSX
-
-#if !TARGET_OS_OSX
-- (void)setPullToRefreshEnabled:(BOOL)pullToRefreshEnabled
-{
-    _pullToRefreshEnabled = pullToRefreshEnabled;
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [_webView.scrollView addSubview: refreshControl];
-    [refreshControl addTarget:self action:@selector(pullToRefresh:) forControlEvents: UIControlEventValueChanged];
-}
-#endif // !TARGET_OS_OSX
-
 
 - (void)setInjectedJavaScript:(NSString *)source {
   _injectedJavaScript = source;
