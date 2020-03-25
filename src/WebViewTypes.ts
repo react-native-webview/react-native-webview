@@ -16,8 +16,6 @@ type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'post
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
-type IOSWebViewCommands = 'clearCache';
-
 
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
@@ -29,7 +27,7 @@ interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
 }
 
 export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<WebViewCommands | AndroidWebViewCommands>
-export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands | IOSWebViewCommands>
+export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>
 export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>
 
@@ -214,6 +212,7 @@ export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
 export interface ViewManager {
   startLoadWithResult: Function;
+  clearCache: () => Promise<void>;
 }
 
 export interface WebViewNativeConfig {
