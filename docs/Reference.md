@@ -1256,7 +1256,7 @@ clearFormData();
 
 Removes the autocomplete popup from the currently focused form field, if present. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearFormData()>)
 
-### `clearCache(bool)`[⬆](#methods-index)<!-- Link generated with jump2header -->
+### `clearCache(bool): Promise`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 (android and ios only)
 
@@ -1265,6 +1265,8 @@ clearCache(true);
 ```
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
+
+Note that on Android, this is a fake promise, it doesn't wait for the cache to be cleaned.
 
 ### `clearHistory()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 

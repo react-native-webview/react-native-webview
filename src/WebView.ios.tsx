@@ -152,14 +152,13 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   };
 
   /**
-   * Clears all WKWebView caches.
+   * Clears all WKWebView caches. (promise)
    */
   clearCache = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().clearCache,
-      undefined,
-    );
+    const viewManager
+      = (this.props.nativeConfig && this.props.nativeConfig.viewManager)
+      || RNCWebViewManager;
+    return viewManager.clearCache();
   };
 
   /**

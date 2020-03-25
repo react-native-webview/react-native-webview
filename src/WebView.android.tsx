@@ -146,11 +146,14 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   }
 
   clearCache = (includeDiskFiles: boolean) => {
-    UIManager.dispatchViewManagerCommand(
-       this.getWebViewHandle(),
-       this.getCommands().clearCache,
-       [includeDiskFiles],
-    );
+    return new Promise(resolve => {
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        this.getCommands().clearCache,
+        [includeDiskFiles],
+      );
+      resolve();
+    });
   };
 
   clearHistory = () => {
