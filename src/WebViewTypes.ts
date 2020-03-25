@@ -16,6 +16,8 @@ type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'post
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
+type IOSWebViewCommands = 'clearCache';
+
 
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
@@ -27,7 +29,7 @@ interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
 }
 
 export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<WebViewCommands | AndroidWebViewCommands>
-export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>
+export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands | IOSWebViewCommands>
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>
 export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>
 
@@ -721,7 +723,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-  
+
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from other file scheme URLs.

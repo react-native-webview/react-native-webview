@@ -187,6 +187,16 @@ RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
   }];
 }
 
+RCT_EXPORT_METHOD(clearCache:(nonnull NSNumber *)reactTag)
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [[WKWebsiteDataStore defaultDataStore] fetchDataRecordsOfTypes:WKWebsiteDataStore.allWebsiteDataTypes completionHandler:^(NSArray<WKWebsiteDataRecord *> * _Nonnull records) {
+      [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:WKWebsiteDataStore.allWebsiteDataTypes forDataRecords:records completionHandler:^{
+      }];
+    }];
+  });
+}
+
 #pragma mark - Exported synchronous methods
 
 - (BOOL)          webView:(RNCWebView *)webView

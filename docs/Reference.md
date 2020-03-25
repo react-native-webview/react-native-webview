@@ -1258,7 +1258,7 @@ Removes the autocomplete popup from the currently focused form field, if present
 
 ### `clearCache(bool)`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
-(android only)
+(android and ios only)
 
 ```javascript
 clearCache(true);

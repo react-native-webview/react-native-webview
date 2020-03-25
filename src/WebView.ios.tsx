@@ -152,6 +152,17 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   };
 
   /**
+   * Clears all WKWebView caches.
+   */
+  clearCache = () => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().clearCache,
+      undefined,
+    );
+  };
+
+  /**
    * Injects a javascript string into the referenced WebView. Deliberately does not
    * return a response because using eval() to return a response breaks this method
    * on pages with a Content Security Policy that disallows eval(). If you need that
