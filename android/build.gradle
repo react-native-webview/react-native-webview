@@ -127,4 +127,5 @@ dependencies {
   api 'com.facebook.react:react-native:+'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "com.android.support:appcompat-v7:$support_version"
+  implementation "com.tencent.tbs.tbssdk:sdk:43697"
 }
