@@ -70,7 +70,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-
 /**
  * Manages instances of {@link WebView}
  * <p>
