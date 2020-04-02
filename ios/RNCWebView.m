@@ -1190,6 +1190,13 @@ static NSDictionary* customCertificatesForHost;
       for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
         [wkWebViewConfig.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:nil];
       }
+        
+      // Write all cookies from WKWebView back to sharedHTTPCookieStorage
+      [wkWebViewConfig.websiteDataStore.httpCookieStore getAllCookies:^(NSArray* cookies) {
+        for (NSHTTPCookie *cookie in cookies) {
+          [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+        }
+      }];
     } else {
       NSMutableString *script = [NSMutableString string];
 
