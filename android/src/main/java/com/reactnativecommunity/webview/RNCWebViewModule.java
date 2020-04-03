@@ -300,7 +300,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private Boolean acceptsImages(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image");
+    return arrayContainsString(mimeTypes, DEFAULT_MIME_TYPES) || arrayContainsString(mimeTypes, "image");
   }
 
   private Boolean acceptsVideo(String types) {
@@ -313,7 +313,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private Boolean acceptsVideo(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "video");
+    return arrayContainsString(mimeTypes, DEFAULT_MIME_TYPES) || arrayContainsString(mimeTypes, "video");
   }
 
   private Boolean arrayContainsString(String[] array, String pattern) {
@@ -326,7 +326,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   private String[] getAcceptedMimeType(String[] types) {
-    if (isArrayEmpty(types)) {
+    if (noAcceptTypesSet(types)) {
       return new String[]{DEFAULT_MIME_TYPES};
     }
     String[] mimeTypes = new String[types.length];
@@ -400,11 +400,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return File.createTempFile(filename, suffix, storageDir);
   }
 
-  private Boolean isArrayEmpty(String[] arr) {
+  private Boolean noAcceptTypesSet(String[] types) {
     // when our array returned from getAcceptTypes() has no values set from the webview
     // i.e. <input type="file" />, without any "accept" attr
     // will be an array with one empty string element, afaik
-    return arr.length == 0 || (arr.length == 1 && arr[0].length() == 0);
+    return types.length == 0 || (types.length == 1 && types[0].length() == 0);
   }
 
   private PermissionAwareActivity getPermissionAwareActivity() {
