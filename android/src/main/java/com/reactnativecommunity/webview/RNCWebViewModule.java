@@ -397,7 +397,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
 
     File storageDir = getReactApplicationContext().getExternalFilesDir(null);
-    return File.createTempFile(filename, suffix, storageDir);
+    return File.createTempFile(prefix, suffix, storageDir);
   }
 
   private Boolean noAcceptTypesSet(String[] types) {
