@@ -272,7 +272,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   saveFormDataDisabled?: boolean;
   textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
-  urlPrefixesForDefaultIntent?: readonly string[];
+  readonly urlPrefixesForDefaultIntent?: string[];
 }
 
 export enum ContentInsetAdjustmentBehavior {
@@ -291,7 +291,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   bounces?: boolean;
   contentInset?: ContentInsetProp;
   contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
-  dataDetectorTypes?: DataDetectorTypes | readonly DataDetectorTypes[];
+  readonly dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
   hideKeyboardAccessoryView?: boolean;
@@ -409,7 +409,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    *
    * @platform ios
    */
-  dataDetectorTypes?: DataDetectorTypes | readonly DataDetectorTypes[];
+  readonly dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -728,7 +728,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
    * @platform android
    */
-  urlPrefixesForDefaultIntent?: readonly string[];
+  readonly urlPrefixesForDefaultIntent?: string[];
 
   /**
    * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
@@ -907,7 +907,7 @@ export interface WebViewSharedProps extends ViewProps {
    * this whitelist, we will open the URL in Safari.
    * The default whitelisted origins are "http://*" and "https://*".
    */
-  originWhitelist?: readonly string[];
+  readonly originWhitelist?: string[];
 
   /**
    * Function that allows custom handling of any web view requests. Return
