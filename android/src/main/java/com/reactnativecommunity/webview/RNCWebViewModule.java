@@ -11,9 +11,11 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.webkit.ValueCallback;
@@ -42,11 +44,23 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private static final int PICKER = 1;
   private static final int PICKER_LEGACY = 3;
   private static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
-  final String DEFAULT_MIME_TYPES = "*/*";
   private ValueCallback<Uri> filePathCallbackLegacy;
   private ValueCallback<Uri[]> filePathCallback;
   private Uri outputFileUri;
   private DownloadManager.Request downloadRequest;
+
+  private enum MimeType {
+    DEFAULT("*/*"),
+    IMAGE("image"),
+    VIDEO("video");
+
+    private final String value;
+
+    MimeType(String value) {
+      this.value = value;
+    }
+  }
+
   private PermissionListener webviewFileDownloaderPermissionListener = new PermissionListener() {
     @Override
     public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -181,7 +195,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     filePathCallback = callback;
 
     ArrayList<Parcelable> extraIntents = new ArrayList<>();
-    if (! needsCameraPermission()) {
+    if (!needsCameraPermission()) {
       if (acceptsImages(acceptTypes)) {
         extraIntents.add(getPhotoIntent());
       }
@@ -255,14 +269,14 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private Intent getPhotoIntent() {
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    outputFileUri = getOutputUri(MediaStore.ACTION_IMAGE_CAPTURE);
+    outputFileUri = getOutputUri(MimeType.IMAGE);
     intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
     return intent;
   }
 
   private Intent getVideoIntent() {
     Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-    outputFileUri = getOutputUri(MediaStore.ACTION_VIDEO_CAPTURE);
+    outputFileUri = getOutputUri(MimeType.VIDEO);
     intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
     return intent;
   }
@@ -270,7 +284,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private Intent getFileChooserIntent(String acceptTypes) {
     String _acceptTypes = acceptTypes;
     if (acceptTypes.isEmpty()) {
-      _acceptTypes = DEFAULT_MIME_TYPES;
+      _acceptTypes = MimeType.DEFAULT.value;
     }
     if (acceptTypes.matches("\\.\\w+")) {
       _acceptTypes = getMimeTypeFromExtension(acceptTypes.replace(".", ""));
@@ -284,7 +298,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private Intent getFileChooserIntent(String[] acceptTypes, boolean allowMultiple) {
     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
-    intent.setType("*/*");
+    intent.setType(MimeType.DEFAULT.value);
     intent.putExtra(Intent.EXTRA_MIME_TYPES, getAcceptedMimeType(acceptTypes));
     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple);
     return intent;
@@ -295,12 +309,12 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     if (types.matches("\\.\\w+")) {
       mimeType = getMimeTypeFromExtension(types.replace(".", ""));
     }
-    return mimeType.isEmpty() || mimeType.toLowerCase().contains("image");
+    return mimeType.isEmpty() || mimeType.toLowerCase().contains(MimeType.IMAGE.value);
   }
 
   private Boolean acceptsImages(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return arrayContainsString(mimeTypes, DEFAULT_MIME_TYPES) || arrayContainsString(mimeTypes, "image");
+    return arrayContainsString(mimeTypes, MimeType.DEFAULT.value) || arrayContainsString(mimeTypes, MimeType.IMAGE.value);
   }
 
   private Boolean acceptsVideo(String types) {
@@ -308,12 +322,12 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     if (types.matches("\\.\\w+")) {
       mimeType = getMimeTypeFromExtension(types.replace(".", ""));
     }
-    return mimeType.isEmpty() || mimeType.toLowerCase().contains("video");
+    return mimeType.isEmpty() || mimeType.toLowerCase().contains(MimeType.VIDEO.value);
   }
 
   private Boolean acceptsVideo(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return arrayContainsString(mimeTypes, DEFAULT_MIME_TYPES) || arrayContainsString(mimeTypes, "video");
+    return arrayContainsString(mimeTypes, MimeType.DEFAULT.value) || arrayContainsString(mimeTypes, MimeType.VIDEO.value);
   }
 
   private Boolean arrayContainsString(String[] array, String pattern) {
@@ -327,7 +341,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private String[] getAcceptedMimeType(String[] types) {
     if (noAcceptTypesSet(types)) {
-      return new String[]{DEFAULT_MIME_TYPES};
+      return new String[]{MimeType.DEFAULT.value};
     }
     String[] mimeTypes = new String[types.length];
     for (int i = 0; i < types.length; i++) {
@@ -351,10 +365,10 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return type;
   }
 
-  private Uri getOutputUri(String intentType) {
+  private Uri getOutputUri(MimeType mimeType) {
     File capturedFile = null;
     try {
-      capturedFile = getCapturedFile(intentType);
+      capturedFile = getCapturedFile(mimeType);
     } catch (IOException e) {
       Log.e("CREATE FILE", "Error occurred while creating the File", e);
       e.printStackTrace();
@@ -370,23 +384,28 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return FileProvider.getUriForFile(getReactApplicationContext(), packageName + ".fileprovider", capturedFile);
   }
 
-  private File getCapturedFile(String intentType) throws IOException {
+  private File getCapturedFile(MimeType mimeType) throws IOException {
     String prefix = "";
     String suffix = "";
     String dir = "";
-    String filename = "";
 
-    if (intentType.equals(MediaStore.ACTION_IMAGE_CAPTURE)) {
-      prefix = "image-";
-      suffix = ".jpg";
-      dir = Environment.DIRECTORY_PICTURES;
-    } else if (intentType.equals(MediaStore.ACTION_VIDEO_CAPTURE)) {
-      prefix = "video-";
-      suffix = ".mp4";
-      dir = Environment.DIRECTORY_MOVIES;
+    switch (mimeType) {
+      case IMAGE:
+        prefix = "image-";
+        suffix = ".jpg";
+        dir = Environment.DIRECTORY_PICTURES;
+        break;
+      case VIDEO:
+        prefix = "video-";
+        suffix = ".mp4";
+        dir = Environment.DIRECTORY_MOVIES;
+        break;
+
+      default:
+        break;
     }
 
-    filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
+    String filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
 
     // for versions below 6.0 (23) we use the old File creation & permissions model
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
