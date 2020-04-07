@@ -46,7 +46,8 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
   private ValueCallback<Uri> filePathCallbackLegacy;
   private ValueCallback<Uri[]> filePathCallback;
-  private Uri outputFileUri;
+  private File outputImage;
+  private File outputVideo;
   private DownloadManager.Request downloadRequest;
 
   private enum MimeType {
@@ -110,6 +111,16 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       return;
     }
 
+    boolean imageTaken = false;
+    boolean videoTaken = false;
+
+    if (outputImage != null && outputImage.length() > 0) {
+      imageTaken = true;
+    }
+    if (outputVideo != null && outputVideo.length() > 0) {
+      videoTaken = true;
+    }
+
     // based off of which button was pressed, we get an activity result and a file
     // the camera activity doesn't properly return the filename* (I think?) so we use
     // this filename instead
@@ -120,23 +131,42 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
             filePathCallback.onReceiveValue(null);
           }
         } else {
-          Uri result[] = this.getSelectedFiles(data, resultCode);
-          if (result != null) {
-            filePathCallback.onReceiveValue(result);
+          if (imageTaken) {
+            filePathCallback.onReceiveValue(new Uri[]{getOutputUri(outputImage)});
+          } else if (videoTaken) {
+            filePathCallback.onReceiveValue(new Uri[]{getOutputUri(outputVideo)});
           } else {
-            filePathCallback.onReceiveValue(new Uri[]{outputFileUri});
+            filePathCallback.onReceiveValue(this.getSelectedFiles(data, resultCode));
           }
         }
         break;
       case PICKER_LEGACY:
-        Uri result = resultCode != Activity.RESULT_OK ? null : data == null ? outputFileUri : data.getData();
-        filePathCallbackLegacy.onReceiveValue(result);
+        if (resultCode != RESULT_OK) {
+          filePathCallbackLegacy.onReceiveValue(null);
+        } else {
+          if (imageTaken) {
+            filePathCallbackLegacy.onReceiveValue(getOutputUri(outputImage));
+          } else if (videoTaken) {
+            filePathCallbackLegacy.onReceiveValue(getOutputUri(outputVideo));
+          } else {
+            filePathCallbackLegacy.onReceiveValue(data.getData());
+          }
+        }
         break;
 
     }
+
+    if (outputImage != null && !imageTaken) {
+      outputImage.delete();
+    }
+    if (outputVideo != null && !videoTaken) {
+      outputVideo.delete();
+    }
+
     filePathCallback = null;
     filePathCallbackLegacy = null;
-    outputFileUri = null;
+    outputImage = null;
+    outputVideo = null;
   }
 
   public void onNewIntent(Intent intent) {
@@ -269,15 +299,17 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
   private Intent getPhotoIntent() {
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    outputFileUri = getOutputUri(MimeType.IMAGE);
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+    outputImage = getCapturedFile(MimeType.IMAGE);
+    Uri outputImageUri = getOutputUri(outputImage);
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputImageUri);
     return intent;
   }
 
   private Intent getVideoIntent() {
     Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-    outputFileUri = getOutputUri(MimeType.VIDEO);
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+    outputVideo = getCapturedFile(MimeType.VIDEO);
+    Uri outputVideoUri = getOutputUri(outputVideo);
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputVideoUri);
     return intent;
   }
 
@@ -365,15 +397,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return type;
   }
 
-  private Uri getOutputUri(MimeType mimeType) {
-    File capturedFile = null;
-    try {
-      capturedFile = getCapturedFile(mimeType);
-    } catch (IOException e) {
-      Log.e("CREATE FILE", "Error occurred while creating the File", e);
-      e.printStackTrace();
-    }
-
+  private Uri getOutputUri(File capturedFile) {
     // for versions below 6.0 (23) we use the old File creation & permissions model
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
       return Uri.fromFile(capturedFile);
@@ -384,7 +408,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return FileProvider.getUriForFile(getReactApplicationContext(), packageName + ".fileprovider", capturedFile);
   }
 
-  private File getCapturedFile(MimeType mimeType) throws IOException {
+  private File getCapturedFile(MimeType mimeType) {
     String prefix = "";
     String suffix = "";
     String dir = "";
@@ -406,17 +430,25 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
 
     String filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
+    File outputFile = null;
 
-    // for versions below 6.0 (23) we use the old File creation & permissions model
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-      // only this Directory works on all tested Android versions
-      // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
-      File storageDir = Environment.getExternalStoragePublicDirectory(dir);
-      return new File(storageDir, filename);
+    try {
+      // for versions below 6.0 (23) we use the old File creation & permissions model
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        // only this Directory works on all tested Android versions
+        // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
+        File storageDir = Environment.getExternalStoragePublicDirectory(dir);
+        outputFile = new File(storageDir, filename);
+      } else {
+        File storageDir = getReactApplicationContext().getExternalFilesDir(null);
+        outputFile = File.createTempFile(prefix, suffix, storageDir);
+      }
+    } catch (IOException e) {
+      Log.e("CREATE FILE", "Error occurred while creating the File", e);
+      e.printStackTrace();
     }
 
-    File storageDir = getReactApplicationContext().getExternalFilesDir(null);
-    return File.createTempFile(prefix, suffix, storageDir);
+    return outputFile;
   }
 
   private Boolean noAcceptTypesSet(String[] types) {
