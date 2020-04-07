@@ -1245,13 +1245,13 @@ static NSDictionary* customCertificatesForHost;
                                                                        name:MessageHandlerName];
       [wkWebViewConfig.userContentController addUserScript:self.postMessageScript];
     }
-    // FIXME: For a separate (minor) PR: these two shouldn't be gated by messagingEnabled; just keeping consistency with previous behaviour.
-    if (self.atStartScript) {
-      [wkWebViewConfig.userContentController addUserScript:self.atStartScript];
-    }
     if (self.atEndScript) {
       [wkWebViewConfig.userContentController addUserScript:self.atEndScript];
     }
+  }
+  // Whether or not messaging is enabled, add the startup script if it exists.
+  if (self.atStartScript) {
+    [wkWebViewConfig.userContentController addUserScript:self.atStartScript];
   }
 }
 
