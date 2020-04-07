@@ -80,7 +80,7 @@ namespace winrt::ReactNativeWebView::implementation {
                     }
                 }
                 else if (propertyName == "backgroundColor") {
-                    auto color = propertyValue.As<winrt::Color>();
+                    auto color = propertyValue.To<winrt::Color>();
                     webView.DefaultBackgroundColor(color.A==0 ? winrt::Colors::Transparent() : color);
                 }
             }
