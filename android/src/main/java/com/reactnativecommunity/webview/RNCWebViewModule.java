@@ -177,15 +177,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       return null;
     }
 
-    // we have one file selected
-    if (data.getData() != null) {
-      if (resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        return WebChromeClient.FileChooserParams.parseResult(resultCode, data);
-      } else {
-        return null;
-      }
-    }
-
     // we have multiple files selected
     if (data.getClipData() != null) {
       final int numSelectedFiles = data.getClipData().getItemCount();
@@ -195,6 +186,12 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       }
       return result;
     }
+
+    // we have one file selected
+    if (data.getData() != null && resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      return WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+    }
+
     return null;
   }
 
