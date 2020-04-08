@@ -29,6 +29,7 @@ interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
 export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<WebViewCommands | AndroidWebViewCommands>
 export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>
+export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>
 
 
 type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
@@ -72,6 +73,14 @@ declare class NativeWebViewAndroidComponent extends Component<
 declare const NativeWebViewAndroidBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewAndroidComponent;
 export class NativeWebViewAndroid extends NativeWebViewAndroidBase {}
+
+// eslint-disable-next-line react/prefer-stateless-function
+declare class NativeWebViewWindowsComponent extends Component<
+  WindowsNativeWebViewProps
+> {}
+declare const NativeWebViewWindowsBase: Constructor<NativeMethodsMixin> &
+  typeof NativeWebViewWindowsComponent;
+export class NativeWebViewWindows extends NativeWebViewWindowsBase {}
 
 export interface ContentInsetProp {
   top?: number;
@@ -263,7 +272,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   saveFormDataDisabled?: boolean;
   textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
-  urlPrefixesForDefaultIntent?: readonly string[];
+  readonly urlPrefixesForDefaultIntent?: string[];
 }
 
 export enum ContentInsetAdjustmentBehavior {
@@ -282,7 +291,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   bounces?: boolean;
   contentInset?: ContentInsetProp;
   contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
-  dataDetectorTypes?: DataDetectorTypes | readonly DataDetectorTypes[];
+  readonly dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
   hideKeyboardAccessoryView?: boolean;
@@ -290,6 +299,8 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+  injectedJavaScriptForMainFrameOnly?: boolean;
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -307,6 +318,10 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+}
+
+export interface WindowsNativeWebViewProps extends CommonNativeWebViewProps {
+  testID?: string
 }
 
 export interface IOSWebViewProps extends WebViewSharedProps {
@@ -394,7 +409,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    *
    * @platform ios
    */
-  dataDetectorTypes?: DataDetectorTypes | readonly DataDetectorTypes[];
+  readonly dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
@@ -482,6 +497,20 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+
+  /**
+   * If `true` (default), loads the `injectedJavaScript` only into the main frame.
+   * If `false`, loads it into all frames (e.g. iframes).
+   * @platform ios
+  */
+  injectedJavaScriptForMainFrameOnly?: boolean;
+
+  /**
+   * If `true` (default), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+   * If `false`, loads it into all frames (e.g. iframes).
+   * @platform ios
+  */
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
@@ -699,7 +728,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
    * @platform android
    */
-  urlPrefixesForDefaultIntent?: readonly string[];
+  readonly urlPrefixesForDefaultIntent?: string[];
 
   /**
    * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
@@ -878,7 +907,7 @@ export interface WebViewSharedProps extends ViewProps {
    * this whitelist, we will open the URL in Safari.
    * The default whitelisted origins are "http://*" and "https://*".
    */
-  originWhitelist?: readonly string[];
+  readonly originWhitelist?: string[];
 
   /**
    * Function that allows custom handling of any web view requests. Return
