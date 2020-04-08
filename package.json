@@ -35,7 +35,8 @@
   "dependencies": {
     "escape-string-regexp": "2.0.0",
     "invariant": "2.2.4",
-    "rnpm-plugin-windows": "^0.5.1-0"
+    "rnpm-plugin-windows": "^0.5.1-0",
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
     "@babel/core": "7.4.5",
@@ -48,6 +49,7 @@
     "@types/jest": "24.0.18",
     "@types/react": "16.8.8",
     "@types/react-native": "0.60.11",
+    "@types/uuid": "^7.0.2",
     "@typescript-eslint/eslint-plugin": "2.1.0",
     "@typescript-eslint/parser": "2.1.0",
     "babel-eslint": "10.0.3",

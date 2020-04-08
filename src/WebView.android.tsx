@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 
 import {
   Image,
@@ -70,7 +71,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     lastErrorEvent: null,
   };
 
-  uniqueRef = Math.floor(Math.random() * 10000000000);
+  uniqueRef = uuid().replace(/-/g, '');
 
   webViewRef = React.createRef<NativeWebViewAndroid>();
 
