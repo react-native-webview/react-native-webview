@@ -10,6 +10,8 @@ import {
   findNodeHandle,
 } from 'react-native';
 
+import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
+
 import invariant from 'invariant';
 
 import {
@@ -69,6 +71,10 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   };
 
   webViewRef = React.createRef<NativeWebViewAndroid>();
+
+  componentDidMount = () => {
+    BatchedBridge.registerCallableModule('WebViewMessageHandler', this);
+  }
 
   getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
 
