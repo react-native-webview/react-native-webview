@@ -398,6 +398,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
   }
+
+  @ReactProp(name = "messagingModuleName")
+  public void setMessagingModuleName(WebView view, String moduleName) {
+    ((RNCWebView) view).setMessagingModuleName(moduleName);
+  }
    
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
@@ -975,6 +980,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     String injectedJS;
     protected boolean messagingEnabled = false;
     protected @Nullable
+    String messagingModuleName;
+    protected @Nullable
     RNCWebViewClient mRNCWebViewClient;
     protected @Nullable
     CatalystInstance mCatalystInstance;
@@ -1076,6 +1083,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
     }
 
+    public void setMessagingModuleName(String moduleName) {
+      messagingModuleName = moduleName;
+    }
+
     protected void evaluateJavascriptWithFallback(String script) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
         evaluateJavascript(script, null);
@@ -1139,7 +1150,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       WritableNativeArray params = new WritableNativeArray();
       params.pushMap(event);
 
-      mCatalystInstance.callFunction("WebViewMessageHandler", "onMessage", params);
+      mCatalystInstance.callFunction(messagingModuleName, "onMessage", params);
     }
 
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
