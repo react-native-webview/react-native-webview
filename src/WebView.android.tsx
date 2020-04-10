@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 
 import {
   Image,
@@ -70,11 +71,15 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     lastErrorEvent: null,
   };
 
+  uniqueRef = uuid().replace(/-/g, '');
+
   webViewRef = React.createRef<NativeWebViewAndroid>();
 
   componentDidMount = () => {
-    BatchedBridge.registerCallableModule('WebViewMessageHandler', this);
+    BatchedBridge.registerCallableModule(this.getMessagingModuleName(), this);
   }
+
+  getMessagingModuleName = () => `WebViewMessageHandler${this.uniqueRef}`;
 
   getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
 
@@ -333,6 +338,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         key="webViewKey"
         {...otherProps}
         messagingEnabled={typeof onMessage === 'function'}
+        messagingModuleName={this.getMessagingModuleName()}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
