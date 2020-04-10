@@ -197,6 +197,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+        webView.setIgnoreErrFailedForThisURL(url);
+
         RNCWebViewModule module = getModule(reactContext);
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
@@ -721,6 +723,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean mLastLoadFailed = false;
     protected @Nullable
     ReadableArray mUrlPrefixesForDefaultIntent;
+    protected @Nullable String ignoreErrFailedForThisURL = null;
+
+    public void setIgnoreErrFailedForThisURL(@Nullable String url) {
+      ignoreErrFailedForThisURL = url;
+    }
 
     @Override
     public void onPageFinished(WebView webView, String url) {
@@ -772,6 +779,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       int errorCode,
       String description,
       String failingUrl) {
+
+      if (ignoreErrFailedForThisURL != null
+          && failingUrl.equals(ignoreErrFailedForThisURL)
+          && errorCode == -1
+          && description.equals("net::ERR_FAILED")) {
+
+        // This is a workaround for a bug in the WebView.
+        // See these chromium issues for more context:
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=1023678
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=1050635
+        // This entire commit should be reverted once this bug is resolved in chromium.
+        setIgnoreErrFailedForThisURL(null);
+        return;
+      }
+
       super.onReceivedError(webView, errorCode, description, failingUrl);
       mLastLoadFailed = true;
 
@@ -997,6 +1019,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
      */
     public RNCWebView(ThemedReactContext reactContext) {
       super(reactContext);
+    }
+
+    public void setIgnoreErrFailedForThisURL(String url) {
+      mRNCWebViewClient.setIgnoreErrFailedForThisURL(url);
     }
 
     public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
