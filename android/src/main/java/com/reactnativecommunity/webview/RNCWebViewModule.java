@@ -347,6 +347,10 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   private Boolean acceptsVideo(String types) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      return false;
+    }
+
     String mimeType = types;
     if (types.matches("\\.\\w+")) {
       mimeType = getMimeTypeFromExtension(types.replace(".", ""));
@@ -355,6 +359,10 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   private Boolean acceptsVideo(String[] types) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      return false;
+    }
+
     String[] mimeTypes = getAcceptedMimeType(types);
     return arrayContainsString(mimeTypes, MimeType.DEFAULT.value) || arrayContainsString(mimeTypes, MimeType.VIDEO.value);
   }
