@@ -9,6 +9,17 @@ import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['http://*', 'https://*'];
 
+const uuid = () => {
+  let d = new Date().getTime();
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (d + Math.random() * 16) % 16 | 0;
+    d = Math.floor(d / 16);
+
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+};
+
 const extractOrigin = (url: string): string => {
   const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
   return result === null ? '' : result[0];
@@ -85,4 +96,5 @@ export {
   createOnShouldStartLoadWithRequest,
   defaultRenderLoading,
   defaultRenderError,
+  uuid,
 };

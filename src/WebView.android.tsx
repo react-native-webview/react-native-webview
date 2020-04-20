@@ -1,5 +1,4 @@
 import React from 'react';
-import { v4 as uuid } from 'uuid';
 
 import {
   Image,
@@ -20,6 +19,7 @@ import {
   createOnShouldStartLoadWithRequest,
   defaultRenderError,
   defaultRenderLoading,
+  uuid,
 } from './WebViewShared';
 import {
   WebViewErrorEvent,
