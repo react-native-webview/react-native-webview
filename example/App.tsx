@@ -15,6 +15,7 @@ import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
+import LocalPageLoad from './examples/LocalPageLoad';
 
 const TESTS = {
   Alerts: {
@@ -55,6 +56,14 @@ const TESTS = {
     description: 'Injection test',
     render() {
       return <Injection />;
+    },
+  },
+  PageLoad: {
+    title: 'LocalPageLoad',
+    testId: 'LocalPageLoad',
+    description: 'Local Page load test',
+    render() {
+      return <LocalPageLoad />;
     },
   },
 };
@@ -114,6 +123,11 @@ export default class App extends Component<Props, State> {
             testID="testType_injection"
             title="Injection"
             onPress={() => this._changeTest('Injection')}
+          />
+          <Button
+            testID="testType_pageLoad"
+            title="LocalPageLoad"
+            onPress={() => this._changeTest('PageLoad')}
           />
           {Platform.OS === 'android' && <Button
             testID="testType_uploads"

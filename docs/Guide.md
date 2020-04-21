@@ -55,7 +55,7 @@ class MyWeb extends Component {
 
 ### Loading local HTML files
 
-Sometimes you would have bundled an HTML file along with the app and would like to load the HTML asset into your WebView. To do this on iOS, you can just import the html file like any other asset as shown below.
+Sometimes you would have bundled an HTML file along with the app and would like to load the HTML asset into your WebView. To do this on iOS and Windows, you can just import the html file like any other asset as shown below.
 
 ```js
 import React, { Component } from 'react';
