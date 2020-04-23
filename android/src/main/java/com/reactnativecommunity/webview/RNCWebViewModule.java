@@ -203,10 +203,16 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
 
     ArrayList<Parcelable> extraIntents = new ArrayList<>();
     if (acceptsImages(acceptType)) {
-      extraIntents.add(getPhotoIntent());
+      Intent photoIntent = getPhotoIntent();
+      if (photoIntent != null) {
+        extraIntents.add(photoIntent);
+      }
     }
     if (acceptsVideo(acceptType)) {
-      extraIntents.add(getVideoIntent());
+      Intent videoIntent = getVideoIntent();
+      if (videoIntent != null) {
+        extraIntents.add(videoIntent);
+      }
     }
     chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
 
@@ -224,10 +230,16 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     ArrayList<Parcelable> extraIntents = new ArrayList<>();
     if (!needsCameraPermission()) {
       if (acceptsImages(acceptTypes)) {
-        extraIntents.add(getPhotoIntent());
+        Intent photoIntent = getPhotoIntent();
+        if (photoIntent != null) {
+          extraIntents.add(photoIntent);
+        }
       }
       if (acceptsVideo(acceptTypes)) {
-        extraIntents.add(getVideoIntent());
+        Intent videoIntent = getVideoIntent();
+        if (videoIntent != null) {
+          extraIntents.add(videoIntent);
+        }
       }
     }
 
@@ -295,18 +307,34 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   private Intent getPhotoIntent() {
-    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    outputImage = getCapturedFile(MimeType.IMAGE);
-    Uri outputImageUri = getOutputUri(outputImage);
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputImageUri);
+    Intent intent = null;
+
+    try {
+      outputImage = getCapturedFile(MimeType.IMAGE);
+      Uri outputImageUri = getOutputUri(outputImage);
+      intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+      intent.putExtra(MediaStore.EXTRA_OUTPUT, outputImageUri);
+    } catch (IOException | IllegalArgumentException e) {
+      Log.e("CREATE FILE", "Error occurred while creating the File", e);
+      e.printStackTrace();
+    }
+
     return intent;
   }
 
   private Intent getVideoIntent() {
-    Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-    outputVideo = getCapturedFile(MimeType.VIDEO);
-    Uri outputVideoUri = getOutputUri(outputVideo);
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputVideoUri);
+    Intent intent = null;
+
+    try {
+      outputVideo = getCapturedFile(MimeType.VIDEO);
+      Uri outputVideoUri = getOutputUri(outputVideo);
+      intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+      intent.putExtra(MediaStore.EXTRA_OUTPUT, outputVideoUri);
+    } catch (IOException | IllegalArgumentException e) {
+      Log.e("CREATE FILE", "Error occurred while creating the File", e);
+      e.printStackTrace();
+    }
+    
     return intent;
   }
 
@@ -413,7 +441,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return FileProvider.getUriForFile(getReactApplicationContext(), packageName + ".fileprovider", capturedFile);
   }
 
-  private File getCapturedFile(MimeType mimeType) {
+  private File getCapturedFile(MimeType mimeType) throws IOException {
     String prefix = "";
     String suffix = "";
     String dir = "";
@@ -437,20 +465,15 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     String filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
     File outputFile = null;
 
-    try {
-      // for versions below 6.0 (23) we use the old File creation & permissions model
-      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-        // only this Directory works on all tested Android versions
-        // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
-        File storageDir = Environment.getExternalStoragePublicDirectory(dir);
-        outputFile = new File(storageDir, filename);
-      } else {
-        File storageDir = getReactApplicationContext().getExternalFilesDir(null);
-        outputFile = File.createTempFile(prefix, suffix, storageDir);
-      }
-    } catch (IOException e) {
-      Log.e("CREATE FILE", "Error occurred while creating the File", e);
-      e.printStackTrace();
+    // for versions below 6.0 (23) we use the old File creation & permissions model
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      // only this Directory works on all tested Android versions
+      // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
+      File storageDir = Environment.getExternalStoragePublicDirectory(dir);
+      outputFile = new File(storageDir, filename);
+    } else {
+      File storageDir = getReactApplicationContext().getExternalFilesDir(null);
+      outputFile = File.createTempFile(prefix, suffix, storageDir);
     }
 
     return outputFile;
