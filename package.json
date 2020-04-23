@@ -75,6 +75,7 @@
   },
   "files": [
     "android",
+    "apple",
     "ios",
     "macos",
     "windows",
