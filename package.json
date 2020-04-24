@@ -63,7 +63,7 @@
     "metro-react-native-babel-preset": "0.54.1",
     "react": "16.9.0",
     "react-native": "0.61.5",
-    "react-native-macos": "0.60.0-microsoft.49",
+    "react-native-macos": "0.60.0-microsoft.73",
     "react-native-windows": "^0.61.0-beta.58",
     "rnpm-plugin-windows": "^0.5.1-0",
     "semantic-release": "15.13.24",
@@ -75,6 +75,7 @@
   },
   "files": [
     "android",
+    "apple",
     "ios",
     "macos",
     "windows",
