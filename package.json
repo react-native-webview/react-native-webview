@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "9.1.1",
+  "version": "9.3.0",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -62,8 +62,8 @@
     "metro-react-native-babel-preset": "0.54.1",
     "react": "16.9.0",
     "react-native": "0.61.5",
-    "react-native-macos": "0.60.0-microsoft.49",
-    "react-native-windows": "0.61.0",
+    "react-native-macos": "0.60.0-microsoft.73",
+    "react-native-windows": "0.61.5",
     "semantic-release": "15.13.24",
     "typescript": "3.6.2"
   },
@@ -73,6 +73,7 @@
   },
   "files": [
     "android",
+    "apple",
     "ios",
     "macos",
     "windows",
