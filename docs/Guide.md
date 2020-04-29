@@ -226,9 +226,23 @@ You can control **single** or **multiple** file selection by specifing the [`mul
 
 ##### iOS
 
-For iOS, all you need to do is specify the permissions in your `ios/[project]/Info.plist` file:
+On iOS, you are going to have to supply your own code to download files. You can supply an `onFileDownload` callback
+to the WebView component as a prop. If RNCWebView determines that a file download needs to take place, the URL where you can download the file
+will be given to `onFileDownload`. From that callback you can then download that file however you would like to do so.
 
-Save to gallery:
+NOTE: iOS 13+ is needed for the best possible download experience. On iOS 13 Apple added an API for accessing HTTP response headers, which
+is used to determine if an HTTP response should be a download. On iOS 12 or older, only MIME types that cannot be rendered by the webview will
+trigger calls to `onFileDownload`.
+
+Example:
+```javascript
+  onFileDownload = ({ nativeEvent }) => {
+    const { downloadUrl } = nativeEvent;
+    // --> Your download code goes here <--
+  }
+```
+
+To be able to save images to the gallery you need to specify this permission in your `ios/[project]/Info.plist` file:
 
 ```
 <key>NSPhotoLibraryAddUsageDescription</key>
@@ -237,7 +251,8 @@ Save to gallery:
 
 ##### Android
 
-Add permission in AndroidManifest.xml:
+On Android, integration with the DownloadManager is built-in.
+All you have to do to support downloads is add these permissions in AndroidManifest.xml:
 
 ```xml
 <manifest ...>
