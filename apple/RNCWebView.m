@@ -67,6 +67,8 @@ static NSDictionary* customCertificatesForHost;
     UIScrollViewDelegate,
 #endif // !TARGET_OS_OSX
     RCTAutoInsetsProtocol>
+
+@property (nonatomic, copy) RCTDirectEventBlock onFileDownload;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
@@ -973,24 +975,42 @@ static NSDictionary* customCertificatesForHost;
   decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse
                     decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
 {
+  WKNavigationResponsePolicy policy = WKNavigationResponsePolicyAllow;
   if (_onHttpError && navigationResponse.forMainFrame) {
     if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
       NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
       NSInteger statusCode = response.statusCode;
 
       if (statusCode >= 400) {
-        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-        [event addEntriesFromDictionary: @{
+        NSMutableDictionary<NSString *, id> *httpErrorEvent = [self baseEvent];
+        [httpErrorEvent addEntriesFromDictionary: @{
           @"url": response.URL.absoluteString,
           @"statusCode": @(statusCode)
         }];
 
-        _onHttpError(event);
+        _onHttpError(httpErrorEvent);
+      }
+
+      NSString *disposition = nil;
+      if (@available(iOS 13, *)) {
+        disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
+      }
+      BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
+      if (isAttachment || !navigationResponse.canShowMIMEType) {
+        if (_onFileDownload) {
+          policy = WKNavigationResponsePolicyCancel;
+
+          NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
+          [downloadEvent addEntriesFromDictionary: @{
+            @"downloadUrl": (response.URL).absoluteString,
+          }];
+          _onFileDownload(downloadEvent);
+        }
       }
     }
-  }  
+  }
 
-  decisionHandler(WKNavigationResponsePolicyAllow);
+  decisionHandler(policy);
 }
 
 /**
