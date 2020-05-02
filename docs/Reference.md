@@ -65,6 +65,7 @@ This document lays out the current public properties and methods for the React N
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
+- [`onFileDownload`](Reference.md#onFileDownload)
 
 ## Methods Index
 
@@ -1137,6 +1138,38 @@ When set to true the hardware silent switch is ignored. Default: `false`
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
+
+### `onFileDownload`
+This property is iOS-only.
+
+Function that is invoked when the client needs to download a file.
+
+iOS 13+ only: If the webview navigates to a URL that results in an HTTP
+response with a Content-Disposition header 'attachment...', then
+this will be called.
+
+iOS 8+: If the MIME type indicates that the content is not renderable by the
+webview, that will also cause this to be called. On iOS versions before 13,
+this is the only condition that will cause this function to be called.
+
+The application will need to provide its own code to actually download
+the file.
+
+If not provided, the default is to let the webview try to render the file.
+
+Example:
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onFileDownload={ ( { nativeEvent: { downloadUrl } } ) => {
+    // You use downloadUrl which is a string to download files however you want.
+  }}
+  />
+```
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| function | No       | iOS      |
 
 ## Methods
 
