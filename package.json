@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "7.4.6",
+  "version": "7.4.7",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "ci": "CI=true && yarn lint && yarn test",
@@ -34,7 +34,6 @@
     "@babel/core": "7.5.5",
     "@semantic-release/git": "7.0.16",
     "@types/invariant": "^2.2.30",
-    "@types/jest": "24.0.18",
     "@types/react": "16.8.8",
     "@types/react-native": "0.60.11",
     "@typescript-eslint/eslint-plugin": "2.1.0",
