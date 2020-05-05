@@ -13,6 +13,7 @@ import {
 import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
+import Downloads from './examples/Downloads';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 
@@ -39,6 +40,14 @@ const TESTS = {
     description: 'Background color test',
     render() {
       return <Background />;
+    },
+  },
+  Downloads: {
+    title: 'Downloads',
+    testId: 'downloads',
+    description: 'File downloads test',
+    render() {
+      return <Downloads />;
     },
   },
   Uploads: {
@@ -115,6 +124,11 @@ export default class App extends Component<Props, State> {
             title="Injection"
             onPress={() => this._changeTest('Injection')}
           />
+          {Platform.OS == "ios" && <Button
+            testID="testType_downloads"
+            title="Downloads"
+            onPress={() => this._changeTest('Downloads')}
+          />}
           {Platform.OS === 'android' && <Button
             testID="testType_uploads"
             title="Uploads"
