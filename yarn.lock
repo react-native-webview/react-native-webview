@@ -1502,11 +1502,6 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
   integrity sha512-l42BggppR6zLmpfU6fq9HEa2oGPEI8yrSPL3GITjfRInppYFahObbIQOQK3UGxEnyQpltZLaPe75046NOZQikw==
 
-"@types/uuid@^7.0.2":
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-7.0.2.tgz#d680a9c596ef84abf5c4c07a32ffd66d582526f8"
-  integrity sha512-8Ly3zIPTnT0/8RCU6Kg/G3uTICf9sRwYOpUzSIM3503tLIKcnJPRuinHhXngJUy2MntrEf6dlpOHXJju90Qh5w==
-
 "@types/yargs-parser@*":
   version "13.0.0"
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-13.0.0.tgz#453743c5bbf9f1bed61d959baab5b06be029b2d0"
@@ -8304,10 +8299,10 @@ react-is@^16.8.1, react-is@^16.8.4:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.9.0.tgz#21ca9561399aad0ff1a7701c01683e8ca981edcb"
   integrity sha512-tJBzzzIgnnRfEm046qRcURvwQnZVXmuCbscxUO5RWrGTXpon2d4c8mI0D8WE6ydVIm29JiLB6+RslkIvym9Rjw==
 
-react-native-macos@0.60.0-microsoft.49:
-  version "0.60.0-microsoft.49"
-  resolved "https://registry.yarnpkg.com/react-native-macos/-/react-native-macos-0.60.0-microsoft.49.tgz#ac506343f7450f12f852769102e6262b531b181f"
-  integrity sha512-2631KIggGpw1RoLC/lWRZ/agFgAAMWuoQrRcmGsN+0neXHggEY5jUzz1uV6LeqKkrcudV+qaz3ajo85UjwqDIA==
+react-native-macos@0.60.0-microsoft.73:
+  version "0.60.0-microsoft.73"
+  resolved "https://registry.yarnpkg.com/react-native-macos/-/react-native-macos-0.60.0-microsoft.73.tgz#f4c0b7634c39695006170c45a8a66aa8a4a87522"
+  integrity sha512-iJatxEIC28S3+My9xYc1lGnXBbfh+sy5IjKd/OolyhhKcMgN3chN/1/5YgnjNEaxdw4SvPD0EQiQXQz5PLcjtw==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@react-native-community/cli" "^2.6.0"
@@ -10158,11 +10153,6 @@ uuid@^3.3.2, uuid@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
   integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
-
-uuid@^7.0.3:
-  version "7.0.3"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
-  integrity sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==
 
 v8-compile-cache@^2.0.3:
   version "2.1.0"
