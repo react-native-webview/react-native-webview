@@ -20,7 +20,7 @@
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
     "build": "yarn tsc",
-    "prepare": "yarn build",
+    "prepare": "yarn",
     "test": "yarn jest"
   },
   "rn-docs": {
