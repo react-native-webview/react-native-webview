@@ -40,6 +40,7 @@ const RNCWebView = requireNativeComponent(
   'RNCWebView',
 ) as typeof NativeWebViewAndroid;
 const { resolveAssetSource } = Image;
+
 /**
  * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
  */
