@@ -12,8 +12,8 @@
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "start:android": "react-native run-android --root example/",
-    "start:ios": "react-native run-ios --project-path example/ios --scheme example",
+    "start:android": "react-native run-android",
+    "start:ios": "react-native run-ios",
     "start:macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
     "start:windows": "react-native start --use-react-native-windows",
     "ci": "CI=true && yarn lint",
@@ -29,8 +29,8 @@
     "type": "Component"
   },
   "peerDependencies": {
-    "react": "^16.9",
-    "react-native": ">=0.60 <0.62"
+    "react": "16.11.0",
+    "react-native": ">=0.60 <0.63"
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
@@ -39,14 +39,14 @@
   "devDependencies": {
     "@babel/core": "7.4.5",
     "@babel/runtime": "7.4.5",
-    "@react-native-community/cli": "^3.2.0",
-    "@react-native-community/cli-platform-android": "^3.0.0",
-    "@react-native-community/cli-platform-ios": "^3.0.0",
+    "@react-native-community/cli": "^4.8.0",
+    "@react-native-community/cli-platform-android": "^4.8.0",
+    "@react-native-community/cli-platform-ios": "^4.8.0",
     "@semantic-release/git": "7.0.16",
     "@types/invariant": "^2.2.30",
     "@types/jest": "24.0.18",
-    "@types/react": "16.8.8",
-    "@types/react-native": "0.60.11",
+    "@types/react": "16.9.34",
+    "@types/react-native": "0.62.5",
     "@types/selenium-webdriver": "4.0.9",
     "@typescript-eslint/eslint-plugin": "2.1.0",
     "@typescript-eslint/parser": "2.1.0",
@@ -62,13 +62,14 @@
     "eslint-plugin-react-native": "3.7.0",
     "jest": "24.9.0",
     "metro": "0.56.4",
-    "metro-react-native-babel-preset": "0.54.1",
-    "react": "16.9.0",
-    "react-native": "0.61.5",
+    "metro-react-native-babel-preset": "^0.59.0",
+    "react": "16.11.0",
+    "react-native": "0.62.2",
     "react-native-macos": "0.60.0-microsoft.73",
     "react-native-windows": "0.61.5",
+    "rnpm-plugin-windows": "^0.6.1",
     "semantic-release": "15.13.24",
-    "typescript": "3.6.2",
+    "typescript": "3.8.3",
     "appium": "1.17.0",
     "selenium-appium": "0.0.15",
     "selenium-webdriver": "4.0.0-alpha.7"
