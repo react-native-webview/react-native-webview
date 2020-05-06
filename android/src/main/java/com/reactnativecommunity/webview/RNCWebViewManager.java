@@ -118,6 +118,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
   public static final int COMMAND_FOCUS = 8;
+  public static final int COMMAND_PAUSE_VIDEO = 9;
+  public static final int COMMAND_RESUME_VIDEO = 10;
 
   // android commands
   public static final int COMMAND_CLEAR_FORM_DATA = 1000;
@@ -538,6 +540,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ((RNCWebView) view).setHasScrollEvent(hasScrollEvent);
   }
 
+  @ReactProp(name = "useNativeResumeAndPauseLifecycleEvents")
+  public void setUseNativeResumeAndPauseLifecycleEvents(WebView view, boolean useHostResumeAndPause) {
+    // This prop will ensure no background activity will occur while playing any media in a webview
+    // In cases where this prop is not set and a media streaming is consumed inside the WebView,
+    // You might experience  "Device and Network abuse" policy problems in Play Store.
+    ((RNCWebView) view).setUseHostResumeAndPause(useHostResumeAndPause);
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -572,6 +582,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
       .put("clearCache", COMMAND_CLEAR_CACHE)
       .put("clearHistory", COMMAND_CLEAR_HISTORY)
+      .put("onPause", COMMAND_PAUSE_VIDEO)
+      .put("onResume", COMMAND_RESUME_VIDEO)
       .build();
   }
 
@@ -633,6 +645,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       case COMMAND_CLEAR_HISTORY:
         root.clearHistory();
         break;
+      case COMMAND_PAUSE_VIDEO:
+        if(root != null) {
+          root.onPause();
+        }
+        break;
+      case COMMAND_RESUME_VIDEO:
+        if(root != null) {
+          root.onResume();
+        }
+        break;
+
     }
   }
 
@@ -1010,6 +1033,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean sendContentSizeChangeEvents = false;
     private OnScrollDispatchHelper mOnScrollDispatchHelper;
     protected boolean hasScrollEvent = false;
+    protected boolean useHostResumeAndPause = false;
 
     /**
      * WebView must be created with an context of the current activity
@@ -1033,14 +1057,22 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       this.hasScrollEvent = hasScrollEvent;
     }
 
+    public void setUseHostResumeAndPause(boolean useHostResumeAndPause) {
+      this.useHostResumeAndPause = useHostResumeAndPause;
+    }
+
     @Override
     public void onHostResume() {
-      // do nothing
+      if (useHostResumeAndPause) {
+        super.onResume();
+      }
     }
 
     @Override
     public void onHostPause() {
-      // do nothing
+      if (useHostResumeAndPause) {
+        super.onPause();
+      }
     }
 
     @Override
