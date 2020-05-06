@@ -1,0 +1,85 @@
+import React from 'react';
+import { MacOSWebViewProps, NativeWebViewMacOS, State } from './WebViewTypes';
+declare class WebView extends React.Component<MacOSWebViewProps, State> {
+    static defaultProps: {
+        javaScriptEnabled: boolean;
+        cacheEnabled: boolean;
+        originWhitelist: string[];
+        useSharedProcessPool: boolean;
+    };
+    static isFileUploadSupported: () => Promise<boolean>;
+    state: State;
+    webViewRef: React.RefObject<NativeWebViewMacOS>;
+    getCommands: () => {
+        goForward: number;
+        goBack: number;
+        reload: number;
+        stopLoading: number;
+        postMessage: number;
+        injectJavaScript: number;
+        loadUrl: number;
+        requestFocus: number;
+        onPause: number;
+        onResume: number;
+    };
+    /**
+     * Go forward one page in the web view's history.
+     */
+    goForward: () => void;
+    /**
+     * Go back one page in the web view's history.
+     */
+    goBack: () => void;
+    /**
+     * Reloads the current page.
+     */
+    reload: () => void;
+    /**
+     * Stop loading the current page.
+     */
+    stopLoading: () => void;
+    /**
+     * Request focus on WebView rendered page.
+     */
+    requestFocus: () => void;
+    /**
+     * Posts a message to the web view, which will emit a `message` event.
+     * Accepts one argument, `data`, which must be a string.
+     *
+     * In your webview, you'll need to something like the following.
+     *
+     * ```js
+     * document.addEventListener('message', e => { document.title = e.data; });
+     * ```
+     */
+    postMessage: (data: string) => void;
+    /**
+     * Injects a javascript string into the referenced WebView. Deliberately does not
+     * return a response because using eval() to return a response breaks this method
+     * on pages with a Content Security Policy that disallows eval(). If you need that
+     * functionality, look into postMessage/onMessage.
+     */
+    injectJavaScript: (data: string) => void;
+    /**
+     * We return an event with a bunch of fields including:
+     *  url, title, loading, canGoBack, canGoForward
+     */
+    updateNavigationState: (event: import("react-native").NativeSyntheticEvent<import("./WebViewTypes").WebViewNavigation>) => void;
+    /**
+     * Returns the native `WebView` node.
+     */
+    getWebViewHandle: () => number;
+    onLoadingStart: (event: import("react-native").NativeSyntheticEvent<import("./WebViewTypes").WebViewNavigation>) => void;
+    onLoadingError: (event: import("react-native").NativeSyntheticEvent<import("./WebViewTypes").WebViewError>) => void;
+    onHttpError: (event: import("react-native").NativeSyntheticEvent<import("./WebViewTypes").WebViewHttpError>) => void;
+    onLoadingFinish: (event: import("react-native").NativeSyntheticEvent<import("./WebViewTypes").WebViewNavigation>) => void;
+    onMessage: (event: import("react-native").NativeSyntheticEvent<import("./WebViewTypes").WebViewMessage>) => void;
+    onLoadingProgress: (event: import("react-native").NativeSyntheticEvent<import("./WebViewTypes").WebViewNativeProgressEvent>) => void;
+    onShouldStartLoadWithRequestCallback: (shouldStart: boolean, _url: string, lockIdentifier: number) => void;
+    onContentProcessDidTerminate: (event: import("react-native").NativeSyntheticEvent<import("./WebViewTypes").WebViewNativeEvent>) => void;
+    componentDidUpdate(prevProps: MacOSWebViewProps): void;
+    showRedboxOnPropChanges(prevProps: MacOSWebViewProps, propName: keyof MacOSWebViewProps): void;
+    render(): JSX.Element;
+}
+export default WebView;
+//# sourceMappingURL=WebView.macos.d.ts.map

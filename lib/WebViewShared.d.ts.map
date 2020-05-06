@@ -1,0 +1,1 @@
+{"version":3,"file":"WebViewShared.d.ts","sourceRoot":"","sources":["../src/WebViewShared.tsx"],"names":[],"mappings":"AAGA,OAAO,EAEL,4BAA4B,EAC7B,MAAM,gBAAgB,CAAC;AAGxB,QAAA,MAAM,sBAAsB,UAA4B,CAAC;AAuBzD,QAAA,MAAM,kCAAkC,uTA8BvC,CAAC;AAEF,QAAA,MAAM,oBAAoB,mBAIzB,CAAC;AACF,QAAA,MAAM,kBAAkB,wFAWvB,CAAC;AAEF,OAAO,EACL,sBAAsB,EACtB,kCAAkC,EAClC,oBAAoB,EACpB,kBAAkB,GACnB,CAAC"}
