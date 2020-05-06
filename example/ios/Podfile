@@ -4,8 +4,10 @@ require_relative '../../node_modules/@react-native-community/cli-platform-ios/na
 project './example.xcodeproj'
 
 target 'example' do
-  # Pods for example
+  use_native_modules!
+
   pod 'react-native-webview', :path => "../.."
+
   pod 'FBLazyVector', :path => "../../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../../node_modules/react-native/Libraries/RCTRequired"
@@ -41,8 +43,6 @@ target 'example' do
     inherit! :search_paths
     # Pods for testing
   end
-
-  use_native_modules!
 end
 
 target 'example-tvOS' do
