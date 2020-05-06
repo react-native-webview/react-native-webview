@@ -28,16 +28,16 @@ $ react-native link react-native-webview
 
 _NOTE: If you ever need to uninstall React Native WebView, run `react-native unlink react-native-webview` to unlink it._
 
-### iOS:
+### iOS & macOS:
 
-If using cocoapods in the `ios/` directory run
+If using CocoaPods, in the `ios/` or `macos/` directory run:
 
 ```
 $ pod install
 ```
 
-For iOS, while you can manually link the old way using [react-native own tutorial](https://reactnative.dev/docs/linking-libraries-ios), we find it easier to use cocoapods.
-If you wish to use cocoapods and haven't set it up yet, please instead refer to [that article](https://engineering.brigad.co/demystifying-react-native-modules-linking-ae6c017a6b4a).
+While you can manually link the old way using [react-native own tutorial](https://reactnative.dev/docs/linking-libraries-ios), we find it easier to use CocoaPods.
+If you wish to use CocoaPods and haven't set it up yet, please instead refer to [that article](https://engineering.brigad.co/demystifying-react-native-modules-linking-ae6c017a6b4a).
 
 ### Android:
 
@@ -54,11 +54,34 @@ android.enableJetifier=true
 
 For Android manual installation, please refer to [this article](https://engineering.brigad.co/demystifying-react-native-modules-linking-964399ec731b) where you can find detailed step on how to link any react-native project.
 
-### macOS:
+### Windows:
 
-Cocoapod and autolinking is not yet support for react-native macOS but is coming soon. In the meantime you must manually link.
+Autolinking is not yet supported for ReactNativeWindows. Make following additions to the given files manually:
 
-The method is nearly identical to the [manual linking method for iOS](https://reactnative.dev/docs/linking-libraries-ios#manual-linking) except that you will include the `node_modules/react-native-webview/macos/RNCWebView.xcodeproj` project in your main project and link the `RNCWebView-macOS.a` library.
+#### **windows/myapp.sln**
+
+Add the `ReactNativeWebView` project to your solution.
+
+1. Open the solution in Visual Studio 2019
+2. Right-click Solution icon in Solution Explorer > Add > Existing Project
+   Select `node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj`
+
+#### **windows/myapp/myapp.vcxproj**
+
+Add a reference to `ReactNativeWebView` to your main application project. From Visual Studio 2019:
+
+1. Right-click main application project > Add > Reference...
+   Check `ReactNativeWebView` from Solution Projects.
+
+2. Modify files below to add the package providers to your main application project
+
+#### **pch.h**
+
+Add `#include "winrt/ReactNativeWebView.h"`.
+
+#### **app.cpp**
+
+Add `PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider());` before `InitializeComponent();`.
 
 ## 3. Import the webview into your component
 

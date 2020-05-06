@@ -7,7 +7,9 @@ This document lays out the current public properties and methods for the React N
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
-- [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedJavaScriptBeforeContentLoaded)
+- [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded)
+- [`injectedJavaScriptForMainFrameOnly`](Reference.md#injectedjavascriptformainframeonly)
+- [`injectedJavaScriptBeforeContentLoadedForMainFrameOnly`](Reference.md#injectedjavascriptbeforecontentloadedformainframeonly)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
@@ -62,6 +64,8 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
+- [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
+- [`onFileDownload`](Reference.md#onFileDownload)
 
 ## Methods Index
 
@@ -120,11 +124,15 @@ Controls whether to adjust the content inset for web views that are placed behin
 
 ### `injectedJavaScript`
 
-Set this to provide JavaScript that will be injected into the web page when the view loads. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+Set this to provide JavaScript that will be injected into the web page after the document finishes loading, but before other subresources finish loading.
 
-| Type   | Required |
-| ------ | -------- |
-| string | No       |
+Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+
+On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc)
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS, Android, macOS
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
@@ -148,18 +156,21 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ### `injectedJavaScriptBeforeContentLoaded`
 
-Set this to provide JavaScript that will be injected into the web page after the document element is created, but before any other content is loaded. Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
-On iOS, see [WKUserScriptInjectionTimeAtDocumentStart](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
+Set this to provide JavaScript that will be injected into the web page after the document element is created, but before other subresources finish loading.
 
-| Type   | Required |
-| ------ | -------- |
-| string | No       |
+Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
+
+On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS, macOS |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
 Example:
 
-Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage)
+Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.ReactNativeWebView.postMessage` *will* be available at this time.
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
@@ -175,15 +186,41 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ---
 
+### `injectedJavaScriptForMainFrameOnly`
+
+If `true` (default), loads the `injectedJavaScript` only into the main frame.
+
+If `false`, loads it into all frames (e.g. iframes).
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| bool | No       | iOS, macOS       |
+
+---
+
+### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`
+
+If `true` (default), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+
+If `false`, loads it into all frames (e.g. iframes).
+
+Warning: although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| bool | No       | iOS, macOS       |
+
+---
+
 ### `mediaPlaybackRequiresUserAction`
 
 Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`. (Android API minimum version 17).
 
 NOTE: the default `true` value might cause some videos to hang loading on iOS. Setting it to `false` could fix this issue.
 
-| Type | Required |
-| ---- | -------- |
-| bool | No       |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS, Android, macOS |
 
 ---
 
@@ -197,9 +234,9 @@ The `nativeConfig` prop expects an object with the following keys:
 - `props` (object)
 - `viewManager` (object)
 
-| Type   | Required |
-| ------ | -------- |
-| object | No       |
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| object | No       | iOS, Android, macOS |
 
 ---
 
@@ -348,9 +385,9 @@ url
 
 Function that is invoked when the `WebView` is loading.
 
-| Type     | Required |
-| -------- | -------- |
-| function | No       |
+| Type     | Required | Platform |
+| -------- | -------- | --------- |
+| function | No       | iOS, Android, macOS |
 
 Example:
 
@@ -509,9 +546,9 @@ url
 
 List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are "http://*" and "https://*".
 
-| Type             | Required |
-| ---------------- | -------- |
-| array of strings | No       |
+| Type             | Required | Platform |
+| ---------------- | -------- | -------- |
+| array of strings | No       | iOS, Android, macOS |
 
 Example:
 
@@ -529,9 +566,9 @@ Example:
 
 Function that returns a view to show if there's an error.
 
-| Type     | Required |
-| -------- | -------- |
-| function | No       |
+| Type     | Required | Platform |
+| -------- | -------- | -------- |
+| function | No       | iOS, Android, macOS |
 
 Example:
 
@@ -550,9 +587,9 @@ The function passed to `renderError` will be called with the name of the error
 
 Function that returns a loading indicator. The startInLoadingState prop must be set to true in order to use this prop.
 
-| Type     | Required |
-| -------- | -------- |
-| function | No       |
+| Type     | Required | Platform |
+| -------- | -------- | -------- |
+| function | No       | iOS, Android, macOS |
 
 Example:
 
@@ -582,9 +619,9 @@ Function that allows custom handling of any web view requests. Return `true` fro
 
 On Android, is not called on the first load.
 
-| Type     | Required |
-| -------- | -------- |
-| function | No       |
+| Type     | Required | Platform |
+| -------- | -------- | -------- |
+| function | No       | iOS, Android, macOS |
 
 Example:
 
@@ -618,9 +655,9 @@ navigationType
 
 Boolean value that forces the `WebView` to show the loading view on the first load. This prop must be set to `true` in order for the `renderLoading` prop to work.
 
-| Type | Required |
-| ---- | -------- |
-| bool | No       |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS, Android, macOS |
 
 ---
 
@@ -735,9 +772,9 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 Sets the user-agent for the `WebView`.
 
-| Type   | Required |
-| ------ | -------- |
-| string | No       |
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS, Android, macOS |
 
 ---
 
@@ -745,9 +782,9 @@ Sets the user-agent for the `WebView`.
 
 Append to the existing user-agent. Setting `userAgent` will override this.
 
-| Type   | Required |
-| ------ | -------- |
-| string | No       |
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS, Android, macOS |
 
 ```jsx
 <WebView
@@ -885,9 +922,9 @@ The default value is `true`.
 
 Boolean value that determines whether a horizontal scroll indicator is shown in the `WebView`. The default value is `true`.
 
-| Type | Required |
-| ---- | -------- |
-| bool | No       |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS, Android, macOS |
 
 ---
 
@@ -895,9 +932,9 @@ Boolean value that determines whether a horizontal scroll indicator is shown in 
 
 Boolean value that determines whether a vertical scroll indicator is shown in the `WebView`. The default value is `true`.
 
-| Type | Required |
-| ---- | -------- |
-| bool | No       |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS, Android, macOS |
 
 ---
 
@@ -915,9 +952,9 @@ Set whether Geolocation is enabled in the `WebView`. The default value is `false
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
 
-| Type | Required |
-| ---- | -------- |
-| bool | No       |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS, Android, macOS |
 
 ---
 
@@ -995,9 +1032,9 @@ If true, this will be able horizontal swipe gestures. The default value is `fals
 
 Does not store any data within the lifetime of the WebView.
 
-| Type    | Required |
-| ------- | -------- |
-| boolean | No       |
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS, Android, macOS |
 
 ---
 
@@ -1025,9 +1062,9 @@ Sets whether the WebView should disable saving form data. The default value is `
 
 Sets whether WebView should use browser caching.
 
-| Type    | Required | Default |
-| ------- | -------- | ------- |
-| boolean | No       | true    |
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | true    | iOS, Android, macOS |
 
 ---
 
@@ -1091,6 +1128,48 @@ When setting the standard textZoom (100) parameter size, this undesirable effect
 Example:
 
 `<WebView textZoom={100} />`
+
+### `ignoreSilentHardwareSwitch`
+
+(ios only)
+
+When set to true the hardware silent switch is ignored. Default: `false`
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+### `onFileDownload`
+This property is iOS-only.
+
+Function that is invoked when the client needs to download a file.
+
+iOS 13+ only: If the webview navigates to a URL that results in an HTTP
+response with a Content-Disposition header 'attachment...', then
+this will be called.
+
+iOS 8+: If the MIME type indicates that the content is not renderable by the
+webview, that will also cause this to be called. On iOS versions before 13,
+this is the only condition that will cause this function to be called.
+
+The application will need to provide its own code to actually download
+the file.
+
+If not provided, the default is to let the webview try to render the file.
+
+Example:
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onFileDownload={ ( { nativeEvent: { downloadUrl } } ) => {
+    // You use downloadUrl which is a string to download files however you want.
+  }}
+  />
+```
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| function | No       | iOS      |
 
 ## Methods
 

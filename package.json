@@ -1,6 +1,6 @@
 {
   "name": "react-native-webview",
-  "description": "React Native WebView component for iOS, Android, and macOS",
+  "description": "React Native WebView component for iOS, Android, macOS, and Windows",
   "main": "index.js",
   "typings": "index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
@@ -8,13 +8,14 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "8.1.2",
+  "version": "9.4.0",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start:android": "react-native run-android --root example/",
     "start:ios": "react-native run-ios --project-path example/ios --scheme example",
     "start:macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
+    "start:windows": "react-native start --use-react-native-windows",
     "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
@@ -28,7 +29,8 @@
   },
   "peerDependencies": {
     "react": "^16.9",
-    "react-native": ">=0.60 <0.62"
+    "react-native": ">=0.60 <0.62",
+    "react-native-windows": "^0.61.0-beta.58"
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
@@ -37,8 +39,9 @@
   "devDependencies": {
     "@babel/core": "7.4.5",
     "@babel/runtime": "7.4.5",
-    "@react-native-community/cli-platform-ios": "^3.0.0",
+    "@react-native-community/cli": "^3.2.0",
     "@react-native-community/cli-platform-android": "^3.0.0",
+    "@react-native-community/cli-platform-ios": "^3.0.0",
     "@semantic-release/git": "7.0.16",
     "@types/invariant": "^2.2.30",
     "@types/jest": "24.0.18",
@@ -60,7 +63,9 @@
     "metro-react-native-babel-preset": "0.54.1",
     "react": "16.9.0",
     "react-native": "0.61.5",
-    "react-native-macos": "0.60.0-microsoft.49",
+    "react-native-macos": "0.60.0-microsoft.73",
+    "react-native-windows": "^0.61.0-beta.58",
+    "rnpm-plugin-windows": "^0.5.1-0",
     "semantic-release": "15.13.24",
     "typescript": "3.6.2"
   },
@@ -70,8 +75,10 @@
   },
   "files": [
     "android",
+    "apple",
     "ios",
     "macos",
+    "windows",
     "lib",
     "index.js",
     "index.d.ts",

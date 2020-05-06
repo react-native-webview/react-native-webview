@@ -226,9 +226,23 @@ You can control **single** or **multiple** file selection by specifing the [`mul
 
 ##### iOS
 
-For iOS, all you need to do is specify the permissions in your `ios/[project]/Info.plist` file:
+On iOS, you are going to have to supply your own code to download files. You can supply an `onFileDownload` callback
+to the WebView component as a prop. If RNCWebView determines that a file download needs to take place, the URL where you can download the file
+will be given to `onFileDownload`. From that callback you can then download that file however you would like to do so.
 
-Save to gallery:
+NOTE: iOS 13+ is needed for the best possible download experience. On iOS 13 Apple added an API for accessing HTTP response headers, which
+is used to determine if an HTTP response should be a download. On iOS 12 or older, only MIME types that cannot be rendered by the webview will
+trigger calls to `onFileDownload`.
+
+Example:
+```javascript
+  onFileDownload = ({ nativeEvent }) => {
+    const { downloadUrl } = nativeEvent;
+    // --> Your download code goes here <--
+  }
+```
+
+To be able to save images to the gallery you need to specify this permission in your `ios/[project]/Info.plist` file:
 
 ```
 <key>NSPhotoLibraryAddUsageDescription</key>
@@ -237,7 +251,8 @@ Save to gallery:
 
 ##### Android
 
-Add permission in AndroidManifest.xml:
+On Android, integration with the DownloadManager is built-in.
+All you have to do to support downloads is add these permissions in AndroidManifest.xml:
 
 ```xml
 <manifest ...>
@@ -293,11 +308,13 @@ export default class App extends Component {
 
 This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds.
 
+By setting `injectedJavaScriptForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform.
+
 <img alt="screenshot of Github repo" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
 
 _Under the hood_
 
-> On iOS, `injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`
+> On iOS, ~~`injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentEnd`. As a consequence, `injectedJavaScript` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
 
 #### The `injectedJavaScriptBeforeContentLoaded` prop
@@ -331,6 +348,11 @@ export default class App extends Component {
 ```
 
 This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes.
+
+By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform. Howver, although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
+
+> On iOS, ~~`injectedJavaScriptBeforeContentLoaded` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentStart`. As a consequence, `injectedJavaScriptBeforeContentLoaded` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
+> On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
 
 #### The `injectJavaScript` method
 
@@ -510,3 +532,10 @@ const App = () => {
 ```
 
 Note that these cookies will only be sent on the first request unless you use the technique above for [setting custom headers on each page load](#Setting-Custom-Headers).
+
+### Hardware Silence Switch
+There are some inconsistencies in how the hardware silence switch is handled between embedded `audio` and `video` elements and between iOS and Android platforms.
+
+Audio on `iOS` will be muted when the hardware silence switch is in the on position, unless the `ignoreSilentHardwareSwitch` parameter is set to true.
+
+Video on `iOS` will always ignore the hardware silence switch.
