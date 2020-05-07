@@ -404,7 +404,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     // when our array returned from getAcceptTypes() has no values set from the webview
     // i.e. <input type="file" />, without any "accept" attr
     // will be an array with one empty string element, afaik
-    return arr.length == 0 || (arr.length == 1 && arr[0].length() == 0);
+    return arr.length == 0 || (arr.length == 1 && arr[0] != null && arr[0].length() == 0);
   }
 
   private PermissionAwareActivity getPermissionAwareActivity() {
