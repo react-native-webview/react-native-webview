@@ -335,7 +335,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       // convert file extensions to mime types
       if (t.matches("\\.\\w+")) {
         String mimeType = getMimeTypeFromExtension(t.replace(".", ""));
-        mimeTypes[i] = mimeType;
+        if(mimeType != null) {
+          mimeTypes[i] = mimeType;
+        } else {
+          mimeTypes[i] = t;
+        }
       } else {
         mimeTypes[i] = t;
       }
