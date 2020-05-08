@@ -97,7 +97,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 eventDataWriter.WriteObjectEnd();
             });
 
-        winrt::hstring windowAlert = L"window.alert = function (msg) {window.external.notify(`{\"type\":\"alert\",\"message\":\"${msg}\"}`)};";
+        winrt::hstring windowAlert = L"window.alert = function (msg) {window.external.notify(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
         winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {window.external.notify(String(data))}};";
         m_webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
     }
@@ -119,26 +119,26 @@ namespace winrt::ReactNativeWebView::implementation {
 
     void ReactWebView::OnScriptNotify(winrt::IInspectable const& /*sender*/, winrt::Windows::UI::Xaml::Controls::NotifyEventArgs const& args) {
         winrt::JsonObject jsonObject;
-        if (winrt::JsonObject::TryParse(args.Value(), jsonObject)) {
+        if (winrt::JsonObject::TryParse(args.Value(), jsonObject) && jsonObject.HasKey(L"type")) {
             auto type = jsonObject.GetNamedString(L"type");
-            if (type == L"alert") {
+            if (type == L"__alert") {
                 auto dialog = winrt::MessageDialog(jsonObject.GetNamedString(L"message"));
                 dialog.Commands().Append(winrt::UICommand(L"OK"));
                 dialog.ShowAsync();
+                return;
             }
         }
-        else {
-            m_reactContext.DispatchEvent(
-                m_webView,
-                L"topMessage",
-                [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
-                    eventDataWriter.WriteObjectBegin();
-                    {
-                        WriteProperty(eventDataWriter, L"data", winrt::to_string(args.Value()));
-                    }
-                    eventDataWriter.WriteObjectEnd();
-                });
-        }
+
+        m_reactContext.DispatchEvent(
+            m_webView,
+            L"topMessage",
+            [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
+                eventDataWriter.WriteObjectBegin();
+                {
+                    WriteProperty(eventDataWriter, L"data", winrt::to_string(args.Value()));
+                }
+                eventDataWriter.WriteObjectEnd();
+            });
     }
 
 } // namespace winrt::ReactNativeWebView::implementation
