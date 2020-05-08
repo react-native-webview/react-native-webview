@@ -29,6 +29,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -579,6 +580,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void receiveCommand(WebView root, int commandId, @Nullable ReadableArray args) {
     switch (commandId) {
       case COMMAND_GO_BACK:
+        WebBackForwardList backForwardList = root.copyBackForwardList();
+        activeUrl = backForwardList.getItemAtIndex(backForwardList.getCurrentIndex() - 1).getUrl();
         root.goBack();
         break;
       case COMMAND_GO_FORWARD:
