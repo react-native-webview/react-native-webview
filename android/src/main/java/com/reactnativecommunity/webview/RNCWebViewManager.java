@@ -109,7 +109,7 @@ import javax.annotation.Nullable;
 @ReactModule(name = RNCWebViewManager.REACT_CLASS)
 public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
-  public static String activeUrl = null;
+  public static boolean isOverriddenLoad = false;
   public static final int COMMAND_GO_BACK = 1;
   public static final int COMMAND_GO_FORWARD = 2;
   public static final int COMMAND_RELOAD = 3;
@@ -618,6 +618,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         if (args == null) {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
+        isOverriddenLoad = false;
         root.loadUrl(args.getString(0));
         break;
       case COMMAND_FOCUS:
@@ -756,7 +757,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      activeUrl = url;
+      isOverriddenLoad = true;
       dispatchEvent(
         view,
         new TopShouldStartLoadWithRequestEvent(
@@ -928,11 +929,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public void onProgressChanged(WebView webView, int newProgress) {
       super.onProgressChanged(webView, newProgress);
       final String url = webView.getUrl();
-      if (
-        url != null
-        && activeUrl != null
-        && !url.equals(activeUrl)
-      ) {
+      if (isOverriddenLoad) {
         return;
       }
       WritableMap event = Arguments.createMap();
