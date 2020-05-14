@@ -252,13 +252,13 @@ To be able to save images to the gallery you need to specify this permission in 
 ##### Android
 
 On Android, integration with the DownloadManager is built-in.
-All you have to do to support downloads is add these permissions in AndroidManifest.xml:
+Add this permisison in AndroidManifest.xml (only required if your app supports Android versions lower than 10):
 
 ```xml
 <manifest ...>
   ......
 
-  <!-- this is required to save files on Android  -->
+  <!-- this is required to save files on Android versions lower than 10 -->
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
   ......
