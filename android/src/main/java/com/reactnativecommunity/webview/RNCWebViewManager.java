@@ -376,6 +376,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setMediaPlaybackRequiresUserGesture(requires);
   }
 
+  @ReactProp(name = "javaScriptCanOpenWindowsAutomatically")
+  public void setJavaScriptCanOpenWindowsAutomatically(WebView view, boolean enabled) {
+    view.getSettings().setJavaScriptCanOpenWindowsAutomatically(enabled);
+  }
+
   @ReactProp(name = "allowFileAccessFromFileURLs")
   public void setAllowFileAccessFromFileURLs(WebView view, boolean allow) {
     view.getSettings().setAllowFileAccessFromFileURLs(allow);
