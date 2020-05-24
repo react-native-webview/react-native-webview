@@ -18,6 +18,7 @@
     <PackageCertificateKeyFile>WebViewWindows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>82A0D300B0912A62746FFB3E6E04F88985BC2798</PackageCertificateThumbprint>
     <PackageCertificatePassword>password</PackageCertificatePassword>
+    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ItemGroup Label="ProjectConfigurations">
@@ -145,6 +146,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
+    <None Include="WebViewWindows_TemporaryKey.pfx" />
     <Text Include="readme.txt">
       <DeploymentContent>false</DeploymentContent>
     </Text>
@@ -160,8 +162,8 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <PropertyGroup>
     <BundleCommand>
-      cd $(SolutionDir)..
-      react-native bundle --platform windows --entry-file example/index.js --bundle-output windows/$(SolutionName)/Bundle/index.windows.bundle --assets-dest windows/$(SolutionName)/Bundle
+      cd $(SolutionDir)..\..
+      npx react-native bundle --platform windows --entry-file example/index.js --bundle-output example/windows/WebViewWindows/Bundle/index.windows.bundle --assets-dest example/windows/WebViewWindows/Bundle --use-react-native-windows
     </BundleCommand>
   </PropertyGroup>
   <Import Project="..\..\..\node_modules\react-native-windows\PropertySheets\Bundle.Cpp.targets" />

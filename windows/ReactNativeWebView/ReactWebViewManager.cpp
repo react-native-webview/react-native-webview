@@ -58,7 +58,6 @@ namespace winrt::ReactNativeWebView::implementation {
                     auto const& srcMap = propertyValue.AsObject();
                     if (srcMap.find("uri") != srcMap.end()) {
                         auto uriString = srcMap.at("uri").AsString();
-                        // non-uri sources not yet supported
                         if (uriString.length() == 0) {
                             continue;
                         }
@@ -67,9 +66,9 @@ namespace winrt::ReactNativeWebView::implementation {
                         if (srcMap.find("__packager_asset") != srcMap.end()) {
                             isPackagerAsset = srcMap.at("__packager_asset").AsBoolean();
                         }
-
-                        if (isPackagerAsset && uriString.find("assets") == 0) {
-                            uriString.replace(0, 6, "ms-appx://");
+                        if (isPackagerAsset && uriString.find("file://") == 0) {
+                            auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
+                            uriString.replace(0, 7, bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                         }
 
                         webView.Navigate(winrt::Uri(to_hstring(uriString)));
@@ -94,10 +93,10 @@ namespace winrt::ReactNativeWebView::implementation {
 
     ConstantProviderDelegate ReactWebViewManager::ExportedCustomDirectEventTypeConstants() noexcept {
         return [](winrt::IJSValueWriter const& constantWriter) {
-            WriteCustomDirectEventTypeConstant(constantWriter, "onLoadingStart");
-            WriteCustomDirectEventTypeConstant(constantWriter, "onLoadingFinish");
-            WriteCustomDirectEventTypeConstant(constantWriter, "onLoadingError");
-            WriteCustomDirectEventTypeConstant(constantWriter, "onMessage");
+            WriteCustomDirectEventTypeConstant(constantWriter, "LoadingStart");
+            WriteCustomDirectEventTypeConstant(constantWriter, "LoadingFinish");
+            WriteCustomDirectEventTypeConstant(constantWriter, "LoadingError");
+            WriteCustomDirectEventTypeConstant(constantWriter, "Message");
         };
     }
 
@@ -116,6 +115,7 @@ namespace winrt::ReactNativeWebView::implementation {
         FrameworkElement const& view,
         int64_t commandId,
         winrt::IJSValueReader const& commandArgsReader) noexcept {
+        auto commandArgs = JSValue::ReadArrayFrom(commandArgsReader);
         if (auto webView = view.try_as<winrt::WebView>()) {
             switch (commandId) {
                 case static_cast<int64_t>(WebViewCommands::GoForward) :
@@ -135,7 +135,7 @@ namespace winrt::ReactNativeWebView::implementation {
                     webView.Stop();
                     break;
                 case static_cast<int64_t>(WebViewCommands::InjectJavaScript) :
-                    webView.InvokeScriptAsync(L"eval", { commandArgsReader.GetString() });
+                    webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
                     break;
             }
         }
