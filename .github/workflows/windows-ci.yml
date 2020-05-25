@@ -46,22 +46,22 @@ jobs:
         yarn build
         yarn tsc
  
-    - name: NuGet restore
-      run: nuget restore example\windows\WebViewWindows.sln
+    # - name: NuGet restore
+    #   run: nuget restore example\windows\WebViewWindows.sln
 
-    - name: Build x64 release
-      run: msbuild example\windows\WebViewWindows.sln /p:Configuration=Release /p:Platform=x64 -m
+    # - name: Build x64 release
+    #   run: msbuild example\windows\WebViewWindows.sln /p:Configuration=Release /p:Platform=x64 -m
 
-    - name: Deploy
-      shell: powershell
-      run: |
-        cd example
-        Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
-        npx react-native run-windows --arch x64 --release --no-build --no-packager
+    # - name: Deploy
+    #   shell: powershell
+    #   run: |
+    #     cd example
+    #     Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
+    #     npx react-native run-windows --arch x64 --release --no-build --no-packager
 
-    - name: Start Appium server
-      shell: powershell
-      run: Start-Process PowerShell -ArgumentList "yarn appium"
+    # - name: Start Appium server
+    #   shell: powershell
+    #   run: Start-Process PowerShell -ArgumentList "yarn appium"
       
-    - name: Run tests
-      run: yarn test:windows
+    # - name: Run tests
+    #   run: yarn test:windows
