@@ -20,7 +20,7 @@ jobs:
       run: .\.github\workflows\scripts\install-vs-features.ps1 Microsoft.VisualStudio.Component.VC.v141.x86.x64,Microsoft.VisualStudio.ComponentGroup.UWP.VC.v141
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.0.0
+      uses: microsoft/setup-msbuild@v1
       with:
         vs-version: 16.5
        
@@ -28,7 +28,7 @@ jobs:
       uses: NuGet/setup-nuget@v1.0.2
 
     - name: Check node modules cache
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       id: yarn-cache
       with:
         path: ./node_modules
