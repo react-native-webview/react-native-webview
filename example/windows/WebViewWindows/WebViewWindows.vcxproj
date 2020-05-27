@@ -161,12 +161,11 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <PropertyGroup>
-    <BundleCommand>
-      cd $(SolutionDir)..\..
-      npx react-native bundle --platform windows --entry-file example/index.js --bundle-output example/windows/WebViewWindows/Bundle/index.windows.bundle --assets-dest example/windows/WebViewWindows/Bundle --use-react-native-windows
-    </BundleCommand>
+    <BundleEntryFile>example/index.js</BundleEntryFile>
+    <BundlerExtraArgs>--use-react-native-windows</BundlerExtraArgs>
   </PropertyGroup>
   <Import Project="..\..\..\node_modules\react-native-windows\PropertySheets\Bundle.Cpp.targets" />
+  <Import Project="..\..\..\node_modules\react-native-windows\PropertySheets\Bundle.props" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(SolutionDir)packages\Microsoft.Windows.CppWinRT.2.0.190730.2\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.Windows.CppWinRT.2.0.190730.2\build\native\Microsoft.Windows.CppWinRT.targets')" />
     <Import Project="$(SolutionDir)packages\Microsoft.UI.Xaml.2.3.191129002\build\native\Microsoft.UI.Xaml.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.UI.Xaml.2.3.191129002\build\native\Microsoft.UI.Xaml.targets')" />
