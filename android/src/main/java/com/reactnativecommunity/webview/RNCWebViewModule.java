@@ -414,7 +414,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       // convert file extensions to mime types
       if (t.matches("\\.\\w+")) {
         String mimeType = getMimeTypeFromExtension(t.replace(".", ""));
-        mimeTypes[i] = mimeType;
+        if(mimeType != null) {
+          mimeTypes[i] = mimeType;
+        } else {
+          mimeTypes[i] = t;
+        }
       } else {
         mimeTypes[i] = t;
       }
@@ -483,7 +487,8 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     // when our array returned from getAcceptTypes() has no values set from the webview
     // i.e. <input type="file" />, without any "accept" attr
     // will be an array with one empty string element, afaik
-    return types.length == 0 || (types.length == 1 && types[0].length() == 0);
+
+    return types.length == 0 || (types.length == 1 && types[0] != null && types[0].length() == 0);
   }
 
   private PermissionAwareActivity getPermissionAwareActivity() {
