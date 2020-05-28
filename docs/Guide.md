@@ -55,6 +55,10 @@ class MyWeb extends Component {
 
 ### Loading local HTML files
 
+Note: This is currently not working as discussed in [#428](https://github.com/react-native-community/react-native-webview/issues/428) and [#518](https://github.com/react-native-community/react-native-webview/issues/518). Possible workarounds include bundling all assets with webpack or similar, or running a [local webserver](https://github.com/futurepress/react-native-static-server).
+
+<details><summary>Show non-working method</summary>
+
 Sometimes you would have bundled an HTML file along with the app and would like to load the HTML asset into your WebView. To do this on iOS and Windows, you can just import the html file like any other asset as shown below.
 
 ```js
@@ -84,6 +88,7 @@ class MyWeb extends Component {
   }
 }
 ```
+</details>
 
 ### Controlling navigation state changes
 
