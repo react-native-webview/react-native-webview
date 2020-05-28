@@ -236,11 +236,13 @@ export type OnShouldStartLoadWithRequest = (
 ) => boolean;
 
 export interface CommonNativeWebViewProps extends ViewProps {
+  allowFileAccessFromFileURLs?: boolean;
   cacheEnabled?: boolean;
   incognito?: boolean;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   javaScriptCanOpenWindowsAutomatically?: boolean;
+  javaScriptEnabled?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
   onScroll?: (event: NativeScrollEvent) => void;
@@ -267,12 +269,10 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   cacheMode?: CacheMode;
   allowFileAccess?: boolean;
   scalesPageToFit?: boolean;
-  allowFileAccessFromFileURLs?: boolean;
   allowUniversalAccessFromFileURLs?: boolean;
   androidHardwareAccelerationDisabled?: boolean;
   domStorageEnabled?: boolean;
   geolocationEnabled?: boolean;
-  javaScriptEnabled?: boolean;
   mixedContentMode?: 'never' | 'always' | 'compatibility';
   onContentSizeChange?: (event: WebViewEvent) => void;
   overScrollMode?: OverScrollModeType;
@@ -334,11 +334,6 @@ export interface WindowsNativeWebViewProps extends CommonNativeWebViewProps {
 }
 
 export interface IOSWebViewProps extends WebViewSharedProps {
-  /**
-   * Does not store any data within the lifetime of the WebView.
-   */
-  incognito?: boolean;
-
   /**
    * Boolean value that determines whether the web view bounces
    * when it reaches the edge of the content. The default value is `true`.
@@ -542,11 +537,6 @@ export interface IOSWebViewProps extends WebViewSharedProps {
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
   /**
-   * Does not store any data within the lifetime of the WebView.
-   */
-  incognito?: boolean;
-
-  /**
    * Boolean value that determines whether the web view bounces
    * when it reaches the edge of the content. The default value is `true`.
    * @platform macos
@@ -719,15 +709,6 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-  
-  /**
-   * Boolean that sets whether JavaScript running in the context of a file
-   * scheme URL should be allowed to access content from other file scheme URLs.
-   * Including accessing content from other file scheme URLs
-   * @platform android
-   */
-  allowFileAccessFromFileURLs?: boolean;
-
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from any origin.
@@ -811,14 +792,20 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
 
 export interface WebViewSharedProps extends ViewProps {
   /**
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from other file scheme URLs.
+   * Including accessing content from other file scheme URLs
+   */
+  allowFileAccessFromFileURLs?: boolean;
+
+  /**
    * Loads static html or a uri (with optional headers) in the WebView.
    */
   source?: WebViewSource;
 
   /**
-   * Boolean value to enable JavaScript in the `WebView`. Used on Android only
-   * as JavaScript is enabled by default on iOS. The default value is `true`.
-   * @platform android
+   * Boolean value to enable JavaScript in the `WebView`.
+   * The default value is `true`.
    */
   javaScriptEnabled?: boolean;
 
@@ -959,4 +946,9 @@ export interface WebViewSharedProps extends ViewProps {
    * Should caching be enabled. Default is true.
    */
   cacheEnabled?: boolean;
+
+  /**
+   * Does not store any data within the lifetime of the WebView.
+   */
+  incognito?: boolean;
 }
