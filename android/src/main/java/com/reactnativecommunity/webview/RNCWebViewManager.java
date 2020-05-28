@@ -375,6 +375,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setMediaPlaybackRequiresUserGesture(requires);
   }
 
+  @ReactProp(name = "javaScriptCanOpenWindowsAutomatically")
+  public void setJavaScriptCanOpenWindowsAutomatically(WebView view, boolean enabled) {
+    view.getSettings().setJavaScriptCanOpenWindowsAutomatically(enabled);
+  }
+
   @ReactProp(name = "allowFileAccessFromFileURLs")
   public void setAllowFileAccessFromFileURLs(WebView view, boolean allow) {
     view.getSettings().setAllowFileAccessFromFileURLs(allow);
@@ -974,8 +979,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
       String[] acceptTypes = fileChooserParams.getAcceptTypes();
       boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
-      Intent intent = fileChooserParams.createIntent();
-      return getModule(mReactContext).startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+      return getModule(mReactContext).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple);
     }
 
     @Override

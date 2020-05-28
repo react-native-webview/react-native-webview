@@ -37,11 +37,6 @@ App::App() noexcept
     PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider());
 
     InitializeComponent();
-
-    // This works around a cpp/winrt bug with composable/aggregable types tracked
-    // by 22116519
-    AddRef();
-    m_inner.as<::IUnknown>()->Release();
 }
 
 
