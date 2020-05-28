@@ -19,6 +19,8 @@ _Esse projeto é mantido gratuitamente por essas pessoas usando ambos seu tempo 
 
 - [x] iOS
 - [x] Android
+- [x] macOS
+- [x] Windows
 
 _Nota: O suporte da Expo para o React Native WebView começou com [Expo SDK v33.0.0](https://blog.expo.io/expo-sdk-v33-0-0-is-now-available-52d1c99dfe4c)._
 
@@ -34,7 +36,9 @@ Esse projeto segue [versionamento semântico](https://semver.org/). Não hesitam
 
 Versão atual: ![version](https://img.shields.io/npm/v/react-native-webview.svg)
 
-- [7.0.1](https://github.com/react-native-community/react-native-webview/releases/tag/v7.0.1) - UIWebView removido
+- [8.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v8.0.0) - onNavigationStateChange agora é disparado quando alterado o hash da URL.
+
+- [7.0.1](https://github.com/react-native-community/react-native-webview/releases/tag/v7.0.1) - UIWebView removido.
 
 - [6.0.**2**](https://github.com/react-native-community/react-native-webview/releases/tag/v6.0.2) - Update para AndroidX. Tenha certeza de habilitar no `android/gradle.properties` do seu projeto. Veja o [Getting Started Guide](https://github.com/react-native-community/react-native-webview/blob/master/docs/Getting-Started.md).
 
