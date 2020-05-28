@@ -272,16 +272,13 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   public boolean grantFileDownloaderPermissions() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+    // Permission not required for Android Q and above
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       return true;
     }
 
-    boolean result = true;
-    if (ContextCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-      result = false;
-    }
-
-    if (!result) {
+    boolean result = ContextCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    if (!result && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       PermissionAwareActivity activity = getPermissionAwareActivity();
       activity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, FILE_DOWNLOAD_PERMISSION_REQUEST, webviewFileDownloaderPermissionListener);
     }
