@@ -32,6 +32,7 @@ This document lays out the current public properties and methods for the React N
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
+- [`javaScriptCanOpenWindowsAutomatically`](Reference.md#javascriptcanopenwindowsautomatically)
 - [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
@@ -725,6 +726,16 @@ Boolean value to control whether DOM Storage is enabled. Used only in Android.
 ### `javaScriptEnabled`
 
 Boolean value to enable JavaScript in the `WebView`. The default value is `true`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
+### `javaScriptCanOpenWindowsAutomatically`
+
+A Boolean value indicating whether JavaScript can open windows without user interaction. The default value is `false`.
 
 | Type | Required |
 | ---- | -------- |
