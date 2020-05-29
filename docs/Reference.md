@@ -80,6 +80,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearCache`](Reference.md#clearCache)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
+- [`postMessage`](Reference.md#postMessage)
 
 ---
 
@@ -1239,6 +1240,13 @@ requestFocus();
 ```
 
 Request the webView to ask for focus. (People working on TV apps might want having a look at this!)
+
+### `postMessage(str)`
+
+```javascript
+postMessage('message');
+```
+Post a message to WebView, handled by [`onMessage`](Reference.md#onmessage).
 
 ### `clearFormData()`
 

@@ -128,14 +128,18 @@ namespace winrt::ReactNativeWebView::implementation {
                 return;
             }
         }
+        
+        PostMessage(winrt::hstring(args.Value()));
+    }
 
+    void ReactWebView::PostMessage(winrt::hstring const& message) {
         m_reactContext.DispatchEvent(
             m_webView,
             L"topMessage",
             [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
                 {
-                    WriteProperty(eventDataWriter, L"data", winrt::to_string(args.Value()));
+                    WriteProperty(eventDataWriter, L"data", message);
                 }
                 eventDataWriter.WriteObjectEnd();
             });
