@@ -409,7 +409,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setMessagingModuleName(WebView view, String moduleName) {
     ((RNCWebView) view).setMessagingModuleName(moduleName);
   }
-   
+
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
     // Remove all previous cookies
@@ -660,7 +660,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         public Bitmap getDefaultVideoPoster() {
           return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
         }
-        
+
         @Override
         public void onShowCustomView(View view, CustomViewCallback callback) {
           if (mVideoView != null) {
@@ -1086,8 +1086,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
     }
 
+    WebChromeClient mWebChromeClient;
     @Override
     public void setWebChromeClient(WebChromeClient client) {
+      this.mWebChromeClient = client;
       super.setWebChromeClient(client);
       if (client instanceof RNCWebChromeClient) {
         ((RNCWebChromeClient) client).setProgressChangedFilter(progressChangedFilter);
@@ -1234,16 +1236,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       destroy();
     }
 
-    WebChromeClient mWebChromeClient;
-    @Override
-    public void setWebChromeClient(WebChromeClient client) {
-      this.mWebChromeClient = client;
-      super.setWebChromeClient(client);
-    }
-
     @Override
     public void destroy() {
-      if(mWebChromeClient!=null){
+      if (mWebChromeClient != null) {
         mWebChromeClient.onHideCustomView();
       }
       super.destroy();
