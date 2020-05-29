@@ -8,46 +8,46 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "9.1.0",
+  "version": "10.2.0",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "start:android": "react-native run-android --root example/",
-    "start:ios": "react-native run-ios --project-path example/ios --scheme example",
+    "start:android": "react-native run-android",
+    "start:ios": "react-native run-ios",
     "start:macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
     "start:windows": "react-native start --use-react-native-windows",
-    "ci": "CI=true && yarn lint && yarn test",
+    "ci": "CI=true && yarn lint",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
     "build": "yarn tsc",
     "prepare": "yarn build",
-    "test": "yarn jest"
+    "appium": "appium",
+    "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.windows.js"
   },
   "rn-docs": {
     "title": "Webview",
     "type": "Component"
   },
   "peerDependencies": {
-    "react": "^16.9",
-    "react-native": ">=0.60 <0.62",
-    "react-native-windows": "^0.61.0-beta.58"
+    "react": "16.11.0",
+    "react-native": ">=0.60 <0.63"
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
-    "invariant": "2.2.4",
-    "rnpm-plugin-windows": "^0.5.1-0"
+    "invariant": "2.2.4"
   },
   "devDependencies": {
     "@babel/core": "7.4.5",
     "@babel/runtime": "7.4.5",
-    "@react-native-community/cli": "^3.2.0",
-    "@react-native-community/cli-platform-android": "^3.0.0",
-    "@react-native-community/cli-platform-ios": "^3.0.0",
+    "@react-native-community/cli": "^4.8.0",
+    "@react-native-community/cli-platform-android": "^4.8.0",
+    "@react-native-community/cli-platform-ios": "^4.8.0",
     "@semantic-release/git": "7.0.16",
     "@types/invariant": "^2.2.30",
     "@types/jest": "24.0.18",
-    "@types/react": "16.8.8",
-    "@types/react-native": "0.60.11",
+    "@types/react": "16.9.34",
+    "@types/react-native": "0.62.5",
+    "@types/selenium-webdriver": "4.0.9",
     "@typescript-eslint/eslint-plugin": "2.1.0",
     "@typescript-eslint/parser": "2.1.0",
     "babel-eslint": "10.0.3",
@@ -61,13 +61,17 @@
     "eslint-plugin-react": "7.14.3",
     "eslint-plugin-react-native": "3.7.0",
     "jest": "24.9.0",
-    "metro-react-native-babel-preset": "0.54.1",
-    "react": "16.9.0",
-    "react-native": "0.61.5",
-    "react-native-macos": "0.60.0-microsoft.49",
-    "react-native-windows": "^0.61.0-beta.58",
+    "metro": "0.56.4",
+    "metro-react-native-babel-preset": "^0.59.0",
+    "react": "16.11.0",
+    "react-native": "0.62.2",
+    "react-native-macos": "0.60.0-microsoft.73",
+    "react-native-windows": "^0.62.0-0",
     "semantic-release": "15.13.24",
-    "typescript": "3.6.2"
+    "typescript": "3.8.3",
+    "appium": "1.17.0",
+    "selenium-appium": "0.0.15",
+    "selenium-webdriver": "4.0.0-alpha.7"
   },
   "repository": {
     "type": "git",
@@ -75,6 +79,7 @@
   },
   "files": [
     "android",
+    "apple",
     "ios",
     "macos",
     "windows",

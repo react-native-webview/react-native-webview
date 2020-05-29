@@ -15,6 +15,8 @@
  */
 'use strict';
 
+const path = require('path');
+
 const macSwitch = '--use-react-native-macos';
 const windowsSwitch = '--use-react-native-windows';
 
@@ -30,5 +32,17 @@ else if (process.argv.includes(windowsSwitch)) {
   process.argv.push('--config=metro.config.windows.js');
   module.exports = {
     reactNativePath: 'node_modules/react-native-windows',
+  };
+}
+else {
+  module.exports = {
+    project: {
+      ios: {
+        project: 'example/ios/',
+      },
+      android: {
+        sourceDir: 'example/android',
+      },
+    },
   };
 }

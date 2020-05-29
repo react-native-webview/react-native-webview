@@ -42,6 +42,11 @@ const RNCWebView = requireNativeComponent(
 const { resolveAssetSource } = Image;
 
 /**
+ * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
+ */
+let uniqueRef = 0;
+
+/**
  * Renders a native WebView.
  */
 class WebView extends React.Component<AndroidWebViewProps, State> {
@@ -70,11 +75,14 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     lastErrorEvent: null,
   };
 
+
   webViewRef = React.createRef<NativeWebViewAndroid>();
 
+  messagingModuleName = `WebViewMessageHandler${uniqueRef+=1}`;
+
   componentDidMount = () => {
-    BatchedBridge.registerCallableModule('WebViewMessageHandler', this);
-  }
+    BatchedBridge.registerCallableModule(this.messagingModuleName, this);
+  };
 
   getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
 
@@ -333,6 +341,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         key="webViewKey"
         {...otherProps}
         messagingEnabled={typeof onMessage === 'function'}
+        messagingModuleName={this.messagingModuleName}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}

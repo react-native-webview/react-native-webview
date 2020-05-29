@@ -13,8 +13,10 @@ import {
 import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
+import Downloads from './examples/Downloads';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
+import LocalPageLoad from './examples/LocalPageLoad';
 
 const TESTS = {
   Alerts: {
@@ -41,6 +43,14 @@ const TESTS = {
       return <Background />;
     },
   },
+  Downloads: {
+    title: 'Downloads',
+    testId: 'downloads',
+    description: 'File downloads test',
+    render() {
+      return <Downloads />;
+    },
+  },
   Uploads: {
     title: 'Uploads',
     testId: 'uploads',
@@ -55,6 +65,14 @@ const TESTS = {
     description: 'Injection test',
     render() {
       return <Injection />;
+    },
+  },
+  PageLoad: {
+    title: 'LocalPageLoad',
+    testId: 'LocalPageLoad',
+    description: 'Local Page load test',
+    render() {
+      return <LocalPageLoad />;
     },
   },
 };
@@ -115,6 +133,16 @@ export default class App extends Component<Props, State> {
             title="Injection"
             onPress={() => this._changeTest('Injection')}
           />
+          <Button
+            testID="testType_pageLoad"
+            title="LocalPageLoad"
+            onPress={() => this._changeTest('PageLoad')}
+          />
+          {Platform.OS == "ios" && <Button
+            testID="testType_downloads"
+            title="Downloads"
+            onPress={() => this._changeTest('Downloads')}
+          />}
           {Platform.OS === 'android' && <Button
             testID="testType_uploads"
             title="Uploads"
