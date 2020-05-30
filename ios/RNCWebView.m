@@ -256,7 +256,8 @@ static NSDictionary* customCertificatesForHost;
     }
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
-    _webView.scrollView.bounces = _bounces;
+      //For UIRefreshControl to work correctly, the bounces should always be true
+    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces; 
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
@@ -1100,6 +1101,8 @@ static NSDictionary* customCertificatesForHost;
     } else {
         [_refreshControl removeFromSuperview];
     }
+
+    [self setBounces:_bounces];
 }
 #endif // !TARGET_OS_OSX
 
@@ -1112,7 +1115,8 @@ static NSDictionary* customCertificatesForHost;
 - (void)setBounces:(BOOL)bounces
 {
   _bounces = bounces;
-  _webView.scrollView.bounces = bounces;
+    //For UIRefreshControl to work correctly, the bounces should always be true
+  _webView.scrollView.bounces = _pullToRefreshEnabled || bounces;
 }
 #endif // !TARGET_OS_OSX
 

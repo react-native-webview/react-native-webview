@@ -514,7 +514,9 @@ export interface IOSWebViewProps extends WebViewSharedProps {
 
   /**
    * Boolean value that determines whether a pull to refresh gesture is
-   * available in the `WebView`. The default value is `false`
+   * available in the `WebView`. The default value is `false`.
+   * If `true`, sets `bounces` automatically to `true`
+   * @platform ios
    *
   */
   pullToRefreshEnabled?: boolean;
@@ -699,7 +701,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-  
+
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from other file scheme URLs.

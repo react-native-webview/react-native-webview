@@ -1132,7 +1132,7 @@ Example:
 
 ### `pullToRefreshEnabled`
 
-Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`
+Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
