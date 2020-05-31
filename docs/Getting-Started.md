@@ -16,6 +16,8 @@ For npm use
 $ npm install --save react-native-webview
 ```
 
+(react-native-windows had some breaking changes between version 0.61 and 0.62. RNW 0.61 users please use `npm install --save react-native-webview@^9.0.0` to install the compatible version of WebView)
+
 ## 2. Link native dependencies
 
 From react-native 0.60 autolinking will take care of the link step but don't forget to run `pod install`
