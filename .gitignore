@@ -54,3 +54,8 @@ android/gradlew
 android/gradlew.bat
 
 lib/
+.classpath
+.project
+.settings/
+msbuild.binlog
+example/msbuild.binlog

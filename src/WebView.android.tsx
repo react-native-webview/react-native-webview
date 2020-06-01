@@ -10,6 +10,8 @@ import {
   findNodeHandle,
 } from 'react-native';
 
+import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
+
 import invariant from 'invariant';
 
 import {
@@ -27,17 +29,22 @@ import {
   AndroidWebViewProps,
   NativeWebViewAndroid,
   State,
-  RNCWebViewUIManager,
+  RNCWebViewUIManagerAndroid,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManager;
+const UIManager = NotTypedUIManager as RNCWebViewUIManagerAndroid;
 
 const RNCWebView = requireNativeComponent(
   'RNCWebView',
 ) as typeof NativeWebViewAndroid;
 const { resolveAssetSource } = Image;
+
+/**
+ * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
+ */
+let uniqueRef = 0;
 
 /**
  * Renders a native WebView.
@@ -68,7 +75,14 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     lastErrorEvent: null,
   };
 
+
   webViewRef = React.createRef<NativeWebViewAndroid>();
+
+  messagingModuleName = `WebViewMessageHandler${uniqueRef+=1}`;
+
+  componentDidMount = () => {
+    BatchedBridge.registerCallableModule(this.messagingModuleName, this);
+  };
 
   getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
 
@@ -120,6 +134,30 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       this.getWebViewHandle(),
       this.getCommands().postMessage,
       [String(data)],
+    );
+  };
+
+  clearFormData = () => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearFormData,
+        undefined,
+    );
+  }
+
+  clearCache = (includeDiskFiles: boolean) => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearCache,
+       [includeDiskFiles],
+    );
+  };
+
+  clearHistory = () => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearHistory,
+        undefined,
     );
   };
 
@@ -218,8 +256,11 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     const { onLoadProgress } = this.props;
     const { nativeEvent: { progress } } = event;
     if (progress === 1) {
-      this.setState({
-        viewState: 'IDLE',
+      this.setState((state) => {
+        if (state.viewState === 'LOADING') {
+          return { viewState: 'IDLE' };
+        }
+        return null;
       });
     }
     if (onLoadProgress) {
@@ -249,6 +290,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       renderLoading,
       source,
       style,
+      containerStyle,
       nativeConfig = {},
       ...otherProps
     } = this.props;
@@ -272,8 +314,9 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
+    const webViewContainerStyle = [styles.container, containerStyle];
 
-    if (source && 'method' in source) {
+    if (typeof source !== "number" && source && 'method' in source) {
       if (source.method === 'POST' && source.headers) {
         console.warn(
           'WebView: `source.headers` is not supported when using POST.',
@@ -298,6 +341,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         key="webViewKey"
         {...otherProps}
         messagingEnabled={typeof onMessage === 'function'}
+        messagingModuleName={this.messagingModuleName}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
@@ -314,7 +358,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     );
 
     return (
-      <View style={styles.container}>
+      <View style={webViewContainerStyle}>
         {webView}
         {otherView}
       </View>

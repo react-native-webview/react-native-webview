@@ -28,12 +28,12 @@ import {
   NativeWebViewIOS,
   ViewManager,
   State,
-  RNCWebViewUIManager,
+  RNCWebViewUIManagerIOS,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManager;
+const UIManager = NotTypedUIManager as RNCWebViewUIManagerIOS;
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -290,7 +290,10 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       originWhitelist,
       renderError,
       renderLoading,
+      injectedJavaScriptForMainFrameOnly = true,
+      injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true,
       style,
+      containerStyle,
       ...otherProps
     } = this.props;
 
@@ -313,6 +316,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
+    const webViewContainerStyle = [styles.container, containerStyle];
 
     const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
@@ -336,12 +340,17 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
+        onFileDownload={this.props.onFileDownload}
         onLoadingStart={this.onLoadingStart}
         onHttpError={this.onHttpError}
         onMessage={this.onMessage}
         onScroll={this.props.onScroll}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentProcessDidTerminate={this.onContentProcessDidTerminate}
+        injectedJavaScript={this.props.injectedJavaScript}
+        injectedJavaScriptBeforeContentLoaded={this.props.injectedJavaScriptBeforeContentLoaded}
+        injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
+        injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
         ref={this.webViewRef}
         // TODO: find a better way to type this.
         source={resolveAssetSource(this.props.source as ImageSourcePropType)}
@@ -351,7 +360,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     );
 
     return (
-      <View style={styles.container}>
+      <View style={webViewContainerStyle}>
         {webView}
         {otherView}
       </View>
