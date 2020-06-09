@@ -412,6 +412,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
+    // Don't do anything when incognito is disabled
+    if (!enabled) {
+      return;
+    }
+
     // Remove all previous cookies
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       CookieManager.getInstance().removeAllCookies(null);
