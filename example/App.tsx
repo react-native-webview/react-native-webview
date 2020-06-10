@@ -17,6 +17,7 @@ import Downloads from './examples/Downloads';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
+import Custom from './examples/Custom';
 
 const TESTS = {
   Alerts: {
@@ -75,6 +76,14 @@ const TESTS = {
       return <LocalPageLoad />;
     },
   },
+  Custom: {
+    title: 'Custom',
+    testId: 'Custom',
+    description: 'Custom Subclass test',
+    render() {
+      return <Custom />;
+    }
+  }
 };
 
 type Props = {};
@@ -147,6 +156,11 @@ export default class App extends Component<Props, State> {
             testID="testType_uploads"
             title="Uploads"
             onPress={() => this._changeTest('Uploads')}
+          />}
+          {Platform.OS == "ios" && <Button
+            testID="testType_custom"
+            title="Custom"
+            onPress={() => this._changeTest('Custom')}
           />}
         </View>
 

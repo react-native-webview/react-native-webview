@@ -17,6 +17,8 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* exampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* exampleTests.m */; };
 		646BD8E8CDDF5A464B5419B3 /* libPods-example-tvOS-example-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4830F7139A954350DD22DE4A /* libPods-example-tvOS-example-tvOSTests.a */; };
+		9498A3072491794E002473B0 /* CustomWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9498A3062491794E002473B0 /* CustomWebView.m */; };
+		9498A30A24917962002473B0 /* CustomWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9498A30924917962002473B0 /* CustomWebViewManager.m */; };
 		C7D826CF866C25BE421302B6 /* libPods-example-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F9A8A9F158876EC099CFA57A /* libPods-example-tvOS.a */; };
 		D0E3313DFCE78BFCB650F812 /* libPods-exampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB301596D47BBAD9E9C0A45A /* libPods-exampleTests.a */; };
 		E719A6E171791CD8906B3D55 /* libPods-example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 917A19FC1EBE6E8B85FE404D /* libPods-example.a */; };
@@ -62,6 +64,10 @@
 		775F6B7492793F5DB7ECE95B /* Pods-example-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-example-tvOS/Pods-example-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		8A20011E75A0AD2EC5C6EAE9 /* Pods-exampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-exampleTests.debug.xcconfig"; path = "Target Support Files/Pods-exampleTests/Pods-exampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		917A19FC1EBE6E8B85FE404D /* libPods-example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9498A3052491794E002473B0 /* CustomWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomWebView.h; path = example/CustomWebView.h; sourceTree = "<group>"; };
+		9498A3062491794E002473B0 /* CustomWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomWebView.m; path = example/CustomWebView.m; sourceTree = "<group>"; };
+		9498A30824917962002473B0 /* CustomWebViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomWebViewManager.h; path = example/CustomWebViewManager.h; sourceTree = "<group>"; };
+		9498A30924917962002473B0 /* CustomWebViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomWebViewManager.m; path = example/CustomWebViewManager.m; sourceTree = "<group>"; };
 		CB301596D47BBAD9E9C0A45A /* libPods-exampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-exampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
@@ -134,6 +140,10 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				9498A3052491794E002473B0 /* CustomWebView.h */,
+				9498A3062491794E002473B0 /* CustomWebView.m */,
+				9498A30824917962002473B0 /* CustomWebViewManager.h */,
+				9498A30924917962002473B0 /* CustomWebViewManager.m */,
 			);
 			name = example;
 			sourceTree = "<group>";
@@ -532,6 +542,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9498A30A24917962002473B0 /* CustomWebViewManager.m in Sources */,
+				9498A3072491794E002473B0 /* CustomWebView.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
