@@ -63,7 +63,12 @@ class WebView extends React.Component<MacOSWebViewProps, State> {
   webViewRef = React.createRef<NativeWebViewMacOS>();
 
   // eslint-disable-next-line react/sort-comp
-  getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
+  getCommands = () => {
+    const viewName
+      = (this.props.nativeConfig && this.props.nativeConfig.viewName)
+      || 'RNCWebView';
+    return UIManager.getViewManagerConfig(viewName).Commands;
+  };
 
   /**
    * Go forward one page in the web view's history.

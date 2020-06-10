@@ -195,6 +195,7 @@ export default class CustomWebView extends Component {
         nativeConfig={{
           component: RCTCustomWebView,
           viewManager: CustomWebViewManager,
+          viewName: 'RCTCustomWebView'
         }}
       />
     );

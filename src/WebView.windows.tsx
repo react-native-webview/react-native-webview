@@ -72,10 +72,17 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
 
   webViewRef = React.createRef<NativeWebViewWindows>();
 
+  getCommands = () => {
+    const viewName
+      = (this.props.nativeConfig && this.props.nativeConfig.viewName)
+      || 'RNCWebView';
+    return UIManager.getViewManagerConfig(viewName).Commands;
+  };
+
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.getViewManagerConfig('RCTWebView').Commands.goForward,
+      this.getCommands().goForward,
       undefined,
     );
   }
@@ -83,7 +90,7 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
   goBack = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.getViewManagerConfig('RCTWebView').Commands.goBack,
+      this.getCommands().goBack,
       undefined,
     );
   }
@@ -91,7 +98,7 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
   reload = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.getViewManagerConfig('RCTWebView').Commands.reload,
+      this.getCommands().reload,
       undefined,
     );
   }
@@ -99,7 +106,7 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
   injectJavaScript = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.getViewManagerConfig('RCTWebView').Commands.injectJavaScript,
+      this.getCommands().injectJavaScript,
       [data],
     );
   }
@@ -107,7 +114,7 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
   postMessage = (data: string) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.getViewManagerConfig('RCTWebView').Commands.postMessage,
+      this.getCommands().postMessage,
       [String(data)],
     );
   };

@@ -84,7 +84,12 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     BatchedBridge.registerCallableModule(this.messagingModuleName, this);
   };
 
-  getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
+  getCommands = () => {
+    const viewName
+      = (this.props.nativeConfig && this.props.nativeConfig.viewName)
+      || 'RNCWebView';
+    return UIManager.getViewManagerConfig(viewName).Commands;
+  };
 
   goForward = () => {
     UIManager.dispatchViewManagerCommand(

@@ -183,7 +183,10 @@ export default class CustomWebView extends Component {
 
   render() {
     return (
-      <WebView {...this.props} nativeConfig={{ component: RCTCustomWebView }} />
+      <WebView {...this.props} nativeConfig={{
+        component: RCTCustomWebView,
+        viewName: 'RCTCustomWebView'
+      }} />
     );
   }
 }

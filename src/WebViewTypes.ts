@@ -229,6 +229,11 @@ export interface WebViewNativeConfig {
    * @platform ios, macos
    */
   viewManager?: ViewManager;
+  /**
+   * Set the ViewName you also use with `requireNativeComponent` to create a custom web view.
+   * @platform ios, macos
+   */
+  viewName?: string;
 }
 
 export type OnShouldStartLoadWithRequest = (
