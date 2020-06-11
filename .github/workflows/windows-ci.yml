@@ -1,0 +1,67 @@
+name: Windows CI
+on: [pull_request]
+
+jobs:
+  run-windows-tests:
+    name: Build & run tests
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout Code
+     
+    - name: Setup Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.9.1'
+
+    - name: Install Visual Studio components
+      shell: powershell
+      run: .\.github\workflows\scripts\install-vs-features.ps1 Microsoft.VisualStudio.Component.VC.v141.x86.x64,Microsoft.VisualStudio.ComponentGroup.UWP.VC.v141
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.0
+      with:
+        vs-version: 16.5
+       
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.2
+
+    - name: Check node modules cache
+      uses: actions/cache@v1
+      id: yarn-cache
+      with:
+        path: ./node_modules
+        key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - name: Install node modules
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn --pure-lockfile
+    
+    - name: yarn build
+      if: steps.yarn-cache.outputs.cache-hit == 'true'
+      run: |
+        yarn build
+        yarn tsc
+ 
+    - name: NuGet restore
+      run: nuget restore example\windows\WebViewWindows.sln
+
+    - name: Build x64 release
+      run: msbuild example\windows\WebViewWindows.sln /p:Configuration=Release /p:Platform=x64 -m
+
+    - name: Deploy
+      shell: powershell
+      run: |
+        cd example
+        Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
+        npx react-native run-windows --arch x64 --release --no-build --no-packager
+
+    - name: Start Appium server
+      shell: powershell
+      run: Start-Process PowerShell -ArgumentList "yarn appium"
+      
+    - name: Run tests
+      run: yarn test:windows

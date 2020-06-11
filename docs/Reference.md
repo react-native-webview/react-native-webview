@@ -32,6 +32,7 @@ This document lays out the current public properties and methods for the React N
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
+- [`javaScriptCanOpenWindowsAutomatically`](Reference.md#javascriptcanopenwindowsautomatically)
 - [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
@@ -64,6 +65,8 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
+- [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
+- [`onFileDownload`](Reference.md#onFileDownload)
 
 ## Methods Index
 
@@ -77,6 +80,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearCache`](Reference.md#clearCache)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
+- [`postMessage`](Reference.md#postMessage)
 
 ---
 
@@ -728,6 +732,16 @@ Boolean value to enable JavaScript in the `WebView`. The default value is `true`
 
 ---
 
+### `javaScriptCanOpenWindowsAutomatically`
+
+A Boolean value indicating whether JavaScript can open windows without user interaction. The default value is `false`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
 ### `androidHardwareAccelerationDisabled`
 
 Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only as Hardware Acceleration is a feature only for Android. The default value is `false`.
@@ -1125,6 +1139,48 @@ Example:
 
 `<WebView textZoom={100} />`
 
+### `ignoreSilentHardwareSwitch`
+
+(ios only)
+
+When set to true the hardware silent switch is ignored. Default: `false`
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+### `onFileDownload`
+This property is iOS-only.
+
+Function that is invoked when the client needs to download a file.
+
+iOS 13+ only: If the webview navigates to a URL that results in an HTTP
+response with a Content-Disposition header 'attachment...', then
+this will be called.
+
+iOS 8+: If the MIME type indicates that the content is not renderable by the
+webview, that will also cause this to be called. On iOS versions before 13,
+this is the only condition that will cause this function to be called.
+
+The application will need to provide its own code to actually download
+the file.
+
+If not provided, the default is to let the webview try to render the file.
+
+Example:
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onFileDownload={ ( { nativeEvent: { downloadUrl } } ) => {
+    // You use downloadUrl which is a string to download files however you want.
+  }}
+  />
+```
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| function | No       | iOS      |
+
 ## Methods
 
 ### `extraNativeComponentConfig()`
@@ -1182,6 +1238,13 @@ requestFocus();
 ```
 
 Request the webView to ask for focus. (People working on TV apps might want having a look at this!)
+
+### `postMessage(str)`
+
+```javascript
+postMessage('message');
+```
+Post a message to WebView, handled by [`onMessage`](Reference.md#onmessage).
 
 ### `clearFormData()`
 

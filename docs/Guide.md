@@ -55,7 +55,11 @@ class MyWeb extends Component {
 
 ### Loading local HTML files
 
-Sometimes you would have bundled an HTML file along with the app and would like to load the HTML asset into your WebView. To do this on iOS, you can just import the html file like any other asset as shown below.
+Note: This is currently not working as discussed in [#428](https://github.com/react-native-community/react-native-webview/issues/428) and [#518](https://github.com/react-native-community/react-native-webview/issues/518). Possible workarounds include bundling all assets with webpack or similar, or running a [local webserver](https://github.com/futurepress/react-native-static-server).
+
+<details><summary>Show non-working method</summary>
+
+Sometimes you would have bundled an HTML file along with the app and would like to load the HTML asset into your WebView. To do this on iOS and Windows, you can just import the html file like any other asset as shown below.
 
 ```js
 import React, { Component } from 'react';
@@ -84,6 +88,7 @@ class MyWeb extends Component {
   }
 }
 ```
+</details>
 
 ### Controlling navigation state changes
 
@@ -226,9 +231,23 @@ You can control **single** or **multiple** file selection by specifing the [`mul
 
 ##### iOS
 
-For iOS, all you need to do is specify the permissions in your `ios/[project]/Info.plist` file:
+On iOS, you are going to have to supply your own code to download files. You can supply an `onFileDownload` callback
+to the WebView component as a prop. If RNCWebView determines that a file download needs to take place, the URL where you can download the file
+will be given to `onFileDownload`. From that callback you can then download that file however you would like to do so.
 
-Save to gallery:
+NOTE: iOS 13+ is needed for the best possible download experience. On iOS 13 Apple added an API for accessing HTTP response headers, which
+is used to determine if an HTTP response should be a download. On iOS 12 or older, only MIME types that cannot be rendered by the webview will
+trigger calls to `onFileDownload`.
+
+Example:
+```javascript
+  onFileDownload = ({ nativeEvent }) => {
+    const { downloadUrl } = nativeEvent;
+    // --> Your download code goes here <--
+  }
+```
+
+To be able to save images to the gallery you need to specify this permission in your `ios/[project]/Info.plist` file:
 
 ```
 <key>NSPhotoLibraryAddUsageDescription</key>
@@ -237,13 +256,14 @@ Save to gallery:
 
 ##### Android
 
-Add permission in AndroidManifest.xml:
+On Android, integration with the DownloadManager is built-in.
+Add this permisison in AndroidManifest.xml (only required if your app supports Android versions lower than 10):
 
 ```xml
 <manifest ...>
   ......
 
-  <!-- this is required to save files on Android  -->
+  <!-- this is required to save files on Android versions lower than 10 -->
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
   ......
@@ -523,3 +543,10 @@ const App = () => {
 ```
 
 Note that these cookies will only be sent on the first request unless you use the technique above for [setting custom headers on each page load](#Setting-Custom-Headers).
+
+### Hardware Silence Switch
+There are some inconsistencies in how the hardware silence switch is handled between embedded `audio` and `video` elements and between iOS and Android platforms.
+
+Audio on `iOS` will be muted when the hardware silence switch is in the on position, unless the `ignoreSilentHardwareSwitch` parameter is set to true.
+
+Video on `iOS` will always ignore the hardware silence switch.
