@@ -402,6 +402,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ((RNCWebView) view).setInjectedJavaScript(injectedJavaScript);
   }
 
+  @ReactProp(name = "injectedJavaScriptBeforeContentLoaded")
+  public void setInjectedJavaScriptBeforeContentLoaded(WebView view, @Nullable String injectedJavaScriptBeforeContentLoaded) {
+    ((RNCWebView) view).setInjectedJavaScriptBeforeContentLoaded(injectedJavaScriptBeforeContentLoaded);
+  }
+
+  @ReactProp(name = "injectedJavaScriptForMainFrameOnly")
+  public void setInjectedJavaScriptForMainFrameOnly(WebView view, boolean enabled) {
+    ((RNCWebView) view).setInjectedJavaScriptForMainFrameOnly(enabled);
+  }
+
+  @ReactProp(name = "injectedJavaScriptBeforeContentLoadedForMainFrameOnly")
+  public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(WebView view, boolean enabled) {
+    ((RNCWebView) view).setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(enabled);
+  }
+
   @ReactProp(name = "messagingEnabled")
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
@@ -755,6 +770,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       super.onPageStarted(webView, url, favicon);
       mLastLoadFailed = false;
 
+      RNCWebView reactWebView = (RNCWebView) webView;
+      reactWebView.callInjectedJavaScriptBeforeContentLoaded();       
+
       dispatchEvent(
         webView,
         new TopLoadingStartEvent(
@@ -1057,6 +1075,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String injectedJS;
+    protected @Nullable
+    String injectedJSBeforeContentLoaded;
+
+    /**
+     * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
+     * than the main frame, so these two properties are mostly here just for parity with iOS & macOS.
+     */
+    protected boolean injectedJavaScriptForMainFrameOnly = true;
+    protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
+
     protected boolean messagingEnabled = false;
     protected @Nullable
     String messagingModuleName;
@@ -1151,6 +1179,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       injectedJS = js;
     }
 
+    public void setInjectedJavaScriptBeforeContentLoaded(@Nullable String js) {
+      injectedJSBeforeContentLoaded = js;
+    }
+
+    public void setInjectedJavaScriptForMainFrameOnly(boolean enabled) {
+      injectedJavaScriptForMainFrameOnly = enabled;
+    }
+
+    public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(boolean enabled) {
+      injectedJavaScriptBeforeContentLoadedForMainFrameOnly = enabled;
+    }
+
     protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
       return new RNCWebViewBridge(webView);
     }
@@ -1202,6 +1242,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         injectedJS != null &&
         !TextUtils.isEmpty(injectedJS)) {
         evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
+      }
+    }
+
+    public void callInjectedJavaScriptBeforeContentLoaded() {
+      if (getSettings().getJavaScriptEnabled() &&
+      injectedJSBeforeContentLoaded != null &&
+      !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
+        evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
       }
     }
 
