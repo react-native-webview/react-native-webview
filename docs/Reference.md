@@ -133,9 +133,9 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc)
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| string | No       | iOS, Android, macOS
+| Type   | Required | Platform            |
+| ------ | -------- | ------------------- |
+| string | No       | iOS, Android, macOS |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
@@ -165,15 +165,15 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
+| Type   | Required | Platform   |
+| ------ | -------- | ---------- |
 | string | No       | iOS, macOS |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
 Example:
 
-Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.ReactNativeWebView.postMessage` *will* be available at this time.
+Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.ReactNativeWebView.postMessage` _will_ be available at this time.
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
@@ -195,8 +195,8 @@ If `true` (default; mandatory for Android), loads the `injectedJavaScript` only 
 
 If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
+| Type | Required | Platform                                          |
+| ---- | -------- | ------------------------------------------------- |
 | bool | No       | iOS and macOS (only `true` supported for Android) |
 
 ---
@@ -207,8 +207,8 @@ If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeC
 
 If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
+| Type | Required | Platform                                          |
+| ---- | -------- | ------------------------------------------------- |
 | bool | No       | iOS and macOS (only `true` supported for Android) |
 
 ---
@@ -219,8 +219,8 @@ Boolean that determines whether HTML5 audio and video requires the user to tap t
 
 NOTE: the default `true` value might cause some videos to hang loading on iOS. Setting it to `false` could fix this issue.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
+| Type | Required | Platform            |
+| ---- | -------- | ------------------- |
 | bool | No       | iOS, Android, macOS |
 
 ---
@@ -235,8 +235,8 @@ The `nativeConfig` prop expects an object with the following keys:
 - `props` (object)
 - `viewManager` (object)
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
+| Type   | Required | Platform            |
+| ------ | -------- | ------------------- |
 | object | No       | iOS, Android, macOS |
 
 ---
@@ -254,7 +254,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onError={syntheticEvent => {
+  onError={(syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
     console.warn('WebView error: ', nativeEvent);
   }}
@@ -294,7 +294,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onLoad={syntheticEvent => {
+  onLoad={(syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
     this.url = nativeEvent.url;
   }}
@@ -327,7 +327,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onLoadEnd={syntheticEvent => {
+  onLoadEnd={(syntheticEvent) => {
     // update component to be aware of loading status
     const { nativeEvent } = syntheticEvent;
     this.isLoading = nativeEvent.loading;
@@ -361,7 +361,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev/=' }}
-  onLoadStart={syntheticEvent => {
+  onLoadStart={(syntheticEvent) => {
     // update component to be aware of loading status
     const { nativeEvent } = syntheticEvent;
     this.isLoading = nativeEvent.loading;
@@ -386,8 +386,8 @@ url
 
 Function that is invoked when the `WebView` is loading.
 
-| Type     | Required | Platform |
-| -------- | -------- | --------- |
+| Type     | Required | Platform            |
+| -------- | -------- | ------------------- |
 | function | No       | iOS, Android, macOS |
 
 Example:
@@ -431,7 +431,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onHttpError={syntheticEvent => {
+  onHttpError={(syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
     console.warn(
       'WebView received error status code: ',
@@ -486,7 +486,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onNavigationStateChange={navState => {
+  onNavigationStateChange={(navState) => {
     // Keep track of going back navigation within component
     this.canGoBack = navState.canGoBack;
   }}
@@ -522,7 +522,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onContentProcessDidTerminate={syntheticEvent => {
+  onContentProcessDidTerminate={(syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
     console.warn('Content process terminated, reloading', nativeEvent);
     this.refs.webview.reload();
@@ -547,8 +547,8 @@ url
 
 List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are "http://*" and "https://*".
 
-| Type             | Required | Platform |
-| ---------------- | -------- | -------- |
+| Type             | Required | Platform            |
+| ---------------- | -------- | ------------------- |
 | array of strings | No       | iOS, Android, macOS |
 
 Example:
@@ -567,8 +567,8 @@ Example:
 
 Function that returns a view to show if there's an error.
 
-| Type     | Required | Platform |
-| -------- | -------- | -------- |
+| Type     | Required | Platform            |
+| -------- | -------- | ------------------- |
 | function | No       | iOS, Android, macOS |
 
 Example:
@@ -576,7 +576,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  renderError={errorName => <Error name={errorName} />}
+  renderError={(errorName) => <Error name={errorName} />}
 />
 ```
 
@@ -588,8 +588,8 @@ The function passed to `renderError` will be called with the name of the error
 
 Function that returns a loading indicator. The startInLoadingState prop must be set to true in order to use this prop.
 
-| Type     | Required | Platform |
-| -------- | -------- | -------- |
+| Type     | Required | Platform            |
+| -------- | -------- | ------------------- |
 | function | No       | iOS, Android, macOS |
 
 Example:
@@ -620,8 +620,8 @@ Function that allows custom handling of any web view requests. Return `true` fro
 
 On Android, is not called on the first load.
 
-| Type     | Required | Platform |
-| -------- | -------- | -------- |
+| Type     | Required | Platform            |
+| -------- | -------- | ------------------- |
 | function | No       | iOS, Android, macOS |
 
 Example:
@@ -629,7 +629,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onShouldStartLoadWithRequest={request => {
+  onShouldStartLoadWithRequest={(request) => {
     // Only allow navigating within this website
     return request.url.startsWith('https://reactnative.dev');
   }}
@@ -656,8 +656,8 @@ navigationType
 
 Boolean value that forces the `WebView` to show the loading view on the first load. This prop must be set to `true` in order for the `renderLoading` prop to work.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
+| Type | Required | Platform            |
+| ---- | -------- | ------------------- |
 | bool | No       | iOS, Android, macOS |
 
 ---
@@ -783,8 +783,8 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 Sets the user-agent for the `WebView`.
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
+| Type   | Required | Platform            |
+| ------ | -------- | ------------------- |
 | string | No       | iOS, Android, macOS |
 
 ---
@@ -793,8 +793,8 @@ Sets the user-agent for the `WebView`.
 
 Append to the existing user-agent. Setting `userAgent` will override this.
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
+| Type   | Required | Platform            |
+| ------ | -------- | ------------------- |
 | string | No       | iOS, Android, macOS |
 
 ```jsx
@@ -933,8 +933,8 @@ The default value is `true`.
 
 Boolean value that determines whether a horizontal scroll indicator is shown in the `WebView`. The default value is `true`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
+| Type | Required | Platform            |
+| ---- | -------- | ------------------- |
 | bool | No       | iOS, Android, macOS |
 
 ---
@@ -943,8 +943,8 @@ Boolean value that determines whether a horizontal scroll indicator is shown in 
 
 Boolean value that determines whether a vertical scroll indicator is shown in the `WebView`. The default value is `true`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
+| Type | Required | Platform            |
+| ---- | -------- | ------------------- |
 | bool | No       | iOS, Android, macOS |
 
 ---
@@ -963,8 +963,8 @@ Set whether Geolocation is enabled in the `WebView`. The default value is `false
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
+| Type | Required | Platform            |
+| ---- | -------- | ------------------- |
 | bool | No       | iOS, Android, macOS |
 
 ---
@@ -1043,8 +1043,8 @@ If true, this will be able horizontal swipe gestures. The default value is `fals
 
 Does not store any data within the lifetime of the WebView.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
+| Type    | Required | Platform            |
+| ------- | -------- | ------------------- |
 | boolean | No       | iOS, Android, macOS |
 
 ---
@@ -1073,8 +1073,8 @@ Sets whether the WebView should disable saving form data. The default value is `
 
 Sets whether WebView should use browser caching.
 
-| Type    | Required | Default | Platform |
-| ------- | -------- | ------- | -------- |
+| Type    | Required | Default | Platform            |
+| ------- | -------- | ------- | ------------------- |
 | boolean | No       | true    | iOS, Android, macOS |
 
 ---
@@ -1151,6 +1151,7 @@ When set to true the hardware silent switch is ignored. Default: `false`
 | boolean | No       | iOS      |
 
 ### `onFileDownload`
+
 This property is iOS-only.
 
 Function that is invoked when the client needs to download a file.
@@ -1169,33 +1170,35 @@ the file.
 If not provided, the default is to let the webview try to render the file.
 
 Example:
+
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onFileDownload={ ( { nativeEvent: { downloadUrl } } ) => {
+  onFileDownload={({ nativeEvent: { downloadUrl } }) => {
     // You use downloadUrl which is a string to download files however you want.
   }}
-  />
+/>
 ```
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
+| Type     | Required | Platform |
+| -------- | -------- | -------- |
 | function | No       | iOS      |
-
 
 ---
 
 ### `autoManageStatusBarEnabled`
 
-If the user watch fullscreen video in WebView then StatusBar will be light. The default value is `true`.
+If set to `true`, the status bar will be automatically hidden/shown by WebView, specifically when full screen video is being watched. If `false`, WebView will not manage the status bar at all. The default value is `true`.
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| number | No       | iOS      |
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 Example:
 
-`<WebView autoManageStatusBarEnabled={false} />`
+```javascript
+<WebView autoManageStatusBarEnabled={false} />
+```
 
 ## Methods
 
@@ -1260,6 +1263,7 @@ Request the webView to ask for focus. (People working on TV apps might want havi
 ```javascript
 postMessage('message');
 ```
+
 Post a message to WebView, handled by [`onMessage`](Reference.md#onmessage).
 
 ### `clearFormData()`
