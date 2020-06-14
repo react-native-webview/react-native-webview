@@ -331,7 +331,7 @@ static NSDictionary* customCertificatesForHost;
 
     _isFullScreenVideoOpen = YES;
     RCTUnsafeExecuteOnMainQueueSync(^{
-      [RCTSharedApplication() setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+      [RCTSharedApplication() setStatusBarStyle:self->_savedStatusBarStyle animated:YES];
     });
 #pragma clang diagnostic pop
 }
