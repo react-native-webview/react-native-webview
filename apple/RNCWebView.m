@@ -339,6 +339,10 @@ static NSDictionary* customCertificatesForHost;
 -(void)hideFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if (!_autoManageStatusBarEnabled) {
+      return;
+    }
+
     _isFullScreenVideoOpen = NO;
     RCTUnsafeExecuteOnMainQueueSync(^{
       [RCTSharedApplication() setStatusBarHidden:self->_savedStatusBarHidden animated:YES];
