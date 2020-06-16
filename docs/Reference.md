@@ -78,6 +78,7 @@ This document lays out the current public properties and methods for the React N
 - [`injectJavaScript`](Reference.md#injectjavascriptstr)
 - [`clearFormData`](Reference.md#clearFormData)
 - [`clearCache`](Reference.md#clearCache)
+- [`clearCookies`](Reference.md#clearCookies)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
 - [`postMessage`](Reference.md#postMessage)
@@ -1258,13 +1259,19 @@ Removes the autocomplete popup from the currently focused form field, if present
 
 ### `clearCache(bool)`
 
-(android only)
-
 ```javascript
 clearCache(true);
 ```
 
-Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
+Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>). In iOS, includeDiskFiles will also remove data from the web storages and databases.
+
+### `clearCookies()`
+
+```javascript
+clearCookies();
+```
+
+Clears all cookies.
 
 ### `clearHistory()`
 

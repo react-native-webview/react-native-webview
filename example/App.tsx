@@ -17,6 +17,7 @@ import Downloads from './examples/Downloads';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
+import ClearData from './examples/ClearData';
 
 const TESTS = {
   Alerts: {
@@ -73,6 +74,14 @@ const TESTS = {
     description: 'Local Page load test',
     render() {
       return <LocalPageLoad />;
+    },
+  },
+  ClearData: {
+    title: 'Clear data',
+    testId: 'clearData',
+    description: 'Clear cache & cookies tests',
+    render() {
+      return <ClearData />;
     },
   },
 };
@@ -137,6 +146,11 @@ export default class App extends Component<Props, State> {
             testID="testType_pageLoad"
             title="LocalPageLoad"
             onPress={() => this._changeTest('PageLoad')}
+          />
+          <Button
+            testID="testType_clearData"
+            title="Clear Data"
+            onPress={() => this._changeTest('ClearData')}
           />
           {Platform.OS == "ios" && <Button
             testID="testType_downloads"

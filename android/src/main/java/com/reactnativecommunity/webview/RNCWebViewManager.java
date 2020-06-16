@@ -119,11 +119,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
   public static final int COMMAND_FOCUS = 8;
+  public static final int COMMAND_CLEAR_CACHE = 9;
+  public static final int COMMAND_CLEAR_COOKIES = 10;
 
   // android commands
   public static final int COMMAND_CLEAR_FORM_DATA = 1000;
-  public static final int COMMAND_CLEAR_CACHE = 1001;
-  public static final int COMMAND_CLEAR_HISTORY = 1002;
+  public static final int COMMAND_CLEAR_HISTORY = 1001;
 
   protected static final String REACT_CLASS = "RNCWebView";
   protected static final String HTML_ENCODING = "UTF-8";
@@ -429,23 +430,20 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
-    // Remove all previous cookies
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      CookieManager.getInstance().removeAllCookies(null);
-    } else {
-      CookieManager.getInstance().removeAllCookie();
+    if (enabled) {
+      this.clearCookies();
+
+      // Disable caching
+      view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+      view.getSettings().setAppCacheEnabled(false);
+      view.clearHistory();
+      view.clearCache(true);
+
+      // No form data or autofill enabled
+      view.clearFormData();
+      view.getSettings().setSavePassword(false);
+      view.getSettings().setSaveFormData(false);
     }
-
-    // Disable caching
-    view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-    view.getSettings().setAppCacheEnabled(!enabled);
-    view.clearHistory();
-    view.clearCache(enabled);
-
-    // No form data or autofill enabled
-    view.clearFormData();
-    view.getSettings().setSavePassword(!enabled);
-    view.getSettings().setSaveFormData(!enabled);
   }
 
   @ReactProp(name = "source")
@@ -592,6 +590,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       .put("requestFocus", COMMAND_FOCUS)
       .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
       .put("clearCache", COMMAND_CLEAR_CACHE)
+      .put("clearCookies", COMMAND_CLEAR_COOKIES)
       .put("clearHistory", COMMAND_CLEAR_HISTORY)
       .build();
   }
@@ -652,9 +651,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         boolean includeDiskFiles = args != null && args.getBoolean(0);
         root.clearCache(includeDiskFiles);
         break;
+      case COMMAND_CLEAR_COOKIES:
+        this.clearCookies();
+        break;
       case COMMAND_CLEAR_HISTORY:
         root.clearHistory();
         break;
+    }
+  }
+
+  public void clearCookies() {
+    // Remove all previous cookies
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager.getInstance().removeAllCookies(null);
+    } else {
+      CookieManager.getInstance().removeAllCookie();
     }
   }
 

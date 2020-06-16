@@ -153,6 +153,14 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     );
   };
 
+  clearCookies = () => {
+    UIManager.dispatchViewManagerCommand(
+       this.getWebViewHandle(),
+       this.getCommands().clearCookies,
+       undefined,
+    );
+  };
+
   clearHistory = () => {
     UIManager.dispatchViewManagerCommand(
        this.getWebViewHandle(),

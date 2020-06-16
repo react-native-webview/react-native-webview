@@ -71,5 +71,7 @@
 - (void)goBack;
 - (void)reload;
 - (void)stopLoading;
+- (void)clearCache:(BOOL)includeDiskFiles;
+- (void)clearCookies;
 
 @end

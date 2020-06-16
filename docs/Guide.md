@@ -541,6 +541,28 @@ const App = () => {
 
 Note that these cookies will only be sent on the first request unless you use the technique above for [setting custom headers on each page load](#Setting-Custom-Headers).
 
+#### Deleting Cookies
+
+It's also possible to clear cookies anytime using `clearCookies` method like this:
+
+```jsx
+const App = () => {
+  const webviewRef = useRef();
+  return (
+    <>
+      <Button title="Clear cookies" onPress={() => webviewRef.current.clearCookies()} />
+      <WebView
+        ref={webviewRef}
+        source={{
+          uri: 'http://example.com',
+        }}
+        sharedCookiesEnabled={true}
+      />
+    </>
+  );
+};
+```
+
 ### Hardware Silence Switch
 
 There are some inconsistencies in how the hardware silence switch is handled between embedded `audio` and `video` elements and between iOS and Android platforms.
