@@ -28,6 +28,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
+import android.webkit.HttpAuthHandler;
 import android.webkit.JavascriptInterface;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SslErrorHandler;
@@ -556,6 +557,19 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.loadUrl(BLANK_URL);
   }
 
+  @ReactProp(name = "basicAuthCredential")
+  public void setBasicAuthCredential(WebView view, @Nullable ReadableMap credential) {
+    @Nullable BasicAuthCredential basicAuthCredential = null;
+    if (credential != null) {
+      if (credential.hasKey("username") && credential.hasKey("password")) {
+        String username = credential.getString("username");
+        String password = credential.getString("password");
+        basicAuthCredential = new BasicAuthCredential(username, password);
+      }
+    }
+    ((RNCWebView) view).setBasicAuthCredential(basicAuthCredential);
+  }
+
   @ReactProp(name = "onContentSizeChange")
   public void setOnContentSizeChange(WebView view, boolean sendContentSizeChangeEvents) {
     ((RNCWebView) view).setSendContentSizeChangeEvents(sendContentSizeChangeEvents);
@@ -849,9 +863,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ReadableArray mUrlPrefixesForDefaultIntent;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
+    protected @Nullable BasicAuthCredential basicAuthCredential = null;
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
       ignoreErrFailedForThisURL = url;
+    }
+
+    public void setBasicAuthCredential(@Nullable BasicAuthCredential credential) {
+      basicAuthCredential = credential;
     }
 
     @Override
@@ -936,6 +955,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
       final String url = request.getUrl().toString();
       return this.shouldOverrideUrlLoading(view, url);
+    }
+
+    @Override
+    public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+      if (basicAuthCredential != null) {
+        handler.proceed(basicAuthCredential.username, basicAuthCredential.password);
+        return;
+      }
+      super.onReceivedHttpAuthRequest(view, handler, host, realm);
     }
 
     @Override
@@ -1463,6 +1491,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       mRNCWebViewClient.setIgnoreErrFailedForThisURL(url);
     }
 
+    public void setBasicAuthCredential(BasicAuthCredential credential) {
+      mRNCWebViewClient.setBasicAuthCredential(credential);
+    }
+
     public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
       this.sendContentSizeChangeEvents = sendContentSizeChangeEvents;
     }
@@ -1735,5 +1767,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         return waitingForCommandLoadUrl;
       }
     }
+  }
+}
+
+class BasicAuthCredential {
+  String username;
+  String password;
+
+  BasicAuthCredential(String username, String password) {
+    this.username = username;
+    this.password = password;
   }
 }
