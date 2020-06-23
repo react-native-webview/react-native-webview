@@ -464,7 +464,7 @@ url
 Function that is invoked when the `WebView` process crashes or is killed by the OS on Android.
 
 > **_Note_**
-> Android API minimum level 26.
+> Android API minimum level 26. Android Only
 
 | Type     | Required |
 | -------- | -------- |
@@ -490,9 +490,6 @@ Function passed to `onCrash` is called with a SyntheticEvent wrapping a nativeEv
 ```
 didCrash
 ```
-
-> **_Note_**
-> Android only.
 
 ---
 

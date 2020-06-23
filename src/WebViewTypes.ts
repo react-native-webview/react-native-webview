@@ -137,7 +137,7 @@ export interface WebViewHttpError extends WebViewNativeEvent {
   statusCode: number;
 }
 
-export interface WebViewCrashError extends WebViewNativeEvent {
+export interface WebViewCrashError {
   didCrash: boolean;
 }
 
@@ -691,6 +691,12 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   onContentSizeChange?: (event: WebViewEvent) => void;
 
   /**
+   * Function that is invoked when the `WebView` process crashes or is killed.
+   * Works on Android (minimum API level 26).
+   */
+  onCrash?: (event: WebViewCrashEvent) => void;
+
+  /**
    * https://developer.android.com/reference/android/webkit/WebSettings.html#setCacheMode(int)
    * Set the cacheMode. Possible values are:
    *
@@ -886,12 +892,6 @@ export interface WebViewSharedProps extends ViewProps {
    * Works on iOS and Android (minimum API level 23).
    */
   onHttpError?: (event: WebViewHttpErrorEvent) => void;
-
-  /**
-   * Function that is invoked when the `WebView` process crashes or is killed.
-   * Works on Android (minimum API level 26).
-   */
-  onCrash?: (event: WebViewCrashError) => void;
 
   /**
    * Function that is invoked when the `WebView` loading starts or ends.
