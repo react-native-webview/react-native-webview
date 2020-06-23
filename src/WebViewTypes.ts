@@ -137,6 +137,10 @@ export interface WebViewHttpError extends WebViewNativeEvent {
   statusCode: number;
 }
 
+export interface WebViewCrashError extends WebViewNativeEvent {
+  didCrash: boolean;
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent = NativeSyntheticEvent<
@@ -154,6 +158,8 @@ export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 export type WebViewTerminatedEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
+
+export type WebViewCrashEvent = NativeSyntheticEvent<WebViewCrashError>;
 
 export type DataDetectorTypes =
   | 'phoneNumber'
@@ -277,6 +283,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   javaScriptEnabled?: boolean;
   mixedContentMode?: 'never' | 'always' | 'compatibility';
   onContentSizeChange?: (event: WebViewEvent) => void;
+  onCrash?: (event: WebViewCrashEvent) => void;
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
   textZoom?: number;
@@ -721,7 +728,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-  
+
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from other file scheme URLs.
@@ -879,6 +886,12 @@ export interface WebViewSharedProps extends ViewProps {
    * Works on iOS and Android (minimum API level 23).
    */
   onHttpError?: (event: WebViewHttpErrorEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` process crashes or is killed.
+   * Works on Android (minimum API level 26).
+   */
+  onCrash?: (event: WebViewCrashError) => void;
 
   /**
    * Function that is invoked when the `WebView` loading starts or ends.

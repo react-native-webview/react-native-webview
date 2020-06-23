@@ -12,6 +12,7 @@ This document lays out the current public properties and methods for the React N
 - [`injectedJavaScriptBeforeContentLoadedForMainFrameOnly`](Reference.md#injectedjavascriptbeforecontentloadedformainframeonly)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
+- [`onCrash`](Reference.md#oncrash)
 - [`onError`](Reference.md#onerror)
 - [`onLoad`](Reference.md#onload)
 - [`onLoadEnd`](Reference.md#onloadend)
@@ -455,6 +456,43 @@ url
 
 > **_Note_**
 > Description is only used on Android
+
+---
+
+### `onCrash`
+
+Function that is invoked when the `WebView` process crashes or is killed by the OS on Android.
+
+> **_Note_**
+> Android API minimum level 26.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onCrash={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn(
+      'WebView Crashed: ',
+      nativeEvent.didCrash,
+    );
+  }}
+/>
+```
+
+Function passed to `onCrash` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+didCrash
+```
+
+> **_Note_**
+> Android only.
 
 ---
 
