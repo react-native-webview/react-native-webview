@@ -39,6 +39,7 @@
 @property (nonatomic, assign) CGFloat decelerationRate;
 @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
+@property (nonatomic, assign) BOOL bouncesZoom;
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
 @property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;

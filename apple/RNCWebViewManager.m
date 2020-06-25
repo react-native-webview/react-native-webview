@@ -93,6 +93,10 @@ RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWebView) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(bouncesZoom, BOOL, RNCWebView) {
+  view.bouncesZoom = json == nil ? true : [RCTConvert BOOL: json];
+}
+
 RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, RNCWebView) {
   view.useSharedProcessPool = json == nil ? true : [RCTConvert BOOL: json];
 }

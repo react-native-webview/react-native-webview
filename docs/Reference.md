@@ -41,6 +41,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsFullscreenVideo`](Reference.md#allowsfullscreenvideo)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
 - [`bounces`](Reference.md#bounces)
+- [`bouncesZoom`](Reference.md#bouncesZoom)
 - [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
 - [`contentInsetAdjustmentBehavior`](Reference.md#contentInsetAdjustmentBehavior)
@@ -833,6 +834,16 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 ### `bounces`
 
 Boolean value that determines whether the web view bounces when it reaches the edge of the content. The default value is `true`.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS      |
+
+---
+
+### `bouncesZoom`
+
+Boolean value that determines whether the web view bounces when it reaches the minimum or maximum zoom scale. The default value is `true`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
