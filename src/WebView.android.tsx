@@ -230,15 +230,18 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
+    const { nativeEvent: { url } } = event;
     if (onLoad) {
       onLoad(event);
     }
     if (onLoadEnd) {
       onLoadEnd(event);
     }
-    this.setState({
-      viewState: 'IDLE',
-    });
+    if (url && this.startUrl && url.toLowerCase() === this.startUrl.toLowerCase()) {
+      this.setState({
+          viewState: 'IDLE',
+      });
+    }
     this.updateNavigationState(event);
   };
 
