@@ -1,4 +1,6 @@
 #include "RNCWebViewJsiInterface.h"
+
+#include "jsi/jsi.h"
 #include "RNCWebViewJniUtils.h"
 
 #define LOG_TAG "RNCWebViewJsiInterface"

@@ -34,6 +34,15 @@ def getExtOrIntegerDefault(name) {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+task extractSo(type: Copy) {
+  from zipTree("${project.rootDir}/../node_modules/react-native/android/com/facebook/react/react-native/0.62.2/react-native-0.62.2.aar")
+  into "${buildDir}/_libraries/"
+  include "jni/**/libjscexecutor.so"
+
+}
+preBuild.dependsOn(extractSo)
+
+
 android {
   compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
   buildToolsVersion getExtOrDefault('buildToolsVersion')
@@ -45,6 +54,11 @@ android {
     ndk {
       moduleName "reactnativecommunity-webview"
       ldLibs "log"
+    }
+    externalNativeBuild {
+      ndkBuild {
+        arguments "BUILD_DIR=${buildDir}"
+      }
     }
   }
   buildTypes {
@@ -149,3 +163,4 @@ dependencies {
   implementation 'com.facebook.react:react-native:+'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
+

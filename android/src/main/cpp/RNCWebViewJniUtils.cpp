@@ -2,6 +2,12 @@
 #include <stdexcept>
 
 #include "RNCWebViewJniUtils.h"
+#include "jsi/jsi.h"
+
+
+using facebook::jsi::JSIException;
+using facebook::jsi::JSINativeException;
+using facebook::jsi::JSError;
 
 
 // This is how we represent a Java exception already in progress
@@ -35,12 +41,15 @@ void swallow_cpp_exception_and_throw_java(JNIEnv * env) {
     throw;
   } catch(const ThrownJavaException&) {
     // already reported to Java, ignore
-  } catch(const std::bad_alloc& rhs) {
+  } catch(const JSError& e) {
+    NewJavaException(env, "com/reactnativecommunity/webview/jsi/JsiJSError", e.what());
+  } catch(const JSINativeException& e) {
+    NewJavaException(env, "com/reactnativecommunity/webview/jsi/JsiException", e.what());
+  } catch(const JSIException& e) {
+    NewJavaException(env, "com/reactnativecommunity/webview/jsi/JsiException", e.what());
+  } catch(const std::bad_alloc& e) {
     // translate OOM C++ exception to a Java exception
-    NewJavaException(env, "java/lang/OutOfMemoryError", rhs.what());
-  } catch(const std::ios_base::failure& rhs) { //sample translation
-    // translate IO C++ exception to a Java exception
-    NewJavaException(env, "java/io/IOException", rhs.what());
+    NewJavaException(env, "java/lang/OutOfMemoryError", e.what());
   } catch(const std::exception& e) {
     // translate unknown C++ exception to a Java exception
     NewJavaException(env, "java/lang/RuntimeException", e.what());

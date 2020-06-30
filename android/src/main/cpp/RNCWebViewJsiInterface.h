@@ -1,7 +1,6 @@
 #pragma once
 
 #include <jni.h>
-#include <jsi/jsi.h>
 
 
 extern "C" {
