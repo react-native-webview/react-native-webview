@@ -164,7 +164,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   protected RNCWebView createRNCWebViewInstance(ThemedReactContext reactContext) {
-    return new RNCWebView(reactContext);
+    RNCWebView webView = new RNCWebView(reactContext);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      webView.forceHasOverlappingRendering(false);
+    }
+
+    return webView;
   }
 
   @Override
