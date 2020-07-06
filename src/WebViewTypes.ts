@@ -240,6 +240,9 @@ export interface CommonNativeWebViewProps extends ViewProps {
   incognito?: boolean;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
+  injectedJavaScriptForMainFrameOnly?: boolean;
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
+  javaScriptCanOpenWindowsAutomatically?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
@@ -822,6 +825,12 @@ export interface WebViewSharedProps extends ViewProps {
   javaScriptEnabled?: boolean;
 
   /**
+   * A Boolean value indicating whether JavaScript can open windows without user interaction.
+   * The default value is `false`.
+   */
+  javaScriptCanOpenWindowsAutomatically?: boolean;
+
+  /**
    * Stylesheet object to set the style of the container view.
    */
   containerStyle?: StyleProp<ViewStyle>;
@@ -907,6 +916,18 @@ export interface WebViewSharedProps extends ViewProps {
    * once the webview is initialized but before the view loads any content.
    */
   injectedJavaScriptBeforeContentLoaded?: string;
+
+  /**
+   * If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
+   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+   */
+  injectedJavaScriptForMainFrameOnly?: boolean;
+
+  /**
+   * If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+   */
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
 
   /**
    * Boolean value that determines whether a horizontal scroll indicator is

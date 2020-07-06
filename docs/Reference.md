@@ -32,6 +32,7 @@ This document lays out the current public properties and methods for the React N
 - [`decelerationRate`](Reference.md#decelerationrate)
 - [`domStorageEnabled`](Reference.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
+- [`javaScriptCanOpenWindowsAutomatically`](Reference.md#javascriptcanopenwindowsautomatically)
 - [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
@@ -79,6 +80,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearCache`](Reference.md#clearCache)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
+- [`postMessage`](Reference.md#postMessage)
 
 ---
 
@@ -188,27 +190,25 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ### `injectedJavaScriptForMainFrameOnly`
 
-If `true` (default), loads the `injectedJavaScript` only into the main frame.
+If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
 
-If `false`, loads it into all frames (e.g. iframes).
+If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| bool | No       | iOS, macOS       |
+| bool | No       | iOS and macOS (only `true` supported for Android) |
 
 ---
 
 ### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`
 
-If `true` (default), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
 
-If `false`, loads it into all frames (e.g. iframes).
-
-Warning: although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
+If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
-| bool | No       | iOS, macOS       |
+| bool | No       | iOS and macOS (only `true` supported for Android) |
 
 ---
 
@@ -732,6 +732,16 @@ Boolean value to enable JavaScript in the `WebView`. The default value is `true`
 
 ---
 
+### `javaScriptCanOpenWindowsAutomatically`
+
+A Boolean value indicating whether JavaScript can open windows without user interaction. The default value is `false`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
 ### `androidHardwareAccelerationDisabled`
 
 Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only as Hardware Acceleration is a feature only for Android. The default value is `false`.
@@ -1228,6 +1238,13 @@ requestFocus();
 ```
 
 Request the webView to ask for focus. (People working on TV apps might want having a look at this!)
+
+### `postMessage(str)`
+
+```javascript
+postMessage('message');
+```
+Post a message to WebView, handled by [`onMessage`](Reference.md#onmessage).
 
 ### `clearFormData()`
 

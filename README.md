@@ -97,7 +97,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 MIT
 
-## Traduções
+## Translations
 
 This readme is available in:
 
