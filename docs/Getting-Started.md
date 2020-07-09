@@ -83,6 +83,10 @@ Add `#include "winrt/ReactNativeWebView.h"`.
 
 Add `PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider());` before `InitializeComponent();`.
 
+#### **App.xaml.cs**
+
+Add PackageProviders.Add(new ReactNativeAsyncStorage.ReactPackageProvider());
+
 ## 3. Import the webview into your component
 
 ```js
