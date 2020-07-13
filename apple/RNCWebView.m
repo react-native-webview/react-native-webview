@@ -937,6 +937,10 @@ static NSDictionary* customCertificatesForHost;
       @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
       @"navigationType": navigationTypes[@(navigationType)]
     }];
+    if (!navigationAction.targetFrame.isMainFrame){
+      decisionHandler(WKNavigationActionPolicyAllow);
+      return;
+    }
     if (![self.delegate webView:self
       shouldStartLoadForRequest:event
                    withCallback:_onShouldStartLoadWithRequest]) {
