@@ -15,11 +15,13 @@ It's possible to debug WebView contents in the iOS simulator or on a device usin
 3. Safari -> Develop -> [device name] -> [app name] -> [url - title]
 4. You can now debug the WebView contents just as you would on the web
 
-##### Note:
+##### Notes:
 
 When debugging on device you must enable Web Inspector in your device settings:
 
 Settings -> Safari -> Advanced -> Web Inspector
+
+Also, if you don't see your device in the Develop menu, and you started Safari before you started your simulator, try restarting Safari.
 
 ### Android & Chrome
 
