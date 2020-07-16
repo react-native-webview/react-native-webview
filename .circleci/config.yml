@@ -1,12 +1,26 @@
 defaults: &defaults
-  working_directory: ~/code
+  working_directory: ~/react-native-webview
+
+workspace: &addWorkspace
+  attach_workspace:
+    at: ~/react-native-webview
+
+default config for js: &js_defaults
+  <<: *defaults
   docker:
     - image: circleci/node:12.9.1-browsers
+
+default config for Windows: &windows_defaults
+  <<: *defaults
+  resource_class: windows.medium
+  shell: powershell.exe -ExecutionPolicy Bypass
+  machine:
+    image: windows-server-2019-vs2019:stable
 
 version: 2
 jobs:
   setup:
-    <<: *defaults
+    <<: *js_defaults
     steps:
       - checkout
       - restore_cache:
@@ -23,29 +37,60 @@ jobs:
           key: node_modules-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
+            
+      - persist_to_workspace:
+          root: .
+          paths: .
 
-  tests:
-    <<: *defaults
+  "test: lint":
+    <<: *js_defaults
     steps:
-      - checkout
-      - restore_cache:
-          name: Restore node modules
-          keys:
-            - node_modules-{{ arch }}-{{ checksum "yarn.lock" }}
-
+      - *addWorkspace
       - run:
-          name: Lint checks
+          name: Lint check
           command: yarn ci
 
-  publish:
-    <<: *defaults
+  "test: windows":
+    <<: *windows_defaults
     steps:
-      - checkout
-      - restore_cache:
-          name: Restore node modules
-          keys:
-            - node_modules-{{ arch }}-{{ checksum "yarn.lock" }}
+      - *addWorkspace
+      - run:
+          name: Install nvm & switch to node 12.9.1
+          command: |
+            choco install nvm --no-progress
+            nvm install 12.9.1
+            nvm on
+            nvm use 12.9.1
+            node -v
+      - run:
+          name: Install react-native-cli 2.0.1
+          command: npm install -g react-native-cli@2.0.1
+      - run:
+          name: Install certificate
+          command: |
+            $password=ConvertTo-SecureString "password" –asplaintext –force
+            Import-PfxCertificate -FilePath example\windows\WebViewWindows\WebViewWindows_TemporaryKey.pfx -CertStoreLocation Cert:\LocalMachine\Root -Password $password -Exportable
+            Import-PfxCertificate -FilePath example\windows\WebViewWindows\WebViewWindows_TemporaryKey.pfx -CertStoreLocation Cert:\LocalMachine\My -Password $password -Exportable
+      - run:
+          name: NuGet restore
+          command: nuget restore example\windows\WebViewWindows.sln
+      - run:
+          name: Build
+          command: msbuild example\windows\WebViewWindows.sln /p:Configuration=Release /p:Platform=x64 -m
+      - run:
+          name: Sign
+          command: |
+            $signTool = "${env:ProgramFiles(x86)}\Windows Kits\10\bin\x64\signtool.exe"
+            $keyPath = "example\windows\WebViewWindows\WebViewWindows_TemporaryKey.pfx"
+            $appxPath = "example\windows\AppPackages\WebViewWindows\WebViewWindows_1.0.0.0_x64_Test\WebViewWindows_1.0.0.0_x64.appx"
+            & "$signTool" sign /fd sha256 /f $keyPath /p password $appxPath
+      - store_artifacts:
+          path: example\windows\AppPackages\
 
+  publish:
+    <<: *js_defaults
+    steps:
+      - *addWorkspace
       - run:
           name: Publish to NPM
           command: yarn ci:publish
@@ -55,12 +100,15 @@ workflows:
   ci:
     jobs:
       - setup
-      - tests:
+      - "test: lint":
+          requires:
+            - setup
+      - "test: windows":
           requires:
             - setup
       - publish:
           requires:
-            - tests
+            - "test: lint"
           filters:
             branches:
               only: master
