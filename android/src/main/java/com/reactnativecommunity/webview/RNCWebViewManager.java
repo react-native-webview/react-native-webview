@@ -110,6 +110,8 @@ import javax.annotation.Nullable;
  */
 @ReactModule(name = RNCWebViewManager.REACT_CLASS)
 public class RNCWebViewManager extends SimpleViewManager<WebView> {
+  
+  private static final Map<String, String> COOKIE_MAP = new HashMap<>();
 
   public static final int COMMAND_GO_BACK = 1;
   public static final int COMMAND_GO_FORWARD = 2;
@@ -797,6 +799,20 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
       final String url = request.getUrl().toString();
       return this.shouldOverrideUrlLoading(view, url);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+      String cookie = request.getRequestHeaders() == null ? null : request.getRequestHeaders().get("cookie");
+      if (null == cookie || cookie.length() == 0) {
+        if (COOKIE_MAP.containsKey(request.getUrl().getAuthority())) {
+          CookieManager.getInstance().setCookie(request.getUrl().toString(), COOKIE_MAP.get(request.getUrl().getAuthority()));
+        }
+      } else {
+        COOKIE_MAP.put(request.getUrl().getAuthority(), cookie);
+      }
+      return super.shouldInterceptRequest(view, request);
     }
 
     @Override
