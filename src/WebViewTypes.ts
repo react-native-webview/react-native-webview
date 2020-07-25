@@ -285,12 +285,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   readonly urlPrefixesForDefaultIntent?: string[];
 }
 
-export enum ContentInsetAdjustmentBehavior {
-  automatic = 'automatic',
-  scrollableAxes = 'scrollableAxes',
-  never = 'never',
-  always = 'always'
-};
+export declare type ContentInsetAdjustmentBehavior = 'automatic' | 'scrollableAxes' | 'never' | 'always';
 
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowingReadAccessToURL?: string;
