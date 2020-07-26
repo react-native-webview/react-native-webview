@@ -292,6 +292,8 @@ export enum ContentInsetAdjustmentBehavior {
   always = 'always'
 };
 
+export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
+
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;
@@ -301,6 +303,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   bounces?: boolean;
   contentInset?: ContentInsetProp;
   contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
+  contentMode?: ContentMode;
   readonly dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
@@ -397,6 +400,18 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   contentInset?: ContentInsetProp;
+
+  /**
+   * Defaults to `recommended`, which loads mobile content on iPhone
+   * and iPad Mini but desktop content on other iPads.
+   * 
+   * Possible values are:
+   * - `'recommended'`
+   * - `'mobile'`
+   * - `'desktop'`
+   * @platform ios
+   */
+  contentMode?: ContentMode;
 
   /**
    * Determines the types of data converted to clickable URLs in the web view's content.
