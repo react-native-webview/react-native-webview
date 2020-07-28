@@ -12,8 +12,8 @@ This document lays out the current public properties and methods for the React N
 - [`injectedJavaScriptBeforeContentLoadedForMainFrameOnly`](Reference.md#injectedjavascriptbeforecontentloadedformainframeonly)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
-- [`onCrash`](Reference.md#oncrash)
 - [`onError`](Reference.md#onerror)
+- [`onRenderProcessGone`](Reference.md#onRenderProcessGone)
 - [`onLoad`](Reference.md#onload)
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
@@ -459,7 +459,7 @@ url
 
 ---
 
-### `onCrash`
+### `onRenderProcessGone`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` process crashes or is killed by the OS on Android.
 
@@ -475,7 +475,7 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onCrash={syntheticEvent => {
+  onRenderProcessGone={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
     console.warn(
       'WebView Crashed: ',
@@ -485,7 +485,7 @@ Example:
 />
 ```
 
-Function passed to `onCrash` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+Function passed to `onRenderProcessGone` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
 
 ```
 didCrash

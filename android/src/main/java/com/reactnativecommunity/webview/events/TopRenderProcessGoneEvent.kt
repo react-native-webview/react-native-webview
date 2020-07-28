@@ -5,12 +5,13 @@ import com.facebook.react.uimanager.events.Event
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
 /**
- * Event emitted when the WebView's process has crashed
+ * Event emitted when the WebView's process has crashed or
+   was killed by the OS.
  */
-class TopCrashEvent(viewId: Int, private val mEventData: WritableMap) :
-  Event<TopCrashEvent>(viewId) {
+class TopRenderProcessGoneEvent(viewId: Int, private val mEventData: WritableMap) :
+  Event<TopRenderProcessGoneEvent>(viewId) {
   companion object {
-    const val EVENT_NAME = "topCrash"
+    const val EVENT_NAME = "topRenderProcessGone"
   }
 
   override fun getEventName(): String = EVENT_NAME
