@@ -927,6 +927,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         }
 
         WritableMap event = createWebViewEvent(webView, webView.getUrl());
+        event.putBoolean("didCrash", detail.didCrash());
 
         dispatchEvent(
           webView,
