@@ -14,8 +14,8 @@ default config for Windows: &windows_defaults
   <<: *defaults
   resource_class: windows.medium
   shell: powershell.exe -ExecutionPolicy Bypass
-  machine:
-    image: windows-server-2019-vs2019:stable
+  docker:
+    - image: kai18/rn-windows-builder:1.0
 
 version: 2
 jobs:
