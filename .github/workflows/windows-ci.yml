@@ -15,10 +15,6 @@ jobs:
       with:
         node-version: '12.9.1'
 
-    - name: Install Visual Studio components
-      shell: powershell
-      run: .\.github\workflows\scripts\install-vs-features.ps1 Microsoft.VisualStudio.Component.VC.v141.x86.x64,Microsoft.VisualStudio.ComponentGroup.UWP.VC.v141
-
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.0.0
       with:
@@ -45,19 +41,9 @@ jobs:
       run: |
         yarn build
         yarn tsc
- 
-    - name: NuGet restore
-      run: nuget restore example\windows\WebViewWindows.sln
 
-    - name: Build x64 release
-      run: msbuild example\windows\WebViewWindows.sln /p:Configuration=Release /p:Platform=x64 -m
-
-    - name: Deploy
-      shell: powershell
-      run: |
-        cd example
-        Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
-        npx react-native run-windows --arch x64 --release --no-build --no-packager
+    - name: Build and run x64 release
+      run: npx react-native run-windows --arch x64 --release --no-packager --logging
 
     - name: Start Appium server
       shell: powershell
