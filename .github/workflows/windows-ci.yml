@@ -43,7 +43,10 @@ jobs:
         yarn tsc
 
     - name: Build and run x64 release
-      run: npx react-native run-windows --arch x64 --release --no-packager --logging
+      shell: powershell
+      run: |
+        cd example
+        npx react-native run-windows --arch x64 --release --no-packager --logging
 
     - name: Start Appium server
       shell: powershell
