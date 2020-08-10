@@ -13,6 +13,7 @@ This document lays out the current public properties and methods for the React N
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
+- [`onRenderProcessGone`](Reference.md#onRenderProcessGone)
 - [`onLoad`](Reference.md#onload)
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
@@ -456,6 +457,39 @@ url
 > **_Note_**
 > Description is only used on Android
 
+---
+
+### `onRenderProcessGone`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the `WebView` process crashes or is killed by the OS on Android.
+
+> **_Note_**
+> Android API minimum level 26. Android Only
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onRenderProcessGone={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn(
+      'WebView Crashed: ',
+      nativeEvent.didCrash,
+    );
+  }}
+/>
+```
+
+Function passed to `onRenderProcessGone` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+didCrash
+```
 ---
 
 ### `onMessage`[⬆](#props-index)<!-- Link generated with jump2header -->
