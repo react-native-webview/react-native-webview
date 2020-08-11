@@ -88,6 +88,7 @@ class MyWeb extends Component {
   }
 }
 ```
+
 </details>
 
 ### Controlling navigation state changes
@@ -104,14 +105,14 @@ class MyWeb extends Component {
   render() {
     return (
       <WebView
-        ref={ref => (this.webview = ref)}
+        ref={(ref) => (this.webview = ref)}
         source={{ uri: 'https://reactnative.dev/' }}
         onNavigationStateChange={this.handleWebViewNavigationStateChange}
       />
     );
   }
 
-  handleWebViewNavigationStateChange = newNavState => {
+  handleWebViewNavigationStateChange = (newNavState) => {
     // newNavState looks something like this:
     // {
     //   url?: string;
@@ -240,11 +241,12 @@ is used to determine if an HTTP response should be a download. On iOS 12 or olde
 trigger calls to `onFileDownload`.
 
 Example:
+
 ```javascript
-  onFileDownload = ({ nativeEvent }) => {
-    const { downloadUrl } = nativeEvent;
-    // --> Your download code goes here <--
-  }
+onFileDownload = ({ nativeEvent }) => {
+  const { downloadUrl } = nativeEvent;
+  // --> Your download code goes here <--
+};
 ```
 
 To be able to save images to the gallery you need to specify this permission in your `ios/[project]/Info.plist` file:
@@ -313,7 +315,7 @@ export default class App extends Component {
 
 This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds.
 
-By setting `injectedJavaScriptForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform.
+By setting `injectedJavaScriptForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the main frame) if supported for the given platform. For example, if a page contains an iframe, the javascript will be injected into that iframe as well with this set to `false`. (Note this is not supported on Android.) There is also `injectedJavaScriptBeforeContentLoadedForMainFrameOnly` for injecting prior to content loading. Read more about this in the [Reference](./Reference.md#injectedjavascriptformainframeonly).
 
 <img alt="screenshot of Github repo" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
 
@@ -354,10 +356,11 @@ export default class App extends Component {
 
 This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes.
 
-By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform. Howver, although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
+By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform. However, although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
 
 > On iOS, ~~`injectedJavaScriptBeforeContentLoaded` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentStart`. As a consequence, `injectedJavaScriptBeforeContentLoaded` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-community/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
+> Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
 
 #### The `injectJavaScript` method
 
@@ -382,7 +385,7 @@ export default class App extends Component {
     return (
       <View style={{ flex: 1 }}>
         <WebView
-          ref={r => (this.webref = r)}
+          ref={(r) => (this.webref = r)}
           source={{
             uri:
               'https://github.com/react-native-community/react-native-webview',
@@ -435,7 +438,7 @@ export default class App extends Component {
       <View style={{ flex: 1 }}>
         <WebView
           source={{ html }}
-          onMessage={event => {
+          onMessage={(event) => {
             alert(event.nativeEvent.data);
           }}
         />
@@ -471,7 +474,7 @@ This will set the header on the first load, but not on subsequent page navigatio
 In order to work around this, you can track the current URL, intercept new page loads, and navigate to them yourself ([original credit for this technique to Chirag Shah from Big Binary](https://blog.bigbinary.com/2016/07/26/passing-request-headers-on-each-webview-request-in-react-native.html)):
 
 ```jsx
-const CustomHeaderWebView = props => {
+const CustomHeaderWebView = (props) => {
   const { uri, onLoadStart, ...restProps } = props;
   const [currentURI, setURI] = useState(props.source.uri);
   const newSource = { ...props.source, uri: currentURI };
@@ -480,7 +483,7 @@ const CustomHeaderWebView = props => {
     <WebView
       {...restProps}
       source={newSource}
-      onShouldStartLoadWithRequest={request => {
+      onShouldStartLoadWithRequest={(request) => {
         // If we're loading the current URI, allow it to load
         if (request.url === currentURI) return true;
         // We're loading a new URL -- change state first
@@ -505,7 +508,7 @@ const CustomHeaderWebView = props => {
 
 You can set cookies on the React Native side using the [@react-native-community/cookies](https://github.com/react-native-community/cookies) package.
 
-When you do, you'll likely want to enable the [sharedCookiesEnabled](Reference#sharedCookiesEnabled) prop as well.
+When you do, you'll likely want to enable the [sharedCookiesEnabled](Reference.md#sharedCookiesEnabled) prop as well.
 
 ```jsx
 const App = () => {
@@ -539,6 +542,7 @@ const App = () => {
 Note that these cookies will only be sent on the first request unless you use the technique above for [setting custom headers on each page load](#Setting-Custom-Headers).
 
 ### Hardware Silence Switch
+
 There are some inconsistencies in how the hardware silence switch is handled between embedded `audio` and `video` elements and between iOS and Android platforms.
 
 Audio on `iOS` will be muted when the hardware silence switch is in the on position, unless the `ignoreSilentHardwareSwitch` parameter is set to true.

@@ -10,12 +10,14 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.Manifest;
+import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,8 @@ import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
+import android.webkit.RenderProcessGoneDetail;
+import android.webkit.SslErrorHandler;
 import android.webkit.PermissionRequest;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
@@ -67,6 +71,7 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
+import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -400,6 +405,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ((RNCWebView) view).setInjectedJavaScript(injectedJavaScript);
   }
 
+  @ReactProp(name = "injectedJavaScriptBeforeContentLoaded")
+  public void setInjectedJavaScriptBeforeContentLoaded(WebView view, @Nullable String injectedJavaScriptBeforeContentLoaded) {
+    ((RNCWebView) view).setInjectedJavaScriptBeforeContentLoaded(injectedJavaScriptBeforeContentLoaded);
+  }
+
+  @ReactProp(name = "injectedJavaScriptForMainFrameOnly")
+  public void setInjectedJavaScriptForMainFrameOnly(WebView view, boolean enabled) {
+    ((RNCWebView) view).setInjectedJavaScriptForMainFrameOnly(enabled);
+  }
+
+  @ReactProp(name = "injectedJavaScriptBeforeContentLoadedForMainFrameOnly")
+  public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(WebView view, boolean enabled) {
+    ((RNCWebView) view).setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(enabled);
+  }
+
   @ReactProp(name = "messagingEnabled")
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
@@ -558,6 +578,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
     export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
+    export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
     return export;
   }
 
@@ -753,6 +774,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       super.onPageStarted(webView, url, favicon);
       mLastLoadFailed = false;
 
+      RNCWebView reactWebView = (RNCWebView) webView;
+      reactWebView.callInjectedJavaScriptBeforeContentLoaded();
+
       dispatchEvent(
         webView,
         new TopLoadingStartEvent(
@@ -777,6 +801,50 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
       final String url = request.getUrl().toString();
       return this.shouldOverrideUrlLoading(view, url);
+    }
+
+    @Override
+    public void onReceivedSslError(final WebView webView, final SslErrorHandler handler, final SslError error) {
+        handler.cancel();
+
+        int code = error.getPrimaryError();
+        String failingUrl = error.getUrl();
+        String description = "";
+        String descriptionPrefix = "SSL error: ";
+
+        // https://developer.android.com/reference/android/net/http/SslError.html
+        switch (code) {
+          case SslError.SSL_DATE_INVALID:
+            description = "The date of the certificate is invalid";
+            break;
+          case SslError.SSL_EXPIRED:
+            description = "The certificate has expired";
+            break;
+          case SslError.SSL_IDMISMATCH:
+            description = "Hostname mismatch";
+            break;
+          case SslError.SSL_INVALID:
+            description = "A generic error occurred";
+            break;
+          case SslError.SSL_NOTYETVALID:
+            description = "The certificate is not yet valid";
+            break;
+          case SslError.SSL_UNTRUSTED:
+            description = "The certificate authority is not trusted";
+            break;
+          default:
+            description = "Unknown SSL Error";
+            break;
+        }
+
+        description = descriptionPrefix + description;
+
+        this.onReceivedError(
+          webView,
+          code,
+          description,
+          failingUrl
+        );
     }
 
     @Override
@@ -833,6 +901,41 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           webView,
           new TopHttpErrorEvent(webView.getId(), eventData));
       }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public boolean onRenderProcessGone(WebView webView, RenderProcessGoneDetail detail) {
+        // WebViewClient.onRenderProcessGone was added in O.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return false;
+        }
+        super.onRenderProcessGone(webView, detail);
+
+        if(detail.didCrash()){
+          Log.e("RNCWebViewManager", "The WebView rendering process crashed.");
+        }
+        else{
+          Log.w("RNCWebViewManager", "The WebView rendering process was killed by the system.");
+        }
+
+        // if webView is null, we cannot return any event
+        // since the view is already dead/disposed
+        // still prevent the app crash by returning true.
+        if(webView == null){
+          return true;
+        }
+
+        WritableMap event = createWebViewEvent(webView, webView.getUrl());
+        event.putBoolean("didCrash", detail.didCrash());
+
+        dispatchEvent(
+          webView,
+          new TopRenderProcessGoneEvent(webView.getId(), event)
+        );
+
+        // returning false would crash the app.
+        return true;
     }
 
     protected void emitFinishEvent(WebView webView, String url) {
@@ -1011,6 +1114,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String injectedJS;
+    protected @Nullable
+    String injectedJSBeforeContentLoaded;
+
+    /**
+     * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
+     * than the main frame, so these two properties are mostly here just for parity with iOS & macOS.
+     */
+    protected boolean injectedJavaScriptForMainFrameOnly = true;
+    protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
+
     protected boolean messagingEnabled = false;
     protected @Nullable
     String messagingModuleName;
@@ -1105,6 +1218,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       injectedJS = js;
     }
 
+    public void setInjectedJavaScriptBeforeContentLoaded(@Nullable String js) {
+      injectedJSBeforeContentLoaded = js;
+    }
+
+    public void setInjectedJavaScriptForMainFrameOnly(boolean enabled) {
+      injectedJavaScriptForMainFrameOnly = enabled;
+    }
+
+    public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(boolean enabled) {
+      injectedJavaScriptBeforeContentLoadedForMainFrameOnly = enabled;
+    }
+
     protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
       return new RNCWebViewBridge(webView);
     }
@@ -1156,6 +1281,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         injectedJS != null &&
         !TextUtils.isEmpty(injectedJS)) {
         evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
+      }
+    }
+
+    public void callInjectedJavaScriptBeforeContentLoaded() {
+      if (getSettings().getJavaScriptEnabled() &&
+      injectedJSBeforeContentLoaded != null &&
+      !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
+        evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
       }
     }
 
