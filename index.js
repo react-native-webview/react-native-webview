@@ -1,4 +1,4 @@
-import WebView from './src/WebView';
+import WebView from './lib/WebView';
 
 export { WebView };
 export default WebView;
