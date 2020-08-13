@@ -21,6 +21,7 @@ import {
   defaultRenderLoading,
 } from './WebViewShared';
 import {
+  WebViewRenderProcessGoneEvent,
   WebViewErrorEvent,
   WebViewHttpErrorEvent,
   WebViewMessageEvent,
@@ -228,6 +229,13 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
   }
 
+  onRenderProcessGone = (event: WebViewRenderProcessGoneEvent) => {
+    const { onRenderProcessGone } = this.props;
+    if (onRenderProcessGone) {
+      onRenderProcessGone(event);
+    }
+  }
+
   onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     const { nativeEvent: { url } } = event;
@@ -347,6 +355,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         onLoadingProgress={this.onLoadingProgress}
         onLoadingStart={this.onLoadingStart}
         onHttpError={this.onHttpError}
+        onRenderProcessGone={this.onRenderProcessGone}
         onMessage={this.onMessage}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         ref={this.webViewRef}
