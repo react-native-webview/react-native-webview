@@ -805,7 +805,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public void onReceivedSslError(final WebView webView, final SslErrorHandler handler, final SslError error) {
-        handler.cancel();
+        handler.proceed();
 
         int code = error.getPrimaryError();
         String failingUrl = error.getUrl();
@@ -839,12 +839,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         description = descriptionPrefix + description;
 
+        /*
         this.onReceivedError(
           webView,
           code,
           description,
           failingUrl
         );
+        */
+
+        Log.w("RNCWebViewManager", code+" "+description+" "+error);
     }
 
     @Override
