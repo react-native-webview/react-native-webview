@@ -141,6 +141,10 @@ export interface WebViewHttpError extends WebViewNativeEvent {
   statusCode: number;
 }
 
+export interface WebViewRenderProcessGoneDetail {
+  didCrash: boolean;
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent = NativeSyntheticEvent<
@@ -160,6 +164,8 @@ export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 export type WebViewTerminatedEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
+
+export type WebViewRenderProcessGoneEvent = NativeSyntheticEvent<WebViewRenderProcessGoneDetail>;
 
 export type DataDetectorTypes =
   | 'phoneNumber'
@@ -283,6 +289,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   javaScriptEnabled?: boolean;
   mixedContentMode?: 'never' | 'always' | 'compatibility';
   onContentSizeChange?: (event: WebViewEvent) => void;
+  onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
   textZoom?: number;
@@ -298,6 +305,8 @@ export enum ContentInsetAdjustmentBehavior {
   always = 'always'
 };
 
+export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
+
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;
@@ -307,6 +316,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   bounces?: boolean;
   contentInset?: ContentInsetProp;
   contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
+  contentMode?: ContentMode;
   readonly dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
@@ -403,6 +413,18 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   contentInset?: ContentInsetProp;
+
+  /**
+   * Defaults to `recommended`, which loads mobile content on iPhone
+   * and iPad Mini but desktop content on other iPads.
+   * 
+   * Possible values are:
+   * - `'recommended'`
+   * - `'mobile'`
+   * - `'desktop'`
+   * @platform ios
+   */
+  contentMode?: ContentMode;
 
   /**
    * Determines the types of data converted to clickable URLs in the web view's content.
@@ -690,6 +712,12 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   onContentSizeChange?: (event: WebViewEvent) => void;
 
   /**
+   * Function that is invoked when the `WebView` process crashes or is killed by the OS.
+   * Works only on Android (minimum API level 26).
+   */
+  onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
+
+  /**
    * https://developer.android.com/reference/android/webkit/WebSettings.html#setCacheMode(int)
    * Set the cacheMode. Possible values are:
    *
@@ -727,7 +755,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   geolocationEnabled?: boolean;
 
-  
+
   /**
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from other file scheme URLs.
@@ -979,4 +1007,9 @@ export interface WebViewSharedProps extends ViewProps {
    * Should caching be enabled. Default is true.
    */
   cacheEnabled?: boolean;
+
+  /**
+   * Append to the existing user-agent. Overridden if `userAgent` is set.
+   */
+  applicationNameForUserAgent?: string;
 }
