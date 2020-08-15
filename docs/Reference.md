@@ -45,6 +45,7 @@ This document lays out the current public properties and methods for the React N
 - [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
 - [`contentInsetAdjustmentBehavior`](Reference.md#contentInsetAdjustmentBehavior)
+- [`contentMode`](Reference.md#contentMode)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
@@ -910,6 +911,24 @@ Possible values:
 - `scrollableAxes`
 - `never`
 - `always`
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
+
+---
+
+### `contentMode`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Controls the type of content to load. Available on iOS 13 and later. Defaults to `recommended`, which loads mobile content on iPhone & iPad Mini but desktop content on larger iPads.
+
+See [Introducing Desktop-class Browsing on iPad](https://developer.apple.com/videos/play/wwdc2019/203/) for more.
+
+Possible values:
+
+- `recommended`
+- `mobile`
+- `desktop`
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
