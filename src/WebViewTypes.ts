@@ -113,6 +113,10 @@ export interface WebViewNavigation extends WebViewNativeEvent {
   mainDocumentURL?: string;
 }
 
+export interface ShouldStartLoadRequest extends WebViewNavigation {
+  isTopFrame: boolean;
+}
+
 export interface FileDownload {
   downloadUrl: string;
 }
@@ -148,6 +152,8 @@ export type WebViewProgressEvent = NativeSyntheticEvent<
 >;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
+
+export type ShouldStartLoadRequestEvent = NativeSyntheticEvent<ShouldStartLoadRequest>;
 
 export type FileDownloadEvent = NativeSyntheticEvent<FileDownload>;
 
@@ -238,7 +244,7 @@ export interface WebViewNativeConfig {
 }
 
 export type OnShouldStartLoadWithRequest = (
-  event: WebViewNavigation,
+  event: ShouldStartLoadRequest,
 ) => boolean;
 
 export interface CommonNativeWebViewProps extends ViewProps {
@@ -258,7 +264,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onLoadingStart: (event: WebViewNavigationEvent) => void;
   onHttpError: (event: WebViewHttpErrorEvent) => void;
   onMessage: (event: WebViewMessageEvent) => void;
-  onShouldStartLoadWithRequest: (event: WebViewNavigationEvent) => void;
+  onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
   // TODO: find a better way to type this.
@@ -266,7 +272,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   source: any;
   userAgent?: string;
   /**
-   * Append to the existing user-agent. Overriden if `userAgent` is set.
+   * Append to the existing user-agent. Overridden if `userAgent` is set.
    */
   applicationNameForUserAgent?: string;
 }

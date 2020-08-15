@@ -937,13 +937,15 @@ static NSDictionary* customCertificatesForHost;
 
   WKNavigationType navigationType = navigationAction.navigationType;
   NSURLRequest *request = navigationAction.request;
+  BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
 
   if (_onShouldStartLoadWithRequest) {
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     [event addEntriesFromDictionary: @{
       @"url": (request.URL).absoluteString,
       @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
-      @"navigationType": navigationTypes[@(navigationType)]
+      @"navigationType": navigationTypes[@(navigationType)],
+      @"isTopFrame": @(isTopFrame)
     }];
     if (![self.delegate webView:self
       shouldStartLoadForRequest:event
@@ -955,7 +957,6 @@ static NSDictionary* customCertificatesForHost;
 
   if (_onLoadingStart) {
     // We have this check to filter out iframe requests and whatnot
-    BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
     if (isTopFrame) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       [event addEntriesFromDictionary: @{
