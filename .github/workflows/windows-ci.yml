@@ -15,17 +15,10 @@ jobs:
       with:
         node-version: '12.9.1'
 
-    - name: Install Visual Studio components
-      shell: powershell
-      run: .\.github\workflows\scripts\install-vs-features.ps1 Microsoft.VisualStudio.Component.VC.v141.x86.x64,Microsoft.VisualStudio.ComponentGroup.UWP.VC.v141
-
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.0.0
       with:
         vs-version: 16.5
-       
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.2
 
     - name: Check node modules cache
       uses: actions/cache@v1
@@ -45,13 +38,14 @@ jobs:
       run: |
         yarn build
         yarn tsc
- 
-    - name: NuGet restore
-      run: nuget restore example\windows\WebViewWindows.sln
 
     - name: Build x64 release
-      run: msbuild example\windows\WebViewWindows.sln /p:Configuration=Release /p:Platform=x64 -m
+      shell: powershell
+      run: npx react-native run-windows --root example --arch x64 --release --no-packager --no-deploy --logging
 
+    # Workaround for a bug in package searching during deploy.
+    # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the pakcages at windows/x64/Release.
+    # Copy the packages to Windows/Release before deploying.
     - name: Deploy
       shell: powershell
       run: |
