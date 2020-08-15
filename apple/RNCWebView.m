@@ -226,6 +226,14 @@ static NSDictionary* customCertificatesForHost;
   }
   wkWebViewConfig.userContentController = [WKUserContentController new];
 
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
+  if (@available(iOS 13.0, *)) {
+    WKWebpagePreferences *pagePrefs = [[WKWebpagePreferences alloc]init];
+    pagePrefs.preferredContentMode = _contentMode;
+    wkWebViewConfig.defaultWebpagePreferences = pagePrefs;
+  }
+#endif
+
   // Shim the HTML5 history API:
   [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                             name:HistoryShimName];
