@@ -417,7 +417,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   /**
    * Defaults to `recommended`, which loads mobile content on iPhone
    * and iPad Mini but desktop content on other iPads.
-   * 
+   *
    * Possible values are:
    * - `'recommended'`
    * - `'mobile'`
@@ -550,6 +550,15 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
   */
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
+
+  /**
+   * Boolean value that determines whether a pull to refresh gesture is
+   * available in the `WebView`. The default value is `false`.
+   * If `true`, sets `bounces` automatically to `true`
+   * @platform ios
+   *
+  */
+  pullToRefreshEnabled?: boolean;
 
   /**
    * Function that is invoked when the client needs to download a file.
