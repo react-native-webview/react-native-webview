@@ -1196,7 +1196,7 @@ Example:
 
 ---
 
-### `pullToRefreshEnabled`
+### `pullToRefreshEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true`.
 
