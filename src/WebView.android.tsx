@@ -61,6 +61,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     saveFormDataDisabled: false,
     cacheEnabled: true,
     androidHardwareAccelerationDisabled: false,
+    androidLayerType: 'none',
     originWhitelist: defaultOriginWhitelist,
   };
 

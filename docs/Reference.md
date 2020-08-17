@@ -35,6 +35,7 @@ This document lays out the current public properties and methods for the React N
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
 - [`javaScriptCanOpenWindowsAutomatically`](Reference.md#javascriptcanopenwindowsautomatically)
 - [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
+- [`androidLayerType`](Reference.md#androidLayerType)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
 - [`userAgent`](Reference.md#useragent)
@@ -786,6 +787,22 @@ Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | Android  |
+
+---
+
+### `androidLayerType`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Specifies the layer type.
+
+Possible values for `layerType` are:
+
+- `none` (default) - The view does not have a layer.
+- `software` - The view has a software layer. A software layer is backed by a bitmap and causes the view to be rendered using Android's software rendering pipeline, even if hardware acceleration is enabled.
+- `hardware` - The view has a hardware layer. A hardware layer is backed by a hardware specific texture and causes the view to be rendered using Android's hardware rendering pipeline, but only if hardware acceleration is turned on for the view hierarchy.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
 
 ---
 
