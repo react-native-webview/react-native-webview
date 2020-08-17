@@ -58,7 +58,6 @@ namespace winrt::ReactNativeWebView::implementation {
                     auto const& srcMap = propertyValue.AsObject();
                     if (srcMap.find("uri") != srcMap.end()) {
                         auto uriString = srcMap.at("uri").AsString();
-                        // non-uri sources not yet supported
                         if (uriString.length() == 0) {
                             continue;
                         }
@@ -67,9 +66,9 @@ namespace winrt::ReactNativeWebView::implementation {
                         if (srcMap.find("__packager_asset") != srcMap.end()) {
                             isPackagerAsset = srcMap.at("__packager_asset").AsBoolean();
                         }
-
-                        if (isPackagerAsset && uriString.find("assets") == 0) {
-                            uriString.replace(0, 6, "ms-appx://");
+                        if (isPackagerAsset && uriString.find("file://") == 0) {
+                            auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
+                            uriString.replace(0, 7, bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                         }
 
                         webView.Navigate(winrt::Uri(to_hstring(uriString)));
@@ -94,49 +93,51 @@ namespace winrt::ReactNativeWebView::implementation {
 
     ConstantProviderDelegate ReactWebViewManager::ExportedCustomDirectEventTypeConstants() noexcept {
         return [](winrt::IJSValueWriter const& constantWriter) {
-            WriteCustomDirectEventTypeConstant(constantWriter, "onLoadingStart");
-            WriteCustomDirectEventTypeConstant(constantWriter, "onLoadingFinish");
-            WriteCustomDirectEventTypeConstant(constantWriter, "onLoadingError");
-            WriteCustomDirectEventTypeConstant(constantWriter, "onMessage");
+            WriteCustomDirectEventTypeConstant(constantWriter, "LoadingStart");
+            WriteCustomDirectEventTypeConstant(constantWriter, "LoadingFinish");
+            WriteCustomDirectEventTypeConstant(constantWriter, "LoadingError");
+            WriteCustomDirectEventTypeConstant(constantWriter, "Message");
         };
     }
 
     // IViewManagerWithCommands
-    IMapView<hstring, int64_t> ReactWebViewManager::Commands() noexcept {
-        auto commands = winrt::single_threaded_map<hstring, int64_t>();
-        commands.Insert(L"goForward", static_cast<int32_t>(WebViewCommands::GoForward));
-        commands.Insert(L"goBack", static_cast<int32_t>(WebViewCommands::GoBack));
-        commands.Insert(L"reload", static_cast<int32_t>(WebViewCommands::Reload));
-        commands.Insert(L"stopLoading", static_cast<int32_t>(WebViewCommands::StopLoading));
-        commands.Insert(L"injectJavaScript", static_cast<int32_t>(WebViewCommands::InjectJavaScript));
+    IVectorView<hstring> ReactWebViewManager::Commands() noexcept {
+        auto commands = winrt::single_threaded_vector<hstring>();
+        commands.Append(L"goForward");
+        commands.Append(L"goBack");
+        commands.Append(L"reload");
+        commands.Append(L"stopLoading");
+        commands.Append(L"injectJavaScript");
+        commands.Append(L"postMessage");
         return commands.GetView();
     }
 
     void ReactWebViewManager::DispatchCommand(
         FrameworkElement const& view,
-        int64_t commandId,
+        winrt::hstring const& commandId,
         winrt::IJSValueReader const& commandArgsReader) noexcept {
+        auto commandArgs = JSValue::ReadArrayFrom(commandArgsReader);
         if (auto webView = view.try_as<winrt::WebView>()) {
-            switch (commandId) {
-                case static_cast<int64_t>(WebViewCommands::GoForward) :
-                    if (webView.CanGoForward()) {
-                        webView.GoForward();
-                    }
-                    break;
-                case static_cast<int64_t>(WebViewCommands::GoBack) :
-                    if (webView.CanGoBack()) {
-                        webView.GoBack();
-                    }
-                    break;
-                case static_cast<int64_t>(WebViewCommands::Reload) :
-                    webView.Refresh();
-                    break;
-                case static_cast<int64_t>(WebViewCommands::StopLoading) :
-                    webView.Stop();
-                    break;
-                case static_cast<int64_t>(WebViewCommands::InjectJavaScript) :
-                    webView.InvokeScriptAsync(L"eval", { commandArgsReader.GetString() });
-                    break;
+            if (commandId == L"goForward") {
+                if (webView.CanGoForward()) {
+                    webView.GoForward();
+                }
+            }
+            else if (commandId == L"goBack") {
+                if (webView.CanGoBack()) {
+                    webView.GoBack();
+                }
+            }
+            else if (commandId == L"reload") {
+                webView.Refresh();
+            }
+            else if (commandId == L"stopLoading") {
+                webView.Stop();
+            }
+            else if (commandId == L"injectJavaScript") {
+                webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
+            } else if(commandId == L"postMessage") {
+                m_reactWebView.PostMessage(winrt::to_hstring(commandArgs[0].AsString()));
             }
         }
     }

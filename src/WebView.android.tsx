@@ -10,6 +10,8 @@ import {
   findNodeHandle,
 } from 'react-native';
 
+import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
+
 import invariant from 'invariant';
 
 import {
@@ -19,6 +21,7 @@ import {
   defaultRenderLoading,
 } from './WebViewShared';
 import {
+  WebViewRenderProcessGoneEvent,
   WebViewErrorEvent,
   WebViewHttpErrorEvent,
   WebViewMessageEvent,
@@ -38,6 +41,11 @@ const RNCWebView = requireNativeComponent(
   'RNCWebView',
 ) as typeof NativeWebViewAndroid;
 const { resolveAssetSource } = Image;
+
+/**
+ * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
+ */
+let uniqueRef = 0;
 
 /**
  * Renders a native WebView.
@@ -68,7 +76,14 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     lastErrorEvent: null,
   };
 
+
   webViewRef = React.createRef<NativeWebViewAndroid>();
+
+  messagingModuleName = `WebViewMessageHandler${uniqueRef+=1}`;
+
+  componentDidMount = () => {
+    BatchedBridge.registerCallableModule(this.messagingModuleName, this);
+  };
 
   getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
 
@@ -214,6 +229,13 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
   }
 
+  onRenderProcessGone = (event: WebViewRenderProcessGoneEvent) => {
+    const { onRenderProcessGone } = this.props;
+    if (onRenderProcessGone) {
+      onRenderProcessGone(event);
+    }
+  }
+
   onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     const { nativeEvent: { url } } = event;
@@ -327,11 +349,13 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         key="webViewKey"
         {...otherProps}
         messagingEnabled={typeof onMessage === 'function'}
+        messagingModuleName={this.messagingModuleName}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
         onLoadingStart={this.onLoadingStart}
         onHttpError={this.onHttpError}
+        onRenderProcessGone={this.onRenderProcessGone}
         onMessage={this.onMessage}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         ref={this.webViewRef}
