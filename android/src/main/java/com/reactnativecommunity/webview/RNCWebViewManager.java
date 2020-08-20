@@ -304,7 +304,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     int layerType = View.LAYER_TYPE_NONE;
     switch (layerTypeString) {
         case "hardware":
-          layerType = view.isHardwareAccelerated() ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_SOFTWARE;
+          layerType = View.LAYER_TYPE_HARDWARE;
           break;
         case "software":
           layerType = View.LAYER_TYPE_SOFTWARE;

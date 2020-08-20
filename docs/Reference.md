@@ -782,7 +782,7 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidHardwareAccelerationDisabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only as Hardware Acceleration is a feature only for Android. The default value is `false`.
+**Deprecated.** Use the `androidLayerType` prop instead.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -794,7 +794,7 @@ Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android
 
 Specifies the layer type.
 
-Possible values for `layerType` are:
+Possible values for `androidLayerType` are:
 
 - `none` (default) - The view does not have a layer.
 - `software` - The view has a software layer. A software layer is backed by a bitmap and causes the view to be rendered using Android's software rendering pipeline, even if hardware acceleration is enabled.
