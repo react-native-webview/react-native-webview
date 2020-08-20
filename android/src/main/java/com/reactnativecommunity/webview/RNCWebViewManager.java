@@ -140,7 +140,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
-  protected boolean mSkipSslErrors = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
 
@@ -548,7 +547,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setSkipSslErrors(
     WebView view,
     @Nullable Boolean skipSslErrors) {
-    mSkipSslErrors = skipSslErrors != null && skipSslErrors;
+    RNCWebViewClient client = ((RNCWebView) view).getRNCWebViewClient();
+    if (client != null && skipSslErrors != null) {
+      client.setSkipSslErrors(skipSslErrors);
+    }
   }
 
   @ReactProp(name = "allowFileAccess")
@@ -759,6 +761,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ReadableArray mUrlPrefixesForDefaultIntent;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
+    protected @Nullable Boolean mSkipSslErrors = false;
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
       ignoreErrFailedForThisURL = url;
@@ -971,6 +974,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
       mUrlPrefixesForDefaultIntent = specialUrls;
+    }
+
+    public void setSkipSslErrors(Boolean skipSslErrors) {
+      mSkipSslErrors = skipSslErrors;
     }
 
     public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
