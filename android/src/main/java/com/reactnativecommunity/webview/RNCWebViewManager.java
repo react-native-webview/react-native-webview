@@ -140,6 +140,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
+  protected boolean mSkipSslErrors = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
 
@@ -543,6 +544,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     setupWebChromeClient((ReactContext)view.getContext(), view);
   }
 
+  @ReactProp(name = "skipSslErrors")
+  public void setSkipSslErrors(
+    WebView view,
+    @Nullable Boolean skipSslErrors) {
+    mSkipSslErrors = skipSslErrors != null && skipSslErrors;
+  }
+
   @ReactProp(name = "allowFileAccess")
   public void setAllowFileAccess(
     WebView view,
@@ -805,8 +813,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public void onReceivedSslError(final WebView webView, final SslErrorHandler handler, final SslError error) {
+      if (mSkipSslErrors) {
         handler.proceed();
-
+      } else {
         int code = error.getPrimaryError();
         String failingUrl = error.getUrl();
         String description = "";
@@ -839,16 +848,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         description = descriptionPrefix + description;
 
-        /*
         this.onReceivedError(
           webView,
           code,
           description,
           failingUrl
         );
-        */
-
-        Log.w("RNCWebViewManager", code+" "+description+" "+error);
+      }
     }
 
     @Override
