@@ -782,7 +782,7 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidHardwareAccelerationDisabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-**Deprecated.** Use the `androidLayerType` prop instead.
+**Deprecated.** Use the `androidLayerType` prop instead. 
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -792,13 +792,15 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidLayerType`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Specifies the layer type.
+Specifies the layer type. 
 
 Possible values for `androidLayerType` are:
 
 - `none` (default) - The view does not have a layer.
 - `software` - The view has a software layer. A software layer is backed by a bitmap and causes the view to be rendered using Android's software rendering pipeline, even if hardware acceleration is enabled.
 - `hardware` - The view has a hardware layer. A hardware layer is backed by a hardware specific texture and causes the view to be rendered using Android's hardware rendering pipeline, but only if hardware acceleration is turned on for the view hierarchy.
+
+Avoid setting both `androidLayerType` and `androidHardwareAccelerationDisabled` props at the same time, as this may cause undefined behaviour.
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
