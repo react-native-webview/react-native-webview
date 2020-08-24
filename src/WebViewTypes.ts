@@ -182,6 +182,8 @@ export type OverScrollModeType = 'always' | 'content' | 'never';
 
 export type CacheMode = 'LOAD_DEFAULT' | 'LOAD_CACHE_ONLY' | 'LOAD_CACHE_ELSE_NETWORK' | 'LOAD_NO_CACHE';
 
+export type AndroidLayerType = 'none' | 'software' | 'hardware';
+
 export interface WebViewSourceUri {
   /**
    * The URI to load in the `WebView`. Can be a local or remote file.
@@ -284,6 +286,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   allowFileAccessFromFileURLs?: boolean;
   allowUniversalAccessFromFileURLs?: boolean;
   androidHardwareAccelerationDisabled?: boolean;
+  androidLayerType?: AndroidLayerType;
   domStorageEnabled?: boolean;
   geolocationEnabled?: boolean;
   javaScriptEnabled?: boolean;
@@ -808,6 +811,18 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   androidHardwareAccelerationDisabled?: boolean;
+
+    /**
+   * https://developer.android.com/reference/android/webkit/WebView#setLayerType(int,%20android.graphics.Paint)
+   * Sets the layerType. Possible values are:
+   *
+   * - `'none'` (default)
+   * - `'software'`
+   * - `'hardware'`
+   *
+   * @platform android
+   */
+  androidLayerType?: AndroidLayerType;
 
   /**
    * Boolean value to enable third party cookies in the `WebView`. Used on

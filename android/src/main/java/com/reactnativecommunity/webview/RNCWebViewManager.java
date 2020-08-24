@@ -299,6 +299,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "androidLayerType")
+  public void setLayerType(WebView view, String layerTypeString) {
+    int layerType = View.LAYER_TYPE_NONE;
+    switch (layerTypeString) {
+        case "hardware":
+          layerType = View.LAYER_TYPE_HARDWARE;
+          break;
+        case "software":
+          layerType = View.LAYER_TYPE_SOFTWARE;
+          break;
+    }
+    view.setLayerType(layerType, null);
+  }
+
+
   @ReactProp(name = "overScrollMode")
   public void setOverScrollMode(WebView view, String overScrollModeString) {
     Integer overScrollMode;
