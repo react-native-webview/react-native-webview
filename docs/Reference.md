@@ -35,6 +35,7 @@ This document lays out the current public properties and methods for the React N
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
 - [`javaScriptCanOpenWindowsAutomatically`](Reference.md#javascriptcanopenwindowsautomatically)
 - [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
+- [`androidLayerType`](Reference.md#androidLayerType)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
 - [`userAgent`](Reference.md#useragent)
@@ -67,6 +68,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
+- [`pullToRefreshEnabled`](Reference.md#pullToRefreshEnabled)
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 
@@ -682,6 +684,7 @@ canGoForward
 lockIdentifier
 mainDocumentURL (iOS only)
 navigationType
+isTopFrame
 ```
 
 ---
@@ -779,11 +782,29 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidHardwareAccelerationDisabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only as Hardware Acceleration is a feature only for Android. The default value is `false`.
+**Deprecated.** Use the `androidLayerType` prop instead. 
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | Android  |
+
+---
+
+### `androidLayerType`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Specifies the layer type. 
+
+Possible values for `androidLayerType` are:
+
+- `none` (default) - The view does not have a layer.
+- `software` - The view has a software layer. A software layer is backed by a bitmap and causes the view to be rendered using Android's software rendering pipeline, even if hardware acceleration is enabled.
+- `hardware` - The view has a hardware layer. A hardware layer is backed by a hardware specific texture and causes the view to be rendered using Android's hardware rendering pipeline, but only if hardware acceleration is turned on for the view hierarchy.
+
+Avoid setting both `androidLayerType` and `androidHardwareAccelerationDisabled` props at the same time, as this may cause undefined behaviour.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
 
 ---
 
@@ -1191,6 +1212,16 @@ When setting the standard textZoom (100) parameter size, this undesirable effect
 Example:
 
 `<WebView textZoom={100} />`
+
+---
+
+### `pullToRefreshEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)<!-- Link generated with jump2header -->
 

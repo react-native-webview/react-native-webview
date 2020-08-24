@@ -103,6 +103,10 @@ RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)m
   }];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(pullToRefreshEnabled, BOOL, RNCWebView) {
+    view.pullToRefreshEnabled = json == nil ? false : [RCTConvert BOOL: json];
+}
+
 RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWebView) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];
 }
