@@ -880,40 +880,9 @@ static NSDictionary* customCertificatesForHost;
  * topViewController
  */
 -(UIViewController *)topViewController{
-    UIViewController *controller = [self topViewControllerWithRootViewController:[self getCurrentWindow].rootViewController];
-    return controller;
+    return RCTPresentedViewController();
 }
 
-/**
- * topViewControllerWithRootViewController
- */
--(UIViewController *)topViewControllerWithRootViewController:(UIViewController *)viewController{
-  if (viewController==nil) return nil;
-  if (viewController.presentedViewController!=nil && viewController.presentedViewController.isBeingPresented) {
-    return [self topViewControllerWithRootViewController:viewController.presentedViewController];
-  } else if ([viewController isKindOfClass:[UITabBarController class]]){
-    return [self topViewControllerWithRootViewController:[(UITabBarController *)viewController selectedViewController]];
-  } else if ([viewController isKindOfClass:[UINavigationController class]]){
-    return [self topViewControllerWithRootViewController:[(UINavigationController *)viewController visibleViewController]];
-  } else {
-    return viewController;
-  }
-}
-/**
- * getCurrentWindow
- */
--(UIWindow *)getCurrentWindow{
-  UIWindow *window = [UIApplication sharedApplication].keyWindow;
-  if (window.windowLevel!=UIWindowLevelNormal) {
-    for (UIWindow *wid in [UIApplication sharedApplication].windows) {
-      if (window.windowLevel==UIWindowLevelNormal) {
-        window = wid;
-        break;
-      }
-    }
-  }
-  return window;
-}
 #endif // !TARGET_OS_OSX
 
 /**
