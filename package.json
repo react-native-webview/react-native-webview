@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "10.3.2",
+  "version": "10.8.2",
   "homepage": "https://github.com/react-native-community/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -29,8 +29,7 @@
     "type": "Component"
   },
   "peerDependencies": {
-    "react": "16.11.0",
-    "react-native": ">=0.60 <0.63"
+    "react-native": ">=0.60 <0.64"
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
