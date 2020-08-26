@@ -23,8 +23,8 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
     winrt::FrameworkElement ReactWebViewManager::CreateView() noexcept {
-        m_reactWebView = *winrt::make_self<ReactWebView>(m_reactContext);
-        return m_reactWebView.GetView();
+      auto view = winrt::ReactNativeWebView::ReactWebView(m_reactContext);
+      return view;
     }
 
     // IViewManagerWithReactContext
@@ -46,7 +46,11 @@ namespace winrt::ReactNativeWebView::implementation {
     void ReactWebViewManager::UpdateProperties(
         FrameworkElement const& view,
         IJSValueReader const& propertyMapReader) noexcept {
-        if (auto webView = view.try_as<winrt::WebView>()) {
+
+        auto control = view.try_as<winrt::UserControl>();
+        auto content = control.Content();
+
+        if (auto webView = content.try_as<winrt::WebView>()) {
             const JSValueObject& propertyMap = JSValueObject::ReadFrom(propertyMapReader);
 
             for (auto const& pair : propertyMap) {
@@ -116,8 +120,10 @@ namespace winrt::ReactNativeWebView::implementation {
         FrameworkElement const& view,
         winrt::hstring const& commandId,
         winrt::IJSValueReader const& commandArgsReader) noexcept {
+        auto control = view.try_as<winrt::UserControl>();
+        auto content = control.Content();
         auto commandArgs = JSValue::ReadArrayFrom(commandArgsReader);
-        if (auto webView = view.try_as<winrt::WebView>()) {
+        if (auto webView = content.try_as<winrt::WebView>()) {
             if (commandId == L"goForward") {
                 if (webView.CanGoForward()) {
                     webView.GoForward();
@@ -137,7 +143,9 @@ namespace winrt::ReactNativeWebView::implementation {
             else if (commandId == L"injectJavaScript") {
                 webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
             } else if(commandId == L"postMessage") {
-                m_reactWebView.PostMessage(winrt::to_hstring(commandArgs[0].AsString()));
+                if (auto reactWebView = content.try_as<ReactNativeWebView::ReactWebView>()) {
+                    reactWebView.PostMessage(winrt::to_hstring(commandArgs[0].AsString()));
+                }
             }
         }
     }

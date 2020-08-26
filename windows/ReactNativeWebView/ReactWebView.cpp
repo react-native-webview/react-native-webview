@@ -26,11 +26,13 @@ namespace winrt::ReactNativeWebView::implementation {
 #else
         m_webView = winrt::WebView();
 #endif
+        this->Content(m_webView);
         RegisterEvents();
     }
 
-    winrt::WebView ReactWebView::GetView() {
-        return m_webView;
+    ReactWebView::~ReactWebView()
+    {
+      OutputDebugStringW(L"> ReactWebView::~ReactWebView()\n");
     }
 
     void ReactWebView::RegisterEvents() {
@@ -64,54 +66,54 @@ namespace winrt::ReactNativeWebView::implementation {
             });
     }
 
-    void ReactWebView::WriteWebViewNavigationEventArg(winrt::IJSValueWriter const& eventDataWriter) {
-        auto tag = m_webView.GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
-        WriteProperty(eventDataWriter, L"canGoBack", m_webView.CanGoBack());
-        WriteProperty(eventDataWriter, L"canGoForward", m_webView.CanGoForward());
-        WriteProperty(eventDataWriter, L"loading", !m_webView.IsLoaded());
+    void ReactWebView::WriteWebViewNavigationEventArg(winrt::WebView const& sender, winrt::IJSValueWriter const& eventDataWriter) {
+        auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
+        WriteProperty(eventDataWriter, L"canGoBack", sender.CanGoBack());
+        WriteProperty(eventDataWriter, L"canGoForward", sender.CanGoForward());
+        WriteProperty(eventDataWriter, L"loading", !sender.IsLoaded());
         WriteProperty(eventDataWriter, L"target", tag);
-        WriteProperty(eventDataWriter, L"title", m_webView.DocumentTitle());
-        if (auto uri = m_webView.Source()) {
-            WriteProperty(eventDataWriter, L"url", uri.AbsoluteCanonicalUri());
+        WriteProperty(eventDataWriter, L"title", sender.DocumentTitle());
+        if (auto uri = sender.Source()) {
+          WriteProperty(eventDataWriter, L"url", uri.AbsoluteCanonicalUri());
         }
     }
 
     void ReactWebView::OnNavigationStarting(winrt::WebView const& webView, winrt::WebViewNavigationStartingEventArgs const& /*args*/) {
         m_reactContext.DispatchEvent(
-            webView,
+            *this,
             L"topLoadingStart",
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
-                WriteWebViewNavigationEventArg(eventDataWriter);
+                WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
     }
 
     void ReactWebView::OnNavigationCompleted(winrt::WebView const& webView, winrt::WebViewNavigationCompletedEventArgs const& /*args*/) {
         m_reactContext.DispatchEvent(
-            webView,
+            *this,
             L"topLoadingFinish",
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
-                WriteWebViewNavigationEventArg(eventDataWriter);
+                WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
 
         winrt::hstring windowAlert = L"window.alert = function (msg) {window.external.notify(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
         winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {window.external.notify(String(data))}};";
-        m_webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
+        webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
     }
 
     void ReactWebView::OnNavigationFailed(winrt::IInspectable const& /*sender*/, winrt::WebViewNavigationFailedEventArgs const& args) {
         m_reactContext.DispatchEvent(
-            m_webView,
+            *this,
             L"topLoadingError",
             [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
                 auto httpCode = static_cast<int32_t>(args.WebErrorStatus());
                 eventDataWriter.WriteObjectBegin();
                 {
                     WriteProperty(eventDataWriter, L"code", httpCode);
-                    WriteWebViewNavigationEventArg(eventDataWriter);
+                    WriteWebViewNavigationEventArg(m_webView, eventDataWriter);
                 }
                 eventDataWriter.WriteObjectEnd();
             });
@@ -134,7 +136,7 @@ namespace winrt::ReactNativeWebView::implementation {
 
     void ReactWebView::PostMessage(winrt::hstring const& message) {
         m_reactContext.DispatchEvent(
-            m_webView,
+            *this,
             L"topMessage",
             [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
