@@ -13,7 +13,6 @@ namespace winrt::ReactNativeWebView::implementation {
     public:
         ReactWebView(Microsoft::ReactNative::IReactContext const& reactContext);
         void PostMessage(winrt::hstring const& message);
-        ~ReactWebView();
 
     private:
         winrt::Windows::UI::Xaml::Controls::WebView m_webView{ nullptr };

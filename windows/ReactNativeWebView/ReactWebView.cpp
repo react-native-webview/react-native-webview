@@ -30,11 +30,6 @@ namespace winrt::ReactNativeWebView::implementation {
         RegisterEvents();
     }
 
-    ReactWebView::~ReactWebView()
-    {
-      OutputDebugStringW(L"> ReactWebView::~ReactWebView()\n");
-    }
-
     void ReactWebView::RegisterEvents() {
         m_navigationStartingRevoker = m_webView.NavigationStarting(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
