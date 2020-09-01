@@ -40,6 +40,8 @@ namespace winrt::ReactNativeWebView::implementation {
     IMapView<hstring, ViewManagerPropertyType> ReactWebViewManager::NativeProps() noexcept {
         auto nativeProps = winrt::single_threaded_map<hstring, ViewManagerPropertyType>();
         nativeProps.Insert(L"source", ViewManagerPropertyType::Map);
+        nativeProps.Insert(L"backgroundColor", ViewManagerPropertyType::Color); // Does this really work?
+        nativeProps.Insert(L"messagingEnabled", ViewManagerPropertyType::Boolean);
         return nativeProps.GetView();
     }
 
@@ -83,6 +85,12 @@ namespace winrt::ReactNativeWebView::implementation {
                 else if (propertyName == "backgroundColor") {
                     auto color = propertyValue.To<winrt::Color>();
                     webView.DefaultBackgroundColor(color.A==0 ? winrt::Colors::Transparent() : color);
+                }
+                else if (propertyName == "messagingEnabled") {
+                  auto messagingEnabled = propertyValue.To<bool>();
+                  if (auto reactWebView = content.try_as<ReactNativeWebView::ReactWebView>()) {
+                    reactWebView.SetMessagingEnabled(messagingEnabled);
+                  }
                 }
             }
         }

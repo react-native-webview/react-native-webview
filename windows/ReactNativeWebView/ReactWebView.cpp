@@ -142,4 +142,8 @@ namespace winrt::ReactNativeWebView::implementation {
             });
     }
 
+    void ReactWebView::SetMessagingEnabled(bool enabled) {
+      this->m_messagingEnabled = enabled;
+    }
+
 } // namespace winrt::ReactNativeWebView::implementation
