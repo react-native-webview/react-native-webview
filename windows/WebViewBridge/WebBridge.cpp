@@ -8,10 +8,6 @@ using namespace Platform;
 
 using namespace Windows::UI::Core;
 
-// https://docs.microsoft.com/en-us/windows/uwp/winrt-components/create-a-windows-runtime-component-in-cppwinrt
-// https://github.com/microsoft/react-native-windows/blob/0.59-legacy/current/ReactWindows/ReactNativeWebViewBridge/WebViewBridge.cs
-// https://github.com/MicrosoftEdge/JSBrowser/blob/master/NativeListener
-
 WebBridge::WebBridge(int64 tag)
 {
   m_tag = tag;
@@ -24,7 +20,7 @@ void WebBridge::PostMessage(int message) {
     CoreDispatcherPriority::Normal,
     ref new DispatchedHandler([this, message]
       {
-        OutputDebugStringW(L"> WebBridge sending MessagePostedEvent");
+        OutputDebugStringW(L"> WebBridge sending MessagePostedEvent \n");
         MessagePostedEvent(message);
       }));
 }

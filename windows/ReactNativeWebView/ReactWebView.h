@@ -16,12 +16,14 @@ namespace winrt::ReactNativeWebView::implementation {
         ReactWebView(Microsoft::ReactNative::IReactContext const& reactContext);
         void PostMessage(winrt::hstring const& message);
         void SetMessagingEnabled(bool enabled);
+        ~ReactWebView();
 
     private:
         bool m_messagingEnabled{ false };
         winrt::Windows::UI::Xaml::Controls::WebView m_webView{ nullptr };
         Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
         WebViewBridge::WebBridge m_webBridge{ nullptr };
+        winrt::event_token m_message_token;
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationStarting_revoker m_navigationStartingRevoker{};
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationCompleted_revoker m_navigationCompletedRevoker{};
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationFailed_revoker m_navigationFailedRevoker{};

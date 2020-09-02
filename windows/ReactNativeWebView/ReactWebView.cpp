@@ -32,6 +32,13 @@ namespace winrt::ReactNativeWebView::implementation {
         RegisterEvents();
     }
 
+    ReactWebView::~ReactWebView()
+    {
+      if (m_messagingEnabled) {
+        m_webBridge.MessagePostedEvent(m_message_token);
+      }
+    }
+
     void ReactWebView::RegisterEvents() {
         m_navigationStartingRevoker = m_webView.NavigationStarting(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
@@ -88,11 +95,8 @@ namespace winrt::ReactNativeWebView::implementation {
         if (m_messagingEnabled) {
           auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
           m_webBridge = WebViewBridge::WebBridge(tag);
-          m_webBridge.MessagePostedEvent(winrt::auto_revoke, [ref = get_weak()](const int32_t& message) {
-            OutputDebugStringW(L"> ReactWebView:MessagePostedEvent");
-            if (auto self = ref.get()) {
-              self->OnMessagePosted(message);
-            }
+          m_message_token = m_webBridge.MessagePostedEvent([this](const int32_t& message) {
+            this->OnMessagePosted(message);
           });
           webView.AddWebAllowedObject(L"__RN_WEBVIEW_JS_BRIDGE", m_webBridge);
         }
@@ -100,9 +104,10 @@ namespace winrt::ReactNativeWebView::implementation {
 
     void ReactWebView::OnMessagePosted(const int32_t& message)
     {
+      OutputDebugStringW(L"> ReactWebView:OnMessagePosted received \n");
+
       // TODO: send to RN
       // PostMessage(winrt::hstring(args.Value()));
-      OutputDebugStringW(L"> ReactWebView:OnMessagePosted received");
     }
 
     void ReactWebView::OnNavigationCompleted(winrt::WebView const& webView, winrt::WebViewNavigationCompletedEventArgs const& /*args*/) {
