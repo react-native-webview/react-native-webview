@@ -20,13 +20,11 @@ WebBridge::WebBridge(int64 tag)
 }
 
 void WebBridge::PostMessage(int message) {
-
-  
   m_dispatcher->RunAsync(
     CoreDispatcherPriority::Normal,
     ref new DispatchedHandler([this, message]
       {
+        OutputDebugStringW(L"> WebBridge sending MessagePostedEvent");
         MessagePostedEvent(message);
       }));
-  
 }

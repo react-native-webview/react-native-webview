@@ -89,6 +89,7 @@ namespace winrt::ReactNativeWebView::implementation {
           auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
           m_webBridge = WebViewBridge::WebBridge(tag);
           m_webBridge.MessagePostedEvent(winrt::auto_revoke, [ref = get_weak()](const int32_t& message) {
+            OutputDebugStringW(L"> ReactWebView:MessagePostedEvent");
             if (auto self = ref.get()) {
               self->OnMessagePosted(message);
             }
@@ -100,6 +101,8 @@ namespace winrt::ReactNativeWebView::implementation {
     void ReactWebView::OnMessagePosted(const int32_t& message)
     {
       // TODO: send to RN
+      // PostMessage(winrt::hstring(args.Value()));
+      OutputDebugStringW(L"> ReactWebView:OnMessagePosted received");
     }
 
     void ReactWebView::OnNavigationCompleted(winrt::WebView const& webView, winrt::WebViewNavigationCompletedEventArgs const& /*args*/) {
@@ -113,8 +116,14 @@ namespace winrt::ReactNativeWebView::implementation {
             });
 
         winrt::hstring windowAlert = L"window.alert = function (msg) {window.external.notify(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
-        winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {window.external.notify(String(data))}};";
-        webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
+        if (m_messagingEnabled) {
+          winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {__RN_WEBVIEW_JS_BRIDGE.postMessage(String(data))}};";
+          webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
+        }
+        else {
+          winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {window.external.notify(String(data))}};";
+          webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
+        }
     }
 
     void ReactWebView::OnNavigationFailed(winrt::IInspectable const& /*sender*/, winrt::WebViewNavigationFailedEventArgs const& args) {
