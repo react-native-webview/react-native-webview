@@ -20,7 +20,6 @@ void WebBridge::PostMessage(Platform::String^ message) {
     CoreDispatcherPriority::Normal,
     ref new DispatchedHandler([this, message]
       {
-        OutputDebugStringW(L"> WebBridge sending MessagePostedEvent \n");
         MessagePostedEvent(message);
       }));
 }

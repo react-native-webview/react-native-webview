@@ -97,7 +97,6 @@ namespace winrt::ReactNativeWebView::implementation {
 
     void ReactWebView::OnMessagePosted(hstring const& message)
     {
-      OutputDebugStringW(L"> ReactWebView:OnMessagePosted received \n");
       PostMessage(message);
     }
 
