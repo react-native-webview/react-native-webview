@@ -145,6 +145,9 @@
       <Project>{f7d32bd0-2749-483e-9a0d-1635ef7e3136}</Project>
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\WebViewBridge\WebViewBridge.vcxproj">
+      <Project>{dc466263-7d1f-4907-acd1-cc771d1fdd58}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

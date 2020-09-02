@@ -6,6 +6,10 @@
 #include "ReactWebView.h"
 #include "ReactWebView.g.cpp"
 
+#include "winrt/WebViewBridge.h"
+
+
+
 namespace winrt {
     using namespace Microsoft::ReactNative;
     using namespace Windows::Data::Json;
@@ -82,6 +86,13 @@ namespace winrt::ReactNativeWebView::implementation {
                 WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
+
+        if (m_messagingEnabled) {
+          auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
+
+          auto bridge = WebViewBridge::WebBridge(tag);
+          webView.AddWebAllowedObject(L"__RN_WEBVIEW_JS_BRIDGE", bridge);
+        }
     }
 
     void ReactWebView::OnNavigationCompleted(winrt::WebView const& webView, winrt::WebViewNavigationCompletedEventArgs const& /*args*/) {

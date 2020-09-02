@@ -88,7 +88,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 }
                 else if (propertyName == "messagingEnabled") {
                   auto messagingEnabled = propertyValue.To<bool>();
-                  if (auto reactWebView = content.try_as<ReactNativeWebView::ReactWebView>()) {
+                  if (auto reactWebView = view.try_as<ReactNativeWebView::ReactWebView>()) {
                     reactWebView.SetMessagingEnabled(messagingEnabled);
                   }
                 }
@@ -149,7 +149,7 @@ namespace winrt::ReactNativeWebView::implementation {
             else if (commandId == L"injectJavaScript") {
                 webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
             } else if(commandId == L"postMessage") {
-                if (auto reactWebView = content.try_as<ReactNativeWebView::ReactWebView>()) {
+                if (auto reactWebView = view.try_as<ReactNativeWebView::ReactWebView>()) {
                     reactWebView.PostMessage(winrt::to_hstring(commandArgs[0].AsString()));
                 }
             }
