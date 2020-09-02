@@ -91,8 +91,19 @@ namespace winrt::ReactNativeWebView::implementation {
           auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
 
           auto bridge = WebViewBridge::WebBridge(tag);
+          bridge.MessagePostedEvent(winrt::auto_revoke, [ref = get_weak()](const int32_t& message) {
+            if (auto self = ref.get()) {
+              self->OnMessagePosted(message);
+            }
+          });
+
           webView.AddWebAllowedObject(L"__RN_WEBVIEW_JS_BRIDGE", bridge);
         }
+    }
+
+    void ReactWebView::OnMessagePosted(const int32_t& message)
+    {
+
     }
 
     void ReactWebView::OnNavigationCompleted(winrt::WebView const& webView, winrt::WebViewNavigationCompletedEventArgs const& /*args*/) {
