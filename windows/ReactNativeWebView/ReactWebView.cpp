@@ -6,8 +6,6 @@
 #include "ReactWebView.h"
 #include "ReactWebView.g.cpp"
 
-#include "winrt/WebViewBridge.h"
-
 
 
 namespace winrt {
@@ -89,21 +87,19 @@ namespace winrt::ReactNativeWebView::implementation {
 
         if (m_messagingEnabled) {
           auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
-
-          auto bridge = WebViewBridge::WebBridge(tag);
-          bridge.MessagePostedEvent(winrt::auto_revoke, [ref = get_weak()](const int32_t& message) {
+          m_webBridge = WebViewBridge::WebBridge(tag);
+          m_webBridge.MessagePostedEvent(winrt::auto_revoke, [ref = get_weak()](const int32_t& message) {
             if (auto self = ref.get()) {
               self->OnMessagePosted(message);
             }
           });
-
-          webView.AddWebAllowedObject(L"__RN_WEBVIEW_JS_BRIDGE", bridge);
+          webView.AddWebAllowedObject(L"__RN_WEBVIEW_JS_BRIDGE", m_webBridge);
         }
     }
 
     void ReactWebView::OnMessagePosted(const int32_t& message)
     {
-
+      // TODO: send to RN
     }
 
     void ReactWebView::OnNavigationCompleted(winrt::WebView const& webView, winrt::WebViewNavigationCompletedEventArgs const& /*args*/) {
