@@ -61,13 +61,6 @@ namespace winrt::ReactNativeWebView::implementation {
                     self->OnNavigationFailed(sender, args);
                 }
             });
-
-        m_scriptNotifyRevoker = m_webView.ScriptNotify(
-            winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
-                if (auto self = ref.get()) {
-                    self->OnScriptNotify(sender, args);
-                }
-            });
     }
 
     void ReactWebView::WriteWebViewNavigationEventArg(winrt::WebView const& sender, winrt::IJSValueWriter const& eventDataWriter) {
@@ -118,13 +111,9 @@ namespace winrt::ReactNativeWebView::implementation {
                 eventDataWriter.WriteObjectEnd();
             });
 
-        winrt::hstring windowAlert = L"window.alert = function (msg) {window.external.notify(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
         if (m_messagingEnabled) {
+          winrt::hstring windowAlert = L"window.alert = function (msg) {__REACT_WEB_VIEW_BRIDGE.postMessage(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
           winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {__REACT_WEB_VIEW_BRIDGE.postMessage(String(data))}};";
-          webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
-        }
-        else {
-          winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {window.external.notify(String(data))}};";
           webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
         }
     }
@@ -144,36 +133,32 @@ namespace winrt::ReactNativeWebView::implementation {
             });
     }
 
-    void ReactWebView::OnScriptNotify(winrt::IInspectable const& /*sender*/, winrt::Windows::UI::Xaml::Controls::NotifyEventArgs const& args) {
-        winrt::JsonObject jsonObject;
-        if (winrt::JsonObject::TryParse(args.Value(), jsonObject) && jsonObject.HasKey(L"type")) {
-            auto type = jsonObject.GetNamedString(L"type");
-            if (type == L"__alert") {
-                auto dialog = winrt::MessageDialog(jsonObject.GetNamedString(L"message"));
-                dialog.Commands().Append(winrt::UICommand(L"OK"));
-                dialog.ShowAsync();
-                return;
-            }
-        }
-        
-        PostMessage(winrt::hstring(args.Value()));
-    }
-
     void ReactWebView::PostMessage(winrt::hstring const& message) {
+      winrt::JsonObject jsonObject;
+      if (winrt::JsonObject::TryParse(message, jsonObject) && jsonObject.HasKey(L"type")) {
+          auto type = jsonObject.GetNamedString(L"type");
+          if (type == L"__alert") {
+            auto dialog = winrt::MessageDialog(jsonObject.GetNamedString(L"message"));
+            dialog.Commands().Append(winrt::UICommand(L"OK"));
+            dialog.ShowAsync();
+            return;
+          }
+        }
+      
         m_reactContext.DispatchEvent(
-            *this,
-            L"topMessage",
-            [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
-                eventDataWriter.WriteObjectBegin();
-                {
-                    WriteProperty(eventDataWriter, L"data", message);
-                }
-                eventDataWriter.WriteObjectEnd();
-            });
+              *this,
+              L"topMessage",
+              [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
+                  eventDataWriter.WriteObjectBegin();
+                  {
+                      WriteProperty(eventDataWriter, L"data", message);
+                  }
+                  eventDataWriter.WriteObjectEnd();
+              });
     }
 
     void ReactWebView::SetMessagingEnabled(bool enabled) {
-      this->m_messagingEnabled = enabled;
+      m_messagingEnabled = enabled;
     }
 
 } // namespace winrt::ReactNativeWebView::implementation
