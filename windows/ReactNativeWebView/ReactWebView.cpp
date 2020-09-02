@@ -95,19 +95,17 @@ namespace winrt::ReactNativeWebView::implementation {
         if (m_messagingEnabled) {
           auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
           m_webBridge = WebViewBridge::WebBridge(tag);
-          m_message_token = m_webBridge.MessagePostedEvent([this](const int32_t& message) {
+          m_message_token = m_webBridge.MessagePostedEvent([this](hstring const& message) {
             this->OnMessagePosted(message);
           });
-          webView.AddWebAllowedObject(L"__RN_WEBVIEW_JS_BRIDGE", m_webBridge);
+          webView.AddWebAllowedObject(L"__REACT_WEB_VIEW_BRIDGE", m_webBridge);
         }
     }
 
-    void ReactWebView::OnMessagePosted(const int32_t& message)
+    void ReactWebView::OnMessagePosted(hstring const& message)
     {
       OutputDebugStringW(L"> ReactWebView:OnMessagePosted received \n");
-
-      // TODO: send to RN
-      // PostMessage(winrt::hstring(args.Value()));
+      PostMessage(message);
     }
 
     void ReactWebView::OnNavigationCompleted(winrt::WebView const& webView, winrt::WebViewNavigationCompletedEventArgs const& /*args*/) {
@@ -122,7 +120,7 @@ namespace winrt::ReactNativeWebView::implementation {
 
         winrt::hstring windowAlert = L"window.alert = function (msg) {window.external.notify(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
         if (m_messagingEnabled) {
-          winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {__RN_WEBVIEW_JS_BRIDGE.postMessage(String(data))}};";
+          winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {__REACT_WEB_VIEW_BRIDGE.postMessage(String(data))}};";
           webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
         }
         else {

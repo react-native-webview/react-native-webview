@@ -15,7 +15,7 @@ WebBridge::WebBridge(int64 tag)
   m_dispatcher = Windows::UI::Core::CoreWindow::GetForCurrentThread()->Dispatcher;
 }
 
-void WebBridge::PostMessage(int message) {
+void WebBridge::PostMessage(Platform::String^ message) {
   m_dispatcher->RunAsync(
     CoreDispatcherPriority::Normal,
     ref new DispatchedHandler([this, message]
