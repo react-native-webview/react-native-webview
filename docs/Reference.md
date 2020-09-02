@@ -13,6 +13,7 @@ This document lays out the current public properties and methods for the React N
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
+- [`onRenderProcessGone`](Reference.md#onRenderProcessGone)
 - [`onLoad`](Reference.md#onload)
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
@@ -34,6 +35,7 @@ This document lays out the current public properties and methods for the React N
 - [`javaScriptEnabled`](Reference.md#javascriptenabled)
 - [`javaScriptCanOpenWindowsAutomatically`](Reference.md#javascriptcanopenwindowsautomatically)
 - [`androidHardwareAccelerationDisabled`](Reference.md#androidHardwareAccelerationDisabled)
+- [`androidLayerType`](Reference.md#androidLayerType)
 - [`mixedContentMode`](Reference.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.md#thirdpartycookiesenabled)
 - [`userAgent`](Reference.md#useragent)
@@ -44,6 +46,7 @@ This document lays out the current public properties and methods for the React N
 - [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
 - [`contentInsetAdjustmentBehavior`](Reference.md#contentInsetAdjustmentBehavior)
+- [`contentMode`](Reference.md#contentMode)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
@@ -65,6 +68,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
+- [`pullToRefreshEnabled`](Reference.md#pullToRefreshEnabled)
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 
@@ -88,7 +92,7 @@ This document lays out the current public properties and methods for the React N
 
 ## Props
 
-### `source`
+### `source`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Loads static HTML or a URI (with optional headers) in the WebView. Note that static HTML will require setting [`originWhitelist`](Reference.md#originwhitelist) to `["*"]`.
 
@@ -114,7 +118,7 @@ _Note that using static HTML requires the WebView property [originWhiteList](Ref
 
 ---
 
-### `automaticallyAdjustContentInsets`
+### `automaticallyAdjustContentInsets`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Controls whether to adjust the content inset for web views that are placed behind a navigation bar, tab bar, or toolbar. The default value is `true`.
 
@@ -124,7 +128,7 @@ Controls whether to adjust the content inset for web views that are placed behin
 
 ---
 
-### `injectedJavaScript`
+### `injectedJavaScript`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Set this to provide JavaScript that will be injected into the web page after the document finishes loading, but before other subresources finish loading.
 
@@ -156,7 +160,7 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ---
 
-### `injectedJavaScriptBeforeContentLoaded`
+### `injectedJavaScriptBeforeContentLoaded`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Set this to provide JavaScript that will be injected into the web page after the document element is created, but before other subresources finish loading.
 
@@ -188,7 +192,7 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ---
 
-### `injectedJavaScriptForMainFrameOnly`
+### `injectedJavaScriptForMainFrameOnly`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
 
@@ -200,7 +204,7 @@ If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. if
 
 ---
 
-### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`
+### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
 
@@ -212,7 +216,7 @@ If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. if
 
 ---
 
-### `mediaPlaybackRequiresUserAction`
+### `mediaPlaybackRequiresUserAction`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`. (Android API minimum version 17).
 
@@ -224,7 +228,7 @@ NOTE: the default `true` value might cause some videos to hang loading on iOS. S
 
 ---
 
-### `nativeConfig`
+### `nativeConfig`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Override the native component used to render the WebView. Enables a custom native WebView which uses the same JavaScript as the original WebView.
 
@@ -240,7 +244,7 @@ The `nativeConfig` prop expects an object with the following keys:
 
 ---
 
-### `onError`
+### `onError`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` load fails.
 
@@ -280,7 +284,7 @@ url
 
 ---
 
-### `onLoad`
+### `onLoad`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` has finished loading.
 
@@ -313,7 +317,7 @@ url
 
 ---
 
-### `onLoadEnd`
+### `onLoadEnd`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` load succeeds or fails.
 
@@ -347,7 +351,7 @@ url
 
 ---
 
-### `onLoadStart`
+### `onLoadStart`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` starts loading.
 
@@ -381,7 +385,7 @@ url
 
 ---
 
-### `onLoadProgress`
+### `onLoadProgress`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` is loading.
 
@@ -414,7 +418,7 @@ url
 
 ---
 
-### `onHttpError`
+### `onHttpError`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` receives an http error.
 
@@ -458,7 +462,40 @@ url
 
 ---
 
-### `onMessage`
+### `onRenderProcessGone`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the `WebView` process crashes or is killed by the OS on Android.
+
+> **_Note_**
+> Android API minimum level 26. Android Only
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onRenderProcessGone={syntheticEvent => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn(
+      'WebView Crashed: ',
+      nativeEvent.didCrash,
+    );
+  }}
+/>
+```
+
+Function passed to `onRenderProcessGone` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+didCrash
+```
+---
+
+### `onMessage`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`. Setting this property will inject this global into your webview.
 
@@ -472,7 +509,7 @@ To learn more, read the [Communicating between JS and Native](Guide.md#communica
 
 ---
 
-### `onNavigationStateChange`
+### `onNavigationStateChange`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` loading starts or ends.
 
@@ -508,7 +545,7 @@ Note that this method will not be invoked on hash URL changes (e.g. from `https:
 
 ---
 
-### `onContentProcessDidTerminate`
+### `onContentProcessDidTerminate`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` content process is terminated.
 
@@ -542,7 +579,7 @@ url
 
 ---
 
-### `originWhitelist`
+### `originWhitelist`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are "http://*" and "https://*".
 
@@ -562,7 +599,7 @@ Example:
 
 ---
 
-### `renderError`
+### `renderError`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that returns a view to show if there's an error.
 
@@ -583,7 +620,7 @@ The function passed to `renderError` will be called with the name of the error
 
 ---
 
-### `renderLoading`
+### `renderLoading`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that returns a loading indicator. The startInLoadingState prop must be set to true in order to use this prop.
 
@@ -603,7 +640,7 @@ Example:
 
 ---
 
-### `scalesPageToFit`
+### `scalesPageToFit`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean that controls whether the web content is scaled to fit the view and enables the user to change the scale. The default value is `true`.
 
@@ -613,7 +650,7 @@ Boolean that controls whether the web content is scaled to fit the view and enab
 
 ---
 
-### `onShouldStartLoadWithRequest`
+### `onShouldStartLoadWithRequest`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that allows custom handling of any web view requests. Return `true` from the function to continue loading the request and `false` to stop loading.
 
@@ -647,11 +684,12 @@ canGoForward
 lockIdentifier
 mainDocumentURL (iOS only)
 navigationType
+isTopFrame
 ```
 
 ---
 
-### `startInLoadingState`
+### `startInLoadingState`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value that forces the `WebView` to show the loading view on the first load. This prop must be set to `true` in order for the `renderLoading` prop to work.
 
@@ -661,7 +699,7 @@ Boolean value that forces the `WebView` to show the loading view on the first lo
 
 ---
 
-### `style`
+### `style`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A style object that allow you to customize the `WebView` style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
 
@@ -680,7 +718,7 @@ Example:
 
 ---
 
-### `containerStyle`
+### `containerStyle`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A style object that allow you to customize the `WebView` container style. Please note that there are default styles (example: you need to add `flex: 0` to the style if you want to use `height` property).
 
@@ -699,7 +737,7 @@ Example:
 
 ---
 
-### `decelerationRate`
+### `decelerationRate`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A floating-point number that determines how quickly the scroll view decelerates after the user lifts their finger. You may also use the string shortcuts `"normal"` and `"fast"` which match the underlying iOS settings for `UIScrollViewDecelerationRateNormal` and `UIScrollViewDecelerationRateFast` respectively:
 
@@ -712,7 +750,7 @@ A floating-point number that determines how quickly the scroll view decelerates 
 
 ---
 
-### `domStorageEnabled`
+### `domStorageEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value to control whether DOM Storage is enabled. Used only in Android.
 
@@ -722,7 +760,7 @@ Boolean value to control whether DOM Storage is enabled. Used only in Android.
 
 ---
 
-### `javaScriptEnabled`
+### `javaScriptEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value to enable JavaScript in the `WebView`. The default value is `true`.
 
@@ -732,7 +770,7 @@ Boolean value to enable JavaScript in the `WebView`. The default value is `true`
 
 ---
 
-### `javaScriptCanOpenWindowsAutomatically`
+### `javaScriptCanOpenWindowsAutomatically`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A Boolean value indicating whether JavaScript can open windows without user interaction. The default value is `false`.
 
@@ -742,9 +780,9 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ---
 
-### `androidHardwareAccelerationDisabled`
+### `androidHardwareAccelerationDisabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only as Hardware Acceleration is a feature only for Android. The default value is `false`.
+**Deprecated.** Use the `androidLayerType` prop instead. 
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -752,7 +790,25 @@ Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android
 
 ---
 
-### `mixedContentMode`
+### `androidLayerType`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Specifies the layer type. 
+
+Possible values for `androidLayerType` are:
+
+- `none` (default) - The view does not have a layer.
+- `software` - The view has a software layer. A software layer is backed by a bitmap and causes the view to be rendered using Android's software rendering pipeline, even if hardware acceleration is enabled.
+- `hardware` - The view has a hardware layer. A hardware layer is backed by a hardware specific texture and causes the view to be rendered using Android's hardware rendering pipeline, but only if hardware acceleration is turned on for the view hierarchy.
+
+Avoid setting both `androidLayerType` and `androidHardwareAccelerationDisabled` props at the same time, as this may cause undefined behaviour.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
+
+---
+
+### `mixedContentMode`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Specifies the mixed content mode. i.e WebView will allow a secure origin to load content from any other origin.
 
@@ -768,7 +824,7 @@ Possible values for `mixedContentMode` are:
 
 ---
 
-### `thirdPartyCookiesEnabled`
+### `thirdPartyCookiesEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value to enable third party cookies in the `WebView`. Used on Android Lollipop and above only as third party cookies are enabled by default on Android Kitkat and below and on iOS. The default value is `true`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
@@ -778,7 +834,7 @@ Boolean value to enable third party cookies in the `WebView`. Used on Android Lo
 
 ---
 
-### `userAgent`
+### `userAgent`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Sets the user-agent for the `WebView`.
 
@@ -788,7 +844,7 @@ Sets the user-agent for the `WebView`.
 
 ---
 
-### `applicationNameForUserAgent`
+### `applicationNameForUserAgent`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Append to the existing user-agent. Setting `userAgent` will override this.
 
@@ -806,7 +862,7 @@ Append to the existing user-agent. Setting `userAgent` will override this.
 // Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 DemoApp/1.1.0
 ```
 
-### `allowsFullscreenVideo`
+### `allowsFullscreenVideo`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean that determines whether videos are allowed to be played in fullscreen. The default value is `false`.
 
@@ -816,7 +872,7 @@ Boolean that determines whether videos are allowed to be played in fullscreen. T
 
 ---
 
-### `allowsInlineMediaPlayback`
+### `allowsInlineMediaPlayback`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean that determines whether HTML5 videos play inline or use the native full-screen controller. The default value is `false`.
 
@@ -830,7 +886,7 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 
 ---
 
-### `bounces`
+### `bounces`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value that determines whether the web view bounces when it reaches the edge of the content. The default value is `true`.
 
@@ -840,7 +896,7 @@ Boolean value that determines whether the web view bounces when it reaches the e
 
 ---
 
-### `overScrollMode`
+### `overScrollMode`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Specifies the over scroll mode.
 
@@ -856,7 +912,7 @@ Possible values for `overScrollMode` are:
 
 ---
 
-### `contentInset`
+### `contentInset`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 The amount by which the web view content is inset from the edges of the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
 
@@ -866,7 +922,7 @@ The amount by which the web view content is inset from the edges of the scroll v
 
 ---
 
-### `contentInsetAdjustmentBehavior`
+### `contentInsetAdjustmentBehavior`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 This property specifies how the safe area insets are used to modify the content area of the scroll view. The default value of this property is "never". Available on iOS 11 and later. Defaults to `never`.
 
@@ -883,7 +939,25 @@ Possible values:
 
 ---
 
-### `dataDetectorTypes`
+### `contentMode`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Controls the type of content to load. Available on iOS 13 and later. Defaults to `recommended`, which loads mobile content on iPhone & iPad Mini but desktop content on larger iPads.
+
+See [Introducing Desktop-class Browsing on iPad](https://developer.apple.com/videos/play/wwdc2019/203/) for more.
+
+Possible values:
+
+- `recommended`
+- `mobile`
+- `desktop`
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
+
+---
+
+### `dataDetectorTypes`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Determines the types of data converted to clickable URLs in the web view's content. By default only phone numbers are detected.
 
@@ -907,7 +981,7 @@ Possible values for `dataDetectorTypes` are:
 
 ---
 
-### `scrollEnabled`
+### `scrollEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value that determines whether scrolling is enabled in the `WebView`. The default value is `true`. Setting this to `false` will prevent the webview from moving the document body when the keyboard appears over an input.
 
@@ -917,7 +991,7 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 
 ---
 
-### `directionalLockEnabled`
+### `directionalLockEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A Boolean value that determines whether scrolling is disabled in a particular direction.
 The default value is `true`.
@@ -928,7 +1002,7 @@ The default value is `true`.
 
 ---
 
-### `showsHorizontalScrollIndicator`
+### `showsHorizontalScrollIndicator`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value that determines whether a horizontal scroll indicator is shown in the `WebView`. The default value is `true`.
 
@@ -938,7 +1012,7 @@ Boolean value that determines whether a horizontal scroll indicator is shown in 
 
 ---
 
-### `showsVerticalScrollIndicator`
+### `showsVerticalScrollIndicator`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean value that determines whether a vertical scroll indicator is shown in the `WebView`. The default value is `true`.
 
@@ -948,7 +1022,7 @@ Boolean value that determines whether a vertical scroll indicator is shown in th
 
 ---
 
-### `geolocationEnabled`
+### `geolocationEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Set whether Geolocation is enabled in the `WebView`. The default value is `false`. Used only in Android.
 
@@ -958,7 +1032,7 @@ Set whether Geolocation is enabled in the `WebView`. The default value is `false
 
 ---
 
-### `allowFileAccessFromFileURLs`
+### `allowFileAccessFromFileURLs`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
 
@@ -968,7 +1042,7 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 ---
 
-### `allowUniversalAccessFromFileURLs`
+### `allowUniversalAccessFromFileURLs`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin. Including accessing content from other file scheme URLs. The default value is `false`.
 
@@ -978,7 +1052,7 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 ---
 
-### `allowingReadAccessToURL`
+### `allowingReadAccessToURL`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in for WebViews that are loaded with a source.uri set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in source.uri itself.
 
@@ -988,7 +1062,7 @@ A String value that indicates which URLs the WebView's file can then reference i
 
 ---
 
-### `url`
+### `url`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 **Deprecated.** Use the `source` prop instead.
 
@@ -998,7 +1072,7 @@ A String value that indicates which URLs the WebView's file can then reference i
 
 ---
 
-### `html`
+### `html`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 **Deprecated.** Use the `source` prop instead.
 
@@ -1008,7 +1082,7 @@ A String value that indicates which URLs the WebView's file can then reference i
 
 ---
 
-### `keyboardDisplayRequiresUserAction`
+### `keyboardDisplayRequiresUserAction`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If false, web content can programmatically display the keyboard. The default value is `true`.
 
@@ -1018,7 +1092,7 @@ If false, web content can programmatically display the keyboard. The default val
 
 ---
 
-### `hideKeyboardAccessoryView`
+### `hideKeyboardAccessoryView`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If true, this will hide the keyboard accessory view (< > and Done).
 
@@ -1028,7 +1102,7 @@ If true, this will hide the keyboard accessory view (< > and Done).
 
 ---
 
-### `allowsBackForwardNavigationGestures`
+### `allowsBackForwardNavigationGestures`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If true, this will be able horizontal swipe gestures. The default value is `false`.
 
@@ -1038,7 +1112,7 @@ If true, this will be able horizontal swipe gestures. The default value is `fals
 
 ---
 
-### `incognito`
+### `incognito`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Does not store any data within the lifetime of the WebView.
 
@@ -1048,7 +1122,7 @@ Does not store any data within the lifetime of the WebView.
 
 ---
 
-### `allowFileAccess`
+### `allowFileAccess`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If true, this will allow access to the file system via `file://` URI's. The default value is `false`.
 
@@ -1058,7 +1132,7 @@ If true, this will allow access to the file system via `file://` URI's. The defa
 
 ---
 
-### `saveFormDataDisabled`
+### `saveFormDataDisabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Sets whether the WebView should disable saving form data. The default value is `false`. This function does not have any effect from Android API level 26 onwards as there is an Autofill feature which stores form data.
 
@@ -1068,7 +1142,7 @@ Sets whether the WebView should disable saving form data. The default value is `
 
 ---
 
-### `cacheEnabled`
+### `cacheEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Sets whether WebView should use browser caching.
 
@@ -1078,7 +1152,7 @@ Sets whether WebView should use browser caching.
 
 ---
 
-### `cacheMode`
+### `cacheMode`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed. When navigating back, content is not revalidated, instead the content is just retrieved from the cache. This property allows the client to override this behavior.
 
@@ -1095,7 +1169,7 @@ Possible values are:
 
 ---
 
-### `pagingEnabled`
+### `pagingEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If the value of this property is true, the scroll view stops on multiples of the scroll view’s bounds when the user scrolls. The default value is false.
 
@@ -1105,7 +1179,7 @@ If the value of this property is true, the scroll view stops on multiples of the
 
 ---
 
-### `allowsLinkPreview`
+### `allowsLinkPreview`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is true; before that, the default value is false.
 
@@ -1115,7 +1189,7 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 ---
 
-### `sharedCookiesEnabled`
+### `sharedCookiesEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
@@ -1125,7 +1199,7 @@ Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]
 
 ---
 
-### `textZoom`
+### `textZoom`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If the user has set a custom font size in the Android system, an undesirable scale of the site interface in WebView occurs.
 
@@ -1139,7 +1213,17 @@ Example:
 
 `<WebView textZoom={100} />`
 
-### `ignoreSilentHardwareSwitch`
+---
+
+### `pullToRefreshEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+### `ignoreSilentHardwareSwitch`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 (ios only)
 
@@ -1149,7 +1233,7 @@ When set to true the hardware silent switch is ignored. Default: `false`
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
 
-### `onFileDownload`
+### `onFileDownload`[⬆](#props-index)<!-- Link generated with jump2header -->
 This property is iOS-only.
 
 Function that is invoked when the client needs to download a file.
@@ -1183,13 +1267,13 @@ Example:
 
 ## Methods
 
-### `extraNativeComponentConfig()`
+### `extraNativeComponentConfig()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
 static extraNativeComponentConfig()
 ```
 
-### `goForward()`
+### `goForward()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
 goForward();
@@ -1197,7 +1281,7 @@ goForward();
 
 Go forward one page in the web view's history.
 
-### `goBack()`
+### `goBack()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
 goBack();
@@ -1205,7 +1289,7 @@ goBack();
 
 Go back one page in the web view's history.
 
-### `reload()`
+### `reload()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
 reload();
@@ -1213,7 +1297,7 @@ reload();
 
 Reloads the current page.
 
-### `stopLoading()`
+### `stopLoading()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
 stopLoading();
@@ -1221,7 +1305,7 @@ stopLoading();
 
 Stop loading the current page.
 
-### `injectJavaScript(str)`
+### `injectJavaScript(str)`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
 injectJavaScript('... javascript string ...');
@@ -1231,7 +1315,7 @@ Executes the JavaScript string.
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
-### `requestFocus()`
+### `requestFocus()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
 requestFocus();
@@ -1239,14 +1323,14 @@ requestFocus();
 
 Request the webView to ask for focus. (People working on TV apps might want having a look at this!)
 
-### `postMessage(str)`
+### `postMessage(str)`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
 postMessage('message');
 ```
 Post a message to WebView, handled by [`onMessage`](Reference.md#onmessage).
 
-### `clearFormData()`
+### `clearFormData()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 (android only)
 
@@ -1256,7 +1340,7 @@ clearFormData();
 
 Removes the autocomplete popup from the currently focused form field, if present. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearFormData()>)
 
-### `clearCache(bool)`
+### `clearCache(bool)`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 (android only)
 
@@ -1266,7 +1350,7 @@ clearCache(true);
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
 
-### `clearHistory()`
+### `clearHistory()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 (android only)
 
