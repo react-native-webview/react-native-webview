@@ -35,7 +35,7 @@ namespace winrt::ReactNativeWebView::implementation {
     ReactWebView::~ReactWebView()
     {
       if (m_messagingEnabled) {
-        m_webBridge.MessagePostedEvent(m_message_token);
+        //m_webBridge.MessagePostedEvent(m_message_token);
       }
     }
 
@@ -87,10 +87,15 @@ namespace winrt::ReactNativeWebView::implementation {
 
         if (m_messagingEnabled) {
           auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
+          /*
           m_webBridge = WebViewBridge::WebBridge(tag);
           m_message_token = m_webBridge.MessagePostedEvent([this](hstring const& message) {
             this->OnMessagePosted(message);
           });
+          webView.AddWebAllowedObject(L"__REACT_WEB_VIEW_BRIDGE", m_webBridge);
+          */
+
+          m_webBridge = WebBridge();
           webView.AddWebAllowedObject(L"__REACT_WEB_VIEW_BRIDGE", m_webBridge);
         }
     }

@@ -7,7 +7,9 @@
 #include "NativeModules.h"
 #include "ReactWebView.g.h"
 
-#include "winrt/WebViewBridge.h"
+#include "winrt/WebViewBridgeComponent.h"
+
+using namespace winrt::WebViewBridgeComponent;
 
 namespace winrt::ReactNativeWebView::implementation {
 
@@ -22,7 +24,7 @@ namespace winrt::ReactNativeWebView::implementation {
         bool m_messagingEnabled{ true };
         winrt::Windows::UI::Xaml::Controls::WebView m_webView{ nullptr };
         Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
-        WebViewBridge::WebBridge m_webBridge{ nullptr };
+        WebBridge m_webBridge{ nullptr };
         winrt::event_token m_message_token;
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationStarting_revoker m_navigationStartingRevoker{};
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationCompleted_revoker m_navigationCompletedRevoker{};

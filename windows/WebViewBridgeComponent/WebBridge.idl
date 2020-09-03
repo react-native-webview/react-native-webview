@@ -1,0 +1,9 @@
+namespace WebViewBridgeComponent
+{
+    [default_interface]
+    [allowforweb]
+    runtimeclass WebBridge
+    {
+        WebBridge();
+    }
+}
