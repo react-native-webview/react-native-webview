@@ -97,15 +97,8 @@ For example:
 
 ```tsx
 <WebView
-  ref={webViewRef}
-  originWhitelist={['*']}
   source={{
     uri: 'https://appassets.androidplatform.net/assets/index.html',
-  }}
-  onLoadEnd={sendRequests}
-  onMessage={(event) => {
-    console.log('resolve', event);
-    resolve(event.nativeEvent.data);
   }}
 />
 ```
