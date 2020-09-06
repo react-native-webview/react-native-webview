@@ -43,6 +43,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
+import androidx.webkit.WebViewAssetLoader;
+import androidx.webkit.WebViewAssetLoader.ResourcesPathHandler;
+import androidx.webkit.WebViewAssetLoader.AssetsPathHandler;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.views.scroll.ScrollEvent;
@@ -149,6 +152,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
 
+  private static WebViewAssetLoader assetLoader;
+
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
@@ -195,6 +200,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       setAllowUniversalAccessFromFileURLs(webView, false);
     }
     setMixedContentMode(webView, "never");
+
+    if (assetLoader == null) {
+      assetLoader = new WebViewAssetLoader.Builder()
+        .addPathHandler("/assets/", new AssetsPathHandler(reactContext))
+        .addPathHandler("/res/", new ResourcesPathHandler(reactContext))
+        .build();
+    }
 
     // Fixes broken full-screen modals/galleries due to body height being 0.
     webView.setLayoutParams(
@@ -777,6 +789,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     ReadableArray mUrlPrefixesForDefaultIntent;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
+
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view,
+                                                      WebResourceRequest request) {
+      return assetLoader.shouldInterceptRequest(request.getUrl());
+    }
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
       ignoreErrFailedForThisURL = url;
