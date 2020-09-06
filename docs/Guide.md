@@ -89,6 +89,27 @@ class MyWeb extends Component {
 }
 ```
 
+**Access local assets by WebViewAssetLoader on android x**
+
+Android x provide a new way to access assets, by using WebViewAssetLoader. now we can access assets via uri **https://appassets.androidplatform.net/assets/some-assets**
+
+For example:
+
+```tsx
+<WebView
+  ref={webViewRef}
+  originWhitelist={['*']}
+  source={{
+    uri: 'https://appassets.androidplatform.net/assets/index.html',
+  }}
+  onLoadEnd={sendRequests}
+  onMessage={(event) => {
+    console.log('resolve', event);
+    resolve(event.nativeEvent.data);
+  }}
+/>
+```
+
 </details>
 
 ### Controlling navigation state changes
