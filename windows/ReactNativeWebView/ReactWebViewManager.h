@@ -47,6 +47,7 @@ namespace winrt::ReactNativeWebView::implementation {
             winrt::Microsoft::ReactNative::IJSValueReader const& commandArgsReader) noexcept;
 
     private:
+        winrt::ReactNativeWebView::ReactWebView m_reactWebView{ nullptr };
         winrt::Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
 
     };

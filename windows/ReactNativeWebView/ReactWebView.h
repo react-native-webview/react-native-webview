@@ -12,6 +12,7 @@ namespace winrt::ReactNativeWebView::implementation {
     class ReactWebView : public ReactWebViewT<ReactWebView> {
     public:
         ReactWebView(Microsoft::ReactNative::IReactContext const& reactContext);
+        winrt::Windows::UI::Xaml::Controls::WebView GetView();
         void PostMessage(winrt::hstring const& message);
 
     private:
@@ -23,7 +24,7 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::Windows::UI::Xaml::Controls::WebView::ScriptNotify_revoker m_scriptNotifyRevoker{};
 
         void RegisterEvents();
-        void WriteWebViewNavigationEventArg(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter);
+        void WriteWebViewNavigationEventArg(winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter);
         void OnNavigationStarting(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationStartingEventArgs const& args);
         void OnNavigationCompleted(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationCompletedEventArgs const& args);
         void OnNavigationFailed(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationFailedEventArgs const& args);
