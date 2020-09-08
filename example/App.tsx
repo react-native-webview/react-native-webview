@@ -84,13 +84,6 @@ const TESTS = {
       return <LocalPageLoad />;
     },
   },
-  {Platform.OS === 'windows' && (
-    <Button
-      testID="testType_messaging"
-      title="WebGL"
-      onPress={() => this._changeTest('WebGL')}
-    />
-  )}
 };
 
 type Props = {};
@@ -166,6 +159,13 @@ export default class App extends Component<Props, State> {
               testID="testType_uploads"
               title="Uploads"
               onPress={() => this._changeTest('Uploads')}
+            />
+          )}
+          {Platform.OS === 'windows' && (
+            <Button
+              testID="testType_webGl"
+              title="WebGL"
+              onPress={() => this._changeTest('WebGL')}
             />
           )}
         </View>
