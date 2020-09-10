@@ -541,8 +541,6 @@ title
 url
 ```
 
-Note that this method will not be invoked on hash URL changes (e.g. from `https://example.com/users#list` to `https://example.com/users#help`). There is a workaround for this that is described [in the Guide](Guide.md#intercepting-hash-url-changes).
-
 ---
 
 ### `onContentProcessDidTerminate`[⬆](#props-index)<!-- Link generated with jump2header -->
