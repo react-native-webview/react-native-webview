@@ -598,8 +598,16 @@ Example:
 />
 ```
 
-Function will receive event object of `NativeSyntheticEvent<NativeScrollEvent>`
-type as an argument.
+Function passed to `onScroll` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+contentInset
+contentOffset
+contentSize
+layoutMeasurement
+velocity
+zoomScale
+```
 
 ---
 
