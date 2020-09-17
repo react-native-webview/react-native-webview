@@ -16,4 +16,5 @@ Pod::Spec.new do |s|
   s.source_files  = "apple/**/*.{h,m}"
 
   s.dependency 'React'
+  s.dependency 'React-Core'
 end
