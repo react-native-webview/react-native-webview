@@ -10,6 +10,8 @@ import {
   findNodeHandle,
 } from 'react-native';
 
+import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
+
 import invariant from 'invariant';
 
 import {
@@ -19,6 +21,7 @@ import {
   defaultRenderLoading,
 } from './WebViewShared';
 import {
+  WebViewRenderProcessGoneEvent,
   WebViewErrorEvent,
   WebViewHttpErrorEvent,
   WebViewMessageEvent,
@@ -40,6 +43,11 @@ const RNCWebView = requireNativeComponent(
 const { resolveAssetSource } = Image;
 
 /**
+ * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
+ */
+let uniqueRef = 0;
+
+/**
  * Renders a native WebView.
  */
 class WebView extends React.Component<AndroidWebViewProps, State> {
@@ -53,6 +61,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     saveFormDataDisabled: false,
     cacheEnabled: true,
     androidHardwareAccelerationDisabled: false,
+    androidLayerType: 'none',
     originWhitelist: defaultOriginWhitelist,
   };
 
@@ -68,7 +77,15 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     lastErrorEvent: null,
   };
 
+  onShouldStartLoadWithRequest: ReturnType<typeof createOnShouldStartLoadWithRequest> | null = null;
+
   webViewRef = React.createRef<NativeWebViewAndroid>();
+
+  messagingModuleName = `WebViewMessageHandler${uniqueRef+=1}`;
+
+  componentDidMount = () => {
+    BatchedBridge.registerCallableModule(this.messagingModuleName, this);
+  };
 
   getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
 
@@ -214,6 +231,13 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
   }
 
+  onRenderProcessGone = (event: WebViewRenderProcessGoneEvent) => {
+    const { onRenderProcessGone } = this.props;
+    if (onRenderProcessGone) {
+      onRenderProcessGone(event);
+    }
+  }
+
   onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     const { nativeEvent: { url } } = event;
@@ -257,8 +281,11 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   onShouldStartLoadWithRequestCallback = (
     shouldStart: boolean,
     url: string,
+    lockIdentifier?: number,
   ) => {
-    if (shouldStart) {
+    if (lockIdentifier) {
+      NativeModules.RNCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
+    } else if (shouldStart) {
       UIManager.dispatchViewManagerCommand(
         this.getWebViewHandle(),
         this.getCommands().loadUrl,
@@ -315,7 +342,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     const NativeWebView
       = (nativeConfig.component as typeof NativeWebViewAndroid) || RNCWebView;
 
-    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+    this.onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
       // casting cause it's in the default props
       originWhitelist as readonly string[],
@@ -327,13 +354,15 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         key="webViewKey"
         {...otherProps}
         messagingEnabled={typeof onMessage === 'function'}
+        messagingModuleName={this.messagingModuleName}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
         onLoadingStart={this.onLoadingStart}
         onHttpError={this.onHttpError}
+        onRenderProcessGone={this.onRenderProcessGone}
         onMessage={this.onMessage}
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
         ref={this.webViewRef}
         // TODO: find a better way to type this.
         source={resolveAssetSource(source as ImageSourcePropType)}

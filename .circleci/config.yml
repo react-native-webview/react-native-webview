@@ -34,7 +34,7 @@ jobs:
             - node_modules-{{ arch }}-{{ checksum "yarn.lock" }}
 
       - run:
-          name: Run Tests
+          name: Lint checks
           command: yarn ci
 
   publish:
