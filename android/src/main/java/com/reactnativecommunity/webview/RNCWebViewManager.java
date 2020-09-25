@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -574,6 +575,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     WebView view,
     @Nullable Boolean allowFileAccess) {
     view.getSettings().setAllowFileAccess(allowFileAccess != null && allowFileAccess);
+  }
+
+  // Howard added 
+  @ReactProp(name = "autoShowKeyboard")
+  public void setAutoShowKeyboard(
+    WebView view,
+    @Nullable Boolean autoShowKeyboard) {
+    if (autoShowKeyboard != null) {
+      view.setFocusableInTouchMode(autoShowKeyboard);
+      view.setFocusable(autoShowKeyboard);
+    }
   }
 
   @ReactProp(name = "geolocationEnabled")

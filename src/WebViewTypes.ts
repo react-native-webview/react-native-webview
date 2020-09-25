@@ -299,6 +299,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   thirdPartyCookiesEnabled?: boolean;
   messagingModuleName?: string;
   readonly urlPrefixesForDefaultIntent?: string[];
+  autoShowKeyboard?: boolean;// Howard added 
 }
 
 export declare type ContentInsetAdjustmentBehavior = 'automatic' | 'scrollableAxes' | 'never' | 'always';
@@ -792,6 +793,11 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   allowFileAccess?: boolean;
+
+  /**
+     * Sets auto show Keyboard when user focus on input on Android devices.
+     */
+  autoShowKeyboard?: boolean;
 
   /**
    * Used on Android only, controls whether form autocomplete data should be saved

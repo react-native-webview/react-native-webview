@@ -126,6 +126,7 @@ static NSDictionary* customCertificatesForHost;
     _directionalLockEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
     _autoManageStatusBarEnabled = YES;
+    _autoShowKeyboard = YES; // Howard added 
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
     #if !TARGET_OS_OSX
@@ -225,6 +226,7 @@ static NSDictionary* customCertificatesForHost;
   if(self.useSharedProcessPool) {
     wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
   }
+  
   wkWebViewConfig.userContentController = [WKUserContentController new];
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
@@ -369,6 +371,10 @@ static NSDictionary* customCertificatesForHost;
 }
 -(void)keyboardWillShow
 {
+    if (!_autoShowKeyboard) {
+        [self.webView endEditing: YES];
+        return;
+    }
     if (keyboardTimer != nil) {
         [keyboardTimer invalidate];
     }
@@ -661,6 +667,11 @@ static NSDictionary* customCertificatesForHost;
 #if !TARGET_OS_OSX
   _webView.scrollView.scrollEnabled = scrollEnabled;
 #endif // !TARGET_OS_OSX
+}
+
+- (void)setAutoShowKeyboard:(BOOL)autoShowKeyboard
+{
+  _autoShowKeyboard = autoShowKeyboard;
 }
 
 #if !TARGET_OS_OSX
