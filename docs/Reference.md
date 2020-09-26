@@ -72,6 +72,7 @@ This document lays out the current public properties and methods for the React N
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
+- [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 
 ## Methods Index
 
@@ -1279,6 +1280,20 @@ Example:
 
 ```javascript
 <WebView autoManageStatusBarEnabled={false} />
+```
+
+### `setSupportMultipleWindows`
+
+Sets whether the WebView supports multiple windows. See [Android documentation]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') for more information. 
+
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | true    | Android  |
+
+Example:
+
+```javascript
+<WebView setSupportMultipleWindows={false} />
 ```
 
 ## Methods
