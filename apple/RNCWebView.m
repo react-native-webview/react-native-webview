@@ -99,7 +99,7 @@ static NSDictionary* customCertificatesForHost;
   BOOL _savedKeyboardDisplayRequiresUserAction;
 
   // Workaround for StatusBar appearance bug for iOS 12
-  // https://github.com/react-native-community/react-native-webview/issues/62
+  // https://github.com/react-native-webview/react-native-webview/issues/62
   BOOL _isFullScreenVideoOpen;
 #if !TARGET_OS_OSX
   UIStatusBarStyle _savedStatusBarStyle;
@@ -165,7 +165,7 @@ static NSDictionary* customCertificatesForHost;
       name:UIKeyboardWillShowNotification object:nil];
 
     // Workaround for StatusBar appearance bug for iOS 12
-    // https://github.com/react-native-community/react-native-webview/issues/62
+    // https://github.com/react-native-webview/react-native-webview/issues/62
       [[NSNotificationCenter defaultCenter] addObserver:self
                                                selector:@selector(showFullScreenVideoStatusBars)
                                                    name:UIWindowDidBecomeVisibleNotification
@@ -282,7 +282,7 @@ static NSDictionary* customCertificatesForHost;
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
       //For UIRefreshControl to work correctly, the bounces should always be true
-    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces; 
+    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
@@ -1155,7 +1155,7 @@ static NSDictionary* customCertificatesForHost;
 - (void)setPullToRefreshEnabled:(BOOL)pullToRefreshEnabled
 {
     _pullToRefreshEnabled = pullToRefreshEnabled;
-    
+
     if (pullToRefreshEnabled) {
         [self addPullToRefreshControl];
     } else {
