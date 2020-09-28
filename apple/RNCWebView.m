@@ -672,6 +672,9 @@ static NSDictionary* customCertificatesForHost;
 - (void)setAutoShowKeyboard:(BOOL)autoShowKeyboard
 {
   _autoShowKeyboard = autoShowKeyboard;
+  if (!autoShowKeyboard) {
+    [self.webView endEditing: YES];
+  }
 }
 
 #if !TARGET_OS_OSX

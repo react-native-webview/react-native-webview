@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.view.MotionEvent;
+import android.view.View.OnTouchListener;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -147,6 +149,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
+  protected boolean mAutoShowKeyboard = true;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
 
@@ -205,6 +208,22 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
+    
+    webView.setOnTouchListener(new OnTouchListener() {
+      public boolean onTouch(View v, MotionEvent event) {
+        webView.getSettings().setJavaScriptEnabled(true);
+        RNCWebView reactWebView = (RNCWebView) webView;
+        if (!mAutoShowKeyboard) {
+          reactWebView.evaluateJavascriptWithFallback("document.querySelector('input').disabled='disabled'" 
+          + ";document.querySelector('textarea').disabled='disabled'");
+        } else {
+          reactWebView.evaluateJavascriptWithFallback("document.querySelector('input').disabled=false" 
+          + ";document.querySelector('textarea').disabled=false");
+        }
+        v.onTouchEvent(event);
+        return true;
+      }
+    });
 
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
@@ -577,14 +596,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setAllowFileAccess(allowFileAccess != null && allowFileAccess);
   }
 
-  // Howard added 
   @ReactProp(name = "autoShowKeyboard")
   public void setAutoShowKeyboard(
     WebView view,
     @Nullable Boolean autoShowKeyboard) {
     if (autoShowKeyboard != null) {
+      mAutoShowKeyboard = autoShowKeyboard;
       view.setFocusableInTouchMode(autoShowKeyboard);
       view.setFocusable(autoShowKeyboard);
+      Context ctx = view.getContext();
+      if (!autoShowKeyboard && ctx != null) {
+        InputMethodManager imm = (InputMethodManager)ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+      }
+      view.getSettings().setJavaScriptEnabled(true);
+      RNCWebView reactWebView = (RNCWebView) view;
+      if (!autoShowKeyboard) {
+        reactWebView.evaluateJavascriptWithFallback("document.querySelector('input').disabled='disabled'" 
+        + ";document.querySelector('textarea').disabled='disabled'");
+      } else {
+        reactWebView.evaluateJavascriptWithFallback("document.querySelector('input').disabled=false" 
+        + ";document.querySelector('textarea').disabled=false");
+      }
     }
   }
 
