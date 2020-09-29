@@ -63,7 +63,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     androidHardwareAccelerationDisabled: false,
     androidLayerType: 'none',
     originWhitelist: defaultOriginWhitelist,
-    setSupportMultipleWindowsDisabled: true,
+    setSupportMultipleWindows: true,
   };
 
   static isFileUploadSupported = async () => {
