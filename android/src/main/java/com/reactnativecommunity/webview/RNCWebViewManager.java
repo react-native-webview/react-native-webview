@@ -208,22 +208,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
-    
-    webView.setOnTouchListener(new OnTouchListener() {
-      public boolean onTouch(View v, MotionEvent event) {
-        webView.getSettings().setJavaScriptEnabled(true);
-        RNCWebView reactWebView = (RNCWebView) webView;
-        if (!mAutoShowKeyboard) {
-          reactWebView.evaluateJavascriptWithFallback("document.querySelector('input').disabled='disabled'" 
-          + ";document.querySelector('textarea').disabled='disabled'");
-        } else {
-          reactWebView.evaluateJavascriptWithFallback("document.querySelector('input').disabled=false" 
-          + ";document.querySelector('textarea').disabled=false");
-        }
-        v.onTouchEvent(event);
-        return true;
-      }
-    });
 
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
@@ -605,18 +589,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       view.setFocusableInTouchMode(autoShowKeyboard);
       view.setFocusable(autoShowKeyboard);
       Context ctx = view.getContext();
+      ReactContext mReactContext = (ReactContext)view.getContext();
+
       if (!autoShowKeyboard && ctx != null) {
         InputMethodManager imm = (InputMethodManager)ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-      }
-      view.getSettings().setJavaScriptEnabled(true);
-      RNCWebView reactWebView = (RNCWebView) view;
-      if (!autoShowKeyboard) {
-        reactWebView.evaluateJavascriptWithFallback("document.querySelector('input').disabled='disabled'" 
-        + ";document.querySelector('textarea').disabled='disabled'");
+        mReactContext.getCurrentActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
+        WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
       } else {
-        reactWebView.evaluateJavascriptWithFallback("document.querySelector('input').disabled=false" 
-        + ";document.querySelector('textarea').disabled=false");
+        mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
       }
     }
   }
