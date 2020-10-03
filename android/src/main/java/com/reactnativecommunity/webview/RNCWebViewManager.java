@@ -40,6 +40,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebView.HitTestResult;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
@@ -208,6 +209,24 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
+
+    webView.setOnTouchListener(new OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        final HitTestResult result = webView.getHitTestResult();
+        int act = event.getAction(); // backup action type
+        
+        if ((result.getType() == HitTestResult.EDIT_TEXT_TYPE) && (!mAutoShowKeyboard)) {
+          event.setAction(MotionEvent.ACTION_CANCEL); // disable soft input keyboard
+          webView.onTouchEvent(event); // call native handler
+          event.setAction(act); // restore action type
+          
+          return false;
+        }
+        webView.onTouchEvent(event); 
+        return true;
+      }
+    });
 
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
@@ -591,13 +610,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       Context ctx = view.getContext();
       ReactContext mReactContext = (ReactContext)view.getContext();
 
+      InputMethodManager imm = (InputMethodManager)ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
       if (!autoShowKeyboard && ctx != null) {
-        InputMethodManager imm = (InputMethodManager)ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         mReactContext.getCurrentActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
         WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
       } else {
         mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
       }
     }
   }
