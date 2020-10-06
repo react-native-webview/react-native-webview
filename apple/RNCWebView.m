@@ -17,6 +17,10 @@
 
 #import "objc/runtime.h"
 
+#import <TrustKit/TrustKit.h>
+#import <TrustKit/TSKPinningValidator.h>
+#import <TrustKit/TSKPinningValidatorCallback.h>
+
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
@@ -761,36 +765,15 @@ static NSDictionary* customCertificatesForHost;
   didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
                   completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler
 {
-    NSString* host = nil;
-    if (webView.URL != nil) {
-        host = webView.URL.host;
+    /// SSL Pinning using TrustKit
+   @try {
+      TSKPinningValidator *pinningValidator = [[TrustKit sharedInstance] pinningValidator];
+      if (![pinningValidator handleChallenge:challenge completionHandler:completionHandler]) {
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+      }
+    }@catch (NSException *e) {
+      completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
     }
-    if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
-        completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
-        return;
-    }
-    if ([[challenge protectionSpace] serverTrust] != nil && customCertificatesForHost != nil && host != nil) {
-        SecCertificateRef localCertificate = (__bridge SecCertificateRef)([customCertificatesForHost objectForKey:host]);
-        if (localCertificate != nil) {
-            NSData *localCertificateData = (NSData*) CFBridgingRelease(SecCertificateCopyData(localCertificate));
-            SecTrustRef trust = [[challenge protectionSpace] serverTrust];
-            long count = SecTrustGetCertificateCount(trust);
-            for (long i = 0; i < count; i++) {
-                SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(trust, i);
-                if (serverCertificate == nil) { continue; }
-                NSData *serverCertificateData = (NSData *) CFBridgingRelease(SecCertificateCopyData(serverCertificate));
-                if ([serverCertificateData isEqualToData:localCertificateData]) {
-                    NSURLCredential *useCredential = [NSURLCredential credentialForTrust:trust];
-                    if (challenge.sender != nil) {
-                        [challenge.sender useCredential:useCredential forAuthenticationChallenge:challenge];
-                    }
-                    completionHandler(NSURLSessionAuthChallengeUseCredential, useCredential);
-                    return;
-                }
-            }
-        }
-    }
-    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
 }
 
 #pragma mark - WKNavigationDelegate methods
