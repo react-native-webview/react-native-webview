@@ -77,6 +77,7 @@ import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
 import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
+import com.reactnativecommunity.webview.events.TopPermissionRequestEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -127,6 +128,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
   public static final int COMMAND_FOCUS = 8;
+  public static final int COMMAND_ANSWER_PERMISSION_REQUEST = 9;
 
   // android commands
   public static final int COMMAND_CLEAR_FORM_DATA = 1000;
@@ -604,6 +606,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
     export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
+    export.put(TopPermissionRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onPermissionRequest"));
     export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
     return export;
   }
@@ -618,6 +621,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       .put("stopLoading", COMMAND_STOP_LOADING)
       .put("postMessage", COMMAND_POST_MESSAGE)
       .put("injectJavaScript", COMMAND_INJECT_JAVASCRIPT)
+      .put("answerPermissionRequest", COMMAND_ANSWER_PERMISSION_REQUEST)
       .put("loadUrl", COMMAND_LOAD_URL)
       .put("requestFocus", COMMAND_FOCUS)
       .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
@@ -665,6 +669,23 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         RNCWebView reactWebView = (RNCWebView) root;
         reactWebView.evaluateJavascriptWithFallback(args.getString(0));
         break;
+      case COMMAND_ANSWER_PERMISSION_REQUEST:
+         if (args == null || args.size() < 1) {
+           throw new RuntimeException("Arguments for answerPermissionRequest are null!");
+         }
+
+         boolean answer = args.getBoolean(0);
+         ArrayList<String> resources = new ArrayList<String>();
+         for(int i=1; i<args.size(); ++i) {
+           resources.add(args.getString(i));
+         }
+
+         RNCWebChromeClient client = (RNCWebChromeClient) root.getWebChromeClient();
+         if(null != client) {
+           client.answerPermissionRequest(answer, resources.toArray(new String[resources.size()]));
+         }
+
+         break;
       case COMMAND_LOAD_URL:
         if (args == null) {
           throw new RuntimeException("Arguments for loading an url are null!");
@@ -1050,6 +1071,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected View mVideoView;
     protected WebChromeClient.CustomViewCallback mCustomViewCallback;
 
+    /**
+      * This field stores the PermissionRequest from the web application until it is allowed
+      * or denied by user.
+      */
+    private PermissionRequest mPermissionRequest;
+
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
 
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
@@ -1065,41 +1092,47 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       // Ignore console logs in non debug builds.
       return true;
     }
+    
+    public void answerPermissionRequest(boolean allowed, String[] resources) {
+       if(null == mPermissionRequest )
+         return;
+
+       if (allowed) {
+         mPermissionRequest.grant(resources);
+       } else {
+         mPermissionRequest.deny();
+       }
+       mPermissionRequest = null;
+     }
+
+     // This method is called when the permission request is canceled by the web content.
+     @Override
+     public void onPermissionRequestCanceled(PermissionRequest request) {
+       // We dismiss the prompt UI here as the request is no longer valid.
+       mPermissionRequest = null;
+     }
 
     // Fix WebRTC permission request error.
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onPermissionRequest(final PermissionRequest request) {
+
+      mPermissionRequest = request;
       String[] requestedResources = request.getResources();
-      ArrayList<String> permissions = new ArrayList<>();
-      ArrayList<String> grantedPermissions = new ArrayList<String>();
+
+      WebView wv = (WebView) mWebView;
+      WritableMap event = Arguments.createMap();
+      WritableNativeArray params = new WritableNativeArray();
       for (int i = 0; i < requestedResources.length; i++) {
-        if (requestedResources[i].equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
-          permissions.add(Manifest.permission.RECORD_AUDIO);
-        } else if (requestedResources[i].equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
-          permissions.add(Manifest.permission.CAMERA);
-        }
-        // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
+        params.pushString(requestedResources[i]);
       }
+      event.putArray("resources", params);
 
-      for (int i = 0; i < permissions.size(); i++) {
-        if (ContextCompat.checkSelfPermission(mReactContext, permissions.get(i)) != PackageManager.PERMISSION_GRANTED) {
-          continue;
-        }
-        if (permissions.get(i).equals(Manifest.permission.RECORD_AUDIO)) {
-          grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
-        } else if (permissions.get(i).equals(Manifest.permission.CAMERA)) {
-          grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
-        }
-      }
-
-      if (grantedPermissions.isEmpty()) {
-        request.deny();
-      } else {
-        String[] grantedPermissionsArray = new String[grantedPermissions.size()];
-        grantedPermissionsArray = grantedPermissions.toArray(grantedPermissionsArray);
-        request.grant(grantedPermissionsArray);
-      }
+      dispatchEvent(
+        wv,
+        new TopPermissionRequestEvent(
+          wv.getId(),
+          event));
     }
 
     @Override

@@ -14,7 +14,7 @@ import {
 
 type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
 
-type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
+type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData' | 'answerPermissionRequest';
 
 
 
@@ -102,6 +102,10 @@ export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
   progress: number;
 }
 
+export interface WebViewNativePermissionEvent extends WebViewNativeEvent {
+  resources: string[];
+}
+
 export interface WebViewNavigation extends WebViewNativeEvent {
   navigationType:
     | 'click'
@@ -149,6 +153,10 @@ export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent = NativeSyntheticEvent<
   WebViewNativeProgressEvent
+>;
+
+export type WebViewPermissionEvent = NativeSyntheticEvent<
+  WebViewNativePermissionEvent
 >;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
@@ -292,6 +300,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   javaScriptEnabled?: boolean;
   mixedContentMode?: 'never' | 'always' | 'compatibility';
   onContentSizeChange?: (event: WebViewEvent) => void;
+  onPermissionRequest?: (event: WebViewPermissionEvent) => void;
   onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
@@ -725,6 +734,7 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
 export interface AndroidWebViewProps extends WebViewSharedProps {
   onNavigationStateChange?: (event: WebViewNavigation) => void;
   onContentSizeChange?: (event: WebViewEvent) => void;
+  onPermissionRequest?: (event: WebViewPermissionEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` process crashes or is killed by the OS.

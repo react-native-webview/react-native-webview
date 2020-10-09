@@ -10,6 +10,7 @@ import {
   Platform,
 } from 'react-native';
 
+import Permission from './examples/Permission';
 import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
@@ -19,6 +20,14 @@ import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
 
 const TESTS = {
+  Permission: {
+    title: 'Permission',
+    testId: 'permission',
+    description: 'Permission tests',
+    render() {
+      return <Permission />;
+    },
+  },
   Alerts: {
     title: 'Alerts',
     testId: 'alerts',
@@ -113,6 +122,11 @@ export default class App extends Component<Props, State> {
         </TouchableOpacity>
 
         <View style={styles.testPickerContainer}>
+          <Button
+            testID="testType_permission"
+            title="Permission"
+            onPress={() => this._changeTest('Permission')}
+          />
           <Button
             testID="testType_alerts"
             title="Alerts"
