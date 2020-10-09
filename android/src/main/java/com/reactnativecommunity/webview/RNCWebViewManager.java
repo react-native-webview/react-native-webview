@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.view.MotionEvent;
 import android.view.View.OnTouchListener;
 import android.webkit.ConsoleMessage;
@@ -607,10 +609,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       mAutoShowKeyboard = autoShowKeyboard;
       view.setFocusableInTouchMode(autoShowKeyboard);
       view.setFocusable(autoShowKeyboard);
+      final RNCWebView rncWebView = (RNCWebView) view;
+      rncWebView.setAutoShowKeyboard(autoShowKeyboard);
+
       Context ctx = view.getContext();
       ReactContext mReactContext = (ReactContext)view.getContext();
-
       InputMethodManager imm = (InputMethodManager)ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+      
       if (!autoShowKeyboard && ctx != null) {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         mReactContext.getCurrentActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
@@ -1244,6 +1249,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     private OnScrollDispatchHelper mOnScrollDispatchHelper;
     protected boolean hasScrollEvent = false;
     protected ProgressChangedFilter progressChangedFilter;
+    protected @Nullable
+    Boolean mAutoShowKeyboard = true;
 
     /**
      * WebView must be created with an context of the current activity
@@ -1267,6 +1274,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setHasScrollEvent(boolean hasScrollEvent) {
       this.hasScrollEvent = hasScrollEvent;
+    }
+
+    public void setAutoShowKeyboard(Boolean bAutoShow) {
+      this.mAutoShowKeyboard = bAutoShow;
+    }
+
+    @Override
+    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+      if (!this.mAutoShowKeyboard) {
+        hideKeyboard();
+      }
+      return super.onCreateInputConnection(outAttrs);
+    }
+
+    private void hideKeyboard() {
+      post(new Runnable() {
+          @Override
+          public void run() {
+              InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+              if (imm != null) imm.hideSoftInputFromWindow(getRootView().getWindowToken(), 0);
+          }
+      });
     }
 
     @Override
