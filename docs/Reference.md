@@ -1285,6 +1285,7 @@ Example:
 ### `setSupportMultipleWindows`
 
 Sets whether the WebView supports multiple windows. See [Android documentation]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') for more information. 
+Setting this to false can expose the application to this vulnerability https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/ allowing a malicious iframe to escape into the top layer DOM. 
 
 | Type    | Required | Default | Platform |
 | ------- | -------- | ------- | -------- |
