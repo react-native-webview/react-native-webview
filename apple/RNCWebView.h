@@ -65,7 +65,9 @@
 @property (nonatomic, assign) BOOL autoShowKeyboard;
 @property (nonatomic, copy) NSString * _Nullable allowingReadAccessToURL;
 @property (nonatomic, assign) BOOL pullToRefreshEnabled;
+#if !TARGET_OS_OSX
 @property (nonatomic, weak) UIRefreshControl * refreshControl;
+#endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
 @property (nonatomic, assign) WKContentMode contentMode;
@@ -79,7 +81,9 @@
 - (void)goBack;
 - (void)reload;
 - (void)stopLoading;
+#if !TARGET_OS_OSX
 - (void)addPullToRefreshControl;
 - (void)pullToRefresh:(UIRefreshControl *)refreshControl;
+#endif
 
 @end
