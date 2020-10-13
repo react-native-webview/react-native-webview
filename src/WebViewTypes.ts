@@ -299,7 +299,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   thirdPartyCookiesEnabled?: boolean;
   messagingModuleName?: string;
   readonly urlPrefixesForDefaultIntent?: string[];
-  autoShowKeyboard?: boolean;// Howard added 
+  autoShowKeyboard?: boolean;
 }
 
 export declare type ContentInsetAdjustmentBehavior = 'automatic' | 'scrollableAxes' | 'never' | 'always';

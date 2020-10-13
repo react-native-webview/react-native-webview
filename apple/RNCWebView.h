@@ -62,7 +62,6 @@
 @property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
 @property (nonatomic, assign) BOOL directionalLockEnabled;
 @property (nonatomic, assign) BOOL ignoreSilentHardwareSwitch;
-/* Howard added  */
 @property (nonatomic, assign) BOOL autoShowKeyboard;
 @property (nonatomic, copy) NSString * _Nullable allowingReadAccessToURL;
 @property (nonatomic, assign) BOOL pullToRefreshEnabled;

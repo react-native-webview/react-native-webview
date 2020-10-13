@@ -126,7 +126,7 @@ static NSDictionary* customCertificatesForHost;
     _directionalLockEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
     _autoManageStatusBarEnabled = YES;
-    _autoShowKeyboard = YES; // Howard added 
+    _autoShowKeyboard = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
     #if !TARGET_OS_OSX
