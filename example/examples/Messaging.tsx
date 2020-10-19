@@ -23,10 +23,6 @@ const HTML = `
     <button onclick="sendPostMessage()">Send post message from JS to WebView</button>
     <p id="demo"></p>    
     <script>
-      window.addEventListener("message", function(event) {
-        console.log("Received from RN: ",event.data);
-      }, false);
-
       function sendPostMessage() {
         window.ReactNativeWebView.postMessage('Message from javascript');
       }
@@ -44,10 +40,6 @@ export default class Messaging extends Component<Props, State> {
   constructor(props) {
     super(props);
     this.webView = React.createRef();
-  }
-
-  componentDidMount() {
-    this.webView.current.postMessage("Hello from React Native");
   }
 
   render() {

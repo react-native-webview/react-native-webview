@@ -116,7 +116,6 @@ namespace winrt::ReactNativeWebView::implementation {
         commands.Append(L"reload");
         commands.Append(L"stopLoading");
         commands.Append(L"injectJavaScript");
-        commands.Append(L"postMessage");
         return commands.GetView();
     }
 
@@ -148,9 +147,6 @@ namespace winrt::ReactNativeWebView::implementation {
         else if (commandId == L"injectJavaScript") {
             webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
         } 
-        else if(commandId == L"postMessage") {
-            webView.InvokeScriptAsync(L"eval", { L"document.dispatchEvent(new MessageEvent(\"message\", { data: JSON.stringify(\"" + winrt::to_hstring(commandArgs[0].AsString()) + L"\") }));" });        
-        }
     }
 
 } // namespace winrt::ReactWebView::implementation
