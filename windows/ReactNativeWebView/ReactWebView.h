@@ -25,7 +25,7 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::Windows::UI::Xaml::Controls::WebView m_webView{ nullptr };
         Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
         WebBridge m_webBridge{ nullptr };
-        winrt::event_token m_message_token;
+        winrt::event_token m_messageToken;
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationStarting_revoker m_navigationStartingRevoker{};
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationCompleted_revoker m_navigationCompletedRevoker{};
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationFailed_revoker m_navigationFailedRevoker{};

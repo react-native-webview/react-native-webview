@@ -35,7 +35,7 @@ namespace winrt::ReactNativeWebView::implementation {
     ReactWebView::~ReactWebView()
     {
       if (m_messagingEnabled) {
-        m_webBridge.MessagePostEvent(m_message_token);
+        m_webBridge.MessagePostEvent(m_messageToken);
       }
     }
 
@@ -87,7 +87,7 @@ namespace winrt::ReactNativeWebView::implementation {
 
         if (m_messagingEnabled) {
           m_webBridge = WebBridge();
-          m_message_token = m_webBridge.MessagePostEvent([this](const auto&, hstring const& message)
+          m_messageToken = m_webBridge.MessagePostEvent([this](const auto&, hstring const& message)
             {
               this->OnMessagePosted(message);
             });
