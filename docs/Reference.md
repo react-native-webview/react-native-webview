@@ -135,7 +135,8 @@ Set this to provide JavaScript that will be injected into the web page after the
 
 Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
 
-On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc)
+On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc). Be sure
+to set an [`onMessage`](Reference.md#onmessage) handler, even if it's a no-op, or the code will not be run.
 
 | Type   | Required | Platform            |
 | ------ | -------- | ------------------- |
