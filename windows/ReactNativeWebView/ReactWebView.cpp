@@ -145,7 +145,6 @@ namespace winrt::ReactNativeWebView::implementation {
         // WebGL permission request https://docs.microsoft.com/en-us/microsoft-edge/webvr/webvr-in-webview
         args.PermissionRequest().Allow();
       }
-      args.PermissionRequest().Deny();
     }
 
     void ReactWebView::PostMessage(winrt::hstring const& message) {
