@@ -105,11 +105,9 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
   }
 
   postMessage = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      UIManager.getViewManagerConfig('RCTWebView').Commands.postMessage,
-      [String(data)],
-    );
+    // Currently injectJavaScript is in use, for example:
+    // webView.injectJavaScript("document.dispatchEvent(new MessageEvent('message', {data: 'hello'}))");
+    throw Error('Not in use');
   };
 
   /**
