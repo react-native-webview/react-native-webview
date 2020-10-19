@@ -149,7 +149,7 @@ namespace winrt::ReactNativeWebView::implementation {
             webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
         } 
         else if(commandId == L"postMessage") {
-          webView.InvokeScriptAsync(L"eval", { L"document.dispatchEvent(new MessageEvent('message', { data: '${JSON.stringify(" + winrt::to_hstring(commandArgs[0].AsString()) + L")}' })); " });
+            webView.InvokeScriptAsync(L"eval", { L"document.dispatchEvent(new MessageEvent(\"message\", { data: JSON.stringify(\"" + winrt::to_hstring(commandArgs[0].AsString()) + L"\") }));" });        
         }
     }
 

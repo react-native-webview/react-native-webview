@@ -23,6 +23,10 @@ const HTML = `
     <button onclick="sendPostMessage()">Send post message from JS to WebView</button>
     <p id="demo"></p>    
     <script>
+      window.addEventListener("message", function(event) {
+        console.log("Received from RN: ",event.data);
+      }, false);
+
       function sendPostMessage() {
         window.ReactNativeWebView.postMessage('Message from javascript');
       }
@@ -54,7 +58,6 @@ export default class Messaging extends Component<Props, State> {
           source={{html: HTML}}
           automaticallyAdjustContentInsets={false}
           onMessage={(e: {nativeEvent: {data?: string}}) => {
-            console.log('onMessage', e.nativeEvent.data);
             Alert.alert('Message received', e.nativeEvent.data);
           }}
         />
