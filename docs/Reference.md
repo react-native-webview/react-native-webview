@@ -265,6 +265,8 @@ Example:
 />
 ```
 
+The `syntheticEvent` can be stopped doing its default action by calling `syntheticEvent.preventDefault()`.
+
 Function passed to `onError` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
 
 ```
