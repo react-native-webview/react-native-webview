@@ -114,10 +114,11 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
   };
 
   getInjectableJSMessage = (message: string ) => {
-    return `(function() {document.dispatchEvent(new MessageEvent('message', {data: ${JSON.stringify(
+    return `(function() {window.dispatchEvent(new MessageEvent('message', {data: ${JSON.stringify(
       message
     )}}));})();`;
   }
+
 
 
   /**
