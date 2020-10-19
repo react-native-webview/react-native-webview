@@ -30,7 +30,7 @@ namespace winrt::ReactNativeWebView::implementation {
         void OnNavigationCompleted(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationCompletedEventArgs const& args);
         void OnNavigationFailed(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationFailedEventArgs const& args);
         void OnScriptNotify(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::NotifyEventArgs const& args);
-        void OnPremissionRequested(winrt::Windows::UI::Xaml::Controls::WebView const& webView, winrt::Windows::UI::Xaml::Controls::WebViewPermissionRequestedEventArgs const& args);
+        void OnPermissionRequested(winrt::Windows::UI::Xaml::Controls::WebView const& webView, winrt::Windows::UI::Xaml::Controls::WebViewPermissionRequestedEventArgs const& args);
 
     };
 } // namespace winrt::ReactNativeWebView::implementation
