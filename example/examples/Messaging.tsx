@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, Alert} from 'react-native';
+import {View, Alert} from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -34,13 +34,23 @@ const HTML = `
 type Props = {};
 type State = {};
 
-export default class Alerts extends Component<Props, State> {
+export default class Messaging extends Component<Props, State> {
   state = {};
+
+  constructor(props) {
+    super(props);
+    this.webView = React.createRef();
+  }
+
+  componentDidMount() {
+    this.webView.current.postMessage("Hello from React Native");
+  }
 
   render() {
     return (
       <View style={{height: 120}}>
         <WebView
+          ref={this.webView}
           source={{html: HTML}}
           automaticallyAdjustContentInsets={false}
           onMessage={(e: {nativeEvent: {data?: string}}) => {

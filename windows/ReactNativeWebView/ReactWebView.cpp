@@ -132,12 +132,6 @@ namespace winrt::ReactNativeWebView::implementation {
             });
     }
 
-    void ReactWebView::PostMessage(winrt::hstring const& message) {
-        // Not in use anymore
-        // Currently injectJavaScript is in use, for example:
-        // webView.injectJavaScript("document.dispatchEvent(new MessageEvent('message', {data: 'hello'}))");
-    }
-
     void ReactWebView::HandleMessageFromJS(winrt::hstring const& message) {
         winrt::JsonObject jsonObject;
         if (winrt::JsonObject::TryParse(message, jsonObject) && jsonObject.HasKey(L"type")) {
