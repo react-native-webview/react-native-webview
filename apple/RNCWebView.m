@@ -125,6 +125,7 @@ static NSDictionary* customCertificatesForHost;
     _showsVerticalScrollIndicator = YES;
     _directionalLockEnabled = YES;
     _automaticallyAdjustContentInsets = YES;
+    _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
     #if !TARGET_OS_OSX
@@ -335,9 +336,13 @@ static NSDictionary* customCertificatesForHost;
 -(void)showFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if (!_autoManageStatusBarEnabled) {
+      return;
+    }
+
     _isFullScreenVideoOpen = YES;
     RCTUnsafeExecuteOnMainQueueSync(^{
-      [RCTSharedApplication() setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+      [RCTSharedApplication() setStatusBarStyle:self->_savedStatusBarStyle animated:YES];
     });
 #pragma clang diagnostic pop
 }
@@ -345,6 +350,10 @@ static NSDictionary* customCertificatesForHost;
 -(void)hideFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if (!_autoManageStatusBarEnabled) {
+      return;
+    }
+
     _isFullScreenVideoOpen = NO;
     RCTUnsafeExecuteOnMainQueueSync(^{
       [RCTSharedApplication() setStatusBarHidden:self->_savedStatusBarHidden animated:YES];
@@ -1127,7 +1136,7 @@ static NSDictionary* customCertificatesForHost;
     [_webView reload];
   }
 }
-
+#if !TARGET_OS_OSX
 - (void)addPullToRefreshControl
 {
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
@@ -1142,7 +1151,7 @@ static NSDictionary* customCertificatesForHost;
     [refreshControl endRefreshing];
 }
 
-#if !TARGET_OS_OSX
+
 - (void)setPullToRefreshEnabled:(BOOL)pullToRefreshEnabled
 {
     _pullToRefreshEnabled = pullToRefreshEnabled;
@@ -1375,4 +1384,3 @@ static NSDictionary* customCertificatesForHost;
 }
 
 @end
-

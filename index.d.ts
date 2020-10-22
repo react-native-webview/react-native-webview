@@ -6,7 +6,7 @@ export { FileDownload, WebViewMessageEvent, WebViewNavigation } from "./lib/WebV
 
 export type WebViewProps = IOSWebViewProps & AndroidWebViewProps;
 
-declare class WebView extends Component<WebViewProps> {
+declare class WebView<P = {}> extends Component<WebViewProps & P> {
     /**
      * Go back one page in the webview's history.
      */
