@@ -28,12 +28,12 @@ import {
   NativeWebViewIOS,
   ViewManager,
   State,
-  RNCWebViewUIManager,
+  RNCWebViewUIManagerIOS,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManager;
+const UIManager = NotTypedUIManager as RNCWebViewUIManagerIOS;
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -302,6 +302,8 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       originWhitelist,
       renderError,
       renderLoading,
+      injectedJavaScriptForMainFrameOnly = true,
+      injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true,
       style,
       containerStyle,
       ...otherProps
@@ -350,12 +352,17 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
+        onFileDownload={this.props.onFileDownload}
         onLoadingStart={this.onLoadingStart}
         onHttpError={this.onHttpError}
         onMessage={this.onMessage}
         onScroll={this.props.onScroll}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentProcessDidTerminate={this.onContentProcessDidTerminate}
+        injectedJavaScript={this.props.injectedJavaScript}
+        injectedJavaScriptBeforeContentLoaded={this.props.injectedJavaScriptBeforeContentLoaded}
+        injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
+        injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
         ref={this.webViewRef}
         // TODO: find a better way to type this.
         source={resolveAssetSource(this.props.source as ImageSourcePropType)}

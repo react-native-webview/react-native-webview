@@ -2,8 +2,8 @@ import escapeStringRegexp from 'escape-string-regexp';
 import React from 'react';
 import { Linking, View, ActivityIndicator, Text } from 'react-native';
 import {
-  WebViewNavigationEvent,
   OnShouldStartLoadWithRequest,
+  ShouldStartLoadRequestEvent,
 } from './WebViewTypes';
 import styles from './WebView.styles';
 
@@ -39,16 +39,22 @@ const createOnShouldStartLoadWithRequest = (
   originWhitelist: readonly string[],
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
-  return ({ nativeEvent }: WebViewNavigationEvent) => {
+  return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
     let shouldStart = true;
     const { url, lockIdentifier } = nativeEvent;
 
     if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      Linking.openURL(url);
+      Linking.canOpenURL(url).then((supported) => {
+        if (supported) {
+          return Linking.openURL(url);
+        }
+        console.warn(`Can't open url: ${url}`);
+        return undefined;
+      }).catch(e => {
+        console.warn('Error opening URL: ', e);
+      });
       shouldStart = false;
-    }
-
-    if (onShouldStartLoadWithRequest) {
+    } else if (onShouldStartLoadWithRequest) {
       shouldStart = onShouldStartLoadWithRequest(nativeEvent);
     }
 

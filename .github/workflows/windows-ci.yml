@@ -1,0 +1,61 @@
+name: Windows CI
+on: [pull_request]
+
+jobs:
+  run-windows-tests:
+    name: Build & run tests
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout Code
+     
+    - name: Setup Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.9.1'
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.0
+      with:
+        vs-version: 16.5
+
+    - name: Check node modules cache
+      uses: actions/cache@v1
+      id: yarn-cache
+      with:
+        path: ./node_modules
+        key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - name: Install node modules
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn --pure-lockfile
+    
+    - name: yarn build
+      if: steps.yarn-cache.outputs.cache-hit == 'true'
+      run: |
+        yarn build
+        yarn tsc
+
+    - name: Build x64 release
+      shell: powershell
+      run: npx react-native run-windows --root example --arch x64 --release --no-packager --no-deploy --logging
+
+    # Workaround for a bug in package searching during deploy.
+    # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the pakcages at windows/x64/Release.
+    # Copy the packages to Windows/Release before deploying.
+    - name: Deploy
+      shell: powershell
+      run: |
+        cd example
+        Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
+        npx react-native run-windows --arch x64 --release --no-build --no-packager
+
+    - name: Start Appium server
+      shell: powershell
+      run: Start-Process PowerShell -ArgumentList "yarn appium"
+      
+    - name: Run tests
+      run: yarn test:windows
