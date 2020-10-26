@@ -104,13 +104,22 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
     );
   }
 
-  postMessage = (data: string) => {
+  postMessage = (data: string) => {    
+    const message = this.getInjectableJSMessage(data);
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.getViewManagerConfig('RCTWebView').Commands.postMessage,
-      [String(data)],
+      UIManager.getViewManagerConfig('RCTWebView').Commands.injectJavaScript,
+      [message],
     );
   };
+
+  getInjectableJSMessage = (message: string ) => {
+    return `(function() {window.dispatchEvent(new MessageEvent('message', {data: ${JSON.stringify(
+      message
+    )}}));})();`;
+  }
+
+
 
   /**
    * We return an event with a bunch of fields including:

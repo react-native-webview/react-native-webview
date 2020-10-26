@@ -18,14 +18,24 @@ import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
 import WebGL from './examples/WebGL';
+import Messaging from './examples/Messaging';
+
 
 const TESTS = {
   WebGL: {
     title: 'WebGL',
     testId: 'webgl',
     description: 'WebGL for Windows',
-    render() {
+    render() { 
       return <WebGL />;
+    },
+  },
+  Messaging: {
+    title: 'Messaging',
+    testId: 'messaging',
+    description: 'js-webview postMessage messaging test',
+    render() {
+      return <Messaging />;
     },
   },
   Alerts: {
@@ -161,6 +171,11 @@ export default class App extends Component<Props, State> {
               onPress={() => this._changeTest('Uploads')}
             />
           )}
+          <Button
+            testID="testType_messaging"
+            title="Messaging"
+            onPress={() => this._changeTest('Messaging')}
+          />
           {Platform.OS === 'windows' && (
             <Button
               testID="testType_webGl"
