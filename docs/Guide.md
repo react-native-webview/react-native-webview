@@ -541,6 +541,7 @@ const App = () => {
 ```
 
 Note that these cookies will only be sent on the first request unless you use the technique above for [setting custom headers on each page load](#Setting-Custom-Headers).
+On Android, `RNCWebViewManager` maintains a map of Cookies. For any request, it retrieves the stored cookie for the authority and sets it using the `CookieManager`.
 
 ### Hardware Silence Switch
 
