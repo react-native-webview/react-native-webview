@@ -739,7 +739,7 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from other file scheme URLs.
    * Including accessing content from other file scheme URLs
-   * @platform ios
+   * @platform macos
    */
   allowFileAccessFromFileURLs?: boolean;
 
@@ -747,7 +747,7 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
    * Boolean that sets whether JavaScript running in the context of a file
    * scheme URL should be allowed to access content from any origin.
    * Including accessing content from other file scheme URLs
-   * @platform ios
+   * @platform macos
    */
   allowUniversalAccessFromFileURLs?: boolean;
 
