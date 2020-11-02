@@ -237,8 +237,10 @@ static NSDictionary* customCertificatesForHost;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
   if (@available(iOS 14.0, *)) {
-    if (_limitsNavigationsToAppBoundDomains) {
-      wkWebViewConfig.limitsNavigationsToAppBoundDomains = YES;
+    if ([wkWebViewConfig respondsToSelector:@selector(limitsNavigationsToAppBoundDomains)]) {
+      if (_limitsNavigationsToAppBoundDomains) {
+        wkWebViewConfig.limitsNavigationsToAppBoundDomains = YES;
+      }
     }
   }
 #endif
