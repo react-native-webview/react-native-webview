@@ -1,6 +1,7 @@
 package com.reactnativecommunity.webview;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import android.util.Log;
@@ -20,6 +22,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.widget.Toast;
 
+import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -40,6 +43,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   public static final String MODULE_NAME = "RNCWebView";
   private static final int PICKER = 1;
   private static final int PICKER_LEGACY = 3;
+  private static final int REQUEST_CAMERA = 2;
   private static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
   final String DEFAULT_MIME_TYPES = "*/*";
   private ValueCallback<Uri> filePathCallbackLegacy;
@@ -50,6 +54,18 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     @Override
     public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
       switch (requestCode) {
+        case REQUEST_CAMERA: {
+          if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+              startCamera();
+              break;
+          }
+          else {
+              filePathCallback.onReceiveValue(null);
+              Toast.makeText(getCurrentActivity().getApplicationContext(), "Cannot open camera as permission was denied. Please provide permission to access camera, in order to capture a photo.", Toast.LENGTH_LONG).show();
+              break;
+          }
+        }
+
         case FILE_DOWNLOAD_PERMISSION_REQUEST: {
           // If request is cancelled, the result arrays are empty.
           if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -61,10 +77,44 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
           }
           return true;
         }
+
       }
       return false;
     }
   };
+
+  @TargetApi(Build.VERSION_CODES.M)
+  private void requestPermissions() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      return;
+    }
+
+    if (getCurrentActivity() instanceof ReactActivity) {
+        ((ReactActivity) getCurrentActivity()).requestPermissions(new String[]{ Manifest.permission.CAMERA}, REQUEST_CAMERA, webviewFileDownloaderPermissionListener);
+    }
+    else {
+        ((PermissionAwareActivity) getCurrentActivity()).requestPermissions(new String[]{ Manifest.permission.CAMERA}, REQUEST_CAMERA, webviewFileDownloaderPermissionListener);
+    }
+  }
+
+  @TargetApi(Build.VERSION_CODES.M)
+  private boolean permissionsGranted() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      return true;
+    }
+
+    return ActivityCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+  }
+
+  private void startCamera() {
+    if (permissionsGranted()) {
+      Intent intent = getPhotoIntent();
+      getCurrentActivity().startActivityForResult(intent, REQUEST_CAMERA);
+
+    } else {
+      requestPermissions();
+    }
+  }
 
   public RNCWebViewModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -90,6 +140,10 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+    if (resultCode != RESULT_OK && !permissionsGranted()) {
+      requestPermissions();
+      return;
+    }
 
     if (filePathCallback == null && filePathCallbackLegacy == null) {
       return;
@@ -100,6 +154,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     // this filename instead
     switch (requestCode) {
       case PICKER:
+      case REQUEST_CAMERA:
         if (resultCode != RESULT_OK) {
           if (filePathCallback != null) {
             filePathCallback.onReceiveValue(null);
@@ -366,14 +421,14 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       dir = Environment.DIRECTORY_MOVIES;
     }
 
-    filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
+    filename = prefix + String.valueOf(System.currentTimeMillis());
 
     // for versions below 6.0 (23) we use the old File creation & permissions model
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
       // only this Directory works on all tested Android versions
       // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
       File storageDir = Environment.getExternalStoragePublicDirectory(dir);
-      return new File(storageDir, filename);
+      return new File(storageDir, filename + suffix);
     }
 
     File storageDir = getReactApplicationContext().getExternalFilesDir(null);
