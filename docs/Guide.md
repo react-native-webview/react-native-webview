@@ -305,6 +305,7 @@ export default class App extends Component {
             uri:
               'https://github.com/react-native-community/react-native-webview',
           }}
+          onMessage={(event) => {}}
           injectedJavaScript={runFirst}
         />
       </View>
@@ -313,7 +314,7 @@ export default class App extends Component {
 }
 ```
 
-This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds.
+This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds. An `onMessage` event is required as well to inject the JavaScript code into the WebView.
 
 By setting `injectedJavaScriptForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the main frame) if supported for the given platform. For example, if a page contains an iframe, the javascript will be injected into that iframe as well with this set to `false`. (Note this is not supported on Android.) There is also `injectedJavaScriptBeforeContentLoadedForMainFrameOnly` for injecting prior to content loading. Read more about this in the [Reference](./Reference.md#injectedjavascriptformainframeonly).
 
