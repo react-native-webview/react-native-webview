@@ -693,6 +693,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     super.onDropViewInstance(webView);
     ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RNCWebView) webView);
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
+    mWebChromeClient = null;
   }
 
   public static RNCWebViewModule getModule(ReactContext reactContext) {
