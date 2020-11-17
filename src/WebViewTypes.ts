@@ -295,6 +295,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
+  setSupportMultipleWindows?: boolean;
   textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
   messagingModuleName?: string;
@@ -798,6 +799,13 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   saveFormDataDisabled?: boolean;
+
+  /**
+   * Boolean value to set whether the WebView supports multiple windows. Used on Android only
+   * The default value is `true`.
+   * @platform android
+   */
+  setSupportMultipleWindows?: boolean;
 
   /**
    * Used on Android only, controls whether the given list of URL prefixes should

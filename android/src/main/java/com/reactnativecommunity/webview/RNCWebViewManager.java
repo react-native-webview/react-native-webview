@@ -252,6 +252,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setJavaScriptEnabled(enabled);
   }
 
+  @ReactProp(name = "setSupportMultipleWindows")
+  public void setSupportMultipleWindows(WebView view, boolean enabled){
+    view.getSettings().setSupportMultipleWindows(enabled);
+  }
+
   @ReactProp(name = "showsHorizontalScrollIndicator")
   public void setShowsHorizontalScrollIndicator(WebView view, boolean enabled) {
     view.setHorizontalScrollBarEnabled(enabled);
