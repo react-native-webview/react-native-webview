@@ -188,6 +188,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     settings.setBuiltInZoomControls(true);
     settings.setDisplayZoomControls(false);
     settings.setDomStorageEnabled(true);
+    settings.setSupportMultipleWindows(true);
 
     settings.setAllowFileAccess(false);
     settings.setAllowContentAccess(false);
@@ -881,7 +882,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         // This is desired behavior. We later use these values to determine whether the request is a top-level navigation or a subresource request.
         String topWindowUrl = webView.getUrl();
         String failingUrl = error.getUrl();
-        
+
         // Cancel request after obtaining top-level URL.
         // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
         // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
