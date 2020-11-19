@@ -693,6 +693,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     super.onDropViewInstance(webView);
     ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RNCWebView) webView);
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
+    mWebChromeClient = null;
   }
 
   public static RNCWebViewModule getModule(ReactContext reactContext) {
@@ -868,10 +869,25 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public void onReceivedSslError(final WebView webView, final SslErrorHandler handler, final SslError error) {
+        // onReceivedSslError is called for most requests, per Android docs: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%2520android.webkit.SslErrorHandler,%2520android.net.http.SslError)
+        // WebView.getUrl() will return the top-level window URL.
+        // If a top-level navigation triggers this error handler, the top-level URL will be the failing URL (not the URL of the currently-rendered page).
+        // This is desired behavior. We later use these values to determine whether the request is a top-level navigation or a subresource request.
+        String topWindowUrl = webView.getUrl();
+        String failingUrl = error.getUrl();
+        
+        // Cancel request after obtaining top-level URL.
+        // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
+        // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
         handler.cancel();
 
+        if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
+          // If error is not due to top-level navigation, then do not call onReceivedError()
+          Log.w("RNCWebViewManager", "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
+          return;
+        }
+
         int code = error.getPrimaryError();
-        String failingUrl = error.getUrl();
         String description = "";
         String descriptionPrefix = "SSL error: ";
 
