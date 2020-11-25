@@ -72,6 +72,7 @@ This document lays out the current public properties and methods for the React N
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
+- [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 
 ## Methods Index
 
@@ -782,7 +783,7 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidHardwareAccelerationDisabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-**Deprecated.** Use the `androidLayerType` prop instead. 
+**Deprecated.** Use the `androidLayerType` prop instead.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -792,7 +793,7 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidLayerType`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Specifies the layer type. 
+Specifies the layer type.
 
 Possible values for `androidLayerType` are:
 
@@ -1280,6 +1281,21 @@ Example:
 
 ```javascript
 <WebView autoManageStatusBarEnabled={false} />
+```
+
+### `setSupportMultipleWindows`
+
+Sets whether the WebView supports multiple windows. See [Android documentation]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') for more information.
+Setting this to false can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
+
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | true    | Android  |
+
+Example:
+
+```javascript
+<WebView setSupportMultipleWindows={false} />
 ```
 
 ## Methods
