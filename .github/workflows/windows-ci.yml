@@ -17,8 +17,6 @@ jobs:
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.0.2
-      with:
-        vs-version: 16.5
 
     - name: Check node modules cache
       uses: actions/cache@v1
