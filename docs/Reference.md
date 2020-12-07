@@ -22,6 +22,7 @@ This document lays out the current public properties and methods for the React N
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
+- [`onScroll`](Reference.md#onscroll)
 - [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
@@ -576,6 +577,39 @@ loading
 target
 title
 url
+```
+
+---
+
+### `onScroll`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the scroll event is fired in the `WebView`.
+
+| Type     | Required | Platform                |
+| -------- | -------- | ----------------------- |
+| function | No       | iOS, macOS, Android, Windows |
+
+Example:
+
+```jsx
+<Webview
+  source={{ uri: 'https://reactnative.dev' }}
+  onScroll={syntheticEvent => {
+    const { contentOffset } = syntheticEvent.nativeEvent
+    console.table(contentOffset)
+  }}
+/>
+```
+
+Function passed to `onScroll` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+contentInset
+contentOffset
+contentSize
+layoutMeasurement
+velocity
+zoomScale
 ```
 
 ---
