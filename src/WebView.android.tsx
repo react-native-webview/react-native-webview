@@ -31,6 +31,7 @@ import {
   NativeWebViewAndroid,
   State,
   RNCWebViewUIManagerAndroid,
+  WebViewEvent,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -208,6 +209,13 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     this.updateNavigationState(event);
   };
 
+  onFileDownload = (obj: Map<string,string>) => {
+    const { onFileDownload } = this.props;
+    if (onFileDownload) {
+      onFileDownload(obj);
+    }
+  }
+
   onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
@@ -360,6 +368,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
         onLoadingStart={this.onLoadingStart}
+        onFileDownload={this.onFileDownload}
         onHttpError={this.onHttpError}
         onRenderProcessGone={this.onRenderProcessGone}
         onMessage={this.onMessage}
