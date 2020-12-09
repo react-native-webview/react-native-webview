@@ -167,6 +167,8 @@ export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
 
 export type WebViewRenderProcessGoneEvent = NativeSyntheticEvent<WebViewRenderProcessGoneDetail>;
 
+export type WebViewScrollEvent = NativeSyntheticEvent<NativeScrollEvent>;
+
 export type DataDetectorTypes =
   | 'phoneNumber'
   | 'link'
@@ -259,7 +261,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   javaScriptCanOpenWindowsAutomatically?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
-  onScroll?: (event: NativeScrollEvent) => void;
+  onScroll?: (event: WebViewScrollEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
   onLoadingFinish: (event: WebViewNavigationEvent) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
@@ -295,6 +297,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
+  setSupportMultipleWindows?: boolean;
   textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
   messagingModuleName?: string;
@@ -800,6 +803,13 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   saveFormDataDisabled?: boolean;
 
   /**
+   * Boolean value to set whether the WebView supports multiple windows. Used on Android only
+   * The default value is `true`.
+   * @platform android
+   */
+  setSupportMultipleWindows?: boolean;
+
+  /**
    * Used on Android only, controls whether the given list of URL prefixes should
    * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
    * default activity intent for those URL instead of loading it within the webview.
@@ -913,7 +923,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that is invoked when the `WebView` scrolls.
    */
-  onScroll?: (event: NativeScrollEvent) => void;
+  onScroll?: (event: WebViewScrollEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` has finished loading.
