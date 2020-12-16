@@ -22,6 +22,7 @@ This document lays out the current public properties and methods for the React N
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
+- [`onScroll`](Reference.md#onscroll)
 - [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
@@ -72,6 +73,7 @@ This document lays out the current public properties and methods for the React N
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
+- [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 
 ## Methods Index
 
@@ -579,6 +581,39 @@ url
 
 ---
 
+### `onScroll`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the scroll event is fired in the `WebView`.
+
+| Type     | Required | Platform                |
+| -------- | -------- | ----------------------- |
+| function | No       | iOS, macOS, Android, Windows |
+
+Example:
+
+```jsx
+<Webview
+  source={{ uri: 'https://reactnative.dev' }}
+  onScroll={syntheticEvent => {
+    const { contentOffset } = syntheticEvent.nativeEvent
+    console.table(contentOffset)
+  }}
+/>
+```
+
+Function passed to `onScroll` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+contentInset
+contentOffset
+contentSize
+layoutMeasurement
+velocity
+zoomScale
+```
+
+---
+
 ### `originWhitelist`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are "http://*" and "https://*".
@@ -782,7 +817,7 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidHardwareAccelerationDisabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-**Deprecated.** Use the `androidLayerType` prop instead. 
+**Deprecated.** Use the `androidLayerType` prop instead.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -792,7 +827,7 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidLayerType`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Specifies the layer type. 
+Specifies the layer type.
 
 Possible values for `androidLayerType` are:
 
@@ -1280,6 +1315,21 @@ Example:
 
 ```javascript
 <WebView autoManageStatusBarEnabled={false} />
+```
+
+### `setSupportMultipleWindows`
+
+Sets whether the WebView supports multiple windows. See [Android documentation]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') for more information.
+Setting this to false can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
+
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | true    | Android  |
+
+Example:
+
+```javascript
+<WebView setSupportMultipleWindows={false} />
 ```
 
 ## Methods
