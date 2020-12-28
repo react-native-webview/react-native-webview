@@ -511,6 +511,7 @@ static NSDictionary* customCertificatesForHost;
 {
     // Check for a static html source first
     NSString *html = [RCTConvert NSString:_source[@"html"]];
+    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]]; 
     if (html) {
         NSURL *baseURL = [RCTConvert NSURL:_source[@"baseUrl"]];
         if (!baseURL) {
@@ -518,6 +519,12 @@ static NSDictionary* customCertificatesForHost;
         }
         [_webView loadHTMLString:html baseURL:baseURL];
         return;
+    } else if(headerCookie) {
+        NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys:headerCookie,@"Set-Cookie",nil];
+        NSURL *urlString = [NSURL URLWithString:_source[@"uri"]];
+        NSArray *httpCookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:urlString ];
+        for (NSHTTPCookie *httpCookie in httpCookies) {
+            [_webView.configuration.websiteDataStore.httpCookieStore setCookie:httpCookie completionHandler:nil];
     }
 
     NSURLRequest *request = [self requestForSource:_source];
