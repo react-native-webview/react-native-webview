@@ -8,8 +8,6 @@
 
 namespace winrt::ReactNativeWebView::implementation {
     
-    enum class WebViewCommands : int32_t { GoForward = 0, GoBack = 1,  Reload = 2, StopLoading = 3, InjectJavaScript = 4 };
-
     class ReactWebViewManager : public winrt::implements<
         ReactWebViewManager,
         winrt::Microsoft::ReactNative::IViewManager,
@@ -41,15 +39,14 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::Microsoft::ReactNative::ConstantProviderDelegate ExportedCustomDirectEventTypeConstants() noexcept;
 
         // IViewManagerWithCommands
-        winrt::Windows::Foundation::Collections::IMapView<winrt::hstring, int64_t> Commands() noexcept;
+        winrt::Windows::Foundation::Collections::IVectorView<winrt::hstring> Commands() noexcept;
 
         void DispatchCommand(
             winrt::Windows::UI::Xaml::FrameworkElement const& view,
-            int64_t commandId,
+            winrt::hstring const& commandId,
             winrt::Microsoft::ReactNative::IJSValueReader const& commandArgsReader) noexcept;
 
     private:
-        winrt::ReactNativeWebView::ReactWebView m_reactWebView{ nullptr };
         winrt::Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
 
     };

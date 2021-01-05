@@ -16,8 +16,19 @@ import Background from './examples/Background';
 import Downloads from './examples/Downloads';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
+import LocalPageLoad from './examples/LocalPageLoad';
+import Messaging from './examples/Messaging';
+import NativeWebpage from './examples/NativeWebpage';
 
 const TESTS = {
+  Messaging: {
+    title: 'Messaging',
+    testId: 'messaging',
+    description: 'js-webview postMessage messaging test',
+    render() {
+      return <Messaging />;
+    },
+  },
   Alerts: {
     title: 'Alerts',
     testId: 'alerts',
@@ -66,10 +77,26 @@ const TESTS = {
       return <Injection />;
     },
   },
+  PageLoad: {
+    title: 'LocalPageLoad',
+    testId: 'LocalPageLoad',
+    description: 'Local Page load test',
+    render() {
+      return <LocalPageLoad />;
+    },
+  },
+  NativeWebpage: {
+    title: 'NativeWebpage',
+    testId: 'NativeWebpage',
+    description: 'Test to open a new webview with a link',
+    render() {
+      return <NativeWebpage />;
+    },
+  },
 };
 
 type Props = {};
-type State = {restarting: boolean, currentTest: Object};
+type State = {restarting: boolean; currentTest: Object};
 
 export default class App extends Component<Props, State> {
   state = {
@@ -81,7 +108,7 @@ export default class App extends Component<Props, State> {
     this.setState({restarting: true}, () => this.setState({restarting: false}));
   };
 
-  _changeTest = testName => {
+  _changeTest = (testName) => {
     this.setState({currentTest: TESTS[testName]});
   };
 
@@ -124,16 +151,35 @@ export default class App extends Component<Props, State> {
             title="Injection"
             onPress={() => this._changeTest('Injection')}
           />
-          {Platform.OS == "ios" && <Button
-            testID="testType_downloads"
-            title="Downloads"
-            onPress={() => this._changeTest('Downloads')}
-          />}
-          {Platform.OS === 'android' && <Button
-            testID="testType_uploads"
-            title="Uploads"
-            onPress={() => this._changeTest('Uploads')}
-          />}
+          <Button
+            testID="testType_pageLoad"
+            title="LocalPageLoad"
+            onPress={() => this._changeTest('PageLoad')}
+          />
+          {Platform.OS == 'ios' && (
+            <Button
+              testID="testType_downloads"
+              title="Downloads"
+              onPress={() => this._changeTest('Downloads')}
+            />
+          )}
+          {Platform.OS === 'android' && (
+            <Button
+              testID="testType_uploads"
+              title="Uploads"
+              onPress={() => this._changeTest('Uploads')}
+            />
+          )}
+          <Button
+            testID="testType_messaging"
+            title="Messaging"
+            onPress={() => this._changeTest('Messaging')}
+          />
+          <Button
+            testID="testType_nativeWebpage"
+            title="NativeWebpage"
+            onPress={() => this._changeTest('NativeWebpage')}
+          />
         </View>
 
         {restarting ? null : (

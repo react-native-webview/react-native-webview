@@ -21,6 +21,7 @@ import {
   defaultRenderLoading,
 } from './WebViewShared';
 import {
+  WebViewRenderProcessGoneEvent,
   WebViewErrorEvent,
   WebViewHttpErrorEvent,
   WebViewMessageEvent,
@@ -60,7 +61,9 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     saveFormDataDisabled: false,
     cacheEnabled: true,
     androidHardwareAccelerationDisabled: false,
+    androidLayerType: 'none',
     originWhitelist: defaultOriginWhitelist,
+    setSupportMultipleWindows: true,
   };
 
   static isFileUploadSupported = async () => {
@@ -229,6 +232,13 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
   };
 
+  onRenderProcessGone = (event: WebViewRenderProcessGoneEvent) => {
+    const { onRenderProcessGone } = this.props;
+    if (onRenderProcessGone) {
+      onRenderProcessGone(event);
+    }
+  }
+
   onLoadingFinish = (event: WebViewNavigationEvent) => {
     const { onLoad, onLoadEnd } = this.props;
     const {
@@ -276,8 +286,11 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   onShouldStartLoadWithRequestCallback = (
     shouldStart: boolean,
     url: string,
+    lockIdentifier?: number,
   ) => {
-    if (shouldStart) {
+    if (lockIdentifier) {
+      NativeModules.RNCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
+    } else if (shouldStart) {
       UIManager.dispatchViewManagerCommand(
         this.getWebViewHandle(),
         this.getCommands().loadUrl,
@@ -334,7 +347,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     const NativeWebView =
       (nativeConfig.component as typeof NativeWebViewAndroid) || RNCWebView;
 
-    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+    this.onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,
       // casting cause it's in the default props
       originWhitelist as readonly string[],
@@ -352,8 +365,9 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         onLoadingProgress={this.onLoadingProgress}
         onLoadingStart={this.onLoadingStart}
         onHttpError={this.onHttpError}
+        onRenderProcessGone={this.onRenderProcessGone}
         onMessage={this.onMessage}
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
         ref={this.webViewRef}
         // TODO: find a better way to type this.
         source={resolveAssetSource(source as ImageSourcePropType)}
