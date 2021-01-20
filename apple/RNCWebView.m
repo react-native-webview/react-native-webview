@@ -99,7 +99,7 @@ static NSDictionary* customCertificatesForHost;
   BOOL _savedKeyboardDisplayRequiresUserAction;
 
   // Workaround for StatusBar appearance bug for iOS 12
-  // https://github.com/react-native-community/react-native-webview/issues/62
+  // https://github.com/react-native-webview/react-native-webview/issues/62
   BOOL _isFullScreenVideoOpen;
 #if !TARGET_OS_OSX
   UIStatusBarStyle _savedStatusBarStyle;
@@ -172,7 +172,7 @@ static NSDictionary* customCertificatesForHost;
       name:UIKeyboardWillShowNotification object:nil];
 
     // Workaround for StatusBar appearance bug for iOS 12
-    // https://github.com/react-native-community/react-native-webview/issues/62
+    // https://github.com/react-native-webview/react-native-webview/issues/62
       [[NSNotificationCenter defaultCenter] addObserver:self
                                                selector:@selector(showFullScreenVideoStatusBars)
                                                    name:UIWindowDidBecomeVisibleNotification
@@ -289,7 +289,7 @@ static NSDictionary* customCertificatesForHost;
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
       //For UIRefreshControl to work correctly, the bounces should always be true
-    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces; 
+    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
@@ -1175,7 +1175,7 @@ static NSDictionary* customCertificatesForHost;
 - (void)setPullToRefreshEnabled:(BOOL)pullToRefreshEnabled
 {
     _pullToRefreshEnabled = pullToRefreshEnabled;
-    
+
     if (pullToRefreshEnabled) {
         [self addPullToRefreshControl];
     } else {
@@ -1376,7 +1376,7 @@ static NSDictionary* customCertificatesForHost;
   if (_sharedCookiesEnabled) {
     if (@available(iOS 11.0, *)) {
       // see WKWebView initialization for added cookies
-    } else {
+    } else if (request != nil) {
       NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL];
       NSDictionary<NSString *, NSString *> *cookieHeader = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
       NSMutableURLRequest *mutableRequest = [request mutableCopy];
