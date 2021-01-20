@@ -403,6 +403,14 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   automaticallyAdjustContentInsets?: boolean;
 
   /**
+   * Controls whether to adjust the scroll indicator inset for web views that are
+   * placed behind a navigation bar, tab bar, or toolbar. The default value
+   * is `false`. (iOS 13+)
+   * @platform ios
+   */
+  automaticallyAdjustsScrollIndicatorInsets?: boolean;
+
+  /**
    * This property specifies how the safe area insets are used to modify the
    * content area of the scroll view. The default value of this property is
    * "never". Available on iOS 11 and later.
