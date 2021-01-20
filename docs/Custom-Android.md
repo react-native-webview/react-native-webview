@@ -4,7 +4,7 @@ Before you do this, you should be familiar with the concepts in [native UI compo
 
 ## Native Code
 
-To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `ReactWebViewClient`. In your view manager, you'll then need to override:
+To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `RNCWebViewClient`. In your view manager, you'll then need to override:
 
 - `createReactWebViewInstance`
 - `getName`
@@ -16,7 +16,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
   /* This name must match what we're referring to in JS */
   protected static final String REACT_CLASS = "RCTCustomWebView";
 
-  protected static class CustomWebViewClient extends ReactWebViewClient { }
+  protected static class CustomWebViewClient extends RNCWebViewClient { }
 
   protected static class CustomWebView extends RNCWebView {
     public CustomWebView(ThemedReactContext reactContext) {
