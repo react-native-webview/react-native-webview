@@ -37,6 +37,7 @@ This project follows [semantic versioning](https://semver.org/). We do not hesit
 
 Current Version: ![version](https://img.shields.io/npm/v/react-native-webview.svg)
 
+- [11.0.0](https://github.com/react-native-webview/react-native-webview/releases/tag/v11.0.0) - Android setSupportMultipleWindows.
 - [10.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v10.0.0) - Android Gradle plugin is only required when opening the project stand-alone
 - [9.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v9.0.0) - props updates to injectedJavaScript are no longer immutable.
 - [8.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v8.0.0) - onNavigationStateChange now triggers with hash url changes
