@@ -1356,7 +1356,7 @@ static NSDictionary* customCertificatesForHost;
   if (_sharedCookiesEnabled) {
     if (@available(iOS 11.0, *)) {
       // see WKWebView initialization for added cookies
-    } else {
+    } else if (request != nil) {
       NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL];
       NSDictionary<NSString *, NSString *> *cookieHeader = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
       NSMutableURLRequest *mutableRequest = [request mutableCopy];
