@@ -54,6 +54,12 @@ Current Version: ![version](https://img.shields.io/npm/v/react-native-webview.sv
 - Kotlin rewrite
 - Maybe Swift rewrite
 
+## Installation
+
+```sh
+expo install react-native-webview
+```
+
 ## Usage
 
 Import the `WebView` component from `react-native-webview` and use it like so:
