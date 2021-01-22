@@ -279,6 +279,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+  blockMainThreadEnabled?: boolean;
 }
 
 export interface IOSWebViewProps extends WebViewSharedProps {
@@ -458,6 +459,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+  /**
+   * Boolean value to enable block main thread in the `WebView`. 
+   * The default value is `true`.
+   * * @platform ios
+   */
+  blockMainThreadEnabled?: boolean;
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {

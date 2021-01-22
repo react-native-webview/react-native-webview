@@ -1091,6 +1091,17 @@ Example:
 
 `<WebView textZoom={100} />`
 
+---
+### `blockMainThreadEnabled`
+
+The default value is true. If the value of this property is false, iOS main thread will not be blocked for a maximum of 250ms until the JS thread returns. 
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+---
+
 ## Methods
 
 ### `extraNativeComponentConfig()`

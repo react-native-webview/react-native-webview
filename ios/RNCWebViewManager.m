@@ -57,6 +57,7 @@ RCT_EXPORT_VIEW_PROPERTY(applicationNameForUserAgent, NSString)
 RCT_EXPORT_VIEW_PROPERTY(cacheEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsLinkPreview, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowingReadAccessToURL, NSString)
+RCT_EXPORT_VIEW_PROPERTY(blockMainThreadEnabled, BOOL)
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
 RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentBehavior)
@@ -183,19 +184,23 @@ RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
 shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
              withCallback:(RCTDirectEventBlock)callback
 {
-  _shouldStartLoadLock = [[NSConditionLock alloc] initWithCondition:arc4random()];
-  _shouldStartLoad = YES;
-  request[@"lockIdentifier"] = @(_shouldStartLoadLock.condition);
-  callback(request);
+  if(webView.blockMainThreadEnabled) {
+    _shouldStartLoadLock = [[NSConditionLock alloc] initWithCondition:arc4random()];
+    _shouldStartLoad = YES;
+    request[@"lockIdentifier"] = @(_shouldStartLoadLock.condition);
+    callback(request);
 
-  // Block the main thread for a maximum of 250ms until the JS thread returns
-  if ([_shouldStartLoadLock lockWhenCondition:0 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.25]]) {
-    BOOL returnValue = _shouldStartLoad;
-    [_shouldStartLoadLock unlock];
-    _shouldStartLoadLock = nil;
-    return returnValue;
+    // Block the main thread for a maximum of 250ms until the JS thread returns
+    if ([_shouldStartLoadLock lockWhenCondition:0 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.25]]) {
+      BOOL returnValue = _shouldStartLoad;
+      [_shouldStartLoadLock unlock];
+      _shouldStartLoadLock = nil;
+      return returnValue;
+    } else {
+      RCTLogWarn(@"Did not receive response to shouldStartLoad in time, defaulting to YES");
+      return YES;
+    }
   } else {
-    RCTLogWarn(@"Did not receive response to shouldStartLoad in time, defaulting to YES");
     return YES;
   }
 }
