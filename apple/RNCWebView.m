@@ -310,7 +310,9 @@ static NSDictionary* customCertificatesForHost;
     }
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-    _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
+    if (@available(iOS 13.0, *)) {
+      _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
+    }
 #endif
 
     [self addSubview:_webView];
