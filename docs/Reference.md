@@ -6,6 +6,7 @@ This document lays out the current public properties and methods for the React N
 
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
+- [`automaticallyAdjustsScrollIndicatorInsets`](Reference.md#automaticallyAdjustsScrollIndicatorInsets)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
 - [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded)
 - [`injectedJavaScriptForMainFrameOnly`](Reference.md#injectedjavascriptformainframeonly)
@@ -128,6 +129,16 @@ Controls whether to adjust the content inset for web views that are placed behin
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | iOS      |
+
+---
+
+### `automaticallyAdjustsScrollIndicatorInsets`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Controls whether to adjust the scroll indicator inset for web views that are placed behind a navigation bar, tab bar, or toolbar. The default value `false`. (iOS 13+)
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS(13+) |
 
 ---
 
@@ -1081,9 +1092,9 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin. Including accessing content from other file scheme URLs. The default value is `false`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | Android  |
+| Type | Required | Platform             |
+| ---- | -------- | -------------------- |
+| bool | No       | iOS, Android, macOS  |
 
 ---
 
