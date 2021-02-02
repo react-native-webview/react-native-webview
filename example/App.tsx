@@ -18,6 +18,7 @@ import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
+import NativeWebpage from './examples/NativeWebpage';
 
 const TESTS = {
   Messaging: {
@@ -82,6 +83,14 @@ const TESTS = {
     description: 'Local Page load test',
     render() {
       return <LocalPageLoad />;
+    },
+  },
+  NativeWebpage: {
+    title: 'NativeWebpage',
+    testId: 'NativeWebpage',
+    description: 'Test to open a new webview with a link',
+    render() {
+      return <NativeWebpage />;
     },
   },
 };
@@ -165,6 +174,11 @@ export default class App extends Component<Props, State> {
             testID="testType_messaging"
             title="Messaging"
             onPress={() => this._changeTest('Messaging')}
+          />
+          <Button
+            testID="testType_nativeWebpage"
+            title="NativeWebpage"
+            onPress={() => this._changeTest('NativeWebpage')}
           />
         </View>
 

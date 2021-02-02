@@ -10976,10 +10976,10 @@ react-native-macos@0.60.0-microsoft.73:
     stacktrace-parser "^0.1.3"
     whatwg-fetch "^3.0.0"
 
-react-native-windows@^0.62.5:
-  version "0.62.6"
-  resolved "https://registry.yarnpkg.com/react-native-windows/-/react-native-windows-0.62.6.tgz#a5bcd10ac4cae6ca5e63bff9b4b3368fd172770f"
-  integrity sha512-vVWS5Sp+uh2+yFz4qR0kz3dExe4HZzsrThGtD3nMzfSJuVEJAFADGIyUOTrTEBrhZGqYbseU2Rs9UHNHSWGgAg==
+react-native-windows@0.62.17:
+  version "0.62.17"
+  resolved "https://registry.yarnpkg.com/react-native-windows/-/react-native-windows-0.62.17.tgz#204272c084940c4a5c20bef9a85cb8ac0ba8481b"
+  integrity sha512-pgeqFt3SsvH5Fa/P30Nv4KJv2KcNmRqU50STGMKhfSBMZ64bCYQIKz8So18MhQnI8A9AIomwQCwynFLP1hjQFw==
   dependencies:
     "@babel/runtime" "^7.8.4"
     cli-spinners "^2.2.0"

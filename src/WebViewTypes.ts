@@ -167,6 +167,8 @@ export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
 
 export type WebViewRenderProcessGoneEvent = NativeSyntheticEvent<WebViewRenderProcessGoneDetail>;
 
+export type WebViewScrollEvent = NativeSyntheticEvent<NativeScrollEvent>;
+
 export type DataDetectorTypes =
   | 'phoneNumber'
   | 'link'
@@ -259,7 +261,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   javaScriptCanOpenWindowsAutomatically?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
-  onScroll?: (event: NativeScrollEvent) => void;
+  onScroll?: (event: WebViewScrollEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
   onLoadingFinish: (event: WebViewNavigationEvent) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
@@ -295,6 +297,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
   overScrollMode?: OverScrollModeType;
   saveFormDataDisabled?: boolean;
+  setSupportMultipleWindows?: boolean;
   textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
   messagingModuleName?: string;
@@ -310,6 +313,8 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowsBackForwardNavigationGestures?: boolean;
   allowsInlineMediaPlayback?: boolean;
   allowsLinkPreview?: boolean;
+  allowFileAccessFromFileURLs?: boolean;
+  allowUniversalAccessFromFileURLs?: boolean;
   automaticallyAdjustContentInsets?: boolean;
   autoManageStatusBarEnabled?: boolean;
   bounces?: boolean;
@@ -332,6 +337,8 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowingReadAccessToURL?: string;
+  allowFileAccessFromFileURLs?: boolean;
+  allowUniversalAccessFromFileURLs?: boolean;
   allowsBackForwardNavigationGestures?: boolean;
   allowsInlineMediaPlayback?: boolean;
   allowsLinkPreview?: boolean;
@@ -399,6 +406,14 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   automaticallyAdjustContentInsets?: boolean;
+
+  /**
+   * Controls whether to adjust the scroll indicator inset for web views that are
+   * placed behind a navigation bar, tab bar, or toolbar. The default value
+   * is `false`. (iOS 13+)
+   * @platform ios
+   */
+  automaticallyAdjustsScrollIndicatorInsets?: boolean;
 
   /**
    * This property specifies how the safe area insets are used to modify the
@@ -537,6 +552,22 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   allowingReadAccessToURL?: string;
+
+  /**
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from other file scheme URLs.
+   * Including accessing content from other file scheme URLs
+   * @platform ios
+   */
+  allowFileAccessFromFileURLs?: boolean;
+
+  /**
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from any origin.
+   * Including accessing content from other file scheme URLs
+   * @platform ios
+   */
+  allowUniversalAccessFromFileURLs?: boolean;
 
   /**
    * Function that is invoked when the WebKit WebView content process gets terminated.
@@ -728,6 +759,22 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
   allowingReadAccessToURL?: string;
 
   /**
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from other file scheme URLs.
+   * Including accessing content from other file scheme URLs
+   * @platform macos
+   */
+  allowFileAccessFromFileURLs?: boolean;
+
+  /**
+   * Boolean that sets whether JavaScript running in the context of a file
+   * scheme URL should be allowed to access content from any origin.
+   * Including accessing content from other file scheme URLs
+   * @platform macos
+   */
+  allowUniversalAccessFromFileURLs?: boolean;
+
+  /**
    * Function that is invoked when the WebKit WebView content process gets terminated.
    * @platform macos
    */
@@ -810,6 +857,13 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   saveFormDataDisabled?: boolean;
+
+  /**
+   * Boolean value to set whether the WebView supports multiple windows. Used on Android only
+   * The default value is `true`.
+   * @platform android
+   */
+  setSupportMultipleWindows?: boolean;
 
   /**
    * Used on Android only, controls whether the given list of URL prefixes should
@@ -925,7 +979,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that is invoked when the `WebView` scrolls.
    */
-  onScroll?: (event: NativeScrollEvent) => void;
+  onScroll?: (event: WebViewScrollEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` has finished loading.

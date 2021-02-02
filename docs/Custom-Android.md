@@ -1,10 +1,10 @@
 While the built-in web view has a lot of features, it is not possible to handle every use-case in React Native. You can, however, extend the web view with native code without forking React Native or duplicating all the existing web view code.
 
-Before you do this, you should be familiar with the concepts in [native UI components](https://reactnative.dev/docs/native-components-android). You should also familiarise yourself with the [native code for web views](https://github.com/react-native-community/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java), as you will have to use this as a reference when implementing new features—although a deep understanding is not required.
+Before you do this, you should be familiar with the concepts in [native UI components](https://reactnative.dev/docs/native-components-android). You should also familiarise yourself with the [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java), as you will have to use this as a reference when implementing new features—although a deep understanding is not required.
 
 ## Native Code
 
-To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `ReactWebViewClient`. In your view manager, you'll then need to override:
+To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `RNCWebViewClient`. In your view manager, you'll then need to override:
 
 - `createReactWebViewInstance`
 - `getName`
@@ -16,7 +16,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
   /* This name must match what we're referring to in JS */
   protected static final String REACT_CLASS = "RCTCustomWebView";
 
-  protected static class CustomWebViewClient extends ReactWebViewClient { }
+  protected static class CustomWebViewClient extends RNCWebViewClient { }
 
   protected static class CustomWebView extends RNCWebView {
     public CustomWebView(ThemedReactContext reactContext) {
@@ -105,7 +105,7 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 
 You can trigger the event in your web view client. You can hook existing handlers if your events are based on them.
 
-You should refer to [RNCWebViewManager.java](https://github.com/react-native-community/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) in the react-native-webview codebase to see what handlers are available and how they are implemented. You can extend any methods here to provide extra functionality.
+You should refer to [RNCWebViewManager.java](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) in the react-native-webview codebase to see what handlers are available and how they are implemented. You can extend any methods here to provide extra functionality.
 
 ```java
 public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
@@ -199,7 +199,7 @@ If you want to add custom props to your native component, you can use `nativeCon
 
 For events, the event handler must always be set to a function. This means it isn't safe to use the event handler directly from `this.props`, as the user might not have provided one. The standard approach is to create a event handler in your class, and then invoking the event handler given in `this.props` if it exists.
 
-If you are unsure how something should be implemented from the JS side, look at [WebView.android.js](https://github.com/react-native-community/react-native-webview/blob/master/js/WebView.android.js) in the React Native source.
+If you are unsure how something should be implemented from the JS side, look at [WebView.android.js](https://github.com/react-native-webview/react-native-webview/blob/master/js/WebView.android.js) in the React Native source.
 
 ```javascript
 export default class CustomWebView extends Component {
@@ -213,7 +213,7 @@ export default class CustomWebView extends Component {
     finalUrl: 'about:blank',
   };
 
-  _onNavigationCompleted = event => {
+  _onNavigationCompleted = (event) => {
     const { onNavigationCompleted } = this.props;
     onNavigationCompleted && onNavigationCompleted(event);
   };
