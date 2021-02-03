@@ -1112,6 +1112,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           permissions.add(Manifest.permission.RECORD_AUDIO);
         } else if (requestedResources[i].equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
           permissions.add(Manifest.permission.CAMERA);
+        } else if(requestedResources[i].equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+          permissions.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
         }
         // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
       }
@@ -1124,6 +1126,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
         } else if (permissions.get(i).equals(Manifest.permission.CAMERA)) {
           grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+        } else if (permissions.get(i).equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+          grantedPermissions.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
         }
       }
 
