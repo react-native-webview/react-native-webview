@@ -731,6 +731,7 @@ lockIdentifier
 mainDocumentURL (iOS only)
 navigationType (iOS only)
 isTopFrame (iOS only)
+hasGesture (Android only, API 21+)
 ```
 
 ---
