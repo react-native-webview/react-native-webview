@@ -103,7 +103,7 @@ export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
 }
 
 export interface WebViewNavigation extends WebViewNativeEvent {
-  navigationType:
+  navigationType?:
     | 'click'
     | 'formsubmit'
     | 'backforward'
@@ -115,6 +115,7 @@ export interface WebViewNavigation extends WebViewNativeEvent {
 
 export interface ShouldStartLoadRequest extends WebViewNavigation {
   isTopFrame: boolean;
+  hasGesture?: boolean;
 }
 
 export interface FileDownload {

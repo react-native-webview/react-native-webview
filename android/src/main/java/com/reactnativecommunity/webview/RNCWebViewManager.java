@@ -847,6 +847,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+      return shouldOverrideUrlLoading(view, url, null);
+    }
+
+    public boolean shouldOverrideUrlLoading(WebView view, String url, @Nullable WebResourceRequest request) {
       final RNCWebView rncWebView = (RNCWebView) view;
       final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
 
@@ -857,6 +861,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         final WritableMap event = createWebViewEvent(view, url);
         event.putInt("lockIdentifier", lockIdentifier);
+        if (request != null) {
+          event.putBoolean("hasGesture", request.hasGesture());
+          event.putBoolean("isTopFrame", request.isForMainFrame());
+        }
         rncWebView.sendDirectMessage("onShouldStartLoadWithRequest", event);
 
         try {
@@ -898,7 +906,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
       final String url = request.getUrl().toString();
-      return this.shouldOverrideUrlLoading(view, url);
+      return this.shouldOverrideUrlLoading(view, url, request);
     }
 
     @Override
