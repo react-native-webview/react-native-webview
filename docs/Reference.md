@@ -550,7 +550,7 @@ The `navState` object includes these properties:
 canGoBack
 canGoForward
 loading
-navigationType
+navigationType (iOS only)
 target
 title
 url
@@ -729,8 +729,8 @@ canGoBack
 canGoForward
 lockIdentifier
 mainDocumentURL (iOS only)
-navigationType
-isTopFrame
+navigationType (iOS only)
+isTopFrame (iOS only)
 ```
 
 ---
