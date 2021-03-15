@@ -88,7 +88,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearCache`](Reference.md#clearCache)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
-- [`postMessage`](Reference.md#postMessage)
+- [`postMessage`](Reference.md#postmessagestr)
 
 ---
 
