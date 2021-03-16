@@ -5,8 +5,8 @@
 #include "JSValueXaml.h"
 #include "ReactWebView.h"
 #include "ReactWebView.g.cpp"
-
-
+#include <winrt/Windows.Foundation.Metadata.h>
+#include <optional>
 
 namespace winrt {
     using namespace Microsoft::ReactNative;
@@ -63,11 +63,22 @@ namespace winrt::ReactNativeWebView::implementation {
             });
     }
 
+    bool Is17763OrHigher() {
+      static std::optional<bool> hasUniversalAPIContract_v7;
+
+      if (!hasUniversalAPIContract_v7.has_value()) {
+        hasUniversalAPIContract_v7 = winrt::Windows::Foundation::Metadata::ApiInformation::IsApiContractPresent(L"Windows.Foundation.UniversalApiContract", 7);
+      }
+      return hasUniversalAPIContract_v7.value();
+    }
+
     void ReactWebView::WriteWebViewNavigationEventArg(winrt::WebView const& sender, winrt::IJSValueWriter const& eventDataWriter) {
         auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
         WriteProperty(eventDataWriter, L"canGoBack", sender.CanGoBack());
         WriteProperty(eventDataWriter, L"canGoForward", sender.CanGoForward());
-        WriteProperty(eventDataWriter, L"loading", !sender.IsLoaded());
+        if (Is17763OrHigher()) {
+          WriteProperty(eventDataWriter, L"loading", !sender.IsLoaded());
+        }
         WriteProperty(eventDataWriter, L"target", tag);
         WriteProperty(eventDataWriter, L"title", sender.DocumentTitle());
         if (auto uri = sender.Source()) {
