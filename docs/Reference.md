@@ -89,7 +89,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearCache`](Reference.md#clearCache)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
-- [`postMessage`](Reference.md#postMessage)
+- [`postMessage`](Reference.md#postmessagestr)
 
 ---
 
@@ -551,7 +551,7 @@ The `navState` object includes these properties:
 canGoBack
 canGoForward
 loading
-navigationType
+navigationType (iOS only)
 target
 title
 url
@@ -730,8 +730,8 @@ canGoBack
 canGoForward
 lockIdentifier
 mainDocumentURL (iOS only)
-navigationType
-isTopFrame
+navigationType (iOS only)
+isTopFrame (iOS only)
 ```
 
 ---

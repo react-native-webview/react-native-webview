@@ -341,6 +341,7 @@ static NSDictionary* customCertificatesForHost;
 - (void)removeFromSuperview
 {
     if (_webView) {
+        [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
         [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
@@ -553,6 +554,16 @@ static NSDictionary* customCertificatesForHost;
         }
         [_webView loadHTMLString:html baseURL:baseURL];
         return;
+    } 
+    //Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
+    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]]; 
+    if(headerCookie) {
+      NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys:headerCookie,@"Set-Cookie",nil];
+      NSURL *urlString = [NSURL URLWithString:_source[@"uri"]];
+      NSArray *httpCookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:urlString];
+      for (NSHTTPCookie *httpCookie in httpCookies) {
+          [_webView.configuration.websiteDataStore.httpCookieStore setCookie:httpCookie completionHandler:nil];
+      }
     }
 
     NSURLRequest *request = [self requestForSource:_source];
