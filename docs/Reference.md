@@ -73,6 +73,7 @@ This document lays out the current public properties and methods for the React N
 - [`pullToRefreshEnabled`](Reference.md#pullToRefreshEnabled)
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
+- [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 
@@ -1311,6 +1312,25 @@ Example:
 | Type     | Required | Platform |
 | -------- | -------- | -------- |
 | function | No       | iOS      |
+
+---
+
+### `limitsNavigationsToAppBoundDomains`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+If true indicates to WebKit that a WKWebView will only navigate to app-bound domains. Only applicable for iOS 14 or greater.
+
+Once set, any attempt to navigate away from an app-bound domain will fail with the error “App-bound domain failure.”
+Applications can specify up to 10 “app-bound” domains using a new Info.plist key `WKAppBoundDomains`. For more information see [App-Bound Domains](https://webkit.org/blog/10882/app-bound-domains/).
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+Example:
+
+```jsx
+<WebView limitsNavigationsToAppBoundDomains={true} />
+```
 
 ---
 
