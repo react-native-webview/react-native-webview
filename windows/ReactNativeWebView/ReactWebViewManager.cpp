@@ -4,6 +4,7 @@
 #include "ReactWebView.h"
 #include "JSValueXaml.h"
 
+
 namespace winrt {
     using namespace Microsoft::ReactNative;
     using namespace Windows::Foundation;
@@ -11,6 +12,7 @@ namespace winrt {
     using namespace Windows::UI;
     using namespace Windows::UI::Xaml;
     using namespace Windows::UI::Xaml::Controls;
+    using namespace Windows::Web::Http;
 }
 
 namespace winrt::ReactNativeWebView::implementation {
@@ -75,7 +77,17 @@ namespace winrt::ReactNativeWebView::implementation {
                         uriString.replace(0, 7, bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
 
-                    webView.Navigate(winrt::Uri(to_hstring(uriString)));
+                    if (srcMap.find("method") != srcMap.end() && srcMap.at("method").AsString() == "POST")
+                    {
+                        auto httpRequest =
+                            winrt::HttpRequestMessage(winrt::HttpMethod::Post(), winrt::Uri(to_hstring(uriString)));
+                        httpRequest.Content(winrt::HttpStringContent(to_hstring(srcMap.at("body").AsString())));
+                        webView.NavigateWithHttpRequestMessage(httpRequest);
+                    }
+                    else
+                    {
+                        webView.Navigate(winrt::Uri(to_hstring(uriString)));
+                    }
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
                     auto htmlString = srcMap.at("html").AsString();
