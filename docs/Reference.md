@@ -152,8 +152,8 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc). Be sure
 to set an [`onMessage`](Reference.md#onmessage) handler, even if it's a no-op, or the code will not be run.
 
-| Type   | Required | Platform            |
-| ------ | -------- | ------------------- |
+| Type   | Required | Platform                     |
+| ------ | -------- | ---------------------------- |
 | string | No       | iOS, Android, macOS, Windows |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
@@ -597,8 +597,8 @@ url
 
 Function that is invoked when the scroll event is fired in the `WebView`.
 
-| Type     | Required | Platform                |
-| -------- | -------- | ----------------------- |
+| Type     | Required | Platform                     |
+| -------- | -------- | ---------------------------- |
 | function | No       | iOS, macOS, Android, Windows |
 
 Example:
