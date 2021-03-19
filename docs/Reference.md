@@ -1031,6 +1031,8 @@ Possible values for `dataDetectorTypes` are:
 
 Boolean value that determines whether scrolling is enabled in the `WebView`. The default value is `true`. Setting this to `false` will prevent the webview from moving the document body when the keyboard appears over an input.
 
+[apple docs](https://developer.apple.com/documentation/uikit/uiscrollview/1619395-scrollenabled)
+
 | Type | Required | Platform      |
 | ---- | -------- | ------------- |
 | bool | No       | iOS and macOS |
@@ -1041,6 +1043,8 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 
 A Boolean value that determines whether scrolling is disabled in a particular direction.
 The default value is `true`.
+
+[apple docs](https://developer.apple.com/documentation/uikit/uiscrollview/1619390-directionallockenabled)
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -1132,6 +1136,8 @@ A String value that indicates which URLs the WebView's file can then reference i
 
 If false, web content can programmatically display the keyboard. The default value is `true`.
 
+[apple docs](https://developer.apple.com/documentation/uikit/uiwebview/1617967-keyboarddisplayrequiresuseractio)
+
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
@@ -1151,6 +1157,8 @@ If true, this will hide the keyboard accessory view (< > and Done).
 ### `allowsBackForwardNavigationGestures`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 If true, this will be able horizontal swipe gestures. The default value is `false`.
+
+[apple docs](https://developer.apple.com/documentation/webkit/wkwebview/1414995-allowsbackforwardnavigationgestu?language=occ)
 
 | Type    | Required | Platform      |
 | ------- | -------- | ------------- |
@@ -1219,6 +1227,8 @@ Possible values are:
 
 If the value of this property is true, the scroll view stops on multiples of the scroll view’s bounds when the user scrolls. The default value is false.
 
+[apple docs](https://developer.apple.com/documentation/uikit/uiscrollview/1619432-pagingenabled?language=occ)
+
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS      |
@@ -1228,6 +1238,8 @@ If the value of this property is true, the scroll view stops on multiples of the
 ### `allowsLinkPreview`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is true; before that, the default value is false.
+
+[apple docs](https://developer.apple.com/documentation/webkit/wkwebview/1415000-allowslinkpreview)
 
 | Type    | Required | Platform      |
 | ------- | -------- | ------------- |
