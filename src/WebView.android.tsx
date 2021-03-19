@@ -166,8 +166,8 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   };
 
   /**
-   * Change the color of the selection tool, use only by Perlego for the highlight
-   * works only with hex color formated like this '#000000'
+   * Change the color of the selection tool
+   * works only with hex color format '#000000'
    */
   setSelectionColor = (data: string) => {
     UIManager.dispatchViewManagerCommand(
