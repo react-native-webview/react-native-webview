@@ -99,7 +99,7 @@ static NSDictionary* customCertificatesForHost;
   BOOL _savedKeyboardDisplayRequiresUserAction;
 
   // Workaround for StatusBar appearance bug for iOS 12
-  // https://github.com/react-native-community/react-native-webview/issues/62
+  // https://github.com/react-native-webview/react-native-webview/issues/62
   BOOL _isFullScreenVideoOpen;
 #if !TARGET_OS_OSX
   UIStatusBarStyle _savedStatusBarStyle;
@@ -108,6 +108,9 @@ static NSDictionary* customCertificatesForHost;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
+#endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+  BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
 #endif
 }
 
@@ -148,6 +151,10 @@ static NSDictionary* customCertificatesForHost;
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 #endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+    _savedAutomaticallyAdjustsScrollIndicatorInsets = NO;
+#endif
+      
   }
 
 #if !TARGET_OS_OSX
@@ -173,7 +180,7 @@ static NSDictionary* customCertificatesForHost;
       name:UIKeyboardWillShowNotification object:nil];
 
     // Workaround for StatusBar appearance bug for iOS 12
-    // https://github.com/react-native-community/react-native-webview/issues/62
+    // https://github.com/react-native-webview/react-native-webview/issues/62
       [[NSNotificationCenter defaultCenter] addObserver:self
                                                selector:@selector(showFullScreenVideoStatusBars)
                                                    name:UIWindowDidBecomeVisibleNotification
@@ -224,6 +231,9 @@ static NSDictionary* customCertificatesForHost;
     prefs.javaScriptEnabled = NO;
     _prefsUsed = YES;
   }
+  if (_allowUniversalAccessFromFileURLs) {
+    [wkWebViewConfig setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
+  }
   if (_allowFileAccessFromFileURLs) {
     [prefs setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
     _prefsUsed = YES;
@@ -250,6 +260,16 @@ static NSDictionary* customCertificatesForHost;
     WKWebpagePreferences *pagePrefs = [[WKWebpagePreferences alloc]init];
     pagePrefs.preferredContentMode = _contentMode;
     wkWebViewConfig.defaultWebpagePreferences = pagePrefs;
+  }
+#endif
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
+  if (@available(iOS 14.0, *)) {
+    if ([wkWebViewConfig respondsToSelector:@selector(limitsNavigationsToAppBoundDomains)]) {
+      if (_limitsNavigationsToAppBoundDomains) {
+        wkWebViewConfig.limitsNavigationsToAppBoundDomains = YES;
+      }
+    }
   }
 #endif
 
@@ -300,7 +320,7 @@ static NSDictionary* customCertificatesForHost;
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
       //For UIRefreshControl to work correctly, the bounces should always be true
-    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces; 
+    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
@@ -315,6 +335,11 @@ static NSDictionary* customCertificatesForHost;
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
       _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
+    }
+#endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+    if (@available(iOS 13.0, *)) {
+      _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
     }
 #endif
 
@@ -334,6 +359,7 @@ static NSDictionary* customCertificatesForHost;
 - (void)removeFromSuperview
 {
     if (_webView) {
+        [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
         [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
         [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
         [_webView removeFromSuperview];
@@ -463,7 +489,17 @@ static NSDictionary* customCertificatesForHost;
     }
 }
 #endif
-
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+- (void)setAutomaticallyAdjustsScrollIndicatorInsets:(BOOL)automaticallyAdjustsScrollIndicatorInsets{
+    _savedAutomaticallyAdjustsScrollIndicatorInsets = automaticallyAdjustsScrollIndicatorInsets;
+    if (_webView == nil) {
+           return;
+       }
+       if ([_webView.scrollView respondsToSelector:@selector(setAutomaticallyAdjustsScrollIndicatorInsets:)]) {
+           _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = automaticallyAdjustsScrollIndicatorInsets;
+       }
+}
+#endif
 /**
  * This method is called whenever JavaScript running within the web view calls:
  *   - window.webkit.messageHandlers[MessageHandlerName].postMessage
@@ -536,6 +572,16 @@ static NSDictionary* customCertificatesForHost;
         }
         [_webView loadHTMLString:html baseURL:baseURL];
         return;
+    } 
+    //Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
+    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]]; 
+    if(headerCookie) {
+      NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys:headerCookie,@"Set-Cookie",nil];
+      NSURL *urlString = [NSURL URLWithString:_source[@"uri"]];
+      NSArray *httpCookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:urlString];
+      for (NSHTTPCookie *httpCookie in httpCookies) {
+          [_webView.configuration.websiteDataStore.httpCookieStore setCookie:httpCookie completionHandler:nil];
+      }
     }
 
     NSURLRequest *request = [self requestForSource:_source];
@@ -1046,7 +1092,8 @@ static NSDictionary* customCertificatesForHost;
       return;
     }
 
-    if ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102 || [error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 101) {
+    if ([error.domain isEqualToString:@"WebKitErrorDomain"] &&
+        (error.code == 102 || error.code == 101)) {
       // Error code 102 "Frame load interrupted" is raised by the WKWebView
       // when the URL is from an http redirect. This is a common pattern when
       // implementing OAuth with a WebView.
@@ -1178,7 +1225,7 @@ static NSDictionary* customCertificatesForHost;
 - (void)setPullToRefreshEnabled:(BOOL)pullToRefreshEnabled
 {
     _pullToRefreshEnabled = pullToRefreshEnabled;
-    
+
     if (pullToRefreshEnabled) {
         [self addPullToRefreshControl];
     } else {
@@ -1379,7 +1426,7 @@ static NSDictionary* customCertificatesForHost;
   if (_sharedCookiesEnabled) {
     if (@available(iOS 11.0, *)) {
       // see WKWebView initialization for added cookies
-    } else {
+    } else if (request != nil) {
       NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL];
       NSDictionary<NSString *, NSString *> *cookieHeader = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
       NSMutableURLRequest *mutableRequest = [request mutableCopy];

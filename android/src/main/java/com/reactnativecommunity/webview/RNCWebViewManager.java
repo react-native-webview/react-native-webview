@@ -13,6 +13,7 @@ import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
@@ -192,6 +193,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     settings.setBuiltInZoomControls(true);
     settings.setDisplayZoomControls(false);
     settings.setDomStorageEnabled(true);
+    settings.setSupportMultipleWindows(true);
 
     settings.setAllowFileAccess(false);
     settings.setAllowContentAccess(false);
@@ -255,6 +257,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "setSupportMultipleWindows")
+  public void setSupportMultipleWindows(WebView view, boolean enabled){
+    view.getSettings().setSupportMultipleWindows(enabled);
   }
 
   @ReactProp(name = "showsHorizontalScrollIndicator")
@@ -701,6 +708,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     super.onDropViewInstance(webView);
     ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RNCWebView) webView);
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
+    mWebChromeClient = null;
   }
 
   public static RNCWebViewModule getModule(ReactContext reactContext) {
@@ -734,8 +742,25 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           }
 
           mVideoView.setBackgroundColor(Color.BLACK);
-          getRootView().addView(mVideoView, FULLSCREEN_LAYOUT_PARAMS);
-          mWebView.setVisibility(View.GONE);
+
+          // since RN's Modals interfere with the View hierarchy
+          // we will decide which View to Hide if the hierarchy
+          // does not match (i.e., the webview is within a Modal)
+          // NOTE: We could use mWebView.getRootView() instead of getRootView()
+          // but that breaks the Modal's styles and layout, so we need this to render
+          // in the main View hierarchy regardless.
+          ViewGroup rootView = getRootView();
+          rootView.addView(mVideoView, FULLSCREEN_LAYOUT_PARAMS);
+
+          // Different root views, we are in a Modal
+          if(rootView.getRootView() != mWebView.getRootView()){
+            mWebView.getRootView().setVisibility(View.GONE);
+          }
+
+          // Same view hierarchy (no Modal), just hide the webview then
+          else{
+            mWebView.setVisibility(View.GONE);
+          }
 
           mReactContext.addLifecycleEventListener(this);
         }
@@ -746,18 +771,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
             return;
           }
 
-          mVideoView.setVisibility(View.GONE);
-          getRootView().removeView(mVideoView);
+          // same logic as above
+          ViewGroup rootView = getRootView();
+
+          if(rootView.getRootView() !=  mWebView.getRootView()){
+            mWebView.getRootView().setVisibility(View.VISIBLE);
+          }
+
+          // Same view hierarchy (no Modal)
+          else{
+            mWebView.setVisibility(View.VISIBLE);
+          }
+
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+          }
+
+          rootView.removeView(mVideoView);
           mCustomViewCallback.onCustomViewHidden();
 
           mVideoView = null;
           mCustomViewCallback = null;
 
-          mWebView.setVisibility(View.VISIBLE);
-
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-          }
           mReactContext.getCurrentActivity().setRequestedOrientation(initialRequestedOrientation);
 
           mReactContext.removeLifecycleEventListener(this);
@@ -882,7 +917,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         // This is desired behavior. We later use these values to determine whether the request is a top-level navigation or a subresource request.
         String topWindowUrl = webView.getUrl();
         String failingUrl = error.getUrl();
-        
+
         // Cancel request after obtaining top-level URL.
         // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
         // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
@@ -1081,6 +1116,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+
+      final WebView newWebView = new WebView(view.getContext());
+      final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+      transport.setWebView(newWebView);
+      resultMsg.sendToTarget();
+
+      return true;
+    }
+
+    @Override
     public boolean onConsoleMessage(ConsoleMessage message) {
       if (ReactBuildConfig.DEBUG) {
         return super.onConsoleMessage(message);
@@ -1101,6 +1147,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           permissions.add(Manifest.permission.RECORD_AUDIO);
         } else if (requestedResources[i].equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
           permissions.add(Manifest.permission.CAMERA);
+        } else if(requestedResources[i].equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+          permissions.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
         }
         // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
       }
@@ -1113,6 +1161,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
         } else if (permissions.get(i).equals(Manifest.permission.CAMERA)) {
           grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+        } else if (permissions.get(i).equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+          grantedPermissions.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
         }
       }
 
