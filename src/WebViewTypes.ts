@@ -332,6 +332,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   injectedJavaScriptForMainFrameOnly?: boolean;
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   onFileDownload?: (event: FileDownloadEvent) => void;
+  limitsNavigationsToAppBoundDomains?: boolean;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -614,6 +615,17 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * If not provided, the default is to let the webview try to render the file.
    */
   onFileDownload?: (event: FileDownloadEvent) => void;
+
+  /**
+   * A Boolean value which, when set to `true`, indicates to WebKit that a WKWebView
+   * will only navigate to app-bound domains. Once set, any attempt to navigate away
+   * from an app-bound domain will fail with the error “App-bound domain failure.”
+   * 
+   * Applications can specify up to 10 “app-bound” domains using a new
+   * Info.plist key `WKAppBoundDomains`.
+   * @platform ios
+   */
+  limitsNavigationsToAppBoundDomains?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
