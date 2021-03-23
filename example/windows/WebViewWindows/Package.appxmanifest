@@ -8,7 +8,7 @@
 
  <Identity
     Name="WebViewWindows"
-    Publisher="CN=jfkm69"
+    Publisher="CN=kaigu"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="6b4ef5e9-85c1-4006-87d7-77c61c62f84f" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
