@@ -1301,7 +1301,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       super.onSizeChanged(w, h, ow, oh);
 
       if (sendContentSizeChangeEvents) {
-        dispatchEvent((
+        dispatchEvent(
           this,
           new ContentSizeChangeEvent(
             this.getId(),
