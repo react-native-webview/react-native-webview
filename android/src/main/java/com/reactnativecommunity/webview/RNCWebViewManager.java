@@ -539,7 +539,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setAllowsFullscreenVideo(
     WebView view,
     @Nullable Boolean allowsFullscreenVideo) {
-    mAllowsFullscreenVideo = allowsFullscreenVideo != null && allowsFullscreenVideo;
+    mAllowsFullscreenVideo = allowsFullscreenVideo != null && allowsFullscreenVideo && (((ReactContext)view.getContext()).getCurrentActivity() == null);
     setupWebChromeClient((ReactContext)view.getContext(), view);
   }
 
