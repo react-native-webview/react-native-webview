@@ -1003,7 +1003,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         eventData.putInt("statusCode", errorResponse.getStatusCode());
         eventData.putString("description", errorResponse.getReasonPhrase());
 
-        ((RNCWebView) webView).dispatchEvent((
+        ((RNCWebView) webView).dispatchEvent(
           webView,
           new TopHttpErrorEvent(webView.getId(), eventData));
       }
@@ -1035,7 +1035,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         WritableMap event = createWebViewEvent(webView, webView.getUrl());
         event.putBoolean("didCrash", detail.didCrash());
 
-      ((RNCWebView) webView).dispatchEvent((
+      ((RNCWebView) webView).dispatchEvent(
           webView,
           new TopRenderProcessGoneEvent(webView.getId(), event)
         );
@@ -1045,7 +1045,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     protected void emitFinishEvent(WebView webView, String url) {
-      ((RNCWebView) webView).dispatchEvent((
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingFinishEvent(
           webView.getId(),
@@ -1174,7 +1174,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       event.putBoolean("canGoBack", webView.canGoBack());
       event.putBoolean("canGoForward", webView.canGoForward());
       event.putDouble("progress", (float) newProgress / 100);
-      ((RNCWebView) webView).dispatchEvent((
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingProgressEvent(
           webView.getId(),
