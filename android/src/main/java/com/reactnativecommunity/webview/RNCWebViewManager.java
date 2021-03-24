@@ -161,13 +161,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     mWebViewConfig = webViewConfig;
   }
 
-  protected static void dispatchEvent(WebView webView, Event event) {
-    ReactContext reactContext = (ReactContext) webView.getContext();
-    EventDispatcher eventDispatcher =
-      reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-    eventDispatcher.dispatchEvent(event);
-  }
-
   @Override
   public String getName() {
     return REACT_CLASS;
@@ -838,7 +831,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       RNCWebView reactWebView = (RNCWebView) webView;
       reactWebView.callInjectedJavaScriptBeforeContentLoaded();
 
-      dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingStartEvent(
           webView.getId(),
@@ -885,7 +878,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       } else {
         FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
         progressChangedFilter.setWaitingForCommandLoadUrl(true);
-        dispatchEvent(
+        ((RNCWebView) view).dispatchEvent(
           view,
           new TopShouldStartLoadWithRequestEvent(
             view.getId(),
@@ -992,7 +985,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       eventData.putDouble("code", errorCode);
       eventData.putString("description", description);
 
-      dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingErrorEvent(webView.getId(), eventData));
     }
@@ -1010,7 +1003,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         eventData.putInt("statusCode", errorResponse.getStatusCode());
         eventData.putString("description", errorResponse.getReasonPhrase());
 
-        dispatchEvent(
+        ((RNCWebView) webView).dispatchEvent(
           webView,
           new TopHttpErrorEvent(webView.getId(), eventData));
       }
@@ -1042,7 +1035,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         WritableMap event = createWebViewEvent(webView, webView.getUrl());
         event.putBoolean("didCrash", detail.didCrash());
 
-        dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
           webView,
           new TopRenderProcessGoneEvent(webView.getId(), event)
         );
@@ -1052,7 +1045,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     protected void emitFinishEvent(WebView webView, String url) {
-      dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingFinishEvent(
           webView.getId(),
@@ -1181,7 +1174,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       event.putBoolean("canGoBack", webView.canGoBack());
       event.putBoolean("canGoForward", webView.canGoForward());
       event.putDouble("progress", (float) newProgress / 100);
-      dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingProgressEvent(
           webView.getId(),
@@ -1490,6 +1483,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         dispatchEvent(this, event);
       }
+    }
+
+    protected void dispatchEvent(WebView webView, Event event) {
+      ReactContext reactContext = (ReactContext) webView.getContext();
+      EventDispatcher eventDispatcher =
+        reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+      eventDispatcher.dispatchEvent(event);
     }
 
     protected void cleanupCallbacksAndDestroy() {
