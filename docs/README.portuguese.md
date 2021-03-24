@@ -1,9 +1,9 @@
 # React Native WebView - Um moderno, multiplataforma WebView para React Native
 
-[![star this repo](http://githubbadges.com/star.svg?user=react-native-community&repo=react-native-webview&style=flat)](https://github.com/react-native-community/react-native-webview)
+[![star this repo](http://githubbadges.com/star.svg?user=react-native-webview&repo=react-native-webview&style=flat)](https://github.com/react-native-webview/react-native-webview)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors)
-[![Known Vulnerabilities](https://snyk.io/test/github/react-native-community/react-native-webview/badge.svg?style=flat-square)](https://snyk.io/test/github/react-native-community/react-native-webview)
+[![Known Vulnerabilities](https://snyk.io/test/github/react-native-webview/react-native-webview/badge.svg?style=flat-square)](https://snyk.io/test/github/react-native-webview/react-native-webview)
 <a href="https://www.npmjs.com/package/react-native-webview"><img src="https://img.shields.io/npm/v/react-native-webview.svg"></a>
 
 **React Native WebView** é um moderno, bem apoiado, e multiplataforma WebView para React Native. É projetado para substituir o WebView embutido(que sera [removido do core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
@@ -36,21 +36,21 @@ Esse projeto segue [versionamento semântico](https://semver.org/). Não hesitam
 
 Versão atual: ![version](https://img.shields.io/npm/v/react-native-webview.svg)
 
-- [8.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v8.0.0) - onNavigationStateChange agora é disparado quando alterado o hash da URL.
+- [8.0.0](https://github.com/react-native-webview/react-native-webview/releases/tag/v8.0.0) - onNavigationStateChange agora é disparado quando alterado o hash da URL.
 
-- [7.0.1](https://github.com/react-native-community/react-native-webview/releases/tag/v7.0.1) - UIWebView removido.
+- [7.0.1](https://github.com/react-native-webview/react-native-webview/releases/tag/v7.0.1) - UIWebView removido.
 
-- [6.0.**2**](https://github.com/react-native-community/react-native-webview/releases/tag/v6.0.2) - Update para AndroidX. Tenha certeza de habilitar no `android/gradle.properties` do seu projeto. Veja o [Getting Started Guide](https://github.com/react-native-community/react-native-webview/blob/master/docs/Getting-Started.md).
+- [6.0.**2**](https://github.com/react-native-webview/react-native-webview/releases/tag/v6.0.2) - Update para AndroidX. Tenha certeza de habilitar no `android/gradle.properties` do seu projeto. Veja o [Getting Started Guide](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Getting-Started.md).
 
-- [5.0.**1**](https://github.com/react-native-community/react-native-webview/releases/tag/v5.0.0) - Refatorou a antiga implementação postMessage para comunicação da visualização da webview para nativa.
-- [4.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v4.0.0) - Cache adicionada(habilitada por padrão).
-- [3.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v3.0.0) - WKWebview: Adicionado um pool de processos compartilhados para que os cookies e o localStorage sejam compartilhados nas webviews no iOS (habilitadas por padrão)
-- [2.0.0](https://github.com/react-native-community/react-native-webview/releases/tag/v2.0.0) - Primeiro lançamento, esta é uma réplica do componente principal do webview.
+- [5.0.**1**](https://github.com/react-native-webview/react-native-webview/releases/tag/v5.0.0) - Refatorou a antiga implementação postMessage para comunicação da visualização da webview para nativa.
+- [4.0.0](https://github.com/react-native-webview/react-native-webview/releases/tag/v4.0.0) - Cache adicionada(habilitada por padrão).
+- [3.0.0](https://github.com/react-native-webview/react-native-webview/releases/tag/v3.0.0) - WKWebview: Adicionado um pool de processos compartilhados para que os cookies e o localStorage sejam compartilhados nas webviews no iOS (habilitadas por padrão)
+- [2.0.0](https://github.com/react-native-webview/react-native-webview/releases/tag/v2.0.0) - Primeiro lançamento, esta é uma réplica do componente principal do webview.
 
 **Seguinte:**
 
 - remoção do this.webView.postMessage() (
-  nunca documentado e menos flexível que o injectJavascript) -> [Como migrar](https://github.com/react-native-community/react-native-webview/issues/809)
+  nunca documentado e menos flexível que o injectJavascript) -> [Como migrar](https://github.com/react-native-webview/react-native-webview/issues/809)
 - Reescrita em Kotlin
 - talvez reescrita em Swift
 
@@ -79,7 +79,7 @@ Para mais informações, leia a [API Reference](./docs/Reference.md) e o [Guia](
 
 ## Contribuindo
 
-Veja [Contributing.md](https://github.com/react-native-community/react-native-webview/blob/master/docs/Contributing.md)
+Veja [Contributing.md](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Contributing.md)
 
 ## Contribuidores
 
