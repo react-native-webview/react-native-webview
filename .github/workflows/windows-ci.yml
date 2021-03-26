@@ -51,11 +51,6 @@ jobs:
         Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
         npx react-native run-windows --arch x64 --release --no-build --no-packager
 
-    - name: Install WinAppDriver
-      uses: crazy-max/ghaction-chocolatey@v1
-      with:
-        args: install winappdriver
-
     - name: Start Appium server
       shell: powershell
       run: Start-Process PowerShell -ArgumentList "yarn appium"
