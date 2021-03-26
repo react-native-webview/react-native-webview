@@ -158,6 +158,8 @@ to set an [`onMessage`](Reference.md#onmessage) handler, even if it's a no-op, o
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
+_Kindly note: Windows does not have [native support for alerts](https://github.com/MicrosoftDocs/winrt-api/blob/docs/windows.ui.xaml.controls/webview.md#use-of-alert), as such any scripts to show an alert will not work._
+
 Example:
 
 Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage)

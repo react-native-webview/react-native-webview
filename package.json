@@ -22,7 +22,7 @@
     "build": "yarn tsc",
     "prepare": "yarn build",
     "appium": "appium",
-    "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.windows.js"
+    "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.js"
   },
   "rn-docs": {
     "title": "Webview",
@@ -67,10 +67,11 @@
     "react-native": "0.62.2",
     "react-native-macos": "0.60.0-microsoft.73",
     "react-native-windows": "0.62.17",
-    "selenium-appium": "0.0.15",
+    "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",
     "semantic-release": "15.13.24",
-    "typescript": "3.8.3"
+    "typescript": "3.8.3",
+    "winappdriver": "^0.0.7"
   },
   "repository": {
     "type": "git",
