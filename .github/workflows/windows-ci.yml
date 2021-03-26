@@ -51,12 +51,13 @@ jobs:
         Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
         npx react-native run-windows --arch x64 --release --no-build --no-packager
 
+
     - name: Start Appium server
       shell: powershell
       run: Start-Process PowerShell -ArgumentList "yarn appium"
 
     - name: Start React server
-      run: yarn start:windows
+      run: yarn start:windows > react-native-windows.log &
       
     - name: Run tests
       run: yarn test:windows
