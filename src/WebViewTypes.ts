@@ -626,6 +626,19 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   limitsNavigationsToAppBoundDomains?: boolean;
+  /**
+   * A Boolean value which, when set to `true`, WKWebView will be in ApplePay compact mode.
+   *  Once set, websites will be able to invoke apple pay from React Native Webview.
+   *  This comes with a cost features like script injection,html5 History , shared Cookies,
+   *  atEndScript , atStartScript will not work
+   * {@link https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API ApplePay Doc}
+   * if you require to send message to App , webpage has to explicitly call webkit message handler
+   * @example
+   *     window.webkit.messageHandlers.ReactNativeWebView.postMessage("hello apple pay")
+   * from webpage are receive it on onMessage handler on react native side
+   * @platform ios
+   */
+  applePayCompactMode?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
