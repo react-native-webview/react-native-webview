@@ -78,15 +78,18 @@ namespace winrt::ReactNativeWebView::implementation {
                         uriString.replace(0, 7, bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
 
+                    bool hasHeaders = srcMap.find("headers") != srcMap.end();
+                    auto httpRequest = winrt::HttpRequestMessage();
+                    httpRequest.RequestUri(winrt::Uri(to_hstring(uriString)));
                     if (srcMap.find("method") != srcMap.end() && srcMap.at("method").AsString() == "POST")
                     {
-                        auto httpRequest =
-                            winrt::HttpRequestMessage(winrt::HttpMethod::Post(), winrt::Uri(to_hstring(uriString)));
+                        httpRequest.Method(winrt::HttpMethod::Post());
                         auto formBody = srcMap.at("body").AsString();
-                        if (srcMap.find("headers") != srcMap.end() &&
+                        bool isUrlEncodedForm = hasHeaders &&
                             srcMap.at("headers").AsObject().find("content-type") !=
-                                srcMap.at("headers").AsObject().end() &&
-                            srcMap.at("headers").AsObject().at("content-type") == "application/x-www-form-urlencoded")
+                            srcMap.at("headers").AsObject().end() &&
+                            srcMap.at("headers").AsObject().at("content-type") == "application/x-www-form-urlencoded";
+                        if (isUrlEncodedForm)
                         {
                             auto formContent = winrt::single_threaded_observable_map<winrt::hstring, winrt::hstring>();
                             auto counter = 0;
@@ -111,12 +114,16 @@ namespace winrt::ReactNativeWebView::implementation {
                         {
                             httpRequest.Content(winrt::HttpStringContent(to_hstring(formBody)));
                         }
-                        webView.NavigateWithHttpRequestMessage(httpRequest);
                     }
-                    else
-                    {
-                        webView.Navigate(winrt::Uri(to_hstring(uriString)));
+                    if (hasHeaders) {
+                        for (auto const& header : srcMap.at("headers").AsObject()) {
+                            auto const& headerKey = header.first;
+                            auto const& headerValue = header.second;
+                            if (headerValue.IsNull()) continue;
+                            httpRequest.Headers().TryAppendWithoutValidation(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
+                        }
                     }
+                    webView.NavigateWithHttpRequestMessage(httpRequest);
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
                     auto htmlString = srcMap.at("html").AsString();
