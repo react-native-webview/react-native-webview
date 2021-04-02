@@ -57,7 +57,8 @@ jobs:
       run: Start-Process PowerShell -ArgumentList "yarn appium"
 
     - name: Start React server
-      run: yarn start:windows > react-native-windows.log &
+      shell: powershell
+      run: Start-Process PowerShell -ArgumentList "yarn start:windows"
       
     - name: Run tests
       run: yarn test:windows
