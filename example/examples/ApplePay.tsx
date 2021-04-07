@@ -13,7 +13,7 @@ export default class Alerts extends Component<Props, State> {
         return (
             <View style={{ flex: 1 }}>
                 <WebView
-                    applePayCompactMode={true}
+                    enableApplePay={true}
                     source={{uri: "https://applepaydemo.apple.com/"}}
                     automaticallyAdjustContentInsets={false}
                 />
