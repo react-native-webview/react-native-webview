@@ -1096,6 +1096,10 @@ static NSDictionary* customCertificatesForHost;
 - (void)evaluateJS:(NSString *)js
           thenCall: (void (^)(NSString*)) callback
 {
+  if (self.enableApplePay) {
+    RCTLogWarn(@"Cannot run javascript when apple pay is enabled");
+    return;
+  }
   [self.webView evaluateJavaScript: js completionHandler: ^(id result, NSError *error) {
     if (callback != nil) {
       callback([NSString stringWithFormat:@"%@", result]);
