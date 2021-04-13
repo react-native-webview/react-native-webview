@@ -323,6 +323,7 @@ _Under the hood_
 
 > On iOS, ~~`injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentEnd`. As a consequence, `injectedJavaScript` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
+> On Windows, `injectedJavaScript` runs a method on the WinRT/C++ WebView called `InvokeScriptAsync`
 
 #### The `injectedJavaScriptBeforeContentLoaded` prop
 
