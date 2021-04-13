@@ -83,6 +83,8 @@ Add `#include "winrt/ReactNativeWebView.h"`.
 
 Add `PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider());` before `InitializeComponent();`.
 
+Note if you want to enable scroll with Touch for the WebView component you must disable perspective for your app using [ReactRootView.IsPerspectiveEnabled](https://microsoft.github.io/react-native-windows/docs/ReactRootView#isperspectiveenabled).
+
 ## 3. Import the webview into your component
 
 ```js
