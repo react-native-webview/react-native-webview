@@ -11689,10 +11689,10 @@ scheduler@0.17.0:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-selenium-appium@0.0.15:
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/selenium-appium/-/selenium-appium-0.0.15.tgz#27eacd40ebddc1f4af00a1c50278a394e420e2ef"
-  integrity sha512-9/DGdpC8TF88h2eOaFoLIwNDG16He5o2CZOOoaeV1gwNKpkvcpCCA6SjIxgHbWm/0vGzn8TUdmbAlszIoQQzQg==
+selenium-appium@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/selenium-appium/-/selenium-appium-1.0.2.tgz#78f274c61c2edd4837ef9ffc8c855d70e5b01f29"
+  integrity sha512-+aIvzAoydWhJSfsLd0fdIq7D9eas2Ck7DQxT18fe2bnm5TZE6j+2DaOVK6vUrSp/uUuG+KB9RfAuxfUXQqVPFg==
 
 selenium-webdriver@3.x:
   version "3.6.0"
@@ -13296,6 +13296,11 @@ widest-line@^2.0.0:
   integrity sha512-Ba5m9/Fa4Xt9eb2ELXt77JxVDV8w7qQrH0zS/TWSJdLyAwQjWoOzpzj5lwVftDz6n/EOu3tNACS84v509qwnJA==
   dependencies:
     string-width "^2.1.1"
+
+winappdriver@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/winappdriver/-/winappdriver-0.0.7.tgz#77c730b1f321c7b0f389612867ae2ef8d4121e82"
+  integrity sha512-Tq9BGwWmnsSdIjMIDtfH5/mdn4Qk2FO5FYAhAcoL0kZByHVtleCwoCFoLG814b4a4BEbVOizuMgY6x7bTFVY/g==
 
 windows-release@^3.1.0:
   version "3.3.3"
