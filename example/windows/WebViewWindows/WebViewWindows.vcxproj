@@ -15,14 +15,9 @@
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
     <WindowsTargetPlatformVersion Condition=" '$(WindowsTargetPlatformVersion)' == '' ">10.0.18362.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.15063.0</WindowsTargetPlatformMinVersion>
-<<<<<<< HEAD
-    <PackageCertificateThumbprint>5FCF7B529E2F905953A0304430E6A4D6568EC1AC</PackageCertificateThumbprint>
-    <PackageCertificatePassword>password</PackageCertificatePassword>
-=======
     <PackageCertificateKeyFile>WebViewWindows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>1DA6E34911B18C433FE3E543D0429FC808468C89</PackageCertificateThumbprint>
     <PackageCertificatePassword></PackageCertificatePassword>
->>>>>>> d6672c87eb61827c9b0215733a4766c14f68d01a
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
