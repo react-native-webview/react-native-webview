@@ -79,7 +79,6 @@ This document lays out the current public properties and methods for the React N
 
 ## Methods Index
 
-- [`extraNativeComponentConfig`](Reference.md#extranativecomponentconfig)
 - [`goForward`](Reference.md#goforward)
 - [`goBack`](Reference.md#goback)
 - [`reload`](Reference.md#reload)
@@ -1366,12 +1365,6 @@ Example:
 ```
 
 ## Methods
-
-### `extraNativeComponentConfig()`[⬆](#methods-index)<!-- Link generated with jump2header -->
-
-```javascript
-static extraNativeComponentConfig()
-```
 
 ### `goForward()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
