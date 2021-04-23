@@ -54,6 +54,10 @@ jobs:
     - name: Start Appium server
       shell: powershell
       run: Start-Process PowerShell -ArgumentList "yarn appium"
+
+    - name: Start React server
+      shell: powershell
+      run: Start-Process PowerShell -ArgumentList "yarn start:windows"
       
     - name: Run tests
       run: yarn test:windows

@@ -4,6 +4,7 @@
 #include "ReactWebView.h"
 #include "JSValueXaml.h"
 
+
 namespace winrt {
     using namespace Microsoft::ReactNative;
     using namespace Windows::Foundation;
@@ -11,6 +12,8 @@ namespace winrt {
     using namespace Windows::UI;
     using namespace Windows::UI::Xaml;
     using namespace Windows::UI::Xaml::Controls;
+    using namespace Windows::Web::Http;
+    using namespace Windows::Web::Http::Headers;
 }
 
 namespace winrt::ReactNativeWebView::implementation {
@@ -75,7 +78,52 @@ namespace winrt::ReactNativeWebView::implementation {
                         uriString.replace(0, 7, bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
 
-                    webView.Navigate(winrt::Uri(to_hstring(uriString)));
+                    bool hasHeaders = srcMap.find("headers") != srcMap.end();
+                    auto httpRequest = winrt::HttpRequestMessage();
+                    httpRequest.RequestUri(winrt::Uri(to_hstring(uriString)));
+                    if (srcMap.find("method") != srcMap.end() && srcMap.at("method").AsString() == "POST")
+                    {
+                        httpRequest.Method(winrt::HttpMethod::Post());
+                        auto formBody = srcMap.at("body").AsString();
+                        bool isUrlEncodedForm = hasHeaders &&
+                            srcMap.at("headers").AsObject().find("content-type") !=
+                            srcMap.at("headers").AsObject().end() &&
+                            srcMap.at("headers").AsObject().at("content-type") == "application/x-www-form-urlencoded";
+                        if (isUrlEncodedForm)
+                        {
+                            auto formContent = winrt::single_threaded_observable_map<winrt::hstring, winrt::hstring>();
+                            auto counter = 0;
+                            auto current = formBody.find_first_of("&");
+                            while (counter <= formBody.find_last_of("&"))
+                            {
+                                auto keyValueSeparator = formBody.substr(counter, counter + current).find('=');
+                                if (keyValueSeparator <= current)
+                                {
+                                    auto key = winrt::to_hstring(formBody.substr(counter, keyValueSeparator));
+                                    auto value = winrt::to_hstring(formBody.substr(
+                                        keyValueSeparator + counter + 1, current - keyValueSeparator - 1));
+                                    formContent.Insert(key, value);
+                                }
+                                counter += current + 1;
+                                current = formBody.substr(counter, formBody.size() - counter).find_first_of("&");
+                            }
+                            httpRequest.Content(winrt::HttpFormUrlEncodedContent(formContent));
+                            httpRequest.Headers().Accept().TryParseAdd(L"application/x-www-form-urlencoded");
+                        }
+                        else
+                        {
+                            httpRequest.Content(winrt::HttpStringContent(to_hstring(formBody)));
+                        }
+                    }
+                    if (hasHeaders) {
+                        for (auto const& header : srcMap.at("headers").AsObject()) {
+                            auto const& headerKey = header.first;
+                            auto const& headerValue = header.second;
+                            if (headerValue.IsNull()) continue;
+                            httpRequest.Headers().TryAppendWithoutValidation(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
+                        }
+                    }
+                    webView.NavigateWithHttpRequestMessage(httpRequest);
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
                     auto htmlString = srcMap.at("html").AsString();
