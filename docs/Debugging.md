@@ -11,12 +11,12 @@ One option (if you're loading HTML from an external source) is to inject an erro
 ```js
 <WebView
   injectedJavaScriptBeforeContentLoaded={`
-		window.onerror = function(message, sourcefile, lineno, colno, error) {
-			alert("Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno);
-			return true;
-		};
-		true;
-	`}
+    window.onerror = function(message, sourcefile, lineno, colno, error) {
+      alert("Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno);
+      return true;
+    };
+    true;
+  `}
   source={{
     uri:
       'https://bl.ocks.org/jamonholmgren/raw/48423fd99537283beace1daa2688e80f/',
