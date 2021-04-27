@@ -2,6 +2,47 @@
 
 Here are some helpful React Native WebView debugging tips.
 
+## Script Errors
+
+It can be difficult to debug syntax errors and other script errors in WebView, since errors don't show up in a console by default.
+
+One option (if you're loading HTML from an external source) is to inject an error handler before the content is loaded.
+
+```js
+<WebView
+	injectedJavaScriptBeforeContentLoaded={`
+		window.onerror = function(message, sourcefile, lineno, colno, error) {
+			alert("Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno);
+			return true;
+		};
+		true;
+	`}
+	source={{
+		uri:
+			"https://bl.ocks.org/jamonholmgren/raw/48423fd99537283beace1daa2688e80f/",
+	}}
+/>
+```
+
+This will provide an Alert box with (hopefully) useful debugging information.
+
+If you're injecting JavaScript, this may fail with `Script error` and no other useful information. One simple way to debug this is to wrap your injected JavaScript in a try/catch, like so:
+
+```js
+const js = `
+  try {
+    // your code here
+  } catch(e) {
+    alert(e)
+  }
+  true;
+`;
+```
+
+This will bring up an alert with the error message, which may or may not be helpful.
+
+If these two simple methods fail to uncover the bug, try using the next technique!
+
 ## Debugging WebView Contents
 
 ### iOS & Safari
