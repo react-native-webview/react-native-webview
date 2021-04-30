@@ -8,7 +8,6 @@ buildscript {
   // module dependency in an application project.
   if (project == rootProject) {
     repositories {
-      mavenCentral()
       google()
       jcenter()
     }
@@ -19,7 +18,6 @@ buildscript {
     }
   } else {
     repositories {
-      mavenCentral()
       jcenter()
     }
 
@@ -40,7 +38,7 @@ android {
   compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
   buildToolsVersion getExtOrDefault('buildToolsVersion')
   defaultConfig {
-    minSdkVersion getExtOrIntegerDefault('minSdkVersion')
+    minSdkVersion 16
     targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
     versionCode 1
     versionName "1.0"
