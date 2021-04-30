@@ -1,7 +1,0 @@
-namespace ReactNativeWebView{
-    [default_interface]
-    runtimeclass ReactWebView : Windows.UI.Xaml.Controls.UserControl{
-        ReactWebView(Microsoft.ReactNative.IReactContext context);
-        void SetMessagingEnabled(Boolean enabled);
-    };
-} // namespace ReactNativeWebView

@@ -14,16 +14,6 @@
 @interface RNCWebViewManager () <RNCWebViewDelegate>
 @end
 
-@implementation RCTConvert (WKWebView)
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
-RCT_ENUM_CONVERTER(WKContentMode, (@{
-    @"recommended": @(WKContentModeRecommended),
-    @"mobile": @(WKContentModeMobile),
-    @"desktop": @(WKContentModeDesktop),
-}), WKContentModeRecommended, integerValue)
-#endif
-@end
-
 @implementation RNCWebViewManager
 {
   NSConditionLock *_shouldStartLoadLock;
@@ -32,11 +22,7 @@ RCT_ENUM_CONVERTER(WKContentMode, (@{
 
 RCT_EXPORT_MODULE()
 
-#if !TARGET_OS_OSX
 - (UIView *)view
-#else
-- (RCTUIView *)view
-#endif // !TARGET_OS_OSX
 {
   RNCWebView *webView = [RNCWebView new];
   webView.delegate = self;
@@ -44,7 +30,6 @@ RCT_EXPORT_MODULE()
 }
 
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
-RCT_EXPORT_VIEW_PROPERTY(onFileDownload, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingStart, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingFinish, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingError, RCTDirectEventBlock)
@@ -54,12 +39,8 @@ RCT_EXPORT_VIEW_PROPERTY(onShouldStartLoadWithRequest, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onContentProcessDidTerminate, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(injectedJavaScript, NSString)
 RCT_EXPORT_VIEW_PROPERTY(injectedJavaScriptBeforeContentLoaded, NSString)
-RCT_EXPORT_VIEW_PROPERTY(injectedJavaScriptForMainFrameOnly, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(injectedJavaScriptBeforeContentLoadedForMainFrameOnly, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(javaScriptEnabled, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(javaScriptCanOpenWindowsAutomatically, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowFileAccessFromFileURLs, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(allowUniversalAccessFromFileURLs, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaPlaybackRequiresUserAction, BOOL)
 #if WEBKIT_IOS_10_APIS_AVAILABLE
@@ -67,7 +48,6 @@ RCT_EXPORT_VIEW_PROPERTY(dataDetectorTypes, WKDataDetectorTypes)
 #endif
 RCT_EXPORT_VIEW_PROPERTY(contentInset, UIEdgeInsets)
 RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustContentInsets, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(autoManageStatusBarEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(incognito, BOOL)
@@ -80,17 +60,6 @@ RCT_EXPORT_VIEW_PROPERTY(allowingReadAccessToURL, NSString)
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
 RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentBehavior)
-#endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustsScrollIndicatorInsets, BOOL)
-#endif
-
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
-RCT_EXPORT_VIEW_PROPERTY(contentMode, WKContentMode)
-#endif
-
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
-RCT_EXPORT_VIEW_PROPERTY(limitsNavigationsToAppBoundDomains, BOOL)
 #endif
 
 /**
@@ -112,10 +81,6 @@ RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)m
   }];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(pullToRefreshEnabled, BOOL, RNCWebView) {
-    view.pullToRefreshEnabled = json == nil ? false : [RCTConvert BOOL: json];
-}
-
 RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWebView) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];
 }
@@ -132,11 +97,9 @@ RCT_CUSTOM_VIEW_PROPERTY(sharedCookiesEnabled, BOOL, RNCWebView) {
     view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
 
-#if !TARGET_OS_OSX
 RCT_CUSTOM_VIEW_PROPERTY(decelerationRate, CGFloat, RNCWebView) {
   view.decelerationRate = json == nil ? UIScrollViewDecelerationRateNormal : [RCTConvert CGFloat: json];
 }
-#endif // !TARGET_OS_OSX
 
 RCT_CUSTOM_VIEW_PROPERTY(directionalLockEnabled, BOOL, RNCWebView) {
     view.directionalLockEnabled = json == nil ? true : [RCTConvert BOOL: json];
