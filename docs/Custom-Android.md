@@ -19,13 +19,13 @@ public class CustomWebViewManager extends RNCWebViewManager {
   protected static class CustomWebViewClient extends RNCWebViewClient { }
 
   protected static class CustomWebView extends RNCWebView {
-    public CustomWebView(ReactContext reactContext) {
+    public CustomWebView(ThemedReactContext reactContext) {
       super(reactContext);
     }
   }
 
   @Override
-  protected RNCWebView createRNCWebViewInstance(ReactContext reactContext) {
+  protected RNCWebView createRNCWebViewInstance(ThemedReactContext reactContext) {
     return new CustomWebView(reactContext);
   }
 
@@ -35,7 +35,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
   }
 
   @Override
-  protected void addEventEmitters(ReactContext reactContext, WebView view) {
+  protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     view.setWebViewClient(new CustomWebViewClient());
   }
 }
@@ -52,7 +52,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
   ...
 
   protected static class CustomWebView extends RNCWebView {
-    public CustomWebView(ReactContext reactContext) {
+    public CustomWebView(ThemedReactContext reactContext) {
       super(reactContext);
     }
 
