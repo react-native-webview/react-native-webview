@@ -1,10 +1,12 @@
 import { windowsAppDriverCapabilities } from 'selenium-appium'
 
+const { platform } = require('./jest.setup.windows');
+
 switch (platform) {
     case "windows":
         const webViewWindowsAppId = 'WebViewWindows_3x6rhkkr9xcf6!App';
         module.exports = {
-            capabilites: windowsAppDriverCapabilities(webViewWindowsAppId)
+            capabilities: windowsAppDriverCapabilities(webViewWindowsAppId)
         }
         break;
     default:

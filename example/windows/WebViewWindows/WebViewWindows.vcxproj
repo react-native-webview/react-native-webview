@@ -16,9 +16,9 @@
     <WindowsTargetPlatformVersion Condition=" '$(WindowsTargetPlatformVersion)' == '' ">10.0.18362.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.15063.0</WindowsTargetPlatformMinVersion>
     <PackageCertificateKeyFile>WebViewWindows_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>82A0D300B0912A62746FFB3E6E04F88985BC2798</PackageCertificateThumbprint>
-    <PackageCertificatePassword>password</PackageCertificatePassword>
-    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+    <PackageCertificateThumbprint>1DA6E34911B18C433FE3E543D0429FC808468C89</PackageCertificateThumbprint>
+    <PackageCertificatePassword></PackageCertificatePassword>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ItemGroup Label="ProjectConfigurations">
@@ -170,6 +170,7 @@
     <Import Project="$(SolutionDir)packages\Microsoft.Windows.CppWinRT.2.0.200729.8\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.Windows.CppWinRT.2.0.200729.8\build\native\Microsoft.Windows.CppWinRT.targets')" />
     <Import Project="$(SolutionDir)packages\Microsoft.UI.Xaml.2.3.191129002\build\native\Microsoft.UI.Xaml.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.UI.Xaml.2.3.191129002\build\native\Microsoft.UI.Xaml.targets')" />
   </ImportGroup>
+  <Target Name="Deploy" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

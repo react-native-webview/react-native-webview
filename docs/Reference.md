@@ -106,9 +106,9 @@ The object passed to `source` can have either of the following shapes:
 **Load uri**
 
 - `uri` (string) - The URI to load in the `WebView`. Can be a local or remote file, and can be changed with React state or props to navigate to a new page.
-- `method` (string) - The HTTP Method to use. Defaults to GET if not specified. On Android, the only supported methods are GET and POST.
+- `method` (string) - The HTTP Method to use. Defaults to GET if not specified. On Android and Windows, the only supported methods are GET and POST.
 - `headers` (object) - Additional HTTP headers to send with the request. On Android, this can only be used with GET requests. See the [Guide](Guide.md#setting-custom-headers) for more information on setting custom headers.
-- `body` (string) - The HTTP body to send with the request. This must be a valid UTF-8 string, and will be sent exactly as specified, with no additional encoding (e.g. URL-escaping or base64) applied. On Android, this can only be used with POST requests.
+- `body` (string) - The HTTP body to send with the request. This must be a valid UTF-8 string, and will be sent exactly as specified, with no additional encoding (e.g. URL-escaping or base64) applied. On Android and Windows, this can only be used with POST requests.
 
 **Static HTML**
 
@@ -152,11 +152,13 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc). Be sure
 to set an [`onMessage`](Reference.md#onmessage) handler, even if it's a no-op, or the code will not be run.
 
-| Type   | Required | Platform            |
-| ------ | -------- | ------------------- |
-| string | No       | iOS, Android, macOS |
+| Type   | Required | Platform                     |
+| ------ | -------- | ---------------------------- |
+| string | No       | iOS, Android, macOS, Windows |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
+
+_Kindly note: Windows does not have [native support for alerts](https://github.com/MicrosoftDocs/winrt-api/blob/docs/windows.ui.xaml.controls/webview.md#use-of-alert), as such any scripts to show an alert will not work._
 
 Example:
 
@@ -597,8 +599,8 @@ url
 
 Function that is invoked when the scroll event is fired in the `WebView`.
 
-| Type     | Required | Platform                |
-| -------- | -------- | ----------------------- |
+| Type     | Required | Platform                     |
+| -------- | -------- | ---------------------------- |
 | function | No       | iOS, macOS, Android, Windows |
 
 Example:

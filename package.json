@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "11.3.1",
+  "version": "11.4.5",
   "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -16,20 +16,21 @@
     "start:ios": "react-native run-ios",
     "start:macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
     "start:windows": "react-native start --use-react-native-windows",
+    "run:windows": "react-native run-windows --root ./example --no-packager",
     "ci": "CI=true && yarn lint",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
     "build": "yarn tsc",
     "prepare": "yarn build",
     "appium": "appium",
-    "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.windows.js"
+    "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.js"
   },
   "rn-docs": {
     "title": "Webview",
     "type": "Component"
   },
   "peerDependencies": {
-    "react-native": ">=0.60 <0.64"
+    "react-native": ">=0.60 <=0.64"
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
@@ -67,10 +68,11 @@
     "react-native": "0.62.2",
     "react-native-macos": "0.60.0-microsoft.73",
     "react-native-windows": "0.62.17",
-    "selenium-appium": "0.0.15",
+    "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",
     "semantic-release": "15.13.24",
-    "typescript": "3.8.3"
+    "typescript": "3.8.3",
+    "winappdriver": "^0.0.7"
   },
   "repository": {
     "type": "git",
@@ -85,6 +87,7 @@
     "lib",
     "index.js",
     "index.d.ts",
-    "react-native-webview.podspec"
+    "react-native-webview.podspec",
+    "react-native.config.js"
   ]
 }
