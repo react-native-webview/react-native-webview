@@ -76,6 +76,7 @@ This document lays out the current public properties and methods for the React N
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
+- [`enableApplePay`](Reference.md#enableApplePay)
 
 ## Methods Index
 
@@ -1362,6 +1363,26 @@ Example:
 
 ```javascript
 <WebView setSupportMultipleWindows={false} />
+```
+
+### `enableApplePay`
+
+A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support. Once set, websites will be able to invoke Apple Pay from React Native Webview.
+This comes with a cost features like [`injectJavaScript`](Reference.md#injectjavascriptstr), html5 History, [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled), [`injectedJavaScript`](Reference.md#injectedjavascript), [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded) will not work  See [Apple Pay Release Note](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API).
+
+If you are required to send message to App , webpage has to explicitly call webkit message handler and receive it on `onMessage` handler on react native side
+```javascript
+window.webkit.messageHandlers.ReactNativeWebView.postMessage("hello apple pay")
+```
+
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | false   | iOS      |
+
+Example:
+
+```javascript
+<WebView enableApplePay={true} />
 ```
 
 ## Methods

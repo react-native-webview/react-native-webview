@@ -146,7 +146,7 @@ static NSDictionary* customCertificatesForHost;
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     _savedAutomaticallyAdjustsScrollIndicatorInsets = NO;
 #endif
-      
+    _enableApplePay = NO;
   }
 
 #if !TARGET_OS_OSX
@@ -1096,6 +1096,10 @@ static NSDictionary* customCertificatesForHost;
 - (void)evaluateJS:(NSString *)js
           thenCall: (void (^)(NSString*)) callback
 {
+  if (self.enableApplePay) {
+    RCTLogWarn(@"Cannot run javascript when apple pay is enabled");
+    return;
+  }
   [self.webView evaluateJavaScript: js completionHandler: ^(id result, NSError *error) {
     if (callback != nil) {
       callback([NSString stringWithFormat:@"%@", result]);
@@ -1292,6 +1296,13 @@ static NSDictionary* customCertificatesForHost;
 - (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
   [wkWebViewConfig.userContentController removeAllUserScripts];
   [wkWebViewConfig.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
+  if(self.enableApplePay){
+    if (self.postMessageScript){
+      [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+                                                                       name:MessageHandlerName];
+    }
+    return;
+  }
 
   NSString *html5HistoryAPIShimSource = [NSString stringWithFormat:
     @"(function(history) {\n"
