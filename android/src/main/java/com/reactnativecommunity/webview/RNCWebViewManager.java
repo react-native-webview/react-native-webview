@@ -791,6 +791,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         };
         webView.setWebChromeClient(mWebChromeClient);
       }
+      else {
+        Log.w("RNCWebViewManager", "Unable to get current activity thus could not set web chrome client with full screen video.");
+      }
     } else {
       if (mWebChromeClient != null) {
         mWebChromeClient.onHideCustomView();
