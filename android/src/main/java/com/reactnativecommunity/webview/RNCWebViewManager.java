@@ -2,6 +2,7 @@ package com.reactnativecommunity.webview;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -13,6 +14,7 @@ import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
@@ -45,6 +47,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
 import com.facebook.common.logging.FLog;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.modules.core.PermissionListener;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.scroll.OnScrollDispatchHelper;
@@ -86,7 +90,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -160,13 +166,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     mWebViewConfig = webViewConfig;
   }
 
-  protected static void dispatchEvent(WebView webView, Event event) {
-    ReactContext reactContext = (ReactContext) webView.getContext();
-    EventDispatcher eventDispatcher =
-      reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-    eventDispatcher.dispatchEvent(event);
-  }
-
   @Override
   public String getName() {
     return REACT_CLASS;
@@ -187,6 +186,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     settings.setBuiltInZoomControls(true);
     settings.setDisplayZoomControls(false);
     settings.setDomStorageEnabled(true);
+    settings.setSupportMultipleWindows(true);
 
     settings.setAllowFileAccess(false);
     settings.setAllowContentAccess(false);
@@ -250,6 +250,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "setSupportMultipleWindows")
+  public void setSupportMultipleWindows(WebView view, boolean enabled){
+    view.getSettings().setSupportMultipleWindows(enabled);
   }
 
   @ReactProp(name = "showsHorizontalScrollIndicator")
@@ -693,6 +698,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     super.onDropViewInstance(webView);
     ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RNCWebView) webView);
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
+    mWebChromeClient = null;
   }
 
   public static RNCWebViewModule getModule(ReactContext reactContext) {
@@ -726,8 +732,25 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           }
 
           mVideoView.setBackgroundColor(Color.BLACK);
-          getRootView().addView(mVideoView, FULLSCREEN_LAYOUT_PARAMS);
-          mWebView.setVisibility(View.GONE);
+
+          // since RN's Modals interfere with the View hierarchy
+          // we will decide which View to Hide if the hierarchy
+          // does not match (i.e., the webview is within a Modal)
+          // NOTE: We could use mWebView.getRootView() instead of getRootView()
+          // but that breaks the Modal's styles and layout, so we need this to render
+          // in the main View hierarchy regardless.
+          ViewGroup rootView = getRootView();
+          rootView.addView(mVideoView, FULLSCREEN_LAYOUT_PARAMS);
+
+          // Different root views, we are in a Modal
+          if(rootView.getRootView() != mWebView.getRootView()){
+            mWebView.getRootView().setVisibility(View.GONE);
+          }
+
+          // Same view hierarchy (no Modal), just hide the webview then
+          else{
+            mWebView.setVisibility(View.GONE);
+          }
 
           mReactContext.addLifecycleEventListener(this);
         }
@@ -738,18 +761,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
             return;
           }
 
-          mVideoView.setVisibility(View.GONE);
-          getRootView().removeView(mVideoView);
+          // same logic as above
+          ViewGroup rootView = getRootView();
+
+          if(rootView.getRootView() !=  mWebView.getRootView()){
+            mWebView.getRootView().setVisibility(View.VISIBLE);
+          }
+
+          // Same view hierarchy (no Modal)
+          else{
+            mWebView.setVisibility(View.VISIBLE);
+          }
+
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+          }
+
+          rootView.removeView(mVideoView);
           mCustomViewCallback.onCustomViewHidden();
 
           mVideoView = null;
           mCustomViewCallback = null;
 
-          mWebView.setVisibility(View.VISIBLE);
-
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-          }
           mReactContext.getCurrentActivity().setRequestedOrientation(initialRequestedOrientation);
 
           mReactContext.removeLifecycleEventListener(this);
@@ -803,7 +836,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       RNCWebView reactWebView = (RNCWebView) webView;
       reactWebView.callInjectedJavaScriptBeforeContentLoaded();
 
-      dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingStartEvent(
           webView.getId(),
@@ -850,7 +883,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       } else {
         FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
         progressChangedFilter.setWaitingForCommandLoadUrl(true);
-        dispatchEvent(
+        ((RNCWebView) view).dispatchEvent(
           view,
           new TopShouldStartLoadWithRequestEvent(
             view.getId(),
@@ -874,7 +907,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         // This is desired behavior. We later use these values to determine whether the request is a top-level navigation or a subresource request.
         String topWindowUrl = webView.getUrl();
         String failingUrl = error.getUrl();
-        
+
         // Cancel request after obtaining top-level URL.
         // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
         // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
@@ -957,7 +990,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       eventData.putDouble("code", errorCode);
       eventData.putString("description", description);
 
-      dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingErrorEvent(webView.getId(), eventData));
     }
@@ -975,7 +1008,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         eventData.putInt("statusCode", errorResponse.getStatusCode());
         eventData.putString("description", errorResponse.getReasonPhrase());
 
-        dispatchEvent(
+        ((RNCWebView) webView).dispatchEvent(
           webView,
           new TopHttpErrorEvent(webView.getId(), eventData));
       }
@@ -1007,7 +1040,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         WritableMap event = createWebViewEvent(webView, webView.getUrl());
         event.putBoolean("didCrash", detail.didCrash());
 
-        dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
           webView,
           new TopRenderProcessGoneEvent(webView.getId(), event)
         );
@@ -1017,7 +1050,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     protected void emitFinishEvent(WebView webView, String url) {
-      dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingFinishEvent(
           webView.getId(),
@@ -1059,11 +1092,34 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       View.SYSTEM_UI_FLAG_IMMERSIVE |
       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 
+    protected static final int COMMON_PERMISSION_REQUEST = 3;
+
     protected ReactContext mReactContext;
     protected View mWebView;
 
     protected View mVideoView;
     protected WebChromeClient.CustomViewCallback mCustomViewCallback;
+
+    /*
+     * - Permissions -
+     * As native permissions are asynchronously handled by the PermissionListener, many fields have
+     * to be stored to send permissions results to the webview
+     */
+
+    // Webview camera & audio permission callback
+    protected PermissionRequest permissionRequest;
+    // Webview camera & audio permission already granted
+    protected List<String> grantedPermissions;
+
+    // Webview geolocation permission callback
+    protected GeolocationPermissions.Callback geolocationPermissionCallback;
+    // Webview geolocation permission origin callback
+    protected String geolocationPermissionOrigin;
+
+    // true if native permissions dialog is shown, false otherwise
+    protected boolean permissionsRequestShown = false;
+    // Pending Android permissions for the next request
+    protected List<String> pendingPermissions = new ArrayList<>();
 
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
 
@@ -1073,48 +1129,23 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+
+      final WebView newWebView = new WebView(view.getContext());
+      final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+      transport.setWebView(newWebView);
+      resultMsg.sendToTarget();
+
+      return true;
+    }
+
+    @Override
     public boolean onConsoleMessage(ConsoleMessage message) {
       if (ReactBuildConfig.DEBUG) {
         return super.onConsoleMessage(message);
       }
       // Ignore console logs in non debug builds.
       return true;
-    }
-
-    // Fix WebRTC permission request error.
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public void onPermissionRequest(final PermissionRequest request) {
-      String[] requestedResources = request.getResources();
-      ArrayList<String> permissions = new ArrayList<>();
-      ArrayList<String> grantedPermissions = new ArrayList<String>();
-      for (int i = 0; i < requestedResources.length; i++) {
-        if (requestedResources[i].equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
-          permissions.add(Manifest.permission.RECORD_AUDIO);
-        } else if (requestedResources[i].equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
-          permissions.add(Manifest.permission.CAMERA);
-        }
-        // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
-      }
-
-      for (int i = 0; i < permissions.size(); i++) {
-        if (ContextCompat.checkSelfPermission(mReactContext, permissions.get(i)) != PackageManager.PERMISSION_GRANTED) {
-          continue;
-        }
-        if (permissions.get(i).equals(Manifest.permission.RECORD_AUDIO)) {
-          grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
-        } else if (permissions.get(i).equals(Manifest.permission.CAMERA)) {
-          grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
-        }
-      }
-
-      if (grantedPermissions.isEmpty()) {
-        request.deny();
-      } else {
-        String[] grantedPermissionsArray = new String[grantedPermissions.size()];
-        grantedPermissionsArray = grantedPermissions.toArray(grantedPermissionsArray);
-        request.grant(grantedPermissionsArray);
-      }
     }
 
     @Override
@@ -1131,17 +1162,179 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       event.putBoolean("canGoBack", webView.canGoBack());
       event.putBoolean("canGoForward", webView.canGoForward());
       event.putDouble("progress", (float) newProgress / 100);
-      dispatchEvent(
+      ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingProgressEvent(
           webView.getId(),
           event));
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public void onPermissionRequest(final PermissionRequest request) {
+
+      grantedPermissions = new ArrayList<>();
+
+      ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
+      for (String requestedResource : request.getResources()) {
+        String androidPermission = null;
+
+        if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+          androidPermission = Manifest.permission.RECORD_AUDIO;
+        } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
+          androidPermission = Manifest.permission.CAMERA;
+        } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+          androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
+        }
+        // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
+
+        if (androidPermission != null) {
+          if (ContextCompat.checkSelfPermission(mReactContext, androidPermission) == PackageManager.PERMISSION_GRANTED) {
+            grantedPermissions.add(requestedResource);
+          } else {
+            requestedAndroidPermissions.add(androidPermission);
+          }
+        }
+      }
+
+      // If all the permissions are already granted, send the response to the WebView synchronously
+      if (requestedAndroidPermissions.isEmpty()) {
+        request.grant(grantedPermissions.toArray(new String[0]));
+        grantedPermissions = null;
+        return;
+      }
+
+      // Otherwise, ask to Android System for native permissions asynchronously
+
+      this.permissionRequest = request;
+
+      requestPermissions(requestedAndroidPermissions);
+    }
+
+
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-      callback.invoke(origin, true, false);
+
+      if (ContextCompat.checkSelfPermission(mReactContext, Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED) {
+
+        /*
+         * Keep the trace of callback and origin for the async permission request
+         */
+        geolocationPermissionCallback = callback;
+        geolocationPermissionOrigin = origin;
+
+        requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
+
+      } else {
+        callback.invoke(origin, true, false);
+      }
     }
+
+    private PermissionAwareActivity getPermissionAwareActivity() {
+      Activity activity = mReactContext.getCurrentActivity();
+      if (activity == null) {
+        throw new IllegalStateException("Tried to use permissions API while not attached to an Activity.");
+      } else if (!(activity instanceof PermissionAwareActivity)) {
+        throw new IllegalStateException("Tried to use permissions API but the host Activity doesn't implement PermissionAwareActivity.");
+      }
+      return (PermissionAwareActivity) activity;
+    }
+
+    private synchronized void requestPermissions(List<String> permissions) {
+
+      /*
+       * If permissions request dialog is displayed on the screen and another request is sent to the
+       * activity, the last permission asked is skipped. As a work-around, we use pendingPermissions
+       * to store next required permissions.
+       */
+
+      if (permissionsRequestShown) {
+        pendingPermissions.addAll(permissions);
+        return;
+      }
+
+      PermissionAwareActivity activity = getPermissionAwareActivity();
+      permissionsRequestShown = true;
+
+      activity.requestPermissions(
+        permissions.toArray(new String[0]),
+        COMMON_PERMISSION_REQUEST,
+        webviewPermissionsListener
+      );
+
+      // Pending permissions have been sent, the list can be cleared
+      pendingPermissions.clear();
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private PermissionListener webviewPermissionsListener = (requestCode, permissions, grantResults) -> {
+
+      permissionsRequestShown = false;
+
+      /*
+       * As a "pending requests" approach is used, requestCode cannot help to define if the request
+       * came from geolocation or camera/audio. This is why shouldAnswerToPermissionRequest is used
+       */
+      boolean shouldAnswerToPermissionRequest = false;
+
+      for (int i = 0; i < permissions.length; i++) {
+
+        String permission = permissions[i];
+        boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+
+        if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION)
+          && geolocationPermissionCallback != null
+          && geolocationPermissionOrigin != null) {
+
+          if (granted) {
+            geolocationPermissionCallback.invoke(geolocationPermissionOrigin, true, false);
+          } else {
+            geolocationPermissionCallback.invoke(geolocationPermissionOrigin, false, false);
+          }
+
+          geolocationPermissionCallback = null;
+          geolocationPermissionOrigin = null;
+        }
+
+        if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
+          if (granted && grantedPermissions != null) {
+            grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
+          }
+          shouldAnswerToPermissionRequest = true;
+        }
+
+        if (permission.equals(Manifest.permission.CAMERA)) {
+          if (granted && grantedPermissions != null) {
+            grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+          }
+          shouldAnswerToPermissionRequest = true;
+        }
+
+        if (permission.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+          if (granted && grantedPermissions != null) {
+            grantedPermissions.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
+          }
+          shouldAnswerToPermissionRequest = true;
+        }
+      }
+
+      if (shouldAnswerToPermissionRequest
+        && permissionRequest != null
+        && grantedPermissions != null) {
+        permissionRequest.grant(grantedPermissions.toArray(new String[0]));
+        permissionRequest = null;
+        grantedPermissions = null;
+      }
+
+      if (!pendingPermissions.isEmpty()) {
+        requestPermissions(pendingPermissions);
+        return false;
+      }
+
+      return true;
+    };
 
     protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
       getModule(mReactContext).startPhotoPickerIntent(filePathCallback, acceptType);
@@ -1440,6 +1633,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         dispatchEvent(this, event);
       }
+    }
+
+    protected void dispatchEvent(WebView webView, Event event) {
+      ReactContext reactContext = (ReactContext) webView.getContext();
+      EventDispatcher eventDispatcher =
+        reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+      eventDispatcher.dispatchEvent(event);
     }
 
     protected void cleanupCallbacksAndDestroy() {
