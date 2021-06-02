@@ -1036,7 +1036,7 @@ static NSDictionary* customCertificatesForHost;
       }
 
       NSString *disposition = nil;
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */ 
       if (@available(iOS 13, *)) {
         disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
       }
