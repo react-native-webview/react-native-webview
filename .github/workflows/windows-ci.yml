@@ -16,9 +16,7 @@ jobs:
         node-version: '12.9.1'
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.0.0
-      with:
-        vs-version: 16.5
+      uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Check node modules cache
       uses: actions/cache@v1
@@ -56,6 +54,10 @@ jobs:
     - name: Start Appium server
       shell: powershell
       run: Start-Process PowerShell -ArgumentList "yarn appium"
+
+    - name: Start React server
+      shell: powershell
+      run: Start-Process PowerShell -ArgumentList "yarn start:windows"
       
     - name: Run tests
       run: yarn test:windows
