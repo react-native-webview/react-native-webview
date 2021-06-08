@@ -201,7 +201,6 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     if (onError) {
       onError(event);
     }
-    console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
       lastErrorEvent: event.nativeEvent,

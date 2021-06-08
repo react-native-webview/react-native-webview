@@ -217,7 +217,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     if (onLoadEnd) {
       onLoadEnd(event);
     }
-    console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
       lastErrorEvent: event.nativeEvent,
