@@ -265,7 +265,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   onLoadingProgress = (event: WebViewProgressEvent) => {
     const { onLoadProgress } = this.props;
-    const { nativeEvent: { progress } } = event;
+    const { nativeEvent: { progress, ...rest } } = event;
     if (progress === 1) {
       this.setState((state) => {
         if (state.viewState === 'LOADING') {
@@ -273,6 +273,12 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         }
         return null;
       });
+      this.updateNavigationState({
+        nativeEvent: {
+          ...rest,
+          loading: false,
+        },
+      } as WebViewNavigationEvent)
     }
     if (onLoadProgress) {
       onLoadProgress(event);
