@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "11.4.2",
+  "version": "11.6.4",
   "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -16,6 +16,7 @@
     "start:ios": "react-native run-ios",
     "start:macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
     "start:windows": "react-native start --use-react-native-windows",
+    "run:windows": "react-native run-windows --root ./example --no-packager",
     "ci": "CI=true && yarn lint",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
@@ -29,7 +30,7 @@
     "type": "Component"
   },
   "peerDependencies": {
-    "react-native": ">=0.60 <0.64"
+    "react-native": ">=0.60 <=0.64"
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
@@ -86,6 +87,7 @@
     "lib",
     "index.js",
     "index.d.ts",
-    "react-native-webview.podspec"
+    "react-native-webview.podspec",
+    "react-native.config.js"
   ]
 }
