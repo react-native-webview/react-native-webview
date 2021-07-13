@@ -1,5 +1,12 @@
-rootProject.name = 'example'
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
-include ':app'
-include ':rnWebView'
-project(':rnWebView').projectDir = new File(rootProject.projectDir, '../../android')
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenLocal()
+        google()
+    }
+}
+
+rootProject.name = "WebviewExample"
+
+apply(from: "../../node_modules/react-native-test-app/test-app.gradle")
+applyTestAppSettings(settings)

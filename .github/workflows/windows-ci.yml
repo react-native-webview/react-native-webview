@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       name: Checkout Code
-     
+
     - name: Setup Node.js
       uses: actions/setup-node@v1
       with:
@@ -30,7 +30,7 @@ jobs:
     - name: Install node modules
       if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: yarn --pure-lockfile
-    
+
     - name: yarn build
       if: steps.yarn-cache.outputs.cache-hit == 'true'
       run: |
@@ -58,6 +58,6 @@ jobs:
     - name: Start React server
       shell: powershell
       run: Start-Process PowerShell -ArgumentList "yarn start:windows"
-      
+
     - name: Run tests
       run: yarn test:windows

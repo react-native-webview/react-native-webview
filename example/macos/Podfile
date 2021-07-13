@@ -1,52 +1,5 @@
-require_relative '../../node_modules/@react-native-community/cli-platform-ios/native_modules'
+require_relative '../../node_modules/react-native-test-app/macos/test_app'
 
-abstract_target 'Shared' do
-  use_native_modules!
+workspace 'WebviewExample.xcworkspace'
 
-  pod 'react-native-webview', :path => "../.."
-
-  react_native = '../../node_modules/react-native-macos'
-
-  pod 'FBLazyVector', :path => "#{react_native}/Libraries/FBLazyVector"
-  pod 'FBReactNativeSpec', :path => "#{react_native}/Libraries/FBReactNativeSpec"
-  pod 'RCTRequired', :path => "#{react_native}/Libraries/RCTRequired"
-  pod 'RCTTypeSafety', :path => "#{react_native}/Libraries/TypeSafety"
-  pod 'React', :path => "#{react_native}/"
-  pod 'React-Core', :path => "#{react_native}/", :inhibit_warnings => true
-  pod 'React-CoreModules', :path => "#{react_native}/React/CoreModules"
-  pod 'React-Core/DevSupport', :path => "#{react_native}/"
-  pod 'React-RCTActionSheet', :path => "#{react_native}/Libraries/ActionSheetIOS"
-  pod 'React-RCTAnimation', :path => "#{react_native}/Libraries/NativeAnimation"
-  pod 'React-RCTBlob', :path => "#{react_native}/Libraries/Blob"
-  pod 'React-RCTImage', :path => "#{react_native}/Libraries/Image"
-  pod 'React-RCTLinking', :path => "#{react_native}/Libraries/LinkingIOS"
-  pod 'React-RCTNetwork', :path => "#{react_native}/Libraries/Network"
-  pod 'React-RCTSettings', :path => "#{react_native}/Libraries/Settings"
-  pod 'React-RCTText', :path => "#{react_native}/Libraries/Text", :inhibit_warnings => true
-  pod 'React-RCTVibration', :path => "#{react_native}/Libraries/Vibration"
-  pod 'React-Core/RCTWebSocket', :path => "#{react_native}/"
-
-  pod 'React-cxxreact', :path => "#{react_native}/ReactCommon/cxxreact", :inhibit_warnings => true
-  pod 'React-jsi', :path => "#{react_native}/ReactCommon/jsi"
-  pod 'React-jsiexecutor', :path => "#{react_native}/ReactCommon/jsiexecutor"
-  pod 'React-jsinspector', :path => "#{react_native}/ReactCommon/jsinspector"
-  pod 'ReactCommon/callinvoker', :path => "#{react_native}/ReactCommon"
-  pod 'ReactCommon/turbomodule/core', :path => "#{react_native}/ReactCommon"
-  pod 'Yoga', :path => "#{react_native}/ReactCommon/yoga", :modular_headers => true
-
-  pod 'DoubleConversion', :podspec => "#{react_native}/third-party-podspecs/DoubleConversion.podspec"
-  pod 'glog', :podspec => "#{react_native}/third-party-podspecs/glog.podspec"
-
-  pod 'RCT-Folly', :podspec => "#{react_native}/third-party-podspecs/RCT-Folly.podspec"
-  pod 'boost-for-react-native', :podspec => "#{react_native}/third-party-podspecs/boost-for-react-native.podspec"
-
-  target 'example-macOS' do
-    platform :macos, '10.15'
-    # Pods specifically for macOS target
-  end
-
-  target 'example-iOS' do
-    platform :ios, '14'
-    # Pods specifically for iOS target
-  end
-end
+use_test_app! :hermes_enabled => false
