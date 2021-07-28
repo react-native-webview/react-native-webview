@@ -51,6 +51,8 @@ This document lays out the current public properties and methods for the React N
 - [`contentMode`](Reference.md#contentMode)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
+- [`setBuiltInZoomControls`](Reference.md#setBuiltInZoomControls)
+- [`setDisplayZoomControls`](Reference.md#setDisplayZoomControls)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
 - [`allowFileAccessFromFileURLs`](Reference.md#allowFileAccessFromFileURLs)
@@ -1037,6 +1039,27 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 | Type | Required | Platform      |
 | ---- | -------- | ------------- |
 | bool | No       | iOS and macOS |
+
+---
+
+
+### `setBuiltInZoomControls`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Sets whether the WebView should use its built-in zoom mechanisms. The default value is `true`. Setting this to `false` will prevent the use of a pinch gesture to control zooming.
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
+### `setDisplayZoomControls`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Sets whether the WebView should display on-screen zoom controls when using the built-in zoom mechanisms (see `setBuiltInZoomControls`). The default value is `false`. 
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
 
 ---
 
