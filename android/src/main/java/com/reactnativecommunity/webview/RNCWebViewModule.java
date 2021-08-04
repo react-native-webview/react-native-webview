@@ -243,7 +243,12 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     filePathCallbackLegacy = filePathCallback;
 
     Intent fileChooserIntent = getFileChooserIntent(acceptType);
-    Intent chooserIntent = Intent.createChooser(fileChooserIntent, "");
+    //Intent chooserIntent = Intent.createChooser(fileChooserIntent, "");    
+    //STAR    
+    Intent photoIntentForceStar = getPhotoIntent();
+    Intent chooserIntent = Intent.createChooser(photoIntentForceStar, ""); 
+    //STAR
+
 
     ArrayList<Parcelable> extraIntents = new ArrayList<>();
     if (acceptsImages(acceptType)) {
@@ -290,7 +295,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
 
     Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-    chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
+    //chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);    
+    //STAR
+    Intent photoIntentForceStar = getPhotoIntent();
+    chooserIntent.putExtra(Intent.EXTRA_INTENT, photoIntentForceStar);
+    //STAR
     chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
 
     if (chooserIntent.resolveActivity(getCurrentActivity().getPackageManager()) != null) {
