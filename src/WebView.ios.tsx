@@ -195,14 +195,17 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
+
     if (onLoadEnd) {
       onLoadEnd(event);
     }
+
     if (onError) {
       onError(event);
+      if (event.isDefaultPrevented()) return;
+    } else {
+      console.warn('Encountered an error loading page', event.nativeEvent);
     }
-    if (event.isDefaultPrevented()) return;
-    console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
       lastErrorEvent: event.nativeEvent,
