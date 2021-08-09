@@ -63,6 +63,10 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     androidHardwareAccelerationDisabled: false,
     androidLayerType: 'none',
     originWhitelist: defaultOriginWhitelist,
+    setSupportMultipleWindows: true,
+    setBuiltInZoomControls: true,
+    setDisplayZoomControls: false,
+    nestedScrollEnabled: false,
   };
 
   static isFileUploadSupported = async () => {
@@ -210,13 +214,16 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
+
     if (onError) {
       onError(event);
+    } else {
+      console.warn('Encountered an error loading page', event.nativeEvent);
     }
+
     if (onLoadEnd) {
       onLoadEnd(event);
     }
-    console.warn('Encountered an error loading page', event.nativeEvent);
 
     this.setState({
       lastErrorEvent: event.nativeEvent,

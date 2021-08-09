@@ -6,6 +6,7 @@ This document lays out the current public properties and methods for the React N
 
 - [`source`](Reference.md#source)
 - [`automaticallyAdjustContentInsets`](Reference.md#automaticallyadjustcontentinsets)
+- [`automaticallyAdjustsScrollIndicatorInsets`](Reference.md#automaticallyAdjustsScrollIndicatorInsets)
 - [`injectedJavaScript`](Reference.md#injectedjavascript)
 - [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded)
 - [`injectedJavaScriptForMainFrameOnly`](Reference.md#injectedjavascriptformainframeonly)
@@ -22,6 +23,7 @@ This document lays out the current public properties and methods for the React N
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
+- [`onScroll`](Reference.md#onscroll)
 - [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
@@ -49,6 +51,9 @@ This document lays out the current public properties and methods for the React N
 - [`contentMode`](Reference.md#contentMode)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
+- [`nestedScrollEnabled`](Reference.md#nestedscrollenabled)
+- [`setBuiltInZoomControls`](Reference.md#setBuiltInZoomControls)
+- [`setDisplayZoomControls`](Reference.md#setDisplayZoomControls)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
 - [`allowFileAccessFromFileURLs`](Reference.md#allowFileAccessFromFileURLs)
@@ -71,11 +76,14 @@ This document lays out the current public properties and methods for the React N
 - [`pullToRefreshEnabled`](Reference.md#pullToRefreshEnabled)
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
+- [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
+- [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
+- [`enableApplePay`](Reference.md#enableApplePay)
+- [`forceDarkOn`](Reference.md#forceDarkOn)
 
 ## Methods Index
 
-- [`extraNativeComponentConfig`](Reference.md#extranativecomponentconfig)
 - [`goForward`](Reference.md#goforward)
 - [`goBack`](Reference.md#goback)
 - [`reload`](Reference.md#reload)
@@ -85,7 +93,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearCache`](Reference.md#clearCache)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
-- [`postMessage`](Reference.md#postMessage)
+- [`postMessage`](Reference.md#postmessagestr)
 
 ---
 
@@ -102,9 +110,9 @@ The object passed to `source` can have either of the following shapes:
 **Load uri**
 
 - `uri` (string) - The URI to load in the `WebView`. Can be a local or remote file, and can be changed with React state or props to navigate to a new page.
-- `method` (string) - The HTTP Method to use. Defaults to GET if not specified. On Android, the only supported methods are GET and POST.
+- `method` (string) - The HTTP Method to use. Defaults to GET if not specified. On Android and Windows, the only supported methods are GET and POST.
 - `headers` (object) - Additional HTTP headers to send with the request. On Android, this can only be used with GET requests. See the [Guide](Guide.md#setting-custom-headers) for more information on setting custom headers.
-- `body` (string) - The HTTP body to send with the request. This must be a valid UTF-8 string, and will be sent exactly as specified, with no additional encoding (e.g. URL-escaping or base64) applied. On Android, this can only be used with POST requests.
+- `body` (string) - The HTTP body to send with the request. This must be a valid UTF-8 string, and will be sent exactly as specified, with no additional encoding (e.g. URL-escaping or base64) applied. On Android and Windows, this can only be used with POST requests.
 
 **Static HTML**
 
@@ -129,6 +137,16 @@ Controls whether to adjust the content inset for web views that are placed behin
 
 ---
 
+### `automaticallyAdjustsScrollIndicatorInsets`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Controls whether to adjust the scroll indicator inset for web views that are placed behind a navigation bar, tab bar, or toolbar. The default value `false`. (iOS 13+)
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS(13+) |
+
+---
+
 ### `injectedJavaScript`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Set this to provide JavaScript that will be injected into the web page after the document finishes loading, but before other subresources finish loading.
@@ -138,11 +156,13 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc). Be sure
 to set an [`onMessage`](Reference.md#onmessage) handler, even if it's a no-op, or the code will not be run.
 
-| Type   | Required | Platform            |
-| ------ | -------- | ------------------- |
-| string | No       | iOS, Android, macOS |
+| Type   | Required | Platform                     |
+| ------ | -------- | ---------------------------- |
+| string | No       | iOS, Android, macOS, Windows |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
+
+_Kindly note: Windows does not have [native support for alerts](https://github.com/MicrosoftDocs/winrt-api/blob/docs/windows.ui.xaml.controls/webview.md#use-of-alert), as such any scripts to show an alert will not work._
 
 Example:
 
@@ -537,7 +557,7 @@ The `navState` object includes these properties:
 canGoBack
 canGoForward
 loading
-navigationType
+navigationType (iOS only)
 target
 title
 url
@@ -575,6 +595,39 @@ loading
 target
 title
 url
+```
+
+---
+
+### `onScroll`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the scroll event is fired in the `WebView`.
+
+| Type     | Required | Platform                     |
+| -------- | -------- | ---------------------------- |
+| function | No       | iOS, macOS, Android, Windows |
+
+Example:
+
+```jsx
+<Webview
+  source={{ uri: 'https://reactnative.dev' }}
+  onScroll={syntheticEvent => {
+    const { contentOffset } = syntheticEvent.nativeEvent
+    console.table(contentOffset)
+  }}
+/>
+```
+
+Function passed to `onScroll` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+contentInset
+contentOffset
+contentSize
+layoutMeasurement
+velocity
+zoomScale
 ```
 
 ---
@@ -683,8 +736,8 @@ canGoBack
 canGoForward
 lockIdentifier
 mainDocumentURL (iOS only)
-navigationType
-isTopFrame
+navigationType (iOS only)
+isTopFrame (iOS only)
 ```
 
 ---
@@ -782,7 +835,7 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidHardwareAccelerationDisabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-**Deprecated.** Use the `androidLayerType` prop instead. 
+**Deprecated.** Use the `androidLayerType` prop instead.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -792,7 +845,7 @@ A Boolean value indicating whether JavaScript can open windows without user inte
 
 ### `androidLayerType`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Specifies the layer type. 
+Specifies the layer type.
 
 Possible values for `androidLayerType` are:
 
@@ -991,6 +1044,38 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 
 ---
 
+### `nestedScrollEnabled`[⬆](#props-index)
+
+Boolean value that determines whether scrolling is possible in the `WebView` when used inside a `ScrollView` on Android. The default value is `false`. 
+
+Setting this to `true` will prevent the `ScrollView` to scroll when scrolling from inside the `WebView`.
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
+### `setBuiltInZoomControls`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Sets whether the WebView should use its built-in zoom mechanisms. The default value is `true`. Setting this to `false` will prevent the use of a pinch gesture to control zooming.
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
+### `setDisplayZoomControls`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Sets whether the WebView should display on-screen zoom controls when using the built-in zoom mechanisms (see `setBuiltInZoomControls`). The default value is `false`. 
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
 ### `directionalLockEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A Boolean value that determines whether scrolling is disabled in a particular direction.
@@ -1046,9 +1131,9 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin. Including accessing content from other file scheme URLs. The default value is `false`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | Android  |
+| Type | Required | Platform             |
+| ---- | -------- | -------------------- |
+| bool | No       | iOS, Android, macOS  |
 
 ---
 
@@ -1268,6 +1353,25 @@ Example:
 
 ---
 
+### `limitsNavigationsToAppBoundDomains`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+If true indicates to WebKit that a WKWebView will only navigate to app-bound domains. Only applicable for iOS 14 or greater.
+
+Once set, any attempt to navigate away from an app-bound domain will fail with the error “App-bound domain failure.”
+Applications can specify up to 10 “app-bound” domains using a new Info.plist key `WKAppBoundDomains`. For more information see [App-Bound Domains](https://webkit.org/blog/10882/app-bound-domains/).
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+Example:
+
+```jsx
+<WebView limitsNavigationsToAppBoundDomains={true} />
+```
+
+---
+
 ### `autoManageStatusBarEnabled`
 
 If set to `true`, the status bar will be automatically hidden/shown by WebView, specifically when full screen video is being watched. If `false`, WebView will not manage the status bar at all. The default value is `true`.
@@ -1282,13 +1386,59 @@ Example:
 <WebView autoManageStatusBarEnabled={false} />
 ```
 
-## Methods
+### `setSupportMultipleWindows`
 
-### `extraNativeComponentConfig()`[⬆](#methods-index)<!-- Link generated with jump2header -->
+Sets whether the WebView supports multiple windows. See [Android documentation]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') for more information.
+Setting this to false can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
+
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | true    | Android  |
+
+Example:
 
 ```javascript
-static extraNativeComponentConfig()
+<WebView setSupportMultipleWindows={false} />
 ```
+
+### `enableApplePay`
+
+A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support. Once set, websites will be able to invoke Apple Pay from React Native Webview.
+This comes with a cost features like [`injectJavaScript`](Reference.md#injectjavascriptstr), html5 History, [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled), [`injectedJavaScript`](Reference.md#injectedjavascript), [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded) will not work  See [Apple Pay Release Note](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API).
+
+If you are required to send message to App , webpage has to explicitly call webkit message handler and receive it on `onMessage` handler on react native side
+```javascript
+window.webkit.messageHandlers.ReactNativeWebView.postMessage("hello apple pay")
+```
+
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | false   | iOS      |
+
+Example:
+
+```javascript
+<WebView enableApplePay={true} />
+```
+
+### `forceDarkOn`
+
+Configuring Dark Theme
+*NOTE* : The force dark setting is not persistent. You must call the static method every time your app process is started.
+
+*NOTE* : The change from day<->night mode is a configuration change so by default the activity will be restarted and pickup the new values to apply the theme. Take care when overriding this default behavior to ensure this method is still called when changes are made.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+Example:
+
+```javascript
+<WebView forceDarkOn={false} />
+```
+
+## Methods
 
 ### `goForward()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 

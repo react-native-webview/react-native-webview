@@ -28,11 +28,6 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     stopLoading(): void;
 
     /**
-     * Extra Native Component Config.
-     */
-    extraNativeComponentConfig: () => any;
-
-    /**
      * Executes the JavaScript string.
      */
     injectJavaScript: (script: string) => void;

@@ -18,6 +18,8 @@ import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
+import NativeWebpage from './examples/NativeWebpage';
+import ApplePay from './examples/ApplePay';
 
 const TESTS = {
   Messaging: {
@@ -84,6 +86,22 @@ const TESTS = {
       return <LocalPageLoad />;
     },
   },
+  NativeWebpage: {
+    title: 'NativeWebpage',
+    testId: 'NativeWebpage',
+    description: 'Test to open a new webview with a link',
+    render() {
+      return <NativeWebpage />;
+    },
+  },
+  ApplePay: {
+    title: 'Apple Pay ',
+    testId: 'ApplePay',
+    description: 'Test to open a apple pay supported page',
+    render() {
+      return <ApplePay />;
+    },
+  }
 };
 
 type Props = {};
@@ -166,6 +184,18 @@ export default class App extends Component<Props, State> {
             title="Messaging"
             onPress={() => this._changeTest('Messaging')}
           />
+          <Button
+            testID="testType_nativeWebpage"
+            title="NativeWebpage"
+            onPress={() => this._changeTest('NativeWebpage')}
+          />
+          {Platform.OS === 'ios' && (
+              <Button
+                  testID="testType_applePay"
+                  title="ApplePay"
+                  onPress={() => this._changeTest('ApplePay')}
+              />
+          )}
         </View>
 
         {restarting ? null : (

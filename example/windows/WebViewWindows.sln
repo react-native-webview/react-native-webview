@@ -47,7 +47,7 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\node_modules\react-native-windows\JSI\Shared\JSI.Shared.vcxitems*{0cc28589-39e4-4288-b162-97b959f8b843}*SharedItemsImports = 9
-		..\..\node_modules\react-native-windows\ReactWindowsCore\ReactWindowsCore.vcxitems*{11c084a3-a57c-4296-a679-cac17b603144}*SharedItemsImports = 4
+		..\..\node_modules\react-native-windows\ReactWindowsCore\ReactWindowsCore-Items.vcxitems*{11c084a3-a57c-4296-a679-cac17b603144}*SharedItemsImports = 4
 		..\..\node_modules\react-native-windows\Shared\Shared.vcxitems*{2049dbe9-8d13-42c9-ae4b-413ae38fffd0}*SharedItemsImports = 9
 		..\..\node_modules\react-native-windows\Microsoft.ReactNative.SharedManaged\Microsoft.ReactNative.SharedManaged.projitems*{67a1076f-7790-4203-86ea-4402ccb5e782}*SharedItemsImports = 13
 		..\..\node_modules\react-native-windows\Microsoft.ReactNative.Cxx\Microsoft.ReactNative.Cxx.vcxitems*{729d9af8-cd9e-4427-9f6c-fb757e287729}*SharedItemsImports = 4
@@ -57,7 +57,6 @@ Global
 		..\..\node_modules\react-native-windows\Chakra\Chakra.vcxitems*{c38970c0-5fbf-4d69-90d8-cbac225ae895}*SharedItemsImports = 9
 		..\..\node_modules\react-native-windows\Microsoft.ReactNative.Cxx\Microsoft.ReactNative.Cxx.vcxitems*{da8b35b3-da00-4b02-bde6-6a397b3fd46b}*SharedItemsImports = 9
 		..\..\node_modules\react-native-windows\Chakra\Chakra.vcxitems*{f7d32bd0-2749-483e-9a0d-1635ef7e3136}*SharedItemsImports = 4
-		..\..\node_modules\react-native-windows\JSI\Shared\JSI.Shared.vcxitems*{f7d32bd0-2749-483e-9a0d-1635ef7e3136}*SharedItemsImports = 4
 		..\..\node_modules\react-native-windows\Microsoft.ReactNative.Cxx\Microsoft.ReactNative.Cxx.vcxitems*{f7d32bd0-2749-483e-9a0d-1635ef7e3136}*SharedItemsImports = 4
 		..\..\node_modules\react-native-windows\Mso\Mso.vcxitems*{f7d32bd0-2749-483e-9a0d-1635ef7e3136}*SharedItemsImports = 4
 		..\..\node_modules\react-native-windows\Shared\Shared.vcxitems*{f7d32bd0-2749-483e-9a0d-1635ef7e3136}*SharedItemsImports = 4
@@ -212,7 +211,8 @@ Global
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|ARM.ActiveCfg = Debug|ARM
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|ARM.Build.0 = Debug|ARM
-		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|ARM64.Build.0 = Debug|ARM64
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|x64.ActiveCfg = Debug|x64
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|x64.Build.0 = Debug|x64
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Debug|x86.ActiveCfg = Debug|Win32
@@ -220,7 +220,8 @@ Global
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|Any CPU.ActiveCfg = Release|Win32
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|ARM.ActiveCfg = Release|ARM
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|ARM.Build.0 = Release|ARM
-		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|ARM64.ActiveCfg = Release|Win32
+		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|ARM64.ActiveCfg = Release|ARM64
+		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|ARM64.Build.0 = Release|ARM64
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|x64.ActiveCfg = Release|x64
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|x64.Build.0 = Release|x64
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|x86.ActiveCfg = Release|Win32

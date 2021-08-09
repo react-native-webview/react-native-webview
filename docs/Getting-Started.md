@@ -60,11 +60,12 @@ Autolinking is not yet supported for ReactNativeWindows. Make following addition
 
 #### **windows/myapp.sln**
 
-Add the `ReactNativeWebView` project to your solution.
+Add the `ReactNativeWebView` and `WebViewBridgeComponent` project to your solution.
 
 1. Open the solution in Visual Studio 2019
 2. Right-click Solution icon in Solution Explorer > Add > Existing Project
    Select `node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj`
+   Select `node_modules\react-native-webview\windows\WebViewBridgeComponent\WebViewBridgeComponent.vcxproj`
 
 #### **windows/myapp/myapp.vcxproj**
 
@@ -82,6 +83,8 @@ Add `#include "winrt/ReactNativeWebView.h"`.
 #### **app.cpp**
 
 Add `PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider());` before `InitializeComponent();`.
+
+Note if you want to enable scroll with Touch for the WebView component you must disable perspective for your app using [ReactRootView.IsPerspectiveEnabled](https://microsoft.github.io/react-native-windows/docs/ReactRootView#isperspectiveenabled).
 
 ## 3. Import the webview into your component
 
