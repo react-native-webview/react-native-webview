@@ -66,6 +66,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     setSupportMultipleWindows: true,
     setBuiltInZoomControls: true,
     setDisplayZoomControls: false,
+    nestedScrollEnabled: false,
   };
 
   static isFileUploadSupported = async () => {
