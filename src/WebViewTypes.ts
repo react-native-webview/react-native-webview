@@ -301,6 +301,9 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   textZoom?: number;
   thirdPartyCookiesEnabled?: boolean;
   messagingModuleName?: string;
+  setBuiltInZoomControls?: boolean,
+  setDisplayZoomControls?: boolean,
+  nestedScrollEnabled?: boolean;
   readonly urlPrefixesForDefaultIntent?: string[];
   forceDarkOn?: boolean;
 }
@@ -965,6 +968,32 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   forceDarkOn?: boolean;
+
+  /**
+   * Boolean value to control whether pinch zoom is enabled. Used only in Android.
+   * Default to true
+   *
+   * @platform android
+   */
+  setBuiltInZoomControls?: boolean;
+   
+  /**
+   * Boolean value to control whether built-in zooms controls are displayed. Used only in Android.
+   * Default to false
+   * Controls will always be hidden if setBuiltInZoomControls is set to `false`
+   * 
+   * @platform android
+   */
+  setDisplayZoomControls?: boolean;
+  
+  /**
+   * Allows to scroll inside the webview when used inside a scrollview.
+   * Behaviour already existing on iOS.
+   * Default to false
+   *
+   * @platform android
+   */
+  nestedScrollEnabled?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {
