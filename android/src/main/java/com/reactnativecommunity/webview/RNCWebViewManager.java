@@ -253,6 +253,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setJavaScriptEnabled(enabled);
   }
 
+  @ReactProp(name = "setBuiltInZoomControls")
+  public void setBuiltInZoomControls(WebView view, boolean enabled) {
+    view.getSettings().setBuiltInZoomControls(enabled);
+  }
+
+  @ReactProp(name = "setDisplayZoomControls")
+  public void setDisplayZoomControls(WebView view, boolean enabled) {
+    view.getSettings().setDisplayZoomControls(enabled);
+  }
+
   @ReactProp(name = "setSupportMultipleWindows")
   public void setSupportMultipleWindows(WebView view, boolean enabled){
     view.getSettings().setSupportMultipleWindows(enabled);
