@@ -156,7 +156,6 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
     const { onError, onLoadEnd } = this.props;
     if (onError) {
       onError(event);
-      if (event.isDefaultPrevented()) return;
     } else {
       console.warn('Encountered an error loading page', event.nativeEvent);
     }
@@ -164,6 +163,7 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
     if (onLoadEnd) {
       onLoadEnd(event);
     }
+    if (event.isDefaultPrevented()) return;
 
     this.setState({
       lastErrorEvent: event.nativeEvent,
