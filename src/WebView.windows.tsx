@@ -153,19 +153,23 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
 
   onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
-    const {onError, onLoadEnd} = this.props;
-    if(onError) {
+    const { onError, onLoadEnd } = this.props;
+    if (onError) {
       onError(event);
+    } else {
+      console.warn('Encountered an error loading page', event.nativeEvent);
     }
-    if(onLoadEnd) {
+
+    if (onLoadEnd) {
       onLoadEnd(event);
     }
-    console.error('Encountered an error loading page', event.nativeEvent);
+    if (event.isDefaultPrevented()) return;
+
     this.setState({
       lastErrorEvent: event.nativeEvent,
       viewState: 'ERROR',
     });
-  }
+  };
 
   onLoadingFinish =(event: WebViewNavigationEvent) => {
     const {onLoad, onLoadEnd} = this.props;

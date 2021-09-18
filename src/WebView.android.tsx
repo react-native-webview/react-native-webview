@@ -64,6 +64,9 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     androidLayerType: 'none',
     originWhitelist: defaultOriginWhitelist,
     setSupportMultipleWindows: true,
+    setBuiltInZoomControls: true,
+    setDisplayZoomControls: false,
+    nestedScrollEnabled: false,
   };
 
   static isFileUploadSupported = async () => {
@@ -211,7 +214,6 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   onLoadingError = (event: WebViewErrorEvent) => {
     event.persist(); // persist this event because we need to store it
     const { onError, onLoadEnd } = this.props;
-
     if (onError) {
       onError(event);
     } else {
@@ -221,6 +223,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     if (onLoadEnd) {
       onLoadEnd(event);
     }
+    if (event.isDefaultPrevented()) return;
 
     this.setState({
       lastErrorEvent: event.nativeEvent,
