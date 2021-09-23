@@ -900,7 +900,21 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   androidHardwareAccelerationDisabled?: boolean;
 
-    /**
+  /**
+   * Boolean value to always forbid access to the microphone in the `WebView`, even if the app
+   * was granted the necessary Android permission. The default value is `false` for backward-compatibility.
+   * @platform android
+   */
+  androidMicrophoneAccessDisabled?: boolean;
+
+  /**
+   * Boolean value to always forbid access to the camera in the `WebView`, even if the app
+   * was granted the necessary Android permission. The default value is `false` for backward-compatibility.
+   * @platform android
+   */
+  androidCameraAccessDisabled?: boolean;
+
+  /**
    * https://developer.android.com/reference/android/webkit/WebView#setLayerType(int,%20android.graphics.Paint)
    * Sets the layerType. Possible values are:
    *

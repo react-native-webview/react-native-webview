@@ -323,6 +323,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "androidMicrophoneAccessDisabled")
+  public void setMicrophoneAccessDisabled(WebView view, boolean disabled) {
+    ((RNCWebView) view).getCustomSettings().setMicrophoneAccessDisabled(disabled);
+  }
+
+  @ReactProp(name = "androidCameraAccessDisabled")
+  public void setCameraAccessDisabled(WebView view, boolean disabled) {
+    ((RNCWebView) view).getCustomSettings().setCameraAccessDisabled(disabled);
+  }
+
   @ReactProp(name = "androidLayerType")
   public void setLayerType(WebView view, String layerTypeString) {
     int layerType = View.LAYER_TYPE_NONE;
@@ -1229,6 +1239,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         if (androidPermission != null) {
           if (ContextCompat.checkSelfPermission(mReactContext, androidPermission) == PackageManager.PERMISSION_GRANTED) {
+            if ((androidPermission.equals(Manifest.permission.RECORD_AUDIO) && ((RNCWebView) mWebView).getCustomSettings().getMicrophoneAccessDisabled()) ||
+                (androidPermission.equals(Manifest.permission.CAMERA) && ((RNCWebView) mWebView).getCustomSettings().getCameraAccessDisabled())) {
+              continue;
+            }
             grantedPermissions.add(requestedResource);
           } else {
             requestedAndroidPermissions.add(androidPermission);
@@ -1446,6 +1460,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+
+    /**
+     *  It is impossibile to override WebView getSettings(), so RNCWebView has getCustomSettings()
+     */
+    private CustomWebSettings customWebSettings;
+    public CustomWebSettings getCustomSettings() {
+      if (customWebSettings == null) {
+        customWebSettings = new CustomWebSettings();
+      }
+      return customWebSettings;
+    }
 
     /**
      * WebView must be created with an context of the current activity
@@ -1733,6 +1758,27 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       public boolean isWaitingForCommandLoadUrl() {
         return waitingForCommandLoadUrl;
+      }
+    }
+
+    private class CustomWebSettings {
+      private boolean microphoneAccess = true;
+      private boolean cameraAccess = true;
+
+      private boolean getMicrophoneAccessDisabled() {
+        return !microphoneAccess;
+      }
+
+      private boolean getCameraAccessDisabled() {
+        return !cameraAccess;
+      }
+
+      private void setMicrophoneAccessDisabled(boolean b) {
+        cameraAccess = !b;
+      }
+
+      private void setCameraAccessDisabled(boolean b) {
+        microphoneAccess = !b;
       }
     }
   }
