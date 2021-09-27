@@ -1774,11 +1774,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
 
       private void setMicrophoneAccessDisabled(boolean b) {
-        cameraAccess = !b;
+        microphoneAccess = !b;
       }
 
       private void setCameraAccessDisabled(boolean b) {
-        microphoneAccess = !b;
+        cameraAccess = !b;
       }
     }
   }
