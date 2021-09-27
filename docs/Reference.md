@@ -51,6 +51,9 @@ This document lays out the current public properties and methods for the React N
 - [`contentMode`](Reference.md#contentMode)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
+- [`nestedScrollEnabled`](Reference.md#nestedscrollenabled)
+- [`setBuiltInZoomControls`](Reference.md#setBuiltInZoomControls)
+- [`setDisplayZoomControls`](Reference.md#setDisplayZoomControls)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
 - [`allowFileAccessFromFileURLs`](Reference.md#allowFileAccessFromFileURLs)
@@ -77,6 +80,7 @@ This document lays out the current public properties and methods for the React N
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 - [`enableApplePay`](Reference.md#enableApplePay)
+- [`forceDarkOn`](Reference.md#forceDarkOn)
 
 ## Methods Index
 
@@ -299,6 +303,8 @@ url
 
 > **_Note_**
 > Domain is only used on iOS
+
+The `syntheticEvent` can be stopped doing its default action by calling `syntheticEvent.preventDefault()`.
 
 ---
 
@@ -1040,6 +1046,38 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 
 ---
 
+### `nestedScrollEnabled`[⬆](#props-index)
+
+Boolean value that determines whether scrolling is possible in the `WebView` when used inside a `ScrollView` on Android. The default value is `false`. 
+
+Setting this to `true` will prevent the `ScrollView` to scroll when scrolling from inside the `WebView`.
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
+### `setBuiltInZoomControls`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Sets whether the WebView should use its built-in zoom mechanisms. The default value is `true`. Setting this to `false` will prevent the use of a pinch gesture to control zooming.
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
+### `setDisplayZoomControls`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Sets whether the WebView should display on-screen zoom controls when using the built-in zoom mechanisms (see `setBuiltInZoomControls`). The default value is `false`. 
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
 ### `directionalLockEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A Boolean value that determines whether scrolling is disabled in a particular direction.
@@ -1383,6 +1421,23 @@ Example:
 
 ```javascript
 <WebView enableApplePay={true} />
+```
+
+### `forceDarkOn`
+
+Configuring Dark Theme
+*NOTE* : The force dark setting is not persistent. You must call the static method every time your app process is started.
+
+*NOTE* : The change from day<->night mode is a configuration change so by default the activity will be restarted and pickup the new values to apply the theme. Take care when overriding this default behavior to ensure this method is still called when changes are made.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+Example:
+
+```javascript
+<WebView forceDarkOn={false} />
 ```
 
 ## Methods
