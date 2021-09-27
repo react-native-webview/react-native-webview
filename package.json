@@ -30,7 +30,7 @@
     "type": "Component"
   },
   "peerDependencies": {
-    "react-native": ">=0.60"
+    "react-native": ">=0.65.1"
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
@@ -65,7 +65,7 @@
     "metro": "0.56.4",
     "metro-react-native-babel-preset": "^0.59.0",
     "react": "16.11.0",
-    "react-native": "0.62.2",
+    "react-native": "0.65.1",
     "react-native-macos": "0.60.0-microsoft.73",
     "react-native-windows": "0.62.17",
     "selenium-appium": "1.0.2",
