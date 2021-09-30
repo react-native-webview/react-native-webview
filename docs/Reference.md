@@ -1231,11 +1231,11 @@ Sets whether the WebView should disable saving form data. The default value is `
 
 ### `cacheEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Sets whether WebView should use browser caching.
+Sets whether WebView should use browser caching. Note that this doesn't work on iOS, use `incognito={true}` instead.
 
 | Type    | Required | Default | Platform            |
 | ------- | -------- | ------- | ------------------- |
-| boolean | No       | true    | iOS, Android, macOS |
+| boolean | No       | true    | Android, macOS |
 
 ---
 
