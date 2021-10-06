@@ -299,12 +299,18 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 }
 
 /**
- * See https://stackoverflow.com/questions/25713069/why-is-wkwebview-not-opening-links-with-target-blank/25853806#25853806 for details.
+ * See https://stackoverflow.com/a/25713070
  */
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
-  if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
+  //this is a 'new window action' (aka target="_blank") > open this URL
+  //externally.
+  if (!navigationAction.targetFrame) {
+    NSURL *url = navigationAction.request.URL;
+    UIApplication *app = [UIApplication sharedApplication];
+    if ([app canOpenURL:url]) {
+      [app openURL:url];
+    }
   }
   return nil;
 }
