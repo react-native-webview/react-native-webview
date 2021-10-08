@@ -156,6 +156,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
+  protected boolean mAllowsOnlyLandscapeInFullscreen = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
 
@@ -606,6 +607,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     setupWebChromeClient((ReactContext)view.getContext(), view);
   }
 
+  @ReactProp(name = "allowsOnlyLandscapeInFullscreen")
+  public void setAllowsOnlyLandscapeInFullscreen(
+    WebView view,
+    @Nullable Boolean allowsOnlyLandscapeInFullscreen) {
+    mAllowsOnlyLandscapeInFullscreen = allowsOnlyLandscapeInFullscreen != null && allowsOnlyLandscapeInFullscreen;
+    setupWebChromeClient((ReactContext)view.getContext(), view);
+  }
+
   @ReactProp(name = "allowFileAccess")
   public void setAllowFileAccess(
     WebView view,
@@ -777,7 +786,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           mVideoView = view;
           mCustomViewCallback = callback;
 
-          mReactContext.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+          int activityInfo = mAllowsOnlyLandscapeInFullscreen ?
+            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE :
+            ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+
+          mReactContext.getCurrentActivity().setRequestedOrientation(activityInfo);
 
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mVideoView.setSystemUiVisibility(FULLSCREEN_SYSTEM_UI_VISIBILITY);

@@ -644,7 +644,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * A Boolean value which, when set to `true`, indicates to WebKit that a WKWebView
    * will only navigate to app-bound domains. Once set, any attempt to navigate away
    * from an app-bound domain will fail with the error “App-bound domain failure.”
-   * 
+   *
    * Applications can specify up to 10 “app-bound” domains using a new
    * Info.plist key `WKAppBoundDomains`.
    * @platform ios
@@ -977,14 +977,21 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   allowsFullscreenVideo?: boolean;
 
   /**
+   * Boolean value to force landscape mode when open videos in fullscreen on Android devices.
+   * The default value is `false`.
+   * @platform android
+   */
+  allowsOnlyLandscapeInFullscreen?: boolean;
+
+  /**
    * Configuring Dark Theme
-   * 
+   *
    * *NOTE* : The force dark setting is not persistent. You must call the static method every time your app process is started.
-   *  
+   *
    * *NOTE* : The change from day<->night mode is a configuration change so by default the activity will be restarted
-   * and pickup the new values to apply the theme. 
+   * and pickup the new values to apply the theme.
    * Take care when overriding this default behavior to ensure this method is still called when changes are made.
-   * 
+   *
    * @platform android
    */
   forceDarkOn?: boolean;
@@ -996,16 +1003,16 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   setBuiltInZoomControls?: boolean;
-   
+
   /**
    * Boolean value to control whether built-in zooms controls are displayed. Used only in Android.
    * Default to false
    * Controls will always be hidden if setBuiltInZoomControls is set to `false`
-   * 
+   *
    * @platform android
    */
   setDisplayZoomControls?: boolean;
-  
+
   /**
    * Allows to scroll inside the webview when used inside a scrollview.
    * Behaviour already existing on iOS.
