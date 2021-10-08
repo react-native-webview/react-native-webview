@@ -224,6 +224,18 @@ export interface WebViewSourceHtml {
   baseUrl?: string;
 }
 
+export interface WebViewCustomMenuItems {
+  /**
+   * The unique key that will be added as a selector on the webview
+   * Returned by the `onCustomMenuSelection` callback
+   */
+  key: string;
+  /**
+   * The label to appear on the UI Menu when selecting text
+   */
+  label: string;
+}
+
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
 export interface ViewManager {
@@ -665,6 +677,20 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * The default value is false.
    */
   enableApplePay?: boolean;
+
+  /** 
+   * An array of objects which will be added to the UIMenu controller when selecting text.
+   * These will appear after a long press to select text.
+  */
+  menuItems?: WebViewCustomMenuItems[];
+
+  /**
+   * The function fired when selecting a custom menu item created by `menuItems`.
+   * It passes a WebViewEvent with a `nativeEvent`, where custom keys are passed:
+   * `customMenuKey`: the string of the menu item
+   * `selectedText`: the text selected on the document
+   */
+  onCustomMenuSelection?: (event: WebViewEvent) => void;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
