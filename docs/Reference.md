@@ -43,6 +43,7 @@ This document lays out the current public properties and methods for the React N
 - [`userAgent`](Reference.md#useragent)
 - [`applicationNameForUserAgent`](Reference.md#applicationNameForUserAgent)
 - [`allowsFullscreenVideo`](Reference.md#allowsfullscreenvideo)
+- [`allowsOnlyLandscapeInFullscreen`](Reference.md#allowsOnlyLandscapeInFullscreen)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
 - [`bounces`](Reference.md#bounces)
 - [`overScrollMode`](Reference.md#overscrollmode)
@@ -921,6 +922,16 @@ Append to the existing user-agent. Setting `userAgent` will override this.
 ### `allowsFullscreenVideo`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Boolean that determines whether videos are allowed to be played in fullscreen. The default value is `false`.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
+---
+
+### `allowsOnlyLandscapeInFullscreen`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Boolean value to force landscape mode when open videos in fullscreen on Android devices. The default value is `false`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
