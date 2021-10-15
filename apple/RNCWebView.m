@@ -210,7 +210,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
         UIMenuController *menuController = [UIMenuController sharedMenuController];
         NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
         
-        for(NSString *menuItemName in self.menuItems) {
+        for(NSDictionary *menuItem in self.menuItems) {
             NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
             NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
             NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
