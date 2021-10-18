@@ -866,6 +866,41 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       return this.shouldOverrideUrlLoading(view, url);
     }
 
+     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
+      ReactContext reactContext = (ReactContext) view.getContext();
+      KeyChain.choosePrivateKeyAlias(reactContext.getCurrentActivity(), alias -> {
+        if (alias != null) {
+          X509Certificate[] certChain = new X509Certificate[0];
+          try {
+            certChain = KeyChain.getCertificateChain(view.getContext(), alias);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          } catch (KeyChainException e) {
+            e.printStackTrace();
+          }
+          PrivateKey privateKey = null;
+          try {
+            privateKey = KeyChain.getPrivateKey(view.getContext(), alias);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          } catch (KeyChainException e) {
+            e.printStackTrace();
+          }
+          request.proceed(privateKey, certChain);
+        } else {
+          request.ignore();
+        }
+      },
+        request.getKeyTypes(),
+        request.getPrincipals(),
+        request.getHost(),
+        request.getPort(),
+        ""
+      );
+    }
+
     @Override
     public void onReceivedSslError(final WebView webView, final SslErrorHandler handler, final SslError error) {
         handler.cancel();
