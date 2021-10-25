@@ -7,9 +7,9 @@
 #include "NativeModules.h"
 #include "ReactWebView.g.h"
 
-#include "winrt/WebViewBridgeComponent.h"
+#include "winrt/ReactNativeWebView.h"
 
-using namespace winrt::WebViewBridgeComponent;
+using namespace winrt::ReactNativeWebView;
 
 namespace winrt::ReactNativeWebView::implementation {
 
