@@ -79,6 +79,7 @@ This document lays out the current public properties and methods for the React N
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
+- [`basicAuthCredential`](Reference.md#basicAuthCredential)
 - [`enableApplePay`](Reference.md#enableApplePay)
 - [`forceDarkOn`](Reference.md#forceDarkOn)
 
@@ -1438,7 +1439,42 @@ Example:
 
 ```javascript
 <WebView forceDarkOn={false} />
+### `menuItems`
+
+An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
+
+Example:
+
+```javascript
+<WebView menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]} />
+
 ```
+
+### `onCustomMenuSelection`
+
+Function called when a custom menu item is selected.  It receives a Native event, which includes three custom keys: `label`, `key` and `selectedText`.
+
+```javascript
+<WebView 
+  menuItems={[{ label: 'Tweet', key: 'tweet', { label: 'Save for later', key: 'saveForLater' }]}
+  onCustomMenuSelection={(webViewEvent) => {
+    const { label } = webViewEvent.nativeEvent; // The name of the menu item, i.e. 'Tweet'
+    const { key } = webViewEvent.nativeEvent; // The key of the menu item, i.e. 'tweet'
+    const { selectedText } = webViewEvent.nativeEvent; // Text highlighted
+  }}
+  />
+```
+
+### `basicAuthCredential`
+
+An object that specifies the credentials of a user to be used for basic authentication.
+
+- `username` (string) - A username used for basic authentication.
+- `password` (string) - A password used for basic authentication.
+
+| Type   | Required |
+| ------ | -------- |
+| object | No       |
 
 ## Methods
 
