@@ -22,6 +22,11 @@ static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
+#if !TARGET_OS_OSX
+static NSMutableDictionary<NSString *, WKWebView *> * webviewInstances;
+#else
+static NSMutableDictionary<NSString *, RNCWebView *> * webviewInstances;
+#endif // !TARGET_OS_OSX
 
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
@@ -115,15 +120,25 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
 #endif
 }
-
++(NSMutableDictionary*)webviewInstances
+{
+    if (!webviewInstances)
+        webviewInstances = [[NSMutableDictionary alloc] init];
+    return webviewInstances;
+}
 - (instancetype)initWithFrame:(CGRect)frame
 {
+    NSLog(@"initWithFrame");
   if ((self = [super initWithFrame:frame])) {
+      NSLog(@"self initWithFrame");
+
     #if !TARGET_OS_OSX
     super.backgroundColor = [UIColor clearColor];
     #else
     super.backgroundColor = [RCTUIColor clearColor];
     #endif // !TARGET_OS_OSX
+      
+      
     _bounces = YES;
     _scrollEnabled = YES;
     _showsHorizontalScrollIndicator = YES;
@@ -225,6 +240,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     }
 }
 
+
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -297,6 +313,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     }
     return NO;
 }
+
 
 /**
  * See https://stackoverflow.com/questions/25713069/why-is-wkwebview-not-opening-links-with-target-blank/25853806#25853806 for details.
@@ -387,13 +404,60 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
-    WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
+      WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
+
+    if(_reuseToken != nil) {
+        NSLog(@"have reuseToken %@", [RNCWebView webviewInstances]);
+
+        _webView = [[RNCWebView webviewInstances] objectForKey: _reuseToken];
+        [_webView setFrame:self.bounds];
+    }
+      
+    if(_webView != nil) {
+        NSLog(@"setting deligates %@", _reuseToken);
+
+#if !TARGET_OS_OSX
+        _webView.scrollView.delegate = self;
+#endif // !TARGET_OS_OSX
+        _webView.UIDelegate = self;
+        _webView.navigationDelegate = self;
+#if !TARGET_OS_OSX
+        if (_pullToRefreshEnabled) {
+            [self addPullToRefreshControl];
+        }
+#endif // !TARGET_OS_OSX
+
+        [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
+    }
+#endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+    if (@available(iOS 13.0, *)) {
+      _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
+    }
+#endif
+        [self addSubview:_webView];
+        [self layoutSubviews];
+        return ;
+    }
+
+      if(_webView == nil) {
+    
 #if !TARGET_OS_OSX
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #else
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
 
+    if(_reuseToken != nil) {
+        NSLog(@"setting webviewInstances for reuseToken %@", _reuseToken);
+
+        [[RNCWebView webviewInstances] setValue:_webView forKey:_reuseToken];
+    }
+      }
+      
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = self;
@@ -432,17 +496,17 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
     [self visitSource];
-  }
+      
+    // Allow this object to recognize gestures
+    if (self.menuItems != nil) {
+        UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startLongPress:)];
+        longPress.delegate = self;
 
-  // Allow this object to recognize gestures
-  if (self.menuItems != nil) {
-    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startLongPress:)];
-    longPress.delegate = self;
-
-    longPress.minimumPressDuration = 0.4f;
-    longPress.numberOfTouchesRequired = 1;
-    longPress.cancelsTouchesInView = YES;
-    [self addGestureRecognizer:longPress];
+        longPress.minimumPressDuration = 0.4f;
+        longPress.numberOfTouchesRequired = 1;
+        longPress.cancelsTouchesInView = YES;
+        [self addGestureRecognizer:longPress];
+    }
   }
 }
 
@@ -463,9 +527,12 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
         _webView.scrollView.delegate = nil;
 #endif // !TARGET_OS_OSX
         _webView = nil;
-        if (_onContentProcessDidTerminate) {
-          NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-          _onContentProcessDidTerminate(event);
+        
+        if(_reuseToken == nil || [[RNCWebView webviewInstances] objectForKey:_reuseToken] != nil) {
+            if (_onContentProcessDidTerminate) {
+              NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+              _onContentProcessDidTerminate(event);
+            }
         }
     }
 
@@ -623,7 +690,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if (![_source isEqualToDictionary:source]) {
     _source = [source copy];
 
-    if (_webView != nil) {
+    if (_webView != nil && [[RNCWebView webviewInstances] objectForKey:_reuseToken] == nil) {
       [self visitSource];
     }
   }
@@ -668,9 +735,9 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
         }
         [_webView loadHTMLString:html baseURL:baseURL];
         return;
-    } 
+    }
     //Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
-    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]]; 
+    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]];
     if(headerCookie) {
       NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys:headerCookie,@"Set-Cookie",nil];
       NSURL *urlString = [NSURL URLWithString:_source[@"uri"]];
@@ -769,6 +836,17 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     }
 
     method_setImplementation(method, override);
+}
+
+- (void) setReuseToken:(NSString *) token {
+    NSLog(@"reuseToken %@", token);
+  _reuseToken = token;
+}
+
+- (void)destroy {
+  if (_webView) {
+    [[RNCWebView webviewInstances] removeObjectForKey: _reuseToken];
+  }
 }
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
@@ -956,17 +1034,18 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
             }
         }
     }
-    if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodHTTPBasic) {
-        NSString *username = [_basicAuthCredential valueForKey:@"username"];
-        NSString *password = [_basicAuthCredential valueForKey:@"password"];
-        if (username && password) {
-            NSURLCredential *credential = [NSURLCredential credentialWithUser:username password:password persistence:NSURLCredentialPersistenceNone];
-            completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
-            return;
-        }
+   if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodHTTPBasic) {
+       NSString *username = [_basicAuthCredential valueForKey:@"username"];
+       NSString *password = [_basicAuthCredential valueForKey:@"password"];
+       if (username && password) {
+           NSURLCredential *credential = [NSURLCredential credentialWithUser:username password:password persistence:NSURLCredentialPersistenceNone];
+           completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+           return;
+       }
     }
     completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
 }
+
 
 #pragma mark - WKNavigationDelegate methods
 
@@ -989,7 +1068,6 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   }];
 #endif // !TARGET_OS_OSX
 }
-
 /**
  * confirm
  */
