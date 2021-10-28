@@ -43,6 +43,7 @@
 @property (nonatomic, assign) CGFloat decelerationRate;
 @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
+@property (nonatomic, copy) NSString * _Nullable reuseToken;
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
 @property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
@@ -83,11 +84,13 @@
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
 @property (nonatomic, assign) BOOL limitsNavigationsToAppBoundDomains;
 #endif
++(NSMutableDictionary*)webviewInstances;
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
 - (void)postMessage:(NSString *_Nullable)message;
 - (void)injectJavaScript:(NSString *_Nullable)script;
+- (void)destroy;
 - (void)goForward;
 - (void)goBack;
 - (void)reload;
