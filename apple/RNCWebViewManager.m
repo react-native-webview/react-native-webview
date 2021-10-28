@@ -161,6 +161,19 @@ RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebView) {
   view.keyboardDisplayRequiresUserAction = json == nil ? true : [RCTConvert BOOL: json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(reuseToken, NSString, RNCWebView) {
+    view.reuseToken = [RCTConvert NSString: json];
+}
+
+RCT_EXPORT_METHOD(destroy:(nonnull NSNumber *)reactTag) {
+  [self.bridge.uiManager addUIBlock:^(RCTUIManager * manager, NSDictionary * registry) {
+      RNCWebView * view = registry[reactTag];
+    if ([view isKindOfClass:[RNCWebView class]]) {
+      [view destroy];
+    }
+  }];
+}
+
 RCT_EXPORT_METHOD(injectJavaScript:(nonnull NSNumber *)reactTag script:(NSString *)script)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
