@@ -759,7 +759,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   protected void setupWebChromeClient(ReactContext reactContext, WebView webView) {
-    Activity activity = mReactContext.getCurrentActivity();
+    Activity activity = reactContext.getCurrentActivity();
 
     if (mAllowsFullscreenVideo && activity != null) {
       int initialRequestedOrientation = activity.getRequestedOrientation();
