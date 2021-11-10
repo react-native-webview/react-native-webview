@@ -10,6 +10,7 @@ buildscript {
     repositories {
       mavenCentral()
       google()
+      jcenter()
     }
 
     dependencies {
@@ -19,6 +20,7 @@ buildscript {
   } else {
     repositories {
       mavenCentral()
+      jcenter()
     }
 
     dependencies {
@@ -58,6 +60,7 @@ android {
 
 repositories {
   mavenCentral()
+  jcenter()
   google()
 
   def found = false

@@ -3,12 +3,13 @@
 buildscript {
     ext {
         buildToolsVersion = "29.0.3"
-        minSdkVersion = 21
+        minSdkVersion = 16
         compileSdkVersion = 29
         targetSdkVersion = 28
     }
     repositories {
         google()
+        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -33,6 +34,7 @@ allprojects {
         }
 
         google()
+        jcenter()
         maven { url 'https://www.jitpack.io' }
     }
 }
