@@ -57,6 +57,10 @@ module.exports.dependency = {
           projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
           directDependency: true,
         },
+        {
+          projectFile: 'ReactNativeWebView2/ReactNativeWebView2.vcxproj',
+          directDependency: true,
+        },
       ],
     },
   },
