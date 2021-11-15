@@ -2,7 +2,7 @@
 #include "WebBridge.h"
 #include "WebBridge.g.cpp"
 
-namespace winrt::WebViewBridgeComponent::implementation
+namespace winrt::ReactNativeWebView::implementation
 {
     void WebBridge::PostMessage(hstring const& message)
     {

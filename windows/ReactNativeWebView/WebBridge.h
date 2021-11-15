@@ -2,7 +2,7 @@
 #include "WebBridge.g.h"
 
 
-namespace winrt::WebViewBridgeComponent::implementation
+namespace winrt::ReactNativeWebView::implementation
 {
     struct WebBridge : WebBridgeT<WebBridge>
     {
@@ -16,7 +16,7 @@ namespace winrt::WebViewBridgeComponent::implementation
       winrt::event<Windows::Foundation::EventHandler<winrt::hstring>> m_messageEvent;
     };
 }
-namespace winrt::WebViewBridgeComponent::factory_implementation
+namespace winrt::ReactNativeWebView::factory_implementation
 {
     struct WebBridge : WebBridgeT<WebBridge, implementation::WebBridge>
     {
