@@ -22,7 +22,7 @@ namespace winrt::ReactNativeWebView2::implementation {
 
     // IViewManager
     winrt::hstring ReactWebView2Manager::Name() noexcept {
-        return L"RCTWebView";
+        return L"RCTWebView2";
     }
 
     winrt::FrameworkElement ReactWebView2Manager::CreateView() noexcept {
