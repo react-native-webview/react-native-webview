@@ -2,7 +2,7 @@
 
 #include "App.h"
 #include "ReactPackageProvider.h"
-#include "winrt/ReactNativeWebView2.h"
+
 
 
 using namespace winrt::WebViewWindows;
@@ -35,6 +35,7 @@ App::App() noexcept
 
     PackageProviders().Append(make<ReactPackageProvider>()); // Includes all modules in this project
     PackageProviders().Append(winrt::ReactNativeWebView2::ReactPackageProvider());
+    PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider());
 
     InitializeComponent();
 }
