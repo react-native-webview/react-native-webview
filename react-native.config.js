@@ -44,10 +44,10 @@ else {
       windows: {
         sourceDir: 'example/windows',
         solutionFile: 'example.sln',
-        projects:{
-          projectFile: 'example/example.vcxproj'
-        }
-      }
+        project:{
+          projectFile: 'example/example.vcxproj',
+        },
+      },
     },
   };
 }
