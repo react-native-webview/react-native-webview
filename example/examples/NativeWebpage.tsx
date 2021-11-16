@@ -16,6 +16,7 @@ export default class NativeWebpage extends Component<Props, State> {
           source={{uri: 'https://infinite.red'}}
           style={{width: '100%', height: '100%'}}
           // setSupportMultipleWindows={false}
+          useWebView2
         />
       </View>
     );
