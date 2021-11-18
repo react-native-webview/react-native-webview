@@ -21,20 +21,20 @@ namespace winrt::ReactNativeWebView2::implementation {
 
     private:
         bool m_messagingEnabled{ true };
-        winrt::Windows::UI::Xaml::Controls::WebView m_webView{ nullptr };
+        winrt::Microsoft::UI::Xaml::Controls::WebView2 m_webView{ nullptr };
         Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
         WebBridge m_webBridge{ nullptr };
         winrt::event_token m_messageToken;
-        winrt::Windows::UI::Xaml::Controls::WebView::NavigationStarting_revoker m_navigationStartingRevoker{};
-        winrt::Windows::UI::Xaml::Controls::WebView::NavigationCompleted_revoker m_navigationCompletedRevoker{};
-        winrt::Windows::UI::Xaml::Controls::WebView::NavigationFailed_revoker m_navigationFailedRevoker{};
+        //winrt::Microsoft::UI::Xaml::Controls::WebView2::NavigationStarting_revoker m_navigationStartingRevoker{};
+        //winrt::Microsoft::UI::Xaml::Controls::WebView2::NavigationCompleted_revoker m_navigationCompletedRevoker{};
+        //winrt::Microsoft::UI::Xaml::Controls::WebView2::NavigationFailed_revoker m_navigationFailedRevoker{};
 
         void HandleMessageFromJS(winrt::hstring const& message);
         void RegisterEvents();
-        void WriteWebViewNavigationEventArg(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter);
-        void OnNavigationStarting(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationStartingEventArgs const& args);
-        void OnNavigationCompleted(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationCompletedEventArgs const& args);
-        void OnNavigationFailed(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationFailedEventArgs const& args);
+        void WriteWebViewNavigationEventArg(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter);
+        //void OnNavigationStarting(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::UI::Xaml::Controls::WebViewNavigationStartingEventArgs const& args);
+        //void OnNavigationCompleted(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationCompletedEventArgs const& args);
+        //void OnNavigationFailed(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationFailedEventArgs const& args);
         void OnMessagePosted(hstring const& message);
     };
 } // namespace winrt::ReactNativeWebView2::implementation

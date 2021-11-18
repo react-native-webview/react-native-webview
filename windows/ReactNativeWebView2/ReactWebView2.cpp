@@ -15,6 +15,7 @@ namespace winrt {
     using namespace Windows::UI;
     using namespace Windows::UI::Popups;
     using namespace Windows::UI::Xaml;
+    using namespace Microsoft::UI::Xaml::Controls;
     using namespace Windows::UI::Xaml::Controls;
     using namespace Windows::UI::Xaml::Input;
     using namespace Windows::UI::Xaml::Media;
@@ -24,9 +25,9 @@ namespace winrt::ReactNativeWebView2::implementation {
 
     ReactWebView2::ReactWebView2(winrt::IReactContext const& reactContext) : m_reactContext(reactContext) {
 #ifdef CHAKRACORE_UWP
-        m_webView = winrt::WebView(winrt::WebViewExecutionMode::SeparateProcess);
+        m_webView = winrt::WebView2(winrt::WebViewExecutionMode::SeparateProcess);
 #else
-        m_webView = winrt::WebView();
+        m_webView = winrt::WebView2();
 #endif
         this->Content(m_webView);
         RegisterEvents();
@@ -40,27 +41,20 @@ namespace winrt::ReactNativeWebView2::implementation {
     }
 
     void ReactWebView2::RegisterEvents() {
-        m_navigationStartingRevoker = m_webView.NavigationStarting(
+        /*m_navigationStartingRevoker = m_webView.NavigationStarting(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
                 if (auto self = ref.get()) {
                     self->OnNavigationStarting(sender, args);
                 }
                 
-            });
+            });*/
 
-        m_navigationCompletedRevoker = m_webView.NavigationCompleted(
-            winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
-                if (auto self = ref.get()) {
-                    self->OnNavigationCompleted(sender, args);
-                }
-            });
-
-        m_navigationFailedRevoker = m_webView.NavigationFailed(
+        /*m_navigationFailedRevoker = m_webView.NavigationFailed(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
                 if (auto self = ref.get()) {
                     self->OnNavigationFailed(sender, args);
                 }
-            });
+            });*/
     }
 
     bool Is17763OrHigher() {
@@ -72,7 +66,7 @@ namespace winrt::ReactNativeWebView2::implementation {
       return hasUniversalAPIContract_v7.value();
     }
 
-    void ReactWebView2::WriteWebViewNavigationEventArg(winrt::WebView const& sender, winrt::IJSValueWriter const& eventDataWriter) {
+    void ReactWebView2::WriteWebViewNavigationEventArg(winrt::WebView2 const& sender, winrt::IJSValueWriter const& eventDataWriter) {
         auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
         WriteProperty(eventDataWriter, L"canGoBack", sender.CanGoBack());
         WriteProperty(eventDataWriter, L"canGoForward", sender.CanGoForward());
@@ -80,13 +74,13 @@ namespace winrt::ReactNativeWebView2::implementation {
           WriteProperty(eventDataWriter, L"loading", !sender.IsLoaded());
         }
         WriteProperty(eventDataWriter, L"target", tag);
-        WriteProperty(eventDataWriter, L"title", sender.DocumentTitle());
+        //WriteProperty(eventDataWriter, L"title", sender.DocumentTitle());
         if (auto uri = sender.Source()) {
           WriteProperty(eventDataWriter, L"url", uri.AbsoluteCanonicalUri());
         }
     }
 
-    void ReactWebView2::OnNavigationStarting(winrt::WebView const& webView, winrt::WebViewNavigationStartingEventArgs const& /*args*/) {
+    /*void ReactWebView2::OnNavigationStarting(winrt::WebView2 const& webView, winrt::WebViewNavigationStartingEventArgs const& args) {
         m_reactContext.DispatchEvent(
             *this,
             L"topLoadingStart",
@@ -104,14 +98,14 @@ namespace winrt::ReactNativeWebView2::implementation {
             });
           webView.AddWebAllowedObject(L"__REACT_WEB_VIEW_BRIDGE", m_webBridge);
         }
-    }
+    }*/
 
     void ReactWebView2::OnMessagePosted(hstring const& message)
     {
         HandleMessageFromJS(message);
     }
 
-    void ReactWebView2::OnNavigationCompleted(winrt::WebView const& webView, winrt::WebViewNavigationCompletedEventArgs const& /*args*/) {
+    /*void ReactWebView2::OnNavigationCompleted(winrt::WebView2 const& webView, winrt::WebViewNavigationCompletedEventArgs const& args) {
         m_reactContext.DispatchEvent(
             *this,
             L"topLoadingFinish",
@@ -126,9 +120,9 @@ namespace winrt::ReactNativeWebView2::implementation {
           winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {__REACT_WEB_VIEW_BRIDGE.postMessage(String(data))}};";
           webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
         }
-    }
+    }*/
 
-    void ReactWebView2::OnNavigationFailed(winrt::IInspectable const& /*sender*/, winrt::WebViewNavigationFailedEventArgs const& args) {
+    /*void ReactWebView2::OnNavigationFailed(winrt::IInspectable const& sender, winrt::WebViewNavigationFailedEventArgs const& args) {
         m_reactContext.DispatchEvent(
             *this,
             L"topLoadingError",
@@ -141,7 +135,7 @@ namespace winrt::ReactNativeWebView2::implementation {
                 }
                 eventDataWriter.WriteObjectEnd();
             });
-    }
+    }*/
 
     void ReactWebView2::HandleMessageFromJS(winrt::hstring const& message) {
         winrt::JsonObject jsonObject;

@@ -53,11 +53,9 @@ Global
 		..\..\node_modules\react-native-windows\Shared\Shared.vcxitems*{f7d32bd0-2749-483e-9a0d-1635ef7e3136}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|ARM = Debug|ARM
 		Debug|ARM64 = Debug|ARM64
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|ARM = Release|ARM
 		Release|ARM64 = Release|ARM64
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
@@ -101,8 +99,6 @@ Global
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|x86.ActiveCfg = Release|Win32
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|x86.Build.0 = Release|Win32
 		{729D9AF8-CD9E-4427-9F6C-FB757E287729}.Release|x86.Deploy.0 = Release|Win32
-		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Debug|ARM.ActiveCfg = Debug|ARM
-		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Debug|ARM.Build.0 = Debug|ARM
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Debug|ARM64.ActiveCfg = Debug|ARM64
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Debug|ARM64.Build.0 = Debug|ARM64
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Debug|x64.ActiveCfg = Debug|x64
@@ -110,8 +106,6 @@ Global
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Debug|x86.ActiveCfg = Debug|Win32
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Debug|x86.Build.0 = Debug|Win32
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Debug|x86.Deploy.0 = Debug|Win32
-		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Release|ARM.ActiveCfg = Release|ARM
-		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Release|ARM.Build.0 = Release|ARM
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Release|ARM64.ActiveCfg = Release|ARM64
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Release|ARM64.Build.0 = Release|ARM64
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Release|x64.ActiveCfg = Release|x64
