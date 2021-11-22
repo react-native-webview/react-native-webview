@@ -56,16 +56,15 @@ For Android manual installation, please refer to [this article](https://engineer
 
 ### Windows:
 
-Autolinking is not yet supported for ReactNativeWindows. Make following additions to the given files manually:
+Autolinking is supported for React Native Windows v0.63 and higher. If your app uses a React Native Windows version that does not have autolinking support, make following additions to the given files manually:
 
 #### **windows/myapp.sln**
 
-Add the `ReactNativeWebView` and `WebViewBridgeComponent` project to your solution.
+Add the `ReactNativeWebView` project to your solution.
 
 1. Open the solution in Visual Studio 2019
 2. Right-click Solution icon in Solution Explorer > Add > Existing Project
    Select `node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj`
-   Select `node_modules\react-native-webview\windows\WebViewBridgeComponent\WebViewBridgeComponent.vcxproj`
 
 #### **windows/myapp/myapp.vcxproj**
 
@@ -86,7 +85,20 @@ Add `PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider()
 
 Note if you want to enable scroll with Touch for the WebView component you must disable perspective for your app using [ReactRootView.IsPerspectiveEnabled](https://microsoft.github.io/react-native-windows/docs/ReactRootView#isperspectiveenabled).
 
-## 3. Import the webview into your component
+## 3. Decide if you want access to WebView2
+The WebView2 control is a WinUI control that renders web content using the Microsoft Edge (Chromium) rendering engine. We have added support for the WebView2 control to the WebView community module. If you want access to the WebView2 control in your app, follow these steps:
+
+  i. Ensure your React Native Windows version is v0.65 or higher.
+
+  ii. Let autolinking handle adding the `ReactNativeWebView2` project to your app.
+
+  iii. Customize your app's WinUI 2.x version to version 2.8.0-prerelease.210927001. See here for instructions.
+  
+  iv. Customize your app's WebView2 version to version 1.0.1020.30. See here for instructions.
+
+Now you can access the WinUI WebView2 control from your app's JavaScript via the useWebView2 prop.
+
+## 4. Import the webview into your component
 
 ```js
 import React, { Component } from 'react';
