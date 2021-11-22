@@ -16,6 +16,8 @@
 
       See https://microsoft.github.io/react-native-windows/docs/winui3
     -->
+    <WinUI2xVersion>2.8.0-prerelease.210927001</WinUI2xVersion>
+    <WebView2Version>1.0.1020.30</WebView2Version>
     <UseWinUI3>false</UseWinUI3>
    </PropertyGroup>
 

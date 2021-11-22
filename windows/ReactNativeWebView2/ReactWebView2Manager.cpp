@@ -12,6 +12,7 @@ namespace winrt {
     using namespace Windows::UI;
     using namespace Windows::UI::Xaml;
     using namespace Windows::UI::Xaml::Controls;
+    using namespace Microsoft::UI::Xaml::Controls;
     using namespace Windows::Web::Http;
     using namespace Windows::Web::Http::Headers;
 }
@@ -53,7 +54,7 @@ namespace winrt::ReactNativeWebView2::implementation {
         IJSValueReader const& propertyMapReader) noexcept {
         auto control = view.as<winrt::UserControl>();
         auto content = control.Content();
-        auto webView = content.as<winrt::WebView>();
+        auto webView = content.as<winrt::WebView2>();
         const JSValueObject& propertyMap = JSValueObject::ReadFrom(propertyMapReader);
 
         for (auto const& pair : propertyMap) {
@@ -77,72 +78,17 @@ namespace winrt::ReactNativeWebView2::implementation {
                         auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
                         uriString.replace(0, 7, bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
-
-                    if (uriString.find("ms-appdata://") == 0 || uriString.find("ms-appx-web://") == 0) {
-                        webView.Navigate(winrt::Uri(to_hstring(uriString)));
-                    }
-                    else {
-                        bool hasHeaders = srcMap.find("headers") != srcMap.end();
-                        auto httpRequest = winrt::HttpRequestMessage();
-                        httpRequest.RequestUri(winrt::Uri(to_hstring(uriString)));
-                        if (srcMap.find("method") != srcMap.end() && srcMap.at("method").AsString() == "POST")
-                        {
-                          httpRequest.Method(winrt::HttpMethod::Post());
-                          auto formBody = srcMap.at("body").AsString();
-                          bool isUrlEncodedForm = hasHeaders &&
-                            srcMap.at("headers").AsObject().find("content-type") !=
-                            srcMap.at("headers").AsObject().end() &&
-                            srcMap.at("headers").AsObject().at("content-type") == "application/x-www-form-urlencoded";
-                          if (isUrlEncodedForm)
-                          {
-                            auto formContent = winrt::single_threaded_observable_map<winrt::hstring, winrt::hstring>();
-                            auto counter = 0u;
-                            auto current = formBody.find_first_of("&");
-                            while (counter <= formBody.find_last_of("&"))
-                            {
-                              auto keyValueSeparator = formBody.substr(counter, counter + current).find('=');
-                              if (keyValueSeparator <= current)
-                              {
-                                auto key = winrt::to_hstring(formBody.substr(counter, keyValueSeparator));
-                                auto value = winrt::to_hstring(formBody.substr(
-                                  keyValueSeparator + counter + 1, current - keyValueSeparator - 1));
-                                formContent.Insert(key, value);
-                              }
-                              counter += current + 1;
-                              current = formBody.substr(counter, formBody.size() - counter).find_first_of("&");
-                            }
-                            httpRequest.Content(winrt::HttpFormUrlEncodedContent(formContent));
-                            httpRequest.Headers().Accept().TryParseAdd(L"application/x-www-form-urlencoded");
-                          }
-                          else
-                          {
-                            httpRequest.Content(winrt::HttpStringContent(to_hstring(formBody)));
-                          }
-                        }
-                        if (hasHeaders) {
-                          for (auto const& header : srcMap.at("headers").AsObject()) {
-                            auto const& headerKey = header.first;
-                            auto const& headerValue = header.second;
-                            if (headerValue.IsNull()) continue;
-                            httpRequest.Headers().TryAppendWithoutValidation(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
-                          }
-                        }
-                        webView.NavigateWithHttpRequestMessage(httpRequest);
-                    }
+                    webView.Source(winrt::Uri(to_hstring(uriString)));
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
                     auto htmlString = srcMap.at("html").AsString();
-                    webView.NavigateToString(to_hstring(htmlString));
+                    auto reactWebView2 = view.as<winrt::ReactNativeWebView2::ReactWebView2>();
+                    reactWebView2.NavigateToHtml(to_hstring(htmlString));
                 }
             }
             else if (propertyName == "backgroundColor") {
                 auto color = propertyValue.To<winrt::Color>();
-                webView.DefaultBackgroundColor(color.A==0 ? winrt::Colors::Transparent() : color);
-            }
-            else if (propertyName == "messagingEnabled") {
-              auto messagingEnabled = propertyValue.To<bool>();
-              auto reactWebView = view.as<ReactNativeWebView2::ReactWebView2>();
-              reactWebView.SetMessagingEnabled(messagingEnabled);
+                //webView.DefaultBackgroundColor(color.A==0 ? winrt::Colors::Transparent() : color);
             }
         }        
     }

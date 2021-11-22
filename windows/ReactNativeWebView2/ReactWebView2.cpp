@@ -33,12 +33,7 @@ namespace winrt::ReactNativeWebView2::implementation {
         RegisterEvents();
     }
 
-    ReactWebView2::~ReactWebView2()
-    {
-      if (m_messagingEnabled) {
-        m_webBridge.MessagePostEvent(m_messageToken);
-      }
-    }
+    ReactWebView2::~ReactWebView2(){}
 
     void ReactWebView2::RegisterEvents() {
         /*m_navigationStartingRevoker = m_webView.NavigationStarting(
@@ -49,12 +44,18 @@ namespace winrt::ReactNativeWebView2::implementation {
                 
             });*/
 
-        /*m_navigationFailedRevoker = m_webView.NavigationFailed(
+        /*m_navigationFailedRevoker = m_webView.NavigationCompleted(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
                 if (auto self = ref.get()) {
-                    self->OnNavigationFailed(sender, args);
+                    self->OnNavigationCompleted(sender, args);
                 }
             });*/
+        m_CoreWebView2InitializedRevoker = m_webView.CoreWebView2Initialized(
+            winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args){
+            if (auto self = ref.get()) {
+                self->OnCoreWebView2Initialized(sender, args);
+             }
+        });
     }
 
     bool Is17763OrHigher() {
@@ -89,15 +90,6 @@ namespace winrt::ReactNativeWebView2::implementation {
                 WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
-
-        if (m_messagingEnabled) {
-          m_webBridge = WebBridge();
-          m_messageToken = m_webBridge.MessagePostEvent([this](const auto&, hstring const& message)
-            {
-              this->OnMessagePosted(message);
-            });
-          webView.AddWebAllowedObject(L"__REACT_WEB_VIEW_BRIDGE", m_webBridge);
-        }
     }*/
 
     void ReactWebView2::OnMessagePosted(hstring const& message)
@@ -114,28 +106,16 @@ namespace winrt::ReactNativeWebView2::implementation {
                 WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
+    }*/
 
-        if (m_messagingEnabled) {
-          winrt::hstring windowAlert = L"window.alert = function (msg) {__REACT_WEB_VIEW_BRIDGE.postMessage(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
-          winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {__REACT_WEB_VIEW_BRIDGE.postMessage(String(data))}};";
-          webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
+    void ReactWebView2::OnCoreWebView2Initialized(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& args) {
+        if (sender.CoreWebView2()) {
+            if (m_navigateToHtml != L"") {
+                m_webView.NavigateToString(m_navigateToHtml);
+                m_navigateToHtml = L"";
+            }
         }
-    }*/
-
-    /*void ReactWebView2::OnNavigationFailed(winrt::IInspectable const& sender, winrt::WebViewNavigationFailedEventArgs const& args) {
-        m_reactContext.DispatchEvent(
-            *this,
-            L"topLoadingError",
-            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept {
-                auto httpCode = static_cast<int32_t>(args.WebErrorStatus());
-                eventDataWriter.WriteObjectBegin();
-                {
-                    WriteProperty(eventDataWriter, L"code", httpCode);
-                    WriteWebViewNavigationEventArg(m_webView, eventDataWriter);
-                }
-                eventDataWriter.WriteObjectEnd();
-            });
-    }*/
+    }
 
     void ReactWebView2::HandleMessageFromJS(winrt::hstring const& message) {
         winrt::JsonObject jsonObject;
@@ -161,8 +141,14 @@ namespace winrt::ReactNativeWebView2::implementation {
                 });
     }
 
-    void ReactWebView2::SetMessagingEnabled(bool enabled) {
-      m_messagingEnabled = enabled;
+    void ReactWebView2::NavigateToHtml(winrt::hstring html) {
+        if (m_webView.CoreWebView2()) {
+            m_webView.NavigateToString(html);
+        }
+        else {
+            m_webView.EnsureCoreWebView2Async();
+            m_navigateToHtml = html;
+        }
     }
 
 } // namespace winrt::ReactNativeWebView2::implementation
