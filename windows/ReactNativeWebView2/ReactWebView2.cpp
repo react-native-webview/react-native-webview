@@ -92,11 +92,6 @@ namespace winrt::ReactNativeWebView2::implementation {
             });
     }*/
 
-    void ReactWebView2::OnMessagePosted(hstring const& message)
-    {
-        HandleMessageFromJS(message);
-    }
-
     /*void ReactWebView2::OnNavigationCompleted(winrt::WebView2 const& webView, winrt::WebViewNavigationCompletedEventArgs const& args) {
         m_reactContext.DispatchEvent(
             *this,
@@ -115,30 +110,6 @@ namespace winrt::ReactNativeWebView2::implementation {
                 m_navigateToHtml = L"";
             }
         }
-    }
-
-    void ReactWebView2::HandleMessageFromJS(winrt::hstring const& message) {
-        winrt::JsonObject jsonObject;
-        if (winrt::JsonObject::TryParse(message, jsonObject) && jsonObject.HasKey(L"type")) {
-            auto type = jsonObject.GetNamedString(L"type");
-            if (type == L"__alert") {
-              auto dialog = winrt::MessageDialog(jsonObject.GetNamedString(L"message"));
-              dialog.Commands().Append(winrt::UICommand(L"OK"));
-              dialog.ShowAsync();
-              return;
-            }
-          }
-      
-          m_reactContext.DispatchEvent(
-                *this,
-                L"topMessage",
-                [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
-                    eventDataWriter.WriteObjectBegin();
-                    {
-                        WriteProperty(eventDataWriter, L"data", message);
-                    }
-                    eventDataWriter.WriteObjectEnd();
-                });
     }
 
     void ReactWebView2::NavigateToHtml(winrt::hstring html) {
