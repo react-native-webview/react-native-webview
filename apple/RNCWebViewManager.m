@@ -93,6 +93,10 @@ RCT_EXPORT_VIEW_PROPERTY(contentMode, WKContentMode)
 RCT_EXPORT_VIEW_PROPERTY(limitsNavigationsToAppBoundDomains, BOOL)
 #endif
 
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
+#endif
+
 /**
  * Expose methods to enable messaging the webview.
  */

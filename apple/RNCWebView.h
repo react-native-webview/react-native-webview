@@ -84,6 +84,10 @@
 @property (nonatomic, assign) BOOL limitsNavigationsToAppBoundDomains;
 #endif
 
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+@property (nonatomic, assign) BOOL textInteractionEnabled;
+#endif
+
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
 - (void)postMessage:(NSString *_Nullable)message;
