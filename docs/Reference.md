@@ -77,6 +77,7 @@ This document lays out the current public properties and methods for the React N
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
+- [`textInteractionEnabled`](Reference.md#textInteractionEnabled)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 - [`basicAuthCredential`](Reference.md#basicAuthCredential)
@@ -1371,6 +1372,24 @@ Example:
 
 ```jsx
 <WebView limitsNavigationsToAppBoundDomains={true} />
+```
+
+---
+
+### `textInteractionEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+If false indicates to WebKit that a WKWebView will not interact with text, thus not showing a text selection loop. Only applicable for iOS 15 or greater.
+
+Defaults to true.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+Example:
+
+```jsx
+<WebView textInteractionEnabled={false} />
 ```
 
 ---
