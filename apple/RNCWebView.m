@@ -190,6 +190,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   return self;
 }
 
+#if !TARGET_OS_OSX
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     // Only allow long press gesture
     if ([otherGestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]]) {
@@ -224,6 +225,8 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
         [menuController setMenuVisible:YES animated:YES];
     }
 }
+
+#endif // !TARGET_OS_OSX
 
 - (void)dealloc
 {
@@ -433,7 +436,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
     [self visitSource];
   }
-
+#if !TARGET_OS_OSX
   // Allow this object to recognize gestures
   if (self.menuItems != nil) {
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startLongPress:)];
@@ -444,6 +447,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     longPress.cancelsTouchesInView = YES;
     [self addGestureRecognizer:longPress];
   }
+#endif // !TARGET_OS_OSX
 }
 
 // Update webview property when the component prop changes.
