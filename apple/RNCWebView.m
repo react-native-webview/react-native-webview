@@ -307,11 +307,11 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    WKWebView *newWebview = [[WKWebView alloc] initWithFrame:self.view.frame configuration:configuration];
+    WKWebView *newWebview = [[WKWebView alloc] initWithFrame:self.bounds configuration:configuration];
     newWebview.UIDelegate = self;
     newWebview.navigationDelegate = self;
     [newWebview loadRequest:navigationAction.request];
-    self.view = newWebview;
+    [self addSubview:_webView];
 
     return  newWebview;
   }
@@ -1136,11 +1136,6 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   // Allow all navigation by default
   decisionHandler(WKNavigationActionPolicyAllow);
 }
-
-- (void)webViewDidClose:(WKWebView *)webView {
-    self.view = self.webView;
-}
-
 /**
  * Called when the web view’s content process is terminated.
  * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi?language=objc
