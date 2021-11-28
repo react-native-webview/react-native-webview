@@ -307,7 +307,13 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
+    WKWebView *newWebview = [[WKWebView alloc] initWithFrame:self.view.frame configuration:configuration];
+    newWebview.UIDelegate = self;
+    newWebview.navigationDelegate = self;
+    [newWebview loadRequest:navigationAction.request];
+    self.view = newWebview;
+
+    return  newWebview;
   }
   return nil;
 }
@@ -1129,6 +1135,10 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
   // Allow all navigation by default
   decisionHandler(WKNavigationActionPolicyAllow);
+}
+
+- (void)webViewDidClose:(WKWebView *)webView {
+    self.view = self.webView;
 }
 
 /**
