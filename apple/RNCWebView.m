@@ -311,11 +311,14 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     newWebview.UIDelegate = self;
     newWebview.navigationDelegate = self;
     [newWebview loadRequest:navigationAction.request];
-    [self addSubview:_webView];
+    [self addSubview:newWebview];
 
     return  newWebview;
   }
   return nil;
+}
+- (void)webViewDidClose:(WKWebView *)webView {
+  [webView removeFromSuperview];
 }
 
 - (WKWebViewConfiguration *)setUpWkWebViewConfig
