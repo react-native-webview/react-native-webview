@@ -1439,6 +1439,7 @@ Example:
 
 ```javascript
 <WebView forceDarkOn={false} />
+```
 ### `menuItems`
 
 An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
@@ -1447,7 +1448,6 @@ Example:
 
 ```javascript
 <WebView menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]} />
-
 ```
 
 ### `onCustomMenuSelection`
@@ -1456,13 +1456,13 @@ Function called when a custom menu item is selected.  It receives a Native event
 
 ```javascript
 <WebView 
-  menuItems={[{ label: 'Tweet', key: 'tweet', { label: 'Save for later', key: 'saveForLater' }]}
+  menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]}
   onCustomMenuSelection={(webViewEvent) => {
     const { label } = webViewEvent.nativeEvent; // The name of the menu item, i.e. 'Tweet'
     const { key } = webViewEvent.nativeEvent; // The key of the menu item, i.e. 'tweet'
     const { selectedText } = webViewEvent.nativeEvent; // Text highlighted
   }}
-  />
+/>
 ```
 
 ### `basicAuthCredential`
@@ -1551,7 +1551,7 @@ Removes the autocomplete popup from the currently focused form field, if present
 (android only)
 
 ```javascript
-clearCache(true);
+
 ```
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
