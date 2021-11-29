@@ -22,6 +22,16 @@ RCT_ENUM_CONVERTER(WKContentMode, (@{
     @"desktop": @(WKContentModeDesktop),
 }), WKContentModeRecommended, integerValue)
 #endif
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+RCT_ENUM_CONVERTER(RNCWebViewPermissionGrantType, (@{
+    @"grantIfSameHostElsePrompt": @(RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt),
+    @"grantIfSameHostElseDeny": @(RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny),
+    @"deny": @(RNCWebViewPermissionGrantType_Deny),
+    @"grant": @(RNCWebViewPermissionGrantType_Grant),
+    @"prompt": @(RNCWebViewPermissionGrantType_Prompt),
+}), RNCWebViewPermissionGrantType_Prompt, integerValue)
+#endif
 @end
 
 @implementation RNCWebViewManager
@@ -91,6 +101,10 @@ RCT_EXPORT_VIEW_PROPERTY(contentMode, WKContentMode)
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
 RCT_EXPORT_VIEW_PROPERTY(limitsNavigationsToAppBoundDomains, BOOL)
+#endif
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, RNCWebViewPermissionGrantType)
 #endif
 
 /**

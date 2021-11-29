@@ -149,6 +149,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     _savedAutomaticallyAdjustsScrollIndicatorInsets = NO;
 #endif
     _enableApplePay = NO;
+    _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
   }
 
 #if !TARGET_OS_OSX
@@ -1062,6 +1063,32 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   }];
 #endif // !TARGET_OS_OSX
 }
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+/**
+ * Media capture permissions (prevent multiple prompts)
+ */
+- (void)                         webView:(WKWebView *)webView
+  requestMediaCapturePermissionForOrigin:(WKSecurityOrigin *)origin
+                        initiatedByFrame:(WKFrameInfo *)frame
+                                    type:(WKMediaCaptureType)type
+                         decisionHandler:(void (^)(WKPermissionDecision decision))decisionHandler {
+    if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt || _mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny) {
+        if ([origin.host isEqualToString:webView.URL.host]) {
+            decisionHandler(WKPermissionDecisionGrant);
+        } else {
+            WKPermissionDecision decision = _mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt ? WKPermissionDecisionPrompt : WKPermissionDecisionDeny;
+            decisionHandler(decision);
+        }
+    } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Deny) {
+        decisionHandler(WKPermissionDecisionDeny);
+    } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Grant) {
+        decisionHandler(WKPermissionDecisionGrant);
+    } else {
+        decisionHandler(WKPermissionDecisionPrompt);
+    }
+}
+#endif
 
 #if !TARGET_OS_OSX
 /**
