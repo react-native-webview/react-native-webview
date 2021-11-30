@@ -16,6 +16,7 @@
 #endif // !TARGET_OS_OSX
 
 #import "objc/runtime.h"
+#import "CertificateRequestService.h"
 
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
@@ -766,8 +767,12 @@ static NSDictionary* customCertificatesForHost;
         host = webView.URL.host;
     }
     if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
-        completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
-        return;
+        //completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
+        //return;
+      [[CertificateRequestService new] viewController: self selectCertificate: ^(NSURLCredential* credential){
+                    [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
+            completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+        }];
     }
     if ([[challenge protectionSpace] serverTrust] != nil && customCertificatesForHost != nil && host != nil) {
         SecCertificateRef localCertificate = (__bridge SecCertificateRef)([customCertificatesForHost objectForKey:host]);
