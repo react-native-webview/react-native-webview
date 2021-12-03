@@ -19,6 +19,7 @@ namespace winrt {
     using namespace Windows::UI::Xaml::Controls;
     using namespace Windows::UI::Xaml::Input;
     using namespace Windows::UI::Xaml::Media;
+    using namespace Microsoft::Web::WebView2::Core;
 } // namespace winrt
 
 namespace winrt::ReactNativeWebView2::implementation {
@@ -36,20 +37,20 @@ namespace winrt::ReactNativeWebView2::implementation {
     ReactWebView2::~ReactWebView2(){}
 
     void ReactWebView2::RegisterEvents() {
-        /*m_navigationStartingRevoker = m_webView.NavigationStarting(
+        m_navigationStartingRevoker = m_webView.NavigationStarting(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
                 if (auto self = ref.get()) {
                     self->OnNavigationStarting(sender, args);
                 }
                 
-            });*/
+            });
 
-        /*m_navigationFailedRevoker = m_webView.NavigationCompleted(
+        m_navigationCompletedRevoker = m_webView.NavigationCompleted(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
                 if (auto self = ref.get()) {
                     self->OnNavigationCompleted(sender, args);
                 }
-            });*/
+            });
         m_CoreWebView2InitializedRevoker = m_webView.CoreWebView2Initialized(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args){
             if (auto self = ref.get()) {
@@ -81,7 +82,7 @@ namespace winrt::ReactNativeWebView2::implementation {
         }
     }
 
-    /*void ReactWebView2::OnNavigationStarting(winrt::WebView2 const& webView, winrt::WebViewNavigationStartingEventArgs const& args) {
+    void ReactWebView2::OnNavigationStarting(winrt::WebView2 const& webView, winrt::CoreWebView2NavigationStartingEventArgs const& args) {
         m_reactContext.DispatchEvent(
             *this,
             L"topLoadingStart",
@@ -90,9 +91,9 @@ namespace winrt::ReactNativeWebView2::implementation {
                 WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
-    }*/
+    }
 
-    /*void ReactWebView2::OnNavigationCompleted(winrt::WebView2 const& webView, winrt::WebViewNavigationCompletedEventArgs const& args) {
+    void ReactWebView2::OnNavigationCompleted(winrt::WebView2 const& webView, winrt::CoreWebView2NavigationCompletedEventArgs const& args) {
         m_reactContext.DispatchEvent(
             *this,
             L"topLoadingFinish",
@@ -101,7 +102,7 @@ namespace winrt::ReactNativeWebView2::implementation {
                 WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
-    }*/
+    }
 
     void ReactWebView2::OnCoreWebView2Initialized(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& args) {
         if (sender.CoreWebView2()) {
