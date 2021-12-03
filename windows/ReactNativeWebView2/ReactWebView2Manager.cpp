@@ -44,8 +44,6 @@ namespace winrt::ReactNativeWebView2::implementation {
     IMapView<hstring, ViewManagerPropertyType> ReactWebView2Manager::NativeProps() noexcept {
         auto nativeProps = winrt::single_threaded_map<hstring, ViewManagerPropertyType>();
         nativeProps.Insert(L"source", ViewManagerPropertyType::Map);
-        nativeProps.Insert(L"backgroundColor", ViewManagerPropertyType::Color);
-        nativeProps.Insert(L"messagingEnabled", ViewManagerPropertyType::Boolean);
         return nativeProps.GetView();
     }
 
@@ -85,10 +83,6 @@ namespace winrt::ReactNativeWebView2::implementation {
                     auto reactWebView2 = view.as<winrt::ReactNativeWebView2::ReactWebView2>();
                     reactWebView2.NavigateToHtml(to_hstring(htmlString));
                 }
-            }
-            else if (propertyName == "backgroundColor") {
-                auto color = propertyValue.To<winrt::Color>();
-                //webView.DefaultBackgroundColor(color.A==0 ? winrt::Colors::Transparent() : color);
             }
         }        
     }
