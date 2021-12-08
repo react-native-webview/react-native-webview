@@ -224,6 +224,18 @@ export interface WebViewSourceHtml {
   baseUrl?: string;
 }
 
+export interface WebViewCustomMenuItems {
+  /**
+   * The unique key that will be added as a selector on the webview
+   * Returned by the `onCustomMenuSelection` callback
+   */
+  key: string;
+  /**
+   * The label to appear on the UI Menu when selecting text
+   */
+  label: string;
+}
+
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
 export interface ViewManager {
@@ -323,6 +335,13 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
 
 export declare type ContentInsetAdjustmentBehavior = 'automatic' | 'scrollableAxes' | 'never' | 'always';
 
+export declare type MediaCapturePermissionGrantType =
+  | 'grantIfSameHostElsePrompt'
+  | 'grantIfSameHostElseDeny'
+  | 'deny'
+  | 'grant'
+  | 'prompt';
+
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -350,6 +369,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   onFileDownload?: (event: FileDownloadEvent) => void;
   limitsNavigationsToAppBoundDomains?: boolean;
+  mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -652,6 +672,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   limitsNavigationsToAppBoundDomains?: boolean;
 
   /**
+   * This property specifies how to handle media capture permission requests.
+   * Defaults to `prompt`, resulting in the user being prompted repeatedly.
+   * Available on iOS 15 and later.
+   */
+  mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
+
+  /**
    * A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support.
    *  Once set, websites will be able to invoke apple pay from React Native Webview.
    *  This comes with a cost features like `injectJavaScript`, html5 History,`sharedCookiesEnabled`,
@@ -665,6 +692,20 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * The default value is false.
    */
   enableApplePay?: boolean;
+
+  /** 
+   * An array of objects which will be added to the UIMenu controller when selecting text.
+   * These will appear after a long press to select text.
+  */
+  menuItems?: WebViewCustomMenuItems[];
+
+  /**
+   * The function fired when selecting a custom menu item created by `menuItems`.
+   * It passes a WebViewEvent with a `nativeEvent`, where custom keys are passed:
+   * `customMenuKey`: the string of the menu item
+   * `selectedText`: the text selected on the document
+   */
+  onCustomMenuSelection?: (event: WebViewEvent) => void;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
