@@ -524,6 +524,12 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     return outputFile;
   }
 
+  public String getFileNameFromDataURL(String dataURL) {
+    String mimeType = dataURL.substring(dataURL.indexOf(":") + 1, dataURL.indexOf(";"));
+    String ext = mimeType.split("/")[1];
+    return String.valueOf(System.currentTimeMillis()) + "." + ext;
+  }
+
   private Boolean noAcceptTypesSet(String[] types) {
     // when our array returned from getAcceptTypes() has no values set from the webview
     // i.e. <input type="file" />, without any "accept" attr

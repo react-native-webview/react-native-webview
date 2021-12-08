@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -16,7 +18,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Message;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -42,10 +46,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
@@ -90,10 +97,17 @@ import com.reactnativecommunity.webview.events.TopDownloadUnsupportedURLEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -148,6 +162,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
   protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
+  protected static final String JAVASCRIPT_INTERFACE_INTERNAL = "_ReactNativeWebView";
   protected static final String HTTP_METHOD_POST = "POST";
   // Use `webView.loadUrl("about:blank")` to reliably reset the view
   // state and release page resources (including any running JavaScript).
@@ -209,10 +224,29 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
-
+    webView.setInternalBridge();
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
         if (!url.startsWith("http")) {
+          if (url.startsWith("blob")) {
+            String injectedJS = "javascript: var xhr = new XMLHttpRequest();" +
+              "xhr.open('GET', '"+ url +"', true);" +
+              "xhr.responseType = 'blob';" +
+              "xhr.onload = function(e) {" +
+              "    if (this.status == 200) {" +
+              "        var blob = this.response;" +
+              "        var reader = new FileReader();" +
+              "        reader.readAsDataURL(blob);" +
+              "        reader.onloadend = function() {" +
+              "            var dataURL = reader.result;" +
+              "            window._ReactNativeWebView.downloadDataURL(dataURL);" +
+              "        }" +
+              "    }" +
+              "};" +
+              "xhr.send();";
+            webView.evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
+            return;
+          }
           WritableMap event = Arguments.createMap();
           event.putString("url", url);
           event.putString("contentDisposition", contentDisposition);
@@ -1604,6 +1638,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       injectedJavaScriptBeforeContentLoadedForMainFrameOnly = enabled;
     }
 
+    protected RNCWebViewInternalBridge createRNCWebViewInternalBridge(RNCWebView webView) {
+      return new RNCWebViewInternalBridge(webView);
+    }
+
     protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
       return new RNCWebViewBridge(webView);
     }
@@ -1615,6 +1653,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         mCatalystInstance = reactContext.getCatalystInstance();
       }
     }
+
+    @SuppressLint("AddJavascriptInterface")
+    public void setInternalBridge() {
+      addJavascriptInterface(createRNCWebViewInternalBridge(this), JAVASCRIPT_INTERFACE_INTERNAL);
+    }
+
 
     @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
@@ -1665,6 +1709,49 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
     }
 
+    public void downloadDataURL(String dataURL) {
+      Context ctx = this.getContext();
+      ReactContext reactContext = (ReactContext) this.getContext();
+      RNCWebViewModule module = getModule(reactContext);
+      ContentResolver contentResolver = ctx.getContentResolver();
+
+      if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+        ContentValues values = new ContentValues();
+        String fileName = module.getFileNameFromDataURL(dataURL);
+
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+        String base64EncodedString = dataURL.substring(dataURL.indexOf(",") + 1);
+        byte[] decodedBytes = Base64.decode(base64EncodedString, Base64.DEFAULT);
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          Uri uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+          if (uri != null) {
+            try {
+              OutputStream outputStream = contentResolver.openOutputStream(uri);
+              if (outputStream != null) {
+                outputStream.write(decodedBytes);
+                outputStream.close();
+                Toast.makeText(this.getContext(), "Download success!", Toast.LENGTH_LONG).show();
+              }
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        } else {
+          if (module.grantFileDownloaderPermissions()) {
+            try {
+              File file =  new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) , fileName);
+              OutputStream os = new FileOutputStream(file);
+              os.write(decodedBytes);
+              os.close();
+              Toast.makeText(this.getContext(), "Download success!", Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      }
+    }
     public void onMessage(String message) {
       ReactContext reactContext = (ReactContext) this.getContext();
       RNCWebView mContext = this;
@@ -1756,7 +1843,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
       super.destroy();
     }
+    protected class RNCWebViewInternalBridge {
+      RNCWebView mContext;
+      RNCWebViewInternalBridge(RNCWebView c) {
+        mContext = c;
+      }
 
+      @JavascriptInterface
+      public void downloadDataURL(String dataURL) {
+        mContext.downloadDataURL(dataURL);
+      }
+    }
     protected class RNCWebViewBridge {
       RNCWebView mContext;
 
