@@ -333,6 +333,10 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     [prefs setValue:@TRUE forKey:@"javaScriptCanOpenWindowsAutomatically"];
     _prefsUsed = YES;
   }
+  if (!_textInteractionEnabled) {
+    [prefs setValue:@FALSE forKey:@"textInteractionEnabled"];
+    _prefsUsed = YES;
+  }
   if (_prefsUsed) {
     wkWebViewConfig.preferences = prefs;
   }

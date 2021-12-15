@@ -93,6 +93,7 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 #endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+@property(nonatomic, assign) BOOL textInteractionEnabled;
 @property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
 #endif
 
