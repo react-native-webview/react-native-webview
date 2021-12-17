@@ -1201,17 +1201,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
-    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-
-      final WebView newWebView = new WebView(view.getContext());
-      final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
-      transport.setWebView(newWebView);
-      resultMsg.sendToTarget();
-
-      return true;
-    }
-
-    @Override
     public boolean onConsoleMessage(ConsoleMessage message) {
       if (ReactBuildConfig.DEBUG) {
         return super.onConsoleMessage(message);
