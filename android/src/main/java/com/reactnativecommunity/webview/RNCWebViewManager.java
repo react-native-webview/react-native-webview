@@ -161,6 +161,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
 
+  private Context reactApplicationContext;
+
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
@@ -187,6 +189,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     RNCWebView webView = createRNCWebViewInstance(reactContext);
     setupWebChromeClient(reactContext, webView);
     reactContext.addLifecycleEventListener(webView);
+    Context reactApplicationContext = reactContext;
     mWebViewConfig.configWebView(webView);
     WebSettings settings = webView.getSettings();
     settings.setBuiltInZoomControls(true);
@@ -260,8 +263,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "cleverTapEnabled")
   public void setCleverTapEnabled(WebView view, boolean enabled) {
-    Log.w("@@@@webview clevertap enabled", "@@@@clevertap enabled")
-    view.addJavascriptInterface(new CTWebInterface(CleverTapAPI.getDefaultInstance(reactContext.getApplicationContext())),"CleverTap");
+    view.addJavascriptInterface(new CTWebInterface(CleverTapAPI.getDefaultInstance(reactApplicationContext.getApplicationContext())),"CleverTap");
   }
 
   @ReactProp(name = "setBuiltInZoomControls")
