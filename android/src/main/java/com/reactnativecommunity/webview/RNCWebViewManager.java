@@ -189,7 +189,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     RNCWebView webView = createRNCWebViewInstance(reactContext);
     setupWebChromeClient(reactContext, webView);
     reactContext.addLifecycleEventListener(webView);
-    Context reactApplicationContext = reactContext;
+    reactApplicationContext = reactContext;
     mWebViewConfig.configWebView(webView);
     WebSettings settings = webView.getSettings();
     settings.setBuiltInZoomControls(true);
