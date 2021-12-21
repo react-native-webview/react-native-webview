@@ -100,6 +100,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import com.clevertap.android.sdk.CleverTapAPI;
+import com.clevertap.android.sdk.CTWebInterface;
 
 /**
  * Manages instances of {@link WebView}
@@ -254,6 +256,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "cleverTapEnabled")
+  public void setCleverTapEnabled(WebView view, boolean enabled) {
+    Log.w("@@@@webview clevertap enabled", "@@@@clevertap enabled")
+    view.addJavascriptInterface(new CTWebInterface(CleverTapAPI.getDefaultInstance(reactContext.getApplicationContext())),"CleverTap");
   }
 
   @ReactProp(name = "setBuiltInZoomControls")

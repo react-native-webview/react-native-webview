@@ -35,7 +35,8 @@
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
-    "invariant": "2.2.4"
+    "invariant": "2.2.4",
+    "yarn": "^1.22.17"
   },
   "devDependencies": {
     "@babel/core": "7.4.5",

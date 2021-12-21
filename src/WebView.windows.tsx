@@ -63,6 +63,7 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
 
   static defaultProps = {
     javaScriptEnabled: true,
+    cleverTapEnabled : false
   };
 
   state: State = {

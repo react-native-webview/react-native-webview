@@ -317,6 +317,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   domStorageEnabled?: boolean;
   geolocationEnabled?: boolean;
   javaScriptEnabled?: boolean;
+  cleverTapEnabled?: boolean;
   mixedContentMode?: 'never' | 'always' | 'compatibility';
   onContentSizeChange?: (event: WebViewEvent) => void;
   onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
@@ -1069,6 +1070,14 @@ export interface WebViewSharedProps extends ViewProps {
    * @platform android
    */
   javaScriptEnabled?: boolean;
+
+
+
+ /**
+   * Boolean value to integrate Clevertap in the `WebView`.  The default value is `false`.
+   * @platform android
+   */
+  cleverTapEnabled?:boolean;
 
   /**
    * A Boolean value indicating whether JavaScript can open windows without user interaction.

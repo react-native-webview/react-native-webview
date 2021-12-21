@@ -54,6 +54,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   static defaultProps = {
     overScrollMode: 'always',
     javaScriptEnabled: true,
+    cleverTapEnabled : false,
     thirdPartyCookiesEnabled: true,
     scalesPageToFit: true,
     allowsFullscreenVideo: false,

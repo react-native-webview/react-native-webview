@@ -827,6 +827,16 @@ Boolean value to enable JavaScript in the `WebView`. The default value is `true`
 
 ---
 
+### `cleverTapEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Boolean value to enable Clevertap in the `WebView`. The default value is `false`.
+
+| Type | Required |
+| ---- | -------- |
+| bool | No       |
+
+---
+
 ### `javaScriptCanOpenWindowsAutomatically`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 A Boolean value indicating whether JavaScript can open windows without user interaction. The default value is `false`.
