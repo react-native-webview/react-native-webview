@@ -263,7 +263,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "cleverTapEnabled")
   public void setCleverTapEnabled(WebView view, boolean enabled) {
+     if (enabled) {
     view.addJavascriptInterface(new CTWebInterface(CleverTapAPI.getDefaultInstance(reactApplicationContext.getApplicationContext())),"CleverTap");
+     }
   }
 
   @ReactProp(name = "setBuiltInZoomControls")
