@@ -25,7 +25,6 @@ import {
 } from './WebViewShared';
 import {
   NativeWebViewWindows,
-  WebViewSharedProps,
   WindowsWebViewProps,
   WebViewProgressEvent,
   WebViewNavigationEvent,
