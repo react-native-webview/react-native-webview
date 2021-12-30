@@ -397,7 +397,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   onFileDownload?: (event: FileDownloadEvent) => void;
   limitsNavigationsToAppBoundDomains?: boolean;
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
-  contentRuleList?: IOSContentRule[];
+  contentRuleList?: string;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -739,7 +739,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * Takes a JSON string for and passes it to WKContentRuleList
    * https://developer.apple.com/documentation/safariservices/creating_a_content_blocker?language=objc
    */
-  contentRuleList?: string;
+  contentRuleList?: IOSContentRule[];
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
