@@ -344,6 +344,33 @@ export declare type MediaCapturePermissionGrantType =
 
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
+export interface IOSContentRule {
+  action: IOSContentBlockerAction;
+  trigger: IOSContentBlockerTrigger;
+}
+
+export interface IOSContentBlockerAction {
+  type:
+    | 'block'
+    | 'block-cookies'
+    | 'css-display-none'
+    | 'ignore-previous-rules'
+    | 'make-https';
+  selector?: string;
+}
+
+export interface IOSContentBlockerTrigger {
+  'url-filter': string;
+  'resource-type'?: string[];
+  'load-type'?: string[];
+  'unless-domain'?: string[];
+  'if-domain'?: string[];
+  'if-top-url'?: string[];
+  'unless-top-url'?: string[];
+  'load-context'?: string[];
+  'url-filter-is-case-sensitive'?: boolean;
+}
+
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;
@@ -370,7 +397,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   onFileDownload?: (event: FileDownloadEvent) => void;
   limitsNavigationsToAppBoundDomains?: boolean;
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
-  contentRuleList?: string;
+  contentRuleList?: IOSContentRule[];
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
