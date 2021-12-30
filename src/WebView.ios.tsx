@@ -359,6 +359,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         // TODO: find a better way to type this.
         source={resolveAssetSource(this.props.source as ImageSourcePropType)}
         style={webViewStyles}
+        contentRuleList={this.props.contentRuleList}
         {...nativeConfig.props}
       />
     );

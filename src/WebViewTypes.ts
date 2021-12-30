@@ -370,6 +370,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   onFileDownload?: (event: FileDownloadEvent) => void;
   limitsNavigationsToAppBoundDomains?: boolean;
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
+  contentRuleList?: string;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -706,6 +707,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * `selectedText`: the text selected on the document
    */
   onCustomMenuSelection?: (event: WebViewEvent) => void;
+
+  /**
+   * Takes a JSON string for and passes it to WKContentRuleList
+   * https://developer.apple.com/documentation/safariservices/creating_a_content_blocker?language=objc
+   */
+  contentRuleList?: string;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
