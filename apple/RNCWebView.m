@@ -150,6 +150,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 #endif
     _enableApplePay = NO;
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
+    _contentRuleList = nil;
   }
 
 #if !TARGET_OS_OSX
@@ -1453,8 +1454,17 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   }
 }
 
+- (void)setContentRuleList:(NSString *)contentRuleList {
+  _contentRuleList = contentRuleList;
+
+  if(_webView != nil){
+    [self resetupScripts:_webView.configuration];
+  }
+}
+
 - (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
   [wkWebViewConfig.userContentController removeAllUserScripts];
+  [wkWebViewConfig.userContentController removeAllContentRuleLists];
   [wkWebViewConfig.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
   if(self.enableApplePay){
     if (self.postMessageScript){
@@ -1563,6 +1573,20 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if (self.atStartScript) {
     [wkWebViewConfig.userContentController addUserScript:self.atStartScript];
   }
+    
+    if (_contentRuleList) {
+        [WKContentRuleListStore.defaultStore compileContentRuleListForIdentifier: @"RN" encodedContentRuleList: _contentRuleList completionHandler: ^(WKContentRuleList *contentRuleList, NSError *err) {
+
+            if (err != nil) {
+                NSLog(@"Error on content rule list compiled");
+                return;
+            }
+
+            if (contentRuleList) {
+                [wkWebViewConfig.userContentController addContentRuleList: contentRuleList];
+            }
+        }];
+    }
 }
 
 - (NSURLRequest *)requestForSource:(id)json {

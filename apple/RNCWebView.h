@@ -83,6 +83,7 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 #if !TARGET_OS_OSX
 @property (nonatomic, weak) UIRefreshControl * _Nullable refreshControl;
 #endif
+@property (nonatomic, copy) NSString * _Nullable contentRuleList;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
 @property (nonatomic, assign) WKContentMode contentMode;
