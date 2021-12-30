@@ -1574,19 +1574,18 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     [wkWebViewConfig.userContentController addUserScript:self.atStartScript];
   }
     
-    if (_contentRuleList) {
-        [WKContentRuleListStore.defaultStore compileContentRuleListForIdentifier: @"RN" encodedContentRuleList: _contentRuleList completionHandler: ^(WKContentRuleList *contentRuleList, NSError *err) {
+  if (_contentRuleList) {
+    [WKContentRuleListStore.defaultStore compileContentRuleListForIdentifier: @"react-native-webview" encodedContentRuleList: _contentRuleList completionHandler: ^(WKContentRuleList *contentRuleList, NSError *err) {
+      if (err != nil) {
+        NSLog(@"Error on content rule list compiled");
+        return;
+      }
 
-            if (err != nil) {
-                NSLog(@"Error on content rule list compiled");
-                return;
-            }
-
-            if (contentRuleList) {
-                [wkWebViewConfig.userContentController addContentRuleList: contentRuleList];
-            }
-        }];
-    }
+      if (contentRuleList) {
+        [wkWebViewConfig.userContentController addContentRuleList: contentRuleList];
+      }
+    }];
+  }
 }
 
 - (NSURLRequest *)requestForSource:(id)json {

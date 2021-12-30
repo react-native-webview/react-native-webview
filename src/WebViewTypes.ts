@@ -736,8 +736,11 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   onCustomMenuSelection?: (event: WebViewEvent) => void;
 
   /**
-   * Takes a JSON string for and passes it to WKContentRuleList
-   * https://developer.apple.com/documentation/safariservices/creating_a_content_blocker?language=objc
+   * `WKWebView` on iOS supports content blocking. This is defined via a JSON string 
+   * that is passed to the native side and then compiled into bytecode. It takes a set of
+   * rules that are used to block content.
+   * More info: https://developer.apple.com/documentation/safariservices/creating_a_content_blocker
+   * @platform ios
    */
   contentRuleList?: IOSContentRule[];
 }
