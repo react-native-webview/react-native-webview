@@ -88,6 +88,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @property (nonatomic, strong) WKUserScript *postMessageScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
+@property (nonatomic, strong) NSString *contentRuleListIdentifier;
 @end
 
 @implementation RNCWebView
@@ -151,6 +152,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     _enableApplePay = NO;
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
     _contentRuleList = nil;
+    _contentRuleListIdentifier = [[NSUUID UUID] UUIDString];
   }
 
 #if !TARGET_OS_OSX
@@ -1575,7 +1577,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   }
     
   if (_contentRuleList) {
-    [WKContentRuleListStore.defaultStore compileContentRuleListForIdentifier: @"react-native-webview" encodedContentRuleList: _contentRuleList completionHandler: ^(WKContentRuleList *contentRuleList, NSError *err) {
+    [WKContentRuleListStore.defaultStore compileContentRuleListForIdentifier: _contentRuleListIdentifier encodedContentRuleList: _contentRuleList completionHandler: ^(WKContentRuleList *contentRuleList, NSError *err) {
       if (err != nil) {
         NSLog(@"Error on content rule list compiled");
         return;
