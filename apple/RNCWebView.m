@@ -211,17 +211,17 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
       }
         UIMenuController *menuController = [UIMenuController sharedMenuController];
         NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
-        
+
         for(NSDictionary *menuItem in self.menuItems) {
             NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
             NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
             NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
             UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
                                                           action: NSSelectorFromString(sel)];
-            
+
             [menuControllerItems addObject: item];
         }
-  
+
         menuController.menuItems = menuControllerItems;
         [menuController setMenuVisible:YES animated:YES];
     }
@@ -309,6 +309,8 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 {
   if (!navigationAction.targetFrame.isMainFrame) {
     WKWebView *newWebview = [[WKWebView alloc] initWithFrame:self.bounds configuration:configuration];
+    newWebview.scrollView.delegate = self;
+    newWebview.customUserAgent = _userAgent;
     newWebview.UIDelegate = self;
     newWebview.navigationDelegate = self;
     [newWebview loadRequest:navigationAction.request];
@@ -682,9 +684,9 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
         }
         [_webView loadHTMLString:html baseURL:baseURL];
         return;
-    } 
+    }
     //Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
-    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]]; 
+    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]];
     if(headerCookie) {
       NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys:headerCookie,@"Set-Cookie",nil];
       NSURL *urlString = [NSURL URLWithString:_source[@"uri"]];
