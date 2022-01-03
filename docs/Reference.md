@@ -77,6 +77,7 @@ This document lays out the current public properties and methods for the React N
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
+- [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 - [`basicAuthCredential`](Reference.md#basicAuthCredential)
@@ -1375,6 +1376,32 @@ Example:
 
 ---
 
+### `mediaCapturePermissionGrantType`
+
+This property specifies how to handle media capture permission requests. Defaults to `prompt`, resulting in the user being prompted repeatedly. Available on iOS 15 and later.
+
+Possible values:
+
+- `grantIfSameHostElsePrompt`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted if it has been granted before. Otherwise, the user gets prompted.
+- `grantIfSameHostElseDeny`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted if it has been granted before. Otherwise, it gets denied.
+- `deny`
+- `grant`: The permission is granted if it has been granted before.
+- `prompt`
+
+Note that a grant may still result in a prompt, for example if the user has never been prompted for the permission before.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
+
+Example:
+
+```javascript
+<WebView mediaCapturePermissionGrantType={'grantIfSameHostElsePrompt'} />
+```
+
+---
+
 ### `autoManageStatusBarEnabled`
 
 If set to `true`, the status bar will be automatically hidden/shown by WebView, specifically when full screen video is being watched. If `false`, WebView will not manage the status bar at all. The default value is `true`.
@@ -1439,6 +1466,7 @@ Example:
 
 ```javascript
 <WebView forceDarkOn={false} />
+```
 ### `menuItems`
 
 An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
@@ -1447,7 +1475,6 @@ Example:
 
 ```javascript
 <WebView menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]} />
-
 ```
 
 ### `onCustomMenuSelection`
@@ -1456,13 +1483,13 @@ Function called when a custom menu item is selected.  It receives a Native event
 
 ```javascript
 <WebView 
-  menuItems={[{ label: 'Tweet', key: 'tweet', { label: 'Save for later', key: 'saveForLater' }]}
+  menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]}
   onCustomMenuSelection={(webViewEvent) => {
     const { label } = webViewEvent.nativeEvent; // The name of the menu item, i.e. 'Tweet'
     const { key } = webViewEvent.nativeEvent; // The key of the menu item, i.e. 'tweet'
     const { selectedText } = webViewEvent.nativeEvent; // Text highlighted
   }}
-  />
+/>
 ```
 
 ### `basicAuthCredential`
@@ -1551,7 +1578,7 @@ Removes the autocomplete popup from the currently focused form field, if present
 (android only)
 
 ```javascript
-clearCache(true);
+
 ```
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)

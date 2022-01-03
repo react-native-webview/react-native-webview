@@ -119,6 +119,9 @@
     <ClInclude Include="ReactWebView.h">
       <DependentUpon>ReactWebView.idl</DependentUpon>
     </ClInclude>
+    <ClInclude Include="WebBridge.h">
+      <DependentUpon>WebBridge.idl</DependentUpon>
+    </ClInclude>
     <ClInclude Include="ReactWebViewManager.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ReactPackageProvider.h">
@@ -130,6 +133,9 @@
       <DependentUpon>ReactWebView.idl</DependentUpon>
     </ClCompile>
     <ClCompile Include="ReactWebViewManager.cpp" />
+    <ClCompile Include="WebBridge.cpp">
+      <DependentUpon>WebBridge.idl</DependentUpon>
+    </ClCompile>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -139,6 +145,7 @@
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Midl Include="WebBridge.idl" />
     <Midl Include="ReactWebView.idl" />
     <Midl Include="ReactPackageProvider.idl" />
   </ItemGroup>
@@ -153,9 +160,6 @@
     <ProjectReference Include="$(ReactNativeWindowsDir)\Microsoft.ReactNative\Microsoft.ReactNative.vcxproj">
       <Project>{f7d32bd0-2749-483e-9a0d-1635ef7e3136}</Project>
       <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\WebViewBridgeComponent\WebViewBridgeComponent.vcxproj">
-      <Project>{176323cd-97ce-4b0f-9d11-a2b77bda829b}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
