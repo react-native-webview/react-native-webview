@@ -1205,11 +1205,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public boolean onCreateWindow(WebView view, boolean isDialog,
                                   boolean isUserGesture, Message resultMsg) {
-      String userAgent = view.getSettings().getUserAgentString();
       newWebView = new WebView(view.getContext());
       newWebView.getSettings().setJavaScriptEnabled(true);
       newWebView.setWebViewClient(new WebViewClient());
-      newWebView.getSettings().setUserAgentString(userAgent);
+      newWebView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 10; Pixel 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Mobile Safari/537.36");
       newWebView.setWebChromeClient(new WebChromeClient() {
         @Override
         public void onCloseWindow(WebView window) {
