@@ -30,6 +30,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
 @interface _SwizzleHelperWK : UIView
 @property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, copy) WKWebView *nwebView;
 @end
 @implementation _SwizzleHelperWK
 -(id)inputAccessoryView
@@ -308,15 +309,17 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    WKWebView *newWebview = [[WKWebView alloc] initWithFrame:self.bounds configuration:configuration];
-    newWebview.scrollView.delegate = self;
-    newWebview.customUserAgent = @"Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Mobile/15E148 Safari/604.1";
-    newWebview.UIDelegate = self;
-    newWebview.navigationDelegate = self;
-    [newWebview loadRequest:navigationAction.request];
-    [self addSubview:newWebview];
+    _nwebView = [[WKWebView alloc] initWithFrame:self.bounds configuration:configuration];
+    [_nwebView setTag:(19299)];
+        _nwebView.scrollView.delegate = self;
 
-    return  newWebview;
+    _nwebView.customUserAgent = @"Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Mobile/15E148 Safari/604.1";
+    _nwebView.UIDelegate = self;
+    _nwebView.navigationDelegate = self;
+    [_nwebView loadRequest:navigationAction.request];
+    [self addSubview:_nwebView];
+
+    return  _nwebView;
   }
   return nil;
 }
@@ -1341,7 +1344,13 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 {
   [_webView goBack];
 }
-
+- (void)closeWindow
+{
+    WKWebView *webview = (WKWebView*)[self viewWithTag:19299];
+    if(webview){
+        [webview removeFromSuperview];
+    }
+}
 - (void)reload
 {
   /**

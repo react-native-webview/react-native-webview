@@ -10,7 +10,11 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     /**
      * Go back one page in the webview's history.
      */
-    goBack: () => void;
+    goBack: () => void; 
+    /**
+     * Close window one page in the webview's history.
+     */
+    closeWindow: () => void;
 
     /**
      * Go forward one page in the webview's history.

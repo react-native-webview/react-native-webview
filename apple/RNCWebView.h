@@ -102,6 +102,7 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 - (void)injectJavaScript:(NSString *_Nullable)script;
 - (void)goForward;
 - (void)goBack;
+- (void)closeWindow;
 - (void)reload;
 - (void)stopLoading;
 #if !TARGET_OS_OSX

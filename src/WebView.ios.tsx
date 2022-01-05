@@ -97,6 +97,16 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       this.getCommands().goBack,
       undefined,
     );
+  }; 
+  /**
+   * close Window one page in the web view's history.
+   */
+   closeWindow = () => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().closeWindow,
+      undefined,
+    );
   };
 
   /**
