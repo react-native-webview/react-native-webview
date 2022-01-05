@@ -30,7 +30,6 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
 @interface _SwizzleHelperWK : UIView
 @property (nonatomic, copy) WKWebView *webView;
-@property (nonatomic, copy) WKWebView *nwebView;
 @end
 @implementation _SwizzleHelperWK
 -(id)inputAccessoryView
@@ -83,6 +82,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, copy) WKWebView *nwebView;
 #else
 @property (nonatomic, copy) RNCWKWebView *webView;
 #endif // !TARGET_OS_OSX
