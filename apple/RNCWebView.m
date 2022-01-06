@@ -311,8 +311,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if (!navigationAction.targetFrame.isMainFrame) {
     _nwebView = [[WKWebView alloc] initWithFrame:self.bounds configuration:configuration];
     [_nwebView setTag:(19299)];
-        _nwebView.scrollView.delegate = self;
-
+    _nwebView.scrollView.delegate = self;
     _nwebView.customUserAgent = @"Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Mobile/15E148 Safari/604.1";
     _nwebView.UIDelegate = self;
     _nwebView.navigationDelegate = self;
@@ -325,6 +324,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 }
 - (void)webViewDidClose:(WKWebView *)webView {
   [webView removeFromSuperview];
+  _nwebView = nil;
 }
 
 - (WKWebViewConfiguration *)setUpWkWebViewConfig
@@ -1347,8 +1347,12 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (void)closeWindow
 {
     WKWebView *webview = (WKWebView*)[self viewWithTag:19299];
-    if(webview){
-        [webview removeFromSuperview];
+    if(webview != nil){
+      [webview removeFromSuperview];
+      webview = nil;
+      [_webView reload];
+    }else{
+      [_webView goBack];
     }
 }
 - (void)reload
