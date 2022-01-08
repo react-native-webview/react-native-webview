@@ -331,9 +331,17 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   nestedScrollEnabled?: boolean;
   readonly urlPrefixesForDefaultIntent?: string[];
   forceDarkOn?: boolean;
+  minimumFontSize?: number;
 }
 
 export declare type ContentInsetAdjustmentBehavior = 'automatic' | 'scrollableAxes' | 'never' | 'always';
+
+export declare type MediaCapturePermissionGrantType =
+  | 'grantIfSameHostElsePrompt'
+  | 'grantIfSameHostElseDeny'
+  | 'deny'
+  | 'grant'
+  | 'prompt';
 
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
@@ -362,6 +370,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   onFileDownload?: (event: FileDownloadEvent) => void;
   limitsNavigationsToAppBoundDomains?: boolean;
+  mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -662,6 +671,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   limitsNavigationsToAppBoundDomains?: boolean;
+
+  /**
+   * This property specifies how to handle media capture permission requests.
+   * Defaults to `prompt`, resulting in the user being prompted repeatedly.
+   * Available on iOS 15 and later.
+   */
+  mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
 
   /**
    * A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support.
@@ -1040,6 +1056,14 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   nestedScrollEnabled?: boolean;
+  
+  /**
+   * Sets the minimum font size.
+   * A non-negative integer between 1 and 72. Any number outside the specified range will be pinned.
+   * Default is 8.
+   * @platform android
+   */
+  minimumFontSize?: number;
 }
 
 export interface WebViewSharedProps extends ViewProps {
