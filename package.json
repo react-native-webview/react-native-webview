@@ -8,7 +8,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "11.15.1",
+  "version": "11.15.2",
   "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
