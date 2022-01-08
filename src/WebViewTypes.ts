@@ -331,6 +331,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   nestedScrollEnabled?: boolean;
   readonly urlPrefixesForDefaultIntent?: string[];
   forceDarkOn?: boolean;
+  minimumFontSize?: number;
 }
 
 export declare type ContentInsetAdjustmentBehavior = 'automatic' | 'scrollableAxes' | 'never' | 'always';
@@ -1055,6 +1056,14 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   nestedScrollEnabled?: boolean;
+  
+  /**
+   * Sets the minimum font size.
+   * A non-negative integer between 1 and 72. Any number outside the specified range will be pinned.
+   * Default is 8.
+   * @platform android
+   */
+  minimumFontSize?: number;
 }
 
 export interface WebViewSharedProps extends ViewProps {

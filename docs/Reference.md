@@ -83,6 +83,7 @@ This document lays out the current public properties and methods for the React N
 - [`basicAuthCredential`](Reference.md#basicAuthCredential)
 - [`enableApplePay`](Reference.md#enableApplePay)
 - [`forceDarkOn`](Reference.md#forceDarkOn)
+- [`minimumFontSize`](Reference.md#minimumFontSize)
 
 ## Methods Index
 
@@ -1502,6 +1503,18 @@ An object that specifies the credentials of a user to be used for basic authenti
 | Type   | Required |
 | ------ | -------- |
 | object | No       |
+
+### `minimumFontSize`
+
+Android enforces a minimum font size based on this value. A non-negative integer between 1 and 72. Any number outside the specified range will be pinned. Default value is 8. If you are using smaller font sizes and are having trouble fitting the whole window onto one screen, try setting this to a smaller value.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| number | No       | Android  |
+
+Example:
+
+`<WebView minimumFontSize={1} />`
 
 ## Methods
 
