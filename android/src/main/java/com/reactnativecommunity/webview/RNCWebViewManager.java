@@ -646,6 +646,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "minimumFontSize")
+  public void setMinimumFontSize(WebView view, int fontSize) {
+    view.getSettings().setMinimumFontSize(fontSize);
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
