@@ -149,7 +149,9 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     _savedAutomaticallyAdjustsScrollIndicatorInsets = NO;
 #endif
     _enableApplePay = NO;
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
+#endif
   }
 
 #if !TARGET_OS_OSX
