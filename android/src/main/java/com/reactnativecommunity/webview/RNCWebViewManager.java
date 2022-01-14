@@ -90,6 +90,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.IllegalArgumentException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -215,7 +216,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         RNCWebViewModule module = getModule(reactContext);
 
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        DownloadManager.Request request;
+        try {
+          request = new DownloadManager.Request(Uri.parse(url));
+        } catch (IllegalArgumentException e) {
+          System.out.println("Unsupported URI, aborting download" + e.toString());
+          e.printStackTrace();
+          return;
+        }
 
         String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
         String downloadMessage = "Downloading " + fileName;
