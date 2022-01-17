@@ -1380,7 +1380,7 @@ Example:
 
 ### `textInteractionEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-If false indicates to WebKit that a WKWebView will not interact with text, thus not showing a text selection loop. Only applicable for iOS 15 or greater.
+If false indicates to WebKit that a WKWebView will not interact with text, thus not showing a text selection loop. Only applicable for iOS 14.5 or greater.
 
 Defaults to true.
 
