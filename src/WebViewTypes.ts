@@ -675,7 +675,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
 
   /**
    * If false indicates to WebKit that a WKWebView will not interact with text, thus
-   * not showing a text selection loop. Only applicable for iOS 15 or greater.
+   * not showing a text selection loop. Only applicable for iOS 14.5 or greater.
    * 
    * Defaults to true.
    * @platform ios
