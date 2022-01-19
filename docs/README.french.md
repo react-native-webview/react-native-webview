@@ -104,7 +104,7 @@ Ce projet suit les spécifications [all-contributors](https://github.com/all-con
 
 MIT
 
-## Traductions
+## Translations
 
 This readme is available in:
 
