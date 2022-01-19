@@ -370,6 +370,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   onFileDownload?: (event: FileDownloadEvent) => void;
   limitsNavigationsToAppBoundDomains?: boolean;
+  textInteractionEnabled?: boolean;
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
 }
 
@@ -671,6 +672,15 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   limitsNavigationsToAppBoundDomains?: boolean;
+
+  /**
+   * If false indicates to WebKit that a WKWebView will not interact with text, thus
+   * not showing a text selection loop. Only applicable for iOS 14.5 or greater.
+   * 
+   * Defaults to true.
+   * @platform ios
+   */
+  textInteractionEnabled?: boolean;
 
   /**
    * This property specifies how to handle media capture permission requests.
