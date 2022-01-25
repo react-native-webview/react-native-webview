@@ -82,6 +82,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, copy) WKWebView *nwebView;
 #else
 @property (nonatomic, copy) RNCWKWebView *webView;
 #endif // !TARGET_OS_OSX
@@ -308,9 +309,21 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
+    _nwebView = [[WKWebView alloc] initWithFrame:self.bounds configuration:configuration];
+    [_nwebView setTag:(19299)];
+    _nwebView.scrollView.delegate = self;
+    _nwebView.UIDelegate = self;
+    _nwebView.navigationDelegate = self;
+    [_nwebView loadRequest:navigationAction.request];
+    [self addSubview:_nwebView];
+
+    return  _nwebView;
   }
   return nil;
+}
+- (void)webViewDidClose:(WKWebView *)webView {
+  [webView removeFromSuperview];
+  _nwebView = nil;
 }
 
 - (WKWebViewConfiguration *)setUpWkWebViewConfig
@@ -1329,7 +1342,14 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 - (void)goBack
 {
-  [_webView goBack];
+  WKWebView *webview = (WKWebView*)[self viewWithTag:19299];
+    if(webview != nil){
+      [webview removeFromSuperview];
+      webview = nil;
+      [_webView reload];
+    }else{
+      [_webView goBack];
+    }
 }
 
 - (void)reload
