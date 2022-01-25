@@ -77,12 +77,14 @@ This document lays out the current public properties and methods for the React N
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
+- [`textInteractionEnabled`](Reference.md#textInteractionEnabled)
 - [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 - [`basicAuthCredential`](Reference.md#basicAuthCredential)
 - [`enableApplePay`](Reference.md#enableApplePay)
 - [`forceDarkOn`](Reference.md#forceDarkOn)
+- [`minimumFontSize`](Reference.md#minimumFontSize)
 
 ## Methods Index
 
@@ -1376,6 +1378,24 @@ Example:
 
 ---
 
+### `textInteractionEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+If false indicates to WebKit that a WKWebView will not interact with text, thus not showing a text selection loop. Only applicable for iOS 14.5 or greater.
+
+Defaults to true.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+Example:
+
+```jsx
+<WebView textInteractionEnabled={false} />
+```
+
+---
+
 ### `mediaCapturePermissionGrantType`
 
 This property specifies how to handle media capture permission requests. Defaults to `prompt`, resulting in the user being prompted repeatedly. Available on iOS 15 and later.
@@ -1502,6 +1522,18 @@ An object that specifies the credentials of a user to be used for basic authenti
 | Type   | Required |
 | ------ | -------- |
 | object | No       |
+
+### `minimumFontSize`
+
+Android enforces a minimum font size based on this value. A non-negative integer between 1 and 72. Any number outside the specified range will be pinned. Default value is 8. If you are using smaller font sizes and are having trouble fitting the whole window onto one screen, try setting this to a smaller value.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| number | No       | Android  |
+
+Example:
+
+`<WebView minimumFontSize={1} />`
 
 ## Methods
 
