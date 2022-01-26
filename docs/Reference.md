@@ -1506,7 +1506,7 @@ An object that specifies the credentials of a user to be used for basic authenti
 
 ### `useWebView2`
 
-Use WinUI WebView2 control instead of WebView control as the native webview. The WebView2 control is a WinUI control that renders web content using the Microsoft Edge (Chromium) rendering engine.
+Use WinUI WebView2 control instead of WebView control as the native webview. The WebView2 control is a WinUI control that renders web content using the Microsoft Edge (Chromium) rendering engine. Option can be toggled at runtime and supports Fast Refresh.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |

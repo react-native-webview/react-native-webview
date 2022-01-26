@@ -62,6 +62,7 @@ namespace winrt::ReactNativeWebView2::implementation {
 
             if (propertyName == "source") {
                 auto const& srcMap = propertyValue.AsObject();
+                std::string file = "file://";
                 if (srcMap.find("uri") != srcMap.end()) {
                     auto uriString = srcMap.at("uri").AsString();
                     if (uriString.length() == 0) {
@@ -72,9 +73,9 @@ namespace winrt::ReactNativeWebView2::implementation {
                     if (srcMap.find("__packager_asset") != srcMap.end()) {
                         isPackagerAsset = srcMap.at("__packager_asset").AsBoolean();
                     }
-                    if (isPackagerAsset && uriString.find("file://") == 0) {
+                    if (isPackagerAsset && uriString.find(file) == 0) {
                         auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
-                        uriString.replace(0, 7, bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
+                        uriString.replace(0, std::size(file), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
                     webView.Source(winrt::Uri(to_hstring(uriString)));
                 }

@@ -10,15 +10,10 @@
 
 namespace winrt {
     using namespace Microsoft::ReactNative;
-    using namespace Windows::Data::Json;
     using namespace Windows::Foundation;
     using namespace Windows::UI;
-    using namespace Windows::UI::Popups;
     using namespace Windows::UI::Xaml;
     using namespace Microsoft::UI::Xaml::Controls;
-    using namespace Windows::UI::Xaml::Controls;
-    using namespace Windows::UI::Xaml::Input;
-    using namespace Windows::UI::Xaml::Media;
     using namespace Microsoft::Web::WebView2::Core;
 } // namespace winrt
 
@@ -76,7 +71,6 @@ namespace winrt::ReactNativeWebView2::implementation {
           WriteProperty(eventDataWriter, L"loading", !sender.IsLoaded());
         }
         WriteProperty(eventDataWriter, L"target", tag);
-        //WriteProperty(eventDataWriter, L"title", sender.DocumentTitle());
         if (auto uri = sender.Source()) {
           WriteProperty(eventDataWriter, L"url", uri.AbsoluteCanonicalUri());
         }

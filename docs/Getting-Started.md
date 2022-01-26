@@ -92,9 +92,9 @@ The WebView2 control is a WinUI control that renders web content using the Micro
 
   ii. Let autolinking handle adding the `ReactNativeWebView2` project to your app.
 
-  iii. Customize your app's WinUI 2.x version to version 2.8.0-prerelease.210927001. See here for instructions.
+  iii. Customize your app's WinUI 2.x version to version 2.8.0-prerelease.210927001 or higher. See [here](https://microsoft.github.io/react-native-windows/docs/customizing-sdk-versions) for instructions.
   
-  iv. Customize your app's WebView2 version to version 1.0.1020.30. See here for instructions.
+  iv. Customize your app's WebView2 version to version 1.0.1020.30. See [here](https://microsoft.github.io/react-native-windows/docs/customizing-sdk-versions) for instructions.
 
 Now you can access the WinUI WebView2 control from your app's JavaScript via the useWebView2 prop.
 
