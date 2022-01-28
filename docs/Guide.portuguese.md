@@ -6,7 +6,7 @@ _Este guia atualmente é um trabalho em andamento._
 
 ## Index
 
-- [HTML Básico](Guide.portuguese.md#html-basico)
+- [HTML Básico](Guide.portuguese.md#html-básico)
 - [Url](Guide.portuguese.md#url)
 - [Carregando de arquivos HTML locais](Guide.portuguese.md#carregando-de-arquivos-html-locais)
 - [Controlando as alterações do estado de navegação](Guide.portuguese.md#controlando-as-alteracoes-do-estado-de-navegacao)
