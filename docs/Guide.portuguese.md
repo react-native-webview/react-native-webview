@@ -9,12 +9,12 @@ _Este guia atualmente é um trabalho em andamento._
 - [HTML Básico](Guide.portuguese.md#html-básico)
 - [Url](Guide.portuguese.md#url)
 - [Carregando de arquivos HTML locais](Guide.portuguese.md#carregando-de-arquivos-html-locais)
-- [Controlando as alterações do estado de navegação](Guide.portuguese.md#controlando-as-alteracoes-do-estado-de-navegacao)
+- [Controlando as alterações do estado de navegação](Guide.portuguese.md#controlando-as-alterações-do-estado-de-navegação)
 - [Adicionar suporte para upload de arquivos](Guide.portuguese.md#adicionar-suporte-para-upload-de-arquivos)
-- [Upload de vários arquivos](Guide.portuguese.md#upload-de-varios-arquivos)
+- [Upload de vários arquivos](Guide.portuguese.md#upload-de-vários-arquivos)
 - [Adicionar suporte para download de arquivos](Guide.portuguese.md#adicionar-suporte-para-download-de-arquivos)
-- [Comunicação entre JS e Native](Guide.portuguese.md#comunicacao-entre-js-e-native)
-- [Trabalhando com cabeçalhos, sessões e cookies personalizados](Guide.portuguese.md#trabalhando-com-cabecalhos-sessoes-e-cookies-personalizados)
+- [Comunicação entre JS e Native](Guide.portuguese.md#comunicação-entre-js-e-native)
+- [Trabalhando com cabeçalhos, sessões e cookies personalizados](Guide.portuguese.md#trabalhando-com-cabeçalhos-sessões-e-cookies-personalizados)
 
 ### HTML Básico
 
