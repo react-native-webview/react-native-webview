@@ -6,15 +6,15 @@ _Este guia atualmente é um trabalho em andamento._
 
 ## Index
 
-- [HTML Básico](Guide.portuguese.md#basic-inline-html)
-- [Url](Guide.portuguese.md#basic-url-source)
-- [Carregando de arquivos HTML locais](Guide.portuguese.md#loading-local-html-files)
-- [Controlando as alterações do estado de navegação](Guide.portuguese.md#controlling-navigation-state-changes)
-- [Adicionar suporte para upload de arquivos](Guide.portuguese.md#add-support-for-file-upload)
-- [Upload de vários arquivos](Guide.portuguese.md#multiple-files-upload)
-- [Adicionar suporte para download de arquivos](Guide.portuguese.md#add-support-for-file-download)
-- [Comunicação entre JS e Native](Guide.portuguese.md#communicating-between-js-and-native)
-- [Trabalhando com cabeçalhos, sessões e cookies personalizados](Guide.portuguese.md#working-with-custom-headers-sessions-and-cookies)
+- [HTML Básico](Guide.portuguese.md#html-basico)
+- [Url](Guide.portuguese.md#url)
+- [Carregando de arquivos HTML locais](Guide.portuguese.md#carregando-de-arquivos-html-locais)
+- [Controlando as alterações do estado de navegação](Guide.portuguese.md#controlando-as-alteracoes-do-estado-de-navegacao)
+- [Adicionar suporte para upload de arquivos](Guide.portuguese.md#adicionar-suporte-para-upload-de-arquivos)
+- [Upload de vários arquivos](Guide.portuguese.md#upload-de-varios-arquivos)
+- [Adicionar suporte para download de arquivos](Guide.portuguese.md#adicionar-suporte-para-download-de-arquivos)
+- [Comunicação entre JS e Native](Guide.portuguese.md#comunicacao-entre-js-e-native)
+- [Trabalhando com cabeçalhos, sessões e cookies personalizados](Guide.portuguese.md#trabalhando-com-cabecalhos-sessoes-e-cookies-personalizados)
 
 ### HTML Básico
 
