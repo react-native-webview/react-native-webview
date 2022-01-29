@@ -1533,7 +1533,9 @@ Android enforces a minimum font size based on this value. A non-negative integer
 
 Example:
 
-`<WebView minimumFontSize={1} />`
+```javascript
+<WebView minimumFontSize={1} />
+```
 
 ## Methods
 
@@ -1628,3 +1630,9 @@ Tells this WebView to clear its internal back/forward list. [developer.android.c
 ## Other Docs
 
 Also check out our [Getting Started Guide](Getting-Started.md) and [In-Depth Guide](Guide.md).
+
+## Translations
+
+This file is available at:
+
+- [Brazilian portuguese](Reference.portuguese.md)
