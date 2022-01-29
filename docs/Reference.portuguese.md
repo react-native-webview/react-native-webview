@@ -220,13 +220,13 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ### `injectedJavaScriptForMainFrameOnly`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
-If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
+Se `true` (padrão; obrigatório para Android), carrega o `injectedJavaScript` apenas no quadro principal.
 
-If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+Se `false`, (suportado apenas em iOS e macOS), carrega-o em todos os quadros (por exemplo, iframes).
 
-| Tipo | Requerido | Plataforma                                          |
+| Tipo | Requerido | Plataforma                                        |
 | ---- | --------- | ------------------------------------------------- |
-| bool | Não        | iOS and macOS (only `true` supported for Android) |
+| bool | Não       | iOS e macOS (`true` somente suportado no Android) |
 
 ---
 

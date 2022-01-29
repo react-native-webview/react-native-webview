@@ -237,7 +237,7 @@ NOTA: O iOS 13+ é necessário para a melhor experiência de download possível.
 é usado para determinar se uma resposta HTTP deve ser um download. No iOS 12 ou anterior, apenas os tipos MIME que não podem ser renderizados pela webview serão
 acionar chamadas para `onFileDownload`.
 
-Example:
+Exemplo:
 
 ```javascript
 onFileDownload = ({ nativeEvent }) => {

@@ -81,7 +81,7 @@ Adicionar novas propriedades e eventos é o mesmo que os componentes de interfac
 @end
 ```
 
-Then expose it in the view manager's `@implementation`.
+Em seguida, exponha-o no `@implementation` do gerenciador de visualização.
 
 ```objc
 // RCTCustomWebViewManager.m
