@@ -547,3 +547,9 @@ There are some inconsistencies in how the hardware silence switch is handled bet
 Audio on `iOS` will be muted when the hardware silence switch is in the on position, unless the `ignoreSilentHardwareSwitch` parameter is set to true.
 
 Video on `iOS` will always ignore the hardware silence switch.
+
+## Translations
+
+This file is available at:
+
+- [Brazilian portuguese](Guide.portuguese.md)

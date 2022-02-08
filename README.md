@@ -105,5 +105,6 @@ MIT
 This readme is available in:
 
 - [Brazilian portuguese](docs/README.portuguese.md)
+- [French](docs/README.french.md)
 
 [lean-core-issue]: https://github.com/facebook/react-native/issues/23313

@@ -5,38 +5,48 @@ abstract_target 'Shared' do
 
   pod 'react-native-webview', :path => "../.."
 
-  pod 'React', :path => "../../node_modules/react-native-macos/"
-  pod 'React-Core', :path => "../../node_modules/react-native-macos/React"
-  pod 'React-fishhook', :path => "../../node_modules/react-native-macos/Libraries/fishhook"
-  pod 'React-RCTActionSheet', :path => "../../node_modules/react-native-macos/Libraries/ActionSheetIOS"
-  pod 'React-RCTAnimation', :path => "../../node_modules/react-native-macos/Libraries/NativeAnimation"
-  pod 'React-RCTBlob', :path => "../../node_modules/react-native-macos/Libraries/Blob"
-  pod 'React-RCTImage', :path => "../../node_modules/react-native-macos/Libraries/Image"
-  pod 'React-RCTLinking', :path => "../../node_modules/react-native-macos/Libraries/LinkingIOS"
-  pod 'React-RCTNetwork', :path => "../../node_modules/react-native-macos/Libraries/Network"
-  pod 'React-RCTSettings', :path => "../../node_modules/react-native-macos/Libraries/Settings"
-  pod 'React-RCTText', :path => "../../node_modules/react-native-macos/Libraries/Text"
-  pod 'React-RCTVibration', :path => "../../node_modules/react-native-macos/Libraries/Vibration"
-  pod 'React-RCTWebSocket', :path => "../../node_modules/react-native-macos/Libraries/WebSocket"
-  pod 'React-cxxreact', :path => "../../node_modules/react-native-macos/ReactCommon/cxxreact"
-  pod 'React-jscallinvoker', :path => "../../node_modules/react-native-macos/ReactCommon/jscallinvoker"
-  pod 'React-jsi', :path => "../../node_modules/react-native-macos/ReactCommon/jsi"
-  pod 'React-jsiexecutor', :path => "../../node_modules/react-native-macos/ReactCommon/jsiexecutor"
-  pod 'React-jsinspector', :path => "../../node_modules/react-native-macos/ReactCommon/jsinspector"
-  pod 'yoga', :path => "../../node_modules/react-native-macos/ReactCommon/yoga"
-  pod 'DoubleConversion', :podspec => "../../node_modules/react-native-macos/third-party-podspecs/DoubleConversion.podspec"
-  pod 'glog', :podspec => "../../node_modules/react-native-macos/third-party-podspecs/glog.podspec"
-  pod 'Folly', :podspec => "../../node_modules/react-native-macos/third-party-podspecs/Folly.podspec"
-  pod 'boost-for-react-native', :podspec => "../../node_modules/react-native-macos/third-party-podspecs/boost-for-react-native.podspec"
-  pod 'React-DevSupport', :path => "../../node_modules/react-native-macos/React"
+  react_native = '../../node_modules/react-native-macos'
+
+  pod 'FBLazyVector', :path => "#{react_native}/Libraries/FBLazyVector"
+  pod 'FBReactNativeSpec', :path => "#{react_native}/Libraries/FBReactNativeSpec"
+  pod 'RCTRequired', :path => "#{react_native}/Libraries/RCTRequired"
+  pod 'RCTTypeSafety', :path => "#{react_native}/Libraries/TypeSafety"
+  pod 'React', :path => "#{react_native}/"
+  pod 'React-Core', :path => "#{react_native}/", :inhibit_warnings => true
+  pod 'React-CoreModules', :path => "#{react_native}/React/CoreModules"
+  pod 'React-Core/DevSupport', :path => "#{react_native}/"
+  pod 'React-RCTActionSheet', :path => "#{react_native}/Libraries/ActionSheetIOS"
+  pod 'React-RCTAnimation', :path => "#{react_native}/Libraries/NativeAnimation"
+  pod 'React-RCTBlob', :path => "#{react_native}/Libraries/Blob"
+  pod 'React-RCTImage', :path => "#{react_native}/Libraries/Image"
+  pod 'React-RCTLinking', :path => "#{react_native}/Libraries/LinkingIOS"
+  pod 'React-RCTNetwork', :path => "#{react_native}/Libraries/Network"
+  pod 'React-RCTSettings', :path => "#{react_native}/Libraries/Settings"
+  pod 'React-RCTText', :path => "#{react_native}/Libraries/Text", :inhibit_warnings => true
+  pod 'React-RCTVibration', :path => "#{react_native}/Libraries/Vibration"
+  pod 'React-Core/RCTWebSocket', :path => "#{react_native}/"
+
+  pod 'React-cxxreact', :path => "#{react_native}/ReactCommon/cxxreact", :inhibit_warnings => true
+  pod 'React-jsi', :path => "#{react_native}/ReactCommon/jsi"
+  pod 'React-jsiexecutor', :path => "#{react_native}/ReactCommon/jsiexecutor"
+  pod 'React-jsinspector', :path => "#{react_native}/ReactCommon/jsinspector"
+  pod 'ReactCommon/callinvoker', :path => "#{react_native}/ReactCommon"
+  pod 'ReactCommon/turbomodule/core', :path => "#{react_native}/ReactCommon"
+  pod 'Yoga', :path => "#{react_native}/ReactCommon/yoga", :modular_headers => true
+
+  pod 'DoubleConversion', :podspec => "#{react_native}/third-party-podspecs/DoubleConversion.podspec"
+  pod 'glog', :podspec => "#{react_native}/third-party-podspecs/glog.podspec"
+
+  pod 'RCT-Folly', :podspec => "#{react_native}/third-party-podspecs/RCT-Folly.podspec"
+  pod 'boost-for-react-native', :podspec => "#{react_native}/third-party-podspecs/boost-for-react-native.podspec"
 
   target 'example-macOS' do
-    platform :macos, '10.14'
+    platform :macos, '10.15'
     # Pods specifically for macOS target
   end
 
   target 'example-iOS' do
-    platform :ios, '9'
+    platform :ios, '14'
     # Pods specifically for iOS target
   end
 end

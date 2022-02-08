@@ -92,3 +92,9 @@ $ yarn add ../react-native-webview && react-native link react-native-webview
 
 - We use TypeScript.
 - After pulling this repo and installing all dependencies, you can run tests using the command: `yarn ci`
+
+## Translations
+
+This file is available at:
+
+- [Brazilian portuguese](Contributing.portuguese.md)

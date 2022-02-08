@@ -683,38 +683,39 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
         }
         [_webView loadHTMLString:html baseURL:baseURL];
         return;
-    } 
-    //Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
-    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]]; 
+    }
+    // Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
+    NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]];
     if(headerCookie) {
       NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys:headerCookie,@"Set-Cookie",nil];
       NSURL *urlString = [NSURL URLWithString:_source[@"uri"]];
       NSArray *httpCookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:urlString];
-      for (NSHTTPCookie *httpCookie in httpCookies) {
-          [_webView.configuration.websiteDataStore.httpCookieStore setCookie:httpCookie completionHandler:nil];
-      }
+      [self writeCookiesToWebView:httpCookies completion:nil];
     }
 
     NSURLRequest *request = [self requestForSource:_source];
-    // Because of the way React works, as pages redirect, we actually end up
-    // passing the redirect urls back here, so we ignore them if trying to load
-    // the same url. We'll expose a call to 'reload' to allow a user to load
-    // the existing page.
-    if ([request.URL isEqual:_webView.URL]) {
-        return;
-    }
-    if (!request.URL) {
-        // Clear the webview
-        [_webView loadHTMLString:@"" baseURL:nil];
-        return;
-    }
-    if (request.URL.host) {
-        [_webView loadRequest:request];
-    }
-    else {
-        NSURL* readAccessUrl = _allowingReadAccessToURL ? [RCTConvert NSURL:_allowingReadAccessToURL] : request.URL;
-        [_webView loadFileURL:request.URL allowingReadAccessToURL:readAccessUrl];
-    }
+
+    [self syncCookiesToWebView:^{
+      // Because of the way React works, as pages redirect, we actually end up
+      // passing the redirect urls back here, so we ignore them if trying to load
+      // the same url. We'll expose a call to 'reload' to allow a user to load
+      // the existing page.
+      if ([request.URL isEqual:_webView.URL]) {
+          return;
+      }
+      if (!request.URL) {
+          // Clear the webview
+          [_webView loadHTMLString:@"" baseURL:nil];
+          return;
+      }
+      if (request.URL.host) {
+          [_webView loadRequest:request];
+      }
+      else {
+          NSURL* readAccessUrl = _allowingReadAccessToURL ? [RCTConvert NSURL:_allowingReadAccessToURL] : request.URL;
+          [_webView loadFileURL:request.URL allowingReadAccessToURL:readAccessUrl];
+      }
+    }];
 }
 
 #if !TARGET_OS_OSX
@@ -1318,6 +1319,15 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (void)webView:(WKWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
+  if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
+    // Write all cookies from WKWebView back to sharedHTTPCookieStorage
+    [webView.configuration.websiteDataStore.httpCookieStore getAllCookies:^(NSArray* cookies) {
+      for (NSHTTPCookie *cookie in cookies) {
+        [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+      }
+    }];
+  }
+
   if (_ignoreSilentHardwareSwitch) {
     [self forceIgnoreSilentHardwareSwitch:true];
   }
@@ -1463,6 +1473,33 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   }
 }
 
+- (void)writeCookiesToWebView:(NSArray<NSHTTPCookie *>*)cookies completion:(void (^)(void))completion {
+  // The required cookie APIs only became available on iOS 11
+  if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      dispatch_group_t group = dispatch_group_create();
+      for (NSHTTPCookie *cookie in cookies) {
+        dispatch_group_enter(group);
+        [_webView.configuration.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:^{
+          dispatch_group_leave(group);
+        }];
+      }
+      dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+        if (completion) {
+          completion();
+        }
+      });
+    });
+  } else if (completion) {
+    completion();
+  }
+}
+
+- (void)syncCookiesToWebView:(void (^)(void))completion {
+  NSArray<NSHTTPCookie *> *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
+  [self writeCookiesToWebView:cookies completion:completion];
+}
+
 - (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
   [wkWebViewConfig.userContentController removeAllUserScripts];
   [wkWebViewConfig.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
@@ -1507,9 +1544,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
       if(!_incognito && !_cacheEnabled) {
         wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
       }
-      for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
-        [wkWebViewConfig.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:nil];
-      }
+      [self syncCookiesToWebView:nil];
     } else {
       NSMutableString *script = [NSMutableString string];
 
