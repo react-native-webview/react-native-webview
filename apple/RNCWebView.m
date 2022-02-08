@@ -585,6 +585,12 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 #endif // !TARGET_OS_OSX
 }
 
+- (void)setTintColor:(UIColor *)TintColor
+{
+
+  _webView.tintColor = TintColor;
+}
+
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
 - (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior
 {

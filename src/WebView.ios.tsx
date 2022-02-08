@@ -166,6 +166,13 @@ class WebView extends React.Component<IOSWebViewProps, State> {
     );
   };
 
+  setTintColor = (red: number, green: number, blue: number) => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().setTintColor,
+      [red, green, blue],
+    );
+  };
   /**
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward

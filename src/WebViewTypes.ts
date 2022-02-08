@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 
 type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
-
+type IOSWebViewCommands = 'setTintColor';
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
 
@@ -27,7 +27,7 @@ interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
 }
 
 export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<WebViewCommands | AndroidWebViewCommands>
-export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>
+export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands | IOSWebViewCommands>
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>
 export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>
 
