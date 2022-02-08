@@ -14,6 +14,9 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start:android": "react-native run-android",
     "start:ios": "react-native run-ios",
+    "lint": "tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
+    "build": "tsc",
+    "prepare": "npm run build",
     "appium": "appium"
   },
   "rn-docs": {

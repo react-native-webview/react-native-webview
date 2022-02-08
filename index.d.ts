@@ -1,8 +1,8 @@
 import { Component } from 'react';
 // eslint-disable-next-line
-import { IOSWebViewProps, AndroidWebViewProps } from './src/WebViewTypes';
+import { IOSWebViewProps, AndroidWebViewProps } from './lib/WebViewTypes';
 
-export { FileDownload, WebViewMessageEvent, WebViewNavigation } from "./src/WebViewTypes";
+export { FileDownload, WebViewMessageEvent, WebViewNavigation } from "./lib/WebViewTypes";
 
 export type WebViewProps = IOSWebViewProps & AndroidWebViewProps;
 
