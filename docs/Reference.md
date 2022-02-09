@@ -573,11 +573,14 @@ url
 
 ### `onContentProcessDidTerminate`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Function that is invoked when the `WebView` content process is terminated.
+Function that is invoked when the `WebView` content process is terminated. 
 
 | Type     | Required | Platform                |
 | -------- | -------- | ----------------------- |
 | function | No       | iOS and macOS WKWebView |
+
+iOS Web views use a separate process to render and manage web content. WebKit calls this method when the process for the specified web view terminates for any reason. 
+The reason is not necessarily a crash. For instance, since iOS WebViews are not included in the total RAM of the app, they can be terminated independently of the app to liberate memory for new apps the user is opening. It's not unexpected to have WebViews get terminated after a while in the background.
 
 Example:
 
