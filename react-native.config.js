@@ -55,7 +55,7 @@ module.exports = {
     },
     windows: fs.existsSync(windowsProjectFile) && {
       sourceDir: path.join('example', 'windows'),
-      solutionFile: 'Example.sln',
+      solutionFile: 'WebviewExample.sln',
       project: {
         projectFile: path.relative(
           path.join(__dirname, 'example', 'windows'),
