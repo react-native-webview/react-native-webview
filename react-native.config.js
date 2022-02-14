@@ -15,8 +15,6 @@
  */
 'use strict';
 
-const path = require('path');
-
 const macSwitch = '--use-react-native-macos';
 const windowsSwitch = '--use-react-native-windows';
 
@@ -43,21 +41,34 @@ else {
       android: {
         sourceDir: 'example/android',
       },
+      windows: {
+        sourceDir: 'example/windows',
+        solutionFile: 'example.sln',
+        project:{
+          projectFile: 'example/example.vcxproj',
+        },
+      },
     },
   };
 }
 
-module.exports.dependency = {
-  platforms: {
-    windows: {
-      sourceDir: 'windows',
-      solutionFile: 'ReactNativeWebView.sln',
-      projects: [
-        {
-          projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
-          directDependency: true,
-        },
-      ],
-    },
+module.exports.dependencies = {
+  'react-native-webview': {
+    root: '.',
   },
+}
+
+module.exports.dependency = {
+platforms: {
+  windows: {
+    sourceDir: 'windows',
+    solutionFile: 'ReactNativeWebView.sln',
+    projects: [
+      {
+        projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
+        directDependency: true,
+      },
+    ],
+  },
+}
 };

@@ -56,16 +56,15 @@ For Android manual installation, please refer to [this article](https://engineer
 
 ### Windows:
 
-Autolinking is not yet supported for ReactNativeWindows. Make following additions to the given files manually:
+Autolinking is supported for React Native Windows v0.63 and higher. If your app uses a React Native Windows version that does not have autolinking support, make following additions to the given files manually:
 
 #### **windows/myapp.sln**
 
-Add the `ReactNativeWebView` and `WebViewBridgeComponent` project to your solution.
+Add the `ReactNativeWebView` project to your solution.
 
 1. Open the solution in Visual Studio 2019
 2. Right-click Solution icon in Solution Explorer > Add > Existing Project
    Select `node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj`
-   Select `node_modules\react-native-webview\windows\WebViewBridgeComponent\WebViewBridgeComponent.vcxproj`
 
 #### **windows/myapp/myapp.vcxproj**
 

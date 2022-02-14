@@ -6,16 +6,16 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   IgnorableNamespaces="uap mp">
 
- <Identity
-    Name="WebViewWindows"
-    Publisher="CN=kaigu"
+  <Identity
+    Name="c5e4f67a-7ecd-4405-bf18-fd91022c37af"
+    Publisher="CN=chiaramooney"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="6b4ef5e9-85c1-4006-87d7-77c61c62f84f" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="c5e4f67a-7ecd-4405-bf18-fd91022c37af" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>WebViewWindows</DisplayName>
-    <PublisherDisplayName>kaigu</PublisherDisplayName>
+    <DisplayName>example</DisplayName>
+    <PublisherDisplayName>chiaramooney</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -28,14 +28,15 @@
   </Resources>
 
   <Applications>
-    <Application Id="App"
+    <Application
+      Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="WebViewWindows.App">
+      EntryPoint="example.App">
       <uap:VisualElements
-        DisplayName="WebViewWindows"
+        DisplayName="example"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="WebViewWindows"
+        Description="example"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
