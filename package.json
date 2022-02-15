@@ -15,7 +15,7 @@
     "ios": "react-native run-ios --project-path example/ios",
     "macos": "react-native run-macos --scheme WebviewExample --project-path example/macos",
     "start": "cd example && react-native start",
-    "windows": "install-windows-test-app --project-directory example/windows --use-nuget && react-native run-windows --root example",
+    "windows": "install-windows-test-app --project-directory example/windows && react-native run-windows --root example --arch x64",
     "ci": "CI=true && yarn lint",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
