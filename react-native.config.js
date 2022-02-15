@@ -16,6 +16,20 @@ module.exports = {
       root: __dirname,
     },
   },
+  dependency: {
+    platforms: {
+      windows: {
+        sourceDir: 'windows',
+        solutionFile: 'ReactNativeWebView.sln',
+        projects: [
+          {
+            projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
+            directDependency: true,
+          },
+        ],
+      },
+    },
+  },
   project: {
     android: {
       sourceDir: path.join('example', 'android'),
