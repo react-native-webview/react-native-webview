@@ -19,12 +19,14 @@ const exclusionList = (() => {
 const blockList = exclusionList([
   /node_modules\/.*\/node_modules\/react-native\/.*/,
 
+  // Workaround for `EPERM: operation not permitted, lstat '~\midl-MIDLRT-cl.read.1.tlog'`
+  /.*\.tlog/,
+
   // This stops "react-native run-windows" from causing the metro server to
   // crash if its already running
   new RegExp(`${path.join(__dirname, 'windows').replace(/[/\\]+/g, '/')}.*`),
 
   // Workaround for `EBUSY: resource busy or locked, open '~\msbuild.ProjectImports.zip'`
-  // when building with `yarn windows --release`
   /.*\.ProjectImports\.zip/,
 ]);
 

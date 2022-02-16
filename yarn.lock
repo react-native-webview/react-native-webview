@@ -10639,10 +10639,10 @@ react-native-macos@^0.64.27:
     whatwg-fetch "^3.0.0"
     ws "^6.1.4"
 
-react-native-test-app@^1.0.10:
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/react-native-test-app/-/react-native-test-app-1.0.11.tgz#093a012c93446f06b9968428db5add4cfdf7b8e3"
-  integrity sha512-eSP8/ifJAJf1i9rqqIlUCoh1EOUmZIQlzs/Ii23hsoBjxPwDASRNkl0e7Vmg/RZUdDPJXXOl3CszQWeodjFRWA==
+react-native-test-app@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-test-app/-/react-native-test-app-1.1.0.tgz#ed0da1d15b122839423efadf8ca286fdc8a7a4b9"
+  integrity sha512-3KXb0sTxWH704I14q9D/INHD9E/bYq7pQdksJDCnteijfIWzZ9+VZWT1Z9aMvFO9L/HN8FkigXbbwhaaMZVVmQ==
   dependencies:
     ajv "^8.0.0"
     chalk "^4.1.0"
