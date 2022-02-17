@@ -15,41 +15,44 @@ Existem dois métodos de teste:
 ### Rodando os testes dentro do react-native-webview
 
 #### Para todas as plataformas:
-```
-$ yarn install
+
+```sh
+yarn install
 ```
 
 #### Para Android:
-```
-$ yarn start:android
+
+```sh
+yarn android
 ```
 
 O aplicativo de exemplo do Android será compilado, o Metro Bundler será iniciado e o aplicativo de exemplo será instalado e iniciado no emulador do Android.
 
 #### Para iOS:
-```
-$ cd example/ios
-$ pod install
-$ cd ../..
-$ yarn start:ios
+
+```sh
+pod install --project-directory=ios
+yarn ios
 ```
 
 O aplicativo de exemplo para iOS será compilado, o empacotador Metro será iniciado e o aplicativo de exemplo será instalado e iniciado no Simulador.
 
-#### para macOS:
-```
-$ open example/macos/example.xcodeproj
-$ yarn start:macos
-```
-O Metro Bundler agora estará rodando no Terminal para react-native-macos. No XCode selecione o alvo `example-macos` e execute.
+#### Para macOS:
 
-#### para Windows:
-```
-$ yarn start:windows
-$ open example/windows/WebViewWindows.sln and click run button.
+```sh
+pod install --project-directory=macos
+yarn macos
 ```
 
-O Metro Bundler agora estará em execução no Terminal para react-native-windows e o aplicativo de exemplo será instalado e iniciado.
+O aplicativo de exemplo para macOS será compilado, o empacotador Metro será iniciado e o aplicativo de exemplo será instalado e iniciado.
+
+#### Para Windows:
+
+```sh
+yarn windows
+```
+
+O aplicativo de exemplo para Windows será compilado, o empacotador Metro será iniciado e o aplicativo de exemplo será instalado e iniciado.
 
 ### Testando em um novo projeto `react-native init`
 
