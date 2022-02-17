@@ -63,7 +63,7 @@
     "react": "17.0.1",
     "react-native": "^0.64.3",
     "react-native-macos": "^0.64.27",
-    "react-native-test-app": "^1.1.0",
+    "react-native-test-app": "^1.1.2",
     "react-native-windows": "^0.64.30",
     "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",
