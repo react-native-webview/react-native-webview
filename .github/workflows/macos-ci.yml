@@ -1,0 +1,31 @@
+name: macOS
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2.5.1
+        with:
+          node-version: 16
+      - name: Cache /node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: Install npm dependencies
+        run: yarn --frozen-lockfile
+      - name: Install Pods
+        run: pod install
+        working-directory: example/macos
+      - name: Build macOS test app
+        run: |
+          xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
+        working-directory: example/macos
+    timeout-minutes: 60
