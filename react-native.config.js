@@ -67,24 +67,6 @@ module.exports = {
           // `project` was only used to infer `sourceDir` and `podfile`.
           return 'example/ios/ReactTestApp-Dummy.xcodeproj';
         }
-
-<<<<<<< HEAD
-module.exports.dependency = {
-  platforms: {
-    windows: {
-      sourceDir: 'windows',
-      solutionFile: 'ReactNativeWebView.sln',
-      projects: [
-        {
-          projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
-          directDependency: true,
-        },
-        {
-          projectFile: 'ReactNativeWebView2/ReactNativeWebView2.vcxproj',
-          directDependency: true,
-        },
-      ],
-=======
         // `sourceDir` and `podfile` detection was fixed in
         // @react-native-community/cli-platform-ios v5.0.2 (see
         // https://github.com/react-native-community/cli/pull/1444).
@@ -100,7 +82,25 @@ module.exports.dependency = {
           windowsProjectFile,
         ),
       },
->>>>>>> b1c48ce76d9f61f7dc855b86a79b5094ce9717eb
     },
   },
+};
+
+module.exports.dependency = {
+  platforms: {
+    windows: {
+      sourceDir: 'windows',
+      solutionFile: 'ReactNativeWebView.sln',
+      projects: [
+        {
+          projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
+          directDependency: true,
+        },
+        {
+          projectFile: 'ReactNativeWebView2/ReactNativeWebView2.vcxproj',
+          directDependency: true,
+        },
+      ],
+    }
+  }
 };

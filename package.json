@@ -11,20 +11,11 @@
   "version": "11.17.2",
   "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
   "scripts": {
-<<<<<<< HEAD
-    "start": "node node_modules/react-native/local-cli/cli.js start",
-    "start:android": "react-native run-android",
-    "start:ios": "react-native run-ios",
-    "start:macos": "node node_modules/react-native-macos/local-cli/cli.js start --use-react-native-macos",
-    "start:windows": "react-native start --use-react-native-windows",
-    "run:windows": "react-native run-windows --no-packager --no-autolink --root example",
-=======
     "android": "react-native run-android",
     "ios": "react-native run-ios --project-path example/ios",
     "macos": "react-native run-macos --scheme WebviewExample --project-path example/macos",
     "start": "cd example && react-native start",
     "windows": "install-windows-test-app --project-directory example/windows && react-native run-windows --root example --arch x64",
->>>>>>> b1c48ce76d9f61f7dc855b86a79b5094ce9717eb
     "ci": "CI=true && yarn lint",
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
