@@ -35,6 +35,8 @@ import {
   State,
 } from './WebViewTypes';
 
+const ReactNativeVersion = require('../node_modules/react-native/Libraries/Core/ReactNativeVersion');
+
 const UIManager = NotTypedUIManager as RNCWebViewUIManagerWindows;
 const { resolveAssetSource } = Image;
 const RCTWebView: typeof NativeWebViewWindows = requireNativeComponent(
@@ -250,9 +252,13 @@ export default class WebView extends React.Component<WindowsWebViewProps, State>
       onShouldStartLoadWithRequestProp,
     );
 
+    const RNW_AT_LEAST = (ReactNativeVersion.version.major>1 || ReactNativeVersion.version.minor>=68);
+    if (RNW_AT_LEAST && this.props.useWebView2){
+      console.error("Use of WebView2 control is only supported for React Native Windows apps running on v0.68 or higher. Please upgrade if you wish to use this control, or set `UseWebView2` to `false` to use WebView control.")
+    }
     const NativeWebView
     = (nativeConfig.component as typeof NativeWebViewWindows | undefined)
-    || (this.props.useWebView2? RCTWebView2 : RCTWebView);
+    || ((RNW_AT_LEAST && this.props.useWebView2)? RCTWebView2 : RCTWebView);
 
     const webView = (
       <NativeWebView
