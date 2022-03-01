@@ -398,7 +398,7 @@ export interface WindowsNativeWebViewProps extends CommonNativeWebViewProps {
 }
 
 export interface WindowsWebViewProps extends WebViewSharedProps {
-  useWebView2?: string;
+  useWebView2?: boolean;
 }
 
 export interface IOSWebViewProps extends WebViewSharedProps {

@@ -1538,7 +1538,7 @@ Use WinUI WebView2 control instead of WebView control as the native webview. The
 Example:
 
 ```javascript
-<WebView useWebView2={true} />
+<WebView useWebView2 />
 
 ### `minimumFontSize`
 
