@@ -26,14 +26,11 @@ module.exports = {
             projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
             directDependency: true,
           },
+          {
+            projectFile: 'ReactNativeWebView2/ReactNativeWebView2.vcxproj',
+            directDependency: true,
+          },
         ],
-      },
-      windows: {
-        sourceDir: 'example/windows',
-        solutionFile: 'example.sln',
-        project:{
-          projectFile: 'example/example.vcxproj',
-        },
       },
     },
   },
@@ -84,23 +81,4 @@ module.exports = {
       },
     },
   },
-};
-
-module.exports.dependency = {
-  platforms: {
-    windows: {
-      sourceDir: 'windows',
-      solutionFile: 'ReactNativeWebView.sln',
-      projects: [
-        {
-          projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
-          directDependency: true,
-        },
-        {
-          projectFile: 'ReactNativeWebView2/ReactNativeWebView2.vcxproj',
-          directDependency: true,
-        },
-      ],
-    }
-  }
 };
