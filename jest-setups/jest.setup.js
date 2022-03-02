@@ -4,7 +4,7 @@ const { platform } = require('./jest.setup.windows');
 
 switch (platform) {
     case "windows":
-        const webViewWindowsAppId = 'WebViewWindows_3x6rhkkr9xcf6!App';
+        const webViewWindowsAppId = 'ReactTestApp!App';
         module.exports = {
             capabilities: windowsAppDriverCapabilities(webViewWindowsAppId)
         }
