@@ -14,15 +14,13 @@ import React from 'react';
 import {
   UIManager as NotTypedUIManager,
   View,
-  requireNativeComponent,
   StyleSheet,
   Image,
   ImageSourcePropType,
   findNodeHandle,
 } from 'react-native';
-import {
-  createOnShouldStartLoadWithRequest,
-} from './WebViewShared';
+import RCTWebView from "./WebViewNativeComponent.windows";
+import { createOnShouldStartLoadWithRequest } from './WebViewShared';
 import {
   NativeWebViewWindows,
   WebViewSharedProps,
@@ -37,9 +35,6 @@ import {
 
 const UIManager = NotTypedUIManager as RNCWebViewUIManagerWindows;
 const { resolveAssetSource } = Image;
-const RCTWebView: typeof NativeWebViewWindows = requireNativeComponent(
-  'RCTWebView',
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -104,7 +99,7 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
     );
   }
 
-  postMessage = (data: string) => {    
+  postMessage = (data: string) => {
     const message = this.getInjectableJSMessage(data);
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
