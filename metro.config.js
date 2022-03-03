@@ -42,6 +42,7 @@ module.exports = {
   projectRoot: path.join(__dirname, 'example'),
   watchFolders: [__dirname],
   resolver: {
+    resolverMainFields: ['main-internal', 'browser', 'main'],
     blacklistRE: blockList,
     blockList,
   },

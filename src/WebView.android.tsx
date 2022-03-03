@@ -2,7 +2,6 @@ import React from 'react';
 
 import {
   Image,
-  requireNativeComponent,
   UIManager as NotTypedUIManager,
   View,
   NativeModules,
@@ -14,6 +13,7 @@ import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
 
 import invariant from 'invariant';
 
+import RNCWebView from "./WebViewNativeComponent.android";
 import {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
@@ -37,9 +37,6 @@ import styles from './WebView.styles';
 
 const UIManager = NotTypedUIManager as RNCWebViewUIManagerAndroid;
 
-const RNCWebView = requireNativeComponent(
-  'RNCWebView',
-) as typeof NativeWebViewAndroid;
 const { resolveAssetSource } = Image;
 
 /**
