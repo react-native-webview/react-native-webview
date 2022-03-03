@@ -19,7 +19,7 @@ import {
   ImageSourcePropType,
   findNodeHandle,
 } from 'react-native';
-import RCTWebView from "./WebViewNativeComponent.windows";
+import {RCTWebView, RCTWebView2} from "./WebViewNativeComponent.windows";
 import { createOnShouldStartLoadWithRequest } from './WebViewShared';
 import {
   NativeWebViewWindows,
@@ -37,10 +37,6 @@ const ReactNativeVersion = require('../node_modules/react-native/Libraries/Core/
 
 const UIManager = NotTypedUIManager as RNCWebViewUIManagerWindows;
 const { resolveAssetSource } = Image;
-
-const RCTWebView2: typeof NativeWebViewWindows = requireNativeComponent(
-  'RCTWebView2',
-);
 
 const styles = StyleSheet.create({
   container: {
