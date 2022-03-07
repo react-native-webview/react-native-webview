@@ -14,3 +14,6 @@
 #include <winrt/Windows.Web.Http.Headers.h>
 #include <winrt/Microsoft.ReactNative.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
+#if __has_include(<VersionMacros.h>)
+#include <VersionMacros.h>
+#endif

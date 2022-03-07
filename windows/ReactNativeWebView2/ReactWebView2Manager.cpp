@@ -52,8 +52,8 @@ namespace winrt::ReactNativeWebView2::implementation {
         IJSValueReader const& propertyMapReader) noexcept {
         auto control = view.as<winrt::UserControl>();
         auto content = control.Content();
-#if define(RNW_AT_LEAST)
-    if (RNW_AT_LEAST(0,68,0)){
+#if define(RNW_VERSION_AT_LEAST)
+    if (RNW_VERSION_AT_LEAST(0,68,0)){
         auto webView = content.as<winrt::WebView2>();
     }else{
         auto webView = content.as<winrt::WebView>();

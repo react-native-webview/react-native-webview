@@ -15,8 +15,8 @@ namespace winrt {
     using namespace Windows::UI::Xaml;
     using namespace Windows::UI::Xaml::Controls;
     using namespace Microsoft::UI::Xaml::Controls;
-#if defined(RNW_AT_LEAST)
-    if (RNW_AT_LEAST(0,68,0)){
+#if defined(RNW_VERSION_AT_LEAST)
+    if (RNW_VERSION_AT_LEAST(0,68,0)){
     using namespace Microsoft::Web::WebView2::Core;
     }
 #endif
@@ -25,8 +25,8 @@ namespace winrt {
 namespace winrt::ReactNativeWebView2::implementation {
 
     ReactWebView2::ReactWebView2(winrt::IReactContext const& reactContext) : m_reactContext(reactContext) {
-#if defined(RNW_AT_LEAST)
-       if (RNW_AT_LEAST(0,68,0)){
+#if defined(RNW_VERSION_AT_LEAST)
+       if (RNW_VERSION_AT_LEAST(0,68,0)){
 #ifdef CHAKRACORE_UWP
             m_webView = winrt::WebView2(winrt::WebViewExecutionMode::SeparateProcess);
 #else
@@ -43,8 +43,8 @@ m_webView = winrt::WebView();
     }
 
     ReactWebView2::~ReactWebView2(){}
-#if defined(RNW_AT_LEAST)
-    if (RNW_AT_LEAST(0,68,0)){
+#if defined(RNW_VERSION_AT_LEAST)
+    if (RNW_VERSION_AT_LEAST(0,68,0)){
         void ReactWebView2::RegisterEvents() {
             m_navigationStartingRevoker = m_webView.NavigationStarting(
                 winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
@@ -79,8 +79,8 @@ m_webView = winrt::WebView();
       }
       return hasUniversalAPIContract_v7.value();
     }
-#if defined(RNW_AT_LEAST)
-    if (RNW_AT_LEAST(0,68,0)){
+#if defined(RNW_VERSION_AT_LEAST)
+    if (RNW_VERSION_AT_LEAST(0,68,0)){
         void ReactWebView2::WriteWebViewNavigationEventArg(winrt::WebView2 const& sender, winrt::IJSValueWriter const& eventDataWriter) {
             auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
             WriteProperty(eventDataWriter, L"canGoBack", sender.CanGoBack());
@@ -128,8 +128,8 @@ m_webView = winrt::WebView();
 #endif
 
     void ReactWebView2::NavigateToHtml(winrt::hstring html) {
-#if defined(RNW_AT_LEAST)
-    if (RNW_AT_LEAST(0,68,0)){
+#if defined(RNW_VERSION_AT_LEAST)
+    if (RNW_VERSION_AT_LEAST(0,68,0)){
         if (m_webView.CoreWebView2()) {
             m_webView.NavigateToString(html);
         }
