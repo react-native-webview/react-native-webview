@@ -88,7 +88,7 @@ Note if you want to enable scroll with Touch for the WebView component you must 
 ## 3. Decide if you want access to WebView2
 The WebView2 control is a WinUI control that renders web content using the Microsoft Edge (Chromium) rendering engine. We have added support for the WebView2 control to the WebView community module. If you want access to the WebView2 control in your app, follow these steps:
 
-  i. Ensure your React Native Windows version is v0.65 or higher.
+  i. Ensure your React Native Windows version is v0.68 or higher.
 
   ii. Let autolinking handle adding the `ReactNativeWebView2` project to your app.
 
