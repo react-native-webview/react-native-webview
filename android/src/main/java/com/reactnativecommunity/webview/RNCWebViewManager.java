@@ -1207,12 +1207,27 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       this.mWebView = webView;
     }
 
-    @Override
+        @Override
     public boolean onCreateWindow(WebView view, boolean isDialog,
                                   boolean isUserGesture, Message resultMsg) {
       newWebView = new WebView(view.getContext());
       newWebView.getSettings().setJavaScriptEnabled(true);
-      newWebView.setWebViewClient(new WebViewClient());
+      newWebView.setWebViewClient(new WebViewClient(){
+         @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (url != null && url.startsWith("intent://")) {
+              try {
+                Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                view.loadUrl(fallbackUrl);
+              } catch (Exception ex) {
+                //Swallowed
+              }
+            }
+
+         return false;
+}
+      });
       newWebView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 10; Pixel 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Mobile Safari/537.36");
       newWebView.setWebChromeClient(new WebChromeClient() {
         @Override
@@ -1220,6 +1235,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           ViewGroup rootView = getRootView();
           if (newWebView != null) rootView.removeView(newWebView);
         }
+
+
       });
       ViewGroup rootView = getRootView();
       rootView.addView(newWebView);
@@ -1228,7 +1245,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       resultMsg.sendToTarget();
       return true;
     }
-
 
 
     @Override
