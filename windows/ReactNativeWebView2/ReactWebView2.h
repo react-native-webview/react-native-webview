@@ -22,18 +22,18 @@ namespace winrt::ReactNativeWebView2::implementation {
     private:
         winrt::hstring m_navigateToHtml = L"";
 #if defined(RNW_VERSION_AT_LEAST)
-    if (RNW_VERSION_AT_LEAST(0,68,0)){
+#if (RNW_VERSION_AT_LEAST(0,68,0))
         winrt::Microsoft::UI::Xaml::Controls::WebView2 m_webView{ nullptr };
-    }else{
+#else
         winrt::Windows::UI::Xaml::Controls::WebView m_webView{ nullptr };
-    }
+#endif
 #else
         winrt::Windows::UI::Xaml::Controls::WebView m_webView{ nullptr };
 #endif
         Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
         winrt::event_token m_messageToken;
 #if defined(RNW_VERSION_AT_LEAST)
-    if (RNW_VERSION_AT_LEAST(0,68,0)){
+#if RNW_VERSION_AT_LEAST(0,68,0))
         winrt::Microsoft::UI::Xaml::Controls::WebView2::NavigationStarting_revoker m_navigationStartingRevoker{};
         winrt::Microsoft::UI::Xaml::Controls::WebView2::NavigationCompleted_revoker m_navigationCompletedRevoker{};
         winrt::Microsoft::UI::Xaml::Controls::WebView2::CoreWebView2Initialized_revoker m_CoreWebView2InitializedRevoker{};
@@ -43,6 +43,7 @@ namespace winrt::ReactNativeWebView2::implementation {
         void OnNavigationCompleted(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationCompletedEventArgs const& args);
         void OnCoreWebView2Initialized(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& args);
     }
+#endif
 #endif
     };
 } // namespace winrt::ReactNativeWebView2::implementation
