@@ -1207,7 +1207,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       this.mWebView = webView;
     }
 
-        @Override
+     @Override
     public boolean onCreateWindow(WebView view, boolean isDialog,
                                   boolean isUserGesture, Message resultMsg) {
       newWebView = new WebView(view.getContext());
@@ -1219,14 +1219,28 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
               try {
                 Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
                 String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                view.stopLoading();
                 view.loadUrl(fallbackUrl);
+                return true;
               } catch (Exception ex) {
                 //Swallowed
               }
+            }else if (url.startsWith("https://")){
+              return false;
+            }else {
+                ViewGroup rootView = getRootView();
+                if (newWebView != null) rootView.removeView(newWebView);
+                return true;
             }
 
          return false;
-}
+      }
+        @TargetApi(Build.VERSION_CODES.N)
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+          final String url = request.getUrl().toString();
+          return this.shouldOverrideUrlLoading(view, url);
+        }
       });
       newWebView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 10; Pixel 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Mobile Safari/537.36");
       newWebView.setWebChromeClient(new WebChromeClient() {
@@ -1245,7 +1259,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       resultMsg.sendToTarget();
       return true;
     }
-
+    
 
     @Override
     public boolean onConsoleMessage(ConsoleMessage message) {
