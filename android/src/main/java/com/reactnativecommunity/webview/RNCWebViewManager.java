@@ -1216,15 +1216,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
          @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if (url != null && url.startsWith("intent://")) {
-              try {
-                Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
-                String fallbackUrl = intent.getStringExtra("browser_fallback_url");
-                view.stopLoading();
-                view.loadUrl(fallbackUrl);
-                return true;
-              } catch (Exception ex) {
-                //Swallowed
-              }
+              ViewGroup rootView = getRootView();
+              if (newWebView != null) rootView.removeView(newWebView);
+              return true;
             }else if (url.startsWith("https://")){
               return false;
             }else {
@@ -1232,8 +1226,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 if (newWebView != null) rootView.removeView(newWebView);
                 return true;
             }
-
-         return false;
       }
         @TargetApi(Build.VERSION_CODES.N)
         @Override
@@ -1250,7 +1242,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           if (newWebView != null) rootView.removeView(newWebView);
         }
 
-
       });
       ViewGroup rootView = getRootView();
       rootView.addView(newWebView);
@@ -1259,7 +1250,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       resultMsg.sendToTarget();
       return true;
     }
-    
+
 
     @Override
     public boolean onConsoleMessage(ConsoleMessage message) {
