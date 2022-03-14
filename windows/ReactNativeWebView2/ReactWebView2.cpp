@@ -26,7 +26,7 @@ namespace winrt::ReactNativeWebView2::implementation {
 
     ReactWebView2::ReactWebView2(winrt::IReactContext const& reactContext) : m_reactContext(reactContext) {
 #if defined(RNW_VERSION_AT_LEAST)
-        #if RNW_VERSION_AT_LEAST(0,68,0))
+#if RNW_VERSION_AT_LEAST(0,68,0))
 #ifdef CHAKRACORE_UWP
             m_webView = winrt::WebView2(winrt::WebViewExecutionMode::SeparateProcess);
 #else
