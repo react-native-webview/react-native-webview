@@ -97,7 +97,7 @@ If you want access to the WebView2 control in your app, follow these steps:
   
   iv. Customize your app's WebView2 version to version 1.0.1020.30. See [here](https://microsoft.github.io/react-native-windows/docs/customizing-sdk-versions) for instructions.
 
-Now you can access the WinUI WebView2 control from your app's JavaScript via the useWebView2 prop.
+Now you can access the WinUI WebView2 control from your app's JavaScript via the `useWebView2` prop.
 
 ## 4. Import the webview into your component
 
