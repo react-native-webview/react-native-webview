@@ -33,7 +33,7 @@ import {
   State,
 } from './WebViewTypes';
 
-const ReactNativeVersion = require('../node_modules/react-native/Libraries/Core/ReactNativeVersion');
+const {version} = require('react-native/Libraries/Core/ReactNativeVersion');
 
 const UIManager = NotTypedUIManager as RNCWebViewUIManagerWindows;
 const { resolveAssetSource } = Image;
@@ -69,9 +69,9 @@ export default class WebView extends React.Component<WindowsWebViewProps, State>
 
   webViewRef = React.createRef<NativeWebViewWindows>();
 
-  RNW_VERSION_AT_LEAST = (ReactNativeVersion.version.major>1 || ReactNativeVersion.version.minor>=68);
+  RnwVersionSupportsWebView2 = (version.major>1 || version.minor>=68);
   
-  RCTWebViewString = (this.RNW_VERSION_AT_LEAST && this.props.useWebView2) ? 'RCTWebView2' : 'RCTWebView';
+  RCTWebViewString = (this.RnwVersionSupportsWebView2 && this.props.useWebView2) ? 'RCTWebView2' : 'RCTWebView';
 
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
@@ -247,7 +247,7 @@ export default class WebView extends React.Component<WindowsWebViewProps, State>
     );
 
     const NativeWebView
-    = (this.RNW_VERSION_AT_LEAST && this.props.useWebView2)? RCTWebView2 : RCTWebView;
+    = (this.RnwVersionSupportsWebView2 && this.props.useWebView2)? RCTWebView2 : RCTWebView;
 
     const webView = (
       <NativeWebView
