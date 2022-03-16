@@ -56,7 +56,7 @@ For Android manual installation, please refer to [this article](https://engineer
 
 ### Windows:
 
-Autolinking is supported for React Native Windows v0.63 and higher. If your app uses a React Native Windows version that does not have autolinking support, make following additions to the given files manually:
+Autolinking is supported for React Native Windows v0.63 and higher. If your app uses a React Native Windows version that does not have autolinking support, make the following additions to the given files manually:
 
 #### **windows/myapp.sln**
 
