@@ -6,7 +6,7 @@
 #include "NativeModules.h"
 #include "ReactWebView2.h"
 
-namespace winrt::ReactNativeWebView2::implementation {
+namespace winrt::ReactNativeWebView::implementation {
     
     class ReactWebView2Manager : public winrt::implements<
         ReactWebView2Manager,
@@ -50,4 +50,4 @@ namespace winrt::ReactNativeWebView2::implementation {
         winrt::Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
 
     };
-} // namespace winrt::ReactWebView2::implementation
+} // namespace winrt::ReactNativeWebView::implementation

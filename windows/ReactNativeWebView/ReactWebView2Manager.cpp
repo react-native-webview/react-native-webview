@@ -17,7 +17,7 @@ namespace winrt {
     using namespace Windows::Web::Http::Headers;
 }
 
-namespace winrt::ReactNativeWebView2::implementation {
+namespace winrt::ReactNativeWebView::implementation {
 
     ReactWebView2Manager::ReactWebView2Manager() {}
 
@@ -27,7 +27,7 @@ namespace winrt::ReactNativeWebView2::implementation {
     }
 
     winrt::FrameworkElement ReactWebView2Manager::CreateView() noexcept {
-      auto view = winrt::ReactNativeWebView2::ReactWebView2(m_reactContext);
+      auto view = winrt::ReactNativeWebView::ReactWebView2(m_reactContext);
       return view;
     }
 
@@ -50,16 +50,10 @@ namespace winrt::ReactNativeWebView2::implementation {
     void ReactWebView2Manager::UpdateProperties(
         FrameworkElement const& view,
         IJSValueReader const& propertyMapReader) noexcept {
-        auto control = view.as<winrt::UserControl>();
+        auto control = view.as<winrt::ContentPresenter>();
         auto content = control.Content();
-#if defined(RNW_VERSION_AT_LEAST)
-#if RNW_VERSION_AT_LEAST(0,68,0))
+#if RNW_VERSION_AT_LEAST(0,68,0)
         auto webView = content.as<winrt::WebView2>();
-#else
-        auto webView = content.as<winrt::WebView>();
-#endif
-#else
-        auto webView = content.as<winrt::WebView>();
 #endif
         const JSValueObject& propertyMap = JSValueObject::ReadFrom(propertyMapReader);
 
@@ -85,11 +79,13 @@ namespace winrt::ReactNativeWebView2::implementation {
                         auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
                         uriString.replace(0, std::size(file), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
+#if RNW_VERSION_AT_LEAST(0,68,0)
                     webView.Source(winrt::Uri(to_hstring(uriString)));
+#endif
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
                     auto htmlString = srcMap.at("html").AsString();
-                    auto reactWebView2 = view.as<winrt::ReactNativeWebView2::ReactWebView2>();
+                    auto reactWebView2 = view.as<winrt::ReactNativeWebView::ReactWebView2>();
                     reactWebView2.NavigateToHtml(to_hstring(htmlString));
                 }
             }
@@ -125,7 +121,7 @@ namespace winrt::ReactNativeWebView2::implementation {
         FrameworkElement const& view,
         winrt::hstring const& commandId,
         winrt::IJSValueReader const& commandArgsReader) noexcept {
-        auto control = view.as<winrt::UserControl>();
+        auto control = view.as<winrt::ContentPresenter>();
         auto content = control.Content();
         auto webView = content.as<winrt::WebView>();
         auto commandArgs = JSValue::ReadArrayFrom(commandArgsReader);
@@ -151,4 +147,4 @@ namespace winrt::ReactNativeWebView2::implementation {
         } 
     }
 
-} // namespace winrt::ReactWebView2::implementation
+} // namespace winrt::ReactNativeWebView::implementation

@@ -15,36 +15,23 @@ namespace winrt {
     using namespace Windows::UI::Xaml;
     using namespace Windows::UI::Xaml::Controls;
     using namespace Microsoft::UI::Xaml::Controls;
-#if defined(RNW_VERSION_AT_LEAST)
-#if RNW_VERSION_AT_LEAST(0,68,0))
+#if RNW_VERSION_AT_LEAST(0,68,0)
     using namespace Microsoft::Web::WebView2::Core;
-#endif
 #endif
 } // namespace winrt
 
-namespace winrt::ReactNativeWebView2::implementation {
+namespace winrt::ReactNativeWebView::implementation {
 
     ReactWebView2::ReactWebView2(winrt::IReactContext const& reactContext) : m_reactContext(reactContext) {
-#if defined(RNW_VERSION_AT_LEAST)
-#if RNW_VERSION_AT_LEAST(0,68,0))
-#ifdef CHAKRACORE_UWP
-            m_webView = winrt::WebView2(winrt::WebViewExecutionMode::SeparateProcess);
-#else
-            m_webView = winrt::WebView2();
-#endif
-            this->Content(m_webView);
-            RegisterEvents();
-#else
-            m_webView = winrt::WebView();
-#endif
-#else
-m_webView = winrt::WebView();
+#if RNW_VERSION_AT_LEAST(0,68,0)
+        m_webView = winrt::WebView2();
+        this->Content(m_webView);
+        RegisterEvents();
 #endif
     }
 
     ReactWebView2::~ReactWebView2(){}
-#if defined(RNW_VERSION_AT_LEAST)
-#if RNW_VERSION_AT_LEAST(0,68,0))
+#if RNW_VERSION_AT_LEAST(0,68,0)
         void ReactWebView2::RegisterEvents() {
             m_navigationStartingRevoker = m_webView.NavigationStarting(
                 winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
@@ -68,19 +55,16 @@ m_webView = winrt::WebView();
                 }
             });
         }  
-#endif
-#endif
 
-    bool Is17763OrHigher() {
-      static std::optional<bool> hasUniversalAPIContract_v7;
+        bool ReactWebView2::Is17763OrHigher() {
+          static std::optional<bool> hasUniversalAPIContract_v7;
 
-      if (!hasUniversalAPIContract_v7.has_value()) {
-        hasUniversalAPIContract_v7 = winrt::Windows::Foundation::Metadata::ApiInformation::IsApiContractPresent(L"Windows.Foundation.UniversalApiContract", 7);
-      }
-      return hasUniversalAPIContract_v7.value();
-    }
-#if defined(RNW_VERSION_AT_LEAST)
-#if RNW_VERSION_AT_LEAST(0,68,0))
+          if (!hasUniversalAPIContract_v7.has_value()) {
+            hasUniversalAPIContract_v7 = winrt::Windows::Foundation::Metadata::ApiInformation::IsApiContractPresent(L"Windows.Foundation.UniversalApiContract", 7);
+          }
+          return hasUniversalAPIContract_v7.value();
+        }
+
         void ReactWebView2::WriteWebViewNavigationEventArg(winrt::WebView2 const& sender, winrt::IJSValueWriter const& eventDataWriter) {
             auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
             WriteProperty(eventDataWriter, L"canGoBack", sender.CanGoBack());
@@ -117,19 +101,16 @@ m_webView = winrt::WebView();
         }
 
         void ReactWebView2::OnCoreWebView2Initialized(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& args) {
-            if (sender.CoreWebView2()) {
-                if (m_navigateToHtml != L"") {
-                    m_webView.NavigateToString(m_navigateToHtml);
-                    m_navigateToHtml = L"";
-                }
+            assert(sender.CoreWebView2());
+            if (m_navigateToHtml != L"") {
+                m_webView.NavigateToString(m_navigateToHtml);
+                m_navigateToHtml = L"";
             }
         }
 #endif
-#endif
 
     void ReactWebView2::NavigateToHtml(winrt::hstring html) {
-#if defined(RNW_VERSION_AT_LEAST)
-#if RNW_VERSION_AT_LEAST(0,68,0))
+#if RNW_VERSION_AT_LEAST(0,68,0)
         if (m_webView.CoreWebView2()) {
             m_webView.NavigateToString(html);
         }
@@ -138,7 +119,6 @@ m_webView = winrt::WebView();
             m_navigateToHtml = html;
         }
 #endif
-#endif   
     }
 
-} // namespace winrt::ReactNativeWebView2::implementation
+} // namespace winrt::ReactNativeWebView::implementation
