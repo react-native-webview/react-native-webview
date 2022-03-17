@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
+#if RNW_VERSION_AT_LEAST(0,68,0)
 #pragma once
 #include "winrt/Microsoft.ReactNative.h"
 #include "NativeModules.h"
@@ -51,3 +51,4 @@ namespace winrt::ReactNativeWebView::implementation {
 
     };
 } // namespace winrt::ReactNativeWebView::implementation
+#endif

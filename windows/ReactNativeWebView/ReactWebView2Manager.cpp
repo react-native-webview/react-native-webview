@@ -1,9 +1,9 @@
 #include "pch.h"
+#if RNW_VERSION_AT_LEAST(0,68,0)
 #include "ReactWebView2Manager.h"
 #include "NativeModules.h"
 #include "ReactWebView2.h"
 #include "JSValueXaml.h"
-
 
 namespace winrt {
     using namespace Microsoft::ReactNative;
@@ -52,9 +52,7 @@ namespace winrt::ReactNativeWebView::implementation {
         IJSValueReader const& propertyMapReader) noexcept {
         auto control = view.as<winrt::ContentPresenter>();
         auto content = control.Content();
-#if RNW_VERSION_AT_LEAST(0,68,0)
         auto webView = content.as<winrt::WebView2>();
-#endif
         const JSValueObject& propertyMap = JSValueObject::ReadFrom(propertyMapReader);
 
         for (auto const& pair : propertyMap) {
@@ -79,9 +77,7 @@ namespace winrt::ReactNativeWebView::implementation {
                         auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
                         uriString.replace(0, std::size(file), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
-#if RNW_VERSION_AT_LEAST(0,68,0)
                     webView.Source(winrt::Uri(to_hstring(uriString)));
-#endif
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
                     auto htmlString = srcMap.at("html").AsString();
@@ -148,3 +144,4 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
 } // namespace winrt::ReactNativeWebView::implementation
+#endif

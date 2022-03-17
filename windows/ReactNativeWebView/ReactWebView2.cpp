@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include "pch.h"
+#if RNW_VERSION_AT_LEAST(0,68,0)
 #include "JSValueXaml.h"
 #include "ReactWebView2.h"
 #include "ReactWebView2.g.cpp"
@@ -15,23 +16,18 @@ namespace winrt {
     using namespace Windows::UI::Xaml;
     using namespace Windows::UI::Xaml::Controls;
     using namespace Microsoft::UI::Xaml::Controls;
-#if RNW_VERSION_AT_LEAST(0,68,0)
     using namespace Microsoft::Web::WebView2::Core;
-#endif
 } // namespace winrt
 
 namespace winrt::ReactNativeWebView::implementation {
 
     ReactWebView2::ReactWebView2(winrt::IReactContext const& reactContext) : m_reactContext(reactContext) {
-#if RNW_VERSION_AT_LEAST(0,68,0)
         m_webView = winrt::WebView2();
         this->Content(m_webView);
         RegisterEvents();
-#endif
     }
 
     ReactWebView2::~ReactWebView2(){}
-#if RNW_VERSION_AT_LEAST(0,68,0)
         void ReactWebView2::RegisterEvents() {
             m_navigationStartingRevoker = m_webView.NavigationStarting(
                 winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
@@ -107,10 +103,8 @@ namespace winrt::ReactNativeWebView::implementation {
                 m_navigateToHtml = L"";
             }
         }
-#endif
 
     void ReactWebView2::NavigateToHtml(winrt::hstring html) {
-#if RNW_VERSION_AT_LEAST(0,68,0)
         if (m_webView.CoreWebView2()) {
             m_webView.NavigateToString(html);
         }
@@ -118,7 +112,7 @@ namespace winrt::ReactNativeWebView::implementation {
             m_webView.EnsureCoreWebView2Async();
             m_navigateToHtml = html;
         }
-#endif
     }
 
 } // namespace winrt::ReactNativeWebView::implementation
+#endif
