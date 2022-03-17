@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       name: Checkout Code
-     
+
     - name: Setup Node.js
       uses: actions/setup-node@v1
       with:
@@ -30,7 +30,7 @@ jobs:
     - name: Install node modules
       if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: yarn --pure-lockfile
-    
+
     - name: yarn build
       if: steps.yarn-cache.outputs.cache-hit == 'true'
       run: |
@@ -39,7 +39,7 @@ jobs:
 
     - name: Build x64 release
       shell: powershell
-      run: npx react-native run-windows --root example --arch x64 --release --no-packager --no-deploy --logging
+      run: yarn windows --release --no-packager --no-deploy --logging
 
     # Workaround for a bug in package searching during deploy.
     # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the pakcages at windows/x64/Release.
@@ -47,9 +47,8 @@ jobs:
     - name: Deploy
       shell: powershell
       run: |
-        cd example
-        Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
-        npx react-native run-windows --arch x64 --release --no-build --no-packager
+        Copy-Item -Path example\windows\x64\Release -Recurse -Destination example\windows\
+        npx react-native run-windows --arch x64 --release --root example --logging --no-build --no-packager
 
     - name: Start Appium server
       shell: powershell
@@ -57,7 +56,7 @@ jobs:
 
     - name: Start React server
       shell: powershell
-      run: Start-Process PowerShell -ArgumentList "yarn start:windows"
-      
+      run: Start-Process PowerShell -ArgumentList "yarn start"
+
     - name: Run tests
       run: yarn test:windows

@@ -15,42 +15,44 @@ There are two methods of testing:
 ### Testing within react-native-webview
 
 #### For all platforms:
-```
-$ yarn install
+
+```sh
+yarn install
 ```
 
 #### For Android:
-```
-$ yarn start:android
+
+```sh
+yarn android
 ```
 
 The Android example app will built, the Metro Bundler will launch, and the example app will be installed and started in the Android emulator.
 
 #### For iOS:
-```
-$ cd example/ios
-$ pod install
-$ cd ../..
-$ yarn start:ios
+
+```sh
+pod install --project-directory=ios
+yarn ios
 ```
 
-The iOS example app will be built, the Metro bundler will launch, and the example app will be install and started in the Simulator.
+The iOS example app will be built, the Metro bundler will launch, and the example app will be installed and started in the Simulator.
 
-#### for macOS:
-```
-$ open example/macos/example.xcodeproj
-$ yarn start:macos
+#### For macOS:
+
+```sh
+pod install --project-directory=macos
+yarn macos
 ```
 
-The Metro Bundler will now be running in the Terminal for react-native-macos.  In XCode select the `example-macos` target and Run.
+The macOS example app will be built, the Metro bundler will launch, and the example app will be installed and started.
 
 #### For Windows:
-```
-$ yarn start:windows
-$ open example/windows/WebViewWindows.sln and click run button.
+
+```sh
+yarn windows
 ```
 
-The Metro Bundler will now be running in the Terminal for react-native-windows and the example app will be install and started
+The Windows example app will be built, the Metro bundler will launch, and the example app will be installed and started.
 
 ### Testing in a new `react-native init` project
 
@@ -92,3 +94,9 @@ $ yarn add ../react-native-webview && react-native link react-native-webview
 
 - We use TypeScript.
 - After pulling this repo and installing all dependencies, you can run tests using the command: `yarn ci`
+
+## Translations
+
+This file is available at:
+
+- [Brazilian portuguese](Contributing.portuguese.md)

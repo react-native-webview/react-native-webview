@@ -573,11 +573,14 @@ url
 
 ### `onContentProcessDidTerminate`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Function that is invoked when the `WebView` content process is terminated.
+Function that is invoked when the `WebView` content process is terminated. 
 
 | Type     | Required | Platform                |
 | -------- | -------- | ----------------------- |
 | function | No       | iOS and macOS WKWebView |
+
+iOS Web views use a separate process to render and manage web content. WebKit calls this method when the process for the specified web view terminates for any reason. 
+The reason is not necessarily a crash. For instance, since iOS WebViews are not included in the total RAM of the app, they can be terminated independently of the app to liberate memory for new apps the user is opening. It's not unexpected to have WebViews get terminated after a while in the background.
 
 Example:
 
@@ -1533,7 +1536,9 @@ Android enforces a minimum font size based on this value. A non-negative integer
 
 Example:
 
-`<WebView minimumFontSize={1} />`
+```javascript
+<WebView minimumFontSize={1} />
+```
 
 ## Methods
 
@@ -1628,3 +1633,9 @@ Tells this WebView to clear its internal back/forward list. [developer.android.c
 ## Other Docs
 
 Also check out our [Getting Started Guide](Getting-Started.md) and [In-Depth Guide](Guide.md).
+
+## Translations
+
+This file is available at:
+
+- [Brazilian portuguese](Reference.portuguese.md)

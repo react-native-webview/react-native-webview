@@ -123,3 +123,9 @@ class MyInlineWeb extends Component {
 ```
 
 Next, check out the [API Reference](Reference.md) or [In-Depth Guide](Guide.md).
+
+## Translations
+
+This file is available at:
+
+- [Brazilian portuguese](Getting-Started.portuguese.md)

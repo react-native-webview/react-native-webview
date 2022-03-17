@@ -1,0 +1,35 @@
+name: iOS
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2.5.1
+        with:
+          node-version: 16
+      - name: Cache /node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: Install npm dependencies
+        run: yarn --frozen-lockfile
+      - name: Install Pods
+        run: pod install
+        working-directory: example/ios
+      - name: Build iOS test app
+        run: |
+          device_name='iPhone 13'
+          device=$(xcrun simctl list devices "${device_name}" available | grep "${device_name} (")
+          re='\(([-0-9A-Fa-f]+)\)'
+          [[ $device =~ $re ]] || exit 1
+          xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination "platform=iOS Simulator,id=${BASH_REMATCH[1]}" CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
+        working-directory: example/ios
+    timeout-minutes: 60
