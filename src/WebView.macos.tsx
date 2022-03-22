@@ -253,6 +253,7 @@ class WebView extends React.Component<MacOSWebViewProps, State> {
 
   componentDidUpdate(prevProps: MacOSWebViewProps) {
     this.showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
+    this.showRedboxOnPropChanges(prevProps, 'allowsAirPlayForMediaPlayback');
     this.showRedboxOnPropChanges(prevProps, 'incognito');
     this.showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
   }
