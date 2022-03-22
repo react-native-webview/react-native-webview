@@ -113,11 +113,6 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup>
-    <Midl>
-      <AdditionalIncludeDirectories>$(ReactNativeWindowsDir)\Microsoft.ReactNative.Cxx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </Midl>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ReactWebView.h" />
     <ClInclude Include="ReactWebView2.h" />
