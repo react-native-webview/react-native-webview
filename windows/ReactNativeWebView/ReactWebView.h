@@ -36,6 +36,7 @@ namespace winrt::ReactNativeWebView::implementation {
         void OnNavigationCompleted(winrt::Windows::UI::Xaml::Controls::WebView const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationCompletedEventArgs const& args);
         void OnNavigationFailed(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::WebViewNavigationFailedEventArgs const& args);
         void OnMessagePosted(hstring const& message);
+        bool Is17763OrHigher();
     };
 } // namespace winrt::ReactNativeWebView::implementation
 

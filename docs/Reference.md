@@ -84,6 +84,7 @@ This document lays out the current public properties and methods for the React N
 - [`basicAuthCredential`](Reference.md#basicAuthCredential)
 - [`enableApplePay`](Reference.md#enableApplePay)
 - [`forceDarkOn`](Reference.md#forceDarkOn)
+- [`useWebView2`](Reference.md#useWebView2)
 - [`minimumFontSize`](Reference.md#minimumFontSize)
 
 ## Methods Index
@@ -1525,6 +1526,19 @@ An object that specifies the credentials of a user to be used for basic authenti
 | Type   | Required |
 | ------ | -------- |
 | object | No       |
+
+### `useWebView2`
+
+Use WinUI WebView2 control instead of WebView control as the native webview. The WebView2 control is a WinUI control that renders web content using the Microsoft Edge (Chromium) rendering engine. Option can be toggled at runtime and supports Fast Refresh.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Windows  |
+
+Example:
+
+```javascript
+<WebView useWebView2 />
 
 ### `minimumFontSize`
 

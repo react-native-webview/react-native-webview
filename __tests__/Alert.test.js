@@ -22,5 +22,4 @@ describe('Alert Tests', () => {
     expect(dismissMessage).not.toBeNull();
     await driver.quit();
   });
-
 });
