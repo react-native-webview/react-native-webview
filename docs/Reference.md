@@ -952,9 +952,9 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 
 A Boolean value indicating whether AirPlay is allowed. The default value is `true`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | iOS      |
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS and macOS |
 
 ---
 

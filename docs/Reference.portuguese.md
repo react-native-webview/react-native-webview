@@ -950,9 +950,9 @@ Booleano que determina se os vídeos HTML5 são reproduzidos inline ou usam o co
 
 Um valor booleano que indica se o AirPlay é permitido. O valor padrão é `falso`.
 
-| Tipo | Requerido | Plataforma |
-| ---- | --------- | ---------- |
-| bool | Não       | iOS        |
+| Tipo | Requerido | Plataforma      |
+| ---- | --------- | --------------- |
+| bool | Não       | iOS e macOS     |
 
 ---
 ### `bounces`[⬆](#props-index)<!-- Link gerado com jump2header -->
