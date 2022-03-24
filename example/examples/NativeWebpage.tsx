@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {View} from 'react-native';
+import React, { Component } from 'react';
+import { View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -11,10 +11,13 @@ export default class NativeWebpage extends Component<Props, State> {
 
   render() {
     return (
-      <View style={{height: 400}}>
+      <View style={{ height: 400 }}>
         <WebView
-          source={{uri: 'https://infinite.red'}}
-          style={{width: '100%', height: '100%'}}
+          source={{
+            uri: 'https://player.vimeo.com/video/538457669?transparent=false&autoplay=1',
+          }}
+          style={{ width: '100%', height: '100%' }}
+          allowsAirPlayForMediaPlayback={true}
         />
       </View>
     );

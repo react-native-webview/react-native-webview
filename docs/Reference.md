@@ -951,7 +951,7 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 ---
 ### `allowsAirPlayForMediaPlayback`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-A Boolean value indicating whether AirPlay is allowed. The default value is `true`.
+A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
 
 | Type    | Required | Platform      |
 | ------- | -------- | ------------- |
