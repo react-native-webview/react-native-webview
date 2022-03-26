@@ -42,13 +42,13 @@ jobs:
       run: yarn windows --release --no-packager --no-deploy --logging
 
     # Workaround for a bug in package searching during deploy.
-    # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the pakcages at windows/x64/Release.
+    # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the packages at windows/x64/Release.
     # Copy the packages to Windows/Release before deploying.
     - name: Deploy
       shell: powershell
       run: |
         Copy-Item -Path example\windows\x64\Release -Recurse -Destination example\windows\
-        npx react-native run-windows --arch x64 --release --root example --logging --no-build --no-packager
+        npx react-native run-windows --arch x64 --release --root example --logging --no-build --no-packager --deploy-from-layout
 
     - name: Start Appium server
       shell: powershell
