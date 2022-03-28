@@ -26,8 +26,6 @@
     ]
   },
   "windows": {
-    "appxManifest": "windows/Package.appxmanifest",
-    "certificateKeyFile": "windows/WebViewWindows_TemporaryKey.pfx",
-    "certificateThumbprint": "1DA6E34911B18C433FE3E543D0429FC808468C89"
+    "appxManifest": "windows/Package.appxmanifest"
   }
 }

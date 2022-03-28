@@ -147,6 +147,7 @@
     <None Include="packages.config" />
     <None Include="ReactNativeWebView.def" />
   </ItemGroup>
+
   <ItemGroup>
     <None Include="PropertySheet.props" />
   </ItemGroup>
