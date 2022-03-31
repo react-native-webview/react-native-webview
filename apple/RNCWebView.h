@@ -102,6 +102,9 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
+- (void)                    webView:(WKWebView *)webView
+  didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+                  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler;
 - (void)postMessage:(NSString *_Nullable)message;
 - (void)injectJavaScript:(NSString *_Nullable)script;
 - (void)goForward;
