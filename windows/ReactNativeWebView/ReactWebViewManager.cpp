@@ -51,7 +51,7 @@ namespace winrt::ReactNativeWebView::implementation {
     void ReactWebViewManager::UpdateProperties(
         FrameworkElement const& view,
         IJSValueReader const& propertyMapReader) noexcept {
-        auto control = view.as<winrt::UserControl>();
+        auto control = view.as<winrt::ContentPresenter>();
         auto content = control.Content();
         auto webView = content.as<winrt::WebView>();
         const JSValueObject& propertyMap = JSValueObject::ReadFrom(propertyMapReader);
@@ -176,7 +176,7 @@ namespace winrt::ReactNativeWebView::implementation {
         FrameworkElement const& view,
         winrt::hstring const& commandId,
         winrt::IJSValueReader const& commandArgsReader) noexcept {
-        auto control = view.as<winrt::UserControl>();
+        auto control = view.as<winrt::ContentPresenter>();
         auto content = control.Content();
         auto webView = content.as<winrt::WebView>();
         auto commandArgs = JSValue::ReadArrayFrom(commandArgsReader);

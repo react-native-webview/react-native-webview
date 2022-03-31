@@ -60,7 +60,6 @@ module.exports = {
           // `project` was only used to infer `sourceDir` and `podfile`.
           return 'example/ios/ReactTestApp-Dummy.xcodeproj';
         }
-
         // `sourceDir` and `podfile` detection was fixed in
         // @react-native-community/cli-platform-ios v5.0.2 (see
         // https://github.com/react-native-community/cli/pull/1444).
