@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import {
   Image,
-  UIManager as NotTypedUIManager,
   View,
   NativeModules,
   ImageSourcePropType,
-  findNodeHandle,
 } from 'react-native';
 
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
+// @ts-expect-error react-native doesn't have this type
+import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
 import invariant from 'invariant';
 
@@ -29,13 +29,16 @@ import {
   WebViewProgressEvent,
   AndroidWebViewProps,
   NativeWebViewAndroid,
-  State,
-  RNCWebViewUIManagerAndroid,
+  WebViewError,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManagerAndroid;
+const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
+
+const Commands = codegenNativeCommands({
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'clearFormData', 'clearCache', 'clearHistory', 'loadUrl'],
+});
 
 const { resolveAssetSource } = Image;
 
@@ -44,344 +47,216 @@ const { resolveAssetSource } = Image;
  */
 let uniqueRef = 0;
 
-/**
- * Renders a native WebView.
- */
-class WebView extends React.Component<AndroidWebViewProps, State> {
-  static defaultProps = {
-    overScrollMode: 'always',
-    javaScriptEnabled: true,
-    thirdPartyCookiesEnabled: true,
-    scalesPageToFit: true,
-    allowsFullscreenVideo: false,
-    allowFileAccess: false,
-    saveFormDataDisabled: false,
-    cacheEnabled: true,
-    androidHardwareAccelerationDisabled: false,
-    androidLayerType: 'none',
-    originWhitelist: defaultOriginWhitelist,
-    setSupportMultipleWindows: true,
-    setBuiltInZoomControls: true,
-    setDisplayZoomControls: false,
-    nestedScrollEnabled: false,
-  };
 
-  static isFileUploadSupported = async () => {
-    // native implementation should return "true" only for Android 5+
-    return NativeModules.RNCWebView.isFileUploadSupported();
-  };
+// native implementation should return "true" only for Android 5+
+const isFileUploadSupported: () => Promise<boolean>
+  = NativeModules.RNCWebView.isFileUploadSupported();
 
-  startUrl: string | null = null;
+const WebView = forwardRef<{}, AndroidWebViewProps>(({
+  overScrollMode = 'always',
+  javaScriptEnabled = true,
+  thirdPartyCookiesEnabled = true,
+  scalesPageToFit = true,
+  allowsFullscreenVideo = false,
+  allowFileAccess = false,
+  saveFormDataDisabled = false,
+  cacheEnabled = true,
+  androidHardwareAccelerationDisabled = false,
+  androidLayerType = "none",
+  originWhitelist = defaultOriginWhitelist,
+  setSupportMultipleWindows = true,
+  setBuiltInZoomControls = true,
+  setDisplayZoomControls = false,
+  nestedScrollEnabled = false,
+  startInLoadingState,
+  onNavigationStateChange,
+  onLoadStart,
+  onError,
+  onLoad,
+  onLoadEnd,
+  onLoadProgress,
+  onHttpError: onHttpErrorProp,
+  onRenderProcessGone: onRenderProcessGoneProp,
+  onMessage: onMessageProp,
+  renderLoading,
+  renderError,
+  style,
+  containerStyle,
+  source,
+  nativeConfig,
+  onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+  ...otherProps
+}, ref) => {
+  const startUrl = useRef<string | null>(null)
+  const [viewState, setViewState] = useState<'IDLE' | 'LOADING' | 'ERROR'>(startInLoadingState ? "LOADING" : "IDLE");
+  const [lastErrorEvent, setLastErrorEvent] = useState<WebViewError | null>(null);
+  const onShouldStartLoadWithRequest = useRef<ReturnType<typeof createOnShouldStartLoadWithRequest> | null>(null);
+  const webViewRef = useRef<NativeWebViewAndroid | null>(null);
+  const messagingModuleName = useRef<string>(`WebViewMessageHandler${uniqueRef += 1}`).current;
 
-  state: State = {
-    viewState: this.props.startInLoadingState ? 'LOADING' : 'IDLE',
-    lastErrorEvent: null,
-  };
+  useEffect(() => {
+    // TODO useMemo and add events
+    BatchedBridge.registerCallableModule(messagingModuleName, {});
+  }, [])
 
-  onShouldStartLoadWithRequest: ReturnType<typeof createOnShouldStartLoadWithRequest> | null = null;
+  useImperativeHandle(ref, () => ({
+    goForward: () => Commands.goForward(webViewRef.current),
+    goBack: () => Commands.goBack(webViewRef.current),
+    reload: () => {
+      setViewState(
+        'LOADING',
+      ); Commands.reload(webViewRef.current)
+    },
+    stopLoading: () => Commands.stopLoading(webViewRef.current),
+    postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
+    injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
+    requestFocus: () => Commands.requestFocus(webViewRef.current),
+    clearFormData: () => Commands.clearFormData(webViewRef.current),
+    clearCache: (includeDiskFiles: boolean) => Commands.clearCache(webViewRef.current, includeDiskFiles),
+    clearHistory: () => Commands.clearHistory(webViewRef.current),
+    isFileUploadSupported,
+  }), [])
 
-  webViewRef = React.createRef<NativeWebViewAndroid>();
+  const updateNavigationState = useCallback((event: WebViewNavigationEvent) => {
+    onNavigationStateChange?.(event.nativeEvent);
+  }, [onNavigationStateChange]);
 
-  messagingModuleName = `WebViewMessageHandler${uniqueRef+=1}`;
+  const onLoadingStart = useCallback((event: WebViewNavigationEvent) => {
+    startUrl.current = event.nativeEvent.url;
+    onLoadStart?.(event);
+    updateNavigationState(event);
+  }, [onLoadStart, updateNavigationState]);
 
-  componentDidMount = () => {
-    BatchedBridge.registerCallableModule(this.messagingModuleName, this);
-  };
-
-  getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
-
-  goForward = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().goForward,
-      undefined
-    );
-  };
-
-  goBack = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().goBack,
-      undefined
-    );
-  };
-
-  reload = () => {
-    this.setState({
-      viewState: 'LOADING',
-    });
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().reload,
-      undefined
-    );
-  };
-
-  stopLoading = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().stopLoading,
-      undefined
-    );
-  };
-
-  requestFocus = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().requestFocus,
-      undefined
-    );
-  };
-
-  postMessage = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().postMessage,
-      [String(data)],
-    );
-  };
-
-  clearFormData = () => {
-    UIManager.dispatchViewManagerCommand(
-       this.getWebViewHandle(),
-       this.getCommands().clearFormData,
-        undefined,
-    );
-  }
-
-  clearCache = (includeDiskFiles: boolean) => {
-    UIManager.dispatchViewManagerCommand(
-       this.getWebViewHandle(),
-       this.getCommands().clearCache,
-       [includeDiskFiles],
-    );
-  };
-
-  clearHistory = () => {
-    UIManager.dispatchViewManagerCommand(
-       this.getWebViewHandle(),
-       this.getCommands().clearHistory,
-        undefined,
-    );
-  };
-
-  /**
-   * Injects a javascript string into the referenced WebView. Deliberately does not
-   * return a response because using eval() to return a response breaks this method
-   * on pages with a Content Security Policy that disallows eval(). If you need that
-   * functionality, look into postMessage/onMessage.
-   */
-  injectJavaScript = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().injectJavaScript,
-      [data],
-    );
-  };
-
-  /**
-   * We return an event with a bunch of fields including:
-   *  url, title, loading, canGoBack, canGoForward
-   */
-  updateNavigationState = (event: WebViewNavigationEvent) => {
-    if (this.props.onNavigationStateChange) {
-      this.props.onNavigationStateChange(event.nativeEvent);
-    }
-  };
-
-  /**
-   * Returns the native `WebView` node.
-   */
-  getWebViewHandle = () => {
-    const nodeHandle = findNodeHandle(this.webViewRef.current);
-    invariant(nodeHandle != null, 'nodeHandle expected to be non-null');
-    return nodeHandle as number;
-  };
-
-  onLoadingStart = (event: WebViewNavigationEvent) => {
-    const { onLoadStart } = this.props;
-    const { nativeEvent: { url } } = event;
-    this.startUrl = url;
-    if (onLoadStart) {
-      onLoadStart(event);
-    }
-    this.updateNavigationState(event);
-  };
-
-  onLoadingError = (event: WebViewErrorEvent) => {
-    event.persist(); // persist this event because we need to store it
-    const { onError, onLoadEnd } = this.props;
+  const onLoadingError = useCallback((event: WebViewErrorEvent) => {
+    event.persist();
     if (onError) {
       onError(event);
     } else {
       console.warn('Encountered an error loading page', event.nativeEvent);
     }
+    onLoadEnd?.(event);
+    if (event.isDefaultPrevented()) { return };
+    setViewState('ERROR');
+    setLastErrorEvent(event.nativeEvent);
+  }, []);
 
-    if (onLoadEnd) {
-      onLoadEnd(event);
-    }
-    if (event.isDefaultPrevented()) return;
+  const onHttpError = useCallback((event: WebViewHttpErrorEvent) => {
+    onHttpErrorProp?.(event);
+  }, []);
 
-    this.setState({
-      lastErrorEvent: event.nativeEvent,
-      viewState: 'ERROR',
-    });
-  };
+  const onRenderProcessGone = useCallback((event: WebViewRenderProcessGoneEvent) => {
+    onRenderProcessGoneProp?.(event);
+  }, []);
 
-  onHttpError = (event: WebViewHttpErrorEvent) => {
-    const { onHttpError } = this.props;
-    if (onHttpError) {
-      onHttpError(event);
-    }
-  }
-
-  onRenderProcessGone = (event: WebViewRenderProcessGoneEvent) => {
-    const { onRenderProcessGone } = this.props;
-    if (onRenderProcessGone) {
-      onRenderProcessGone(event);
-    }
-  }
-
-  onLoadingFinish = (event: WebViewNavigationEvent) => {
-    const { onLoad, onLoadEnd } = this.props;
+  const onLoadingFinish = useCallback((event: WebViewNavigationEvent) => {
+    onLoad?.(event);
+    onLoadEnd?.(event);
     const { nativeEvent: { url } } = event;
-    if (onLoad) {
-      onLoad(event);
+    if (url === startUrl.current) {
+      setViewState('IDLE');
     }
-    if (onLoadEnd) {
-      onLoadEnd(event);
-    }
-    if (url === this.startUrl) {
-      this.setState({
-        viewState: 'IDLE',
-      });
-    }
-    this.updateNavigationState(event);
-  };
+    updateNavigationState(event);
+  }, []);
 
-  onMessage = (event: WebViewMessageEvent) => {
-    const { onMessage } = this.props;
-    if (onMessage) {
-      onMessage(event);
-    }
-  };
+  const onMessage = useCallback((event: WebViewMessageEvent) => {
+    onMessageProp?.(event);
+  }, []);
 
-  onLoadingProgress = (event: WebViewProgressEvent) => {
-    const { onLoadProgress } = this.props;
+  const onLoadingProgress = useCallback((event: WebViewProgressEvent) => {
     const { nativeEvent: { progress } } = event;
     if (progress === 1) {
-      this.setState((state) => {
-        if (state.viewState === 'LOADING') {
-          return { viewState: 'IDLE' };
-        }
-        return null;
-      });
+      setViewState(prevViewState => prevViewState === 'LOADING' ? 'IDLE' : prevViewState);
     }
-    if (onLoadProgress) {
-      onLoadProgress(event);
-    }
-  };
+    onLoadProgress?.(event);
+  }, []);
 
-  onShouldStartLoadWithRequestCallback = (
-    shouldStart: boolean,
+  const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean,
     url: string,
-    lockIdentifier?: number,
-  ) => {
+    lockIdentifier?: number) => {
     if (lockIdentifier) {
       NativeModules.RNCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
     } else if (shouldStart) {
-      UIManager.dispatchViewManagerCommand(
-        this.getWebViewHandle(),
-        this.getCommands().loadUrl,
-        [String(url)],
-      );
+      Commands.loadUrl(webViewRef, url);
     }
-  };
+  }, []);
 
-  render() {
-    const {
-      onMessage,
-      onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-      originWhitelist,
-      renderError,
-      renderLoading,
-      source,
-      style,
-      containerStyle,
-      nativeConfig = {},
-      ...otherProps
-    } = this.props;
-
-    let otherView = null;
-
-    if (this.state.viewState === 'LOADING') {
-      otherView = (renderLoading || defaultRenderLoading)();
-    } else if (this.state.viewState === 'ERROR') {
-      const errorEvent = this.state.lastErrorEvent;
-      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
-      otherView = (renderError || defaultRenderError)(
-        errorEvent.domain,
-        errorEvent.code,
-        errorEvent.description,
-      );
-    } else if (this.state.viewState !== 'IDLE') {
-      console.error(
-        `RNCWebView invalid state encountered: ${this.state.viewState}`,
-      );
-    }
-
-    const webViewStyles = [styles.container, styles.webView, style];
-    const webViewContainerStyle = [styles.container, containerStyle];
-
-    if (typeof source !== "number" && source && 'method' in source) {
-      if (source.method === 'POST' && source.headers) {
-        console.warn(
-          'WebView: `source.headers` is not supported when using POST.',
-        );
-      } else if (source.method === 'GET' && source.body) {
-        console.warn('WebView: `source.body` is not supported when using GET.');
-      }
-    }
-
-    const NativeWebView
-      = (nativeConfig.component as typeof NativeWebViewAndroid) || RNCWebView;
-
-    this.onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
-      this.onShouldStartLoadWithRequestCallback,
-      // casting cause it's in the default props
-      originWhitelist as readonly string[],
-      onShouldStartLoadWithRequestProp,
+  let otherView = null;
+  if (viewState === 'LOADING') {
+    otherView = (renderLoading || defaultRenderLoading)();
+  } else if (viewState === 'ERROR') {
+    invariant(lastErrorEvent != null, 'lastErrorEvent expected to be non-null');
+    otherView = (renderError || defaultRenderError)(
+      lastErrorEvent.domain,
+      lastErrorEvent.code,
+      lastErrorEvent.description,
     );
-
-    const webView = (
-      <NativeWebView
-        key="webViewKey"
-        {...otherProps}
-        messagingEnabled={typeof onMessage === 'function'}
-        messagingModuleName={this.messagingModuleName}
-        onLoadingError={this.onLoadingError}
-        onLoadingFinish={this.onLoadingFinish}
-        onLoadingProgress={this.onLoadingProgress}
-        onLoadingStart={this.onLoadingStart}
-        onHttpError={this.onHttpError}
-        onRenderProcessGone={this.onRenderProcessGone}
-        onMessage={this.onMessage}
-        onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
-        ref={this.webViewRef}
-        // TODO: find a better way to type this.
-        source={resolveAssetSource(source as ImageSourcePropType)}
-        style={webViewStyles}
-        {...nativeConfig.props}
-      />
-    );
-
-    return (
-      <View style={webViewContainerStyle}>
-        {webView}
-        {otherView}
-      </View>
-    );
+  } else if (viewState !== 'IDLE') {
+    console.error(`RNCWebView invalid state encountered: ${viewState}`);
   }
-}
 
+  const webViewStyles = [styles.container, styles.webView, style];
+  const webViewContainerStyle = [styles.container, containerStyle];
+
+  if (typeof source !== "number" && source && 'method' in source) {
+    if (source.method === 'POST' && source.headers) {
+      console.warn(
+        'WebView: `source.headers` is not supported when using POST.',
+      );
+    } else if (source.method === 'GET' && source.body) {
+      console.warn('WebView: `source.body` is not supported when using GET.');
+    }
+  }
+
+
+  const NativeWebView
+    = (nativeConfig?.component as (typeof NativeWebViewAndroid | undefined)) || RNCWebView;
+
+  onShouldStartLoadWithRequest.current = createOnShouldStartLoadWithRequest(
+    onShouldStartLoadWithRequestCallback,
+    // casting cause it's in the default props
+    originWhitelist as readonly string[],
+    onShouldStartLoadWithRequestProp,
+  );
+
+  const webView = <NativeWebView
+    key="webViewKey"
+    {...otherProps}
+    messagingEnabled={typeof onMessage === 'function'}
+    messagingModuleName={messagingModuleName}
+    onLoadingError={onLoadingError}
+    onLoadingFinish={onLoadingFinish}
+    onLoadingProgress={onLoadingProgress}
+    onLoadingStart={onLoadingStart}
+    onHttpError={onHttpError}
+    onRenderProcessGone={onRenderProcessGone}
+    onMessage={onMessage}
+    onShouldStartLoadWithRequest={onShouldStartLoadWithRequest.current}
+    ref={webViewRef}
+    // TODO: find a better way to type this.
+    source={resolveAssetSource(source as ImageSourcePropType)}
+    style={webViewStyles}
+    overScrollMode={overScrollMode}
+    javaScriptEnabled={javaScriptEnabled}
+    thirdPartyCookiesEnabled={thirdPartyCookiesEnabled}
+    scalesPageToFit={scalesPageToFit}
+    allowsFullscreenVideo={allowsFullscreenVideo}
+    allowFileAccess={allowFileAccess}
+    saveFormDataDisabled={saveFormDataDisabled}
+    cacheEnabled={cacheEnabled}
+    androidHardwareAccelerationDisabled={androidHardwareAccelerationDisabled}
+    androidLayerType={androidLayerType}
+    setSupportMultipleWindows={setSupportMultipleWindows}
+    setBuiltInZoomControls={setBuiltInZoomControls}
+    setDisplayZoomControls={setDisplayZoomControls}
+    nestedScrollEnabled={nestedScrollEnabled}
+    {...nativeConfig?.props}
+  />
+
+  return (
+    <View style={webViewContainerStyle}>
+      {webView}
+      {otherView}
+    </View>
+  );
+});
 export default WebView;

@@ -43,6 +43,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -695,7 +696,20 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       .build();
   }
 
+  // receiveCommand signature has changed to receive String commandId
+
   @Override
+  public void receiveCommand(@NonNull WebView root, String commandId, @Nullable ReadableArray args) {
+    switch (commandId) {
+      case "reload":
+        root.reload();
+        break;
+    }
+    super.receiveCommand(root, commandId, args);
+  }
+
+
+  /*  @Override
   public void receiveCommand(WebView root, int commandId, @Nullable ReadableArray args) {
     switch (commandId) {
       case COMMAND_GO_BACK:
@@ -755,7 +769,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         root.clearHistory();
         break;
     }
-  }
+  }*/
 
   @Override
   public void onDropViewInstance(WebView webView) {
