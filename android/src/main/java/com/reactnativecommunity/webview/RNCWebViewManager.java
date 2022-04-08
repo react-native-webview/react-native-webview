@@ -196,7 +196,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected WebView createViewInstance(ThemedReactContext reactContext) {
     RNCWebView webView = createRNCWebViewInstance(reactContext);
     customWebView = new RNCWebView(reactContext);
-    Log.d(TAG, "createViewInstance: "+customWebView);
     setupWebChromeClient(reactContext, customWebView);
     reactContext.addLifecycleEventListener(webView);
     mWebViewConfig.configWebView(customWebView);
@@ -224,9 +223,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
-    webView.setDownloadListener(new DownloadListener() {
+    customWebView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-        webView.setIgnoreErrFailedForThisURL(url);
+        customWebView.setIgnoreErrFailedForThisURL(url);
 
         RNCWebViewModule module = getModule(reactContext);
 
@@ -280,13 +279,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     customWebView.setWebViewClient(new RNCWebViewClient());
     System.out.println("---- reload1  "+ headerMapCustom);
     swipeRefreshLayout.setOnRefreshListener(() -> {
-      new Handler().postDelayed(new Runnable() {
-        @Override public void run() {
-          swipeRefreshLayout.setRefreshing(false);
-          System.out.println("---- reload2  "+ headerMapCustom);
-          customWebView.loadUrl(url, headerMapCustom);
-        }
-      }, 2000); // Delay in millis
+      new Handler().postDelayed(() -> {
+        swipeRefreshLayout.setRefreshing(false);
+        System.out.println("---- reload2  "+ headerMapCustom);
+        customWebView.loadUrl(url, headerMapCustom);
+      }, 0); // Delay in millis
     });
 
     System.out.println("---- c  "+ headerMapCustom.isEmpty());
@@ -359,7 +356,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         cacheMode = WebSettings.LOAD_DEFAULT;
         break;
     }
-    view.getSettings().setCacheMode(cacheMode);
+    customWebView.getSettings().setCacheMode(cacheMode);
   }
 
   @ReactProp(name = "androidHardwareAccelerationDisabled")
@@ -455,39 +452,39 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected void setUserAgentString(WebView view) {
     if(mUserAgent != null) {
-      view.getSettings().setUserAgentString(mUserAgent);
+      customWebView.getSettings().setUserAgentString(mUserAgent);
     } else if(mUserAgentWithApplicationName != null) {
       view.getSettings().setUserAgentString(mUserAgentWithApplicationName);
     } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
       // handle unsets of `userAgent` prop as long as device is >= API 17
-      customWebView.getSettings().setUserAgentString(WebSettings.getDefaultUserAgent(view.getContext()));
+      view.getSettings().setUserAgentString(WebSettings.getDefaultUserAgent(view.getContext()));
     }
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
   @ReactProp(name = "mediaPlaybackRequiresUserAction")
   public void setMediaPlaybackRequiresUserAction(WebView view, boolean requires) {
-    customWebView.getSettings().setMediaPlaybackRequiresUserGesture(requires);
+    view.getSettings().setMediaPlaybackRequiresUserGesture(requires);
   }
 
   @ReactProp(name = "javaScriptCanOpenWindowsAutomatically")
   public void setJavaScriptCanOpenWindowsAutomatically(WebView view, boolean enabled) {
-    customWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(enabled);
+    view.getSettings().setJavaScriptCanOpenWindowsAutomatically(enabled);
   }
 
   @ReactProp(name = "allowFileAccessFromFileURLs")
   public void setAllowFileAccessFromFileURLs(WebView view, boolean allow) {
-    customWebView.getSettings().setAllowFileAccessFromFileURLs(allow);
+    view.getSettings().setAllowFileAccessFromFileURLs(allow);
   }
 
   @ReactProp(name = "allowUniversalAccessFromFileURLs")
   public void setAllowUniversalAccessFromFileURLs(WebView view, boolean allow) {
-    customWebView.getSettings().setAllowUniversalAccessFromFileURLs(allow);
+    view.getSettings().setAllowUniversalAccessFromFileURLs(allow);
   }
 
   @ReactProp(name = "saveFormDataDisabled")
   public void setSaveFormDataDisabled(WebView view, boolean disable) {
-    customWebView.getSettings().setSaveFormData(!disable);
+    view.getSettings().setSaveFormData(!disable);
   }
 
   @ReactProp(name = "injectedJavaScript")
@@ -653,7 +650,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     WebView view,
     @Nullable Boolean allowsFullscreenVideo) {
     mAllowsFullscreenVideo = allowsFullscreenVideo != null && allowsFullscreenVideo;
-    setupWebChromeClient((ReactContext)view.getContext(), view);
+    setupWebChromeClient((ReactContext)view.getContext(), customWebView);
   }
 
   @ReactProp(name = "allowFileAccess")
@@ -704,8 +701,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
-    Log.d(TAG, "addEventEmitters: "+view);
-    Log.d(TAG, "addEventEmitters111: "+customWebView);
     view.setWebViewClient(new RNCWebViewClient());
   }
 
@@ -964,7 +959,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      Log.d(TAG, "shouldOverrideUrlLoading: "+url);
 
       final RNCWebView rncWebView = (RNCWebView) view;
       final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
@@ -1260,7 +1254,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-      Log.d(TAG, "onCreateWindow: ");
 
       final WebView newWebView = new WebView(view.getContext());
       final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
@@ -1586,7 +1579,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-      Log.d(TAG, "onTouchEvent: "+event);
       if (this.nestedScrollEnabled) {
         requestDisallowInterceptTouchEvent(true);
       }
@@ -1650,16 +1642,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
-      Log.d(TAG, "createRNCWebViewBridge: ");
       return new RNCWebViewBridge(webView);
     }
 
     protected void createCatalystInstance() {
       ReactContext reactContext = (ReactContext) this.getContext();
-      Log.d(TAG, "createCatalystInstance: 111");
       if (reactContext != null) {
         mCatalystInstance = reactContext.getCatalystInstance();
-        Log.d(TAG, "createCatalystInstance: "+mCatalystInstance);
       }
     }
 
@@ -1679,9 +1668,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     public void setMessagingModuleName(String moduleName) {
-//      Log.d(TAG, "setMessagingModuleName: "+moduleName);
       messagingModuleName = moduleName;
-      Log.d(TAG, "messagingModuleName: "+messagingModuleName);
     }
 
     protected void evaluateJavascriptWithFallback(String script) {
@@ -1732,7 +1719,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
               mContext.sendDirectMessage("onMessage", data);
             } else {
               dispatchEvent(webView, new TopMessageEvent(webView.getId(), data));
-              Log.d(TAG, "dispatchEvent: "+data);
             }
           }
         });
@@ -1754,11 +1740,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       WritableNativeArray params = new WritableNativeArray();
       params.pushMap(event);
-      Log.d(TAG, "messagingModuleName: "+messagingModuleName);
-      Log.d(TAG, "method: "+method);
-      Log.d(TAG, "params: "+params);
-      Log.d(TAG, "mCatalystInstance: "+mCatalystInstance);
-
       mCatalystInstance.callFunction("WebViewMessageHandler1", method, params);
     }
 
@@ -1823,7 +1804,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
        */
       @JavascriptInterface
       public void postMessage(String message) {
-        Log.d(TAG, "postMessage:---updatedddßß "+message);
         mContext.onMessage(message);
       }
     }
