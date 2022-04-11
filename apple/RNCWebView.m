@@ -1137,7 +1137,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   NSURLRequest *request = navigationAction.request;
   BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
 
-  if (_onShouldStartLoadWithRequest) {
+  if (_onShouldStartLoadWithRequest && request != nil && request.mainDocumentURL != nil) {
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     [event addEntriesFromDictionary: @{
       @"url": (request.URL).absoluteString,
@@ -1153,7 +1153,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     }
   }
 
-  if (_onLoadingStart) {
+  if (_onLoadingStart && request != nil && request.URL != nil) {
     // We have this check to filter out iframe requests and whatnot
     if (isTopFrame) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
