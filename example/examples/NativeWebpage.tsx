@@ -13,11 +13,8 @@ export default class NativeWebpage extends Component<Props, State> {
     return (
       <View style={{ height: 400 }}>
         <WebView
-          source={{
-            uri: 'https://player.vimeo.com/video/538457669?transparent=false&autoplay=1',
-          }}
+          source={{ uri: 'https://infinite.red' }}
           style={{ width: '100%', height: '100%' }}
-          allowsAirPlayForMediaPlayback={true}
         />
       </View>
     );
