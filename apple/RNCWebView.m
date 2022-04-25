@@ -9,6 +9,11 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#import "RNCWKWebViewMapManager.h"
+#import "RNCWebViewMapManager.h"
+#import "RNCScriptMessageManager.h"
+#import "ScriptMessageEventEmitter.h"
+
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
@@ -426,18 +431,46 @@ RCTAutoInsetsProtocol>
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
+    NSMutableDictionary *sharedWKWebViewDictionary= [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+      
+    if ([self shouldReuseWebView]) {
+      WKWebView *webViewForKey = sharedWKWebViewDictionary[_webViewKey];
+      if (webViewForKey != nil) {
+        _webView = webViewForKey;
+        NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+        RNCWebView *rncWebView = sharedRNCWebViewDictionary[_webViewKey];
+        if (rncWebView != nil) {
+          [self removeWKWebViewFromSuperView:rncWebView];
+        }
+      }
+    }
+    
+    bool reusedWebViewInstance = _webView != nil;
+
+    if (_webView == nil) {
 #if !TARGET_OS_OSX
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+      _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #else
-    _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+      _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
+    }
+      
+    if (_webViewKey != nil) {
+        NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+        sharedRNCWebViewDictionary[_webViewKey] = self;
+        if (_webView != nil) {
+          sharedWKWebViewDictionary[_webViewKey] = _webView;
+        }
+    }
     
     [self setBackgroundColor: _savedBackgroundColor];
+    
+    if (!reusedWebViewInstance) {
 #if !TARGET_OS_OSX
-    _webView.scrollView.delegate = self;
+      _webView.scrollView.delegate = self;
 #endif // !TARGET_OS_OSX
-    _webView.UIDelegate = self;
-    _webView.navigationDelegate = self;
+      _webView.UIDelegate = self;
+      _webView.navigationDelegate = self;
 #if !TARGET_OS_OSX
     if (_pullToRefreshEnabled) {
       [self addPullToRefreshControl];
@@ -451,25 +484,33 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
 #endif // !TARGET_OS_OSX
     _webView.allowsLinkPreview = _allowsLinkPreview;
-    [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
     
     _webView.customUserAgent = _userAgent;
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
-    }
+      if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+        _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
+      }
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-    if (@available(iOS 13.0, *)) {
-      _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
-    }
+      if (@available(iOS 13.0, *)) {
+        _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
+      }
 #endif
+    }
     
+    // We have to remove the old observer via removeWKWebViewFromSuperView when reusing the WKWebView instance,
+    // so whether we're reusing the instance or not, we always have to add the observer that references the new
+    // RNCWebView instance.
+    [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
+
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
-    [self visitSource];
+      
+    if (!reusedWebViewInstance) {
+      [self visitSource];
+    }
   }
 #if !TARGET_OS_OSX
   // Allow this object to recognize gestures
@@ -493,11 +534,31 @@ RCTAutoInsetsProtocol>
 
 - (void)removeFromSuperview
 {
+  bool keepWebViewInstance = _keepWebViewInstanceAfterUnmount && _webViewKey != nil;
+  if (!keepWebViewInstance) {
+    [self cleanUpWebView];
+  }
+  
+  if (_webViewKey != nil) {
+    NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+    RNCWebView *rncWebView = sharedRNCWebViewDictionary[_webViewKey];
+      
+    // When this view is being unmounted, only remove the WKWebView from the superview
+    // if this RNCWebView is the "active" view.
+    if (rncWebView == self) {
+      [self removeWKWebViewFromSuperView:self];
+    }
+  }
+
+  [super removeFromSuperview];
+}
+
+- (void)cleanUpWebView
+{
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
-    [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
-    [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
-    [_webView removeFromSuperview];
+    [self removeScriptHandlerForMessages:_webView.configuration.userContentController];
+    [self removeWKWebViewFromSuperView:self];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = nil;
 #endif // !TARGET_OS_OSX
@@ -507,8 +568,18 @@ RCTAutoInsetsProtocol>
       _onContentProcessDidTerminate(event);
     }
   }
-  
-  [super removeFromSuperview];
+}
+
+- (void)removeWKWebViewFromSuperView:(RNCWebView *)webViewObserver
+{
+  // If _webView is getting added to a new super view, we need to first both remove it from the old
+  // superview and also remove the observer which can reference the old super view.
+  if (_webViewKey != nil) {
+    NSMutableDictionary *sharedRNCWebViewDictionary = [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+    sharedRNCWebViewDictionary[_webViewKey] = nil;
+  }
+  [_webView removeObserver:webViewObserver forKeyPath:@"estimatedProgress"];
+  [_webView removeFromSuperview];
 }
 
 #if !TARGET_OS_OSX
@@ -635,6 +706,7 @@ RCTAutoInsetsProtocol>
   }
 }
 #endif
+
 /**
  * This method is called whenever JavaScript running within the web view calls:
  *   - window.webkit.messageHandlers[MessageHandlerName].postMessage
@@ -644,14 +716,12 @@ RCTAutoInsetsProtocol>
 {
   if ([message.name isEqualToString:HistoryShimName]) {
     if (_onLoadingFinish) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-      [event addEntriesFromDictionary: @{@"navigationType": message.body}];
+      NSMutableDictionary<NSString *, id> *event = [RNCWebView createEventFromMessage:message withMessageBodyKey: @"navigationType" withWebView:_webView];
       _onLoadingFinish(event);
     }
   } else if ([message.name isEqualToString:MessageHandlerName]) {
     if (_onMessage) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-      [event addEntriesFromDictionary: @{@"data": message.body}];
+      NSMutableDictionary<NSString *, id> *event = [RNCWebView createEventFromMessage:message withMessageBodyKey: kMessageHandlerBodyKey withWebView:_webView];
       _onMessage(event);
     }
   }
@@ -943,16 +1013,29 @@ RCTAutoInsetsProtocol>
 #endif // !TARGET_OS_OSX
 }
 
-- (NSMutableDictionary<NSString *, id> *)baseEvent
++ (NSMutableDictionary<NSString *, id> *)baseEventWithWebView:(WKWebView *)webView
 {
   NSDictionary *event = @{
-    @"url": _webView.URL.absoluteString ?: @"",
-    @"title": _webView.title ?: @"",
-    @"loading" : @(_webView.loading),
-    @"canGoBack": @(_webView.canGoBack),
-    @"canGoForward" : @(_webView.canGoForward)
+    @"url": webView.URL.absoluteString ?: @"",
+    @"title": webView.title ?: @"",
+    @"loading" : @(webView.loading),
+    @"canGoBack": @(webView.canGoBack),
+    @"canGoForward" : @(webView.canGoForward)
   };
   return [[NSMutableDictionary alloc] initWithDictionary: event];
+}
+
+- (NSMutableDictionary<NSString *, id> *)baseEvent {
+  return [RNCWebView baseEventWithWebView:_webView];
+}
+
+
++ (NSMutableDictionary<NSString *, id>*)createEventFromMessage:(WKScriptMessage *_Nonnull)message
+        withMessageBodyKey: (NSString *_Nonnull)messageBodyKey withWebView:(WKWebView *)webView {
+  NSMutableDictionary<NSString *, id> *event = [RNCWebView baseEventWithWebView:webView];
+  [event addEntriesFromDictionary: @{messageBodyKey: message.body}];
+  
+  return event;
 }
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential {
@@ -1440,6 +1523,15 @@ didFinishNavigation:(WKNavigation *)navigation
 #endif // !TARGET_OS_OSX
 }
 
+- (void)releaseWebView
+{
+  if (_webViewKey != nil) {
+    NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+    sharedWKWebViewDictionary[_webViewKey] = nil;
+  }
+  [self cleanUpWebView];
+}
+
 #if !TARGET_OS_OSX
 - (void)setBounces:(BOOL)bounces
 {
@@ -1540,11 +1632,11 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
   [wkWebViewConfig.userContentController removeAllUserScripts];
-  [wkWebViewConfig.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
+  [self removeScriptHandlerForMessages:wkWebViewConfig.userContentController];
+
   if(self.enableApplePay){
     if (self.postMessageScript){
-      [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
-                                                                name:MessageHandlerName];
+      [self addScriptHandlerForMessages:wkWebViewConfig.userContentController];
     }
     return;
   }
@@ -1636,8 +1728,7 @@ didFinishNavigation:(WKNavigation *)navigation
   
   if(_messagingEnabled){
     if (self.postMessageScript){
-      [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
-                                                                name:MessageHandlerName];
+      [self addScriptHandlerForMessages:wkWebViewConfig.userContentController];
       [wkWebViewConfig.userContentController addUserScript:self.postMessageScript];
     }
     if (self.atEndScript) {
@@ -1668,6 +1759,27 @@ didFinishNavigation:(WKNavigation *)navigation
     }
   }
   return request;
+}
+
+- (BOOL) shouldReuseWebView {
+  return _keepWebViewInstanceAfterUnmount && _webViewKey != nil;
+}
+
+- (void) addScriptHandlerForMessages: (WKUserContentController *)userContentController {
+  if ([self shouldReuseWebView]) {
+    [[RNCScriptMessageManager sharedManager] addScriptMessageHandlerWithName:MessageHandlerName withUserContentController:userContentController withWebViewKey: _webViewKey];
+  } else {
+    [userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+                                                                     name:MessageHandlerName];
+  }
+}
+
+- (void) removeScriptHandlerForMessages: (WKUserContentController *)userContentController {
+  if ([self shouldReuseWebView]) {
+    [[RNCScriptMessageManager sharedManager] removeScriptMessageHandlerWithUserContentController:userContentController withWebViewKey:_webViewKey];
+  } else {
+    [userContentController removeScriptMessageHandlerForName:MessageHandlerName];
+  }
 }
 
 @end

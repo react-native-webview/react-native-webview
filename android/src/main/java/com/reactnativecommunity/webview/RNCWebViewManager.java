@@ -139,6 +139,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_LOAD_URL = 7;
   public static final int COMMAND_FOCUS = 8;
 
+  // commands added by Discord
+  public static final int COMMAND_RELEASE = 4001;
+
   // android commands
   public static final int COMMAND_CLEAR_FORM_DATA = 1000;
   public static final int COMMAND_CLEAR_CACHE = 1001;
@@ -726,6 +729,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
       .put("clearCache", COMMAND_CLEAR_CACHE)
       .put("clearHistory", COMMAND_CLEAR_HISTORY)
+      .put("release", COMMAND_RELEASE)
       .build();
   }
 
@@ -787,6 +791,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         break;
       case "clearHistory":
         root.clearHistory();
+        break;
+      case COMMAND_RELEASE:
+        // no-op for now
         break;
     }
     super.receiveCommand(root, commandId, args);

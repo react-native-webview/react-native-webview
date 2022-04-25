@@ -101,8 +101,13 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
 #endif
 
+@property (nonatomic, assign) BOOL keepWebViewInstanceAfterUnmount;
+@property (nonatomic, copy) NSString * _Nullable webViewKey;
+
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
++ (NSMutableDictionary<NSString *, id> *)baseEventWithWebView: (WKWebView *)webView;
++ (NSMutableDictionary<NSString *, id>*)createEventFromMessage:(WKScriptMessage *_Nonnull)message withMessageBodyKey: (NSString *_Nonnull)messageBodyKey withWebView: (WKWebView *)webView;
 - (void)postMessage:(NSString *_Nullable)message;
 - (void)injectJavaScript:(NSString *_Nullable)script;
 - (void)goForward;
@@ -110,9 +115,11 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 - (void)reload;
 - (void)stopLoading;
 - (void)requestFocus;
+- (void)releaseWebView;
 #if !TARGET_OS_OSX
 - (void)addPullToRefreshControl;
 - (void)pullToRefresh:(UIRefreshControl *_Nonnull)refreshControl;
+- (void)cleanUpWebView;
 #endif
 
 @end

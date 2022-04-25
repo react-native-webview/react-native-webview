@@ -10,6 +10,9 @@
 #import <React/RCTUIManager.h>
 #import <React/RCTDefines.h>
 #import "RNCWebView.h"
+#import "RNCWKWebViewMapManager.h"
+#import "RNCWebViewMapManager.h"
+#import <WebKit/WebKit.h>
 
 @interface RNCWebViewManager () <RNCWebViewDelegate>
 @end
@@ -112,6 +115,12 @@ RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, RNCWebViewPermissionGrantType)
 #endif
 
+RCT_CUSTOM_VIEW_PROPERTY(keepWebViewInstanceAfterUnmount, BOOL, RNCWebView) {
+    view.keepWebViewInstanceAfterUnmount = json == nil ? false : [RCTConvert BOOL: json];
+}
+
+RCT_EXPORT_VIEW_PROPERTY(webViewKey, NSString)
+
 /**
  * Expose methods to enable messaging the webview.
  */
@@ -188,6 +197,20 @@ RCT_EXPORT_METHOD(injectJavaScript:(nonnull NSNumber *)reactTag script:(NSString
       RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
       [view injectJavaScript:script];
+    }
+  }];
+}
+
+RCT_EXPORT_METHOD(injectJavaScriptWithWebViewKey:(nonnull NSString *)webViewKey script:(NSString *)script)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, __unused NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+    WKWebView *wkWebView = sharedWKWebViewDictionary[webViewKey];
+
+    if (wkWebView != nil) {
+      [wkWebView evaluateJavaScript:script completionHandler:nil];
+    } else {
+      RCTLogError(@"Failed to inject JavaScript. WKWebView for webViewKey is nil");
     }
   }];
 }
@@ -284,6 +307,23 @@ RCT_EXPORT_METHOD(startLoadWithResult:(BOOL)result lockIdentifier:(NSInteger)loc
     RCTLogWarn(@"startLoadWithResult invoked with invalid lockIdentifier: "
                "got %lld, expected %lld", (long long)lockIdentifier, (long long)_shouldStartLoadLock.condition);
   }
+}
+
+RCT_EXPORT_METHOD(releaseWebView:(nonnull NSString *)webViewKey)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, __unused NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+    NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+    
+    sharedWKWebViewDictionary[webViewKey] = nil;
+    
+    RNCWebView *rncWebView = sharedRNCWebViewDictionary[webViewKey];
+      
+    if (rncWebView != nil) {
+      [rncWebView cleanUpWebView];
+      sharedRNCWebViewDictionary[webViewKey] = nil;
+    }
+  }];
 }
 
 @end
