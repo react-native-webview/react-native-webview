@@ -9,6 +9,9 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#import "RNCWKWebViewMapManager.h"
+#import "RNCWebViewMapManager.h"
+
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
@@ -402,50 +405,84 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
+    NSMutableDictionary *sharedWKWebViewDictionary= [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+      
+    if (_keepWebViewInstanceAfterUnmount && _webViewKey != nil) {
+      WKWebView *webViewForKey = sharedWKWebViewDictionary[_webViewKey];
+      if (webViewForKey != nil) {
+        _webView = webViewForKey;
+        NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+        RNCWebView *rncWebView = sharedRNCWebViewDictionary[_webViewKey];
+        if (rncWebView != nil) {
+          [self removeWKWebViewFromSuperView:rncWebView];
+        }
+      }
+    }
+    
+    bool reusedWebViewInstance = _webView != nil;
+
+    if (_webView == nil) {
 #if !TARGET_OS_OSX
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+      _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #else
-    _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+      _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
-
+        
+        if (_webView != nil && _webViewKey != nil) {
+          sharedWKWebViewDictionary[_webViewKey] = _webView;
+          NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+          sharedRNCWebViewDictionary[_webViewKey] = self;
+        }
+    }
+    
     [self setBackgroundColor: _savedBackgroundColor];
+    
+    if (!reusedWebViewInstance) {
 #if !TARGET_OS_OSX
-    _webView.scrollView.delegate = self;
+      _webView.scrollView.delegate = self;
 #endif // !TARGET_OS_OSX
-    _webView.UIDelegate = self;
-    _webView.navigationDelegate = self;
+      _webView.UIDelegate = self;
+      _webView.navigationDelegate = self;
 #if !TARGET_OS_OSX
-    if (_pullToRefreshEnabled) {
-        [self addPullToRefreshControl];
-    }
-    _webView.scrollView.scrollEnabled = _scrollEnabled;
-    _webView.scrollView.pagingEnabled = _pagingEnabled;
-      //For UIRefreshControl to work correctly, the bounces should always be true
-    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
-    _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
-    _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
-    _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
+      if (_pullToRefreshEnabled) {
+          [self addPullToRefreshControl];
+      }
+      _webView.scrollView.scrollEnabled = _scrollEnabled;
+      _webView.scrollView.pagingEnabled = _pagingEnabled;
+        //For UIRefreshControl to work correctly, the bounces should always be true
+      _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
+      _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
+      _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
+      _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
 #endif // !TARGET_OS_OSX
-    _webView.allowsLinkPreview = _allowsLinkPreview;
-    [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
-    _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
+      _webView.allowsLinkPreview = _allowsLinkPreview;
+      _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 
-    _webView.customUserAgent = _userAgent;
+      _webView.customUserAgent = _userAgent;
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
-    }
+      if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+        _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
+      }
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-    if (@available(iOS 13.0, *)) {
-      _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
-    }
+      if (@available(iOS 13.0, *)) {
+        _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
+      }
 #endif
+    }
+    
+    // We have to remove the old observer via removeWKWebViewFromSuperView when reusing the WKWebView instance,
+    // so whether we're reusing the instance or not, we always have to add the observer that references the new
+    // RNCWebView instance.
+    [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
 
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
-    [self visitSource];
+      
+    if (!reusedWebViewInstance) {
+      [self visitSource];
+    }
   }
 #if !TARGET_OS_OSX
   // Allow this object to recognize gestures
@@ -469,22 +506,42 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 - (void)removeFromSuperview
 {
-    if (_webView) {
-        [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
-        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
-        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
-        [_webView removeFromSuperview];
-#if !TARGET_OS_OSX
-        _webView.scrollView.delegate = nil;
-#endif // !TARGET_OS_OSX
-        _webView = nil;
-        if (_onContentProcessDidTerminate) {
-          NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-          _onContentProcessDidTerminate(event);
-        }
-    }
+  bool keepWebViewInstance = _keepWebViewInstanceAfterUnmount && _webViewKey != nil;
+  if (!keepWebViewInstance) {
+    [self cleanUpWebView];
+  }
+  
+  if (_webViewKey != nil) {
+    NSMutableDictionary *sharedRNCWebViewDictionary = [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+    sharedRNCWebViewDictionary[_webViewKey] = nil;
+  }
 
-    [super removeFromSuperview];
+  [super removeFromSuperview];
+}
+
+- (void)cleanUpWebView
+{
+  if (_webView) {
+    [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
+    [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
+    [self removeWKWebViewFromSuperView:self];
+#if !TARGET_OS_OSX
+    _webView.scrollView.delegate = nil;
+#endif // !TARGET_OS_OSX
+    _webView = nil;
+    if (_onContentProcessDidTerminate) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      _onContentProcessDidTerminate(event);
+    }
+  }
+}
+
+- (void)removeWKWebViewFromSuperView:(RNCWebView *)webViewObserver
+{
+  // If _webView is getting added to a new super view, we need to first both remove it from the old
+  // superview and also remove the observer which can reference the old super view.
+  [_webView removeObserver:webViewObserver forKeyPath:@"estimatedProgress"];
+  [_webView removeFromSuperview];
 }
 
 #if !TARGET_OS_OSX
@@ -1400,6 +1457,15 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (void)stopLoading
 {
   [_webView stopLoading];
+}
+
+- (void)releaseWebView
+{
+  if (_webViewKey != nil) {
+    NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+    sharedWKWebViewDictionary[_webViewKey] = nil;
+  }
+  [self cleanUpWebView];
 }
 
 #if !TARGET_OS_OSX

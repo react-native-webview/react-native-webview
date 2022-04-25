@@ -111,6 +111,12 @@ RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, RNCWebViewPermissionGrantType)
 #endif
 
+RCT_CUSTOM_VIEW_PROPERTY(keepWebViewInstanceAfterUnmount, BOOL, RNCWebView) {
+    view.keepWebViewInstanceAfterUnmount = json == nil ? false : [RCTConvert BOOL: json];
+}
+
+RCT_EXPORT_VIEW_PROPERTY(webViewKey, NSString)
+
 /**
  * Expose methods to enable messaging the webview.
  */
@@ -238,6 +244,19 @@ RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
     }
   }];
 }
+
+RCT_EXPORT_METHOD(release:(nonnull NSNumber *)reactTag)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    RNCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
+    } else {
+      [view releaseWebView];
+    }
+  }];
+}
+
 
 #pragma mark - Exported synchronous methods
 
