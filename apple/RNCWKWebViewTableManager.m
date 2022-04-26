@@ -18,7 +18,7 @@
     }
 }
 
-- (NSMapTable *)sharedProcessPool {
+- (NSMapTable *)sharedWKWebViewTable {
     if (!_sharedWKWebViewTable) {
         _sharedWKWebViewTable = [[NSMapTable alloc] init];
     }

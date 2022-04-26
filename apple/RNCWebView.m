@@ -9,6 +9,7 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#import "RNCWKWebViewTableManager.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
@@ -402,14 +403,34 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
-#if !TARGET_OS_OSX
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-#else
-    _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-#endif // !TARGET_OS_OSX
+      NSMapTable *sharedWKWebViewTable = [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewTable];
       
-  NSLog(@"pikachu. calling RNCWebView didMoveToWindow. webViewKey: %@", _webViewKey);
-  NSLog(@"pikachu. calling RNCWebView didMoveToWindow. keepWebViewInstanceAfterUnmount: %@", _keepWebViewInstanceAfterUnmount ? @"YES" : @"NO");
+      NSLog(@"pikachu. calling RNCWebView didMoveToWindow. webViewKey: %@", _webViewKey);
+      NSLog(@"pikachu. calling RNCWebView didMoveToWindow. keepWebViewInstanceAfterUnmount: %@", _keepWebViewInstanceAfterUnmount ? @"YES" : @"NO");
+
+      
+      if (_keepWebViewInstanceAfterUnmount && _webViewKey != nil) {
+        WKWebView *webViewForKey = [sharedWKWebViewTable objectForKey: _webViewKey];
+        _webView = webViewForKey;
+        NSLog(@"pikachu. calling RNCWebView didMoveToWindow. tried getting WKWebView from map");
+      }
+      
+      if (_webView == nil) {
+          NSLog(@"pikachu. calling RNCWebView didMoveToWindow. creating new WKWebView");
+
+#if !TARGET_OS_OSX
+        _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+#else
+        _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+#endif // !TARGET_OS_OSX
+          
+          if (_webViewKey != nil) {
+              NSLog(@"pikachu. calling RNCWebView didMoveToWindow. setting WKWebView on map");
+
+              [sharedWKWebViewTable setObject:_webView forKey:_webViewKey];
+          }
+          
+      }
 
 
     [self setBackgroundColor: _savedBackgroundColor];
@@ -473,22 +494,29 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 - (void)removeFromSuperview
 {
-    if (_webView) {
-        [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
-        [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
-        [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
-        [_webView removeFromSuperview];
-#if !TARGET_OS_OSX
-        _webView.scrollView.delegate = nil;
-#endif // !TARGET_OS_OSX
-        _webView = nil;
-        if (_onContentProcessDidTerminate) {
-          NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-          _onContentProcessDidTerminate(event);
-        }
+    if (!_keepWebViewInstanceAfterUnmount) {
+        [self cleanUpWebView];
     }
 
     [super removeFromSuperview];
+}
+
+- (void)cleanUpWebView
+{
+  if (_webView) {
+    [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
+    [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
+    [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+    [_webView removeFromSuperview];
+#if !TARGET_OS_OSX
+    _webView.scrollView.delegate = nil;
+#endif // !TARGET_OS_OSX
+    _webView = nil;
+    if (_onContentProcessDidTerminate) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      _onContentProcessDidTerminate(event);
+    }
+  }
 }
 
 #if !TARGET_OS_OSX
@@ -1404,6 +1432,15 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (void)stopLoading
 {
   [_webView stopLoading];
+}
+
+- (void)releaseWebView
+{
+  NSMapTable *sharedWKWebViewTable = [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewTable];
+  if (_webViewKey != nil) {
+    [sharedWKWebViewTable removeObjectForKey:_webView];
+  }
+  [self cleanUpWebView];
 }
 
 #if !TARGET_OS_OSX

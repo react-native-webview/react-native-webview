@@ -252,7 +252,8 @@ RCT_EXPORT_METHOD(release:(nonnull NSNumber *)reactTag webViewKey:(NSString *)we
     if (![view isKindOfClass:[RNCWebView class]]) {
       RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
     } else {
-        NSLog(@"pikachu. 111~ calling RNCWebViewManager release with webViewKey: %@", webViewKey);
+      NSLog(@"pikachu. 111~ calling RNCWebViewManager release with webViewKey: %@", webViewKey);
+      [view releaseWebView];
     }
   }];
 }
