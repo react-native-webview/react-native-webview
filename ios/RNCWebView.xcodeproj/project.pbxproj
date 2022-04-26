@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */; };
+		40EE00F32818964600A0BA29 /* RNCWKWebViewTableManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40EE00F22818964600A0BA29 /* RNCWKWebViewTableManager.m */; };
 		E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351B21446E6C00F9801F /* RNCWebViewManager.m */; };
 		E91B351E21446E6C00F9801F /* RNCWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351C21446E6C00F9801F /* RNCWebView.m */; };
 /* End PBXBuildFile section */
@@ -28,6 +29,8 @@
 		134814201AA4EA6300B7C361 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNCWKProcessPoolManager.m; path = ../apple/RNCWKProcessPoolManager.m; sourceTree = "<group>"; };
 		3515965F21A3C87E00623BFA /* RNCWKProcessPoolManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNCWKProcessPoolManager.h; path = ../apple/RNCWKProcessPoolManager.h; sourceTree = "<group>"; };
+		40EE00F12818962F00A0BA29 /* RNCWKWebViewTableManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNCWKWebViewTableManager.h; path = ../apple/RNCWKWebViewTableManager.h; sourceTree = "<group>"; };
+		40EE00F22818964600A0BA29 /* RNCWKWebViewTableManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNCWKWebViewTableManager.m; path = ../apple/RNCWKWebViewTableManager.m; sourceTree = "<group>"; };
 		E91B351921446E6C00F9801F /* RNCWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNCWebViewManager.h; path = ../apple/RNCWebViewManager.h; sourceTree = "<group>"; };
 		E91B351A21446E6C00F9801F /* RNCWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNCWebView.h; path = ../apple/RNCWebView.h; sourceTree = "<group>"; };
 		E91B351B21446E6C00F9801F /* RNCWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNCWebViewManager.m; path = ../apple/RNCWebViewManager.m; sourceTree = "<group>"; };
@@ -56,6 +59,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				40EE00F22818964600A0BA29 /* RNCWKWebViewTableManager.m */,
+				40EE00F12818962F00A0BA29 /* RNCWKWebViewTableManager.h */,
 				E91B351A21446E6C00F9801F /* RNCWebView.h */,
 				E91B351C21446E6C00F9801F /* RNCWebView.m */,
 				E91B351921446E6C00F9801F /* RNCWebViewManager.h */,
@@ -124,6 +129,7 @@
 			files = (
 				E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */,
 				E91B351E21446E6C00F9801F /* RNCWebView.m in Sources */,
+				40EE00F32818964600A0BA29 /* RNCWKWebViewTableManager.m in Sources */,
 				3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

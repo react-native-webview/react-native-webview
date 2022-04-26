@@ -11,6 +11,7 @@ const IFRAME_HEIGHT = 200;
 const IFRAME_URI = 'https://www.usaswimming.org';
 const BLUE_GATE_NAME = 'blueGate';
 const GREEN_GATE_NAME = 'greenGate';
+const WEB_VIEW_KEY = 'PortalTestingWebViewKey'
 
 const source = {
   html: `
@@ -39,13 +40,20 @@ export default function Portals() {
 function PortalGates() {
   const {gates, teleport} = React.useContext(PortalContext);
 
+  const [releaseCounter, setReleaseCounter] = React.useState(0);
+
+  const webViewRef = React.useRef<WebView>(null);
+
   const webView = React.useMemo(() => {
     return (
       <WebView
           source={source}
+          webViewKey={WEB_VIEW_KEY}
+          keepWebViewInstanceAfterUnmount
+          ref={webViewRef}
         />
     );
-  }, []);
+  }, [releaseCounter]);
 
   const teleportToBlueGate = React.useCallback(() => {
     teleport(gates, BLUE_GATE_NAME, webView);
@@ -58,6 +66,13 @@ function PortalGates() {
     teleport(gates, BLUE_GATE_NAME, undefined);
   }, [teleport, webView])
 
+  const release = React.useCallback(() => {
+    teleport(gates, GREEN_GATE_NAME, undefined);
+    teleport(gates, BLUE_GATE_NAME, undefined); 
+    setReleaseCounter(releaseCounter + 1);
+    webViewRef.current?.release(WEB_VIEW_KEY);
+  }, []);
+
   return (
     <>
       <Button
@@ -67,6 +82,10 @@ function PortalGates() {
       <Button
         title="Teleport to green gate"
         onPress={teleportToGreenGate}
+      />
+      <Button
+        title="Release WebView"
+        onPress={release}
       />
       <View style={{width: IFRAME_WIDTH, height: IFRAME_HEIGHT, backgroundColor: 'blue', marginBottom: 32}}>
         <PortalGate gateName={BLUE_GATE_NAME}/>

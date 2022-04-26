@@ -100,6 +100,9 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 @property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
 #endif
 
+@property (nonatomic, assign) BOOL keepWebViewInstanceAfterUnmount;
+@property (nonatomic, copy) NSString * _Nullable webViewKey;
+
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
 - (void)postMessage:(NSString *_Nullable)message;
@@ -108,6 +111,7 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 - (void)goBack;
 - (void)reload;
 - (void)stopLoading;
+- (void)release;
 #if !TARGET_OS_OSX
 - (void)addPullToRefreshControl;
 - (void)pullToRefresh:(UIRefreshControl *_Nonnull)refreshControl;

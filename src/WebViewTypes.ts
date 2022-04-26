@@ -12,7 +12,7 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 
-type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
+type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus' | 'release';
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
@@ -721,6 +721,24 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * `selectedText`: the text selected on the document
    */
   onCustomMenuSelection?: (event: WebViewEvent) => void;
+
+  /**
+   * By default, if this is undefined or false, the native WKWebView will get released when
+   * the React component unmounts. TODO: confirm if that's correct.
+   * 
+   * When this is true, the native WKWebView will not get released when the React component
+   * unmounts. When a React component remounts, it can use a previous WKWebView instance
+   * by using the same webViewKey prop that the previous React component used.
+   * 
+   * It's important to call <insert method name here> with the corresponding webViewKey.
+   */
+  keepWebViewInstanceAfterUnmount?: boolean;
+
+  /**
+   * When keepWebViewInstanceAfterUnmount is true, if two React components use the same
+   * key for the WebView, they will use the same instance of WKWebView.
+   */
+  webViewKey?: string;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {

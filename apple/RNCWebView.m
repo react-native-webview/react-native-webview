@@ -407,6 +407,10 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 #else
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
+      
+  NSLog(@"pikachu. calling RNCWebView didMoveToWindow. webViewKey: %@", _webViewKey);
+  NSLog(@"pikachu. calling RNCWebView didMoveToWindow. keepWebViewInstanceAfterUnmount: %@", _keepWebViewInstanceAfterUnmount ? @"YES" : @"NO");
+
 
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
