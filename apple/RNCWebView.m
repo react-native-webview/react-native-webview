@@ -427,9 +427,8 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
           if (_webViewKey != nil) {
               NSLog(@"pikachu. calling RNCWebView didMoveToWindow. setting WKWebView on map");
 
-              [sharedWKWebViewTable setObject:_webView forKey:_webViewKey];
+            [sharedWKWebViewTable setObject:_webView forKey:_webViewKey];
           }
-          
       }
 
 
@@ -494,7 +493,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 - (void)removeFromSuperview
 {
-    if (!_keepWebViewInstanceAfterUnmount) {
+    if (!_keepWebViewInstanceAfterUnmount || _webView == nil) {
         [self cleanUpWebView];
     }
 
@@ -1436,11 +1435,11 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 - (void)releaseWebView
 {
+  [self cleanUpWebView];
   NSMapTable *sharedWKWebViewTable = [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewTable];
   if (_webViewKey != nil) {
-    [sharedWKWebViewTable removeObjectForKey:_webView];
+    [sharedWKWebViewTable removeObjectForKey:_webViewKey];
   }
-  [self cleanUpWebView];
 }
 
 #if !TARGET_OS_OSX
