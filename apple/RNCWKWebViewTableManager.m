@@ -3,6 +3,8 @@
 
 @interface RNCWKWebViewTableManager() {
     NSMapTable *_sharedWKWebViewTable;
+    NSMutableDictionary *_sharedWKWebViewDictionary;
+
 }
 @end
 
@@ -24,6 +26,15 @@
         _sharedWKWebViewTable = [NSMapTable strongToStrongObjectsMapTable];
     }
     return _sharedWKWebViewTable;
+}
+
+- (NSMutableDictionary *)sharedWKWebViewDictionary {
+    if (!_sharedWKWebViewDictionary) {
+//        _sharedWKWebViewTable = [[NSMapTable alloc] init];
+        _sharedWKWebViewDictionary = [[NSMutableDictionary alloc] init];
+//        _sharedWKWebViewTable = [NSMapTable strongToStrongObjectsMapTable];
+    }
+    return _sharedWKWebViewDictionary;
 }
 
 @end

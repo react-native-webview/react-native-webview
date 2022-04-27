@@ -403,18 +403,25 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
-      NSMapTable *sharedWKWebViewTable = [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewTable];
+//      NSMapTable *sharedWKWebViewTable = [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewTable];
+      NSMutableDictionary *sharedWKWebViewDictionary= [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewDictionary];
+
 
       NSLog(@"pikachu. calling RNCWebView didMoveToWindow. webViewKey: %@", _webViewKey);
       NSLog(@"pikachu. calling RNCWebView didMoveToWindow. keepWebViewInstanceAfterUnmount: %@", _keepWebViewInstanceAfterUnmount ? @"YES" : @"NO");
 
       
       if (_keepWebViewInstanceAfterUnmount && _webViewKey != nil) {
-        WKWebView *webViewForKey = [sharedWKWebViewTable objectForKey: _webViewKey];
+//        WKWebView *webViewForKey = [sharedWKWebViewTable objectForKey: _webViewKey];
+          WKWebView *webViewForKey = sharedWKWebViewDictionary[_webViewKey]; //[sharedWKWebViewDictionary objectForKey:_webViewKey];
         _webView = webViewForKey;
+//        [_webView removeFromSuperview];
+
         NSLog(@"pikachu. calling RNCWebView didMoveToWindow. tried getting WKWebView from map");
       }
       
+      bool reusedWebView = _webView != nil;
+
       if (_webView == nil) {
           NSLog(@"pikachu. calling RNCWebView didMoveToWindow. creating new WKWebView");
 
@@ -427,49 +434,54 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
           if (_webView != nil && _webViewKey != nil) {
               NSLog(@"pikachu. calling RNCWebView didMoveToWindow. setting WKWebView on map");
 
-            [sharedWKWebViewTable setObject:_webView forKey:_webViewKey];
+              sharedWKWebViewDictionary[_webViewKey] = _webView;
+//              [sharedWKWebViewDictionary setObject:_webView forKey:_webViewKey];
+//            [sharedWKWebViewTable setObject:_webView forKey:_webViewKey];
           }
       }
 
 
     [self setBackgroundColor: _savedBackgroundColor];
-#if !TARGET_OS_OSX
-    _webView.scrollView.delegate = self;
-#endif // !TARGET_OS_OSX
-    _webView.UIDelegate = self;
-    _webView.navigationDelegate = self;
-#if !TARGET_OS_OSX
-    if (_pullToRefreshEnabled) {
-        [self addPullToRefreshControl];
-    }
-    _webView.scrollView.scrollEnabled = _scrollEnabled;
-    _webView.scrollView.pagingEnabled = _pagingEnabled;
-      //For UIRefreshControl to work correctly, the bounces should always be true
-    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
-    _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
-    _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
-    _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
-#endif // !TARGET_OS_OSX
-    _webView.allowsLinkPreview = _allowsLinkPreview;
-    [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
-    _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
-
-    _webView.customUserAgent = _userAgent;
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
-    }
-#endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-    if (@available(iOS 13.0, *)) {
-      _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
-    }
-#endif
+//#if !TARGET_OS_OSX
+//    _webView.scrollView.delegate = self;
+//#endif // !TARGET_OS_OSX
+//    _webView.UIDelegate = self;
+//    _webView.navigationDelegate = self;
+//#if !TARGET_OS_OSX
+//    if (_pullToRefreshEnabled) {
+//        [self addPullToRefreshControl];
+//    }
+//    _webView.scrollView.scrollEnabled = _scrollEnabled;
+//    _webView.scrollView.pagingEnabled = _pagingEnabled;
+//      //For UIRefreshControl to work correctly, the bounces should always be true
+//    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
+//    _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
+//    _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
+//    _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
+//#endif // !TARGET_OS_OSX
+//    _webView.allowsLinkPreview = _allowsLinkPreview;
+////    [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
+//    _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
+//
+//    _webView.customUserAgent = _userAgent;
+//#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+//    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+//      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
+//    }
+//#endif
+//#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+//    if (@available(iOS 13.0, *)) {
+//      _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
+//    }
+//#endif
 
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
-    [self visitSource];
+      
+      if (!reusedWebView) {
+          [self visitSource];
+      }
   }
 #if !TARGET_OS_OSX
   // Allow this object to recognize gestures
@@ -495,9 +507,12 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 {
     if (!_keepWebViewInstanceAfterUnmount || _webViewKey == nil) {
         [self cleanUpWebView];
+    } else {
+//      [_webView removeFromSuperview];
     }
-    [_webView removeFromSuperview];
-
+//    [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+//    [_webView removeFromSuperview];
+//    _webView = nil;
 
     [super removeFromSuperview];
 }
@@ -507,7 +522,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
-    [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+//    [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = nil;
 #endif // !TARGET_OS_OSX
@@ -1437,10 +1452,10 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (void)releaseWebView
 {
   [self cleanUpWebView];
-  NSMapTable *sharedWKWebViewTable = [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewTable];
-  if (_webViewKey != nil) {
-    [sharedWKWebViewTable removeObjectForKey:_webViewKey];
-  }
+//  NSMapTable *sharedWKWebViewTable = [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewTable];
+//  if (_webViewKey != nil) {
+//    [sharedWKWebViewTable removeObjectForKey:_webViewKey];
+//  }
 }
 
 #if !TARGET_OS_OSX

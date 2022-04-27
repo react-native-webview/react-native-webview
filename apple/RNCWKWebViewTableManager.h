@@ -4,5 +4,7 @@
 
 + (instancetype) sharedManager;
 - (NSMapTable *)sharedWKWebViewTable;
+- (NSMutableDictionary *)sharedWKWebViewDictionary;
+
 
 @end
