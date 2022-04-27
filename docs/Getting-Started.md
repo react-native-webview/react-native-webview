@@ -85,13 +85,11 @@ Add `PackageProviders().Append(winrt::ReactNativeWebView::ReactPackageProvider()
 
 Note if you want to enable scroll with Touch for the WebView component you must disable perspective for your app using [ReactRootView.IsPerspectiveEnabled](https://microsoft.github.io/react-native-windows/docs/ReactRootView#isperspectiveenabled).
 
-## 3. Decide if you want access to WebView2
-The WebView2 control is a [WinUI](https://docs.microsoft.com/windows/apps/winui/) control that renders web content using the Microsoft Edge (Chromium) rendering engine. We have added support for the WebView2 control to the react-native-webview community module.
-If you want access to the WebView2 control in your app, follow these steps:
+## 3. WebView2 Support
+The WebView2 control is a [WinUI](https://docs.microsoft.com/windows/apps/winui/) control that renders web content using the Microsoft Edge (Chromium) rendering engine. We have added support for the WebView2 control to the react-native-webview community module in v11.18.0.
+If your app is RNW v0.68 or higher, follow these steps:
 
-  i. Ensure your React Native Windows version is v0.68 or higher.
-
-  ii. Let autolinking handle adding the `ReactNativeWebView2` project to your app.
+  i. Let autolinking handle adding the `ReactNativeWebView` project to your app.
 
   iii. Customize your app's WinUI 2.x version to version 2.8.0-prerelease.210927001 or higher. See [here](https://microsoft.github.io/react-native-windows/docs/customizing-sdk-versions) for instructions. The WinUI 2.x support for WebView2 is not yet available in "stable" releases, so for now you will need to use a prerelease version.
   
