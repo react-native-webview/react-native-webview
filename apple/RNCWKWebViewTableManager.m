@@ -20,7 +20,8 @@
 
 - (NSMapTable *)sharedWKWebViewTable {
     if (!_sharedWKWebViewTable) {
-        _sharedWKWebViewTable = [[NSMapTable alloc] init];
+//        _sharedWKWebViewTable = [[NSMapTable alloc] init];
+        _sharedWKWebViewTable = [NSMapTable strongToStrongObjectsMapTable];
     }
     return _sharedWKWebViewTable;
 }

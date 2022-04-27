@@ -493,7 +493,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 - (void)removeFromSuperview
 {
-    if (!_keepWebViewInstanceAfterUnmount || _webView == nil) {
+    if (!_keepWebViewInstanceAfterUnmount || _webViewKey == nil) {
         [self cleanUpWebView];
     }
     [_webView removeFromSuperview];
