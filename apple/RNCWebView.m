@@ -404,7 +404,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
       NSMapTable *sharedWKWebViewTable = [[RNCWKWebViewTableManager sharedManager] sharedWKWebViewTable];
-      
+
       NSLog(@"pikachu. calling RNCWebView didMoveToWindow. webViewKey: %@", _webViewKey);
       NSLog(@"pikachu. calling RNCWebView didMoveToWindow. keepWebViewInstanceAfterUnmount: %@", _keepWebViewInstanceAfterUnmount ? @"YES" : @"NO");
 
@@ -424,7 +424,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
         _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
           
-          if (_webViewKey != nil) {
+          if (_webView != nil && _webViewKey != nil) {
               NSLog(@"pikachu. calling RNCWebView didMoveToWindow. setting WKWebView on map");
 
             [sharedWKWebViewTable setObject:_webView forKey:_webViewKey];
@@ -496,6 +496,8 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     if (!_keepWebViewInstanceAfterUnmount || _webView == nil) {
         [self cleanUpWebView];
     }
+    [_webView removeFromSuperview];
+
 
     [super removeFromSuperview];
 }
@@ -506,7 +508,6 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
     [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
-    [_webView removeFromSuperview];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = nil;
 #endif // !TARGET_OS_OSX
