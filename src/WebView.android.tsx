@@ -179,6 +179,14 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     );
   };
 
+  release = () => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().release,
+      undefined
+    );
+  };
+
   /**
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
