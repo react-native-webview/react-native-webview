@@ -1,8 +1,8 @@
 import * as React from 'react';
-import {View, Button, NativeModules} from 'react-native';
+import {View, Button} from 'react-native';
+import WebView, {releaseWebView} from 'react-native-webview';
 import PortalGate from '../portals/PortalGate';
 import PortalProvider from '../portals/PortalProvider';
-import WebView, {releaseWebView} from 'react-native-webview';
 import { PortalContext } from '../portals/PortalContext';
 
 const IFRAME_URI = 'https://www.usaswimming.org';
