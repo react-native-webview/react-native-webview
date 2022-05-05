@@ -1,4 +1,5 @@
 import WebView from './WebView';
+import releaseWebView from './releaseWebView';
 
-export { WebView };
+export { WebView, releaseWebView };
 export default WebView;

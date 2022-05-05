@@ -205,7 +205,7 @@ export default class App extends Component<Props, State> {
                   onPress={() => this._changeTest('ApplePay')}
               />
           )}
-          {Platform.OS === 'ios' && (
+          {(
             <Button
               testID="testType_portals"
               title="Portals"

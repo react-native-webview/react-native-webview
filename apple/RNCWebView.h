@@ -115,6 +115,7 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 #if !TARGET_OS_OSX
 - (void)addPullToRefreshControl;
 - (void)pullToRefresh:(UIRefreshControl *_Nonnull)refreshControl;
+- (void)cleanUpWebView;
 #endif
 
 @end

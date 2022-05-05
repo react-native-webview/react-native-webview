@@ -12,7 +12,7 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 
-type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus' | 'release';
+type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 

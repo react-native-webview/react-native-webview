@@ -10,6 +10,8 @@
 #import <React/RCTUIManager.h>
 #import <React/RCTDefines.h>
 #import "RNCWebView.h"
+#import "RNCWKWebViewMapManager.h"
+#import "RNCWebViewMapManager.h"
 
 @interface RNCWebViewManager () <RNCWebViewDelegate>
 @end
@@ -245,18 +247,6 @@ RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
   }];
 }
 
-RCT_EXPORT_METHOD(release:(nonnull NSNumber *)reactTag)
-{
-  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
-    RNCWebView *view = viewRegistry[reactTag];
-    if (![view isKindOfClass:[RNCWebView class]]) {
-      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
-    } else {
-      [view releaseWebView];
-    }
-  }];
-}
-
 
 #pragma mark - Exported synchronous methods
 
@@ -289,6 +279,21 @@ RCT_EXPORT_METHOD(startLoadWithResult:(BOOL)result lockIdentifier:(NSInteger)loc
   } else {
     RCTLogWarn(@"startLoadWithResult invoked with invalid lockIdentifier: "
                "got %lld, expected %lld", (long long)lockIdentifier, (long long)_shouldStartLoadLock.condition);
+  }
+}
+
+RCT_EXPORT_METHOD(releaseWebView:(nonnull NSString *)webViewKey)
+{
+  NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+  NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+  
+  sharedWKWebViewDictionary[webViewKey] = nil;
+  
+  RNCWebView *rncWebView = sharedWKWebViewDictionary[webViewKey];
+    
+  if (rncWebView != nil) {
+    [rncWebView cleanUpWebView];
+    sharedRNCWebViewDictionary[webViewKey] = nil;
   }
 }
 
