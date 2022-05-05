@@ -1,6 +1,6 @@
 import { ReactElement, Component } from 'react';
 import { NativeSyntheticEvent, ViewProps, StyleProp, ViewStyle, NativeMethodsMixin, Constructor, UIManagerStatic, NativeScrollEvent } from 'react-native';
-declare type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus' | 'release';
+declare type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
 declare type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
     getViewManagerConfig: (name: string) => {

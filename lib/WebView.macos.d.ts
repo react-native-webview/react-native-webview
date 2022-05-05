@@ -19,7 +19,6 @@ declare class WebView extends React.Component<MacOSWebViewProps, State> {
         injectJavaScript: number;
         loadUrl: number;
         requestFocus: number;
-        release: number;
     };
     /**
      * Go forward one page in the web view's history.
