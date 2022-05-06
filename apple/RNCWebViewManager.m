@@ -289,7 +289,7 @@ RCT_EXPORT_METHOD(releaseWebView:(nonnull NSString *)webViewKey)
   
   sharedWKWebViewDictionary[webViewKey] = nil;
   
-  RNCWebView *rncWebView = sharedWKWebViewDictionary[webViewKey];
+  RNCWebView *rncWebView = sharedRNCWebViewDictionary[webViewKey];
     
   if (rncWebView != nil) {
     [rncWebView cleanUpWebView];
