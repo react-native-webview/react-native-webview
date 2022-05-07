@@ -514,6 +514,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if (_webViewKey != nil) {
     NSMutableDictionary *sharedRNCWebViewDictionary = [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
     sharedRNCWebViewDictionary[_webViewKey] = nil;
+    [self removeWKWebViewFromSuperView:self];
   }
 
   [super removeFromSuperview];
