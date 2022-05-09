@@ -6,7 +6,6 @@
     <UseWinUI3>false</UseWinUI3>
     <UseHermes>false</UseHermes>
     <WinUI2xVersion>2.8.0-prerelease.210927001</WinUI2xVersion>
-    <WebView2Version>1.0.1020.30</WebView2Version>
   </PropertyGroup>
 
 </Project>

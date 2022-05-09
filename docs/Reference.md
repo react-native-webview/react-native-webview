@@ -1488,6 +1488,7 @@ Example:
 ### `forceDarkOn`
 
 Configuring Dark Theme
+
 *NOTE* : The force dark setting is not persistent. You must call the static method every time your app process is started.
 
 *NOTE* : The change from day<->night mode is a configuration change so by default the activity will be restarted and pickup the new values to apply the theme. Take care when overriding this default behavior to ensure this method is still called when changes are made.
@@ -1548,7 +1549,8 @@ Use WinUI WebView2 control instead of WebView control as the native webview. The
 Example:
 
 ```javascript
-<WebView useWebView2 />
+<WebView useWebView2={true} />
+```
 
 ### `minimumFontSize`
 
@@ -1639,7 +1641,7 @@ Removes the autocomplete popup from the currently focused form field, if present
 (android only)
 
 ```javascript
-
+clearCache(true)
 ```
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
