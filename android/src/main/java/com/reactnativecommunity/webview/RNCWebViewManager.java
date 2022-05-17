@@ -159,6 +159,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected boolean mAllowsFullscreenVideo = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
+  protected String mDownloadMessage = "Downloading";
 
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -248,8 +249,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         module.setDownloadRequest(request);
 
-        if (module.grantFileDownloaderPermissions()) {
-          module.downloadFile();
+        if (module.grantFileDownloaderPermissions(mDownloadMessage)) {
+          module.downloadFile(mDownloadMessage);
         }
       }
     });
@@ -285,6 +286,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "showsVerticalScrollIndicator")
   public void setShowsVerticalScrollIndicator(WebView view, boolean enabled) {
     view.setVerticalScrollBarEnabled(enabled);
+  }
+
+  @ReactProp(name = "downloadMessage")
+  public void setDownloadMessage(WebView view, String message)
+  {
+    mDownloadMessage = message;
   }
 
   @ReactProp(name = "cacheEnabled")

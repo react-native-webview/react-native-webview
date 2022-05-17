@@ -86,6 +86,7 @@ This document lays out the current public properties and methods for the React N
 - [`forceDarkOn`](Reference.md#forceDarkOn)
 - [`useWebView2`](Reference.md#useWebView2)
 - [`minimumFontSize`](Reference.md#minimumFontSize)
+- [`downloadMessage`](Reference.md#downloadMessage)
 
 ## Methods Index
 
@@ -1555,6 +1556,14 @@ Example:
 ```javascript
 <WebView minimumFontSize={1} />
 ```
+
+### `downloadMessage`
+
+This is the message that is shown in the Toast when downloading a file via WebView. Default message is "Downloading".
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
 
 ## Methods
 
