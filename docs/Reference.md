@@ -86,7 +86,8 @@ This document lays out the current public properties and methods for the React N
 - [`forceDarkOn`](Reference.md#forceDarkOn)
 - [`useWebView2`](Reference.md#useWebView2)
 - [`minimumFontSize`](Reference.md#minimumFontSize)
-- [`downloadMessage`](Reference.md#downloadMessage)
+- [`downloadingMessage`](Reference.md#downloadingMessage)
+- [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 
 ## Methods Index
 
@@ -1557,9 +1558,17 @@ Example:
 <WebView minimumFontSize={1} />
 ```
 
-### `downloadMessage`
+### `downloadingMessage`
 
 This is the message that is shown in the Toast when downloading a file via WebView. Default message is "Downloading".
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
+
+### `lackPermissionToDownloadMessage`
+
+This is the message that is shown in the Toast when the webview is unable to download a file. Default message is "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.".
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |

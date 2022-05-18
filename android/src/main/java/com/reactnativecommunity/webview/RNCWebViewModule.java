@@ -95,7 +95,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     }
   }
 
-  private PermissionListener getWebviewFileDownloaderPermissionListener(String downloadMessage) {
+  private PermissionListener getWebviewFileDownloaderPermissionListener(String downloadingMessage, String lackPermissionToDownloadMessage) {
     return new PermissionListener() {
       @Override
       public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -104,10 +104,10 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
             // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
               if (downloadRequest != null) {
-                downloadFile(downloadMessage);
+                downloadFile(downloadingMessage);
               }
             } else {
-              Toast.makeText(getCurrentActivity().getApplicationContext(), "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.", Toast.LENGTH_LONG).show();
+              Toast.makeText(getCurrentActivity().getApplicationContext(), lackPermissionToDownloadMessage, Toast.LENGTH_LONG).show();
             }
             return true;
           }
@@ -308,15 +308,15 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     this.downloadRequest = request;
   }
 
-  public void downloadFile(String downloadMessage) {
+  public void downloadFile(String downloadingMessage) {
     DownloadManager dm = (DownloadManager) getCurrentActivity().getBaseContext().getSystemService(Context.DOWNLOAD_SERVICE);
 
     dm.enqueue(this.downloadRequest);
 
-    Toast.makeText(getCurrentActivity().getApplicationContext(), downloadMessage, Toast.LENGTH_LONG).show();
+    Toast.makeText(getCurrentActivity().getApplicationContext(), downloadingMessage, Toast.LENGTH_LONG).show();
   }
 
-  public boolean grantFileDownloaderPermissions(String downloadMessage) {
+  public boolean grantFileDownloaderPermissions(String downloadingMessage, String lackPermissionToDownloadMessage) {
     // Permission not required for Android Q and above
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
       return true;
@@ -325,7 +325,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     boolean result = ContextCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     if (!result && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       PermissionAwareActivity activity = getPermissionAwareActivity();
-      activity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, FILE_DOWNLOAD_PERMISSION_REQUEST, getWebviewFileDownloaderPermissionListener(downloadMessage));
+      activity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, FILE_DOWNLOAD_PERMISSION_REQUEST, getWebviewFileDownloaderPermissionListener(downloadingMessage, lackPermissionToDownloadMessage));
     }
 
     return result;
