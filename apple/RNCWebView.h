@@ -22,7 +22,7 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 @protocol RNCWebViewDelegate <NSObject>
 
 - (BOOL)webView:(RNCWebView *_Nonnull)webView
-   shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
+shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
    withCallback:(RCTDirectEventBlock _Nonnull)callback;
 
 @end
