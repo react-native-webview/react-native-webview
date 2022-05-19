@@ -262,11 +262,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     return webView;
   }
 
-  private String getDownloadingMessage(){
+  private String getDownloadingMessage() {
     return  mDownloadingMessage == null ? DEFAULT_DOWNLOADING_MESSAGE : mDownloadingMessage;
   }
 
-  private String getLackPermissionToDownloadMessage(){
+  private String getLackPermissionToDownloadMessage() {
     return  mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
   }
 
@@ -301,14 +301,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   @ReactProp(name = "downloadingMessage")
-  public void setDownloadingMessage(WebView view, String message)
-  {
+  public void setDownloadingMessage(WebView view, String message) {
     mDownloadingMessage = message;
   }
 
   @ReactProp(name = "lackPermissionToDownloadMessage")
-  public void setLackPermissionToDownlaodMessage(WebView view, String message)
-  {
+  public void setLackPermissionToDownlaodMessage(WebView view, String message) {
     mLackPermissionToDownloadMessage = message;
   }
 
