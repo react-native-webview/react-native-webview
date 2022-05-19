@@ -332,6 +332,8 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   readonly urlPrefixesForDefaultIntent?: string[];
   forceDarkOn?: boolean;
   minimumFontSize?: number;
+  downloadingMessage?: string;
+  lackPermissionToDownloadMessage?: string;
 }
 
 export declare type ContentInsetAdjustmentBehavior = 'automatic' | 'scrollableAxes' | 'never' | 'always';
@@ -1078,6 +1080,20 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   minimumFontSize?: number;
+
+  /**
+   * Sets the message to be shown in the toast when downloading via the webview.
+   * Default is 'Downloading'.
+   * @platform android
+   */
+  downloadingMessage?: string;
+
+  /**
+   * Sets the message to be shown in the toast when webview is unable to download due to permissions issue.
+   * Default is 'Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.'.
+   * @platform android
+   */
+  lackPermissionToDownloadMessage?: string;
 }
 
 export interface WebViewSharedProps extends ViewProps {
