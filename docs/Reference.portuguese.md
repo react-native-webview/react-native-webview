@@ -1458,6 +1458,7 @@ Um valor booleano quando definido como `true`, a WebView será renderizado com s
 Isso vem com recursos como [`injectJavaScript`](Reference.portuguese.md#injectjavascriptstr), html5 histórico, [`sharedCookiesEnabled`](Reference.portuguese.md#sharedCookiesEnabled), [`injectedJavaScript`](Reference.portuguese.md#injectedjavascript), [`injectedJavaScriptBeforeContentLoaded`](Reference.portuguese.md#injectedjavascriptbeforecontentloaded) não funcionará veja na [Nota de lançamento do Apple Pay](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API).
 
 Se você for solicitado a enviar uma mensagem para App , a página da Web deve chamar explicitamente o manipulador de mensagens do webkit e recebê-lo no manipulador `onMessage` no lado nativo.
+
 ```javascript
 window.webkit.messageHandlers.ReactNativeWebView.postMessage("hello apple pay")
 ```
@@ -1613,7 +1614,7 @@ Remove o pop-up de preenchimento automático do campo de formulário em foco no 
 (somente Android)
 
 ```javascript
-
+clearCache(true)
 ```
 
 Limpa o cache de recursos. Observe que o cache é por aplicativo, portanto, isso limpará o cache de todos os WebViews usados. [referência do desenvolvedor.android.com](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
