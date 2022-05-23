@@ -44,6 +44,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`applicationNameForUserAgent`](Reference.portuguese.md#applicationNameForUserAgent)
 - [`allowsFullscreenVideo`](Reference.portuguese.md#allowsfullscreenvideo)
 - [`allowsInlineMediaPlayback`](Reference.portuguese.md#allowsinlinemediaplayback)
+- [`allowsAirPlayForMediaPlayback`](Reference.portuguese.md#allowsAirPlayForMediaPlayback)
 - [`bounces`](Reference.portuguese.md#bounces)
 - [`overScrollMode`](Reference.portuguese.md#overscrollmode)
 - [`contentInset`](Reference.portuguese.md#contentinset)
@@ -945,7 +946,15 @@ Booleano que determina se os vídeos HTML5 são reproduzidos inline ou usam o co
 | bool | Não       | iOS        |
 
 ---
+### `allowsAirPlayForMediaPlayback`[⬆](#props-index)<!-- Link generated with jump2header -->
 
+Um valor booleano que indica se o AirPlay é permitido. O valor padrão é `falso`.
+
+| Tipo | Requerido | Plataforma      |
+| ---- | --------- | --------------- |
+| bool | Não       | iOS e macOS     |
+
+---
 ### `bounces`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
 Valor booleano que determina se a visualização da Web é rejeitada quando atinge a borda do conteúdo. O valor padrão é `true`.

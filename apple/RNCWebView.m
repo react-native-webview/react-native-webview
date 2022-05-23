@@ -379,6 +379,10 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
                                                             name:HistoryShimName];
   [self resetupScripts:wkWebViewConfig];
 
+  if(@available(macos 10.11, ios 9.0, *)) {
+    wkWebViewConfig.allowsAirPlayForMediaPlayback = _allowsAirPlayForMediaPlayback;
+  }
+    
 #if !TARGET_OS_OSX
   wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
