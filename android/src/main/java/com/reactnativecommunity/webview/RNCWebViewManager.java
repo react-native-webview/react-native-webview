@@ -153,12 +153,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   // state and release page resources (including any running JavaScript).
   protected static final String BLANK_URL = "about:blank";
   protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
+  protected static final String DEFAULT_DOWNLOADING_MESSAGE = "Downloading";
+  protected static final String DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE =
+    "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.";
   protected WebViewConfig mWebViewConfig;
 
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
+  protected @Nullable String mDownloadingMessage = null;
+  protected @Nullable String mLackPermissionToDownloadMessage = null;
 
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -248,13 +253,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         module.setDownloadRequest(request);
 
-        if (module.grantFileDownloaderPermissions()) {
-          module.downloadFile();
+        if (module.grantFileDownloaderPermissions(getDownloadingMessage(), getLackPermissionToDownloadMessage())) {
+          module.downloadFile(getDownloadingMessage());
         }
       }
     });
 
     return webView;
+  }
+
+  private String getDownloadingMessage() {
+    return  mDownloadingMessage == null ? DEFAULT_DOWNLOADING_MESSAGE : mDownloadingMessage;
+  }
+
+  private String getLackPermissionToDownloadMessage() {
+    return  mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
   }
 
   @ReactProp(name = "javaScriptEnabled")
@@ -285,6 +298,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "showsVerticalScrollIndicator")
   public void setShowsVerticalScrollIndicator(WebView view, boolean enabled) {
     view.setVerticalScrollBarEnabled(enabled);
+  }
+
+  @ReactProp(name = "downloadingMessage")
+  public void setDownloadingMessage(WebView view, String message) {
+    mDownloadingMessage = message;
+  }
+
+  @ReactProp(name = "lackPermissionToDownloadMessage")
+  public void setLackPermissionToDownlaodMessage(WebView view, String message) {
+    mLackPermissionToDownloadMessage = message;
   }
 
   @ReactProp(name = "cacheEnabled")
