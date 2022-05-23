@@ -533,7 +533,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   allowsInlineMediaPlayback?: boolean;
   /**
    * A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
-   * @platform macos
+   * @platform ios
    */
   allowsAirPlayForMediaPlayback?: boolean;
   /**
