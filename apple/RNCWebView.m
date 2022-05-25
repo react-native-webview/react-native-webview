@@ -213,17 +213,17 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
       }
         UIMenuController *menuController = [UIMenuController sharedMenuController];
         NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
-        
+
         for(NSDictionary *menuItem in self.menuItems) {
             NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
             NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
             NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
             UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
                                                           action: NSSelectorFromString(sel)];
-            
+
             [menuControllerItems addObject: item];
         }
-  
+
         menuController.menuItems = menuControllerItems;
         [menuController setMenuVisible:YES animated:YES];
     }
@@ -382,7 +382,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if(@available(macos 10.11, ios 9.0, *)) {
     wkWebViewConfig.allowsAirPlayForMediaPlayback = _allowsAirPlayForMediaPlayback;
   }
-    
+
 #if !TARGET_OS_OSX
   wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
 #if WEBKIT_IOS_10_APIS_AVAILABLE
@@ -1404,6 +1404,13 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (void)stopLoading
 {
   [_webView stopLoading];
+}
+
+- (void)requestFocus
+{
+  #if !TARGET_OS_OSX
+    [_webView becomeFirstResponder];
+  #endif // !TARGET_OS_OSX
 }
 
 #if !TARGET_OS_OSX
