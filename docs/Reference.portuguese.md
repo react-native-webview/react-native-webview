@@ -44,6 +44,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`applicationNameForUserAgent`](Reference.portuguese.md#applicationNameForUserAgent)
 - [`allowsFullscreenVideo`](Reference.portuguese.md#allowsfullscreenvideo)
 - [`allowsInlineMediaPlayback`](Reference.portuguese.md#allowsinlinemediaplayback)
+- [`allowsAirPlayForMediaPlayback`](Reference.portuguese.md#allowsAirPlayForMediaPlayback)
 - [`bounces`](Reference.portuguese.md#bounces)
 - [`overScrollMode`](Reference.portuguese.md#overscrollmode)
 - [`contentInset`](Reference.portuguese.md#contentinset)
@@ -945,7 +946,15 @@ Booleano que determina se os vídeos HTML5 são reproduzidos inline ou usam o co
 | bool | Não       | iOS        |
 
 ---
+### `allowsAirPlayForMediaPlayback`[⬆](#props-index)<!-- Link generated with jump2header -->
 
+Um valor booleano que indica se o AirPlay é permitido. O valor padrão é `falso`.
+
+| Tipo | Requerido | Plataforma      |
+| ---- | --------- | --------------- |
+| bool | Não       | iOS e macOS     |
+
+---
 ### `bounces`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
 Valor booleano que determina se a visualização da Web é rejeitada quando atinge a borda do conteúdo. O valor padrão é `true`.
@@ -1458,6 +1467,7 @@ Um valor booleano quando definido como `true`, a WebView será renderizado com s
 Isso vem com recursos como [`injectJavaScript`](Reference.portuguese.md#injectjavascriptstr), html5 histórico, [`sharedCookiesEnabled`](Reference.portuguese.md#sharedCookiesEnabled), [`injectedJavaScript`](Reference.portuguese.md#injectedjavascript), [`injectedJavaScriptBeforeContentLoaded`](Reference.portuguese.md#injectedjavascriptbeforecontentloaded) não funcionará veja na [Nota de lançamento do Apple Pay](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API).
 
 Se você for solicitado a enviar uma mensagem para App , a página da Web deve chamar explicitamente o manipulador de mensagens do webkit e recebê-lo no manipulador `onMessage` no lado nativo.
+
 ```javascript
 window.webkit.messageHandlers.ReactNativeWebView.postMessage("hello apple pay")
 ```
@@ -1613,7 +1623,7 @@ Remove o pop-up de preenchimento automático do campo de formulário em foco no 
 (somente Android)
 
 ```javascript
-
+clearCache(true)
 ```
 
 Limpa o cache de recursos. Observe que o cache é por aplicativo, portanto, isso limpará o cache de todos os WebViews usados. [referência do desenvolvedor.android.com](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
