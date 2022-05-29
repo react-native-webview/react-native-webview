@@ -375,6 +375,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   decelerationRate?: number;
   directionalLockEnabled?: boolean;
   hideKeyboardAccessoryView?: boolean;
+  javaScriptEnabled?: boolean;
   pagingEnabled?: boolean;
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;

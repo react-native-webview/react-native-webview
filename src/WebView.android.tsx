@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle,  useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 
 import {
   Image,
@@ -16,20 +16,13 @@ import invariant from 'invariant';
 import RNCWebView from "./WebViewNativeComponent.android";
 import {
   defaultOriginWhitelist,
-  createOnShouldStartLoadWithRequest,
   defaultRenderError,
   defaultRenderLoading,
+  useWebWiewLogic,
 } from './WebViewShared';
 import {
-  WebViewRenderProcessGoneEvent,
-  WebViewErrorEvent,
-  WebViewHttpErrorEvent,
-  WebViewMessageEvent,
-  WebViewNavigationEvent,
-  WebViewProgressEvent,
   AndroidWebViewProps,
   NativeWebViewAndroid,
-  WebViewError,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -47,12 +40,7 @@ const { resolveAssetSource } = Image;
  */
 let uniqueRef = 0;
 
-
-// native implementation should return "true" only for Android 5+
-const isFileUploadSupported: () => Promise<boolean>
-  = NativeModules.RNCWebView.isFileUploadSupported();
-
-const WebView = forwardRef<{}, AndroidWebViewProps>(({
+const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   overScrollMode = 'always',
   javaScriptEnabled = true,
   thirdPartyCookiesEnabled = true,
@@ -87,11 +75,34 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
   ...otherProps
 }, ref) => {
-  const startUrl = useRef<string | null>(null)
-  const [viewState, setViewState] = useState<'IDLE' | 'LOADING' | 'ERROR'>(startInLoadingState ? "LOADING" : "IDLE");
-  const [lastErrorEvent, setLastErrorEvent] = useState<WebViewError | null>(null);
-  const webViewRef = useRef<NativeWebViewAndroid | null>(null);
   const messagingModuleName = useRef<string>(`WebViewMessageHandler${uniqueRef += 1}`).current;
+  const webViewRef = useRef<NativeWebViewAndroid | null>(null);
+
+  const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean,
+    url: string,
+    lockIdentifier?: number) => {
+    if (lockIdentifier) {
+      NativeModules.RNCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
+    } else if (shouldStart) {
+      Commands.loadUrl(webViewRef, url);
+    }
+  }, []);
+
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onRenderProcessGone } = useWebWiewLogic({
+    onNavigationStateChange,
+    onLoad,
+    onError,
+    onHttpErrorProp,
+    onLoadEnd,
+    onLoadProgress,
+    onLoadStart,
+    onRenderProcessGoneProp,
+    onMessageProp,
+    startInLoadingState,
+    originWhitelist,
+    onShouldStartLoadWithRequestProp,
+    onShouldStartLoadWithRequestCallback,
+  })
 
   useImperativeHandle(ref, () => ({
     goForward: () => Commands.goForward(webViewRef.current),
@@ -108,79 +119,7 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
     clearFormData: () => Commands.clearFormData(webViewRef.current),
     clearCache: (includeDiskFiles: boolean) => Commands.clearCache(webViewRef.current, includeDiskFiles),
     clearHistory: () => Commands.clearHistory(webViewRef.current),
-    isFileUploadSupported,
-  }), [])
-
-  const updateNavigationState = useCallback((event: WebViewNavigationEvent) => {
-    onNavigationStateChange?.(event.nativeEvent);
-  }, [onNavigationStateChange]);
-
-  const onLoadingStart = useCallback((event: WebViewNavigationEvent) => {
-    startUrl.current = event.nativeEvent.url;
-    onLoadStart?.(event);
-    updateNavigationState(event);
-  }, [onLoadStart, updateNavigationState]);
-
-  const onLoadingError = useCallback((event: WebViewErrorEvent) => {
-    event.persist();
-    if (onError) {
-      onError(event);
-    } else {
-      console.warn('Encountered an error loading page', event.nativeEvent);
-    }
-    onLoadEnd?.(event);
-    if (event.isDefaultPrevented()) { return };
-    setViewState('ERROR');
-    setLastErrorEvent(event.nativeEvent);
-  }, [onError, onLoadEnd]);
-
-  const onHttpError = useCallback((event: WebViewHttpErrorEvent) => {
-    onHttpErrorProp?.(event);
-  }, [onHttpErrorProp]);
-
-  const onRenderProcessGone = useCallback((event: WebViewRenderProcessGoneEvent) => {
-    onRenderProcessGoneProp?.(event);
-  }, [onRenderProcessGoneProp]);
-
-  const onLoadingFinish = useCallback((event: WebViewNavigationEvent) => {
-    onLoad?.(event);
-    onLoadEnd?.(event);
-    const { nativeEvent: { url } } = event;
-    if (url === startUrl.current) {
-      setViewState('IDLE');
-    }
-    updateNavigationState(event);
-  }, [onLoad, onLoadEnd, updateNavigationState]);
-
-  const onMessage = useCallback((event: WebViewMessageEvent) => {
-    onMessageProp?.(event);
-  }, [onMessageProp]);
-
-  const onLoadingProgress = useCallback((event: WebViewProgressEvent) => {
-    const { nativeEvent: { progress } } = event;
-    if (progress === 1) {
-      setViewState(prevViewState => prevViewState === 'LOADING' ? 'IDLE' : prevViewState);
-    }
-    onLoadProgress?.(event);
-  }, [onLoadProgress]);
-
-  const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean,
-    url: string,
-    lockIdentifier?: number) => {
-    if (lockIdentifier) {
-      NativeModules.RNCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
-    } else if (shouldStart) {
-      Commands.loadUrl(webViewRef, url);
-    }
-  }, []);
-
-  const onShouldStartLoadWithRequest = useMemo(() =>  createOnShouldStartLoadWithRequest(
-      onShouldStartLoadWithRequestCallback,
-      // casting cause it's in the default props
-      originWhitelist as readonly string[],
-      onShouldStartLoadWithRequestProp,
-    )
-  , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
+  }), [setViewState, webViewRef]);
 
   const directEventCallbacks = useMemo(() => ({
     onShouldStartLoadWithRequest,
@@ -265,4 +204,11 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
     </View>
   );
 });
+
+// native implementation should return "true" only for Android 5+
+const isFileUploadSupported: () => Promise<boolean>
+  = NativeModules.RNCWebView.isFileUploadSupported();
+
+const WebView = Object.assign(WebViewComponent, {isFileUploadSupported});
+
 export default WebView;
