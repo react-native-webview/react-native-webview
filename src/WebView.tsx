@@ -9,7 +9,7 @@ export type WebViewProps = IOSWebViewProps & AndroidWebViewProps & WindowsWebVie
 const WebView: React.FunctionComponent<WebViewProps> = () => (
 	<View style={{ alignSelf: 'flex-start' }}>
 		<Text style={{ color: 'red' }}>
-			React Native WebView do not support this platform.
+			React Native WebView does not support this platform.
 		</Text>
 	</View>
 );
