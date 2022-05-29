@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle,  useMemo, useRef, useState } from 'react';
 
 import {
   Image,
@@ -90,14 +90,8 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
   const startUrl = useRef<string | null>(null)
   const [viewState, setViewState] = useState<'IDLE' | 'LOADING' | 'ERROR'>(startInLoadingState ? "LOADING" : "IDLE");
   const [lastErrorEvent, setLastErrorEvent] = useState<WebViewError | null>(null);
-  const onShouldStartLoadWithRequest = useRef<ReturnType<typeof createOnShouldStartLoadWithRequest> | null>(null);
   const webViewRef = useRef<NativeWebViewAndroid | null>(null);
   const messagingModuleName = useRef<string>(`WebViewMessageHandler${uniqueRef += 1}`).current;
-
-  useEffect(() => {
-    // TODO useMemo and add events
-    BatchedBridge.registerCallableModule(messagingModuleName, {});
-  }, [])
 
   useImperativeHandle(ref, () => ({
     goForward: () => Commands.goForward(webViewRef.current),
@@ -138,15 +132,15 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
     if (event.isDefaultPrevented()) { return };
     setViewState('ERROR');
     setLastErrorEvent(event.nativeEvent);
-  }, []);
+  }, [onError, onLoadEnd]);
 
   const onHttpError = useCallback((event: WebViewHttpErrorEvent) => {
     onHttpErrorProp?.(event);
-  }, []);
+  }, [onHttpErrorProp]);
 
   const onRenderProcessGone = useCallback((event: WebViewRenderProcessGoneEvent) => {
     onRenderProcessGoneProp?.(event);
-  }, []);
+  }, [onRenderProcessGoneProp]);
 
   const onLoadingFinish = useCallback((event: WebViewNavigationEvent) => {
     onLoad?.(event);
@@ -156,11 +150,11 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
       setViewState('IDLE');
     }
     updateNavigationState(event);
-  }, []);
+  }, [onLoad, onLoadEnd, updateNavigationState]);
 
   const onMessage = useCallback((event: WebViewMessageEvent) => {
     onMessageProp?.(event);
-  }, []);
+  }, [onMessageProp]);
 
   const onLoadingProgress = useCallback((event: WebViewProgressEvent) => {
     const { nativeEvent: { progress } } = event;
@@ -168,7 +162,7 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
       setViewState(prevViewState => prevViewState === 'LOADING' ? 'IDLE' : prevViewState);
     }
     onLoadProgress?.(event);
-  }, []);
+  }, [onLoadProgress]);
 
   const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean,
     url: string,
@@ -179,6 +173,23 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
       Commands.loadUrl(webViewRef, url);
     }
   }, []);
+
+  const onShouldStartLoadWithRequest = useMemo(() =>  createOnShouldStartLoadWithRequest(
+      onShouldStartLoadWithRequestCallback,
+      // casting cause it's in the default props
+      originWhitelist as readonly string[],
+      onShouldStartLoadWithRequestProp,
+    )
+  , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
+
+  const directEventCallbacks = useMemo(() => ({
+    onShouldStartLoadWithRequest,
+    onMessage,
+  }), [onMessage, onShouldStartLoadWithRequest]);
+
+  useEffect(() => {
+    BatchedBridge.registerCallableModule(messagingModuleName, directEventCallbacks);
+  }, [messagingModuleName, directEventCallbacks])
 
   let otherView = null;
   if (viewState === 'LOADING') {
@@ -211,18 +222,12 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
   const NativeWebView
     = (nativeConfig?.component as (typeof NativeWebViewAndroid | undefined)) || RNCWebView;
 
-  onShouldStartLoadWithRequest.current = createOnShouldStartLoadWithRequest(
-    onShouldStartLoadWithRequestCallback,
-    // casting cause it's in the default props
-    originWhitelist as readonly string[],
-    onShouldStartLoadWithRequestProp,
-  );
-
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
     messagingEnabled={typeof onMessage === 'function'}
     messagingModuleName={messagingModuleName}
+
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}
     onLoadingProgress={onLoadingProgress}
@@ -230,7 +235,8 @@ const WebView = forwardRef<{}, AndroidWebViewProps>(({
     onHttpError={onHttpError}
     onRenderProcessGone={onRenderProcessGone}
     onMessage={onMessage}
-    onShouldStartLoadWithRequest={onShouldStartLoadWithRequest.current}
+    onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+
     ref={webViewRef}
     // TODO: find a better way to type this.
     source={resolveAssetSource(source as ImageSourcePropType)}
