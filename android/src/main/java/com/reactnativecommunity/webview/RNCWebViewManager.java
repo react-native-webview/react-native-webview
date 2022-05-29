@@ -726,35 +726,22 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       .build();
   }
 
-  // receiveCommand signature has changed to receive String commandId
-
   @Override
   public void receiveCommand(@NonNull WebView root, String commandId, @Nullable ReadableArray args) {
     switch (commandId) {
+      case "goBack":
+        root.goBack();
+        break;
+      case "goForward":
+        root.goForward();
+        break;
       case "reload":
         root.reload();
         break;
-    }
-    super.receiveCommand(root, commandId, args);
-  }
-
-
-  /*  @Override
-  public void receiveCommand(WebView root, int commandId, @Nullable ReadableArray args) {
-    switch (commandId) {
-      case COMMAND_GO_BACK:
-        root.goBack();
-        break;
-      case COMMAND_GO_FORWARD:
-        root.goForward();
-        break;
-      case COMMAND_RELOAD:
-        root.reload();
-        break;
-      case COMMAND_STOP_LOADING:
+      case "stopLoading":
         root.stopLoading();
         break;
-      case COMMAND_POST_MESSAGE:
+      case "postMessage":
         try {
           RNCWebView reactWebView = (RNCWebView) root;
           JSONObject eventInitDict = new JSONObject();
@@ -774,32 +761,33 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           throw new RuntimeException(e);
         }
         break;
-      case COMMAND_INJECT_JAVASCRIPT:
+      case "injectJavaScript":
         RNCWebView reactWebView = (RNCWebView) root;
         reactWebView.evaluateJavascriptWithFallback(args.getString(0));
         break;
-      case COMMAND_LOAD_URL:
+      case "loadUrl":
         if (args == null) {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
         ((RNCWebView) root).progressChangedFilter.setWaitingForCommandLoadUrl(false);
         root.loadUrl(args.getString(0));
         break;
-      case COMMAND_FOCUS:
+      case "requestFocus":
         root.requestFocus();
         break;
-      case COMMAND_CLEAR_FORM_DATA:
+      case "clearFormData":
         root.clearFormData();
         break;
-      case COMMAND_CLEAR_CACHE:
+      case "clearCache":
         boolean includeDiskFiles = args != null && args.getBoolean(0);
         root.clearCache(includeDiskFiles);
         break;
-      case COMMAND_CLEAR_HISTORY:
+      case "clearHistory":
         root.clearHistory();
         break;
     }
-  }*/
+    super.receiveCommand(root, commandId, args);
+  }
 
   @Override
   public void onDropViewInstance(WebView webView) {
