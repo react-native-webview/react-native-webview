@@ -1,19 +1,17 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { IOSWebViewProps, AndroidWebViewProps, WindowsWebViewProps } from './WebViewTypes';
 
 export type WebViewProps = IOSWebViewProps & AndroidWebViewProps & WindowsWebViewProps;
 
 // This "dummy" WebView is to render something for unsupported platforms,
-// like for example Expo SDK "web" platform. It matches the previous react-native
-// implementation which is produced by Expo SDK 37.0.0.1 implementation, with
-// similar interface than the native ones have.
+// like for example Expo SDK "web" platform.
 const WebView: React.FunctionComponent<WebViewProps> = () => (
-	<View style={{
-		alignSelf: 'flex-start',
-		borderColor: 'rgb(255, 0, 0)',
-		borderWidth: 1
-	}} />
+	<View style={{ alignSelf: 'flex-start' }}>
+		<Text style={{ color: 'red' }}>
+			React Native WebView does not support this platform.
+		</Text>
+	</View>
 );
 
 export { WebView };
