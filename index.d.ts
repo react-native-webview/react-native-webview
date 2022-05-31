@@ -2,6 +2,7 @@ import { Component } from 'react';
 // eslint-disable-next-line
 
 import releaseWebView from './lib/releaseWebView';
+import injectJavaScriptWithWebViewKey from './lib/injectJavaScriptWithWebViewKey';
 
 import { IOSWebViewProps, AndroidWebViewProps, WindowsWebViewProps } from './lib/WebViewTypes';
 
@@ -64,5 +65,5 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     clearHistory?: () => void;
 }
 
-export {WebView, releaseWebView};
+export {WebView, releaseWebView, injectJavaScriptWithWebViewKey};
 export default WebView;

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */; };
+		40136746283E927300EAE5F2 /* RNCScriptMessageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40136745283E927300EAE5F2 /* RNCScriptMessageManager.m */; };
+		40136749283E92C600EAE5F2 /* ScriptMessageEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 40136748283E92C600EAE5F2 /* ScriptMessageEventEmitter.m */; };
 		40EE00F6281AED0000A0BA29 /* RNCWKWebViewMapManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40EE00F5281AED0000A0BA29 /* RNCWKWebViewMapManager.m */; };
 		40EE00FC281C5D1200A0BA29 /* RNCWebViewMapManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40EE00FB281C5D1200A0BA29 /* RNCWebViewMapManager.m */; };
 		E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351B21446E6C00F9801F /* RNCWebViewManager.m */; };
@@ -30,6 +32,10 @@
 		134814201AA4EA6300B7C361 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNCWKProcessPoolManager.m; path = ../apple/RNCWKProcessPoolManager.m; sourceTree = "<group>"; };
 		3515965F21A3C87E00623BFA /* RNCWKProcessPoolManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNCWKProcessPoolManager.h; path = ../apple/RNCWKProcessPoolManager.h; sourceTree = "<group>"; };
+		40136744283E924500EAE5F2 /* RNCScriptMessageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNCScriptMessageManager.h; path = ../apple/RNCScriptMessageManager.h; sourceTree = "<group>"; };
+		40136745283E927300EAE5F2 /* RNCScriptMessageManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNCScriptMessageManager.m; path = ../apple/RNCScriptMessageManager.m; sourceTree = "<group>"; };
+		40136747283E929E00EAE5F2 /* ScriptMessageEventEmitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ScriptMessageEventEmitter.h; path = ../apple/ScriptMessageEventEmitter.h; sourceTree = "<group>"; };
+		40136748283E92C600EAE5F2 /* ScriptMessageEventEmitter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ScriptMessageEventEmitter.m; path = ../apple/ScriptMessageEventEmitter.m; sourceTree = "<group>"; };
 		40EE00F4281AECE600A0BA29 /* RNCWKWebViewMapManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNCWKWebViewMapManager.h; path = ../apple/RNCWKWebViewMapManager.h; sourceTree = "<group>"; };
 		40EE00F5281AED0000A0BA29 /* RNCWKWebViewMapManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNCWKWebViewMapManager.m; path = ../apple/RNCWKWebViewMapManager.m; sourceTree = "<group>"; };
 		40EE00FA281C5CF500A0BA29 /* RNCWebViewMapManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNCWebViewMapManager.h; path = ../apple/RNCWebViewMapManager.h; sourceTree = "<group>"; };
@@ -62,6 +68,10 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				40136748283E92C600EAE5F2 /* ScriptMessageEventEmitter.m */,
+				40136747283E929E00EAE5F2 /* ScriptMessageEventEmitter.h */,
+				40136745283E927300EAE5F2 /* RNCScriptMessageManager.m */,
+				40136744283E924500EAE5F2 /* RNCScriptMessageManager.h */,
 				40EE00FB281C5D1200A0BA29 /* RNCWebViewMapManager.m */,
 				40EE00FA281C5CF500A0BA29 /* RNCWebViewMapManager.h */,
 				40EE00F5281AED0000A0BA29 /* RNCWKWebViewMapManager.m */,
@@ -136,7 +146,9 @@
 				E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */,
 				40EE00F6281AED0000A0BA29 /* RNCWKWebViewMapManager.m in Sources */,
 				E91B351E21446E6C00F9801F /* RNCWebView.m in Sources */,
+				40136746283E927300EAE5F2 /* RNCScriptMessageManager.m in Sources */,
 				3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */,
+				40136749283E92C600EAE5F2 /* ScriptMessageEventEmitter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

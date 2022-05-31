@@ -12,6 +12,7 @@
 #import "RNCWebView.h"
 #import "RNCWKWebViewMapManager.h"
 #import "RNCWebViewMapManager.h"
+#import <WebKit/WebKit.h>
 
 @interface RNCWebViewManager () <RNCWebViewDelegate>
 @end
@@ -199,6 +200,20 @@ RCT_EXPORT_METHOD(injectJavaScript:(nonnull NSNumber *)reactTag script:(NSString
   }];
 }
 
+RCT_EXPORT_METHOD(injectJavaScriptWithWebViewKey:(nonnull NSString *)webViewKey script:(NSString *)script)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, __unused NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+    WKWebView *wkWebView = sharedWKWebViewDictionary[webViewKey];
+
+    if (wkWebView != nil) {
+      [wkWebView evaluateJavaScript:script completionHandler:nil];
+    } else {
+      RCTLogError(@"Failed to inject JavaScript. WKWebView for webViewKey is nil");
+    }
+  }];
+}
+
 RCT_EXPORT_METHOD(goBack:(nonnull NSNumber *)reactTag)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
@@ -284,17 +299,19 @@ RCT_EXPORT_METHOD(startLoadWithResult:(BOOL)result lockIdentifier:(NSInteger)loc
 
 RCT_EXPORT_METHOD(releaseWebView:(nonnull NSString *)webViewKey)
 {
-  NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
-  NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-  
-  sharedWKWebViewDictionary[webViewKey] = nil;
-  
-  RNCWebView *rncWebView = sharedRNCWebViewDictionary[webViewKey];
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, __unused NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
+    NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+    NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
     
-  if (rncWebView != nil) {
-    [rncWebView cleanUpWebView];
-    sharedRNCWebViewDictionary[webViewKey] = nil;
-  }
+    sharedWKWebViewDictionary[webViewKey] = nil;
+    
+    RNCWebView *rncWebView = sharedRNCWebViewDictionary[webViewKey];
+      
+    if (rncWebView != nil) {
+      [rncWebView cleanUpWebView];
+      sharedRNCWebViewDictionary[webViewKey] = nil;
+    }
+  }];
 }
 
 @end

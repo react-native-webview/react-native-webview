@@ -740,6 +740,15 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * key for the WebView, they will use the same native WebView instance.
    */
   webViewKey?: string;
+
+
+  /**
+   * If keepWebViewInstanceAfterUnmount is true, the onMessage callback won't work after
+   * navigating away from the WebView. Instead, to handle messages, set enableMesaging
+   * to true, and use ScriptMessageEventEmitter to listen to messages for a given
+   * webViewKey.
+   */
+   enableMessaging?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {

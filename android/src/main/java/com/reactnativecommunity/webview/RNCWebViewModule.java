@@ -154,6 +154,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
     // no-op for now
   }
 
+  @ReactMethod
+  public void injectJavaScriptWithWebViewKey(final String webViewKey, final String script) {
+    // no-op for now
+  }
+
   public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 
     if (filePathCallback == null && filePathCallbackLegacy == null) {
