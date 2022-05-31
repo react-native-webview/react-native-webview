@@ -9,7 +9,7 @@ namespace ReactNativeWebView{
 #else
 #define RNW_VERSION_AT_LEAST(x,y,z) false
 #endif
-#if RNW_VERSION_AT_LEAST(0,68,0)
+#if defined(USE_WINUI3) && RNW_VERSION_AT_LEAST(0,68,0)
     [default_interface]
     runtimeclass ReactWebView2 : Windows.UI.Xaml.Controls.ContentPresenter{
         ReactWebView2(Microsoft.ReactNative.IReactContext context);

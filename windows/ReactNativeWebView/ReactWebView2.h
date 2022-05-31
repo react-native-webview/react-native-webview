@@ -1,7 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-#if RNW_VERSION_AT_LEAST(0,68,0)
+
 #pragma once
+
+#if defined(USE_WINUI3) && RNW_VERSION_AT_LEAST(0,68,0)
+#define USE_WEBVIEW2 1
+#else
+#define USE_WEBVIEW2 0
+#endif
+
+#if USE_WEBVIEW2
 
 #include "winrt/Microsoft.ReactNative.h"
 #include "NativeModules.h"
@@ -40,4 +48,5 @@ namespace winrt::ReactNativeWebView::implementation {
 namespace winrt::ReactNativeWebView::factory_implementation {
     struct ReactWebView2 : ReactWebView2T<ReactWebView2, implementation::ReactWebView2> {};
 } // namespace winrt::ReactNativeWebView2::factory_implementation
-#endif
+
+#endif // USE_WEBVIEW2

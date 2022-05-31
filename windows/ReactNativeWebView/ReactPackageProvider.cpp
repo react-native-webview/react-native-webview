@@ -13,7 +13,8 @@ namespace winrt::ReactNativeWebView::implementation {
 
 void ReactPackageProvider::CreatePackage(IReactPackageBuilder const &packageBuilder) noexcept {
   packageBuilder.AddViewManager(L"ReactWebViewManager", []() { return winrt::make<ReactWebViewManager>(); });
-#if RNW_VERSION_AT_LEAST(0,68,0)
+
+#if USE_WEBVIEW2
   packageBuilder.AddViewManager(L"ReactWebView2Manager", []() { return winrt::make<ReactWebView2Manager>(); });
 #endif
 }

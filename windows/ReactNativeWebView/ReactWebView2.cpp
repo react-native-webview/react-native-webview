@@ -2,9 +2,10 @@
 // Licensed under the MIT License.
 
 #include "pch.h"
-#if RNW_VERSION_AT_LEAST(0,68,0)
-#include "JSValueXaml.h"
 #include "ReactWebView2.h"
+
+#if USE_WEBVIEW2
+#include "JSValueXaml.h"
 #include "ReactWebView2.g.cpp"
 #include <winrt/Windows.Foundation.Metadata.h>
 #include <optional>
@@ -116,4 +117,5 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
 } // namespace winrt::ReactNativeWebView::implementation
-#endif
+
+#endif // USE_WEBVIEW2
