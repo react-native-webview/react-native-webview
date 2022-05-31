@@ -402,6 +402,7 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
   directionalLockEnabled?: boolean;
   hideKeyboardAccessoryView?: boolean;
+  javaScriptEnabled?: boolean;
   pagingEnabled?: boolean;
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;

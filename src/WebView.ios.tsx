@@ -201,7 +201,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     </View>
   );})
 
-// native implementation should return "true" only for Android 5+
+// no native implementation for iOS, depends only on permissions
 const isFileUploadSupported: () => Promise<boolean>
   = async () => true;
 
