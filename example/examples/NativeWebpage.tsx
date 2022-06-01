@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Alert } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -17,6 +17,9 @@ export default class NativeWebpage extends Component<Props, State> {
           menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]}
           source={{ uri: 'https://infinite.red' }}
           style={{ width: '100%', height: '100%' }}
+          startLoop={() => {
+            Alert.alert('Start loop')
+          }}
         />
       </View>
     );
