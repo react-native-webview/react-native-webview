@@ -1598,16 +1598,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public ActionMode startActionMode(ActionMode.Callback callback, int type) {
-      Log.e(TAG, "Start Action Mode has started");
-      // if (options.useHybridComposition && !options.disableContextMenu && (contextMenu == null || contextMenu.keySet().size() == 0)) {
-      //   return super.startActionMode(callback, type);
-      // }
-      //return rebuildActionMode(super.startActionMode(callback, type), callback);
-
-      Log.e(TAG, "I'm basically a Java dev now");
-      // if (false) {
-      //   return super.startActionMode(callback, type);
-      // }
+      Log.e(TAG, "Start Action Mode");
       return rebuildActionMode(super.startActionMode(callback, type));
     }
 
@@ -1615,134 +1606,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       final ActionMode actionMode
     ) {
       Menu actionMenu = actionMode.getMenu();
-      // actionMode.hide(3000);
       if (actionMode == null) {
         return null;
       }
-      Log.e(TAG, "Action " + actionMenu.size());
       actionMenu.getItem(3).setTitle("Start Loop");
       actionMenu.getItem(3).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
           Log.e(TAG, "Start Loop!");
+          WritableMap eventData = Arguments.createMap();
+          eventData.putString("data", "startLoop");
+          onMessage("startLoop");
           return true;
         }
       });
-      // actionMenu.getItem(3).setOnClickListener(new View.OnClickListener() {
-      //   @Override
-      //   public void onClick(View v) {
-      //     Log.e(TAG, "Start Loop");
-      //     actionMode.hide(3000);
-      //   }
-      // });
-      // List<MenuItem> defaultMenuItems = new ArrayList<>();
-      // for (int i = 0; i < actionMenu.size(); i++) {
-      //   defaultMenuItems.add(actionMenu.getItem(i));
-      // }
-      // actionMenu.clear();
-      // actionMode.finish();
-
       return actionMode;
-      // if (options.disableContextMenu) {
-      //   return actionMode;
-      // }
-
-      // floatingContextMenu = (LinearLayout) LayoutInflater.from(this.getContext())
-      //         .inflate(R.layout.floating_action_mode, this, false);
-      // HorizontalScrollView horizontalScrollView = (HorizontalScrollView) floatingContextMenu.getChildAt(0);
-      // LinearLayout menuItemListLayout = (LinearLayout) horizontalScrollView.getChildAt(0);
-
-      // List<Map<String, Object>> customMenuItems = new ArrayList<>();
-      // ContextMenuOptions contextMenuOptions = new ContextMenuOptions();
-      // if (contextMenu != null) {
-      //   customMenuItems = (List<Map<String, Object>>) contextMenu.get("menuItems");
-      //   Map<String, Object> contextMenuOptionsMap = (Map<String, Object>) contextMenu.get("options");
-      //   if (contextMenuOptionsMap != null) {
-      //     contextMenuOptions.parse(contextMenuOptionsMap);
-      //   }
-      // }
-      // customMenuItems = customMenuItems == null ? new ArrayList<Map<String, Object>>() : customMenuItems;
-
-      // if (contextMenuOptions.hideDefaultSystemContextMenuItems == null || !contextMenuOptions.hideDefaultSystemContextMenuItems) {
-      //   for (final MenuItem menuItem : defaultMenuItems) {
-      //     final int itemId = menuItem.getItemId();
-      //     final String itemTitle = menuItem.getTitle().toString();
-
-      //     TextView text = (TextView) LayoutInflater.from(this.getContext())
-      //             .inflate(R.layout.floating_action_mode_item, this, false);
-      //     text.setText(itemTitle);
-      //     text.setOnClickListener(new OnClickListener() {
-      //       @Override
-      //       public void onClick(View v) {
-      //         hideContextMenu();
-      //         callback.onActionItemClicked(actionMode, menuItem);
-
-      //         Map<String, Object> obj = new HashMap<>();
-      //         obj.put("androidId", itemId);
-      //         obj.put("iosId", null);
-      //         obj.put("title", itemTitle);
-      //         channel.invokeMethod("onContextMenuActionItemClicked", obj);
-      //       }
-      //     });
-      //     if (floatingContextMenu != null) {
-      //       menuItemListLayout.addView(text);
-      //     }
-      //   }
-      // }
-
-      // for (final Map<String, Object> menuItem : customMenuItems) {
-      //   final int itemId = (int) menuItem.get("androidId");
-      //   final String itemTitle = (String) menuItem.get("title");
-      //   TextView text = (TextView) LayoutInflater.from(this.getContext())
-      //           .inflate(R.layout.floating_action_mode_item, this, false);
-      //   text.setText(itemTitle);
-      //   text.setOnClickListener(new OnClickListener() {
-      //     @Override
-      //     public void onClick(View v) {
-      //       hideContextMenu();
-
-      //       Map<String, Object> obj = new HashMap<>();
-      //       obj.put("androidId", itemId);
-      //       obj.put("iosId", null);
-      //       obj.put("title", itemTitle);
-      //       channel.invokeMethod("onContextMenuActionItemClicked", obj);
-      //     }
-      //   });
-      //   if (floatingContextMenu != null) {
-      //     menuItemListLayout.addView(text);
-
-      //   }
-      // }
-
-      // final int x = (lastTouch != null) ? lastTouch.x : 0;
-      // final int y = (lastTouch != null) ? lastTouch.y : 0;
-      // contextMenuPoint = new Point(x, y);
-
-      // if (floatingContextMenu != null) {
-      //   floatingContextMenu.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-      //     @Override
-      //     public void onGlobalLayout() {
-      //       if (floatingContextMenu != null) {
-      //         floatingContextMenu.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-      //         if (getSettings().getJavaScriptEnabled()) {
-      //           onScrollStopped();
-      //         } else {
-      //           onFloatingActionGlobalLayout(x, y);
-      //         }
-      //       }
-      //     }
-      //   });
-      //   addView(floatingContextMenu, new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, x, y));
-      //   if (hasBeenRemovedAndRebuilt) {
-      //     sendOnCreateContextMenuEvent();
-      //   }
-      //   if (checkContextMenuShouldBeClosedTask != null) {
-      //     checkContextMenuShouldBeClosedTask.run();
-      //   }
-      // }
-
-      // return actionMode;
     }
 
     @Override
