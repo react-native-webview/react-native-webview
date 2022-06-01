@@ -219,13 +219,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
-    // webView.setOnLongClickListener(new View.OnLongClickListener() {
-    //   @Override
-    //   public boolean onLongClick(View v) {
-    //     return true;
-    //   }
-    // });
-
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
         webView.setIgnoreErrFailedForThisURL(url);
@@ -1609,8 +1602,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       if (actionMode == null) {
         return null;
       }
-      actionMenu.getItem(3).setTitle("Start Loop");
-      actionMenu.getItem(3).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+      Log.e(TAG, "Action menu size is " + actionMenu.size());
+      actionMenu.getItem(actionMenu.size() - 1).setTitle("Start Loop");
+      actionMenu.getItem(actionMenu.size() - 1).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
           Log.e(TAG, "Start Loop!");
