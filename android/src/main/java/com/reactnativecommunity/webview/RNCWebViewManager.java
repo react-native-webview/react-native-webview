@@ -215,6 +215,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
+    webView.setOnLongClickListener(new View.OnLongClickListener() {
+      @Override
+      public boolean onLongClick(View v) {
+        return true;
+      }
+    });
+
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
         webView.setIgnoreErrFailedForThisURL(url);
