@@ -1,7 +1,6 @@
 #include "pch.h"
+#if RNW_VERSION_AT_LEAST(0,68,0)
 #include "ReactWebView2Manager.h"
-
-#if USE_WEBVIEW2
 #include "NativeModules.h"
 #include "ReactWebView2.h"
 #include "JSValueXaml.h"
@@ -145,5 +144,4 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
 } // namespace winrt::ReactNativeWebView::implementation
-
-#endif // USE_WEBVIEW2
+#endif
