@@ -3,7 +3,7 @@
 
 #pragma once
 
-#if defined(USE_WINUI3) && RNW_VERSION_AT_LEAST(0,68,0)
+#if RNW_VERSION_AT_LEAST(0,68,0)
 #define USE_WEBVIEW2 1
 #else
 #define USE_WEBVIEW2 0
