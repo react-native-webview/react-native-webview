@@ -3,34 +3,30 @@ buildscript {
     return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNativeWebView_' + name]
   }
 
-  // The Android Gradle plugin is only required when opening the android folder stand-alone.
-  // This avoids unnecessary downloads and potential conflicts when the library is included as a
-  // module dependency in an application project.
-  if (project == rootProject) {
-    repositories {
-      mavenCentral()
-      google()
-    }
-
-    dependencies {
-      classpath("com.android.tools.build:gradle:3.6.0")
-      classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}")
-    }
-  } else {
-    repositories {
-      mavenCentral()
-    }
-
-    dependencies {
-      classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}")
-    }
+  repositories {
+    mavenCentral()
   }
+
+  dependencies {
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}")
+  }
+}
+
+def isNewArchitectureEnabled() {
+    // To opt-in for the New Architecture, you can either:
+    // - Set `newArchEnabled` to true inside the `gradle.properties` file
+    // - Invoke gradle with `-newArchEnabled=true`
+    // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
 }
 
 def getExtOrIntegerDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['ReactNativeWebView_' + name]).toInteger()
 }
 
+if (isNewArchitectureEnabled()) {
+    apply plugin: "com.facebook.react"
+}
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
@@ -41,6 +37,24 @@ android {
     targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
     versionCode 1
     versionName "1.0"
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+    if (isNewArchitectureEnabled()) {
+      var appProject = rootProject.allprojects.find {it.plugins.hasPlugin('com.android.application')}
+      externalNativeBuild {
+        ndkBuild {
+          arguments "APP_PLATFORM=android-21",
+            "APP_STL=c++_shared",
+            "NDK_TOOLCHAIN_VERSION=clang",
+            "GENERATED_SRC_DIR=${appProject.buildDir}/generated/source",
+            "PROJECT_BUILD_DIR=${appProject.buildDir}",
+            "REACT_ANDROID_DIR=${appProject.rootDir}/../node_modules/react-native/ReactAndroid",
+            "REACT_ANDROID_BUILD_DIR=${appProject.rootDir}/../node_modules/react-native/ReactAndroid/build"
+          cFlags "-Wall", "-Werror", "-fexceptions", "-frtti", "-DWITH_INSPECTOR=1"
+          cppFlags "-std=c++17"
+          targets "rnscreens_modules"
+        }
+      }
+    }
   }
   buildTypes {
     release {
@@ -49,6 +63,13 @@ android {
   }
   lintOptions {
     disable 'GradleCompatible'
+  }
+  if (isNewArchitectureEnabled()) {
+    externalNativeBuild {
+      ndkBuild {
+        path "src/main/jni/Android.mk"
+      }
+    }
   }
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -130,8 +151,23 @@ def kotlin_version = getExtOrDefault('kotlinVersion')
 def webkit_version = getExtOrDefault('webkitVersion')
 
 dependencies {
-  //noinspection GradleDynamicVersion
-  implementation 'com.facebook.react:react-native:+'
+  if (isNewArchitectureEnabled()) {
+    implementation project(":ReactAndroid")
+  } else {
+    //noinspection GradleDynamicVersion
+    implementation 'com.facebook.react:react-native:+'
+  }
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "androidx.webkit:webkit:$webkit_version"
+}
+
+if (isNewArchitectureEnabled()) {
+  react {
+    libraryName = "react-native-webview"
+    codegenJavaPackageName = "com.reactnativecommunity.webview"
+    root = rootProject.file("..")
+    jsRootDir = rootProject.file("../../src/fabric/")
+    reactNativeDir = rootProject.file("../node_modules/react-native/")
+    codegenDir = rootProject.file("../node_modules/react-native-codegen/")
+  }
 }
