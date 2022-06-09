@@ -18,6 +18,10 @@ namespace winrt {
     using namespace Windows::UI::Xaml::Controls;
     using namespace Microsoft::UI::Xaml::Controls;
     using namespace Microsoft::Web::WebView2::Core;
+    using namespace Windows::Data::Json;
+    using namespace Windows::UI::Popups;
+    using namespace Windows::UI::Xaml::Input;
+    using namespace Windows::UI::Xaml::Media;
 } // namespace winrt
 
 namespace winrt::ReactNativeWebView::implementation {
@@ -85,6 +89,25 @@ namespace winrt::ReactNativeWebView::implementation {
                 WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
+
+                
+        if (m_messagingEnabled) {
+            m_messageToken = webView.WebMessageReceived([this](auto const& sender, winrt::CoreWebView2WebMessageReceivedEventArgs const& args)
+                {
+                    try {
+                        auto message = args.TryGetWebMessageAsString();
+                        this->OnMessagePosted(message);
+                    }
+                    catch (std::exception e) {
+                        return;
+                    }
+                });
+        }
+    }
+
+    void ReactWebView2::OnMessagePosted(hstring const& message)
+    {
+        HandleMessageFromJS(message);
     }
 
     void ReactWebView2::OnNavigationCompleted(winrt::WebView2 const& webView, winrt::CoreWebView2NavigationCompletedEventArgs const& args) {
@@ -96,6 +119,13 @@ namespace winrt::ReactNativeWebView::implementation {
                 WriteWebViewNavigationEventArg(webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
+
+        if (m_messagingEnabled) {
+            winrt::hstring windowAlert = L"window.alert = function (msg) {window.chrome.webview.postMessage(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
+            winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {window.chrome.webview.postMessage(String(data))}};";
+            webView.ExecuteScriptAsync(windowAlert);
+            webView.ExecuteScriptAsync(postMessage);
+        }
     }
 
     void ReactWebView2::OnCoreWebView2Initialized(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& args) {
@@ -105,6 +135,35 @@ namespace winrt::ReactNativeWebView::implementation {
             m_navigateToHtml = L"";
         }
     }
+
+    void ReactWebView2::HandleMessageFromJS(winrt::hstring const& message) {
+        winrt::JsonObject jsonObject;
+        if (winrt::JsonObject::TryParse(message, jsonObject) && jsonObject.HasKey(L"type")) {
+            auto type = jsonObject.GetNamedString(L"type");
+            if (type == L"__alert") {
+                auto dialog = winrt::MessageDialog(jsonObject.GetNamedString(L"message"));
+                dialog.Commands().Append(winrt::UICommand(L"OK"));
+                dialog.ShowAsync();
+                return;
+            }
+        }
+
+        m_reactContext.DispatchEvent(
+            *this,
+            L"topMessage",
+            [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
+                eventDataWriter.WriteObjectBegin();
+                {
+                    WriteProperty(eventDataWriter, L"data", message);
+                }
+                eventDataWriter.WriteObjectEnd();
+            });
+    }
+
+    void ReactWebView2::SetMessagingEnabled(bool enabled) {
+        m_messagingEnabled = enabled;
+    }
+
 
     void ReactWebView2::NavigateToHtml(winrt::hstring html) {
         if (m_webView.CoreWebView2()) {

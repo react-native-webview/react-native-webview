@@ -14,6 +14,7 @@
 #include <winrt/Windows.Web.Http.Headers.h>
 #include <winrt/Microsoft.ReactNative.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
+#include <winrt/Microsoft.Web.WebView2.Core.h>
 #if __has_include(<VersionMacros.h>)
 #include <VersionMacros.h>
 #else
