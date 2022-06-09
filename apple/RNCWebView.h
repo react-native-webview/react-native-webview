@@ -10,11 +10,11 @@
 #import <WebKit/WebKit.h>
 
 typedef enum RNCWebViewPermissionGrantType : NSUInteger {
-    RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt,
-    RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny,
-    RNCWebViewPermissionGrantType_Deny,
-    RNCWebViewPermissionGrantType_Grant,
-    RNCWebViewPermissionGrantType_Prompt
+  RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt,
+  RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny,
+  RNCWebViewPermissionGrantType_Deny,
+  RNCWebViewPermissionGrantType_Grant,
+  RNCWebViewPermissionGrantType_Prompt
 } RNCWebViewPermissionGrantType;
 
 @class RNCWebView;
@@ -22,7 +22,7 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 @protocol RNCWebViewDelegate <NSObject>
 
 - (BOOL)webView:(RNCWebView *_Nonnull)webView
-   shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
+shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
    withCallback:(RCTDirectEventBlock _Nonnull)callback;
 
 @end
