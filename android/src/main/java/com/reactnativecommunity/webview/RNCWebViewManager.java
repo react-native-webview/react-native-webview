@@ -43,6 +43,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -692,6 +693,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (export == null) {
       export = MapBuilder.newHashMap();
     }
+    // Default events but adding them here explicitly for clarity
+    export.put(TopLoadingStartEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingStart"));
+    export.put(TopLoadingFinishEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingFinish"));
+    export.put(TopLoadingErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingError"));
+    export.put(TopMessageEvent.EVENT_NAME, MapBuilder.of("registrationName", "onMessage"));
+    // !Default events but adding them here explicitly for clarity
+
     export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
@@ -719,21 +727,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   @Override
-  public void receiveCommand(WebView root, int commandId, @Nullable ReadableArray args) {
+  public void receiveCommand(@NonNull WebView root, String commandId, @Nullable ReadableArray args) {
     switch (commandId) {
-      case COMMAND_GO_BACK:
+      case "goBack":
         root.goBack();
         break;
-      case COMMAND_GO_FORWARD:
+      case "goForward":
         root.goForward();
         break;
-      case COMMAND_RELOAD:
+      case "reload":
         root.reload();
         break;
-      case COMMAND_STOP_LOADING:
+      case "stopLoading":
         root.stopLoading();
         break;
-      case COMMAND_POST_MESSAGE:
+      case "postMessage":
         try {
           RNCWebView reactWebView = (RNCWebView) root;
           JSONObject eventInitDict = new JSONObject();
@@ -753,31 +761,32 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           throw new RuntimeException(e);
         }
         break;
-      case COMMAND_INJECT_JAVASCRIPT:
+      case "injectJavaScript":
         RNCWebView reactWebView = (RNCWebView) root;
         reactWebView.evaluateJavascriptWithFallback(args.getString(0));
         break;
-      case COMMAND_LOAD_URL:
+      case "loadUrl":
         if (args == null) {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
         ((RNCWebView) root).progressChangedFilter.setWaitingForCommandLoadUrl(false);
         root.loadUrl(args.getString(0));
         break;
-      case COMMAND_FOCUS:
+      case "requestFocus":
         root.requestFocus();
         break;
-      case COMMAND_CLEAR_FORM_DATA:
+      case "clearFormData":
         root.clearFormData();
         break;
-      case COMMAND_CLEAR_CACHE:
+      case "clearCache":
         boolean includeDiskFiles = args != null && args.getBoolean(0);
         root.clearCache(includeDiskFiles);
         break;
-      case COMMAND_CLEAR_HISTORY:
+      case "clearHistory":
         root.clearHistory();
         break;
     }
+    super.receiveCommand(root, commandId, args);
   }
 
   @Override
