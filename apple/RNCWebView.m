@@ -1562,7 +1562,6 @@ didFinishNavigation:(WKNavigation *)navigation
       if(!_incognito && !_cacheEnabled) {
         wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
       }
-      [self syncCookiesToWebView:nil];
       [wkWebViewConfig.websiteDataStore.httpCookieStore addObserver:self];
     } else {
       NSMutableString *script = [NSMutableString string];
