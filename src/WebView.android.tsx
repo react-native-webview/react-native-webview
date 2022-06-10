@@ -84,7 +84,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     if (lockIdentifier) {
       NativeModules.RNCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
     } else if (shouldStart) {
-      Commands.loadUrl(webViewRef, url);
+      Commands.loadUrl(webViewRef.current, url);
     }
   }, []);
 
