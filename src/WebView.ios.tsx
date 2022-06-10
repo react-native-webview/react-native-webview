@@ -1,39 +1,36 @@
-import React from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import {
-  UIManager as NotTypedUIManager,
+  Image,
   View,
   NativeModules,
-  Image,
-  findNodeHandle,
   ImageSourcePropType,
 } from 'react-native';
 import invariant from 'invariant';
 
+// @ts-expect-error react-native doesn't have this type
+import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import RNCWebView from "./WebViewNativeComponent.ios";
 import {
   defaultOriginWhitelist,
-  createOnShouldStartLoadWithRequest,
   defaultRenderError,
   defaultRenderLoading,
+  useWebWiewLogic,
 } from './WebViewShared';
 import {
-  WebViewErrorEvent,
-  WebViewHttpErrorEvent,
-  WebViewMessageEvent,
-  WebViewNavigationEvent,
-  WebViewProgressEvent,
-  WebViewTerminatedEvent,
   IOSWebViewProps,
   DecelerationRateConstant,
   NativeWebViewIOS,
   ViewManager,
-  State,
-  RNCWebViewUIManagerIOS,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManagerIOS;
+
+const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
+
+const Commands = codegenNativeCommands({
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
+});
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -50,324 +47,164 @@ const processDecelerationRate = (
 
 const RNCWebViewManager = NativeModules.RNCWebViewManager as ViewManager;
 
-class WebView extends React.Component<IOSWebViewProps, State> {
-  static defaultProps = {
-    javaScriptEnabled: true,
-    cacheEnabled: true,
-    originWhitelist: defaultOriginWhitelist,
-    useSharedProcessPool: true,
-    textInteractionEnabled: true,
-  };
-
-  static isFileUploadSupported = async () => {
-    // no native implementation for iOS, depends only on permissions
-    return true;
-  };
-
-  state: State = {
-    viewState: this.props.startInLoadingState ? 'LOADING' : 'IDLE',
-    lastErrorEvent: null,
-  };
-
-  webViewRef = React.createRef<NativeWebViewIOS>();
-
-  // eslint-disable-next-line react/sort-comp
-  getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
-
-  /**
-   * Go forward one page in the web view's history.
-   */
-  goForward = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().goForward,
-      undefined,
-    );
-  };
-
-  /**
-   * Go back one page in the web view's history.
-   */
-  goBack = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().goBack,
-      undefined,
-    );
-  };
-
-  /**
-   * Reloads the current page.
-   */
-  reload = () => {
-    this.setState({ viewState: 'LOADING' });
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().reload,
-      undefined,
-    );
-  };
-
-  /**
-   * Stop loading the current page.
-   */
-  stopLoading = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().stopLoading,
-      undefined,
-    );
-  };
-
-  /**
-   * Request focus on WebView rendered page.
-   */
-  requestFocus = () => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().requestFocus,
-      undefined,
-    );
-  };
-
-  /**
-   * Posts a message to the web view, which will emit a `message` event.
-   * Accepts one argument, `data`, which must be a string.
-   *
-   * In your webview, you'll need to something like the following.
-   *
-   * ```js
-   * document.addEventListener('message', e => { document.title = e.data; });
-   * ```
-   */
-  postMessage = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().postMessage,
-      [String(data)],
-    );
-  };
-
-  /**
-   * Injects a javascript string into the referenced WebView. Deliberately does not
-   * return a response because using eval() to return a response breaks this method
-   * on pages with a Content Security Policy that disallows eval(). If you need that
-   * functionality, look into postMessage/onMessage.
-   */
-  injectJavaScript = (data: string) => {
-    UIManager.dispatchViewManagerCommand(
-      this.getWebViewHandle(),
-      this.getCommands().injectJavaScript,
-      [data],
-    );
-  };
-
-  /**
-   * We return an event with a bunch of fields including:
-   *  url, title, loading, canGoBack, canGoForward
-   */
-  updateNavigationState = (event: WebViewNavigationEvent) => {
-    if (this.props.onNavigationStateChange) {
-      this.props.onNavigationStateChange(event.nativeEvent);
-    }
-  };
-
-  /**
-   * Returns the native `WebView` node.
-   */
-  getWebViewHandle = () => {
-    const nodeHandle = findNodeHandle(this.webViewRef.current);
-    invariant(nodeHandle != null, 'nodeHandle expected to be non-null');
-    return nodeHandle as number;
-  };
-
-  onLoadingStart = (event: WebViewNavigationEvent) => {
-    const { onLoadStart } = this.props;
-    if (onLoadStart) {
-      onLoadStart(event);
-    }
-    this.updateNavigationState(event);
-  };
-
-  onLoadingError = (event: WebViewErrorEvent) => {
-    event.persist(); // persist this event because we need to store it
-    const { onError, onLoadEnd } = this.props;
-
-    if (onError) {
-      onError(event);
-    } else {
-      console.warn('Encountered an error loading page', event.nativeEvent);
-    }
-
-    if (onLoadEnd) {
-      onLoadEnd(event);
-    }
-    if (event.isDefaultPrevented()) return;
-
-    this.setState({
-      lastErrorEvent: event.nativeEvent,
-      viewState: 'ERROR',
-    });
-  };
-
-  onHttpError = (event: WebViewHttpErrorEvent) => {
-    const { onHttpError } = this.props;
-    if (onHttpError) {
-      onHttpError(event);
-    }
+const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
+  const ref = useRef(value);
+  if (ref.current !== value) {
+    console.warn(`Changes to property ${name} do nothing after the initial render.`);
+    ref.current = value;
   }
+}
 
-  onLoadingFinish = (event: WebViewNavigationEvent) => {
-    const { onLoad, onLoadEnd } = this.props;
-    if (onLoad) {
-      onLoad(event);
-    }
-    if (onLoadEnd) {
-      onLoadEnd(event);
-    }
-    this.setState({
-      viewState: 'IDLE',
-    });
-    this.updateNavigationState(event);
-  };
+const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
+  javaScriptEnabled = true,
+  cacheEnabled = true,
+  originWhitelist = defaultOriginWhitelist,
+  useSharedProcessPool= true,
+  textInteractionEnabled= true,
+  injectedJavaScript,
+  injectedJavaScriptBeforeContentLoaded,
+  injectedJavaScriptForMainFrameOnly = true,
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true,
+  startInLoadingState,
+  onNavigationStateChange,
+  onLoadStart,
+  onError,
+  onLoad,
+  onLoadEnd,
+  onLoadProgress,
+  onFileDownload,
+  onHttpError: onHttpErrorProp,
+  onMessage: onMessageProp,
+  renderLoading,
+  renderError,
+  style,
+  containerStyle,
+  source,
+  nativeConfig,
+  allowsInlineMediaPlayback,
+  allowsAirPlayForMediaPlayback,
+  mediaPlaybackRequiresUserAction,
+  dataDetectorTypes,
+  incognito,
+  decelerationRate: decelerationRateProp,
+  onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+  ...otherProps
+}, ref) => {
+  const webViewRef = useRef<NativeWebViewIOS | null>(null);
 
-  onMessage = (event: WebViewMessageEvent) => {
-    const { onMessage } = this.props;
-    if (onMessage) {
-      onMessage(event);
-    }
-  };
-
-  onLoadingProgress = (event: WebViewProgressEvent) => {
-    const { onLoadProgress } = this.props;
-    if (onLoadProgress) {
-      onLoadProgress(event);
-    }
-  };
-
-  onShouldStartLoadWithRequestCallback = (
+  const onShouldStartLoadWithRequestCallback = useCallback((
     shouldStart: boolean,
     _url: string,
-    lockIdentifier: number,
+    lockIdentifier = 0,
   ) => {
     const viewManager
-      = (this.props.nativeConfig && this.props.nativeConfig.viewManager)
+      = (nativeConfig?.viewManager)
       || RNCWebViewManager;
 
     viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
-  };
+  }, [nativeConfig?.viewManager]);
 
-  onContentProcessDidTerminate = (event: WebViewTerminatedEvent) => {
-    const { onContentProcessDidTerminate } = this.props;
-    if (onContentProcessDidTerminate) {
-      onContentProcessDidTerminate(event);
-    }
-  };
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebWiewLogic({
+    onNavigationStateChange,
+    onLoad,
+    onError,
+    onHttpErrorProp,
+    onLoadEnd,
+    onLoadProgress,
+    onLoadStart,
+    onMessageProp,
+    startInLoadingState,
+    originWhitelist,
+    onShouldStartLoadWithRequestProp,
+    onShouldStartLoadWithRequestCallback,
+  });
 
-  componentDidUpdate(prevProps: IOSWebViewProps) {
-    this.showRedboxOnPropChanges(prevProps, 'allowsInlineMediaPlayback');
-    this.showRedboxOnPropChanges(prevProps, 'allowsAirPlayForMediaPlayback');
-    this.showRedboxOnPropChanges(prevProps, 'incognito');
-    this.showRedboxOnPropChanges(prevProps, 'mediaPlaybackRequiresUserAction');
-    this.showRedboxOnPropChanges(prevProps, 'dataDetectorTypes');
+  useImperativeHandle(ref, () => ({
+    goForward: () => Commands.goForward(webViewRef.current),
+    goBack: () => Commands.goBack(webViewRef.current),
+    reload: () => {
+      setViewState(
+        'LOADING',
+      ); Commands.reload(webViewRef.current)
+    },
+    stopLoading: () => Commands.stopLoading(webViewRef.current),
+    postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
+    injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
+    requestFocus: () => Commands.requestFocus(webViewRef.current),
+  }), [setViewState, webViewRef]);
+
+
+  useWarnIfChanges(allowsInlineMediaPlayback, 'allowsInlineMediaPlayback');
+  useWarnIfChanges(allowsAirPlayForMediaPlayback, 'allowsAirPlayForMediaPlayback');
+  useWarnIfChanges(incognito, 'incognito');
+  useWarnIfChanges(mediaPlaybackRequiresUserAction, 'mediaPlaybackRequiresUserAction');
+  useWarnIfChanges(dataDetectorTypes, 'dataDetectorTypes');
+
+  let otherView = null;
+  if (viewState === 'LOADING') {
+    otherView = (renderLoading || defaultRenderLoading)();
+  } else if (viewState === 'ERROR') {
+    invariant(lastErrorEvent != null, 'lastErrorEvent expected to be non-null');
+    otherView = (renderError || defaultRenderError)(
+      lastErrorEvent.domain,
+      lastErrorEvent.code,
+      lastErrorEvent.description,
+    );
+  } else if (viewState !== 'IDLE') {
+    console.error(`RNCWebView invalid state encountered: ${viewState}`);
   }
 
-  showRedboxOnPropChanges(
-    prevProps: IOSWebViewProps,
-    propName: keyof IOSWebViewProps,
-  ) {
-    if (this.props[propName] !== prevProps[propName]) {
-      console.error(
-        `Changes to property ${propName} do nothing after the initial render.`,
-      );
-    }
-  }
+  const webViewStyles = [styles.container, styles.webView, style];
+  const webViewContainerStyle = [styles.container, containerStyle];
 
-  render() {
-    const {
-      decelerationRate: decelerationRateProp,
-      nativeConfig = {},
-      onMessage,
-      onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-      originWhitelist,
-      renderError,
-      renderLoading,
-      injectedJavaScriptForMainFrameOnly = true,
-      injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true,
-      style,
-      containerStyle,
-      ...otherProps
-    } = this.props;
+  const decelerationRate = processDecelerationRate(decelerationRateProp);
 
-    let otherView = null;
+  const NativeWebView
+  = (nativeConfig?.component as typeof NativeWebViewIOS | undefined)
+  || RNCWebView;
 
-    if (this.state.viewState === 'LOADING') {
-      otherView = (renderLoading || defaultRenderLoading)();
-    } else if (this.state.viewState === 'ERROR') {
-      const errorEvent = this.state.lastErrorEvent;
-      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
-      otherView = (renderError || defaultRenderError)(
-        errorEvent.domain,
-        errorEvent.code,
-        errorEvent.description,
-      );
-    } else if (this.state.viewState !== 'IDLE') {
-      console.error(
-        `RNCWebView invalid state encountered: ${this.state.viewState}`,
-      );
-    }
+  const webView = (
+    <NativeWebView
+      key="webViewKey"
+      {...otherProps}
+      javaScriptEnabled={javaScriptEnabled}
+      cacheEnabled={cacheEnabled}
+      useSharedProcessPool={useSharedProcessPool}
+      textInteractionEnabled={textInteractionEnabled}
+      decelerationRate={decelerationRate}
+      messagingEnabled={typeof onMessage === 'function'}
+      onLoadingError={onLoadingError}
+      onLoadingFinish={onLoadingFinish}
+      onLoadingProgress={onLoadingProgress}
+      onFileDownload={onFileDownload}
+      onLoadingStart={onLoadingStart}
+      onHttpError={onHttpError}
+      onMessage={onMessage}
+      onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+      onContentProcessDidTerminate={onContentProcessDidTerminate}
+      injectedJavaScript={injectedJavaScript}
+      injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
+      injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
+      injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
+      ref={webViewRef}
+      // TODO: find a better way to type this.
+      source={resolveAssetSource(source as ImageSourcePropType)}
+      style={webViewStyles}
+      {...nativeConfig?.props}
+    />
+  );
 
-    const webViewStyles = [styles.container, styles.webView, style];
-    const webViewContainerStyle = [styles.container, containerStyle];
+  return (
+    <View style={webViewContainerStyle}>
+      {webView}
+      {otherView}
+    </View>
+  );})
 
-    const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
-      this.onShouldStartLoadWithRequestCallback,
-      // casting cause it's in the default props
-      originWhitelist as readonly string[],
-      onShouldStartLoadWithRequestProp,
-    );
+// no native implementation for iOS, depends only on permissions
+const isFileUploadSupported: () => Promise<boolean>
+  = async () => true;
 
-    const decelerationRate = processDecelerationRate(decelerationRateProp);
-
-    const NativeWebView
-      = (nativeConfig.component as typeof NativeWebViewIOS | undefined)
-      || RNCWebView;
-
-    const webView = (
-      <NativeWebView
-        key="webViewKey"
-        {...otherProps}
-        decelerationRate={decelerationRate}
-        messagingEnabled={typeof onMessage === 'function'}
-        onLoadingError={this.onLoadingError}
-        onLoadingFinish={this.onLoadingFinish}
-        onLoadingProgress={this.onLoadingProgress}
-        onFileDownload={this.props.onFileDownload}
-        onLoadingStart={this.onLoadingStart}
-        onHttpError={this.onHttpError}
-        onMessage={this.onMessage}
-        onScroll={this.props.onScroll}
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-        onContentProcessDidTerminate={this.onContentProcessDidTerminate}
-        injectedJavaScript={this.props.injectedJavaScript}
-        injectedJavaScriptBeforeContentLoaded={this.props.injectedJavaScriptBeforeContentLoaded}
-        injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
-        injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
-        ref={this.webViewRef}
-        // TODO: find a better way to type this.
-        source={resolveAssetSource(this.props.source as ImageSourcePropType)}
-        style={webViewStyles}
-        {...nativeConfig.props}
-      />
-    );
-
-    return (
-      <View style={webViewContainerStyle}>
-        {webView}
-        {otherView}
-      </View>
-    );
-  }
-}
+const WebView = Object.assign(WebViewComponent, {isFileUploadSupported});
 
 export default WebView;
