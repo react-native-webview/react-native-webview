@@ -143,7 +143,7 @@ namespace winrt::ReactNativeWebView::implementation {
             webView.Reload();
         }
         else if (commandId == L"stopLoading") {
-            //webView.Stop();
+            // No command
         }
         else if (commandId == L"injectJavaScript") {
             webView.ExecuteScriptAsync(winrt::to_hstring(commandArgs[0].AsString()));
