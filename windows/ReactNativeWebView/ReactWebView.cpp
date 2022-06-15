@@ -118,9 +118,9 @@ namespace winrt::ReactNativeWebView::implementation {
             });
 
         if (m_messagingEnabled) {
-          winrt::hstring windowAlert = L"window.alert = function (msg) {__REACT_WEB_VIEW_BRIDGE.postMessage(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
-          winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {__REACT_WEB_VIEW_BRIDGE.postMessage(String(data))}};";
-          webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
+          winrt::hstring message = LR"(window.alert = function(msg) { __REACT_WEB_VIEW_BRIDGE.postMessage(`{"type":"__alert", "message" : "${msg}" }`) }; 
+            window.ReactNativeWebView = {postMessage: function(data) { __REACT_WEB_VIEW_BRIDGE.postMessage(String(data)) }};)";
+          webView.InvokeScriptAsync(L"eval", { message });
         }
     }
 
@@ -141,13 +141,15 @@ namespace winrt::ReactNativeWebView::implementation {
 
     void ReactWebView::HandleMessageFromJS(winrt::hstring const& message) {
         winrt::JsonObject jsonObject;
-        if (winrt::JsonObject::TryParse(message, jsonObject) && jsonObject.HasKey(L"type")) {
-            auto type = jsonObject.GetNamedString(L"type");
-            if (type == L"__alert") {
-              auto dialog = winrt::MessageDialog(jsonObject.GetNamedString(L"message"));
-              dialog.Commands().Append(winrt::UICommand(L"OK"));
-              dialog.ShowAsync();
-              return;
+        if (winrt::JsonObject::TryParse(message, jsonObject)) {
+            if (auto v = jsonObject.Lookup(L"type"); v && v.ValueType() == JsonValueType::String) {
+                auto type = v.GetString();
+                if (type == L"__alert") {
+                    auto dialog = winrt::MessageDialog(jsonObject.GetNamedString(L"message"));
+                    dialog.Commands().Append(winrt::UICommand(L"OK"));
+                    dialog.ShowAsync();
+                    return;
+                }
             }
           }
       
@@ -163,8 +165,11 @@ namespace winrt::ReactNativeWebView::implementation {
                 });
     }
 
-    void ReactWebView::SetMessagingEnabled(bool enabled) {
+    void ReactWebView::MessagingEnabled(bool enabled) noexcept{
       m_messagingEnabled = enabled;
     }
 
+    bool ReactWebView::MessagingEnabled() const noexcept{
+        return m_messagingEnabled;
+    }
 } // namespace winrt::ReactNativeWebView::implementation

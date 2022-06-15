@@ -16,7 +16,8 @@ namespace winrt::ReactNativeWebView::implementation {
     class ReactWebView : public ReactWebViewT<ReactWebView> {
     public:
         ReactWebView(Microsoft::ReactNative::IReactContext const& reactContext);
-        void SetMessagingEnabled(bool enabled);
+        void MessagingEnabled(bool enabled) noexcept;
+        bool MessagingEnabled() const noexcept;
         ~ReactWebView();
 
     private:

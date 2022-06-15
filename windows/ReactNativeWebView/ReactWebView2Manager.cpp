@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ReactWebView2Manager.h"
 
-#if USE_WEBVIEW2
+#if HAS_WEBVIEW2
 #include "NativeModules.h"
 #include "ReactWebView2.h"
 #include "JSValueXaml.h"
@@ -45,6 +45,7 @@ namespace winrt::ReactNativeWebView::implementation {
     IMapView<hstring, ViewManagerPropertyType> ReactWebView2Manager::NativeProps() noexcept {
         auto nativeProps = winrt::single_threaded_map<hstring, ViewManagerPropertyType>();
         nativeProps.Insert(L"source", ViewManagerPropertyType::Map);
+        nativeProps.Insert(L"messagingEnabled", ViewManagerPropertyType::Boolean);
         return nativeProps.GetView();
     }
 
@@ -86,6 +87,11 @@ namespace winrt::ReactNativeWebView::implementation {
                     reactWebView2.NavigateToHtml(to_hstring(htmlString));
                 }
             }
+            else if (propertyName == "messagingEnabled") {
+                auto messagingEnabled = propertyValue.To<bool>();
+                auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
+                reactWebView2.MessagingEnabled(messagingEnabled);
+            }
         }        
     }
 
@@ -120,7 +126,7 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::IJSValueReader const& commandArgsReader) noexcept {
         auto control = view.as<winrt::ContentPresenter>();
         auto content = control.Content();
-        auto webView = content.as<winrt::WebView>();
+        auto webView = content.as<winrt::WebView2>();
         auto commandArgs = JSValue::ReadArrayFrom(commandArgsReader);
 
         if (commandId == L"goForward") {
@@ -134,16 +140,16 @@ namespace winrt::ReactNativeWebView::implementation {
             }
         }
         else if (commandId == L"reload") {
-            webView.Refresh();
+            webView.Reload();
         }
         else if (commandId == L"stopLoading") {
-            webView.Stop();
+            webView.CoreWebView2().Stop();
         }
         else if (commandId == L"injectJavaScript") {
-            webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
+            webView.ExecuteScriptAsync(winrt::to_hstring(commandArgs[0].AsString()));
         } 
     }
 
 } // namespace winrt::ReactNativeWebView::implementation
 
-#endif // USE_WEBVIEW2
+#endif // HAS_WEBVIEW2
