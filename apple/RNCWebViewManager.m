@@ -17,19 +17,19 @@
 @implementation RCTConvert (WKWebView)
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
 RCT_ENUM_CONVERTER(WKContentMode, (@{
-    @"recommended": @(WKContentModeRecommended),
-    @"mobile": @(WKContentModeMobile),
-    @"desktop": @(WKContentModeDesktop),
+  @"recommended": @(WKContentModeRecommended),
+  @"mobile": @(WKContentModeMobile),
+  @"desktop": @(WKContentModeDesktop),
 }), WKContentModeRecommended, integerValue)
 #endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
 RCT_ENUM_CONVERTER(RNCWebViewPermissionGrantType, (@{
-    @"grantIfSameHostElsePrompt": @(RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt),
-    @"grantIfSameHostElseDeny": @(RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny),
-    @"deny": @(RNCWebViewPermissionGrantType_Deny),
-    @"grant": @(RNCWebViewPermissionGrantType_Grant),
-    @"prompt": @(RNCWebViewPermissionGrantType_Prompt),
+  @"grantIfSameHostElsePrompt": @(RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt),
+  @"grantIfSameHostElseDeny": @(RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny),
+  @"deny": @(RNCWebViewPermissionGrantType_Deny),
+  @"grant": @(RNCWebViewPermissionGrantType_Grant),
+  @"prompt": @(RNCWebViewPermissionGrantType_Prompt),
 }), RNCWebViewPermissionGrantType_Prompt, integerValue)
 #endif
 @end
@@ -135,7 +135,7 @@ RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)m
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(pullToRefreshEnabled, BOOL, RNCWebView) {
-    view.pullToRefreshEnabled = json == nil ? false : [RCTConvert BOOL: json];
+  view.pullToRefreshEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWebView) {
@@ -155,7 +155,7 @@ RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, RNCWebView) {
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(sharedCookiesEnabled, BOOL, RNCWebView) {
-    view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
+  view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
 
 #if !TARGET_OS_OSX
@@ -165,7 +165,7 @@ RCT_CUSTOM_VIEW_PROPERTY(decelerationRate, CGFloat, RNCWebView) {
 #endif // !TARGET_OS_OSX
 
 RCT_CUSTOM_VIEW_PROPERTY(directionalLockEnabled, BOOL, RNCWebView) {
-    view.directionalLockEnabled = json == nil ? true : [RCTConvert BOOL: json];
+  view.directionalLockEnabled = json == nil ? true : [RCTConvert BOOL: json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(showsHorizontalScrollIndicator, BOOL, RNCWebView) {
@@ -262,7 +262,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
   _shouldStartLoad = YES;
   request[@"lockIdentifier"] = @(_shouldStartLoadLock.condition);
   callback(request);
-
+  
   // Block the main thread for a maximum of 250ms until the JS thread returns
   if ([_shouldStartLoadLock lockWhenCondition:0 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.25]]) {
     BOOL returnValue = _shouldStartLoad;
