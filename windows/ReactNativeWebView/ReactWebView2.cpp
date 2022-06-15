@@ -4,7 +4,7 @@
 #include "pch.h"
 #include "ReactWebView2.h"
 
-#if USE_WEBVIEW2
+#if HAS_WEBVIEW2
 #include "JSValueXaml.h"
 #include "ReactWebView2.g.cpp"
 #include <winrt/Windows.Foundation.Metadata.h>
@@ -121,7 +121,8 @@ namespace winrt::ReactNativeWebView::implementation {
             });
 
         if (m_messagingEnabled) {
-            winrt::hstring message = LR"(window.alert = function (msg) {window.chrome.webview.postMessage(`{"type":"__alert","message":"${msg}"}`)}; window.ReactNativeWebView = {postMessage: function (data) {window.chrome.webview.postMessage(String(data))}};)";
+            winrt::hstring message = LR"(window.alert = function (msg) {window.chrome.webview.postMessage(`{"type":"__alert","message":"${msg}"}`)}; 
+                window.ReactNativeWebView = {postMessage: function (data) {window.chrome.webview.postMessage(String(data))}};)";
             webView.ExecuteScriptAsync(message);
         }
     }
@@ -160,11 +161,11 @@ namespace winrt::ReactNativeWebView::implementation {
             });
     }
 
-    void ReactWebView2::MessagingEnabled(bool enabled) {
+    void ReactWebView2::MessagingEnabled(bool enabled) noexcept{
         m_messagingEnabled = enabled;
     }
 
-    bool ReactWebView2::MessagingEnabled() {
+    bool ReactWebView2::MessagingEnabled() const noexcept{
         return m_messagingEnabled;
     }
 
@@ -181,4 +182,4 @@ namespace winrt::ReactNativeWebView::implementation {
 
 } // namespace winrt::ReactNativeWebView::implementation
 
-#endif // USE_WEBVIEW2
+#endif // HAS_WEBVIEW2

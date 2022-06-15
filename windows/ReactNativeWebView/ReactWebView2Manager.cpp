@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ReactWebView2Manager.h"
 
-#if USE_WEBVIEW2
+#if HAS_WEBVIEW2
 #include "NativeModules.h"
 #include "ReactWebView2.h"
 #include "JSValueXaml.h"
@@ -152,4 +152,4 @@ namespace winrt::ReactNativeWebView::implementation {
 
 } // namespace winrt::ReactNativeWebView::implementation
 
-#endif // USE_WEBVIEW2
+#endif // HAS_WEBVIEW2

@@ -2,7 +2,7 @@ namespace ReactNativeWebView{
     [default_interface]
     runtimeclass ReactWebView : Windows.UI.Xaml.Controls.ContentPresenter{
         ReactWebView(Microsoft.ReactNative.IReactContext context);
-        Boolean MessagingEnabled{ get; set; };
+        Boolean MessagingEnabled;
     };
 #if __has_include(<VersionMacros.h>)
 #include <VersionMacros.h>
@@ -14,7 +14,7 @@ namespace ReactNativeWebView{
     runtimeclass ReactWebView2 : Windows.UI.Xaml.Controls.ContentPresenter{
         ReactWebView2(Microsoft.ReactNative.IReactContext context);
         void NavigateToHtml(String html);
-        Boolean MessagingEnabled{ get; set; };
+        Boolean MessagingEnabled;
     };
 #endif
 } // namespace ReactNativeWebView

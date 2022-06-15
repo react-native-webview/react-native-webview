@@ -3,7 +3,7 @@
 
 #pragma once
 
-#if USE_WEBVIEW2
+#if HAS_WEBVIEW2
 
 #include "winrt/Microsoft.ReactNative.h"
 #include "NativeModules.h"
@@ -18,8 +18,8 @@ namespace winrt::ReactNativeWebView::implementation {
     class ReactWebView2 : public ReactWebView2T<ReactWebView2> {
     public:
         ReactWebView2(Microsoft::ReactNative::IReactContext const& reactContext);
-        void MessagingEnabled(bool enabled);
-        bool MessagingEnabled();
+        void MessagingEnabled(bool enabled) noexcept;
+        bool MessagingEnabled() const noexcept;
         void NavigateToHtml(winrt::hstring html);
         ~ReactWebView2();
 
@@ -48,4 +48,4 @@ namespace winrt::ReactNativeWebView::factory_implementation {
     struct ReactWebView2 : ReactWebView2T<ReactWebView2, implementation::ReactWebView2> {};
 } // namespace winrt::ReactNativeWebView2::factory_implementation
 
-#endif // USE_WEBVIEW2
+#endif // HAS_WEBVIEW2

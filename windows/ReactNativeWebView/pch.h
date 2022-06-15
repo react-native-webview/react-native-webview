@@ -9,9 +9,9 @@
 #endif
 
 #if RNW_VERSION_AT_LEAST(0,68,0)
-#define USE_WEBVIEW2 1
+#define HAS_WEBVIEW2 1
 #else
-#define USE_WEBVIEW2 0
+#define HAS_WEBVIEW2 0
 #endif
 
 #include <unknwn.h>
@@ -27,6 +27,6 @@
 #include <winrt/Windows.Web.Http.Headers.h>
 #include <winrt/Microsoft.ReactNative.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
-#if USE_WEBVIEW2
+#if HAS_WEBVIEW2
 #include <winrt/Microsoft.Web.WebView2.Core.h>
 #endif

@@ -118,7 +118,8 @@ namespace winrt::ReactNativeWebView::implementation {
             });
 
         if (m_messagingEnabled) {
-          winrt::hstring message = LR"(window.alert = function(msg) { __REACT_WEB_VIEW_BRIDGE.postMessage(`{"type":"__alert", "message" : "${msg}" }`) }; window.ReactNativeWebView = {postMessage: function(data) { __REACT_WEB_VIEW_BRIDGE.postMessage(String(data)) }};)";
+          winrt::hstring message = LR"(window.alert = function(msg) { __REACT_WEB_VIEW_BRIDGE.postMessage(`{"type":"__alert", "message" : "${msg}" }`) }; 
+            window.ReactNativeWebView = {postMessage: function(data) { __REACT_WEB_VIEW_BRIDGE.postMessage(String(data)) }};)";
           webView.InvokeScriptAsync(L"eval", { message });
         }
     }
@@ -164,11 +165,11 @@ namespace winrt::ReactNativeWebView::implementation {
                 });
     }
 
-    void ReactWebView::MessagingEnabled(bool enabled) {
+    void ReactWebView::MessagingEnabled(bool enabled) noexcept{
       m_messagingEnabled = enabled;
     }
 
-    bool ReactWebView::MessagingEnabled() {
+    bool ReactWebView::MessagingEnabled() const noexcept{
         return m_messagingEnabled;
     }
 } // namespace winrt::ReactNativeWebView::implementation
