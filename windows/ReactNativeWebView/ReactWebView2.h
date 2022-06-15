@@ -3,12 +3,6 @@
 
 #pragma once
 
-#if RNW_VERSION_AT_LEAST(0,68,0)
-#define USE_WEBVIEW2 1
-#else
-#define USE_WEBVIEW2 0
-#endif
-
 #if USE_WEBVIEW2
 
 #include "winrt/Microsoft.ReactNative.h"
@@ -24,7 +18,8 @@ namespace winrt::ReactNativeWebView::implementation {
     class ReactWebView2 : public ReactWebView2T<ReactWebView2> {
     public:
         ReactWebView2(Microsoft::ReactNative::IReactContext const& reactContext);
-        void SetMessagingEnabled(bool enabled);
+        void MessagingEnabled(bool enabled);
+        bool MessagingEnabled();
         void NavigateToHtml(winrt::hstring html);
         ~ReactWebView2();
 
