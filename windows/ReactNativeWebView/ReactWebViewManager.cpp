@@ -142,7 +142,7 @@ namespace winrt::ReactNativeWebView::implementation {
             else if (propertyName == "messagingEnabled") {
               auto messagingEnabled = propertyValue.To<bool>();
               auto reactWebView = view.as<ReactNativeWebView::ReactWebView>();
-              reactWebView.SetMessagingEnabled(messagingEnabled);
+              reactWebView.MessagingEnabled(messagingEnabled);
             }
         }        
     }

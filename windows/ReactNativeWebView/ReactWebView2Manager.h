@@ -5,7 +5,7 @@
 
 #include "ReactWebView2.h"
 
-#if USE_WEBVIEW2
+#if HAS_WEBVIEW2
 #include "winrt/Microsoft.ReactNative.h"
 #include "NativeModules.h"
 
@@ -54,4 +54,4 @@ namespace winrt::ReactNativeWebView::implementation {
 
     };
 } // namespace winrt::ReactNativeWebView::implementation
-#endif // USE_WEBVIEW2
+#endif // HAS_WEBVIEW2

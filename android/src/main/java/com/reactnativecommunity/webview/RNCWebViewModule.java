@@ -311,7 +311,12 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   public void downloadFile(String downloadingMessage) {
     DownloadManager dm = (DownloadManager) getCurrentActivity().getBaseContext().getSystemService(Context.DOWNLOAD_SERVICE);
 
-    dm.enqueue(this.downloadRequest);
+    try {
+      dm.enqueue(this.downloadRequest);
+    } catch (IllegalArgumentException e) {
+      Log.w("RNCWebViewModule", "Unsupported URI, aborting download", e);
+      return;
+    }
 
     Toast.makeText(getCurrentActivity().getApplicationContext(), downloadingMessage, Toast.LENGTH_LONG).show();
   }
