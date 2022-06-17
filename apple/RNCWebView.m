@@ -385,14 +385,10 @@ RCTAutoInsetsProtocol>
   
 #if !TARGET_OS_OSX
   wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
-#if WEBKIT_IOS_10_APIS_AVAILABLE
   wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
   ? WKAudiovisualMediaTypeAll
   : WKAudiovisualMediaTypeNone;
   wkWebViewConfig.dataDetectorTypes = _dataDetectorTypes;
-#else
-  wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
-#endif
 #endif // !TARGET_OS_OSX
   
   if (_applicationNameForUserAgent) {
