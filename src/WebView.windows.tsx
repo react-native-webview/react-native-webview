@@ -39,7 +39,6 @@ const Commands = codegenNativeCommands({
 const { resolveAssetSource } = Image;
 
 const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
-  javaScriptEnabled = true,
   cacheEnabled = true,
   originWhitelist = defaultOriginWhitelist,
   startInLoadingState,
