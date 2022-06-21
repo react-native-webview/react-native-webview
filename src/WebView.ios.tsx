@@ -189,6 +189,8 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       dataDetectorTypes={dataDetectorTypes}
       allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
       allowsInlineMediaPlayback={allowsInlineMediaPlayback}
+      incognito={incognito}
+      mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
       ref={webViewRef}
       // TODO: find a better way to type this.
       source={resolveAssetSource(source as ImageSourcePropType)}
