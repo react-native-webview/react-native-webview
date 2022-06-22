@@ -136,16 +136,14 @@ RCTAutoInsetsProtocol>
 #if !TARGET_OS_OSX
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
+    _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 #endif // !TARGET_OS_OSX
     _injectedJavaScript = nil;
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
     _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
-    
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-    _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-#endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
     _savedAutomaticallyAdjustsScrollIndicatorInsets = NO;
 #endif
     _enableApplePay = NO;
@@ -429,17 +427,17 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
+
+    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
+    }
 #endif // !TARGET_OS_OSX
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
     
     _webView.customUserAgent = _userAgent;
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
-    }
-#endif
+
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     if (@available(iOS 13.0, *)) {
       _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
@@ -580,8 +578,7 @@ RCTAutoInsetsProtocol>
   _webView.backgroundColor = backgroundColor;
 #else
   // https://stackoverflow.com/questions/40007753/macos-wkwebview-background-transparency
-  NSOperatingSystemVersion version = { 10, 12, 0 };
-  if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:version]) {
+  if (@available(macOS 10.12, *)) {
     [_webView setValue:@(opaque) forKey: @"drawsBackground"];
   } else {
     [_webView setValue:@(!opaque) forKey: @"drawsTransparentBackground"];
@@ -589,7 +586,7 @@ RCTAutoInsetsProtocol>
 #endif // !TARGET_OS_OSX
 }
 
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+#if !TARGET_OS_OSX
 - (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior
 {
   _savedContentInsetAdjustmentBehavior = behavior;
@@ -603,7 +600,8 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.contentOffset = contentOffset;
   }
 }
-#endif
+#endif // !TARGET_OS_OSX
+
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
 - (void)setAutomaticallyAdjustsScrollIndicatorInsets:(BOOL)automaticallyAdjustsScrollIndicatorInsets{
   _savedAutomaticallyAdjustsScrollIndicatorInsets = automaticallyAdjustsScrollIndicatorInsets;
@@ -744,15 +742,11 @@ RCTAutoInsetsProtocol>
   if(subview == nil) return;
   
   Class class = subview.class;
-  
-  NSOperatingSystemVersion iOS_11_3_0 = (NSOperatingSystemVersion){11, 3, 0};
-  NSOperatingSystemVersion iOS_12_2_0 = (NSOperatingSystemVersion){12, 2, 0};
-  NSOperatingSystemVersion iOS_13_0_0 = (NSOperatingSystemVersion){13, 0, 0};
-  
+
   Method method;
   IMP override;
-  
-  if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_13_0_0]) {
+
+  if (@available(iOS 13, *)) {
     // iOS 13.0.0 - Future
     SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:activityStateChanges:userObject:");
     method = class_getInstanceMethod(class, selector);
@@ -761,7 +755,7 @@ RCTAutoInsetsProtocol>
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
     });
   }
-  else if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_12_2_0]) {
+  else if (@available(iOS 12.2, *)) {
     // iOS 12.2.0 - iOS 13.0.0
     SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:changingActivityState:userObject:");
     method = class_getInstanceMethod(class, selector);
@@ -770,7 +764,7 @@ RCTAutoInsetsProtocol>
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
     });
   }
-  else if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_11_3_0]) {
+  else if (@available(iOS 11.3, *)) {
     // iOS 11.3.0 - 12.2.0
     SEL selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:changingActivityState:userObject:");
     method = class_getInstanceMethod(class, selector);
@@ -779,7 +773,7 @@ RCTAutoInsetsProtocol>
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
     });
   } else {
-    // iOS 9.0 - 11.3.0
+    // < 11.3.0
     SEL selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:userObject:");
     method = class_getInstanceMethod(class, selector);
     IMP original = method_getImplementation(method);
@@ -1199,17 +1193,17 @@ RCTAutoInsetsProtocol>
     if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
       NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
       NSInteger statusCode = response.statusCode;
-      
+
       if (statusCode >= 400) {
         NSMutableDictionary<NSString *, id> *httpErrorEvent = [self baseEvent];
         [httpErrorEvent addEntriesFromDictionary: @{
           @"url": response.URL.absoluteString,
           @"statusCode": @(statusCode)
         }];
-        
+
         _onHttpError(httpErrorEvent);
       }
-      
+
       NSString *disposition = nil;
       if (@available(iOS 13, *)) {
         disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
@@ -1218,7 +1212,7 @@ RCTAutoInsetsProtocol>
       if (isAttachment || !navigationResponse.canShowMIMEType) {
         if (_onFileDownload) {
           policy = WKNavigationResponsePolicyCancel;
-          
+
           NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
           [downloadEvent addEntriesFromDictionary: @{
             @"downloadUrl": (response.URL).absoluteString,
@@ -1228,7 +1222,7 @@ RCTAutoInsetsProtocol>
       }
     }
   }
-  
+
   decisionHandler(policy);
 }
 
@@ -1323,7 +1317,7 @@ RCTAutoInsetsProtocol>
 - (void)webView:(WKWebView *)webView
 didFinishNavigation:(WKNavigation *)navigation
 {
-  if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
+  if(_sharedCookiesEnabled) {
     // Write all cookies from WKWebView back to sharedHTTPCookieStorage
     [webView.configuration.websiteDataStore.httpCookieStore getAllCookies:^(NSArray* cookies) {
       for (NSHTTPCookie *cookie in cookies) {
@@ -1485,8 +1479,7 @@ didFinishNavigation:(WKNavigation *)navigation
 }
 
 - (void)writeCookiesToWebView:(NSArray<NSHTTPCookie *>*)cookies completion:(void (^)(void))completion {
-  // The required cookie APIs only became available on iOS 11
-  if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
+  if(_sharedCookiesEnabled) {
     dispatch_async(dispatch_get_main_queue(), ^{
       dispatch_group_t group = dispatch_group_create();
       for (NSHTTPCookie *cookie in cookies) {
@@ -1546,63 +1539,13 @@ didFinishNavigation:(WKNavigation *)navigation
   [wkWebViewConfig.userContentController addUserScript:script];
   
   if(_sharedCookiesEnabled) {
-    // More info to sending cookies with WKWebView
-    // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
-    if (@available(iOS 11.0, *)) {
-      // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
-      // See also https://forums.developer.apple.com/thread/97194
-      // check if websiteDataStore has not been initialized before
-      if(!_incognito && !_cacheEnabled) {
-        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
-      }
-      [self syncCookiesToWebView:nil];
-    } else {
-      NSMutableString *script = [NSMutableString string];
-      
-      // Clear all existing cookies in a direct called function. This ensures that no
-      // javascript error will break the web content javascript.
-      // We keep this code here, if someone requires that Cookies are also removed within the
-      // the WebView and want to extends the current sharedCookiesEnabled option with an
-      // additional property.
-      // Generates JS: document.cookie = "key=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;"
-      // for each cookie which is already available in the WebView context.
-      /*
-       [script appendString:@"(function () {\n"];
-       [script appendString:@"  var cookies = document.cookie.split('; ');\n"];
-       [script appendString:@"  for (var i = 0; i < cookies.length; i++) {\n"];
-       [script appendString:@"    if (cookies[i].indexOf('=') !== -1) {\n"];
-       [script appendString:@"      document.cookie = cookies[i].split('=')[0] + '=; Expires=Thu, 01 Jan 1970 00:00:01 GMT';\n"];
-       [script appendString:@"    }\n"];
-       [script appendString:@"  }\n"];
-       [script appendString:@"})();\n\n"];
-       */
-      
-      // Set cookies in a direct called function. This ensures that no
-      // javascript error will break the web content javascript.
-      // Generates JS: document.cookie = "key=value; Path=/; Expires=Thu, 01 Jan 20xx 00:00:01 GMT;"
-      // for each cookie which is available in the application context.
-      [script appendString:@"(function () {\n"];
-      for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
-        [script appendFormat:@"document.cookie = %@ + '=' + %@",
-         RCTJSONStringify(cookie.name, NULL),
-         RCTJSONStringify(cookie.value, NULL)];
-        if (cookie.path) {
-          [script appendFormat:@" + '; Path=' + %@", RCTJSONStringify(cookie.path, NULL)];
-        }
-        if (cookie.expiresDate) {
-          [script appendFormat:@" + '; Expires=' + new Date(%f).toUTCString()",
-           cookie.expiresDate.timeIntervalSince1970 * 1000
-          ];
-        }
-        [script appendString:@";\n"];
-      }
-      [script appendString:@"})();\n"];
-      
-      WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource:script
-                                                            injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-                                                         forMainFrameOnly:YES];
-      [wkWebViewConfig.userContentController addUserScript:cookieInScript];
+    // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
+    // See also https://forums.developer.apple.com/thread/97194
+    // check if websiteDataStore has not been initialized before
+    if(!_incognito && !_cacheEnabled) {
+      wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
     }
+    [self syncCookiesToWebView:nil];
   }
   
   if(_messagingEnabled){
@@ -1623,21 +1566,6 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (NSURLRequest *)requestForSource:(id)json {
   NSURLRequest *request = [RCTConvert NSURLRequest:self.source];
-  
-  // If sharedCookiesEnabled we automatically add all application cookies to the
-  // http request. This is automatically done on iOS 11+ in the WebView constructor.
-  // Se we need to manually add these shared cookies here only for iOS versions < 11.
-  if (_sharedCookiesEnabled) {
-    if (@available(iOS 11.0, *)) {
-      // see WKWebView initialization for added cookies
-    } else if (request != nil) {
-      NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:request.URL];
-      NSDictionary<NSString *, NSString *> *cookieHeader = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
-      NSMutableURLRequest *mutableRequest = [request mutableCopy];
-      [mutableRequest setAllHTTPHeaderFields:cookieHeader];
-      return mutableRequest;
-    }
-  }
   return request;
 }
 
