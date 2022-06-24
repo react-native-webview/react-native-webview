@@ -41,7 +41,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
 }
 ```
 
-Você precisará seguir as etapas usuais para [registrar o módulo](native-modules-android.md#register-the-module).
+Você precisará seguir as etapas usuais para [registrar o módulo](https://reactnative.dev/docs/native-modules-android#register-the-module-android-specific).
 
 ### Adicionando novas propriedades
 
