@@ -11,6 +11,9 @@
 @implementation SubWebView
   - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
   {
+    if (self.defaultMenuItemsVisible) {
+      return YES;
+    }
     return NO;
   }
 @end

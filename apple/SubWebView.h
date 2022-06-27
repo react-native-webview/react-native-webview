@@ -12,6 +12,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SubWebView : WKWebView
+@property (nonatomic, assign) BOOL defaultMenuItemsVisible;
 
 @end
 

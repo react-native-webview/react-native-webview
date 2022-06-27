@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 
 type WebViewCommands = 'goForward' | 'goBack' | 'reload' | 'stopLoading' | 'postMessage' | 'injectJavaScript' | 'loadUrl' | 'requestFocus';
-type IOSWebViewCommands = 'setTintColor';
+type IOSWebViewCommands = 'setTintColor' | 'setDefaultMenuItemsVisible';
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
 

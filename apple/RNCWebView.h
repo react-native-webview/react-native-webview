@@ -104,6 +104,7 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
 - (void)postMessage:(NSString *_Nullable)message;
 - (void)injectJavaScript:(NSString *_Nullable)script;
+- (void)setDefaultMenuItemsVisible:(Boolean)visible;
 - (void)goForward;
 - (void)goBack;
 - (void)reload;

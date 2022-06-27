@@ -173,6 +173,15 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       [red, green, blue],
     );
   };
+
+  setDefaultMenuItemsVisible = (visible: boolean) => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      this.getCommands().setDefaultMenuItemsVisible,
+      [visible],
+    );
+  };
+
   /**
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
