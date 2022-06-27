@@ -12,7 +12,8 @@
   - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
   {
     if (self.defaultMenuItemsVisible) {
-      return YES;
+      return [super canPerformAction:action withSender:sender];
+
     }
     return NO;
   }
