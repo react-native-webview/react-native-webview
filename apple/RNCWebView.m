@@ -32,7 +32,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
 @interface _SwizzleHelperWK : UIView
-@property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, copy) SubWebView *webView;
 @end
 @implementation _SwizzleHelperWK
 -(id)inputAccessoryView
@@ -52,7 +52,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 #endif // !TARGET_OS_OSX
 
 #if TARGET_OS_OSX
-@interface RNCWKWebView : WKWebView
+@interface RNCWKWebView : SubWebView
 @end
 @implementation RNCWKWebView
 - (void)scrollWheel:(NSEvent *)theEvent {
@@ -84,7 +84,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 #if !TARGET_OS_OSX
-@property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, copy) SubWebView *webView;
 #else
 @property (nonatomic, copy) RNCWKWebView *webView;
 #endif // !TARGET_OS_OSX
@@ -310,7 +310,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 /**
  * See https://stackoverflow.com/questions/25713069/why-is-wkwebview-not-opening-links-with-target-blank/25853806#25853806 for details.
  */
-- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
+- (SubWebView *)webView:(SubWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
     [webView loadRequest:navigationAction.request];
@@ -406,7 +406,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
 #if !TARGET_OS_OSX
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    _webView = [[SubWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #else
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
@@ -948,7 +948,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     customCertificatesForHost = certificates;
 }
 
-- (void)                    webView:(WKWebView *)webView
+- (void)                    webView:(SubWebView *)webView
   didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
                   completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler
 {
@@ -998,7 +998,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 /**
  * alert
  */
-- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
+- (void)webView:(SubWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
@@ -1018,7 +1018,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 /**
  * confirm
  */
-- (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
+- (void)webView:(SubWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
   [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
@@ -1043,7 +1043,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 /**
  * prompt
  */
-- (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
+- (void)webView:(SubWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
   [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
@@ -1088,7 +1088,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 /**
  * Media capture permissions (prevent multiple prompts)
  */
-- (void)                         webView:(WKWebView *)webView
+- (void)                         webView:(SubWebView *)webView
   requestMediaCapturePermissionForOrigin:(WKSecurityOrigin *)origin
                         initiatedByFrame:(WKFrameInfo *)frame
                                     type:(WKMediaCaptureType)type
@@ -1124,7 +1124,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
  * Decides whether to allow or cancel a navigation.
  * @see https://fburl.com/42r9fxob
  */
-- (void)                  webView:(WKWebView *)webView
+- (void)                  webView:(SubWebView *)webView
   decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
                   decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
@@ -1182,7 +1182,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
  * Called when the web view’s content process is terminated.
  * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi?language=objc
  */
-- (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
+- (void)webViewWebContentProcessDidTerminate:(SubWebView *)webView
 {
   RCTLogWarn(@"Webview Process Terminated");
   if (_onContentProcessDidTerminate) {
@@ -1195,7 +1195,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
  * Decides whether to allow or cancel a navigation after its response is known.
  * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview?language=objc
  */
-- (void)                    webView:(WKWebView *)webView
+- (void)                    webView:(SubWebView *)webView
   decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse
                     decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
 {
@@ -1241,7 +1241,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
  * Called when an error occurs while the web view is loading content.
  * @see https://fburl.com/km6vqenw
  */
-- (void)               webView:(WKWebView *)webView
+- (void)               webView:(SubWebView *)webView
   didFailProvisionalNavigation:(WKNavigation *)navigation
                      withError:(NSError *)error
 {
@@ -1325,11 +1325,11 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
  */
-- (void)webView:(WKWebView *)webView
+- (void)webView:(SubWebView *)webView
   didFinishNavigation:(WKNavigation *)navigation
 {
   if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
-    // Write all cookies from WKWebView back to sharedHTTPCookieStorage
+    // Write all cookies from SubWebView back to sharedHTTPCookieStorage
     [webView.configuration.websiteDataStore.httpCookieStore getAllCookies:^(NSArray* cookies) {
       for (NSHTTPCookie *cookie in cookies) {
         [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
