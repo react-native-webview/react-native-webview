@@ -210,7 +210,7 @@ RCT_EXPORT_METHOD(setTintColor:(nonnull NSNumber *)reactTag red:(int)red green:(
   }];
 }
 
-RCT_EXPORT_METHOD(setDefaultMenuItemsVisible:(nonnull NSNumber *)reactTag visible:(Boolean)visible)
+RCT_EXPORT_METHOD(setDefaultMenuItemsVisible:(nonnull NSNumber *)reactTag visible:(BOOL)visible)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
     RNCWebView *view = viewRegistry[reactTag];

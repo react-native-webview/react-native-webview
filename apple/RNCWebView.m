@@ -1361,7 +1361,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   [_webView goBack];
 }
 
--(void)setDefaultMenuItemsVisible:(Boolean) visible
+-(void)setDefaultMenuItemsVisible:(BOOL) visible
 {
   _webView.defaultMenuItemsVisible = visible;
 }
