@@ -514,9 +514,14 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   }
   
   if (_webViewKey != nil) {
-    NSMutableDictionary *sharedRNCWebViewDictionary = [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-    sharedRNCWebViewDictionary[_webViewKey] = nil;
-    [self removeWKWebViewFromSuperView:self];
+    NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+    RNCWebView *rncWebView = sharedRNCWebViewDictionary[_webViewKey];
+      
+    // When this view is being unmounted, only remove the WKWebView from the superview
+    // if this RNCWebView is the "active" view.
+    if (rncWebView == self) {
+      [self removeWKWebViewFromSuperView:self];
+    }
   }
 
   [super removeFromSuperview];
@@ -543,6 +548,8 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 {
   // If _webView is getting added to a new super view, we need to first both remove it from the old
   // superview and also remove the observer which can reference the old super view.
+  NSMutableDictionary *sharedRNCWebViewDictionary = [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+  sharedRNCWebViewDictionary[_webViewKey] = nil;
   [_webView removeObserver:webViewObserver forKeyPath:@"estimatedProgress"];
   [_webView removeFromSuperview];
 }
