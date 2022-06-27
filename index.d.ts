@@ -23,11 +23,6 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     reload: () => void;
 
     /**
-     * Stop loading the current page.
-     */
-    stopLoading(): void;
-
-    /**
      * Executes the JavaScript string.
      */
     injectJavaScript: (script: string) => void;
@@ -36,7 +31,7 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      * Focuses on WebView redered page.
      */
     requestFocus: () => void;
-    
+
      /**
      * Posts a message to WebView.
      */
@@ -44,7 +39,14 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
 
 
     setTintColor: (red: number, green: number, blue: number) => void;
-    
+
+    setDefaultMenuItemsVisible: (visible: boolean) => void;
+
+    /**
+     * Stop loading the current page.
+     */
+    stopLoading(): void;
+
      /**
      * (Android only)
      * Removes the autocomplete popup from the currently focused form field, if present.
