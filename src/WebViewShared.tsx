@@ -147,7 +147,9 @@ export const useWebWiewLogic = ({
   }, [onLoadStart, updateNavigationState]);
 
   const onLoadingError = useCallback((event: WebViewErrorEvent) => {
-    event.persist();
+    if(event && event.persist) {
+      event.persist();
+    }
     if (onError) {
       onError(event);
     } else {

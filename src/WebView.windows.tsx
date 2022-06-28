@@ -153,7 +153,9 @@ export default class WebView extends React.Component<WindowsWebViewProps, State>
   };
 
   onLoadingError = (event: WebViewErrorEvent) => {
-    event.persist(); // persist this event because we need to store it
+    if(event && event.persist) {
+      event.persist(); // persist this event because we need to store it
+    }
     const { onError, onLoadEnd } = this.props;
     if (onError) {
       onError(event);
