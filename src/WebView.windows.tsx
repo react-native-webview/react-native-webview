@@ -29,8 +29,6 @@ import {
 
 import styles from './WebView.styles';
 
-const {version} = require('react-native/Libraries/Core/ReactNativeVersion');
-
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
