@@ -8,7 +8,11 @@
 #define RNW_VERSION_AT_LEAST(x,y,z) false
 #endif
 
-#if RNW_VERSION_AT_LEAST(0,68,0)
+#ifndef WINUI_VERSION_COMPAT
+#define WINUI_VERSION_COMPAT 0
+#endif 
+
+#if RNW_VERSION_AT_LEAST(0,68,0) && WINUI_VERSION_COMPAT
 #define HAS_WEBVIEW2 1
 #else
 #define HAS_WEBVIEW2 0

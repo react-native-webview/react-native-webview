@@ -81,7 +81,9 @@
     <Import Project="$(ReactNativeWindowsDir)\PropertySheets\external\Microsoft.ReactNative.Uwp.CppLib.props" Condition="Exists('$(ReactNativeWindowsDir)\PropertySheets\External\Microsoft.ReactNative.Uwp.CppLib.props')" />
     <Import Project="$(SolutionDir)\packages\$(WinUIPackageProps)" Condition="'$(WinUIPackageProps)'!='' And Exists('$(SolutionDir)\packages\$(WinUIPackageProps)')" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(WinUIPackageVersion)','2.8.0-prerelease.210927001'))">WINUI_VERSION_COMPAT;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
@@ -112,6 +114,16 @@
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(WinUIPackageVersion)','2.8.0-prerelease.210927001'))">
+    <ClCompile>
+      <PreprocessorDefinitions>WINUI_VERSION_COMPAT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(WinUIPackageVersion)','2.8.0-prerelease.210927001'))">
+    <Midl>
+      <PreprocessorDefinitions>WINUI_VERSION_COMPAT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ReactWebView.h" />
