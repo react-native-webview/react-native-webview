@@ -501,7 +501,8 @@ RCTAutoInsetsProtocol>
   
   _isFullScreenVideoOpen = YES;
   RCTUnsafeExecuteOnMainQueueSync(^{
-    [RCTSharedApplication() setStatusBarStyle:self->_savedStatusBarStyle animated:YES];
+    [RCTSharedApplication() setStatusBarHidden:NO animated:YES];
+    [RCTSharedApplication() setStatusBarStyle:RCTSharedApplication().statusBarStyle animated:YES];
   });
 #pragma clang diagnostic pop
 }
@@ -515,8 +516,8 @@ RCTAutoInsetsProtocol>
   
   _isFullScreenVideoOpen = NO;
   RCTUnsafeExecuteOnMainQueueSync(^{
-    [RCTSharedApplication() setStatusBarHidden:self->_savedStatusBarHidden animated:YES];
-    [RCTSharedApplication() setStatusBarStyle:self->_savedStatusBarStyle animated:YES];
+    [RCTSharedApplication() setStatusBarHidden:NO animated:YES];
+    [RCTSharedApplication() setStatusBarStyle:RCTSharedApplication().statusBarStyle animated:YES];
   });
 #pragma clang diagnostic pop
 }
