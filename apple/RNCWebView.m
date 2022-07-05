@@ -429,11 +429,13 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 #else
       _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
-        
-        if (_webView != nil && _webViewKey != nil) {
-          sharedWKWebViewDictionary[_webViewKey] = _webView;
-          NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-          sharedRNCWebViewDictionary[_webViewKey] = self;
+    }
+      
+    if (_webViewKey != nil) {
+        NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+        sharedRNCWebViewDictionary[_webViewKey] = self;
+        if (_webView != nil) {
+            sharedWKWebViewDictionary[_webViewKey] = _webView;
         }
     }
     
