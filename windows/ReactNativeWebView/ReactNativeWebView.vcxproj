@@ -82,7 +82,7 @@
     <Import Project="$(SolutionDir)\packages\$(WinUIPackageProps)" Condition="'$(WinUIPackageProps)'!='' And Exists('$(SolutionDir)\packages\$(WinUIPackageProps)')" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
-    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(WinUIPackageVersion)','2.8.0-prerelease.210927001'))">WINUI_VERSION_COMPAT;$(DefineConstants)</DefineConstants>
+    <WinUI2_HasWebView2 Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(WinUIPackageVersion)','2.8.0-prerelease.210927001'))">true</WinUI2_HasWebView2>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
@@ -115,15 +115,13 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(WinUIPackageVersion)','2.8.0-prerelease.210927001'))">
-    <ClCompile>
-      <PreprocessorDefinitions>WINUI_VERSION_COMPAT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(WinUIPackageVersion)','2.8.0-prerelease.210927001'))">
-    <Midl>
-      <PreprocessorDefinitions>WINUI_VERSION_COMPAT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </Midl>
+  <ItemDefinitionGroup Condition="'$(WinUI2_HasWebView2)'=='true'">
+  <ClCompile>
+    <PreprocessorDefinitions>WINUI2_HAS_WEBVIEW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+  </ClCompile>
+  <Midl>
+    <PreprocessorDefinitions>WINUI2_HAS_WEBVIEW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+  </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ReactWebView.h" />
