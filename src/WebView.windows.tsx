@@ -72,7 +72,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     } else if (shouldStart) {
       Commands.loadUrl(webViewRef, url);
     }
-  }, []);
+  }, [RCTWebViewString]);
 
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebWiewLogic({
     onNavigationStateChange,
