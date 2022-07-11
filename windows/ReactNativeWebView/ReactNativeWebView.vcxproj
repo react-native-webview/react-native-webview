@@ -81,7 +81,9 @@
     <Import Project="$(ReactNativeWindowsDir)\PropertySheets\external\Microsoft.ReactNative.Uwp.CppLib.props" Condition="Exists('$(ReactNativeWindowsDir)\PropertySheets\External\Microsoft.ReactNative.Uwp.CppLib.props')" />
     <Import Project="$(SolutionDir)\packages\$(WinUIPackageProps)" Condition="'$(WinUIPackageProps)'!='' And Exists('$(SolutionDir)\packages\$(WinUIPackageProps)')" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <WinUI2_HasWebView2 Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(WinUIPackageVersion)','2.8.0-prerelease.210927001'))">true</WinUI2_HasWebView2>
+  </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
@@ -112,6 +114,14 @@
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(WinUI2_HasWebView2)'=='true'">
+  <ClCompile>
+    <PreprocessorDefinitions>WINUI2_HAS_WEBVIEW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+  </ClCompile>
+  <Midl>
+    <PreprocessorDefinitions>WINUI2_HAS_WEBVIEW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+  </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ReactWebView.h" />
