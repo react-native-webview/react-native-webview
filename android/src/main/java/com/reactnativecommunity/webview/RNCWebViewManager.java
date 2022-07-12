@@ -114,7 +114,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * {@link WebView} instances could emit following direct events:
  * - topLoadingFinish
  * - topLoadingStart
- * - topLoadingStart
  * - topLoadingProgress
  * - topShouldStartLoadWithRequest
  * <p>
@@ -936,18 +935,26 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
-    public void onPageStarted(WebView webView, String url, Bitmap favicon) {
-      super.onPageStarted(webView, url, favicon);
-      mLastLoadFailed = false;
+    public void doUpdateVisitedHistory (WebView webView, String url, boolean isReload) {
+      // your code here
+      super.doUpdateVisitedHistory(webView, url, isReload);
 
       RNCWebView reactWebView = (RNCWebView) webView;
-      reactWebView.callInjectedJavaScriptBeforeContentLoaded();
 
       ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingStartEvent(
           webView.getId(),
           createWebViewEvent(webView, url)));
+    }
+
+    @Override
+    public void onPageStarted(WebView webView, String url, Bitmap favicon) {
+      super.onPageStarted(webView, url, favicon);
+      mLastLoadFailed = false;
+
+      RNCWebView reactWebView = (RNCWebView) webView;
+      reactWebView.callInjectedJavaScriptBeforeContentLoaded();
     }
 
     @Override

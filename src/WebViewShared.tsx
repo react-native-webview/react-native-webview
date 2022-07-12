@@ -143,6 +143,7 @@ export const useWebWiewLogic = ({
     // !Needed for android
 
     onLoadStart?.(event);
+
     updateNavigationState(event);
   }, [onLoadStart, updateNavigationState]);
 
@@ -174,7 +175,7 @@ export const useWebWiewLogic = ({
       onContentProcessDidTerminateProp?.(event);
   }, [onContentProcessDidTerminateProp]);
   // !iOS Only
-
+  
   const onLoadingFinish = useCallback((event: WebViewNavigationEvent) => {
     onLoad?.(event);
     onLoadEnd?.(event);
@@ -183,7 +184,7 @@ export const useWebWiewLogic = ({
     if (Platform.OS !== "android" || url === startUrl.current) {
       setViewState('IDLE');
     }
-    // !on Android, only if url === startUrl
+
     updateNavigationState(event);
   }, [onLoad, onLoadEnd, updateNavigationState]);
 
