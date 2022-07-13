@@ -550,8 +550,11 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 {
   // If _webView is getting added to a new super view, we need to first both remove it from the old
   // superview and also remove the observer which can reference the old super view.
-  NSMutableDictionary *sharedRNCWebViewDictionary = [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-  sharedRNCWebViewDictionary[_webViewKey] = nil;
+  if (_webViewKey != nil) {
+    NSMutableDictionary *sharedRNCWebViewDictionary = [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+    sharedRNCWebViewDictionary[_webViewKey] = nil;
+  }
+    
   [_webView removeObserver:webViewObserver forKeyPath:@"estimatedProgress"];
   [_webView removeFromSuperview];
 }
