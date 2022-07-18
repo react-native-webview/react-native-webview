@@ -951,42 +951,13 @@ RCTAutoInsetsProtocol>
   if (webView.URL != nil) {
     host = webView.URL.host;
   }
-  if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
-    completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
-    return;
-  }
-  if ([[challenge protectionSpace] serverTrust] != nil && customCertificatesForHost != nil && host != nil) {
-    SecCertificateRef localCertificate = (__bridge SecCertificateRef)([customCertificatesForHost objectForKey:host]);
-    if (localCertificate != nil) {
-      NSData *localCertificateData = (NSData*) CFBridgingRelease(SecCertificateCopyData(localCertificate));
-      SecTrustRef trust = [[challenge protectionSpace] serverTrust];
-      long count = SecTrustGetCertificateCount(trust);
-      for (long i = 0; i < count; i++) {
-        SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(trust, i);
-        if (serverCertificate == nil) { continue; }
-        NSData *serverCertificateData = (NSData *) CFBridgingRelease(SecCertificateCopyData(serverCertificate));
-        if ([serverCertificateData isEqualToData:localCertificateData]) {
-          NSURLCredential *useCredential = [NSURLCredential credentialForTrust:trust];
-          if (challenge.sender != nil) {
-            [challenge.sender useCredential:useCredential forAuthenticationChallenge:challenge];
-          }
-          completionHandler(NSURLSessionAuthChallengeUseCredential, useCredential);
-          return;
-        }
-      }
-    }
-  }
-  if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodHTTPBasic) {
-    NSString *username = [_basicAuthCredential valueForKey:@"username"];
-    NSString *password = [_basicAuthCredential valueForKey:@"password"];
-    if (username && password) {
-      NSURLCredential *credential = [NSURLCredential credentialWithUser:username password:password persistence:NSURLCredentialPersistenceNone];
-      completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
-      return;
-    }
-  }
-  completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+  if ([[challenge protectionSpace] authent(void) webView:(WKWebView *)webView
+  didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler {
+  NSURLCredential * credential = [[NSURLCredential alloc] initWithTrust:[challenge protectionSpace].serverTrust];
+  completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
 }
+
 
 #pragma mark - WKNavigationDelegate methods
 
