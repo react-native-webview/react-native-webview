@@ -20,6 +20,7 @@ import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
+import CustomMenu from './examples/CustomMenu';
 
 const TESTS = {
   Messaging: {
@@ -101,6 +102,14 @@ const TESTS = {
     render() {
       return <ApplePay />;
     },
+  },
+  CustomMenu: {
+    title: 'Custom Menu',
+    testId: 'CustomMenu',
+    description: 'Test to custom context menu shown on highlighting text',
+    render() {
+      return <CustomMenu />;
+    },
   }
 };
 
@@ -164,6 +173,11 @@ export default class App extends Component<Props, State> {
             testID="testType_pageLoad"
             title="LocalPageLoad"
             onPress={() => this._changeTest('PageLoad')}
+          />
+          <Button
+            testID="testType_customMenu"
+            title="CustomMenu"
+            onPress={() => this._changeTest('CustomMenu')}
           />
           <Button
             testID="testType_downloads"

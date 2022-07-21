@@ -18,7 +18,12 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.ActionMode.Callback2;
+import android.graphics.Rect;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +58,7 @@ import androidx.webkit.WebViewFeature;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
+//import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.scroll.OnScrollDispatchHelper;
@@ -76,6 +82,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.reactnativecommunity.webview.RNCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
@@ -101,6 +108,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+//import java.lang.Math;
 
 /**
  * Manages instances of {@link WebView}
@@ -617,6 +625,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "menuItems")
+  public void setMenuItems(WebView view, @Nullable ReadableArray menuItems) {
+    ((RNCWebView) view).setMenuItems(menuItems.toArrayList());
+  }
+
   @ReactProp(name = "allowsFullscreenVideo")
   public void setAllowsFullscreenVideo(
     WebView view,
@@ -708,6 +721,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
     export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
     export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
+    export.put("customMenuSelection", MapBuilder.of("registrationName", "onCustomMenuSelection"));
     return export;
   }
 
@@ -1546,6 +1560,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+    protected @Nullable 
+    ArrayList menuItems;
+
+    protected String selectionText;
+    protected double selectionX;
+    protected double selectionY;
+    protected double selectionWidth;
+    protected double selectionHeight;
 
     /**
      * WebView must be created with an context of the current activity
@@ -1600,8 +1622,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         requestDisallowInterceptTouchEvent(true);
       }
       return super.onTouchEvent(event);
-    }
-
+    } 
+ 
     @Override
     protected void onSizeChanged(int w, int h, int ow, int oh) {
       super.onSizeChanged(w, h, ow, oh);
@@ -1616,6 +1638,84 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           )
         );
       }
+    }   
+
+    @Override
+    public ActionMode startActionMode(ActionMode.Callback callback, int type) {
+      if(menuItems == null || menuItems.size() == 0){
+        return super.startActionMode(callback, type);
+      }
+      return super.startActionMode(new ActionMode.Callback2() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+          for(int i = 0; i < menuItems.size(); i++ ){
+            menu.add(Menu.NONE, i, i, ((HashMap<String, String>)menuItems.get(i)).get("label"));
+          }
+          return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+          WritableMap wMap = Arguments.createMap();
+          HashMap<String, String> menuItemMap = (HashMap<String, String>)menuItems.get(item.getItemId());
+          wMap.putString("label", menuItemMap.get("label"));
+          wMap.putString("key", menuItemMap.get("key")); 
+          wMap.putString("selectedText", RNCWebView.this.selectionText); 
+          ReactContext reactContext = (ReactContext)RNCWebView.this.getContext();
+          reactContext
+            .getJSModule(RCTEventEmitter.class)
+            .receiveEvent(getId(), "customMenuSelection", wMap);
+          mode.finish();
+          return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+          mode = null;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+          return true;
+        }
+
+        @Override
+        public void onGetContentRect (ActionMode mode, 
+                View view, 
+                Rect outRect){
+
+          String js = "(function(){ let wr = " + RNCWebView.this.getWidth() + "/window.innerWidth; let hr = " + RNCWebView.this.getHeight() +"/window.innerHeight; let rect = window.getSelection()?.getRangeAt(0)?.getBoundingClientRect(); return JSON.stringify({x: (rect?.x * wr), y: (rect?.y * hr), width: (rect?.width * wr), height: (rect?.height * hr), selectionText: window.getSelection().toString()?.replace(/\"/g, '%%22')?.replace(/\\\\/g, '%%5C')})})()";
+          RNCWebView.this.evaluateJavascript(js, new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+              try{
+                JSONObject json = new JSONObject(value.substring(1, value.length() - 1).replaceAll("\\\\",""));
+                double x = json.getDouble("x"); 
+                double y = json.getDouble("y"); 
+                double width = json.getDouble("width"); 
+                double height = json.getDouble("height"); 
+                if(x != RNCWebView.this.selectionX || y != RNCWebView.this.selectionY || width !=RNCWebView.this.selectionWidth  || height != RNCWebView.this.selectionHeight){
+                  RNCWebView.this.selectionX = x;
+                  RNCWebView.this.selectionY = y;
+                  RNCWebView.this.selectionWidth = width;
+                  RNCWebView.this.selectionHeight = height;
+                  RNCWebView.this.selectionText = json.getString("selectionText").replaceAll("%%22", "\"").replaceAll("%%5C", "\\\\");
+                  mode.invalidateContentRect();
+                }
+              }catch(JSONException e){
+                throw new RuntimeException(e);
+              }
+            }
+          });
+          outRect.set(
+            (int)RNCWebView.this.selectionX,
+            (int)RNCWebView.this.selectionY,
+            (int)(RNCWebView.this.selectionX + RNCWebView.this.selectionWidth),
+            (int)(RNCWebView.this.selectionY + RNCWebView.this.selectionHeight)
+          );
+        }
+      }, type); 
+      
     }
 
     @Override
@@ -1656,6 +1756,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(boolean enabled) {
       injectedJavaScriptBeforeContentLoadedForMainFrameOnly = enabled;
+    }
+
+    public void setMenuItems(@Nullable ArrayList mi) {
+      menuItems = mi;
     }
 
     protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {

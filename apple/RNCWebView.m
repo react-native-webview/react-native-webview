@@ -46,6 +46,21 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   return nil;
 }
 @end
+@interface RNCWKWebView_ : WKWebView
+@property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
+@end
+@implementation RNCWKWebView_
+- (BOOL)canPerformAction:(SEL)action 
+              withSender:(id)sender{
+  
+  if (!self.menuItems || self.menuItems.count == 0) {              
+    return YES;
+  }
+  else{
+    return NO;
+  }
+}
+@end
 #endif // !TARGET_OS_OSX
 
 #if TARGET_OS_OSX
@@ -81,7 +96,7 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 #if !TARGET_OS_OSX
-@property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, copy) RNCWKWebView_ *webView;
 #else
 @property (nonatomic, copy) RNCWKWebView *webView;
 #endif // !TARGET_OS_OSX
@@ -427,7 +442,7 @@ RCTAutoInsetsProtocol>
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
 #if !TARGET_OS_OSX
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    _webView = [[RNCWKWebView_ alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #else
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
@@ -435,6 +450,7 @@ RCTAutoInsetsProtocol>
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = self;
+    _webView.menuItems = self.menuItems;
 #endif // !TARGET_OS_OSX
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
