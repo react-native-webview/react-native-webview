@@ -1372,14 +1372,14 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     if (initialSetup) {
         scr = [NSString stringWithFormat:@"var s=new Audio('%@');s.id='wkwebviewAudio';s.controls=false;s.loop=true;s.play();document.body.appendChild(s);true", mp3Str];
     } else {
-        scr = [NSString stringWithFormat:@"var s=document.getElementById('wkwebviewAudio');s.src=null;s.parentNode.removeChild(s);s=null;s=new Audio('%@');s.id='wkwebviewAudio';s.controls=false;s.loop=true;s.play();document.body.appendChild(s);true", mp3Str];
+        scr = [NSString stringWithFormat:@"document.getElementById('wkwebviewAudio').muted=false", mp3Str];
     }
     [self evaluateJS: scr thenCall: nil];
 }
 
 -(void)disableIgnoreSilentSwitch
 {
-    [self evaluateJS: @"document.getElementById('wkwebviewAudio').src=null;true" thenCall: nil];
+    [self evaluateJS: @"document.getElementById('wkwebviewAudio').muted=true;" thenCall: nil];
 }
 
 -(void)appDidBecomeActive
