@@ -547,14 +547,18 @@ We can provide support for conventional page navigation for both Android and iOS
 For iOS, you'll just need to use the [`allowsbackforwardnavigationgestures`](Reference.md#allowsbackforwardnavigationgestures) prop.
 
 For Android, you can use `useRef` and `useEffect` (you'll need to import them from React if you aren't already) to allow users to navigate to the previous page when they press the back button like so:
-```js
+```jsx
 import React, {
     useEffect,
     useRef,
 } from 'react';
+import {
+    BackHandler,
+    Platform,
+} from 'react-native';
 ```
 
-```js
+```jsx
 const webViewRef = useRef(null);
 const onAndroidBackPress = () => {
   if (webViewRef.current) {
@@ -572,6 +576,13 @@ useEffect(() => {
       };
   }
 }, []);
+```
+
+And add this prop to your `WebView` component:
+```jsx
+<WebView
+  ref={webViewRef}
+/>
 ```
 
 ### Hardware Silence Switch
