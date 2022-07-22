@@ -936,7 +936,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public void doUpdateVisitedHistory (WebView webView, String url, boolean isReload) {
-      // your code here
       super.doUpdateVisitedHistory(webView, url, isReload);
 
       RNCWebView reactWebView = (RNCWebView) webView;
