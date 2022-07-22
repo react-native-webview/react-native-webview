@@ -1510,7 +1510,7 @@ Example:
 ```
 ### `menuItems`
 
-An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
+An array of custom menu item objects that will be shown as the context menu when text on the webpage is selected.   Used in tandem with `onCustomMenuSelection`.
 
 | Type                                                               | Required | Platform |
 | ------------------------------------------------------------------ | -------- | -------- |

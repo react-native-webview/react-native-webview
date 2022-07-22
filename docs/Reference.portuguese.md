@@ -1500,7 +1500,7 @@ Exemplo:
 ```
 ### `menuItems`
 
-Uma matriz de objetos de itens de menu personalizados que serão anexados ao UIMenu que aparece ao selecionar o texto (aparecerá após 'Copiar' e 'Compartilhar...'). Usado em conjunto com `onCustomMenuSelection`
+Uma matriz de objetos de itens de menu personalizados que serão mostrados como o menu de contexto quando o texto na página da Web for selecionado. Usado em conjunto com `onCustomMenuSelection`
 
 | Tipo                                                               | Requerido | Plataforma |
 | ------------------------------------------------------------------ | --------  | --------   |
