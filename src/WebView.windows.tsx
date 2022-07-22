@@ -29,8 +29,6 @@ import {
 
 import styles from './WebView.styles';
 
-const {version} = require('react-native/Libraries/Core/ReactNativeVersion');
-
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
@@ -61,10 +59,8 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   ...otherProps
 }, ref) => {
   const webViewRef = useRef<NativeWebViewWindows | null>(null);
-
-  const RnwVersionSupportsWebView2 = (version.major>1 || version.minor>=68);
   
-  const RCTWebViewString = (RnwVersionSupportsWebView2 && useWebView2) ? 'RCTWebView2' : 'RCTWebView';
+  const RCTWebViewString = useWebView2 ? 'RCTWebView2' : 'RCTWebView';
 
   const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean, url: string, lockIdentifier?: number) => {
     if (lockIdentifier) {
@@ -76,7 +72,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     } else if (shouldStart) {
       Commands.loadUrl(webViewRef, url);
     }
-  }, []);
+  }, [RCTWebViewString]);
 
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebWiewLogic({
     onNavigationStateChange,
@@ -125,7 +121,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   const webViewContainerStyle = [styles.container, containerStyle];
 
   const NativeWebView
-  = (RnwVersionSupportsWebView2 && useWebView2)? RCTWebView2 : RCTWebView;
+  = useWebView2? RCTWebView2 : RCTWebView;
 
   const webView = <NativeWebView
     key="webViewKey"

@@ -8,7 +8,7 @@
 #define RNW_VERSION_AT_LEAST(x,y,z) false
 #endif
 
-#if RNW_VERSION_AT_LEAST(0,68,0)
+#if RNW_VERSION_AT_LEAST(0,68,0) && defined(WINUI2_HAS_WEBVIEW2)
 #define HAS_WEBVIEW2 1
 #else
 #define HAS_WEBVIEW2 0
