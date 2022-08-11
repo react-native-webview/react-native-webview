@@ -17,8 +17,7 @@ import {
   ImageSourcePropType,
   NativeModules,
 } from 'react-native';
-// @ts-expect-error react-native doesn't have this type
-import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import invariant from 'invariant';
 import {RCTWebView, RCTWebView2} from "./WebViewNativeComponent.windows";
 import { useWebWiewLogic, defaultOriginWhitelist, defaultRenderError, defaultRenderLoading, } from './WebViewShared';
@@ -28,8 +27,6 @@ import {
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
-
-const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
   supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],

@@ -1,19 +1,18 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { forwardRef, ReactElement, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 
 import {
   Image,
   View,
-  NativeModules,
   ImageSourcePropType,
 } from 'react-native';
 
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
-// @ts-expect-error react-native doesn't have this type
-import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
 import invariant from 'invariant';
 
 import RNCWebView from "./WebViewNativeComponent.android";
+import RNCWebViewModule from "./NativeRNCWebView";
 import {
   defaultOriginWhitelist,
   defaultRenderError,
@@ -22,12 +21,9 @@ import {
 } from './WebViewShared';
 import {
   AndroidWebViewProps,
-  NativeWebViewAndroid,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
-
-const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
   supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'clearFormData', 'clearCache', 'clearHistory', 'loadUrl'],
@@ -76,15 +72,15 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   ...otherProps
 }, ref) => {
   const messagingModuleName = useRef<string>(`WebViewMessageHandler${uniqueRef += 1}`).current;
-  const webViewRef = useRef<NativeWebViewAndroid | null>(null);
+  const webViewRef = useRef<typeof RNCWebView | null>(null);
 
   const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean,
     url: string,
     lockIdentifier?: number) => {
     if (lockIdentifier) {
-      NativeModules.RNCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
+      RNCWebViewModule.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
     } else if (shouldStart) {
-      Commands.loadUrl(webViewRef.current, url);
+      Commands.loadUrl(webViewRef, url);
     }
   }, []);
 
@@ -130,16 +126,18 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     BatchedBridge.registerCallableModule(messagingModuleName, directEventCallbacks);
   }, [messagingModuleName, directEventCallbacks])
 
-  let otherView = null;
+  let otherView: ReactElement | undefined;
   if (viewState === 'LOADING') {
     otherView = (renderLoading || defaultRenderLoading)();
   } else if (viewState === 'ERROR') {
     invariant(lastErrorEvent != null, 'lastErrorEvent expected to be non-null');
-    otherView = (renderError || defaultRenderError)(
-      lastErrorEvent.domain,
-      lastErrorEvent.code,
-      lastErrorEvent.description,
-    );
+    if (lastErrorEvent) {
+      otherView = (renderError || defaultRenderError)(
+        lastErrorEvent.domain,
+        lastErrorEvent.code,
+        lastErrorEvent.description,
+      );  
+    }
   } else if (viewState !== 'IDLE') {
     console.error(`RNCWebView invalid state encountered: ${viewState}`);
   }
@@ -157,9 +155,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     }
   }
 
-
   const NativeWebView
-    = (nativeConfig?.component as (typeof NativeWebViewAndroid | undefined)) || RNCWebView;
+    = (nativeConfig?.component as (typeof RNCWebView | undefined)) || RNCWebView;
 
   const webView = <NativeWebView
     key="webViewKey"
@@ -167,6 +164,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     messagingEnabled={typeof onMessage === 'function'}
     messagingModuleName={messagingModuleName}
 
+    hasOnScroll={!!otherProps.onScroll}
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}
     onLoadingProgress={onLoadingProgress}
@@ -175,7 +173,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onRenderProcessGone={onRenderProcessGone}
     onMessage={onMessage}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-
+    // @ts-expect-error: buggy ref type ?
     ref={webViewRef}
     // TODO: find a better way to type this.
     source={resolveAssetSource(source as ImageSourcePropType)}
@@ -206,8 +204,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
 });
 
 // native implementation should return "true" only for Android 5+
-const isFileUploadSupported: () => Promise<boolean>
-  = NativeModules.RNCWebView.isFileUploadSupported();
+const {isFileUploadSupported} = RNCWebViewModule;
 
 const WebView = Object.assign(WebViewComponent, {isFileUploadSupported});
 

@@ -7,8 +7,7 @@ import {
 } from 'react-native';
 import invariant from 'invariant';
 
-// @ts-expect-error react-native doesn't have this type
-import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import RNCWebView from "./WebViewNativeComponent.macos";
 import {
   defaultOriginWhitelist,
@@ -23,9 +22,6 @@ import {
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
-
-
-const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
   supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],

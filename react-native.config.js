@@ -14,9 +14,9 @@ const project = (() => {
           path.join(__dirname, 'example', 'android'),
         ),
       },
-      ios: {
-        project: iosProjectPath('example/ios'),
-      },
+      // ios: {
+      //   project: iosProjectPath('example/ios'),
+      // },
       windows: fs.existsSync('example/windows/WebviewExample.sln') && {
         sourceDir: path.join('example', 'windows'),
         solutionFile: 'WebviewExample.sln',

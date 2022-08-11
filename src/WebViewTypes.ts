@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp, max-classes-per-file */
 
-import { ReactElement, Component } from 'react';
+import { ReactElement, Component, ComponentProps } from 'react';
 import {
   NativeSyntheticEvent,
   ViewProps,
@@ -11,6 +11,8 @@ import {
   UIManagerStatic,
   NativeScrollEvent,
 } from 'react-native';
+
+import type NativeWebViewComponent from './RNCWebViewNativeComponent'
 
 type WebViewCommands =
   | 'goForward'
@@ -66,12 +68,6 @@ declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewPr
 declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewMacOSComponent;
 export class NativeWebViewMacOS extends NativeWebViewMacOSBase {}
-
-// eslint-disable-next-line react/prefer-stateless-function
-declare class NativeWebViewAndroidComponent extends Component<AndroidNativeWebViewProps> {}
-declare const NativeWebViewAndroidBase: Constructor<NativeMethodsMixin> &
-  typeof NativeWebViewAndroidComponent;
-export class NativeWebViewAndroid extends NativeWebViewAndroidBase {}
 
 // eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewWindowsComponent extends Component<WindowsNativeWebViewProps> {}
@@ -251,7 +247,7 @@ export interface WebViewNativeConfig {
   component?:
     | typeof NativeWebViewIOS
     | typeof NativeWebViewMacOS
-    | typeof NativeWebViewAndroid;
+    | typeof NativeWebViewComponent;
   /**
    * Set props directly on the native component WebView. Enables custom props which the
    * original WebView doesn't pass through.
@@ -309,37 +305,6 @@ export interface CommonNativeWebViewProps extends ViewProps {
    */
   applicationNameForUserAgent?: string;
   basicAuthCredential?: BasicAuthCredential;
-}
-
-export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
-  cacheMode?: CacheMode;
-  allowFileAccess?: boolean;
-  scalesPageToFit?: boolean;
-  allowFileAccessFromFileURLs?: boolean;
-  allowsFullscreenVideo?: boolean;
-  allowUniversalAccessFromFileURLs?: boolean;
-  androidHardwareAccelerationDisabled?: boolean;
-  androidLayerType?: AndroidLayerType;
-  domStorageEnabled?: boolean;
-  geolocationEnabled?: boolean;
-  javaScriptEnabled?: boolean;
-  mixedContentMode?: 'never' | 'always' | 'compatibility';
-  onContentSizeChange?: (event: WebViewEvent) => void;
-  onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
-  overScrollMode?: OverScrollModeType;
-  saveFormDataDisabled?: boolean;
-  setSupportMultipleWindows?: boolean;
-  textZoom?: number;
-  thirdPartyCookiesEnabled?: boolean;
-  messagingModuleName?: string;
-  setBuiltInZoomControls?: boolean;
-  setDisplayZoomControls?: boolean;
-  nestedScrollEnabled?: boolean;
-  readonly urlPrefixesForDefaultIntent?: string[];
-  forceDarkOn?: boolean;
-  minimumFontSize?: number;
-  downloadingMessage?: string;
-  lackPermissionToDownloadMessage?: string;
 }
 
 export declare type ContentInsetAdjustmentBehavior =
@@ -1160,7 +1125,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that is invoked when the `WebView` scrolls.
    */
-  onScroll?: (event: WebViewScrollEvent) => void;
+   onScroll?: ComponentProps<typeof NativeWebViewComponent>['onScroll'];
 
   /**
    * Function that is invoked when the `WebView` has finished loading.
