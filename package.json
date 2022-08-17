@@ -13,7 +13,7 @@
   "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios --project-path example/ios",
+    "ios": "react-native run-ios",
     "macos": "react-native run-macos --scheme WebviewExample --project-path example/macos",
     "start": "cd example && react-native start",
     "windows": "install-windows-test-app --project-directory example/windows && react-native run-windows --root example --arch x64",
@@ -87,5 +87,10 @@
     "index.d.ts",
     "react-native-webview.podspec",
     "react-native.config.js"
-  ]
+  ],
+  "resolutions": {
+    "@react-native-community/cli": "^8.0",
+    "@react-native-community/cli-platform-android": "^8.0",
+    "@react-native-community/cli-platform-ios": "^8.0"
+  }
 }
