@@ -200,7 +200,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         return true;
     }
 
-    public void onShouldStartLoadWithRequestCallback(boolean shouldStart, double lockIdentifier) {
+    public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         final AtomicReference<ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = shouldOverrideUrlLoadingLock.getLock(lockIdentifier);
         if (lockObject != null) {
             synchronized (lockObject) {

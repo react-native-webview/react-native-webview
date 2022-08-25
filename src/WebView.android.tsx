@@ -78,7 +78,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     url: string,
     lockIdentifier?: number) => {
     if (lockIdentifier) {
-      RNCWebViewModule.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
+      RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     } else if (shouldStart) {
       Commands.loadUrl(webViewRef, url);
     }
@@ -136,7 +136,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
         lastErrorEvent.domain,
         lastErrorEvent.code,
         lastErrorEvent.description,
-      );  
+      );
     }
   } else if (viewState !== 'IDLE') {
     console.error(`RNCWebView invalid state encountered: ${viewState}`);

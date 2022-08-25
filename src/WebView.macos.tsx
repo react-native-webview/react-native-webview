@@ -79,7 +79,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
       = (nativeConfig?.viewManager)
       || RNCWebViewManager;
 
-    viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
+    viewManager.shouldStartLoadWithLockIdentifier(!!shouldStart, lockIdentifier);
   }, [nativeConfig?.viewManager]);
 
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebWiewLogic({

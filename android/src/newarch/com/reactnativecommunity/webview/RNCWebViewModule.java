@@ -25,8 +25,8 @@ public class RNCWebViewModule extends NativeRNCWebViewSpec {
     }
 
     @Override
-    public void onShouldStartLoadWithRequestCallback(boolean shouldStart, double lockIdentifier) {
-        mRNCWebViewModuleImpl.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
+    public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
+        mRNCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     }
 
     public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {
