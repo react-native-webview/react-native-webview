@@ -63,12 +63,12 @@ android {
     }
 }
 
-def reactNativeDirPath = findNodeModulePath(projectDir, "react-native")
+def reactNativePath = findNodeModulePath(projectDir, "react-native")
 def codegenPath = findNodeModulePath(projectDir, "react-native-codegen")
 
 repositories {
     maven {
-        url "${reactNativeDirPath}/android"
+        url "${reactNativePath}/android"
     }
     mavenCentral()
     google()
@@ -86,6 +86,6 @@ if (isNewArchitectureEnabled()) {
         libraryName = "rncwebview"
         codegenJavaPackageName = "com.reactnativecommunity.webview"
         codegenDir = new File(codegenPath)
-        reactNativeDir = new File(reactNativeDirPath)
+        reactNativeDir = new File(reactNativePath)
     }
 }
