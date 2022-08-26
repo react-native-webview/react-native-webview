@@ -8,6 +8,7 @@
 #import <React/RCTView.h>
 #import <React/RCTDefines.h>
 #import <UIKit/UIScrollView.h>
+#import <WebKit/WKDataDetectorTypes.h>
 #import <WebKit/WebKit.h>
 
 typedef enum RNCWebViewPermissionGrantType : NSUInteger {
@@ -37,6 +38,17 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @end
 
 @interface RNCWebViewImpl : RCTView
+@property (nonatomic, copy) RCTDirectEventBlock onFileDownload;
+@property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
+@property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
+@property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
+@property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
+@property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
+@property (nonatomic, copy) RCTDirectEventBlock onHttpError;
+@property (nonatomic, copy) RCTDirectEventBlock onMessage;
+@property (nonatomic, copy) RCTDirectEventBlock onScroll;
+@property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
+
 
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
@@ -54,9 +66,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) BOOL allowsAirPlayForMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;
-#if WEBKIT_IOS_10_APIS_AVAILABLE
 @property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
-#endif
 @property (nonatomic, assign) UIEdgeInsets contentInset;
 @property (nonatomic, assign) BOOL automaticallyAdjustContentInsets;
 @property (nonatomic, assign) BOOL keyboardDisplayRequiresUserAction;
@@ -102,6 +112,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
 #endif
 
+- (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior;
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
 - (void)postMessage:(NSString *_Nullable)message;

@@ -71,16 +71,6 @@ UIScrollViewDelegate,
 #endif // !TARGET_OS_OSX
 RCTAutoInsetsProtocol>
 
-@property (nonatomic, copy) RCTDirectEventBlock onFileDownload;
-@property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
-@property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
-@property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
-@property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
-@property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
-@property (nonatomic, copy) RCTDirectEventBlock onHttpError;
-@property (nonatomic, copy) RCTDirectEventBlock onMessage;
-@property (nonatomic, copy) RCTDirectEventBlock onScroll;
-@property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) WKWebView *webView;
 #else
@@ -436,11 +426,9 @@ RCTAutoInsetsProtocol>
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 
     _webView.customUserAgent = _userAgent;
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
       _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
     }
-#endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     if (@available(iOS 13.0, *)) {
       _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
@@ -590,7 +578,6 @@ RCTAutoInsetsProtocol>
 #endif // !TARGET_OS_OSX
 }
 
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
 - (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior
 {
   _savedContentInsetAdjustmentBehavior = behavior;
@@ -604,7 +591,6 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.contentOffset = contentOffset;
   }
 }
-#endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
 - (void)setAutomaticallyAdjustsScrollIndicatorInsets:(BOOL)automaticallyAdjustsScrollIndicatorInsets{
   _savedAutomaticallyAdjustsScrollIndicatorInsets = automaticallyAdjustsScrollIndicatorInsets;
@@ -1141,7 +1127,7 @@ RCTAutoInsetsProtocol>
   WKNavigationType navigationType = navigationAction.navigationType;
   NSURLRequest *request = navigationAction.request;
   BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
-
+    
   if (_onShouldStartLoadWithRequest) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       int lockIdentifier = [[RNCWebViewLockManager getInstance] getNewLock];

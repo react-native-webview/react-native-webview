@@ -31,7 +31,7 @@
         return YES;
     }
     // Block the main thread for a maximum of 250ms until the JS thread returns
-    if ([lock lockWhenCondition:0 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.25]]) {
+    if ([lock lockWhenCondition:0 beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]]) {
         BOOL returnValue = [[shouldOverrideResponses objectForKey:@(lockIdentifier)] boolValue];
         lock = nil;
         return returnValue;

@@ -32,7 +32,17 @@ if (self = [super initWithFrame:frame]) {
     _props = defaultProps;
 
     _view = [[RNCWebViewImpl alloc] init];
-
+    
+    _view.onShouldStartLoadWithRequest = [self](NSDictionary* dictionary) {
+        if (_eventEmitter) {
+            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+            facebook::react::RNCWebViewEventEmitter::OnShouldStartLoadWithRequest data = {
+                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue]
+            };
+            webViewEventEmitter->onShouldStartLoadWithRequest(data);
+        };
+    };
     self.contentView = _view;
 }
 
@@ -43,59 +53,79 @@ return self;
 {
     const auto &oldViewProps = *std::static_pointer_cast<RNCWebViewProps const>(_props);
     const auto &newViewProps = *std::static_pointer_cast<RNCWebViewProps const>(props);
+    
+#define REMAP_WEBVIEW_PROP(name)                    \
+    if (oldViewProps.name != newViewProps.name) {   \
+        _view.name = newViewProps.name;             \
+    }
 
-//    if (oldViewProps.color != newViewProps.color) {
-//        NSString * colorToConvert = [[NSString alloc] initWithUTF8String: newViewProps.color.c_str()];
-//        [_view setBackgroundColor:[self hexStringToColor:colorToConvert]];
-//    }
+#define REMAP_WEBVIEW_STRING_PROP(name)                             \
+    if (oldViewProps.name != newViewProps.name) {                   \
+        _view.name = RCTNSStringFromString(newViewProps.name);      \
+    }
+
+    REMAP_WEBVIEW_PROP(scrollEnabled)
+    REMAP_WEBVIEW_STRING_PROP(injectedJavaScript)
+    REMAP_WEBVIEW_STRING_PROP(injectedJavaScriptBeforeContentLoaded)
+    REMAP_WEBVIEW_PROP(injectedJavaScriptForMainFrameOnly)
+    REMAP_WEBVIEW_PROP(injectedJavaScriptBeforeContentLoadedForMainFrameOnly)
+    REMAP_WEBVIEW_PROP(javaScriptEnabled)
+    REMAP_WEBVIEW_PROP(javaScriptCanOpenWindowsAutomatically)
+    REMAP_WEBVIEW_PROP(allowFileAccessFromFileURLs)
+    REMAP_WEBVIEW_PROP(allowUniversalAccessFromFileURLs)
+    REMAP_WEBVIEW_PROP(allowsInlineMediaPlayback)
+    REMAP_WEBVIEW_PROP(allowsAirPlayForMediaPlayback)
+    REMAP_WEBVIEW_PROP(mediaPlaybackRequiresUserAction)
+    REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
+    REMAP_WEBVIEW_PROP(autoManageStatusBarEnabled)
+    REMAP_WEBVIEW_PROP(hideKeyboardAccessoryView)
+    REMAP_WEBVIEW_PROP(allowsBackForwardNavigationGestures)
+    REMAP_WEBVIEW_PROP(incognito)
+    REMAP_WEBVIEW_PROP(pagingEnabled)
+    REMAP_WEBVIEW_STRING_PROP(applicationNameForUserAgent)
+    REMAP_WEBVIEW_PROP(cacheEnabled)
+    REMAP_WEBVIEW_PROP(allowsLinkPreview)
+    REMAP_WEBVIEW_STRING_PROP(allowingReadAccessToURL)
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+    REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
+#endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
+    REMAP_WEBVIEW_PROP(limitsNavigationsToAppBoundDomains)
+#endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* iOS 14.5 */
+    REMAP_WEBVIEW_PROP(textInteractionEnabled)
+#endif
+    
     if (oldViewProps.source.uri != newViewProps.source.uri) {
         [_view setSource:@{
-            @"uri": [[NSString alloc] initWithUTF8String: newViewProps.source.uri.c_str()],
+            @"uri": RCTNSStringFromString(newViewProps.source.uri),
         }];
     }
-    if (oldViewProps.scrollEnabled != newViewProps.scrollEnabled) {
-        [_view setScrollEnabled:newViewProps.scrollEnabled];
-    }
-    if (oldViewProps.injectedJavaScript != newViewProps.injectedJavaScript) {
-        [_view setInjectedJavaScript: [[NSString alloc] initWithUTF8String: newViewProps.injectedJavaScript.c_str()]];
-    }
-    if (oldViewProps.injectedJavaScriptBeforeContentLoaded != newViewProps.injectedJavaScriptBeforeContentLoaded) {
-        [_view setInjectedJavaScriptBeforeContentLoaded: [[NSString alloc] initWithUTF8String: newViewProps.injectedJavaScriptBeforeContentLoaded.c_str()]];
-    }
-    if (oldViewProps.injectedJavaScriptForMainFrameOnly != newViewProps.injectedJavaScriptForMainFrameOnly) {
-        [_view setInjectedJavaScriptForMainFrameOnly:newViewProps.injectedJavaScriptForMainFrameOnly];
-    }
-    if (oldViewProps.injectedJavaScriptBeforeContentLoadedForMainFrameOnly != newViewProps.injectedJavaScriptBeforeContentLoadedForMainFrameOnly) {
-        [_view setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly:newViewProps.injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
-    }
-    if (oldViewProps.javaScriptEnabled != newViewProps.javaScriptEnabled) {
-        [_view setJavaScriptEnabled:newViewProps.javaScriptEnabled];
-    }
-    if (oldViewProps.javaScriptCanOpenWindowsAutomatically != newViewProps.javaScriptCanOpenWindowsAutomatically) {
-        [_view setJavaScriptCanOpenWindowsAutomatically:newViewProps.javaScriptCanOpenWindowsAutomatically];
-    }
-    if (oldViewProps.allowFileAccessFromFileURLs != newViewProps.allowFileAccessFromFileURLs) {
-        [_view setAllowFileAccessFromFileURLs:newViewProps.allowFileAccessFromFileURLs];
-    }
-    if (oldViewProps.allowUniversalAccessFromFileURLs != newViewProps.allowUniversalAccessFromFileURLs) {
-        [_view setAllowUniversalAccessFromFileURLs:newViewProps.allowUniversalAccessFromFileURLs];
-    }
-    if (oldViewProps.allowsInlineMediaPlayback != newViewProps.allowsInlineMediaPlayback) {
-        [_view setAllowsInlineMediaPlayback:newViewProps.allowsInlineMediaPlayback];
-    }
-    
-    if (oldViewProps.allowsAirPlayForMediaPlayback != newViewProps.allowsAirPlayForMediaPlayback) {
-        [_view setAllowsAirPlayForMediaPlayback:newViewProps.allowsAirPlayForMediaPlayback];
-    }
-    if (oldViewProps.mediaPlaybackRequiresUserAction != newViewProps.mediaPlaybackRequiresUserAction) {
-        [_view setMediaPlaybackRequiresUserAction:newViewProps.mediaPlaybackRequiresUserAction];
-    }
-#if WEBKIT_IOS_10_APIS_AVAILABLE
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
-        // TODO: FIXME
-        // [_view setDataDetectorTypes:newViewProps.dataDetectorTypes];
+        WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
+        for (const auto &dataDetectorType: newViewProps.dataDetectorTypes) {
+            if (dataDetectorType == "address") {
+                dataDetectorTypes |= WKDataDetectorTypeAddress;
+            } else if (dataDetectorType == "link") {
+                dataDetectorTypes |= WKDataDetectorTypeLink;
+            } else if (dataDetectorType == "calendarEvent") {
+                dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
+            } else if (dataDetectorType == "trackingNumber") {
+                dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
+            } else if (dataDetectorType == "flightNumber") {
+                dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
+            } else if (dataDetectorType == "lookupSuggestion") {
+                dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
+            } else if (dataDetectorType == "phoneNumber") {
+                dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
+            } else if (dataDetectorType == "all") {
+                dataDetectorTypes |= WKDataDetectorTypeAll;
+            } else if (dataDetectorType == "none") {
+                dataDetectorTypes = WKDataDetectorTypeNone;
+            }
+        }
+        // TODO: set DATADETECTORTYPES
     }
-#endif
     if (oldViewProps.contentInset.top != newViewProps.contentInset.top || oldViewProps.contentInset.left != newViewProps.contentInset.left || oldViewProps.contentInset.right != newViewProps.contentInset.right || oldViewProps.contentInset.bottom != newViewProps.contentInset.bottom) {
         UIEdgeInsets edgesInsets = {
             .top = newViewProps.contentInset.top,
@@ -105,70 +135,53 @@ return self;
         };
         [_view setContentInset: edgesInsets];
     }
-    if (oldViewProps.automaticallyAdjustContentInsets != newViewProps.automaticallyAdjustContentInsets) {
-        [_view setAutomaticallyAdjustContentInsets:newViewProps.automaticallyAdjustContentInsets];
-    }
-    if (oldViewProps.autoManageStatusBarEnabled != newViewProps.autoManageStatusBarEnabled) {
-        [_view setAutoManageStatusBarEnabled:newViewProps.autoManageStatusBarEnabled];
-    }
-    if (oldViewProps.hideKeyboardAccessoryView != newViewProps.hideKeyboardAccessoryView) {
-        [_view setHideKeyboardAccessoryView:newViewProps.hideKeyboardAccessoryView];
-    }
-    if (oldViewProps.allowsBackForwardNavigationGestures != newViewProps.allowsBackForwardNavigationGestures) {
-        [_view setAllowsBackForwardNavigationGestures:newViewProps.allowsBackForwardNavigationGestures];
-    }
-    if (oldViewProps.incognito != newViewProps.incognito) {
-        [_view setIncognito:newViewProps.incognito];
-    }
-    if (oldViewProps.pagingEnabled != newViewProps.pagingEnabled) {
-        [_view setPagingEnabled:newViewProps.pagingEnabled];
-    }
-    if (oldViewProps.applicationNameForUserAgent != newViewProps.applicationNameForUserAgent) {
-        [_view setApplicationNameForUserAgent:[[NSString alloc] initWithUTF8String: newViewProps.applicationNameForUserAgent.c_str()]];
-    }
-    if (oldViewProps.cacheEnabled != newViewProps.cacheEnabled) {
-        [_view setCacheEnabled:newViewProps.cacheEnabled];
-    }
-    if (oldViewProps.allowsLinkPreview != newViewProps.allowsLinkPreview) {
-        [_view setAllowsLinkPreview:newViewProps.allowsLinkPreview];
-    }
-    if (oldViewProps.allowingReadAccessToURL != newViewProps.allowingReadAccessToURL) {
-        [_view setAllowingReadAccessToURL:[[NSString alloc] initWithUTF8String: newViewProps.allowingReadAccessToURL.c_str()]];
-    }
+
     if (oldViewProps.basicAuthCredential.username != newViewProps.basicAuthCredential.username || oldViewProps.basicAuthCredential.password != newViewProps.basicAuthCredential.password) {
         [_view setBasicAuthCredential: @{
-            @"username": [[NSString alloc] initWithUTF8String: newViewProps.basicAuthCredential.username.c_str()],
-            @"password": [[NSString alloc] initWithUTF8String: newViewProps.basicAuthCredential.password.c_str()]
+            @"username": RCTNSStringFromString(newViewProps.basicAuthCredential.username),
+            @"password": RCTNSStringFromString(newViewProps.basicAuthCredential.password)
         }];
     }
-    
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     if (oldViewProps.contentInsetAdjustmentBehavior != newViewProps.contentInsetAdjustmentBehavior) {
-        [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
+        if (newViewProps.contentInsetAdjustmentBehavior == "never") {
+            [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
+        } else if (newViewProps.contentInsetAdjustmentBehavior == "automatic") {
+            [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAutomatic];
+        } else if (newViewProps.contentInsetAdjustmentBehavior == "scrollableAxes") {
+            [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentScrollableAxes];
+        } else if (newViewProps.contentInsetAdjustmentBehavior == "always") {
+            [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAlways];
+        }
     }
-RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentBehavior)
-#endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustsScrollIndicatorInsets, BOOL)
-#endif
 
+//
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
-RCT_EXPORT_VIEW_PROPERTY(contentMode, WKContentMode)
-#endif
-
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
-RCT_EXPORT_VIEW_PROPERTY(limitsNavigationsToAppBoundDomains, BOOL)
-#endif
-
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* iOS 14.5 */
-RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
+    if (oldViewProps.contentMode != newViewProps.contentMode) {
+        if (newViewProps.contentMode == "recommended") {
+            [_view setContentMode: WKContentModeRecommended];
+        } else if (newViewProps.contentMode == "mobile") {
+            [_view setContentMode:WKContentModeMobile];
+        } else if (newViewProps.contentMode == "desktop") {
+            [_view setContentMode:WKContentModeDesktop];
+        }
+    }
 #endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
-RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, RNCWebViewPermissionGrantType)
+    if (oldViewProps.mediaCapturePermissionGrantType != newViewProps.mediaCapturePermissionGrantType) {
+        if (newViewProps.mediaCapturePermissionGrantType == "prompt") {
+            [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Prompt];
+        } else if (newViewProps.mediaCapturePermissionGrantType == "grant") {
+            [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Grant];
+        } else if (newViewProps.mediaCapturePermissionGrantType == "deny") {
+            [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Deny];
+        }else if (newViewProps.mediaCapturePermissionGrantType == "grantIfSameHostElsePrompt") {
+            [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt];
+        }else if (newViewProps.mediaCapturePermissionGrantType == "grantIfSameHostElseDeny") {
+            [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
+        }
+    }
 #endif
-    
-    
     [super updateProps:props oldProps:oldProps];
 }
 
