@@ -59,6 +59,12 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      * Tells this WebView to clear its internal back/forward list.
      */
     clearHistory?: () => void;
+
+    /**
+     * Explicitly release the native WebView instance if it hasn't released after the React
+     * component unmounts;
+     */
+    release: () => void;
 }
 
 export {WebView};
