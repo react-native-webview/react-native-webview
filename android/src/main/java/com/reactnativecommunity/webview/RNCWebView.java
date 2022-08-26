@@ -66,6 +66,9 @@ class RNCWebView extends FrameLayout implements LifecycleEventListener {
   protected boolean hasScrollEvent = false;
   protected boolean nestedScrollEnabled = false;
   protected ProgressChangedFilter progressChangedFilter;
+  protected boolean keepWebViewInstanceAfterUnmount = false;
+  protected @Nullable String webViewKey = null;
+  protected boolean sourceInitialized = false;
   WebView webView;
 
   /**
@@ -87,6 +90,14 @@ class RNCWebView extends FrameLayout implements LifecycleEventListener {
 
   public WebView getWebView() {
     return this.webView;
+  }
+
+  public void setWebView(WebView webView) {
+    this.webView = webView;
+    webView.setLayoutParams(new ViewGroup.LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.MATCH_PARENT));
+    addView(this.webView);
   }
 
   public WebSettings getSettings() {
@@ -111,6 +122,14 @@ class RNCWebView extends FrameLayout implements LifecycleEventListener {
 
   public void setNestedScrollEnabled(boolean nestedScrollEnabled) {
     this.nestedScrollEnabled = nestedScrollEnabled;
+  }
+
+  public void markSourceInitialized() {
+    this.sourceInitialized = true;
+  }
+
+  public boolean isSourceInitialized() {
+    return this.sourceInitialized;
   }
 
   @Override
@@ -188,6 +207,22 @@ class RNCWebView extends FrameLayout implements LifecycleEventListener {
 
   public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(boolean enabled) {
     injectedJavaScriptBeforeContentLoadedForMainFrameOnly = enabled;
+  }
+
+  public void setKeepWebViewInstanceAfterUnmount(boolean keep) {
+    keepWebViewInstanceAfterUnmount = keep;
+  }
+
+  public void setWebViewKey(String key) {
+    webViewKey = key;
+  }
+
+  public String getWebViewKey() {
+    return webViewKey;
+  }
+
+  public boolean configuredToKeepWebViewInstance() {
+    return this.keepWebViewInstanceAfterUnmount && this.webViewKey != null;
   }
 
   protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {

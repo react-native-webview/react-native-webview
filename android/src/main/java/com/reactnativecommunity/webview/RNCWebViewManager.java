@@ -139,9 +139,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
   public static final int COMMAND_LOAD_URL = 7;
   public static final int COMMAND_FOCUS = 8;
 
-  // commands added by Discord
-  public static final int COMMAND_RELEASE = 4001;
-
   // android commands
   public static final int COMMAND_CLEAR_FORM_DATA = 1000;
   public static final int COMMAND_CLEAR_CACHE = 1001;
@@ -167,6 +164,8 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
   protected @Nullable String mDownloadingMessage = null;
   protected @Nullable String mLackPermissionToDownloadMessage = null;
 
+  protected ReactContext mReactContext;
+
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
@@ -191,6 +190,8 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   protected RNCWebView createViewInstance(ThemedReactContext reactContext) {
     RNCWebView rncWebView = createRNCWebViewInstance(reactContext);
+
+    this.mReactContext = reactContext;
 
     // TODO: move setupWebChromeClient, configWebView, and WebSettings into RNCWebView.java
     setupWebChromeClient(reactContext, rncWebView);
@@ -532,6 +533,24 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
   @ReactProp(name = "source")
   public void setSource(RNCWebView view, @Nullable ReadableMap source) {
+    RNCWebViewModule module = getModule(mReactContext);
+
+    if (view.configuredToKeepWebViewInstance()) {
+      if (!view.isSourceInitialized() && module.isWebViewInstancePreserved(view.getWebViewKey())) {
+        WebView webview = module.getPreservedWebViewInstance(view.getWebViewKey());
+        ViewGroup parent = (ViewGroup) webview.getParent();
+        if (parent != null) {
+          parent.removeView(webview);
+        }
+        view.setWebView(webview);
+        view.markSourceInitialized();
+        return;
+      } else {
+        module.preserveWebViewInstance(view.getWebViewKey(), view.getWebView());
+        view.markSourceInitialized();
+      }
+    }
+
     if (source != null) {
       if (source.hasKey("html")) {
         String html = source.getString("html");
@@ -680,6 +699,16 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     view.getSettings().setMinimumFontSize(fontSize);
   }
 
+  @ReactProp(name = "keepWebViewInstanceAfterUnmount")
+  public void setKeepWebViewInstanceAfterUnmount(RNCWebView view, boolean keep) {
+    view.setKeepWebViewInstanceAfterUnmount(keep);
+  }
+
+  @ReactProp(name = "webViewKey")
+  public void setWebViewKey(RNCWebView view, String key) {
+    view.setWebViewKey(key);
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, RNCWebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -722,7 +751,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
       .put("clearCache", COMMAND_CLEAR_CACHE)
       .put("clearHistory", COMMAND_CLEAR_HISTORY)
-      .put("release", COMMAND_RELEASE)
       .build();
   }
 
@@ -785,15 +813,20 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       case "clearHistory":
         root.getWebView().clearHistory();
         break;
-      case "release":
-        // no-op for now
-        break;
     }
     super.receiveCommand(root, commandId, args);
   }
 
   @Override
   public void onDropViewInstance(RNCWebView rncWebView) {
+    RNCWebViewModule module = getModule(mReactContext);
+    if (rncWebView.configuredToKeepWebViewInstance() && module.isWebViewInstancePreserved(rncWebView.getWebViewKey())) {
+      WebView preservedInstance = module.getPreservedWebViewInstance(rncWebView.getWebViewKey());
+      if (preservedInstance == rncWebView.getWebView()) {
+        return;
+      }
+    }
+
     super.onDropViewInstance(rncWebView);
     ((ThemedReactContext) rncWebView.getContext()).removeLifecycleEventListener(rncWebView);
     rncWebView.cleanupCallbacksAndDestroy();

@@ -23,6 +23,7 @@ import android.webkit.MimeTypeMap;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.widget.Toast;
+import android.webkit.WebView;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Promise;
@@ -53,6 +54,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   private File outputImage;
   private File outputVideo;
   private DownloadManager.Request downloadRequest;
+  private HashMap<String, WebView> preservedWebViewInstances = new HashMap<>();
 
   protected static class ShouldOverrideUrlLoadingLock {
     protected enum ShouldOverrideCallbackState {
@@ -149,6 +151,33 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
         lockObject.notify();
       }
     }
+  }
+
+  public void preserveWebViewInstance(String key, WebView view) {
+    this.preservedWebViewInstances.put(key, view);
+  }
+
+  public WebView getPreservedWebViewInstance(String key) {
+    return this.preservedWebViewInstances.get(key);
+  }
+
+  public boolean isWebViewInstancePreserved(String key) {
+    return this.preservedWebViewInstances.containsKey(key);
+  }
+
+  @ReactMethod
+  public void isWebViewInstancePreserved(String key, Promise promise) {
+    promise.resolve(this.preservedWebViewInstances.containsKey(key));
+  }
+
+  @ReactMethod
+  public void releasePreservedWebViewInstance(String key) {
+    this.preservedWebViewInstances.remove(key);
+  }
+
+  @ReactMethod
+  public void clearPreservedWebViewInstances() {
+    this.preservedWebViewInstances.clear();
   }
 
   public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
