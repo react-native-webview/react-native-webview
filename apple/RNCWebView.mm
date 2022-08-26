@@ -90,11 +90,85 @@ return self;
     if (oldViewProps.mediaPlaybackRequiresUserAction != newViewProps.mediaPlaybackRequiresUserAction) {
         [_view setMediaPlaybackRequiresUserAction:newViewProps.mediaPlaybackRequiresUserAction];
     }
+#if WEBKIT_IOS_10_APIS_AVAILABLE
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
-        [_view setDataDetectorTypes:newViewProps.dataDetectorTypes];
+        // TODO: FIXME
+        // [_view setDataDetectorTypes:newViewProps.dataDetectorTypes];
+    }
+#endif
+    if (oldViewProps.contentInset.top != newViewProps.contentInset.top || oldViewProps.contentInset.left != newViewProps.contentInset.left || oldViewProps.contentInset.right != newViewProps.contentInset.right || oldViewProps.contentInset.bottom != newViewProps.contentInset.bottom) {
+        UIEdgeInsets edgesInsets = {
+            .top = newViewProps.contentInset.top,
+            .left = newViewProps.contentInset.left,
+            .right = newViewProps.contentInset.right,
+            .bottom = newViewProps.contentInset.bottom
+        };
+        [_view setContentInset: edgesInsets];
+    }
+    if (oldViewProps.automaticallyAdjustContentInsets != newViewProps.automaticallyAdjustContentInsets) {
+        [_view setAutomaticallyAdjustContentInsets:newViewProps.automaticallyAdjustContentInsets];
+    }
+    if (oldViewProps.autoManageStatusBarEnabled != newViewProps.autoManageStatusBarEnabled) {
+        [_view setAutoManageStatusBarEnabled:newViewProps.autoManageStatusBarEnabled];
+    }
+    if (oldViewProps.hideKeyboardAccessoryView != newViewProps.hideKeyboardAccessoryView) {
+        [_view setHideKeyboardAccessoryView:newViewProps.hideKeyboardAccessoryView];
+    }
+    if (oldViewProps.allowsBackForwardNavigationGestures != newViewProps.allowsBackForwardNavigationGestures) {
+        [_view setAllowsBackForwardNavigationGestures:newViewProps.allowsBackForwardNavigationGestures];
+    }
+    if (oldViewProps.incognito != newViewProps.incognito) {
+        [_view setIncognito:newViewProps.incognito];
+    }
+    if (oldViewProps.pagingEnabled != newViewProps.pagingEnabled) {
+        [_view setPagingEnabled:newViewProps.pagingEnabled];
+    }
+    if (oldViewProps.applicationNameForUserAgent != newViewProps.applicationNameForUserAgent) {
+        [_view setApplicationNameForUserAgent:[[NSString alloc] initWithUTF8String: newViewProps.applicationNameForUserAgent.c_str()]];
+    }
+    if (oldViewProps.cacheEnabled != newViewProps.cacheEnabled) {
+        [_view setCacheEnabled:newViewProps.cacheEnabled];
+    }
+    if (oldViewProps.allowsLinkPreview != newViewProps.allowsLinkPreview) {
+        [_view setAllowsLinkPreview:newViewProps.allowsLinkPreview];
+    }
+    if (oldViewProps.allowingReadAccessToURL != newViewProps.allowingReadAccessToURL) {
+        [_view setAllowingReadAccessToURL:[[NSString alloc] initWithUTF8String: newViewProps.allowingReadAccessToURL.c_str()]];
+    }
+    if (oldViewProps.basicAuthCredential.username != newViewProps.basicAuthCredential.username || oldViewProps.basicAuthCredential.password != newViewProps.basicAuthCredential.password) {
+        [_view setBasicAuthCredential: @{
+            @"username": [[NSString alloc] initWithUTF8String: newViewProps.basicAuthCredential.username.c_str()],
+            @"password": [[NSString alloc] initWithUTF8String: newViewProps.basicAuthCredential.password.c_str()]
+        }];
     }
     
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+    if (oldViewProps.contentInsetAdjustmentBehavior != newViewProps.contentInsetAdjustmentBehavior) {
+        [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
+    }
+RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentBehavior)
+#endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustsScrollIndicatorInsets, BOOL)
+#endif
 
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
+RCT_EXPORT_VIEW_PROPERTY(contentMode, WKContentMode)
+#endif
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
+RCT_EXPORT_VIEW_PROPERTY(limitsNavigationsToAppBoundDomains, BOOL)
+#endif
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* iOS 14.5 */
+RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
+#endif
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, RNCWebViewPermissionGrantType)
+#endif
+    
+    
     [super updateProps:props oldProps:oldProps];
 }
 

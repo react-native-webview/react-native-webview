@@ -2,6 +2,7 @@
 
 @implementation RNCWebViewLockManager
 
+@synthesize nextLockIdentifier;
 @synthesize shouldOverrideLocks;
 @synthesize shouldOverrideResponses;
 

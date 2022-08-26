@@ -2,7 +2,7 @@
 #import <React/RCTLog.h>
 
 @interface RNCWebViewLockManager : NSObject {
-    int *nextLockIdentifier;
+    int nextLockIdentifier;
     NSMutableDictionary *shouldOverrideLocks;
     NSMutableDictionary *shouldOverrideResponses;
 }
