@@ -53,6 +53,46 @@ return self;
             @"uri": [[NSString alloc] initWithUTF8String: newViewProps.source.uri.c_str()],
         }];
     }
+    if (oldViewProps.scrollEnabled != newViewProps.scrollEnabled) {
+        [_view setScrollEnabled:newViewProps.scrollEnabled];
+    }
+    if (oldViewProps.injectedJavaScript != newViewProps.injectedJavaScript) {
+        [_view setInjectedJavaScript: [[NSString alloc] initWithUTF8String: newViewProps.injectedJavaScript.c_str()]];
+    }
+    if (oldViewProps.injectedJavaScriptBeforeContentLoaded != newViewProps.injectedJavaScriptBeforeContentLoaded) {
+        [_view setInjectedJavaScriptBeforeContentLoaded: [[NSString alloc] initWithUTF8String: newViewProps.injectedJavaScriptBeforeContentLoaded.c_str()]];
+    }
+    if (oldViewProps.injectedJavaScriptForMainFrameOnly != newViewProps.injectedJavaScriptForMainFrameOnly) {
+        [_view setInjectedJavaScriptForMainFrameOnly:newViewProps.injectedJavaScriptForMainFrameOnly];
+    }
+    if (oldViewProps.injectedJavaScriptBeforeContentLoadedForMainFrameOnly != newViewProps.injectedJavaScriptBeforeContentLoadedForMainFrameOnly) {
+        [_view setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly:newViewProps.injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
+    }
+    if (oldViewProps.javaScriptEnabled != newViewProps.javaScriptEnabled) {
+        [_view setJavaScriptEnabled:newViewProps.javaScriptEnabled];
+    }
+    if (oldViewProps.javaScriptCanOpenWindowsAutomatically != newViewProps.javaScriptCanOpenWindowsAutomatically) {
+        [_view setJavaScriptCanOpenWindowsAutomatically:newViewProps.javaScriptCanOpenWindowsAutomatically];
+    }
+    if (oldViewProps.allowFileAccessFromFileURLs != newViewProps.allowFileAccessFromFileURLs) {
+        [_view setAllowFileAccessFromFileURLs:newViewProps.allowFileAccessFromFileURLs];
+    }
+    if (oldViewProps.allowUniversalAccessFromFileURLs != newViewProps.allowUniversalAccessFromFileURLs) {
+        [_view setAllowUniversalAccessFromFileURLs:newViewProps.allowUniversalAccessFromFileURLs];
+    }
+    if (oldViewProps.allowsInlineMediaPlayback != newViewProps.allowsInlineMediaPlayback) {
+        [_view setAllowsInlineMediaPlayback:newViewProps.allowsInlineMediaPlayback];
+    }
+    
+    if (oldViewProps.allowsAirPlayForMediaPlayback != newViewProps.allowsAirPlayForMediaPlayback) {
+        [_view setAllowsAirPlayForMediaPlayback:newViewProps.allowsAirPlayForMediaPlayback];
+    }
+    if (oldViewProps.mediaPlaybackRequiresUserAction != newViewProps.mediaPlaybackRequiresUserAction) {
+        [_view setMediaPlaybackRequiresUserAction:newViewProps.mediaPlaybackRequiresUserAction];
+    }
+    if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
+        [_view setDataDetectorTypes:newViewProps.dataDetectorTypes];
+    }
     
 
     [super updateProps:props oldProps:oldProps];

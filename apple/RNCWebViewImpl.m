@@ -6,6 +6,7 @@
  */
 
 #import "RNCWebViewImpl.h"
+#import "RNCWebViewLockManager.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
@@ -1142,19 +1143,20 @@ RCTAutoInsetsProtocol>
   BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
 
   if (_onShouldStartLoadWithRequest) {
-    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    [event addEntriesFromDictionary: @{
-      @"url": (request.URL).absoluteString,
-      @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
-      @"navigationType": navigationTypes[@(navigationType)],
-      @"isTopFrame": @(isTopFrame)
-    }];
-    if (![self.delegate webView:self
-      shouldStartLoadForRequest:event
-                   withCallback:_onShouldStartLoadWithRequest]) {
-      decisionHandler(WKNavigationActionPolicyCancel);
-      return;
-    }
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      int lockIdentifier = [[RNCWebViewLockManager getInstance] getNewLock];
+      [event addEntriesFromDictionary: @{
+          @"url": (request.URL).absoluteString,
+          @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
+          @"navigationType": navigationTypes[@(navigationType)],
+          @"isTopFrame": @(isTopFrame),
+          @"lockIdentifier": @(lockIdentifier)
+      }];
+      _onShouldStartLoadWithRequest(event);
+      if (![[RNCWebViewLockManager getInstance] getLockResult: lockIdentifier]) {
+          decisionHandler(WKNavigationActionPolicyCancel);
+          return;
+      }
   }
 
   if (_onLoadingStart) {

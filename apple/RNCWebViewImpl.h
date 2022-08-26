@@ -53,9 +53,9 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) BOOL allowsAirPlayForMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;
-#if WEBKIT_IOS_10_APIS_AVAILABLE
+//#if WEBKIT_IOS_10_APIS_AVAILABLE
 @property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
-#endif
+//#endif
 @property (nonatomic, assign) UIEdgeInsets contentInset;
 @property (nonatomic, assign) BOOL automaticallyAdjustContentInsets;
 @property (nonatomic, assign) BOOL keyboardDisplayRequiresUserAction;

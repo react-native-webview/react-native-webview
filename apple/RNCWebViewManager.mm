@@ -1,5 +1,6 @@
 #import <React/RCTViewManager.h>
 #import "RNCWebViewImpl.h"
+#import "RNCWebViewLockManager.h"
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "RNCWebViewSpec/RNCWebViewSpec.h"
 #endif
@@ -154,37 +155,10 @@ RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebViewImpl
   view.keyboardDisplayRequiresUserAction = json == nil ? true : [RCTConvert BOOL: json];
 }
 
-- (BOOL)          webView:(RNCWebViewImpl *)webView
-shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
-             withCallback:(RCTDirectEventBlock)callback
-{
-  _shouldStartLoadLock = [[NSConditionLock alloc] initWithCondition:arc4random()];
-  _shouldStartLoad = YES;
-  request[@"lockIdentifier"] = @(_shouldStartLoadLock.condition);
-  callback(request);
-
-  // Block the main thread for a maximum of 250ms until the JS thread returns
-  if ([_shouldStartLoadLock lockWhenCondition:0 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.25]]) {
-    BOOL returnValue = _shouldStartLoad;
-    [_shouldStartLoadLock unlock];
-    _shouldStartLoadLock = nil;
-    return returnValue;
-  } else {
-    RCTLogWarn(@"Did not receive response to shouldStartLoad in time, defaulting to YES");
-    return YES;
-  }
-}
-
 RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart
                                         lockIdentifier:(double)lockIdentifier)
 {
-  if ([_shouldStartLoadLock tryLockWhenCondition:lockIdentifier]) {
-    _shouldStartLoad = shouldStart;
-    [_shouldStartLoadLock unlockWithCondition:0];
-  } else {
-    RCTLogWarn(@"shouldStartLoadWithLockIdentifier invoked with invalid lockIdentifier: "
-               "got %lld, expected %lld", (long long)lockIdentifier, (long long)_shouldStartLoadLock.condition);
-  }
+    [[RNCWebViewLockManager getInstance] setResult:shouldStart forLockIdentifier:(int)lockIdentifier];
 }
 
 // Thanks to this guard, we won't compile this code when we build for the old architecture.
