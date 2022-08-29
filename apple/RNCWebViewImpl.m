@@ -6,7 +6,6 @@
  */
 
 #import "RNCWebViewImpl.h"
-#import "RNCWebViewLockManager.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
@@ -1110,55 +1109,72 @@ RCTAutoInsetsProtocol>
   decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
                   decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
-  static NSDictionary<NSNumber *, NSString *> *navigationTypes;
-  static dispatch_once_t onceToken;
-
-  dispatch_once(&onceToken, ^{
-    navigationTypes = @{
-      @(WKNavigationTypeLinkActivated): @"click",
-      @(WKNavigationTypeFormSubmitted): @"formsubmit",
-      @(WKNavigationTypeBackForward): @"backforward",
-      @(WKNavigationTypeReload): @"reload",
-      @(WKNavigationTypeFormResubmitted): @"formresubmit",
-      @(WKNavigationTypeOther): @"other",
-    };
-  });
-
-  WKNavigationType navigationType = navigationAction.navigationType;
-  NSURLRequest *request = navigationAction.request;
-  BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
+    static NSDictionary<NSNumber *, NSString *> *navigationTypes;
+    static dispatch_once_t onceToken;
     
-  if (_onShouldStartLoadWithRequest) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-      int lockIdentifier = [[RNCWebViewLockManager getInstance] getNewLock];
-      [event addEntriesFromDictionary: @{
-          @"url": (request.URL).absoluteString,
-          @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
-          @"navigationType": navigationTypes[@(navigationType)],
-          @"isTopFrame": @(isTopFrame),
-          @"lockIdentifier": @(lockIdentifier)
-      }];
-      _onShouldStartLoadWithRequest(event);
-      if (![[RNCWebViewLockManager getInstance] getLockResult: lockIdentifier]) {
-          decisionHandler(WKNavigationActionPolicyCancel);
-          return;
-      }
-  }
+    dispatch_once(&onceToken, ^{
+        navigationTypes = @{
+            @(WKNavigationTypeLinkActivated): @"click",
+            @(WKNavigationTypeFormSubmitted): @"formsubmit",
+            @(WKNavigationTypeBackForward): @"backforward",
+            @(WKNavigationTypeReload): @"reload",
+            @(WKNavigationTypeFormResubmitted): @"formresubmit",
+            @(WKNavigationTypeOther): @"other",
+        };
+    });
+    
+    WKNavigationType navigationType = navigationAction.navigationType;
+    NSURLRequest *request = navigationAction.request;
+    BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
+        
+    if (_onShouldStartLoadWithRequest) {
+        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+        int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
+            if (!shouldStart) {
+                decisionHandler(WKNavigationActionPolicyCancel);
+                return;
+            }
+            if (self->_onLoadingStart) {
+                // We have this check to filter out iframe requests and whatnot
+                if (isTopFrame) {
+                    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+                    [event addEntriesFromDictionary: @{
+                        @"url": (request.URL).absoluteString,
+                        @"navigationType": navigationTypes[@(navigationType)]
+                    }];
+                    self->_onLoadingStart(event);
+                }
+            }
 
-  if (_onLoadingStart) {
-    // We have this check to filter out iframe requests and whatnot
-    if (isTopFrame) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-      [event addEntriesFromDictionary: @{
-        @"url": (request.URL).absoluteString,
-        @"navigationType": navigationTypes[@(navigationType)]
-      }];
-      _onLoadingStart(event);
+            // Allow all navigation by default
+            decisionHandler(WKNavigationActionPolicyAllow);
+        }];
+        [event addEntriesFromDictionary: @{
+            @"url": (request.URL).absoluteString,
+            @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
+            @"navigationType": navigationTypes[@(navigationType)],
+            @"isTopFrame": @(isTopFrame),
+            @"lockIdentifier": @(lockIdentifier)
+        }];
+        _onShouldStartLoadWithRequest(event);
+        // decisionHandler(WKNavigationActionPolicyAllow);
+        return;
     }
-  }
-
-  // Allow all navigation by default
-  decisionHandler(WKNavigationActionPolicyAllow);
+    
+    if (_onLoadingStart) {
+        // We have this check to filter out iframe requests and whatnot
+        if (isTopFrame) {
+            NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+            [event addEntriesFromDictionary: @{
+                @"url": (request.URL).absoluteString,
+                @"navigationType": navigationTypes[@(navigationType)]
+            }];
+            _onLoadingStart(event);
+        }
+    }
+    
+    // Allow all navigation by default
+    decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 /**

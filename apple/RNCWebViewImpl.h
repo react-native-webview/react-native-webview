@@ -10,6 +10,7 @@
 #import <UIKit/UIScrollView.h>
 #import <WebKit/WKDataDetectorTypes.h>
 #import <WebKit/WebKit.h>
+#import "RNCWebViewDecisionManager.h"
 
 typedef enum RNCWebViewPermissionGrantType : NSUInteger {
   RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt,

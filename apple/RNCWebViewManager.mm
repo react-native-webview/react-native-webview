@@ -1,6 +1,6 @@
 #import <React/RCTViewManager.h>
 #import "RNCWebViewImpl.h"
-#import "RNCWebViewLockManager.h"
+#import "RNCWebViewDecisionManager.h"
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "RNCWebViewSpec/RNCWebViewSpec.h"
 #endif
@@ -158,7 +158,7 @@ RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebViewImpl
 RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart
                                         lockIdentifier:(double)lockIdentifier)
 {
-    [[RNCWebViewLockManager getInstance] setResult:shouldStart forLockIdentifier:(int)lockIdentifier];
+    [[RNCWebViewDecisionManager getInstance] setResult:shouldStart forLockIdentifier:(int)lockIdentifier];
 }
 
 // Thanks to this guard, we won't compile this code when we build for the old architecture.

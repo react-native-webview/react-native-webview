@@ -49,11 +49,16 @@ if (self = [super initWithFrame:frame]) {
 return self;
 }
 
+- (void)updateEventEmitter:(EventEmitter::Shared const &)eventEmitter
+{
+    [super updateEventEmitter:eventEmitter];
+}
+
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
     const auto &oldViewProps = *std::static_pointer_cast<RNCWebViewProps const>(_props);
     const auto &newViewProps = *std::static_pointer_cast<RNCWebViewProps const>(props);
-    
+
 #define REMAP_WEBVIEW_PROP(name)                    \
     if (oldViewProps.name != newViewProps.name) {   \
         _view.name = newViewProps.name;             \
@@ -187,7 +192,7 @@ return self;
 
 Class<RCTComponentViewProtocol> RNCWebViewCls(void)
 {
-return RNCWebView.class;
+    return RNCWebView.class;
 }
 
 @end
