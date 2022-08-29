@@ -1130,24 +1130,27 @@ RCTAutoInsetsProtocol>
     if (_onShouldStartLoadWithRequest) {
         NSMutableDictionary<NSString *, id> *event = [self baseEvent];
         int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
-            if (!shouldStart) {
-                decisionHandler(WKNavigationActionPolicyCancel);
-                return;
-            }
-            if (self->_onLoadingStart) {
-                // We have this check to filter out iframe requests and whatnot
-                if (isTopFrame) {
-                    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-                    [event addEntriesFromDictionary: @{
-                        @"url": (request.URL).absoluteString,
-                        @"navigationType": navigationTypes[@(navigationType)]
-                    }];
-                    self->_onLoadingStart(event);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!shouldStart) {
+                    decisionHandler(WKNavigationActionPolicyCancel);
+                    return;
                 }
-            }
+                if (self->_onLoadingStart) {
+                    // We have this check to filter out iframe requests and whatnot
+                    if (isTopFrame) {
+                        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+                        [event addEntriesFromDictionary: @{
+                            @"url": (request.URL).absoluteString,
+                            @"navigationType": navigationTypes[@(navigationType)]
+                        }];
+                        self->_onLoadingStart(event);
+                    }
+                }
+                
+                // Allow all navigation by default
+                decisionHandler(WKNavigationActionPolicyAllow);
+            });
 
-            // Allow all navigation by default
-            decisionHandler(WKNavigationActionPolicyAllow);
         }];
         [event addEntriesFromDictionary: @{
             @"url": (request.URL).absoluteString,

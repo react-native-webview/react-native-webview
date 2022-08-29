@@ -12,6 +12,24 @@
 
 using namespace facebook::react;
 
+auto stringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string value) {
+    if (value == "click") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Click;
+    if (value == "formsubmit") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Formsubmit;
+    if (value == "backforward") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Backforward;
+    if (value == "reload") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Reload;
+    if (value == "formresubmit") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Formresubmit;
+    return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Other;
+}
+
+auto stringToOnLoadingStartNavigationTypeEnum(std::string value) {
+    if (value == "click") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Click;
+    if (value == "formsubmit") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Formsubmit;
+    if (value == "backforward") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Backforward;
+    if (value == "reload") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Reload;
+    if (value == "formresubmit") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Formresubmit;
+    return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Other;
+}
+
 @interface RNCWebView () <RCTRNCWebViewViewProtocol>
 
 @end
@@ -38,10 +56,33 @@ if (self = [super initWithFrame:frame]) {
             auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
             facebook::react::RNCWebViewEventEmitter::OnShouldStartLoadWithRequest data = {
                 .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue]
+                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                .navigationType = stringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
+                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                .isTopFrame = [[dictionary valueForKey:@"isTopFrame"] boolValue],
+                .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String])
             };
             webViewEventEmitter->onShouldStartLoadWithRequest(data);
         };
+    };
+    _view.onLoadingStart = [self](NSDictionary* dictionary) {
+        if (_eventEmitter) {
+            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+            facebook::react::RNCWebViewEventEmitter::OnLoadingStart data = {
+                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                .navigationType = stringToOnLoadingStartNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
+                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String] != nil ? [[dictionary valueForKey:@"mainDocumentURL"] UTF8String] : "")
+            };
+            webViewEventEmitter->onLoadingStart(data);
+        }
     };
     self.contentView = _view;
 }

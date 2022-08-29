@@ -92,7 +92,6 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     _url: string,
     lockIdentifier = 0,
   ) => {
-    console.log("JE TE REPONDS")
     RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
   }, []);
 
