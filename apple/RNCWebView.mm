@@ -79,7 +79,7 @@ if (self = [super initWithFrame:frame]) {
                 .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
                 .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
                 .loading = [[dictionary valueForKey:@"loading"] boolValue],
-                .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String] != nil ? [[dictionary valueForKey:@"mainDocumentURL"] UTF8String] : "")
+                .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String], [[dictionary valueForKey:@"mainDocumentURL"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
             };
             webViewEventEmitter->onLoadingStart(data);
         }
