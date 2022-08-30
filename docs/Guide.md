@@ -364,7 +364,7 @@ By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the J
 
 #### The `injectJavaScript` method
 
-While convenient, the downside to the previously mentioned `injectedJavaScript` prop is that it only runs once. That's why we also expose a method on the webview ref called `injectJavaScript` (note the slightly different name!).
+While convenient, the downside to the previously mentioned `injectedJavaScriptBeforeContentLoaded` prop is that it only runs once. That's why we also expose a method on the webview ref called `injectJavaScript` (note the slightly different name!).
 
 ```jsx
 import React, { Component } from 'react';
