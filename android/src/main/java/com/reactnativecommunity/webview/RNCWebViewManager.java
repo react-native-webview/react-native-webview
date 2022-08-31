@@ -164,7 +164,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
   protected @Nullable String mDownloadingMessage = null;
   protected @Nullable String mLackPermissionToDownloadMessage = null;
 
-  protected HashMap<String, WebView> keepedWebViewInstances = new HashMap<>();
   protected ReactContext mReactContext;
 
   public RNCWebViewManager() {
