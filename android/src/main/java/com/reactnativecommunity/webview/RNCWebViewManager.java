@@ -533,23 +533,23 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
   @ReactProp(name = "source")
   public void setSource(RNCWebView view, @Nullable ReadableMap source) {
-    // そのように設定されている場合、初回の呼び出しは保持されている WebView インスタンスを利用する。
-    boolean initialized = view.isSourceInitialized();
-    view.markSourceInitialized();
-    RNCWebViewModule module = getModule(mReactContext);
-
-    if (view.configuredToKeepWebViewInstance() && !initialized && module.isWebViewInstancePreserved(view.getWebViewKey())) {
-      WebView webview = module.getPreservedWebViewInstance(view.getWebViewKey());
-      ViewGroup parent = (ViewGroup) webview.getParent();
-      if (parent != null) {
-        parent.removeView(webview);
-      }
-      view.setWebView(webview);
-      return;
-    }
-
+    // WebView インスタンスを使い回すようオプションが設定されている場合
     if (view.configuredToKeepWebViewInstance()) {
-      module.preserveWebViewInstance(view.getWebViewKey(), view.getWebView());
+      // 初回の setSource 呼び出しで、かつ保持されている WebView インスタンスが既にある場合は、それを利用する。loadUrl() などは呼び出さない
+      if (!view.isSourceInitialized() && module.isWebViewInstancePreserved(view.getWebViewKey())) {
+        WebView webview = module.getPreservedWebViewInstance(view.getWebViewKey());
+        ViewGroup parent = (ViewGroup) webview.getParent();
+        if (parent != null) {
+          parent.removeView(webview);
+        }
+        view.setWebView(webview);
+        view.markSourceInitialized();
+        return;
+      } else {
+        // そうでない場合はインスタンスを保持し、loadUrl() などの以降の処理も行う
+        module.preserveWebViewInstance(view.getWebViewKey(), view.getWebView());
+        view.markSourceInitialized();
+      }
     }
 
     if (source != null) {
