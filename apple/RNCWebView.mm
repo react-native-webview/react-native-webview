@@ -141,7 +141,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                    .navigationType = stringToOnLoadingFinishNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
+                    .navigationType = stringToOnLoadingFinishNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String], [[dictionary valueForKey:@"navigationType"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])),
                     .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
                     .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
                     .loading = [[dictionary valueForKey:@"loading"] boolValue],
