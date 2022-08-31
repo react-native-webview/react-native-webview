@@ -10,6 +10,17 @@ export type WebViewNativeEvent = Readonly<{
   canGoForward: boolean;
   lockIdentifier: Double;
 }>
+export type WebViewCustomMenuSelectionEvent = Readonly<{
+  url: string;
+  loading: boolean;
+  title: string;
+  canGoBack: boolean;
+  canGoForward: boolean;
+  lockIdentifier: Double;
+  label: string;
+  key: string;
+  selectedText: string;
+}>
 export type WebViewMessageEvent = Readonly<{
   url: string;
   loading: boolean;
@@ -123,7 +134,7 @@ type WebViewRenderProcessGoneEvent = Readonly<{
 }>
 
 type WebViewDownloadEvent = Readonly<{
-  downloadUrl: boolean;
+  downloadUrl: string;
 }>
 
 export interface NativeProps extends ViewProps {
@@ -181,6 +192,7 @@ export interface NativeProps extends ViewProps {
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;
+  onCustomMenuSelection?: DirectEventHandler<WebViewCustomMenuSelectionEvent>;
   onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
   limitsNavigationsToAppBoundDomains?: boolean;
   textInteractionEnabled?: boolean;
