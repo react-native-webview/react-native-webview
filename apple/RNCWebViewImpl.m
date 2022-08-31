@@ -1441,6 +1441,13 @@ didFinishNavigation:(WKNavigation *)navigation
   }
 }
 
+- (void)setEnableApplePay:(BOOL)enableApplePay {
+    _enableApplePay = enableApplePay;
+    if(_webView != nil){
+      [self resetupScripts:_webView.configuration];
+    }
+}
+
 - (void)setInjectedJavaScriptBeforeContentLoaded:(NSString *)source {
   _injectedJavaScriptBeforeContentLoaded = source;
 
