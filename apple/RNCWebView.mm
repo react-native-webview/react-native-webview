@@ -54,177 +54,177 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
-if (self = [super initWithFrame:frame]) {
-    static const auto defaultProps = std::make_shared<const RNCWebViewProps>();
-    _props = defaultProps;
-
-    _view = [[RNCWebViewImpl alloc] init];
-    
-    _view.onShouldStartLoadWithRequest = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnShouldStartLoadWithRequest data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .navigationType = stringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .isTopFrame = [[dictionary valueForKey:@"isTopFrame"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue],
-                .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String])
+    if (self = [super initWithFrame:frame]) {
+        static const auto defaultProps = std::make_shared<const RNCWebViewProps>();
+        _props = defaultProps;
+        
+        _view = [[RNCWebViewImpl alloc] init];
+        
+        _view.onShouldStartLoadWithRequest = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnShouldStartLoadWithRequest data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .navigationType = stringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .isTopFrame = [[dictionary valueForKey:@"isTopFrame"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String])
+                };
+                webViewEventEmitter->onShouldStartLoadWithRequest(data);
             };
-            webViewEventEmitter->onShouldStartLoadWithRequest(data);
         };
-    };
-    _view.onLoadingStart = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnLoadingStart data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .navigationType = stringToOnLoadingStartNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue],
-                .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String], [[dictionary valueForKey:@"mainDocumentURL"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
-            };
-            webViewEventEmitter->onLoadingStart(data);
-        }
-    };
-    _view.onLoadingError = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnLoadingError data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .code = [[dictionary valueForKey:@"code"] intValue],
-                .description = std::string([[dictionary valueForKey:@"description"] UTF8String]),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue],
-                .domain = std::string([[dictionary valueForKey:@"domain"] UTF8String])
-            };
-            webViewEventEmitter->onLoadingError(data);
-        }
-    };
-    _view.onMessage = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnMessage data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue],
-                .data = std::string([[dictionary valueForKey:@"data"] UTF8String])
-            };
-            webViewEventEmitter->onMessage(data);
-        }
-    };
-    _view.onFileDownload = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnFileDownload data = {
-                .downloadUrl = std::string([[dictionary valueForKey:@"downloadUrl"] UTF8String])
-            };
-            webViewEventEmitter->onFileDownload(data);
-        }
-    };
-    _view.onLoadingFinish = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnLoadingFinish data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .navigationType = stringToOnLoadingFinishNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue],
-                .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String], [[dictionary valueForKey:@"mainDocumentURL"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
-            };
-            webViewEventEmitter->onLoadingFinish(data);
-        }
-    };
-    _view.onLoadingProgress = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnLoadingProgress data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue],
-                .progress = [[dictionary valueForKey:@"progress"] doubleValue]
-            };
-            webViewEventEmitter->onLoadingProgress(data);
-    };
-    _view.onContentProcessDidTerminate = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnContentProcessDidTerminate data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue]
-            };
-            webViewEventEmitter->onContentProcessDidTerminate(data);
-        }
-    };
-    _view.onCustomMenuSelection = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnCustomMenuSelection data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue],
-                .selectedText = std::string([[dictionary valueForKey:@"selectedText"] UTF8String]),
-                .key = std::string([[dictionary valueForKey:@"key"] UTF8String]),
-                .label = std::string([[dictionary valueForKey:@"label"] UTF8String])
-
-            };
-            webViewEventEmitter->onCustomMenuSelection(data);
-        }
-    };
-    _view.onScroll = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnScroll data = {
-                // TODO: Do this
-            };
-            webViewEventEmitter->onScroll(data);
-        }
-    };
-    _view.onHttpError = [self](NSDictionary* dictionary) {
-        if (_eventEmitter) {
-            auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-            facebook::react::RNCWebViewEventEmitter::OnHttpError data = {
-                .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                .statusCode = [[dictionary valueForKey:@"statusCode"] intValue],
-                .description = std::string([[dictionary valueForKey:@"description"] UTF8String]),
-                .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                .loading = [[dictionary valueForKey:@"loading"] boolValue]
-            };
-            webViewEventEmitter->onHttpError(data);
-        }
-    };
-    self.contentView = _view;
-}
-
-return self;
+        _view.onLoadingStart = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnLoadingStart data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .navigationType = stringToOnLoadingStartNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String], [[dictionary valueForKey:@"mainDocumentURL"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
+                };
+                webViewEventEmitter->onLoadingStart(data);
+            }
+        };
+        _view.onLoadingError = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnLoadingError data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .code = [[dictionary valueForKey:@"code"] intValue],
+                    .description = std::string([[dictionary valueForKey:@"description"] UTF8String]),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .domain = std::string([[dictionary valueForKey:@"domain"] UTF8String])
+                };
+                webViewEventEmitter->onLoadingError(data);
+            }
+        };
+        _view.onMessage = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnMessage data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .data = std::string([[dictionary valueForKey:@"data"] UTF8String])
+                };
+                webViewEventEmitter->onMessage(data);
+            }
+        };
+        _view.onFileDownload = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnFileDownload data = {
+                    .downloadUrl = std::string([[dictionary valueForKey:@"downloadUrl"] UTF8String])
+                };
+                webViewEventEmitter->onFileDownload(data);
+            }
+        };
+        _view.onLoadingFinish = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnLoadingFinish data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .navigationType = stringToOnLoadingFinishNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String], [[dictionary valueForKey:@"mainDocumentURL"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
+                };
+                webViewEventEmitter->onLoadingFinish(data);
+            }
+        };
+        _view.onLoadingProgress = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnLoadingProgress data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .progress = [[dictionary valueForKey:@"progress"] doubleValue]
+                };
+                webViewEventEmitter->onLoadingProgress(data);
+            }
+        };
+        _view.onContentProcessDidTerminate = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnContentProcessDidTerminate data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue]
+                };
+                webViewEventEmitter->onContentProcessDidTerminate(data);
+            }
+        };
+        _view.onCustomMenuSelection = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnCustomMenuSelection data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .selectedText = std::string([[dictionary valueForKey:@"selectedText"] UTF8String]),
+                    .key = std::string([[dictionary valueForKey:@"key"] UTF8String]),
+                    .label = std::string([[dictionary valueForKey:@"label"] UTF8String])
+                    
+                };
+                webViewEventEmitter->onCustomMenuSelection(data);
+            }
+        };
+        _view.onScroll = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnScroll data = {
+                    // TODO: Do this
+                };
+                webViewEventEmitter->onScroll(data);
+            }
+        };
+        _view.onHttpError = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnHttpError data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .statusCode = [[dictionary valueForKey:@"statusCode"] intValue],
+                    .description = std::string([[dictionary valueForKey:@"description"] UTF8String]),
+                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
+                    .loading = [[dictionary valueForKey:@"loading"] boolValue]
+                };
+                webViewEventEmitter->onHttpError(data);
+            }
+        };
+        self.contentView = _view;
+    }
+    return self;
 }
 
 - (void)updateEventEmitter:(EventEmitter::Shared const &)eventEmitter
@@ -269,6 +269,24 @@ return self;
     REMAP_WEBVIEW_PROP(cacheEnabled)
     REMAP_WEBVIEW_PROP(allowsLinkPreview)
     REMAP_WEBVIEW_STRING_PROP(allowingReadAccessToURL)
+    
+    REMAP_WEBVIEW_PROP(messagingEnabled)
+    REMAP_WEBVIEW_PROP(enableApplePay)
+//    RCT_EXPORT_VIEW_PROPERTY(menuItems, NSArray);
+//    RCT_EXPORT_VIEW_PROPERTY(onCustomMenuSelection, RCTDirectEventBlock)
+    REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
+    REMAP_WEBVIEW_PROP(bounces)
+    REMAP_WEBVIEW_PROP(useSharedProcessPool)
+    REMAP_WEBVIEW_STRING_PROP(userAgent)
+    REMAP_WEBVIEW_PROP(sharedCookiesEnabled)
+    #if !TARGET_OS_OSX
+    REMAP_WEBVIEW_PROP(decelerationRate)
+    #endif // !TARGET_OS_OSX
+    REMAP_WEBVIEW_PROP(directionalLockEnabled)
+    REMAP_WEBVIEW_PROP(showsHorizontalScrollIndicator)
+    REMAP_WEBVIEW_PROP(showsVerticalScrollIndicator)
+    REMAP_WEBVIEW_PROP(keyboardDisplayRequiresUserAction)
+    
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
 #endif

@@ -137,6 +137,8 @@ type WebViewDownloadEvent = Readonly<{
   downloadUrl: string;
 }>
 
+type MenuItem = Readonly<{label: string, key: string}>;
+
 export interface NativeProps extends ViewProps {
   // Android only
   allowFileAccess?: boolean;
@@ -187,16 +189,22 @@ export interface NativeProps extends ViewProps {
   dataDetectorTypes?: readonly string[];
   decelerationRate?: Double;
   directionalLockEnabled?: boolean;
+  enableApplePay: boolean;
   hideKeyboardAccessoryView?: boolean;
+  keyboardDisplayRequiresUserAction?: boolean;
+  limitsNavigationsToAppBoundDomains?: boolean;
+  mediaCapturePermissionGrantType?: string;
   pagingEnabled?: boolean;
+  pullToRefreshEnabled?: boolean;
   scrollEnabled?: boolean;
+  sharedCookiesEnabled?: boolean;
+  textInteractionEnabled?: boolean;
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;
   onCustomMenuSelection?: DirectEventHandler<WebViewCustomMenuSelectionEvent>;
   onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
-  limitsNavigationsToAppBoundDomains?: boolean;
-  textInteractionEnabled?: boolean;
-  mediaCapturePermissionGrantType?: string;
+  // Todo: FIX this
+  // menuItems?: readonly MenuItem[];
   // !iOS only
 
   allowFileAccessFromFileURLs?: boolean;
