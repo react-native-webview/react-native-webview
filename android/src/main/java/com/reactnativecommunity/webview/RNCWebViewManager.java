@@ -533,6 +533,8 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
   @ReactProp(name = "source")
   public void setSource(RNCWebView view, @Nullable ReadableMap source) {
+    RNCWebViewModule module = getModule(mReactContext);
+
     // WebView インスタンスを使い回すようオプションが設定されている場合
     if (view.configuredToKeepWebViewInstance()) {
       // 初回の setSource 呼び出しで、かつ保持されている WebView インスタンスが既にある場合は、それを利用する。loadUrl() などは呼び出さない
