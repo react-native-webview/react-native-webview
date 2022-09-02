@@ -203,7 +203,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                 NSDictionary* contentInset = [dictionary valueForKey:@"contentInset"];
                 NSDictionary* contentSize = [dictionary valueForKey:@"contentSize"];
                 NSDictionary* layoutMeasurement = [dictionary valueForKey:@"layoutMeasurement"];
-                double zoomScale = [[dictionary valueForKey:@"layoutMeasurement"] doubleValue];
+                double zoomScale = [[dictionary valueForKey:@"zoomScale"] doubleValue];
 
                 auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
                 facebook::react::RNCWebViewEventEmitter::OnScroll data = {

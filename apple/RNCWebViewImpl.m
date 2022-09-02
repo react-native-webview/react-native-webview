@@ -375,14 +375,10 @@ RCTAutoInsetsProtocol>
 
 #if !TARGET_OS_OSX
   wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
-#if WEBKIT_IOS_10_APIS_AVAILABLE
   wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
   ? WKAudiovisualMediaTypeAll
   : WKAudiovisualMediaTypeNone;
   wkWebViewConfig.dataDetectorTypes = _dataDetectorTypes;
-#else
-  wkWebViewConfig.mediaPlaybackRequiresUserAction = _mediaPlaybackRequiresUserAction;
-#endif
 #endif // !TARGET_OS_OSX
 
   if (_applicationNameForUserAgent) {
@@ -1111,7 +1107,7 @@ RCTAutoInsetsProtocol>
 {
     static NSDictionary<NSNumber *, NSString *> *navigationTypes;
     static dispatch_once_t onceToken;
-    
+
     dispatch_once(&onceToken, ^{
         navigationTypes = @{
             @(WKNavigationTypeLinkActivated): @"click",
@@ -1122,11 +1118,11 @@ RCTAutoInsetsProtocol>
             @(WKNavigationTypeOther): @"other",
         };
     });
-    
+
     WKNavigationType navigationType = navigationAction.navigationType;
     NSURLRequest *request = navigationAction.request;
     BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
-        
+
     if (_onShouldStartLoadWithRequest) {
         NSMutableDictionary<NSString *, id> *event = [self baseEvent];
         int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
@@ -1146,7 +1142,7 @@ RCTAutoInsetsProtocol>
                         self->_onLoadingStart(event);
                     }
                 }
-                
+
                 // Allow all navigation by default
                 decisionHandler(WKNavigationActionPolicyAllow);
             });
@@ -1163,7 +1159,7 @@ RCTAutoInsetsProtocol>
         // decisionHandler(WKNavigationActionPolicyAllow);
         return;
     }
-    
+
     if (_onLoadingStart) {
         // We have this check to filter out iframe requests and whatnot
         if (isTopFrame) {
@@ -1175,7 +1171,7 @@ RCTAutoInsetsProtocol>
             _onLoadingStart(event);
         }
     }
-    
+
     // Allow all navigation by default
     decisionHandler(WKNavigationActionPolicyAllow);
 }
