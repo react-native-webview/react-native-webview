@@ -199,9 +199,32 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         };
         _view.onScroll = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
+                NSDictionary* contentOffset = [dictionary valueForKey:@"contentOffset"];
+                NSDictionary* contentInset = [dictionary valueForKey:@"contentInset"];
+                NSDictionary* contentSize = [dictionary valueForKey:@"contentSize"];
+                NSDictionary* layoutMeasurement = [dictionary valueForKey:@"layoutMeasurement"];
+                double zoomScale = [[dictionary valueForKey:@"layoutMeasurement"] doubleValue];
+
                 auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
                 facebook::react::RNCWebViewEventEmitter::OnScroll data = {
-                    // TODO: Do this
+                    .contentOffset = {
+                        .x = [[contentOffset valueForKey:@"x"] doubleValue],
+                        .y = [[contentOffset valueForKey:@"y"] doubleValue]
+                    },
+                    .contentInset = {
+                        .left = [[contentInset valueForKey:@"left"] doubleValue],
+                        .right = [[contentInset valueForKey:@"right"] doubleValue],
+                        .top = [[contentInset valueForKey:@"top"] doubleValue],
+                        .bottom = [[contentInset valueForKey:@"bottom"] doubleValue]
+                    },
+                    .contentSize = {
+                        .width = [[contentSize valueForKey:@"width"] doubleValue],
+                        .height = [[contentSize valueForKey:@"height"] doubleValue]
+                    },
+                    .layoutMeasurement = {
+                        .width = [[layoutMeasurement valueForKey:@"width"] doubleValue],
+                        .height = [[layoutMeasurement valueForKey:@"height"] doubleValue]                    },
+                    .zoomScale = zoomScale
                 };
                 webViewEventEmitter->onScroll(data);
             }
@@ -325,7 +348,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                 dataDetectorTypes = WKDataDetectorTypeNone;
             }
         }
-        // TODO: set DATADETECTORTYPES
+        [_view setDataDetectorTypes:dataDetectorTypes];
     }
     if (oldViewProps.contentInset.top != newViewProps.contentInset.top || oldViewProps.contentInset.left != newViewProps.contentInset.left || oldViewProps.contentInset.right != newViewProps.contentInset.right || oldViewProps.contentInset.bottom != newViewProps.contentInset.bottom) {
         UIEdgeInsets edgesInsets = {

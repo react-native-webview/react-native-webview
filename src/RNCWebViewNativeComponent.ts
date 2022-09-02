@@ -137,7 +137,7 @@ type WebViewDownloadEvent = Readonly<{
   downloadUrl: string;
 }>
 
-type MenuItem = Readonly<{label: string, key: string}>;
+// type MenuItem = Readonly<{label: string, key: string}>;
 
 export interface NativeProps extends ViewProps {
   // Android only
