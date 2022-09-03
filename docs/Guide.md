@@ -542,11 +542,13 @@ const App = () => {
 Note that these cookies will only be sent on the first request unless you use the technique above for [setting custom headers on each page load](#Setting-Custom-Headers).
 
 ### Page navigation gesture and button support
-We can provide support for conventional page navigation for both Android and iOS.
+We can provide support for conventional mobile page navigation: forward/back swipe gestures on iOS and the hardware back button/gesture on Android.
 
 For iOS, you'll just need to use the [`allowsbackforwardnavigationgestures`](Reference.md#allowsbackforwardnavigationgestures) prop.
 
-For Android, you can use `useRef` and `useEffect` (you'll need to import them from React if you aren't already) to allow users to navigate to the previous page when they press the back button like so:
+The key parts of this solution are in using `BackHandler.addEventListener` and hooking that up to call `goBack` on the `WebView`.
+
+For Android (with functional React components), you can use `useRef` and `useEffect` (you'll need to import them from React if you aren't already) to allow users to navigate to the previous page when they press the back button like so:
 ```jsx
 import React, {
     useEffect,
