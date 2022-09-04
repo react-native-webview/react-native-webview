@@ -546,7 +546,7 @@ We can provide support for conventional mobile page navigation: forward/back swi
 
 For iOS, you'll just need to use the [`allowsbackforwardnavigationgestures`](Reference.md#allowsbackforwardnavigationgestures) prop.
 
-For Android, you need to use `BackHandler.addEventListener` and hooking that up to call `goBack` on the `WebView`.
+For Android, you need to use `BackHandler.addEventListener` and hook that up to call `goBack` on the `WebView`.
 
 With functional React components, you can use `useRef` and `useEffect` (you'll need to import them from React if you aren't already) to allow users to navigate to the previous page when they press the back button like so:
 ```jsx
