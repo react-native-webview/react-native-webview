@@ -58,7 +58,6 @@ import androidx.webkit.WebViewFeature;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
-//import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.scroll.OnScrollDispatchHelper;
@@ -101,6 +100,7 @@ import java.lang.IllegalArgumentException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import	java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1684,7 +1684,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 View view, 
                 Rect outRect){
 
-          String js = "(function(){ let wr = " + RNCWebView.this.getWidth() + "/window.innerWidth; let hr = " + RNCWebView.this.getHeight() +"/window.innerHeight; let rect = window.getSelection()?.getRangeAt(0)?.getBoundingClientRect(); return JSON.stringify({x: (rect?.x * wr), y: (rect?.y * hr), width: (rect?.width * wr), height: (rect?.height * hr), selectionText: window.getSelection().toString()?.replace(/\"/g, '%%22')?.replace(/\\\\/g, '%%5C')})})()";
+          String js = "(function(){ const wr = " + RNCWebView.this.getWidth() + "/window.innerWidth; const hr = " + RNCWebView.this.getHeight() +"/window.innerHeight; const rect = window.getSelection()?.getRangeAt(0)?.getBoundingClientRect(); return JSON.stringify({x: (rect?.x * wr), y: (rect?.y * hr), width: (rect?.width * wr), height: (rect?.height * hr), selectionText: encodeURIComponent(window.getSelection().toString())})})()";
           RNCWebView.this.evaluateJavascript(js, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String value) {
@@ -1699,7 +1699,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                   RNCWebView.this.selectionY = y;
                   RNCWebView.this.selectionWidth = width;
                   RNCWebView.this.selectionHeight = height;
-                  RNCWebView.this.selectionText = json.getString("selectionText").replaceAll("%%22", "\"").replaceAll("%%5C", "\\\\");
+                  RNCWebView.this.selectionText = URLDecoder.decode(json.getString("selectionText"));
                   mode.invalidateContentRect();
                 }
               }catch(JSONException e){

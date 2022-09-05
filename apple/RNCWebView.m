@@ -56,9 +56,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   if (!self.menuItems || self.menuItems.count == 0) {              
     return YES;
   }
-  else{
-    return NO;
-  }
+  return NO;
 }
 @end
 #endif // !TARGET_OS_OSX

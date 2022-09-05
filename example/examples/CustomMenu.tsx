@@ -24,11 +24,11 @@ const HTML = `
       Select the text to see the custom context menu.
     </p>
     <p>
-      The custom context menu will show the custom menu's defined in the menuItems prop and call the onCustomMenuSelection
-      on clicking on the menu Item.
+      The custom context menu will show the custom menus defined in the menuItems prop and call the onCustomMenuSelection
+      on clicking on the menu Item. Testing symbols ' " < & > + - = ^ % $ # @ ! ~ ; :  ? 
     </p>
     <p>
-      Third Para
+      "Third Para with quotes"
     </p>
   </body>
 </html>
@@ -49,10 +49,10 @@ export default CustomMenu = () => {
             automaticallyAdjustContentInsets={false}
             menuItems={[{ label: 'Highlight', key: 'highlight' }, { label: 'Strikethrough', key: 'strikethrough' }]}
             onCustomMenuSelection={(webViewEvent) => {
-            const { label, key, selectedText } = webViewEvent.nativeEvent;
-            console.log('Custom Menu Tapped: ', label, ' :: ', key, ' :: ', selectedText)
-            setSelectionInfo(webViewEvent.nativeEvent)
-          }}
+              const { label, key, selectedText } = webViewEvent.nativeEvent;
+              console.log('Custom Menu Tapped: ', label, ' :: ', key, ' :: ', selectedText)
+              setSelectionInfo(webViewEvent.nativeEvent)
+            }}
           />
         </View>
         {selectionInfo && 
