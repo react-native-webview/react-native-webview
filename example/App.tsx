@@ -20,6 +20,7 @@ import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
+import Portals from './examples/Portals';
 
 const TESTS = {
   Messaging: {
@@ -101,7 +102,15 @@ const TESTS = {
     render() {
       return <ApplePay />;
     },
-  }
+  },
+  Portals: {
+    title: 'Portals',
+    testId: 'Portals',
+    description: 'Test teleporting a child view between two parent views',
+    render() {
+      return <Portals />;
+    },
+  },
 };
 
 type Props = {};
@@ -196,6 +205,11 @@ export default class App extends Component<Props, State> {
                   onPress={() => this._changeTest('ApplePay')}
               />
           )}
+          <Button
+            testID="testType_portals"
+            title="Portals"
+            onPress={() => this._changeTest('Portals')}
+          />
         </View>
 
         {restarting ? null : (

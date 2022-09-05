@@ -63,3 +63,5 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
 
 export {WebView};
 export default WebView;
+
+export { releaseWebView, clearWebViews } from './lib/utilityMethods';
