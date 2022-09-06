@@ -149,7 +149,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
       javaScriptEnabled={javaScriptEnabled}
       cacheEnabled={cacheEnabled}
       useSharedProcessPool={useSharedProcessPool}
-      messagingEnabled={typeof onMessage === 'function'}
+      messagingEnabled={typeof onMessageProp === 'function'}
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
       onLoadingProgress={onLoadingProgress}

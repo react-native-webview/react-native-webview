@@ -164,7 +164,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    messagingEnabled={typeof onMessage === 'function'}
+    messagingEnabled={typeof onMessageProp === 'function'}
     messagingModuleName={messagingModuleName}
 
     onLoadingError={onLoadingError}
