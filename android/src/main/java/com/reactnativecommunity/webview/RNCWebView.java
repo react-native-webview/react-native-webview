@@ -1,5 +1,6 @@
 package com.reactnativecommunity.webview;
 
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
@@ -9,6 +10,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 
 public class RNCWebView extends FrameLayout {
   private static final String TAG = "RNCWebView";
+  public static final int INVALID_VIEW_ID = -1;
 
   private RNCWebViewManager.InternalWebView internalWebView;
 
@@ -20,6 +22,11 @@ public class RNCWebView extends FrameLayout {
     void apply(RNCWebViewManager.InternalWebView webView);
   }
 
+  /**
+   * Attaches a {@link RNCWebViewManager.InternalWebView} to the RNCWebView parent
+   * Throws an exception if the provided internal webView is already attached to a parent
+   * @param webView
+   */
   public void attachWebView(RNCWebViewManager.InternalWebView webView) {
     this.internalWebView = webView;
 
@@ -32,6 +39,10 @@ public class RNCWebView extends FrameLayout {
     addView(webView, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
   }
 
+  /**
+   * Detaches the internal webview from the RNCWebview parent and returns a reference to it
+   * @return internalWebView
+   */
   public RNCWebViewManager.InternalWebView detachWebView() {
     if (internalWebView == null) {
       throw new IllegalStateException("Webview is null");
@@ -54,11 +65,29 @@ public class RNCWebView extends FrameLayout {
     return internalWebView;
   }
 
+  /**
+   * Applies an action if the internal webview is non null
+   * @param action
+   */
   public void ifHasInternalWebView(Action action) {
     if (internalWebView != null) {
       action.apply(internalWebView);
     } else {
       FLog.e(TAG, new Throwable(), "Internal WebView is null");
     }
+  }
+
+  /**
+   * Provides the associated parent RNCWebView viewId for the provided
+   * webView view id.
+   * @param webView
+   * @return viewId
+   */
+  public static int getRNCWebViewId(WebView webView) {
+    Integer rncViewId = RNCWebViewMapManager.INSTANCE.getViewIdMap().get(webView.getId());
+    if (rncViewId == null) {
+      return INVALID_VIEW_ID;
+    }
+    return rncViewId;
   }
 }

@@ -308,6 +308,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       source,
       style,
       containerStyle,
+      enableMessaging,
       nativeConfig = {},
       ...otherProps
     } = this.props;
@@ -357,7 +358,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       <NativeWebView
         key="webViewKey"
         {...otherProps}
-        messagingEnabled={typeof onMessage === 'function'}
+        messagingEnabled={typeof onMessage === 'function' || (enableMessaging ?? false)}
         messagingModuleName={this.messagingModuleName}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}

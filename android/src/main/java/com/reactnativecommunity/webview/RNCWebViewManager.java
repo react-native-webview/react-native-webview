@@ -64,6 +64,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -188,6 +189,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     RNCWebView wrapper = new RNCWebView(reactContext);
     InternalWebView webView = createInternalWebViewInstance(reactContext);
     wrapper.attachWebView(webView);
+    RNCWebViewMapManager.INSTANCE.getViewIdMap().put(webView.getId(), wrapper.getId());
 
     setupWebChromeClient(reactContext, webView);
     reactContext.addLifecycleEventListener(webView);
@@ -304,6 +306,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     // This means an existing webview can update it's own key
     view.ifHasInternalWebView(webView -> {
       webView.setWebViewKey(webViewKey);
+      RNCWebViewMapManager.INSTANCE.getViewIdMap().put(webView.getId(), view.getId());
       internalWebViewMap.put(webViewKey, webView);
       rncWebViewMap.put(webViewKey, view);
     });
@@ -846,6 +849,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       } else {
         view.removeWebViewFromParent();
         RNCWebViewMapManager.INSTANCE.getRncWebViewMap().remove(webView.webViewKey);
+        RNCWebViewMapManager.INSTANCE.getViewIdMap().remove(webView.getId());
       }
     });
   }
@@ -998,7 +1002,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       ((InternalWebView) webView).dispatchEvent(
         webView,
         new TopLoadingStartEvent(
-          webView.getId(),
+          RNCWebView.getRNCWebViewId(webView),
           createWebViewEvent(webView, url)));
     }
 
@@ -1045,7 +1049,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         ((InternalWebView) view).dispatchEvent(
           view,
           new TopShouldStartLoadWithRequestEvent(
-            view.getId(),
+            RNCWebView.getRNCWebViewId(view),
             createWebViewEvent(view, url)));
         return true;
       }
@@ -1160,7 +1164,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
       ((InternalWebView) webView).dispatchEvent(
         webView,
-        new TopLoadingErrorEvent(webView.getId(), eventData));
+        new TopLoadingErrorEvent(RNCWebView.getRNCWebViewId(webView), eventData));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -1178,7 +1182,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
         ((InternalWebView) webView).dispatchEvent(
           webView,
-          new TopHttpErrorEvent(webView.getId(), eventData));
+          new TopHttpErrorEvent(RNCWebView.getRNCWebViewId(webView), eventData));
       }
     }
 
@@ -1210,7 +1214,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
       ((InternalWebView) webView).dispatchEvent(
           webView,
-          new TopRenderProcessGoneEvent(webView.getId(), event)
+          new TopRenderProcessGoneEvent(RNCWebView.getRNCWebViewId(webView), event)
         );
 
         // returning false would crash the app.
@@ -1221,13 +1225,13 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       ((InternalWebView) webView).dispatchEvent(
         webView,
         new TopLoadingFinishEvent(
-          webView.getId(),
+          RNCWebView.getRNCWebViewId(webView),
           createWebViewEvent(webView, url)));
     }
 
     protected WritableMap createWebViewEvent(WebView webView, String url) {
       WritableMap event = Arguments.createMap();
-      event.putDouble("target", webView.getId());
+      event.putDouble("target", RNCWebView.getRNCWebViewId(webView));
       // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
       // like onPageFinished
       event.putString("url", url);
@@ -1324,7 +1328,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         return;
       }
       WritableMap event = Arguments.createMap();
-      event.putDouble("target", webView.getId());
+      event.putDouble("target", RNCWebView.getRNCWebViewId(webView));
       event.putString("title", webView.getTitle());
       event.putString("url", url);
       event.putBoolean("canGoBack", webView.canGoBack());
@@ -1333,7 +1337,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       ((InternalWebView) webView).dispatchEvent(
         webView,
         new TopLoadingProgressEvent(
-          webView.getId(),
+          RNCWebView.getRNCWebViewId(webView),
           event));
     }
 
@@ -1645,7 +1649,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         dispatchEvent(
           this,
           new ContentSizeChangeEvent(
-            this.getId(),
+            RNCWebView.getRNCWebViewId(this),
             w,
             h
           )
@@ -1765,9 +1769,16 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     public void onMessage(String message) {
       ReactContext reactContext = (ReactContext) this.getContext();
       InternalWebView mContext = this;
+      WebView webView = this;
 
-      if (mRNCWebViewClient != null) {
-        WebView webView = this;
+      if (webViewKey != null && mRNCWebViewClient != null) {
+        reactContext.runOnUiQueueThread(() -> {
+          WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, webView.getUrl());
+          data.putString("webViewKey", webViewKey);
+          data.putString("data", message);
+          reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onMessage", data);
+        });
+      } else if (mRNCWebViewClient != null) {
         webView.post(new Runnable() {
           @Override
           public void run() {
@@ -1780,7 +1791,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
             if (mCatalystInstance != null) {
               mContext.sendDirectMessage("onMessage", data);
             } else {
-              dispatchEvent(webView, new TopMessageEvent(webView.getId(), data));
+              dispatchEvent(webView, new TopMessageEvent(RNCWebView.getRNCWebViewId(webView), data));
             }
           }
         });
@@ -1791,7 +1802,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         if (mCatalystInstance != null) {
           this.sendDirectMessage("onMessage", eventData);
         } else {
-          dispatchEvent(this, new TopMessageEvent(this.getId(), eventData));
+          dispatchEvent(this, new TopMessageEvent(RNCWebView.getRNCWebViewId(webView), eventData));
         }
       }
     }
@@ -1819,7 +1830,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
       if (mOnScrollDispatchHelper.onScrollChanged(x, y)) {
         ScrollEvent event = ScrollEvent.obtain(
-                this.getId(),
+                RNCWebView.getRNCWebViewId(this),
                 ScrollEventType.SCROLL,
                 x,
                 y,
@@ -1835,6 +1846,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     }
 
     protected void dispatchEvent(WebView webView, Event event) {
+      if (event.getViewTag() == RNCWebView.INVALID_VIEW_ID) {
+        FLog.w(TAG, "Unable to dispatch event: ", event.getEventName() + "due to InternalWebView not being attached.");
+        return;
+      }
+
       ReactContext reactContext = (ReactContext) webView.getContext();
       EventDispatcher eventDispatcher =
         reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();

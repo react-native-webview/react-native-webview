@@ -918,6 +918,30 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
      * @platform android
      */
     minimumFontSize?: number;
+    /**
+     * By default, if this is undefined or false, the native WebView will get released when
+     * the React component unmounts.
+     *
+     * When this is true, the native WebView will not get released when the React component
+     * unmounts. When a React component remounts, it can use a previous native WebView instance
+     * by using the same webViewKey prop that the previous React component used.
+     *
+     * It's important to call `release` on the React WebView with the corresponding webViewKey
+     * when the native WebView is no longer needed.
+     */
+    keepWebViewInstanceAfterUnmount?: boolean;
+    /**
+     * When keepWebViewInstanceAfterUnmount is true, if two React components use the same
+     * key for the WebView, they will use the same native WebView instance.
+     */
+    webViewKey?: string;
+    /**
+     * If keepWebViewInstanceAfterUnmount is true, the onMessage callback won't work after
+     * navigating away from the WebView. Instead, to handle messages, set enableMesaging
+     * to true, and use ScriptMessageEventEmitter to listen to messages for a given
+     * webViewKey.
+     */
+    enableMessaging?: boolean;
 }
 export interface WebViewSharedProps extends ViewProps {
     /**

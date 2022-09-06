@@ -1,11 +1,16 @@
 import * as React from 'react';
-import {View, Button, Text, NativeEventEmitter, NativeModules} from 'react-native';
+import {View, Button, Text, NativeEventEmitter, NativeModules, Platform} from 'react-native';
 import {WebView, releaseWebView, injectJavaScriptWithWebViewKey} from 'react-native-webview';
 import PortalGate from '../portals/PortalGate';
 import PortalProvider from '../portals/PortalProvider';
 import { PortalContext } from '../portals/PortalContext';
 
-const scriptMessageEmitter = new NativeEventEmitter(NativeModules.ScriptMessageEventEmitter);
+const scriptMessageEmitter = new NativeEventEmitter(
+  Platform.select({
+    ios: NativeModules.ScriptMessageEventEmitter,
+    android: null
+  })
+);
 
 const IFRAME_URI = 'https://www.usaswimming.org';
 const BLUE_GATE_NAME = 'blueGate';
