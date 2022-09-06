@@ -377,6 +377,18 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAlways];
         }
     }
+    if (oldViewProps.menuItems != newViewProps.menuItems) {
+        NSMutableArray *newMenuItems = [NSMutableArray array];
+
+        for (const auto &menuItem: newViewProps.menuItems) {
+            [newMenuItems addObject:@{
+                @"key": RCTNSStringFromString(menuItem.key),
+                @"label": RCTNSStringFromString(menuItem.label),
+            }];
+
+        }
+        [_view setMenuItems:newMenuItems];
+    }
 
 //
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */

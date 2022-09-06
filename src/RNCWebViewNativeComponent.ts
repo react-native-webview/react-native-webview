@@ -203,8 +203,8 @@ export interface NativeProps extends ViewProps {
   onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;
   onCustomMenuSelection?: DirectEventHandler<WebViewCustomMenuSelectionEvent>;
   onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
-  // Todo: FIX this
-  // menuItems?: readonly MenuItem[];
+  // eslint-disable-next-line @typescript-eslint/array-type
+  menuItems?: ReadonlyArray<Readonly<{label: string, key: string}>>;
   // !iOS only
 
   allowFileAccessFromFileURLs?: boolean;
