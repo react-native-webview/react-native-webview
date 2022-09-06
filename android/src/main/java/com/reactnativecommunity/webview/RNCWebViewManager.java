@@ -100,7 +100,7 @@ import java.lang.IllegalArgumentException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import	java.net.URLDecoder;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1694,12 +1694,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 double y = json.getDouble("y"); 
                 double width = json.getDouble("width"); 
                 double height = json.getDouble("height"); 
-                if(x != RNCWebView.this.selectionX || y != RNCWebView.this.selectionY || width !=RNCWebView.this.selectionWidth  || height != RNCWebView.this.selectionHeight){
+                String selectionText = URLDecoder.decode(json.getString("selectionText"));
+                if(x != RNCWebView.this.selectionX || y != RNCWebView.this.selectionY || width != RNCWebView.this.selectionWidth  || height != RNCWebView.this.selectionHeight || selectionText != RNCWebView.this.selectionText){
                   RNCWebView.this.selectionX = x;
                   RNCWebView.this.selectionY = y;
                   RNCWebView.this.selectionWidth = width;
                   RNCWebView.this.selectionHeight = height;
-                  RNCWebView.this.selectionText = URLDecoder.decode(json.getString("selectionText"));
+                  RNCWebView.this.selectionText = selectionText;
                   mode.invalidateContentRect();
                 }
               }catch(JSONException e){
