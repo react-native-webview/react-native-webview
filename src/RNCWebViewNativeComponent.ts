@@ -186,7 +186,11 @@ export interface NativeProps extends ViewProps {
   }>;
   contentInsetAdjustmentBehavior?: WithDefault<'never' | 'automatic' | 'scrollableAxes' | 'always', 'never'>;
   contentMode?: WithDefault<'recommended' | 'mobile' | 'desktop', 'recommended'>;
-  dataDetectorTypes?: readonly string[];
+  dataDetectorTypes?: WithDefault<
+    // eslint-disable-next-line @typescript-eslint/array-type
+    ReadonlyArray<'address' | 'link' | 'calendarEvent' | 'trackingNumber' | 'flightNumber' | 'lookupSuggestion' | 'phoneNumber' | 'all' | 'none'>,
+    'phoneNumber'
+  >;
   decelerationRate?: Double;
   directionalLockEnabled?: boolean;
   enableApplePay: boolean;

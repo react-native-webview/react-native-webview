@@ -378,6 +378,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     public void setTextInteractionEnabled(RNCWebView view, boolean value) {}
 
     @Override
+    public void setMenuItems(RNCWebView view, ReadableArray value) {}
+
+    @Override
     public void setMediaCapturePermissionGrantType(RNCWebView view, @Nullable String value) {}
     /* !iOS PROPS - no implemented here */
 

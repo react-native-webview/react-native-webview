@@ -327,26 +327,24 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     }
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
         WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
-        for (const auto &dataDetectorType: newViewProps.dataDetectorTypes) {
-            if (dataDetectorType == "address") {
+            if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
                 dataDetectorTypes |= WKDataDetectorTypeAddress;
-            } else if (dataDetectorType == "link") {
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Link) {
                 dataDetectorTypes |= WKDataDetectorTypeLink;
-            } else if (dataDetectorType == "calendarEvent") {
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::CalendarEvent) {
                 dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
-            } else if (dataDetectorType == "trackingNumber") {
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::TrackingNumber) {
                 dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
-            } else if (dataDetectorType == "flightNumber") {
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::FlightNumber) {
                 dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
-            } else if (dataDetectorType == "lookupSuggestion") {
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::LookupSuggestion) {
                 dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
-            } else if (dataDetectorType == "phoneNumber") {
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::PhoneNumber) {
                 dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
-            } else if (dataDetectorType == "all") {
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::All) {
                 dataDetectorTypes |= WKDataDetectorTypeAll;
-            } else if (dataDetectorType == "none") {
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::None) {
                 dataDetectorTypes = WKDataDetectorTypeNone;
-            }
         }
         [_view setDataDetectorTypes:dataDetectorTypes];
     }
