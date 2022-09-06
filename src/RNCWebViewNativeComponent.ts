@@ -1,6 +1,6 @@
 import type { HostComponent, ViewProps } from 'react-native';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import {DirectEventHandler,Double, Int32} from 'react-native/Libraries/Types/CodegenTypes';
+import {DirectEventHandler,Double, Int32, WithDefault} from 'react-native/Libraries/Types/CodegenTypes';
 
 export type WebViewNativeEvent = Readonly<{
   url: string;
@@ -145,8 +145,8 @@ export interface NativeProps extends ViewProps {
 
   allowsFullscreenVideo?: boolean;
   androidHardwareAccelerationDisabled?: boolean;
-  androidLayerType?: string;
-  cacheMode?: string;
+  androidLayerType?: WithDefault<'none' | 'software' | 'hardware', 'none'>;
+  cacheMode?: WithDefault<'LOAD_DEFAULT' | 'LOAD_CACHE_ELSE_NETWORK' | 'LOAD_NO_CACHE' | 'LOAD_CACHE_ONLY', 'LOAD_DEFAULT'>;
   domStorageEnabled?: boolean;
   downloadingMessage?: string;
   forceDarkOn?: boolean;
@@ -154,7 +154,7 @@ export interface NativeProps extends ViewProps {
   lackPermissionToDownloadMessage?: string;
   messagingModuleName: string;
   minimumFontSize?: Int32;
-  mixedContentMode?: string;
+  mixedContentMode?: WithDefault<'never' | 'always' | 'compatibility', 'never'>;
   nestedScrollEnabled?: boolean;
   onContentSizeChange?: DirectEventHandler<WebViewNativeEvent>;
   onRenderProcessGone?: DirectEventHandler<WebViewRenderProcessGoneEvent>;
@@ -184,8 +184,8 @@ export interface NativeProps extends ViewProps {
     bottom?: Double;
     right?: Double;
   }>;
-  contentInsetAdjustmentBehavior?: string;
-  contentMode?: string;
+  contentInsetAdjustmentBehavior?: WithDefault<'never' | 'automatic' | 'scrollableAxes' | 'always', 'never'>;
+  contentMode?: WithDefault<'recommended' | 'mobile' | 'desktop', 'recommended'>;
   dataDetectorTypes?: readonly string[];
   decelerationRate?: Double;
   directionalLockEnabled?: boolean;
@@ -193,7 +193,7 @@ export interface NativeProps extends ViewProps {
   hideKeyboardAccessoryView?: boolean;
   keyboardDisplayRequiresUserAction?: boolean;
   limitsNavigationsToAppBoundDomains?: boolean;
-  mediaCapturePermissionGrantType?: string;
+  mediaCapturePermissionGrantType?: WithDefault<'prompt' | 'grant' | 'deny' | 'grantIfSameHostElsePrompt' | 'grantIfSameHostElseDeny', 'prompt'>;
   pagingEnabled?: boolean;
   pullToRefreshEnabled?: boolean;
   scrollEnabled?: boolean;

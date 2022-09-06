@@ -367,13 +367,13 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }];
     }
     if (oldViewProps.contentInsetAdjustmentBehavior != newViewProps.contentInsetAdjustmentBehavior) {
-        if (newViewProps.contentInsetAdjustmentBehavior == "never") {
+        if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Never) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == "automatic") {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Automatic) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAutomatic];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == "scrollableAxes") {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::ScrollableAxes) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentScrollableAxes];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == "always") {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Always) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAlways];
         }
     }
@@ -381,11 +381,11 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
 //
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
     if (oldViewProps.contentMode != newViewProps.contentMode) {
-        if (newViewProps.contentMode == "recommended") {
+        if (newViewProps.contentMode == RNCWebViewContentMode::Recommended) {
             [_view setContentMode: WKContentModeRecommended];
-        } else if (newViewProps.contentMode == "mobile") {
+        } else if (newViewProps.contentMode == RNCWebViewContentMode::Mobile) {
             [_view setContentMode:WKContentModeMobile];
-        } else if (newViewProps.contentMode == "desktop") {
+        } else if (newViewProps.contentMode == RNCWebViewContentMode::Desktop) {
             [_view setContentMode:WKContentModeDesktop];
         }
     }
@@ -393,15 +393,15 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     if (oldViewProps.mediaCapturePermissionGrantType != newViewProps.mediaCapturePermissionGrantType) {
-        if (newViewProps.mediaCapturePermissionGrantType == "prompt") {
+        if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Prompt) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Prompt];
-        } else if (newViewProps.mediaCapturePermissionGrantType == "grant") {
+        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Grant) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Grant];
-        } else if (newViewProps.mediaCapturePermissionGrantType == "deny") {
+        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Deny) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Deny];
-        }else if (newViewProps.mediaCapturePermissionGrantType == "grantIfSameHostElsePrompt") {
+        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::GrantIfSameHostElsePrompt) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt];
-        }else if (newViewProps.mediaCapturePermissionGrantType == "grantIfSameHostElseDeny") {
+        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::GrantIfSameHostElseDeny) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
         }
     }

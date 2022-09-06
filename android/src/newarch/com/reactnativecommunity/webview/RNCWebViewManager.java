@@ -348,13 +348,25 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     public void setDirectionalLockEnabled(RNCWebView view, boolean value) {}
 
     @Override
+    public void setEnableApplePay(RNCWebView view, boolean value) {}
+
+    @Override
     public void setHideKeyboardAccessoryView(RNCWebView view, boolean value) {}
+
+    @Override
+    public void setKeyboardDisplayRequiresUserAction(RNCWebView view, boolean value) {}
 
     @Override
     public void setPagingEnabled(RNCWebView view, boolean value) {}
 
     @Override
+    public void setPullToRefreshEnabled(RNCWebView view, boolean value) {}
+
+    @Override
     public void setScrollEnabled(RNCWebView view, boolean value) {}
+
+    @Override
+    public void setSharedCookiesEnabled(RNCWebView view, boolean value) {}
 
     @Override
     public void setUseSharedProcessPool(RNCWebView view, boolean value) {}
