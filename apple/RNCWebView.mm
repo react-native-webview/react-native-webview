@@ -183,12 +183,6 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             if (_eventEmitter) {
                 auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
                 facebook::react::RNCWebViewEventEmitter::OnCustomMenuSelection data = {
-                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
-                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
-                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
                     .selectedText = std::string([[dictionary valueForKey:@"selectedText"] UTF8String]),
                     .key = std::string([[dictionary valueForKey:@"key"] UTF8String]),
                     .label = std::string([[dictionary valueForKey:@"label"] UTF8String])
@@ -295,8 +289,6 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     
     REMAP_WEBVIEW_PROP(messagingEnabled)
     REMAP_WEBVIEW_PROP(enableApplePay)
-//    RCT_EXPORT_VIEW_PROPERTY(menuItems, NSArray);
-//    RCT_EXPORT_VIEW_PROPERTY(onCustomMenuSelection, RCTDirectEventBlock)
     REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
     REMAP_WEBVIEW_PROP(bounces)
     REMAP_WEBVIEW_PROP(useSharedProcessPool)
@@ -375,6 +367,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAlways];
         }
     }
+
     if (oldViewProps.menuItems != newViewProps.menuItems) {
         NSMutableArray *newMenuItems = [NSMutableArray array];
 

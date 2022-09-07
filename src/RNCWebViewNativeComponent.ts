@@ -11,12 +11,6 @@ export type WebViewNativeEvent = Readonly<{
   lockIdentifier: Double;
 }>
 export type WebViewCustomMenuSelectionEvent = Readonly<{
-  url: string;
-  loading: boolean;
-  title: string;
-  canGoBack: boolean;
-  canGoForward: boolean;
-  lockIdentifier: Double;
   label: string;
   key: string;
   selectedText: string;
