@@ -566,13 +566,13 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
   @ReactProp(name = "source")
   public void setSource(RNCWebView view, @Nullable ReadableMap source) {
     view.ifHasInternalWebView(webView -> {
-      // TODO Note: If the 'source' prop is changed and the webView has a webViewKey
-      // the webview will not reload.
-      // We can fix this by checking to see by caching the previous source map
-      // and checking if the value has changed.
-      if (webView.webViewKey != null && webView.getUrl() != null) {
+
+      // Do not reload reload webview if the source prop has not changed
+      if (webView.webViewKey != null && !webView.isNewSource(source)) {
         return;
       }
+
+      webView.setSource(source);
 
       if (source != null) {
         if (source.hasKey("html")) {
@@ -1589,6 +1589,8 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
 
+    protected ReadableMap source;
+
     /**
      * WebView must be created with an context of the current activity
      * <p>
@@ -1619,6 +1621,35 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
     public void setNestedScrollEnabled(boolean nestedScrollEnabled) {
       this.nestedScrollEnabled = nestedScrollEnabled;
+    }
+
+    public void setSource(ReadableMap source) {
+      this.source = source;
+    }
+
+    public boolean isNewSource(@Nullable ReadableMap newSource) {
+      if (source == null || newSource == null) {
+        return true;
+      }
+
+      // Check if any of the following string values have changed
+      String[] sourceKeys = {"uri", "method", "body", "html", "baseUrl"};
+
+      for (String key : sourceKeys) {
+        String value = source.getString(key);
+        String newValue = newSource.getString(key);
+        if (newValue != null && !newValue.equals(value)) {
+          return true;
+        }
+      }
+
+      // Check if headers changed
+      ReadableMap headersMap =  source.getMap("headers");
+      ReadableMap newHeadersMap = newSource.getMap("headers");
+      Map<String, Object> headers = headersMap == null ? Collections.emptyMap() : headersMap.toHashMap();
+      Map<String, Object> newHeaders = newHeadersMap == null ? Collections.emptyMap() : newHeadersMap.toHashMap();
+
+      return !headers.equals(newHeaders);
     }
 
     @Override
