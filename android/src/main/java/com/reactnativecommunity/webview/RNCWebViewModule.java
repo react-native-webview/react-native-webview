@@ -186,13 +186,14 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   }
 
   @ReactMethod
-  public void injectJavaScriptWithWebViewKey(final String webViewKey, final String script) {
+  public void injectJavaScriptWithWebViewKey(final String webViewKey, final String script, final Promise promise) {
     UiThreadUtil.runOnUiThread(() -> {
       RNCWebViewManager.InternalWebView webView = (RNCWebViewManager.InternalWebView) RNCWebViewMapManager.INSTANCE.getInternalWebViewMap().get(webViewKey);
       if (webView != null) {
         webView.evaluateJavascriptWithFallback(script);
+        promise.resolve(null);
       } else {
-        FLog.w(TAG, "Failed to inject javascript with webViewKey: " + webViewKey + ". WebView is null.");
+        promise.reject("err", "Failed to inject javascript with webViewKey: " + webViewKey + ". WebView is null.");
       }
     });
   }
