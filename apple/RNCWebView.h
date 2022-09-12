@@ -101,7 +101,6 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
 #endif
 
-@property (nonatomic, assign) BOOL keepWebViewInstanceAfterUnmount;
 @property (nonatomic, copy) NSString * _Nullable webViewKey;
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;

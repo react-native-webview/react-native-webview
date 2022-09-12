@@ -327,11 +327,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     });
   }
 
-  @ReactProp(name = "keepWebViewInstanceAfterUnmount")
-  public void setKeepWebViewInstanceAfterUnmount(RNCWebView view, boolean keepWebViewInstanceAfterUnmount) {
-    view.ifHasInternalWebView(webView -> webView.setKeepWebViewInstanceAfterUnmount(keepWebViewInstanceAfterUnmount));
-  }
-
   @ReactProp(name = "showsHorizontalScrollIndicator")
   public void setShowsHorizontalScrollIndicator(RNCWebView view, boolean enabled) {
     view.ifHasInternalWebView(webView -> webView.setHorizontalScrollBarEnabled(enabled));
@@ -875,7 +870,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     }
 
     view.ifHasInternalWebView(webView -> {
-      if (webView.webViewKey == null || !webView.keepWebViewInstanceAfterUnmount) {
+      if (webView.webViewKey == null) {
         ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener(webView);
         webView.cleanupCallbacksAndDestroy();
         mWebChromeClient = null;
@@ -1625,7 +1620,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
     protected @Nullable
     String webViewKey;
-    protected boolean keepWebViewInstanceAfterUnmount = false;
 
 
     protected @Nullable
@@ -1784,10 +1778,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
     public void setWebViewKey(String webViewKey) {
       this.webViewKey = webViewKey;
-    }
-
-    public void setKeepWebViewInstanceAfterUnmount(boolean keepWebViewInstanceAfterUnmount) {
-      this.keepWebViewInstanceAfterUnmount = keepWebViewInstanceAfterUnmount;
     }
 
     protected RNCWebViewBridge createRNCWebViewBridge(InternalWebView webView) {

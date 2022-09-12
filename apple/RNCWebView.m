@@ -534,7 +534,7 @@ RCTAutoInsetsProtocol>
 
 - (void)removeFromSuperview
 {
-  bool keepWebViewInstance = _keepWebViewInstanceAfterUnmount && _webViewKey != nil;
+  bool keepWebViewInstance = _webViewKey != nil;
   if (!keepWebViewInstance) {
     [self cleanUpWebView];
   }
@@ -1762,7 +1762,7 @@ didFinishNavigation:(WKNavigation *)navigation
 }
 
 - (BOOL) shouldReuseWebView {
-  return _keepWebViewInstanceAfterUnmount && _webViewKey != nil;
+  return _webViewKey != nil;
 }
 
 - (void) addScriptHandlerForMessages: (WKUserContentController *)userContentController {
