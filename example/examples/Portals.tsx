@@ -166,7 +166,6 @@ function PortalGatesPage() {
       <WebView
           source={source}
           webViewKey={WEB_VIEW_KEY}
-          keepWebViewInstanceAfterUnmount
           ref={webViewRef}
           enableMessaging
         />

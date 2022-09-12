@@ -115,10 +115,6 @@ RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, RNCWebViewPermissionGrantType)
 #endif
 
-RCT_CUSTOM_VIEW_PROPERTY(keepWebViewInstanceAfterUnmount, BOOL, RNCWebView) {
-    view.keepWebViewInstanceAfterUnmount = json == nil ? false : [RCTConvert BOOL: json];
-}
-
 RCT_EXPORT_VIEW_PROPERTY(webViewKey, NSString)
 
 /**
