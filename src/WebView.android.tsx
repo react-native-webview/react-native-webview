@@ -57,7 +57,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   setDisplayZoomControls = false,
   nestedScrollEnabled = false,
   startInLoadingState,
-  enableMessaging,
+  messagingWithWebViewKeyEnabled,
   onNavigationStateChange,
   onLoadStart,
   onError,
@@ -165,7 +165,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    messagingEnabled={typeof onMessageProp === 'function' || (enableMessaging ?? false)}
+    messagingEnabled={typeof onMessageProp === 'function' || (messagingWithWebViewKeyEnabled ?? false)}
     messagingModuleName={messagingModuleName}
 
     onLoadingError={onLoadingError}

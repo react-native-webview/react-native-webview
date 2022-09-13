@@ -16,7 +16,7 @@ RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"onMessage"];
+  return @[@"ReactNativeWebViewOnMessageWithWebViewKey"];
 }
 
 // Will be called when this module's first listener is added.
@@ -37,7 +37,7 @@ RCT_EXPORT_MODULE();
 {
   if (_hasListeners && [[notification name] isEqualToString:kScriptMessageNotificationName]) {
     NSDictionary* userInfo = notification.userInfo;
-    [self sendEventWithName:@"onMessage" body:userInfo];
+    [self sendEventWithName:@"ReactNativeWebViewOnMessageWithWebViewKey" body:userInfo];
   }
 }
 

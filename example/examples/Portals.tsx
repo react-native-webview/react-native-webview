@@ -1,16 +1,9 @@
 import * as React from 'react';
-import {View, Button, Text, NativeEventEmitter, NativeModules, Platform} from 'react-native';
-import {WebView, releaseWebView, injectJavaScriptWithWebViewKey} from 'react-native-webview';
+import {View, Button, Text} from 'react-native';
+import {WebView, releaseWebView, injectJavaScriptWithWebViewKey, addOnMessageListenerForWebViewKey} from 'react-native-webview';
 import PortalGate from '../portals/PortalGate';
 import PortalProvider from '../portals/PortalProvider';
 import { PortalContext } from '../portals/PortalContext';
-
-const scriptMessageEmitter = new NativeEventEmitter(
-  Platform.select({
-    ios: NativeModules.ScriptMessageEventEmitter,
-    android: null
-  })
-);
 
 const IFRAME_URI = 'https://www.usaswimming.org';
 const BLUE_GATE_NAME = 'blueGate';
@@ -116,8 +109,8 @@ export default function Portals() {
   const [pageNumber, setPageNumber] = React.useState(PORTALS_PAGE);
 
   React.useEffect(() => {
-    const subscription = scriptMessageEmitter.addListener('onMessage', (eventData) => {
-      if (eventData.data === INCREMENT_SECONDS_COUNTER_MESSAGE && eventData.webViewKey === WEB_VIEW_KEY) {
+    const subscription = addOnMessageListenerForWebViewKey(WEB_VIEW_KEY, (eventData) => {
+      if (eventData.data === INCREMENT_SECONDS_COUNTER_MESSAGE) {
         secondsCounter.setValue(secondsCounter.getValue() + 1);
       }
     });
@@ -167,7 +160,7 @@ function PortalGatesPage() {
           source={source}
           webViewKey={WEB_VIEW_KEY}
           ref={webViewRef}
-          enableMessaging
+          messagingWithWebViewKeyEnabled
         />
     );
   }, [releaseCounter]);
