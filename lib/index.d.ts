@@ -1,6 +1,7 @@
 import WebView from './WebView';
 import releaseWebView from './releaseWebView';
 import injectJavaScriptWithWebViewKey from './injectJavaScriptWithWebViewKey';
-export { WebView, releaseWebView, injectJavaScriptWithWebViewKey };
+import addOnMessageListenerForWebViewKey from './addOnMessageListenerWithWebViewKey';
+export { WebView, releaseWebView, injectJavaScriptWithWebViewKey, addOnMessageListenerForWebViewKey };
 export default WebView;
 //# sourceMappingURL=index.d.ts.map

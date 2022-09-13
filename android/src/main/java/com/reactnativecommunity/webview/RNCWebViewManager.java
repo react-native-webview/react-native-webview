@@ -1800,7 +1800,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
           WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, webView.getUrl());
           data.putString("webViewKey", webViewKey);
           data.putString("data", message);
-          reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onMessage", data);
+          reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ReactNativeWebViewOnMessageWithWebViewKey", data);
         });
       } else if (mRNCWebViewClient != null) {
         webView.post(new Runnable() {

@@ -596,12 +596,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
      */
     webViewKey?: string;
     /**
-     * If webViewKey is set, the onMessage callback won't work after
-     * navigating away from the WebView. Instead, to handle messages, set enableMesaging
-     * to true, and use ScriptMessageEventEmitter to listen to messages for a given
-     * webViewKey.
+     * If a webViewKey is set, the onMessage callback will not work.
+     * Instead, to handle messages, set messagingWithWebViewKeyEnabled
+     * to true, and call 'addOnMessageWithWebViewKeyListener' to listen to messages for a given
+     * webViewKey
      */
-    enableMessaging?: boolean;
+    messagingWithWebViewKeyEnabled?: boolean;
 }
 export interface MacOSWebViewProps extends WebViewSharedProps {
     /**
@@ -932,12 +932,12 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
      */
     webViewKey?: string;
     /**
-     * If webViewKey is set, the onMessage callback won't work after
-     * navigating away from the WebView. Instead, to handle messages, set enableMesaging
-     * to true, and use ScriptMessageEventEmitter to listen to messages for a given
-     * webViewKey.
-     */
-    enableMessaging?: boolean;
+      * If a webViewKey is set, the onMessage callback will not work.
+      * Instead, to handle messages, set messagingWithWebViewKeyEnabled
+      * to true, and call 'addOnMessageWithWebViewKeyListener' to listen to messages for a given
+      * webViewKey
+      */
+    messagingWithWebViewKeyEnabled?: boolean;
 }
 export interface WebViewSharedProps extends ViewProps {
     /**

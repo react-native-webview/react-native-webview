@@ -294,6 +294,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       injectedJavaScriptForMainFrameOnly = true,
       injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true,
       style,
+      messagingWithWebViewKeyEnabled,
       containerStyle,
       ...otherProps
     } = this.props;
@@ -337,7 +338,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
         key="webViewKey"
         {...otherProps}
         decelerationRate={decelerationRate}
-        messagingEnabled={typeof onMessage === 'function' || (this.props.enableMessaging ?? false)}
+        messagingEnabled={typeof onMessage === 'function' || (messagingWithWebViewKeyEnabled ?? false)}
         onLoadingError={this.onLoadingError}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingProgress={this.onLoadingProgress}
