@@ -7,6 +7,7 @@ const scriptMessageEmitter = new NativeEventEmitter(
   })
 );
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function addOnMessageListenerWithWebViewKey(webViewKey: string, listener: (event: any) => void): EmitterSubscription {
   return scriptMessageEmitter.addListener('ReactNativeWebViewOnMessageWithWebViewKey', (eventData) => {
     if (eventData.webViewKey === webViewKey) {

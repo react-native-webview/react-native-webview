@@ -5,6 +5,7 @@ module.exports = {
   plugins: ['react', 'react-native', 'import', '@typescript-eslint'],
   rules: {
     'no-console': 'off',
+    'no-unused-vars': 'off',
     // Lines will be broken before binary operators
     'operator-linebreak': ['error', 'before'],
     // Allow imports from dev and peer dependencies
@@ -61,7 +62,10 @@ module.exports = {
     ],
     '@typescript-eslint/no-unused-vars': [
       'error',
-      { ignoreRestSiblings: true },
+      { 
+        ignoreRestSiblings: true,
+        argsIgnorePattern: "^_"
+      },
     ],
     '@typescript-eslint/consistent-type-definitions': [
       'error',
