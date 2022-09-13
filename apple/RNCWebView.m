@@ -198,6 +198,15 @@ static NSDictionary* customCertificatesForHost;
   return self;
 }
 
+- (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AVAILABLE(ios(13.0))  {
+  if (@available(iOS 16.0, *)) {
+    [builder removeMenuForIdentifier:UIMenuLookup];
+    [builder removeMenuForIdentifier:UIMenuStandardEdit];
+    [builder removeMenuForIdentifier:UIMenuShare];
+  }
+  [super buildMenuWithBuilder:builder];
+}
+
 - (void)hideMenu
 {
   [[UIMenuController sharedMenuController] setMenuVisible:NO animated:NO];
