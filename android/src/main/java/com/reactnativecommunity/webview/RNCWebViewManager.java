@@ -1689,22 +1689,22 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
             @Override
             public void onReceiveValue(String value) {
               try{
-                JSONObject json = new JSONObject(value.substring(1, value.length() - 1).replaceAll("\\\\",""));
-                double x = json.getDouble("x"); 
-                double y = json.getDouble("y"); 
-                double width = json.getDouble("width"); 
-                double height = json.getDouble("height"); 
-                String selectionText = URLDecoder.decode(json.getString("selectionText"));
-                if(x != RNCWebView.this.selectionX || y != RNCWebView.this.selectionY || width != RNCWebView.this.selectionWidth  || height != RNCWebView.this.selectionHeight || selectionText != RNCWebView.this.selectionText){
-                  RNCWebView.this.selectionX = x;
-                  RNCWebView.this.selectionY = y;
-                  RNCWebView.this.selectionWidth = width;
-                  RNCWebView.this.selectionHeight = height;
-                  RNCWebView.this.selectionText = selectionText;
-                  mode.invalidateContentRect();
-                }
+                  JSONObject json = new JSONObject(value.substring(1, value.length() - 1).replaceAll("\\\\",""));
+                  double x = json.getDouble("x"); 
+                  double y = json.getDouble("y"); 
+                  double width = json.getDouble("width"); 
+                  double height = json.getDouble("height"); 
+                  String selectionText = URLDecoder.decode(json.getString("selectionText"));
+                  if(x != RNCWebView.this.selectionX || y != RNCWebView.this.selectionY || width != RNCWebView.this.selectionWidth  || height != RNCWebView.this.selectionHeight || selectionText != RNCWebView.this.selectionText){
+                    RNCWebView.this.selectionX = x;
+                    RNCWebView.this.selectionY = y;
+                    RNCWebView.this.selectionWidth = width;
+                    RNCWebView.this.selectionHeight = height;
+                    RNCWebView.this.selectionText = selectionText;
+                    mode.invalidateContentRect();
+                  }
               }catch(JSONException e){
-                throw new RuntimeException(e);
+                Log.w(TAG, "Selection info not valid JSON", e);
               }
             }
           });

@@ -18,6 +18,23 @@ const HTML = `
         background: #ccc;
       }
     </style>
+    <script>
+      //script to clear selection/highlight
+      const messageEventListenerFn = (e) =>{
+        try{  
+          if(e.origin === '' && typeof window.ReactNativeWebView === 'object'){
+            const parsedData = JSON.parse(e.data)  
+            if(parsedData?.what === 'clearSelection'){
+              window.getSelection()?.removeAllRanges()
+            }
+          }
+        }catch(e){
+          console.log('External: ', 'exception in eventListener: ', e.message)
+        } 
+      }
+      window.addEventListener('message', (e) => messageEventListenerFn(e))
+      document.addEventListener('message', (e) => messageEventListenerFn(e))
+    </script>
   </head>
   <body>
     <p>
@@ -40,18 +57,21 @@ type State = {};
 //export default class CustomMenu extends Component<Props, State> {
 export default CustomMenu = () => {
   const [selectionInfo, setSelectionInfo] = React.useState(null)
+  const webviewRef = React.useRef()
 
     return (
       <View>
         <View style={{ height: 120 }}>
           <WebView
+            ref={webviewRef}
             source={{html: HTML}}
             automaticallyAdjustContentInsets={false}
             menuItems={[{ label: 'Highlight', key: 'highlight' }, { label: 'Strikethrough', key: 'strikethrough' }]}
             onCustomMenuSelection={(webViewEvent) => {
               const { label, key, selectedText } = webViewEvent.nativeEvent;
-              console.log('Custom Menu Tapped: ', label, ' :: ', key, ' :: ', selectedText)
               setSelectionInfo(webViewEvent.nativeEvent)
+              //clearing the selection by sending a message. This would need a script on the source page to listen to the message.
+              webviewRef.current?.postMessage(JSON.stringify({what: 'clearSelection'}))
             }}
           />
         </View>
