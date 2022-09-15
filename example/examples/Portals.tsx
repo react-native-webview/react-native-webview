@@ -70,6 +70,11 @@ function PortalGatesPage() {
           webViewKey={WEB_VIEW_KEY}
           keepWebViewInstanceAfterUnmount
           ref={webViewRef}
+          startInLoadingState
+          onLoad={() => { console.log("onLoad") }}
+          onLoadEnd={() => { console.log("onLoadEnd") }}
+          onLoadStart={() => { console.log("onLoadStart") }}
+          onLoadProgress={() => { console.log("onLoadProgress") }}
         />
     );
   }, [releaseCounter]);
