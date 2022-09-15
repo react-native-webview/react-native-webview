@@ -546,6 +546,10 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         }
         view.setWebView(webview);
         view.markSourceInitialized();
+
+        String url = source.getString("uri");
+        view.getRNCWebViewClient().emitFinishEvent(view.getWebView(), url);
+
         return;
       } else {
         // そうでない場合はインスタンスを保持し、loadUrl() などの以降の処理も行う
@@ -987,7 +991,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       this.rncWebView.dispatchEvent(
         webView,
         new TopLoadingStartEvent(
-          webView.getId(),
+          this.rncWebView.getId(),
           createWebViewEvent(webView, url)));
     }
 
@@ -1034,7 +1038,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         this.rncWebView.dispatchEvent(
           view,
           new TopShouldStartLoadWithRequestEvent(
-            view.getId(),
+            this.rncWebView.getId(),
             createWebViewEvent(view, url)));
         return true;
       }
@@ -1149,7 +1153,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
       this.rncWebView.dispatchEvent(
         webView,
-        new TopLoadingErrorEvent(webView.getId(), eventData));
+        new TopLoadingErrorEvent(this.rncWebView.getId(), eventData));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -1167,7 +1171,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
         this.rncWebView.dispatchEvent(
           webView,
-          new TopHttpErrorEvent(webView.getId(), eventData));
+          new TopHttpErrorEvent(this.rncWebView.getId(), eventData));
       }
     }
 
@@ -1199,7 +1203,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
       this.rncWebView.dispatchEvent(
           webView,
-          new TopRenderProcessGoneEvent(webView.getId(), event)
+          new TopRenderProcessGoneEvent(this.rncWebView.getId(), event)
         );
 
         // returning false would crash the app.
@@ -1210,7 +1214,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       this.rncWebView.dispatchEvent(
         webView,
         new TopLoadingFinishEvent(
-          webView.getId(),
+          this.rncWebView.getId(),
           createWebViewEvent(webView, url)));
     }
 
@@ -1324,7 +1328,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       this.mRncWebView.dispatchEvent(
         webView,
         new TopLoadingProgressEvent(
-          webView.getId(),
+          this.mRncWebView.getId(),
           event));
     }
 
