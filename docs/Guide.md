@@ -573,9 +573,9 @@ const onAndroidBackPress = () => {
 useEffect(() => {
   if (Platform.OS === 'android') {
     BackHandler.addEventListener('hardwareBackPress', onAndroidBackPress);
-      return () => {
-        BackHandler.removeEventListener('hardwareBackPress', onAndroidBackPress);
-      };
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', onAndroidBackPress);
+    };
   }
 }, []);
 ```
