@@ -1676,14 +1676,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-          return true;
-        }
-
-        @Override
-        public void onGetContentRect (ActionMode mode, 
-                View view, 
-                Rect outRect){
-
           String js = "(function(){ const wr = " + RNCWebView.this.getWidth() + "/window.innerWidth; const hr = " + RNCWebView.this.getHeight() +"/window.innerHeight; const rect = window.getSelection()?.getRangeAt(0)?.getBoundingClientRect(); return JSON.stringify({x: (rect?.x * wr), y: (rect?.y * hr), width: (rect?.width * wr), height: (rect?.height * hr), selectionText: encodeURIComponent(window.getSelection().toString())})})()";
           RNCWebView.this.evaluateJavascript(js, new ValueCallback<String>() {
             @Override
@@ -1708,6 +1700,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
               }
             }
           });
+          return true;
+        }
+
+        @Override
+        public void onGetContentRect (ActionMode mode, 
+                View view, 
+                Rect outRect){
           outRect.set(
             (int)RNCWebView.this.selectionX,
             (int)RNCWebView.this.selectionY,
