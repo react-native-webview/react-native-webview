@@ -455,7 +455,11 @@ RCTAutoInsetsProtocol>
   _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 }
 
+#ifdef RCT_NEW_ARCH_ENABLED
+- (void)destroyWebView
+#else
 - (void)removeFromSuperview
+#endif
 {
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
@@ -472,7 +476,9 @@ RCTAutoInsetsProtocol>
     }
   }
 
+#ifndef RCT_NEW_ARCH_ENABLED
   [super removeFromSuperview];
+#endif
 }
 
 #if !TARGET_OS_OSX

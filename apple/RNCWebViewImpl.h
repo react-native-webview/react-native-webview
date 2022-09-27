@@ -123,6 +123,9 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 - (void)reload;
 - (void)stopLoading;
 - (void)requestFocus;
+#ifdef RCT_NEW_ARCH_ENABLED
+- (void)destroyWebView;
+#endif
 #if !TARGET_OS_OSX
 - (void)addPullToRefreshControl;
 - (void)pullToRefresh:(UIRefreshControl *_Nonnull)refreshControl;
