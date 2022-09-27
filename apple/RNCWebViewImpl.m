@@ -1154,9 +1154,13 @@ RCTAutoInsetsProtocol>
             });
 
         }];
+        if (request.mainDocumentURL) {
+          [event addEntriesFromDictionary: @{
+            @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
+          }];
+        }
         [event addEntriesFromDictionary: @{
             @"url": (request.URL).absoluteString,
-            @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
             @"navigationType": navigationTypes[@(navigationType)],
             @"isTopFrame": @(isTopFrame),
             @"lockIdentifier": @(lockIdentifier)

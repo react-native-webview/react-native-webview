@@ -1,4 +1,4 @@
-# React Native WebView - Um moderno, multiplataforma WebView para React Native
+# React Native WebView - Um moderno, WebView multiplataforma para React Native
 
 [![star this repo](http://githubbadges.com/star.svg?user=react-native-webview&repo=react-native-webview&style=flat)](https://github.com/react-native-webview/react-native-webview)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
@@ -6,11 +6,11 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/react-native-webview/react-native-webview/badge.svg?style=flat-square)](https://snyk.io/test/github/react-native-webview/react-native-webview)
 <a href="https://www.npmjs.com/package/react-native-webview"><img src="https://img.shields.io/npm/v/react-native-webview.svg"></a>
 
-**React Native WebView** é um moderno, bem apoiado, e multiplataforma WebView para React Native. É projetado para substituir o WebView embutido(que sera [removido do core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
+**React Native WebView** é um moderno WebView multiplataforma para React Native. Ele foi projetado para substituir o WebView embutido(que será [removido do core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
-## Mantenedores principais - Empresas Patrocinadoras
+## Principais Mantenedores - Empresas Patrocinadoras
 
-_Esse projeto é mantido gratuitamente por essas pessoas usando ambos seu tempo livre e tempo de trabalho na empresa._
+_Esse projeto é mantido gratuitamente por essas pessoas usando ambos, seu tempo livre e tempo de trabalho na empresa._
 
 - [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://brigad.co/about)
 - [Jamon Holmgren](https://github.com/jamonholmgren) ([Twitter @jamonholmgren](https://twitter.com/jamonholmgren)) from [Infinite Red](https://infinite.red/react-native)
@@ -49,16 +49,16 @@ Versão atual: ![version](https://img.shields.io/npm/v/react-native-webview.svg)
 - [3.0.0](https://github.com/react-native-webview/react-native-webview/releases/tag/v3.0.0) - WKWebview: Adicionado um pool de processos compartilhados para que os cookies e o localStorage sejam compartilhados nas webviews no iOS (habilitadas por padrão)
 - [2.0.0](https://github.com/react-native-webview/react-native-webview/releases/tag/v2.0.0) - Primeiro lançamento, esta é uma réplica do componente principal do webview.
 
-**Seguinte:**
+**Próximos Passos:**
 
 - Remoção do this.webView.postMessage() (
-  nunca documentado e menos flexível que o injectJavascript) -> [Como migrar](https://github.com/react-native-webview/react-native-webview/issues/809)
+  nunca foi documentado e é menos flexível que o injectJavascript) -> [Como migrar](https://github.com/react-native-webview/react-native-webview/issues/809)
 - Reescrita em Kotlin
 - Talvez reescrita em Swift
 
 ## Uso
 
-Importe o componente `WebView` de `react-native-webview` e use assim:
+Importe o componente `WebView` `react-native-webview` e use assim:
 
 ```jsx
 import React, { Component } from 'react';
@@ -86,7 +86,7 @@ Veja [Contributing.md](https://github.com/react-native-webview/react-native-webv
 
 ## Contribuidores
 
-Obrigado vai a essas pessoas maravilhosas ([emoji key](https://github.com/all-contributors/all-contributors#emoji-key-)):
+Um grande obrigado vai para essas pessoas maravilhosas ([emoji key](https://github.com/all-contributors/all-contributors#emoji-key-)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->

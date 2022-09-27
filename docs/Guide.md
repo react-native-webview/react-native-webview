@@ -15,6 +15,7 @@ _This guide is currently a work in progress._
 - [Add support for File Download](Guide.md#add-support-for-file-download)
 - [Communicating between JS and Native](Guide.md#communicating-between-js-and-native)
 - [Working with custom headers, sessions, and cookies](Guide.md#working-with-custom-headers-sessions-and-cookies)
+- [Page navigation gesture and button support](Guide.md#page-navigation-gesture-and-button-support)
 
 ### Basic inline HTML
 
@@ -539,6 +540,52 @@ const App = () => {
 ```
 
 Note that these cookies will only be sent on the first request unless you use the technique above for [setting custom headers on each page load](#Setting-Custom-Headers).
+
+### Page navigation gesture and button support
+We can provide support for conventional mobile page navigation: forward/back swipe gestures on iOS and the hardware back button/gesture on Android.
+
+For iOS, you'll just need to use the [`allowsbackforwardnavigationgestures`](Reference.md#allowsbackforwardnavigationgestures) prop.
+
+For Android, you need to use `BackHandler.addEventListener` and hook that up to call `goBack` on the `WebView`.
+
+With functional React components, you can use `useRef` and `useEffect` (you'll need to import them from React if you aren't already) to allow users to navigate to the previous page when they press the back button like so:
+```jsx
+import React, {
+    useEffect,
+    useRef,
+} from 'react';
+import {
+    BackHandler,
+    Platform,
+} from 'react-native';
+```
+
+```jsx
+const webViewRef = useRef(null);
+const onAndroidBackPress = () => {
+  if (webViewRef.current) {
+    webViewRef.current.goBack();
+    return true; // prevent default behavior (exit app)
+  }
+  return false;
+};
+
+useEffect(() => {
+  if (Platform.OS === 'android') {
+    BackHandler.addEventListener('hardwareBackPress', onAndroidBackPress);
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', onAndroidBackPress);
+    };
+  }
+}, []);
+```
+
+And add this prop to your `WebView` component:
+```jsx
+<WebView
+  ref={webViewRef}
+/>
+```
 
 ### Hardware Silence Switch
 
