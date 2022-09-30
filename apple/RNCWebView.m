@@ -426,6 +426,8 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.pagingEnabled = _pagingEnabled;
     //For UIRefreshControl to work correctly, the bounces should always be true
     _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
+    _webView.scrollView.alwaysBounceHorizontal = _pullToRefreshEnabled || bounces;
+    _webView.scrollView.alwaysBounceVertical = _pullToRefreshEnabled || bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
@@ -1423,6 +1425,8 @@ didFinishNavigation:(WKNavigation *)navigation
   _bounces = bounces;
   //For UIRefreshControl to work correctly, the bounces should always be true
   _webView.scrollView.bounces = _pullToRefreshEnabled || bounces;
+  _webView.scrollView.alwaysBounceHorizontal = _pullToRefreshEnabled || bounces;
+  _webView.scrollView.alwaysBounceVertical = _pullToRefreshEnabled || bounces;
 }
 #endif // !TARGET_OS_OSX
 
