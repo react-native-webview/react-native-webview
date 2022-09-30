@@ -133,6 +133,8 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => Commands.requestFocus(webViewRef.current),
+    // @ts-ignore
+    getNativeTag: () => webViewRef.current._nativeTag,
   }), [setViewState, webViewRef]);
 
 

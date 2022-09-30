@@ -119,6 +119,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     clearFormData: () => Commands.clearFormData(webViewRef.current),
     clearCache: (includeDiskFiles: boolean) => Commands.clearCache(webViewRef.current, includeDiskFiles),
     clearHistory: () => Commands.clearHistory(webViewRef.current),
+    // @ts-ignore
+    getNativeTag: () => webViewRef.current._nativeTag,
   }), [setViewState, webViewRef]);
 
   const directEventCallbacks = useMemo(() => ({
