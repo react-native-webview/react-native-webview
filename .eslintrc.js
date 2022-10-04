@@ -4,7 +4,6 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['react', 'react-native', 'import', '@typescript-eslint'],
   rules: {
-    'no-underscore-dangle': 'off',
     'no-console': 'off',
     // Lines will be broken before binary operators
     'operator-linebreak': ['error', 'before'],
