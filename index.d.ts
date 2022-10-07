@@ -18,6 +18,11 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     goForward: () => void;
 
     /**
+     * Get a ref of NativeWebView.
+     */
+    getNativeWebView: () => WebView | null;
+
+    /**
      * Reloads the current page.
      */
     reload: () => void;
@@ -37,7 +42,7 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      */
     requestFocus: () => void;
     
-     /**
+    /**
      * Posts a message to WebView.
      */
     postMessage: (message: string) => void;
