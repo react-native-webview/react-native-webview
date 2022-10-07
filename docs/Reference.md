@@ -102,6 +102,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
 - [`postMessage`](Reference.md#postmessagestr)
+- [`getNativeWebView`](Reference.md#getnativewebview)
 
 ---
 
@@ -1673,6 +1674,14 @@ clearHistory();
 ```
 
 Tells this WebView to clear its internal back/forward list. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearHistory()>)
+
+### `getNativeWebView()`[⬆](#methods-index)<!-- Link generated with jump2header -->
+
+```javascript
+getNativeWebView();
+```
+
+Returns a ref of the native WebView component.
 
 ## Other Docs
 
