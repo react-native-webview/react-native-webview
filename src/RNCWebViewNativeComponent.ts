@@ -187,7 +187,7 @@ export interface NativeProps extends ViewProps {
   >;
   decelerationRate?: Double;
   directionalLockEnabled?: boolean;
-  enableApplePay: boolean;
+  enableApplePay?: boolean;
   hideKeyboardAccessoryView?: boolean;
   keyboardDisplayRequiresUserAction?: boolean;
   limitsNavigationsToAppBoundDomains?: boolean;
@@ -233,7 +233,15 @@ export interface NativeProps extends ViewProps {
   onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
-  source: Readonly<{uri: string}>;
+  source: Readonly<{
+    uri?: string
+    method?: string;
+    body?: string;
+    // eslint-disable-next-line @typescript-eslint/array-type
+    headers?: ReadonlyArray<Readonly<{name: string, value: string}>>;
+    html?: string;
+    baseUrl?: string;
+  }>;
   userAgent?: string;
 }
 

@@ -38,7 +38,7 @@ RCT_EXPORT_MODULE(RNCWebView)
 
 - (UIView *)view
 {
-return [[UIView alloc] init];
+return [[RNCWebViewImpl alloc] init];
 }
 
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)

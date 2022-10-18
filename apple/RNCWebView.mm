@@ -318,11 +318,6 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(textInteractionEnabled)
 #endif
     
-    if (oldViewProps.source.uri != newViewProps.source.uri) {
-        [_view setSource:@{
-            @"uri": RCTNSStringFromString(newViewProps.source.uri),
-        }];
-    }
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
         WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
             if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
@@ -415,6 +410,32 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }
     }
 #endif
+    
+    NSMutableDictionary* source = [[NSMutableDictionary alloc] init];
+    if (!newViewProps.source.uri.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.source.uri) forKey:@"uri"];
+    }
+    NSMutableDictionary* headers = [[NSMutableDictionary alloc] init];
+    for (auto & element : newViewProps.source.headers) {
+        [headers setValue:RCTNSStringFromString(element.value) forKey:RCTNSStringFromString(element.name)];
+    }
+    if (headers.count > 0) {
+        [source setObject:headers forKey:@"headers"];
+    }
+    if (!newViewProps.source.baseUrl.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.source.baseUrl) forKey:@"baseUrl"];
+    }
+    if (!newViewProps.source.body.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.source.body) forKey:@"body"];
+    }
+    if (!newViewProps.source.html.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.source.html) forKey:@"html"];
+    }
+    if (!newViewProps.source.method.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.source.method) forKey:@"method"];
+    }
+    [_view setSource:source];
+    
     [super updateProps:props oldProps:oldProps];
 }
 

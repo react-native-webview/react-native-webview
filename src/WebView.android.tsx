@@ -11,7 +11,7 @@ import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativ
 
 import invariant from 'invariant';
 
-import RNCWebView from "./WebViewNativeComponent.android";
+import RNCWebView from "./RNCWebViewNativeComponent";
 import RNCWebViewModule from "./NativeRNCWebView";
 import {
   defaultOriginWhitelist,

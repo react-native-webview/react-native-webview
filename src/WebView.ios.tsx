@@ -3,11 +3,12 @@ import {
   Image,
   View,
   ImageSourcePropType,
+  HostComponent,
 } from 'react-native';
 import invariant from 'invariant';
 
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import RNCWebView from "./WebViewNativeComponent.ios";
+import RNCWebView, {NativeProps} from "./RNCWebViewNativeComponent";
 import RNCWebViewModule from "./NativeRNCWebView";
 
 import {
@@ -19,7 +20,6 @@ import {
 import {
   IOSWebViewProps,
   DecelerationRateConstant,
-  NativeWebViewIOS,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -85,7 +85,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
   ...otherProps
 }, ref) => {
-  const webViewRef = useRef<NativeWebViewIOS | null>(null);
+  const webViewRef = useRef<HostComponent<NativeProps> | null>(null);
 
   const onShouldStartLoadWithRequestCallback = useCallback((
     shouldStart: boolean,
@@ -152,7 +152,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   const decelerationRate = processDecelerationRate(decelerationRateProp);
 
   const NativeWebView
-  = (nativeConfig?.component as typeof NativeWebViewIOS | undefined)
+  = (nativeConfig?.component as typeof RNCWebView | undefined)
   || RNCWebView;
 
   const webView = (
@@ -165,6 +165,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       textInteractionEnabled={textInteractionEnabled}
       decelerationRate={decelerationRate}
       messagingEnabled={typeof onMessage === 'function'}
+      messagingModuleName="" // android ONLY
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
       onLoadingProgress={onLoadingProgress}
@@ -178,15 +179,14 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
       injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
       injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
-      dataDetectorTypes={dataDetectorTypes}
+      dataDetectorTypes={!dataDetectorTypes || Array.isArray(dataDetectorTypes) ? dataDetectorTypes : [dataDetectorTypes]}
       allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
       allowsInlineMediaPlayback={allowsInlineMediaPlayback}
       incognito={incognito}
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
-      ref={webViewRef}
-      // TODO: find a better way to type this.
       source={resolveAssetSource(source as ImageSourcePropType)}
       style={webViewStyles}
+      ref={webViewRef}
       {...nativeConfig?.props}
     />
   );

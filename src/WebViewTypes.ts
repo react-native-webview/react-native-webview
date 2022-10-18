@@ -58,12 +58,6 @@ interface ErrorState extends BaseState {
 export type State = NormalState | ErrorState;
 
 // eslint-disable-next-line react/prefer-stateless-function
-declare class NativeWebViewIOSComponent extends Component<IOSNativeWebViewProps> {}
-declare const NativeWebViewIOSBase: Constructor<NativeMethodsMixin> &
-  typeof NativeWebViewIOSComponent;
-export class NativeWebViewIOS extends NativeWebViewIOSBase {}
-
-// eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}
 declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewMacOSComponent;
@@ -245,7 +239,6 @@ export interface WebViewNativeConfig {
    * The native component used to render the WebView.
    */
   component?:
-    | typeof NativeWebViewIOS
     | typeof NativeWebViewMacOS
     | typeof NativeWebViewComponent;
   /**
@@ -321,37 +314,6 @@ export declare type MediaCapturePermissionGrantType =
   | 'prompt';
 
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
-
-export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
-  allowingReadAccessToURL?: string;
-  allowsBackForwardNavigationGestures?: boolean;
-  allowsInlineMediaPlayback?: boolean;
-  allowsAirPlayForMediaPlayback?: boolean;
-  allowsLinkPreview?: boolean;
-  allowFileAccessFromFileURLs?: boolean;
-  allowUniversalAccessFromFileURLs?: boolean;
-  automaticallyAdjustContentInsets?: boolean;
-  autoManageStatusBarEnabled?: boolean;
-  bounces?: boolean;
-  contentInset?: ContentInsetProp;
-  contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
-  contentMode?: ContentMode;
-  readonly dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
-  decelerationRate?: number;
-  directionalLockEnabled?: boolean;
-  hideKeyboardAccessoryView?: boolean;
-  javaScriptEnabled?: boolean;
-  pagingEnabled?: boolean;
-  scrollEnabled?: boolean;
-  useSharedProcessPool?: boolean;
-  onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
-  injectedJavaScriptForMainFrameOnly?: boolean;
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
-  onFileDownload?: (event: FileDownloadEvent) => void;
-  limitsNavigationsToAppBoundDomains?: boolean;
-  textInteractionEnabled?: boolean;
-  mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
-}
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowingReadAccessToURL?: string;
@@ -706,7 +668,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * `customMenuKey`: the string of the menu item
    * `selectedText`: the text selected on the document
    */
-  onCustomMenuSelection?: (event: WebViewEvent) => void;
+  onCustomMenuSelection?: (event: {nativeEvent: {
+    label: string;
+    key: string;
+    selectedText: string;
+  }
+  }) => void;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
