@@ -566,7 +566,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
               }
             } else {
               if (key.equalsIgnoreCase("Cookie")) {
-                CookieManager.getInstance().setCookie(url, headers.getString(key));
+                URI uri = new URI(url);
+                String domain = uri.getHost();
+                CookieManager.getInstance().setCookie(domain, headers.getString(key));
               }
               
               headerMap.put(key, headers.getString(key));
