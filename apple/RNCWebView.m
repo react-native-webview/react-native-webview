@@ -712,7 +712,7 @@ RCTAutoInsetsProtocol>
       [_webView loadHTMLString:@"" baseURL:nil];
       return;
     }
-    if (request.URL.host) {
+    if (request.URL.host || [request.URL.absoluteString isEqualToString:@"about:blank"]) {
       [_webView loadRequest:request];
     }
     else {

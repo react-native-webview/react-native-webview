@@ -25,7 +25,12 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     /**
      * Stop loading the current page.
      */
-    stopLoading(): void;
+    stopLoading: () => void;
+
+    /**
+     * Loads the url.
+     */
+    loadUrl: (url: string) => void;
 
     /**
      * Executes the JavaScript string.

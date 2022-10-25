@@ -133,6 +133,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => Commands.requestFocus(webViewRef.current),
+    loadUrl: (url: string) => Commands.loadUrl(webViewRef.current, url),
   }), [setViewState, webViewRef]);
 
 
