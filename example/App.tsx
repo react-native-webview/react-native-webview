@@ -21,6 +21,7 @@ import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
 import Portals from './examples/Portals';
+import AssetLoadedWebpage from './examples/AssetLoadedWebpage';
 
 const TESTS = {
   Messaging: {
@@ -111,6 +112,14 @@ const TESTS = {
       return <Portals />;
     },
   },
+  AssetLoaded: {
+    title: 'Asset Loaded Webpage ',
+    testId: 'AssetLoaded',
+    description: 'Test to open a webpage that is mapped to an android asset',
+    render() {
+      return <AssetLoadedWebpage />;
+    },
+  }
 };
 
 type Props = {};
@@ -205,12 +214,17 @@ export default class App extends Component<Props, State> {
                   onPress={() => this._changeTest('ApplePay')}
               />
           )}
-          {(
-            <Button
-              testID="testType_portals"
-              title="Portals"
-              onPress={() => this._changeTest('Portals')}
-            />
+          <Button
+            testID="testType_portals"
+            title="Portals"
+            onPress={() => this._changeTest('Portals')}
+          />
+          {Platform.OS === 'android' && (
+              <Button
+                  testID="testType_assetLoaded"
+                  title="AssetLoaded"
+                  onPress={() => this._changeTest('AssetLoaded')}
+              />
           )}
         </View>
 

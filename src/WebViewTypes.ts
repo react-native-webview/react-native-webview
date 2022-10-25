@@ -186,6 +186,58 @@ export type CacheMode = 'LOAD_DEFAULT' | 'LOAD_CACHE_ONLY' | 'LOAD_CACHE_ELSE_NE
 
 export type AndroidLayerType = 'none' | 'software' | 'hardware';
 
+
+export interface AndroidAssetLoaderPathHandler {
+  /**
+   * Type of handler that produces responses for a registered path
+   * See:
+   * https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader.AssetsPathHandler
+   * https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader.ResourcesPathHandler
+   * https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader.InternalStoragePathHandler
+   */
+  type: 'resources' | 'internal' | 'assets';
+
+  /**
+   * the suffix path to be handled.
+   */
+  path: string;
+
+  /**
+   * For internal type PathHandler, the directory will be the path to the directory in either 
+   * https://developer.android.com/reference/android/content/Context#getDataDir()
+   * or
+   * https://developer.android.com/reference/android/content/Context#getCacheDir()
+   * 
+   * Exposing the entire data or cache directory is not permitted, to avoid accidentally exposing sensitive application files to the web. 
+   * Certain existing subdirectories of getDataDir are also not permitted as they are often sensitive. 
+   * These files are ("app_webview/", "databases/", "lib/", "shared_prefs/" and "code_cache/").
+   * 
+   * This field is unused for type 'resources' or 'assets' 
+   */
+  directory?: string;
+}
+
+
+export interface AndroidAssetLoaderConfig {
+  /**
+   * Set the domain under which app assets can be accessed. The default domain is "appassets.androidplatform.net"
+   */
+  domain?: string;
+
+  /**
+   * Allow using the HTTP scheme in addition to HTTPS. The default is to not allow HTTP.
+   */
+  httpAllowed?: boolean;
+
+
+  /**
+   * Register a list of PathHandlers for a specific path.
+   * The path should start and end with a "/" and it shouldn't collide with a real web path.
+   * WebViewAssetLoader will try PathHandlers in the order they're registered, and will use whichever is the first to return a non-null.
+   */
+  pathHandlers: AndroidAssetLoaderPathHandler[]
+}
+
 export interface WebViewSourceUri {
   /**
    * The URI to load in the `WebView`. Can be a local or remote file.
@@ -312,6 +364,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   scalesPageToFit?: boolean;
   allowFileAccessFromFileURLs?: boolean;
   allowUniversalAccessFromFileURLs?: boolean;
+  androidAssetLoaderConfig?: AndroidAssetLoaderConfig
   androidHardwareAccelerationDisabled?: boolean;
   androidLayerType?: AndroidLayerType;
   domStorageEnabled?: boolean;
@@ -1011,6 +1064,13 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   androidLayerType?: AndroidLayerType;
+
+  /**
+   * https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader
+   * Sets the AssetLoader configuration to load local files including application's static
+   * assets and resources using http(s):// URLS inside a WebView. 
+   */
+  androidAssetLoaderConfig?: AndroidAssetLoaderConfig;
 
   /**
    * Boolean value to enable third party cookies in the `WebView`. Used on

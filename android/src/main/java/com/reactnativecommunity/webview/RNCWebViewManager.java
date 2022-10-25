@@ -49,6 +49,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewFeature;
 
 import com.facebook.common.logging.FLog;
@@ -91,16 +92,20 @@ import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEven
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -163,6 +168,8 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
   protected boolean mAllowsFullscreenVideo = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
+
+  Set<String> assetLoaderHandlerTypes = new HashSet<>(Arrays.asList("assets", "internal", "resources"));
 
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -387,6 +394,63 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         layerType = View.LAYER_TYPE_NONE;
     }
     view.ifHasInternalWebView(webView -> webView.setLayerType(layerType, null));
+  }
+
+  @ReactProp(name = "androidAssetLoaderConfig")
+  public void setAssetLoaderConfig(RNCWebView view, @Nullable ReadableMap config) {
+    WebViewAssetLoader.Builder builder = new WebViewAssetLoader.Builder();
+
+    String domain = config.getString("domain");
+    if (domain != null) {
+      builder.setDomain(domain);
+    }
+
+    if (config.hasKey("httpAllowed")) {
+      builder.setHttpAllowed(config.getBoolean("httpAllowed"));
+    }
+
+    ReadableArray handlers = config.getArray("pathHandlers");
+    if (handlers != null && handlers.size() > 0) {
+      for (int i = 0; i < handlers.size(); i++) {
+        final ReadableMap handler = handlers.getMap(i);
+        String handlerType = handler.getString("type");
+
+        if (handlerType == null) {
+          FLog.w(TAG, "WebViewAssetLoader error. Path Handler type is null.");
+          continue;
+        }
+
+        if (!assetLoaderHandlerTypes.contains(handlerType)) {
+          FLog.w(TAG, "WebViewAssetLoader error. Skipping Path Handler. Unexpected handler type: " + handlerType + ". Path Handler type must be one of " + assetLoaderHandlerTypes);
+          continue;
+        }
+
+        String handlerPath = handler.getString("path");
+
+        if (handlerPath == null) {
+          FLog.w(TAG, "WebViewAssetLoader error. Skipping Path Handler. Handler path is missing");
+          continue;
+        }
+
+        if (handlerType.equals("resources")) {
+          builder.addPathHandler(handlerPath, new WebViewAssetLoader.ResourcesPathHandler(view.getContext()));
+        } else if (handlerType.equals("assets")) {
+          builder.addPathHandler(handlerPath, new WebViewAssetLoader.AssetsPathHandler(view.getContext()));
+        } else if (handlerType.equals("internal")) {
+          String directory = handler.getString("directory");
+          if (directory == null) {
+            FLog.w(TAG, "WebViewAssetLoader error. Skipping Path Handler. Directory is missing for internal handler path");
+            continue;
+          }
+          builder.addPathHandler(handlerPath, new WebViewAssetLoader.InternalStoragePathHandler(view.getContext(), new File(directory)));
+        }
+      }
+    } else {
+      FLog.w(TAG, "WebViewAssetLoader error. No Path Handlers found.");
+    }
+
+    WebViewAssetLoader assetLoader = builder.build();
+    view.ifHasInternalWebView(webView -> webView.setWebViewAssetLoader(assetLoader));
   }
 
 
@@ -967,6 +1031,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     protected InternalWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
     protected @Nullable BasicAuthCredential basicAuthCredential = null;
+    protected @Nullable WebViewAssetLoader webViewAssetLoader;
+
+    public void setWebViewAssetLoader(@Nullable WebViewAssetLoader assetLoader) {
+      webViewAssetLoader = assetLoader;
+    }
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
       ignoreErrFailedForThisURL = url;
@@ -974,6 +1043,16 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
     public void setBasicAuthCredential(@Nullable BasicAuthCredential credential) {
       basicAuthCredential = credential;
+    }
+
+    @Nullable
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+      if (webViewAssetLoader == null) {
+        return super.shouldInterceptRequest(view, request);
+      }
+
+      return webViewAssetLoader.shouldInterceptRequest(request.getUrl());
     }
 
     @Override
@@ -1603,6 +1682,10 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
     public void setBasicAuthCredential(BasicAuthCredential credential) {
       mRNCWebViewClient.setBasicAuthCredential(credential);
+    }
+
+    public void setWebViewAssetLoader(WebViewAssetLoader webViewAssetLoader) {
+      mRNCWebViewClient.setWebViewAssetLoader(webViewAssetLoader);
     }
 
     public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {

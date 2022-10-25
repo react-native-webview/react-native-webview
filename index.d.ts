@@ -3,6 +3,7 @@ import { Component } from 'react';
 
 import releaseWebView from './lib/releaseWebView';
 import injectJavaScriptWithWebViewKey from './lib/injectJavaScriptWithWebViewKey';
+import addOnMessageListenerWithWebViewKey from './lib/addOnMessageListenerWithWebViewKey';
 
 import { IOSWebViewProps, AndroidWebViewProps, WindowsWebViewProps } from './lib/WebViewTypes';
 
@@ -65,5 +66,5 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     clearHistory?: () => void;
 }
 
-export {WebView, releaseWebView, injectJavaScriptWithWebViewKey};
+export {WebView, releaseWebView, injectJavaScriptWithWebViewKey, addOnMessageListenerWithWebViewKey};
 export default WebView;
