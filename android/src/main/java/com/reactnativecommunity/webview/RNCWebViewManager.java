@@ -627,7 +627,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "menuItems")
   public void setMenuItems(WebView view, @Nullable ReadableArray menuItems) {
-    ((RNCWebView) view).setMenuItems(menuItems.toArrayList());
+    if (menuItems == null) {
+       ((RNCWebView) view).setMenuItems(null);
+    } else {
+      ((RNCWebView) view).setMenuItems(menuItems.toArrayList());
+    }
   }
 
   @ReactProp(name = "allowsFullscreenVideo")
@@ -1642,9 +1646,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public ActionMode startActionMode(ActionMode.Callback callback, int type) {
-      if(menuItems == null || menuItems.size() == 0){
+      if(menuItems == null ){
         return super.startActionMode(callback, type);
       }
+
       return super.startActionMode(new ActionMode.Callback2() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {

@@ -52,8 +52,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @implementation RNCWKWebView_
 - (BOOL)canPerformAction:(SEL)action 
               withSender:(id)sender{
-  
-  if (!self.menuItems || self.menuItems.count == 0) {              
+  if (!self.menuItems) {              
     return YES;
   }
   return NO;
@@ -221,24 +220,34 @@ RCTAutoInsetsProtocol>
 {
   // When a long press ends, bring up our custom UIMenu
   if(pressSender.state == UIGestureRecognizerStateEnded) {
-    if (!self.menuItems || self.menuItems.count == 0) {
+
+    _webView.menuItems = self.menuItems;
+    
+    if (!self.menuItems) {
       return;
     }
-    UIMenuController *menuController = [UIMenuController sharedMenuController];
-    NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
-    
-    for(NSDictionary *menuItem in self.menuItems) {
-      NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
-      NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
-      NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
-      UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
-                                                    action: NSSelectorFromString(sel)];
-      
-      [menuControllerItems addObject: item];
+    else if (self.menuItems.count == 0) {
+      UIMenuController *menuController = [UIMenuController sharedMenuController];
+      menuController.menuItems = nil;
+      [menuController setMenuVisible:NO animated:YES];
     }
-    
-    menuController.menuItems = menuControllerItems;
-    [menuController setMenuVisible:YES animated:YES];
+    else { 
+      UIMenuController *menuController = [UIMenuController sharedMenuController];
+      NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
+      
+      for(NSDictionary *menuItem in self.menuItems) {
+        NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
+        NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
+        NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
+        UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
+                                                      action: NSSelectorFromString(sel)];
+        
+        [menuControllerItems addObject: item];
+      }
+      
+      menuController.menuItems = menuControllerItems;
+      [menuController setMenuVisible:YES animated:YES];
+    }
   }
 }
 
