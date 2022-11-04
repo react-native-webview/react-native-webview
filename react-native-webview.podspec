@@ -2,7 +2,6 @@ require 'json'
 
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
-folly_version = '2021.06.28.00-v2'
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 
 Pod::Spec.new do |s|
@@ -31,7 +30,7 @@ Pod::Spec.new do |s|
 
     s.dependency "React-RCTFabric"
     s.dependency "React-Codegen"
-    s.dependency "RCT-Folly", folly_version
+    s.dependency "RCT-Folly"
     s.dependency "RCTRequired"
     s.dependency "RCTTypeSafety"
     s.dependency "ReactCommon/turbomodule/core"

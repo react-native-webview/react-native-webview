@@ -138,9 +138,9 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   } else if (viewState === 'ERROR') {
     invariant(lastErrorEvent != null, 'lastErrorEvent expected to be non-null');
     otherView = (renderError || defaultRenderError)(
-      lastErrorEvent.domain,
-      lastErrorEvent.code,
-      lastErrorEvent.description,
+      lastErrorEvent?.domain,
+      lastErrorEvent?.code ?? 0,
+      lastErrorEvent?.description ?? '',
     );
   } else if (viewState !== 'IDLE') {
     console.error(`RNCWebView invalid state encountered: ${viewState}`);
@@ -186,7 +186,8 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
       source={resolveAssetSource(source as ImageSourcePropType)}
       style={webViewStyles}
-      ref={webViewRef}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ref={webViewRef as any}
       {...nativeConfig?.props}
     />
   );
