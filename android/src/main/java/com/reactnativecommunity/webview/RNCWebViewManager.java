@@ -670,6 +670,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setMinimumFontSize(fontSize);
   }
 
+  @ReactProp(name = "allowsProtectedMedia")
+  public void setAllowsProtectedMedia(WebView view, boolean enabled) {
+    WebChromeClient client = view.getWebChromeClient();
+    if (client != null && client instanceof RNCWebChromeClient) {
+        ((RNCWebChromeClient) client).setAllowsProtectedMedia(enabled);
+    }
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -1227,6 +1235,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
 
+    // True if protected media should be allowed, false otherwise
+    protected boolean mAllowsProtectedMedia = false;
+
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
       this.mWebView = webView;
@@ -1288,9 +1299,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
           androidPermission = Manifest.permission.CAMERA;
         } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
-          androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
+          if (mAllowsProtectedMedia) {
+              grantedPermissions.add(requestedResource);
+          }
         }
-        // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
+        // TODO: RESOURCE_MIDI_SYSEX.
 
         if (androidPermission != null) {
           if (ContextCompat.checkSelfPermission(mReactContext, androidPermission) == PackageManager.PERMISSION_GRANTED) {
@@ -1479,6 +1492,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
       progressChangedFilter = filter;
+    }
+
+    /**
+     * Set whether or not protected media should be allowed
+     * /!\ Setting this to false won't revoke permission already granted to the current webpage.
+     * In order to do so, you'd need to reload the page /!\
+     */
+    public void setAllowsProtectedMedia(boolean enabled) {
+        mAllowsProtectedMedia = enabled;
     }
   }
 
