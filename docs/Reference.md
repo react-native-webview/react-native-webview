@@ -89,6 +89,7 @@ This document lays out the current public properties and methods for the React N
 - [`minimumFontSize`](Reference.md#minimumFontSize)
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
+- [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
 
 ## Methods Index
 
@@ -1591,6 +1592,15 @@ This is the message that is shown in the Toast when the webview is unable to dow
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
 | string | No       | Android  |
+
+### `allowsProtectedMedia`
+
+Whether or not the Webview can play media protected by DRM. Default is false.
+/!\ Setting this to false won't revoke the permission already granted to the current webpage. In order to do so, you'd have to reload the page as well. /!\
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| boolean | No       | Android  |
 
 ## Methods
 

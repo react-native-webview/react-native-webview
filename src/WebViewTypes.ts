@@ -340,6 +340,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   minimumFontSize?: number;
   downloadingMessage?: string;
   lackPermissionToDownloadMessage?: string;
+  allowsProtectedMedia?: boolean;
 }
 
 export declare type ContentInsetAdjustmentBehavior =
@@ -1119,6 +1120,13 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   lackPermissionToDownloadMessage?: string;
+
+  /**
+   * Boolean value to control whether webview can play media protected by DRM.
+   * Default is false.
+   * @platform android
+   */
+  allowsProtectedMedia?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {
