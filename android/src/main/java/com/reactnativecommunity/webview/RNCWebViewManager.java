@@ -1301,6 +1301,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
           if (mAllowsProtectedMedia) {
               grantedPermissions.add(requestedResource);
+          } else {
+              /**
+               * Legacy handling (Kept in case it was working under some conditions (given Android version or something))
+               *
+               * Try to ask user to grant permission using Activity.requestPermissions
+               *
+               * Find more details here: https://github.com/react-native-webview/react-native-webview/pull/2732
+               */
+              androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
           }
         }
         // TODO: RESOURCE_MIDI_SYSEX.
