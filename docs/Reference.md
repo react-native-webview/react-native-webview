@@ -1602,6 +1602,14 @@ goBack();
 
 Go back one page in the web view's history.
 
+### `loadUrl(str)`[⬆](#methods-index)<!-- Link generated with jump2header -->
+
+```javascript
+loadUrl(url);
+```
+
+Load the url imperatively. In most cases you should use [`source`](Reference.md#source) prop instead of this to load a page.
+
 ### `reload()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
 ```javascript
