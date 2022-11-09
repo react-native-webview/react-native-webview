@@ -143,7 +143,7 @@ export interface WebViewRenderProcessGoneDetail {
 }
 
 export interface WebViewOpenWindow {
-  targeturl: string;
+  targetUrl: string;
 }
 
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
@@ -657,7 +657,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
 
   /**
    * Function that is invoked when the `WebView` should open a new window.
-   * 
+   *
    * This happens when the JS calls `window.open('http://someurl', '_blank')`
    * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
    *
@@ -933,7 +933,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
 
   /**
    * Function that is invoked when the `WebView` should open a new window.
-   * 
+   *
    * This happens when the JS calls `window.open('http://someurl', '_blank')`
    * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
    *
