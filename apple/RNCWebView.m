@@ -80,6 +80,7 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
+@property (nonatomic, copy) RCTDirectEventBlock onOpenWindow;
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) WKWebView *webView;
 #else
@@ -310,7 +311,15 @@ RCTAutoInsetsProtocol>
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
+    NSURL *url = navigationAction.request.URL;
+
+    if (_onOpenWindow) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"targetUrl": url.absoluteString}];
+      _onOpenWindow(event);
+    } else {
+      [webView loadRequest:navigationAction.request];
+    }
   }
   return nil;
 }
@@ -1140,7 +1149,22 @@ RCTAutoInsetsProtocol>
   WKNavigationType navigationType = navigationAction.navigationType;
   NSURLRequest *request = navigationAction.request;
   BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
-  
+  BOOL hasTargetFrame = navigationAction.targetFrame != nil;
+
+  if (_onOpenWindow && !hasTargetFrame) {
+    // When OnOpenWindow should be called, we want to prevent the navigation
+    // If not prevented, the `decisionHandler` is called first and after that `createWebViewWithConfiguration` is called
+    // In that order the WebView's ref would be updated with the target URL even if `createWebViewWithConfiguration` does not call `loadRequest`
+    // So the WebView's document stays on the current URL, but the WebView's ref is replaced by the target URL
+    // By preventing the navigation here, we also prevent the WebView's ref mutation
+    // The counterpart is that we have to manually call `_onOpenWindow` here, because no navigation means no call to `createWebViewWithConfiguration`
+    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    [event addEntriesFromDictionary: @{@"targetUrl": request.URL.absoluteString}];
+    decisionHandler(WKNavigationActionPolicyCancel);
+    _onOpenWindow(event);
+    return;
+  }
+
   if (_onShouldStartLoadWithRequest) {
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     if (request.mainDocumentURL) {
@@ -1151,7 +1175,8 @@ RCTAutoInsetsProtocol>
     [event addEntriesFromDictionary: @{
       @"url": (request.URL).absoluteString,
       @"navigationType": navigationTypes[@(navigationType)],
-      @"isTopFrame": @(isTopFrame)
+      @"isTopFrame": @(isTopFrame),
+      @"hasTargetFrame": @(hasTargetFrame),
     }];
     if (![self.delegate webView:self
       shouldStartLoadForRequest:event
