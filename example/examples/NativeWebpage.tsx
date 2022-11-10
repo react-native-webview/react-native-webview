@@ -13,7 +13,7 @@ export default class NativeWebpage extends Component<Props, State> {
     return (
       <View style={{ height: 400 }}>
         <WebView
-          source={{ uri: 'https://infinite.red' }}
+          source={{ uri: 'https://instagram.com' }}
           style={{ width: '100%', height: '100%' }}
         />
       </View>
