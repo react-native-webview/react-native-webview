@@ -1674,6 +1674,14 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       super(reactContext);
       this.createCatalystInstance();
       progressChangedFilter = new ProgressChangedFilter();
+
+      /**
+       * Default the background color to transparent to avoid flashing a white frame
+       * when initializing the WebView. The React CSS background color will get applied
+       * to the RNCWebView whose background should show behind this transparent background
+       * until the WebView has non-transparent content.
+       */
+      setBackgroundColor(Color.TRANSPARENT);
     }
 
     public void setIgnoreErrFailedForThisURL(String url) {
