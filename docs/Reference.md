@@ -198,9 +198,12 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
 
-| Type   | Required | Platform   |
-| ------ | -------- | ---------- |
-| string | No       | iOS, macOS |
+> **Warning**
+> On Android, this may work, but it is not 100% reliable (see #1609 and #1099).
+
+| Type   | Required | Platform                           |
+| ------ | -------- | ---------------------------------- |
+| string | No       | iOS, macOS, Android (experimental) |
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
