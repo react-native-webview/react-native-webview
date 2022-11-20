@@ -1516,6 +1516,10 @@ Exemplo:
 
 Função chamada quando um item de menu personalizado é selecionado. Ele recebe um evento Nativo, que inclui três chaves personalizadas: `label`, `key` e `selectedText`.
 
+| Tipo                                                               | Requerido | Plataforma |
+| ------------------------------------------------------------------ | --------  | --------   |
+| function                                                           | Não       | iOS        |
+
 ```javascript
 <WebView 
   menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Guardar para depois', key: 'saveForLater' }]}
