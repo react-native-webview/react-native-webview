@@ -17,6 +17,7 @@ import Downloads from './examples/Downloads';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 import ImportHtmlAsset from './examples/ImportHtmlAsset';
+import { LocalHtmlFile } from './examples/LocalHtmlFile';
 import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
@@ -84,6 +85,14 @@ const TESTS = {
     description: 'Import HTML Asset test',
     render() {
       return <ImportHtmlAsset />;
+    },
+  },
+  LocalHtmlFile: {
+    title: 'LocalHtmlFile',
+    testId: 'LocalHtmlFile',
+    description: 'Local HTML File test',
+    render() {
+      return <LocalHtmlFile />;
     },
   },
   NativeWebpage: {
@@ -164,6 +173,11 @@ export default class App extends Component<Props, State> {
             testID="testType_importHtml"
             title="ImportHtmlAsset"
             onPress={() => this._changeTest('ImportHtmlAsset')}
+          />
+          <Button
+            testID="testType_localHtmlFile"
+            title="LocalHtmlFile"
+            onPress={() => this._changeTest('LocalHtmlFile')}
           />
           <Button
             testID="testType_downloads"
