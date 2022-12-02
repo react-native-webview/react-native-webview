@@ -61,6 +61,7 @@
     "metro-react-native-babel-preset": "^0.67.0",
     "react": "17.0.2",
     "react-native": "0.68.5",
+    "react-native-file-access": "^2.5.2",
     "react-native-macos": "0.66.57",
     "react-native-test-app": "1.5.0",
     "react-native-windows": "0.68.4",
