@@ -3,7 +3,7 @@ import {View, Text, Alert, TextInput, Button} from 'react-native';
 import WebView from 'react-native-webview';
 const localHtmlFile = require('../assets/test.html');
 
-export default class LocalPageLoad extends Component<Props, State> {
+export default class ImportHtmlAsset extends Component<Props, State> {
     render() {
       return (
         <View>
