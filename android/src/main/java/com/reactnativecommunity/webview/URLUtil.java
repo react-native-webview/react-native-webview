@@ -20,6 +20,8 @@ import android.net.Uri;
 import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,7 +124,7 @@ public final class URLUtil {
 
     /** Regex used to parse content-disposition headers */
     private static final Pattern CONTENT_DISPOSITION_PATTERN =
-            Pattern.compile("attachment;\\s*filename\\s*=\\s*(\"?)([^\"]*)\\1\\s*$",
+            Pattern.compile("attachment(?:;\\s*filename\\s*=\\s*(\"?)([^\"]*)\\1)?(?:;\\s*filename\\s*\\*\\s*=\\s*([^']+)'[^']*'([^']*))?\\s*$",
             Pattern.CASE_INSENSITIVE);
 
     /**
@@ -138,6 +140,13 @@ public final class URLUtil {
         try {
             Matcher m = CONTENT_DISPOSITION_PATTERN.matcher(contentDisposition);
             if (m.find()) {
+                if (m.group(3) != null && m.group(4) != null) {
+                    try {
+                        return URLDecoder.decode(m.group(4), m.group(3));
+                    } catch (UnsupportedEncodingException e) {
+                        // Skip the ext-parameter as the encoding is unsupported
+                    }
+                }
                 return m.group(2);
             }
         } catch (IllegalStateException ex) {
