@@ -186,10 +186,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onMessage={onMessage}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
     ref={webViewRef}
-    // TODO: find a better way to type this.
-    // @ts-expect-error source is old arch
-    source={sourceResolved}
-    newSource={newSource}
     style={webViewStyles}
     overScrollMode={overScrollMode}
     javaScriptEnabled={javaScriptEnabled}
@@ -204,6 +200,12 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     setBuiltInZoomControls={setBuiltInZoomControls}
     setDisplayZoomControls={setDisplayZoomControls}
     nestedScrollEnabled={nestedScrollEnabled}
+    // Keep 'source' at the end of the properties list because they are applied in order,
+    // and we don't want to start loading content until the WebView has been configured.
+    // TODO: find a better way to type this.
+    // @ts-expect-error source is old arch
+    source={sourceResolved}
+    newSource={newSource}
     {...nativeConfig?.props}
   />
 
