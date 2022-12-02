@@ -16,7 +16,7 @@ import Background from './examples/Background';
 import Downloads from './examples/Downloads';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
-import LocalPageLoad from './examples/LocalPageLoad';
+import ImportHtmlAsset from './examples/ImportHtmlAsset';
 import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
@@ -78,12 +78,12 @@ const TESTS = {
       return <Injection />;
     },
   },
-  PageLoad: {
-    title: 'LocalPageLoad',
-    testId: 'LocalPageLoad',
-    description: 'Local Page load test',
+  ImportHtmlAsset: {
+    title: 'ImportHtmlAsset',
+    testId: 'ImportHtmlAsset',
+    description: 'Import HTML Asset test',
     render() {
-      return <LocalPageLoad />;
+      return <ImportHtmlAsset />;
     },
   },
   NativeWebpage: {
@@ -161,11 +161,11 @@ export default class App extends Component<Props, State> {
             onPress={() => this._changeTest('Injection')}
           />
           <Button
-            testID="testType_pageLoad"
-            title="LocalPageLoad"
-            onPress={() => this._changeTest('PageLoad')}
+            testID="testType_importHtml"
+            title="ImportHtmlAsset"
+            onPress={() => this._changeTest('ImportHtmlAsset')}
           />
-          {Platform.OS == 'ios' && (
+          {Platform.OS === 'ios' && (
             <Button
               testID="testType_downloads"
               title="Downloads"
