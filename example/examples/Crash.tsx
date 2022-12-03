@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {Button, Linking, ScrollView, Text, View} from 'react-native';
+import {ScrollView} from 'react-native';
 
-import WebView from 'react-native-webview';
 import Tweet from './CrashComponents/Tweet';
 
 
