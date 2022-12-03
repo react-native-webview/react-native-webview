@@ -1622,6 +1622,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public void setWebViewClient(WebViewClient client) {
       super.setWebViewClient(client);
+
+      if (client == null) {
+        mRNCWebViewClient = null;
+      }
+
       if (client instanceof RNCWebViewClient) {
         mRNCWebViewClient = (RNCWebViewClient) client;
         mRNCWebViewClient.setProgressChangedFilter(progressChangedFilter);
