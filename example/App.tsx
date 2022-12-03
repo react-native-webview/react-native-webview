@@ -20,6 +20,7 @@ import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
+import Crash from './examples/Crash';
 
 const TESTS = {
   Messaging: {
@@ -101,7 +102,15 @@ const TESTS = {
     render() {
       return <ApplePay />;
     },
-  }
+  },
+  Crash: {
+    title: 'Crash ',
+    testId: 'Crash',
+    description: 'Crashes on Android',
+    render() {
+      return <Crash />;
+    },
+  },
 };
 
 type Props = {};
@@ -135,7 +144,8 @@ export default class App extends Component<Props, State> {
           testID="restart_button"
           onPress={this._simulateRestart}
           style={styles.restartButton}
-          activeOpacity={0.6}>
+          activeOpacity={0.6}
+        >
           <Text>Simulate Restart</Text>
         </TouchableOpacity>
 
@@ -189,12 +199,17 @@ export default class App extends Component<Props, State> {
             title="NativeWebpage"
             onPress={() => this._changeTest('NativeWebpage')}
           />
+          <Button
+            testID="testType_crash"
+            title="Crash"
+            onPress={() => this._changeTest('Crash')}
+          />
           {Platform.OS === 'ios' && (
-              <Button
-                  testID="testType_applePay"
-                  title="ApplePay"
-                  onPress={() => this._changeTest('ApplePay')}
-              />
+            <Button
+              testID="testType_applePay"
+              title="ApplePay"
+              onPress={() => this._changeTest('ApplePay')}
+            />
           )}
         </View>
 
@@ -202,7 +217,8 @@ export default class App extends Component<Props, State> {
           <View
             testID={`example-${currentTest.testId}`}
             key={currentTest.title}
-            style={styles.exampleContainer}>
+            style={styles.exampleContainer}
+          >
             <Text style={styles.exampleTitle}>{currentTest.title}</Text>
             <Text style={styles.exampleDescription}>
               {currentTest.description}
