@@ -339,14 +339,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
     }
 
     fun setCacheEnabled(view: RNCWebView, enabled: Boolean) {
-        if (enabled) {
-            val ctx: Context? = view.context
-            if (ctx != null) {
-                view.settings.cacheMode = WebSettings.LOAD_DEFAULT
-            }
-        } else {
-            view.settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        }
+      view.settings.cacheMode = if (enabled) WebSettings.LOAD_DEFAULT else WebSettings.LOAD_NO_CACHE
     }
 
     fun setIncognito(view: RNCWebView, enabled: Boolean) {
