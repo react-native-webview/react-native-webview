@@ -89,6 +89,7 @@ This document lays out the current public properties and methods for the React N
 - [`minimumFontSize`](Reference.md#minimumFontSize)
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
+- [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
 
 ## Methods Index
 
@@ -1508,6 +1509,10 @@ Example:
 
 An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
 
+| Type                                                               | Required | Platform |
+| ------------------------------------------------------------------ | -------- | -------- |
+| array of objects: {label: string, key: string}                     | No       | iOS      |
+
 Example:
 
 ```javascript
@@ -1517,6 +1522,10 @@ Example:
 ### `onCustomMenuSelection`
 
 Function called when a custom menu item is selected.  It receives a Native event, which includes three custom keys: `label`, `key` and `selectedText`.
+
+| Type                                                               | Required | Platform |
+| ------------------------------------------------------------------ | -------- | -------- |
+| function                                                           | No       | iOS      |
 
 ```javascript
 <WebView 
@@ -1583,6 +1592,15 @@ This is the message that is shown in the Toast when the webview is unable to dow
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
 | string | No       | Android  |
+
+### `allowsProtectedMedia`
+
+Whether or not the Webview can play media protected by DRM. Default is false.
+/!\ Setting this to false won't revoke the permission already granted to the current webpage. In order to do so, you'd have to reload the page as well. /!\
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| boolean | No       | Android  |
 
 ## Methods
 
