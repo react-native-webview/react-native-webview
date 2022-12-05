@@ -218,9 +218,8 @@ PODS:
   - React-jsinspector (0.68.5)
   - React-logger (0.68.5):
     - glog
-  - react-native-file-access (2.5.2):
+  - react-native-blob-util (0.16.4):
     - React-Core
-    - ZIPFoundation (= 0.9.11)
   - react-native-webview (11.25.0):
     - React-Core
   - React-perflogger (0.68.5)
@@ -293,7 +292,6 @@ PODS:
     - React-jsi
   - ReactTestApp-Resources (1.0.0-dev)
   - Yoga (1.14.0)
-  - ZIPFoundation (0.9.11)
 
 DEPENDENCIES:
   - boost (from `../../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -316,7 +314,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../../node_modules/react-native/ReactCommon/logger`)
-  - react-native-file-access (from `../../node_modules/react-native-file-access`)
+  - react-native-blob-util (from `../../node_modules/react-native-blob-util`)
   - react-native-webview (from `../..`)
   - React-perflogger (from `../../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -337,7 +335,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - fmt
-    - ZIPFoundation
 
 EXTERNAL SOURCES:
   boost:
@@ -376,8 +373,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../../node_modules/react-native/ReactCommon/logger"
-  react-native-file-access:
-    :path: "../../node_modules/react-native-file-access"
+  react-native-blob-util:
+    :path: "../../node_modules/react-native-blob-util"
   react-native-webview:
     :path: "../.."
   React-perflogger:
@@ -431,7 +428,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 45c0496ca8cef6b02d9fa0274c25cf458fe91a56
   React-jsinspector: eb202e43b3879aba9a14f3f65788aec85d4e1ea9
   React-logger: 98f663b292a60967ebbc6d803ae96c1381183b6d
-  react-native-file-access: 2105d76b5d584d11db6f5d587b6af98ef9ff8080
+  react-native-blob-util: 60453b777610c87a22b3524032c0214e8db555db
   react-native-webview: a71da846ed2e9085440e1d6659c04e285528834b
   React-perflogger: 0458a87ea9a7342079e7a31b0d32b3734fb8415f
   React-RCTActionSheet: 22538001ea2926dea001111dd2846c13a0730bc9
@@ -448,7 +445,6 @@ SPEC CHECKSUMS:
   ReactTestApp-DevSupport: 00a493184fe748a0c7a3e937a4282d6d1d6d8b84
   ReactTestApp-Resources: ff5f151e465e890010b417ce65ca6c5de6aeccbb
   Yoga: c4d61225a466f250c35c1ee78d2d0b3d41fe661c
-  ZIPFoundation: b1f0de4eed33e74a676f76e12559ab6b75990197
 
 PODFILE CHECKSUM: 8344c021910ed9b6a9bb9985ff8f7f05a68b19c1
 
