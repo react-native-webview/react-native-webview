@@ -61,7 +61,7 @@
     "metro-react-native-babel-preset": "0.73.7",
     "react": "18.2.0",
     "react-native": "0.71.3",
-    "react-native-file-access": "^2.5.2",
+    "react-native-blob-util": "^0.16.4",
     "react-native-test-app": "2.3.12",
     "react-native-windows": "0.71.0",
     "selenium-appium": "1.0.2",

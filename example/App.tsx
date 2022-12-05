@@ -174,11 +174,15 @@ export default class App extends Component<Props, State> {
             title="ImportHtmlAsset"
             onPress={() => this._changeTest('ImportHtmlAsset')}
           />
-          <Button
-            testID="testType_localHtmlFile"
-            title="LocalHtmlFile"
-            onPress={() => this._changeTest('LocalHtmlFile')}
-          />
+          {/* Loading Local files should be supported on other platforms, but the test page
+              uses react-native-blob-util, which only supports iOS/Android */}
+          {(Platform.OS === 'ios' || Platform.OS === 'android') && (
+            <Button
+              testID="testType_localHtmlFile"
+              title="LocalHtmlFile"
+              onPress={() => this._changeTest('LocalHtmlFile')}
+            />
+          )}
           <Button
             testID="testType_downloads"
             title="Downloads"
