@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
+/*
+ * The source code is obtained from the Android SDK Sources (API level 31),
+ * and modified by UNIDY2002 <UNIDY2002@outlook.com>.
+ *
+ * Change list:
+ * - Remove all unused class members except guessFileName,
+ *   CONTENT_DISPOSITION_PATTERN and parseContentDisposition
+ * - Improve CONTENT_DISPOSITION_PATTERN and parseContentDisposition to add
+ *   support for the "filename*" parameter in content disposition
+ */
+
 package com.reactnativecommunity.webview;
 
 import android.net.Uri;
