@@ -140,15 +140,22 @@ public final class URLUtil {
 
     /**
      * Parse the Content-Disposition HTTP Header. The format of the header
-     * is defined here: http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html
+     * is defined here: <a href="https://www.rfc-editor.org/rfc/rfc6266">RFC 6266</a>
      * This header provides a filename for content that is going to be
      * downloaded to the file system. We only support the attachment type.
-     * Note that RFC 2616 specifies the filename value must be double-quoted.
-     * Unfortunately some servers do not quote the value so to maintain
-     * consistent behaviour with other browsers, we allow unquoted values too.
      */
     static String parseContentDisposition(String contentDisposition) {
         try {
+            // The regex attempts to match the following pattern:
+            //     attachment; filename="(Group 2)"; filename*=(Group 3)'(lang)'(Group 4)
+            // (Group 1 refers to the quotation marks around Group 2)
+            //
+            // Test cases can be found at http://test.greenbytes.de/tech/tc2231/
+            // There are a few known limitations:
+            // - any Content Disposition value that does not have parameters
+            //   arranged in the order of "attachment...filename...filename*"
+            //   or contains extra parameters shall fail to be parsed
+            // - any filename that contains " shall fail to be parsed
             Matcher m = CONTENT_DISPOSITION_PATTERN.matcher(contentDisposition);
             if (m.find()) {
                 if (m.group(3) != null && m.group(4) != null) {
