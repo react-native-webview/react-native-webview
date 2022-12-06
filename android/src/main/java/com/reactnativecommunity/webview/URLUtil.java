@@ -135,7 +135,7 @@ public final class URLUtil {
 
     /** Regex used to parse content-disposition headers */
     private static final Pattern CONTENT_DISPOSITION_PATTERN =
-            Pattern.compile("attachment(?:;\\s*filename\\s*=\\s*(\"?)([^\"]*)\\1)?(?:;\\s*filename\\s*\\*\\s*=\\s*([^']+)'[^']*'([^']*))?\\s*$",
+            Pattern.compile("attachment(?:;\\s*filename\\s*=\\s*(\"?)([^\"]*)\\1)?(?:;\\s*filename\\s*\\*\\s*=\\s*([^']*)'[^']*'([^']*))?\\s*$",
             Pattern.CASE_INSENSITIVE);
 
     /**
@@ -153,7 +153,7 @@ public final class URLUtil {
             if (m.find()) {
                 if (m.group(3) != null && m.group(4) != null) {
                     try {
-                        return URLDecoder.decode(m.group(4), m.group(3));
+                        return URLDecoder.decode(m.group(4), m.group(3).isEmpty() ? "UTF-8" : m.group(3));
                     } catch (UnsupportedEncodingException e) {
                         // Skip the ext-parameter as the encoding is unsupported
                     }
