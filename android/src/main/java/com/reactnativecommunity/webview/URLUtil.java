@@ -148,7 +148,10 @@ public final class URLUtil {
         try {
             // The regex attempts to match the following pattern:
             //     attachment; filename="(Group 2)"; filename*=(Group 3)'(lang)'(Group 4)
-            // (Group 1 refers to the quotation marks around Group 2)
+            // Group 4 refers to the percent-encoded filename, and the charset
+            // is specified in Group 3.
+            // Group 2 is the fallback filename.
+            // Group 1 refers to the quotation marks around Group 2.
             //
             // Test cases can be found at http://test.greenbytes.de/tech/tc2231/
             // Examples can be found at https://www.rfc-editor.org/rfc/rfc6266#section-5
