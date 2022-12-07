@@ -172,7 +172,7 @@ export default class App extends Component<Props, State> {
               onPress={() => this._changeTest('Downloads')}
             />
           )}
-          {Platform.OS === 'android' && (
+          {(Platform.OS === 'android' || Platform.OS === 'macos') && (
             <Button
               testID="testType_uploads"
               title="Uploads"
