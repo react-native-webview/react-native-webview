@@ -64,7 +64,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @end
 #endif // TARGET_OS_OSX
 
-@interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler,
+@interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, WKHTTPCookieStoreObserver,
 #if !TARGET_OS_OSX
 UIScrollViewDelegate,
 #endif // !TARGET_OS_OSX
@@ -234,6 +234,9 @@ RCTAutoInsetsProtocol>
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+  if (@available(iOS 11.0, *)) {
+    [self.webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
+  }
 }
 
 - (void)tappedMenuItem:(NSString *)eventType
@@ -1327,21 +1330,24 @@ RCTAutoInsetsProtocol>
 - (void)webView:(WKWebView *)webView
 didFinishNavigation:(WKNavigation *)navigation
 {
+  if (_ignoreSilentHardwareSwitch) {
+    [self forceIgnoreSilentHardwareSwitch:true];
+  }
+
+  if (_onLoadingFinish) {
+    _onLoadingFinish([self baseEvent]);
+  }
+}
+
+- (void)cookiesDidChangeInCookieStore:(WKHTTPCookieStore *)cookieStore
+{
   if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
     // Write all cookies from WKWebView back to sharedHTTPCookieStorage
-    [webView.configuration.websiteDataStore.httpCookieStore getAllCookies:^(NSArray* cookies) {
+    [cookieStore getAllCookies:^(NSArray* cookies) {
       for (NSHTTPCookie *cookie in cookies) {
         [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
       }
     }];
-  }
-  
-  if (_ignoreSilentHardwareSwitch) {
-    [self forceIgnoreSilentHardwareSwitch:true];
-  }
-  
-  if (_onLoadingFinish) {
-    _onLoadingFinish([self baseEvent]);
   }
 }
 
@@ -1559,7 +1565,9 @@ didFinishNavigation:(WKNavigation *)navigation
       if(!_incognito && !_cacheEnabled) {
         wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
       }
-      [self syncCookiesToWebView:nil];
+      [self syncCookiesToWebView:^{
+        [wkWebViewConfig.websiteDataStore.httpCookieStore addObserver:self];
+      }];
     } else {
       NSMutableString *script = [NSMutableString string];
       
