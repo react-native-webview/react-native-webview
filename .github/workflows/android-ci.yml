@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -34,6 +34,6 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.3
         with:
           gradle-version: wrapper
-          arguments: --no-daemon clean build check test
+          arguments: --no-daemon -d clean build check test
           build-root-directory: example/android
     timeout-minutes: 60
