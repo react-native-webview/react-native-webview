@@ -32,6 +32,8 @@ jobs:
         shell: bash
       - name: where am I?
         run: pwd
+      - name: Is ci-info there?
+        run: ls node_modules/ci-info
       - name: Build Android test app
         uses: gradle/gradle-build-action@v2.1.3
         with:
