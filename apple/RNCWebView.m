@@ -318,6 +318,23 @@ RCTAutoInsetsProtocol>
   return nil;
 }
 
+/**
+ * Enables file input on macos, see https://developer.apple.com/documentation/webkit/wkuidelegate/1641952-webview
+ */
+#if TARGET_OS_OSX
+- (void)webView:(WKWebView *)webView runOpenPanelWithParameters:(WKOpenPanelParameters *)parameters initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSArray<NSURL *> *URLs))completionHandler
+{
+  NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+  openPanel.allowsMultipleSelection = parameters.allowsMultipleSelection;
+  [openPanel beginSheetModalForWindow:webView.window completionHandler:^(NSInteger result) {
+    if (result == NSModalResponseOK)
+      completionHandler(openPanel.URLs);
+    else
+      completionHandler(nil);
+  }];
+}
+#endif //Target_OS_OSX
+
 - (WKWebViewConfiguration *)setUpWkWebViewConfig
 {
   WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
