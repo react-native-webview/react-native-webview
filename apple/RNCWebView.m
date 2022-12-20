@@ -1365,19 +1365,32 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 -(void)forceIgnoreSilentHardwareSwitch:(BOOL)initialSetup
 {
+    // This is a hack that allows WebAudio to play even when the silent switch is enabled.
+    // By playing an <audio> element, it changes the WKWebView audio session category from AVAudioSessionCategoryAmbient to
+    // AVAudioSessionCategoryPlayback. This will allow WebAudio to play even when the silent switch is enabled
+    
+    // Playing the audio on some repeated interval is necessary because if audio is played from another source while the app is in the foreground
+    // (think phone call, timer, alarms etc), the WkWebView audio will stop playing and will remain silent until the <audio> element is played again.
+    // Looping the audio spawns excessive worker threads causing a higher than normal cpu usage, so instead, the audio is played every 2 seconds.
+    
+    // For more context: https://stackoverflow.com/questions/56460362/how-to-force-wkwebview-to-ignore-hardware-silent-switch-on-ios
     NSString *mp3Str = @"data:audio/mp3;base64,//tAxAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAFAAAESAAzMzMzMzMzMzMzMzMzMzMzMzMzZmZmZmZmZmZmZmZmZmZmZmZmZmaZmZmZmZmZmZmZmZmZmZmZmZmZmczMzMzMzMzMzMzMzMzMzMzMzMzM//////////////////////////8AAAA5TEFNRTMuMTAwAZYAAAAAAAAAABQ4JAMGQgAAOAAABEhNIZS0AAAAAAD/+0DEAAPH3Yz0AAR8CPqyIEABp6AxjG/4x/XiInE4lfQDFwIIRE+uBgZoW4RL0OLMDFn6E5v+/u5ehf76bu7/6bu5+gAiIQGAABQIUJ0QolFghEn/9PhZQpcUTpXMjo0OGzRCZXyKxoIQzB2KhCtGobpT9TRVj/3Pmfp+f8X7Pu1B04sTnc3s0XhOlXoGVCMNo9X//9/r6a10TZEY5DsxqvO7mO5qFvpFCmKIjhpSItGsUYcRO//7QsQRgEiljQIAgLFJAbIhNBCa+JmorCbOi5q9nVd2dKnusTMQg4MFUlD6DQ4OFijwGAijRMfLbHG4nLVTjydyPlJTj8pfPflf9/5GD950A5e+jsrmNZSjSirjs1R7hnkia8vr//l/7Nb+crvr9Ok5ZJOylUKRxf/P9Zn0j2P4pJYXyKkeuy5wUYtdmOu6uobEtFqhIJViLEKIjGxchGev/L3Y0O3bwrIOszTBAZ7Ih28EUaSOZf/7QsQfg8fpjQIADN0JHbGgQBAZ8T//y//t/7d/2+f5m7MdCeo/9tdkMtGLbt1tqnabRroO1Qfvh20yEbei8nfDXP7btW7f9/uO9tbe5IvHQbLlxpf3DkAk0ojYcv///5/u3/7PTfGjPEPUvt5D6f+/3Lea4lz4tc4TnM/mFPrmalWbboeNiNyeyr+vufttZuvrVrt/WYv3T74JFo8qEDiJqJrmDTs///v99xDku2xG02jjunrICP/7QsQtA8kpkQAAgNMA/7FgQAGnobgfghgqA+uXwWQ3XFmGimSbe2X3ksY//KzK1a2k6cnNWOPJnPWUsYbKqkh8RJzrVf///P///////4vyhLKHLrCb5nIrYIUss4cthigL1lQ1wwNAc6C1pf1TIKRSkt+a//z+yLVcwlXKSqeSuCVQFLng2h4AFAFgTkH+Z/8jTX/zr//zsJV/5f//5UX/0ZNCNCCaf5lTCTRkaEdhNP//n/KUjf/7QsQ5AEhdiwAAjN7I6jGddBCO+WGTQ1mXrYatSAgaykxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==";
     NSString *scr;
+
+    int timeIntervalForInaudibleAudioMs = 2000;
     if (initialSetup) {
-        scr = [NSString stringWithFormat:@"var s=new Audio('%@');s.id='wkwebviewAudio';s.controls=false;s.loop=true;s.play();document.body.appendChild(s);true", mp3Str];
+        scr = [NSString stringWithFormat:@"var s=new Audio('%@');s.id='wkwebviewAudio';s.controls=false;s.play();document.body.appendChild(s);var playInterval = setInterval(() => s.play(), %d);true", mp3Str, timeIntervalForInaudibleAudioMs];
     } else {
-        scr = [NSString stringWithFormat:@"document.getElementById('wkwebviewAudio').muted=false", mp3Str];
+        // When the app is foregrounded, the audio element is played again and the interval is restarted.
+        scr = [NSString stringWithFormat:@"var audio=document.getElementById('wkwebviewAudio');audio.muted=false;audio.play();var playInterval = setInterval(() => s.play(), %d);true", timeIntervalForInaudibleAudioMs];
     }
     [self evaluateJS: scr thenCall: nil];
 }
 
 -(void)disableIgnoreSilentSwitch
 {
-    [self evaluateJS: @"document.getElementById('wkwebviewAudio').muted=true;" thenCall: nil];
+    // The audio is muted here so that this audio is not displayed in the media center when the screen is locked.
+    [self evaluateJS: @"document.getElementById('wkwebviewAudio').muted=true;clearInterval(playInterval);" thenCall: nil];
 }
 
 -(void)appDidBecomeActive
