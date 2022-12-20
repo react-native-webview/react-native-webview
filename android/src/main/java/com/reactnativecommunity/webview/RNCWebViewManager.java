@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.Manifest;
+import android.media.MediaScannerConnection;
 import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
@@ -17,6 +18,7 @@ import android.os.Environment;
 import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -33,6 +35,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SslErrorHandler;
 import android.webkit.PermissionRequest;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -42,7 +45,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -77,6 +79,7 @@ import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.reactnativecommunity.webview.RNCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState;
+import com.reactnativecommunity.webview.events.TopDownloadEvent;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
@@ -89,6 +92,10 @@ import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.IllegalArgumentException;
 import java.net.MalformedURLException;
@@ -160,7 +167,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
-  protected boolean mAllowsProtectedMedia = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
   protected @Nullable String mDownloadingMessage = null;
@@ -218,9 +224,49 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     webView.setDownloadListener(new DownloadListener() {
       public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-        webView.setIgnoreErrFailedForThisURL(url);
-
         RNCWebViewModule module = getModule(reactContext);
+
+        if(url.startsWith("data:")) {
+          if (module.grantFileDownloaderPermissions(getDownloadingMessage(), getLackPermissionToDownloadMessage())) {
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsoluteFile();
+            String filetype = url.substring(url.indexOf("/") + 1, url.indexOf(";"));
+            String filename = System.currentTimeMillis() + "." + filetype;
+            File file = new File(path, filename);
+            try {
+              if(!path.exists())
+                path.mkdirs();
+              if(!file.exists())
+                file.createNewFile();
+
+              String base64EncodedString = url.substring(url.indexOf(",") + 1);
+              byte[] decodedBytes = Base64.decode(base64EncodedString, Base64.DEFAULT);
+              OutputStream os = new FileOutputStream(file);
+              os.write(decodedBytes);
+              os.close();
+
+              MediaScannerConnection.scanFile(reactContext.getApplicationContext(),
+                new String[]{file.toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                  public void onScanCompleted(String path, Uri uri) {
+                    Log.i("ExternalStorage", "Scanned " + path + ":");
+                    Log.i("ExternalStorage", "-> uri=" + uri);
+                  }
+                });
+
+              WritableMap event = Arguments.createMap();
+              event.putString("url", url);
+              event.putString("contentDisposition", contentDisposition);
+              event.putString("mimetype", mimetype);
+              webView.dispatchEvent(
+                webView,
+                new TopDownloadEvent(webView.getId(), event));
+            } catch (IOException e) {
+              Log.w(TAG, "Error writing " + file, e);
+            }
+          }
+          return;
+        }
+        webView.setIgnoreErrFailedForThisURL(url);
 
         DownloadManager.Request request;
         try {
@@ -313,7 +359,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   @ReactProp(name = "cacheEnabled")
   public void setCacheEnabled(WebView view, boolean enabled) {
-    view.getSettings().setCacheMode(enabled ? WebSettings.LOAD_DEFAULT : WebSettings.LOAD_NO_CACHE);
+    if (enabled) {
+      Context ctx = view.getContext();
+      if (ctx != null) {
+        view.getSettings().setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        view.getSettings().setAppCacheEnabled(true);
+      }
+    } else {
+      view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+      view.getSettings().setAppCacheEnabled(false);
+    }
   }
 
   @ReactProp(name = "cacheMode")
@@ -511,6 +567,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     // Disable caching
     view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+    view.getSettings().setAppCacheEnabled(false);
     view.clearHistory();
     view.clearCache(true);
 
@@ -670,20 +727,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     view.getSettings().setMinimumFontSize(fontSize);
   }
 
-  @ReactProp(name = "allowsProtectedMedia")
-  public void setAllowsProtectedMedia(WebView view, boolean enabled) {
-    // This variable is used to keep consistency
-    // in case a new WebChromeClient is created
-    // (eg. when mAllowsFullScreenVideo changes)
-    mAllowsProtectedMedia = enabled;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        WebChromeClient client = view.getWebChromeClient();
-        if (client != null && client instanceof RNCWebChromeClient) {
-            ((RNCWebChromeClient) client).setAllowsProtectedMedia(enabled);
-        }
-    }
-  }
-
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -696,18 +739,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     if (export == null) {
       export = MapBuilder.newHashMap();
     }
-    // Default events but adding them here explicitly for clarity
-    export.put(TopLoadingStartEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingStart"));
-    export.put(TopLoadingFinishEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingFinish"));
-    export.put(TopLoadingErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingError"));
-    export.put(TopMessageEvent.EVENT_NAME, MapBuilder.of("registrationName", "onMessage"));
-    // !Default events but adding them here explicitly for clarity
-
     export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
     export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
     export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
+    export.put(TopDownloadEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDownloadBase64"));
     return export;
   }
 
@@ -730,21 +767,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   @Override
-  public void receiveCommand(@NonNull WebView root, String commandId, @Nullable ReadableArray args) {
+  public void receiveCommand(WebView root, int commandId, @Nullable ReadableArray args) {
     switch (commandId) {
-      case "goBack":
+      case COMMAND_GO_BACK:
         root.goBack();
         break;
-      case "goForward":
+      case COMMAND_GO_FORWARD:
         root.goForward();
         break;
-      case "reload":
+      case COMMAND_RELOAD:
         root.reload();
         break;
-      case "stopLoading":
+      case COMMAND_STOP_LOADING:
         root.stopLoading();
         break;
-      case "postMessage":
+      case COMMAND_POST_MESSAGE:
         try {
           RNCWebView reactWebView = (RNCWebView) root;
           JSONObject eventInitDict = new JSONObject();
@@ -764,32 +801,31 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           throw new RuntimeException(e);
         }
         break;
-      case "injectJavaScript":
+      case COMMAND_INJECT_JAVASCRIPT:
         RNCWebView reactWebView = (RNCWebView) root;
         reactWebView.evaluateJavascriptWithFallback(args.getString(0));
         break;
-      case "loadUrl":
+      case COMMAND_LOAD_URL:
         if (args == null) {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
         ((RNCWebView) root).progressChangedFilter.setWaitingForCommandLoadUrl(false);
         root.loadUrl(args.getString(0));
         break;
-      case "requestFocus":
+      case COMMAND_FOCUS:
         root.requestFocus();
         break;
-      case "clearFormData":
+      case COMMAND_CLEAR_FORM_DATA:
         root.clearFormData();
         break;
-      case "clearCache":
+      case COMMAND_CLEAR_CACHE:
         boolean includeDiskFiles = args != null && args.getBoolean(0);
         root.clearCache(includeDiskFiles);
         break;
-      case "clearHistory":
+      case COMMAND_CLEAR_HISTORY:
         root.clearHistory();
         break;
     }
-    super.receiveCommand(root, commandId, args);
   }
 
   @Override
@@ -889,6 +925,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           mReactContext.removeLifecycleEventListener(this);
         }
       };
+
+      webView.setWebChromeClient(mWebChromeClient);
     } else {
       if (mWebChromeClient != null) {
         mWebChromeClient.onHideCustomView();
@@ -900,9 +938,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
         }
       };
+
+      webView.setWebChromeClient(mWebChromeClient);
     }
-    mWebChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
-    webView.setWebChromeClient(mWebChromeClient);
   }
 
   protected static class RNCWebViewClient extends WebViewClient {
@@ -1239,9 +1277,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
 
-    // True if protected media should be allowed, false otherwise
-    protected boolean mAllowsProtectedMedia = false;
-
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
       this.mWebView = webView;
@@ -1303,20 +1338,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
           androidPermission = Manifest.permission.CAMERA;
         } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
-          if (mAllowsProtectedMedia) {
-              grantedPermissions.add(requestedResource);
-          } else {
-              /**
-               * Legacy handling (Kept in case it was working under some conditions (given Android version or something))
-               *
-               * Try to ask user to grant permission using Activity.requestPermissions
-               *
-               * Find more details here: https://github.com/react-native-webview/react-native-webview/pull/2732
-               */
-              androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
-          }
+          androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
         }
-        // TODO: RESOURCE_MIDI_SYSEX.
+        // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
 
         if (androidPermission != null) {
           if (ContextCompat.checkSelfPermission(mReactContext, androidPermission) == PackageManager.PERMISSION_GRANTED) {
@@ -1505,15 +1529,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
       progressChangedFilter = filter;
-    }
-
-    /**
-     * Set whether or not protected media should be allowed
-     * /!\ Setting this to false won't revoke permission already granted to the current webpage.
-     * In order to do so, you'd need to reload the page /!\
-     */
-    public void setAllowsProtectedMedia(boolean enabled) {
-        mAllowsProtectedMedia = enabled;
     }
   }
 
