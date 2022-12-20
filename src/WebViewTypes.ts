@@ -910,6 +910,12 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   onContentSizeChange?: (event: WebViewEvent) => void;
 
   /**
+   * Function that is invoked when base64 download was completed
+   * Works only on Android.
+   */
+  onDownloadBase64?: (event: WebViewEvent) => void;
+
+  /**
    * Function that is invoked when the `WebView` process crashes or is killed by the OS.
    * Works only on Android (minimum API level 26).
    */
