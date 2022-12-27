@@ -1,6 +1,6 @@
 module.exports = {
   // Airbnb is the base, prettier is here so that eslint doesn't conflict with prettier
-  extends: ['airbnb', 'prettier', 'prettier/react'],
+  extends: ['airbnb', 'prettier', 'prettier/react', 'plugin:react-hooks/recommended'],
   parser: '@typescript-eslint/parser',
   plugins: ['react', 'react-native', 'import', '@typescript-eslint'],
   rules: {

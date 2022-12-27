@@ -37,7 +37,6 @@ import android.webkit.JavascriptInterface;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SslErrorHandler;
 import android.webkit.PermissionRequest;
-import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -168,14 +167,10 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
   protected boolean mAllowsProtectedMedia = false;
-  protected @Nullable
-  String mUserAgent = null;
-  protected @Nullable
-  String mUserAgentWithApplicationName = null;
-  protected @Nullable
-  String mDownloadingMessage = null;
-  protected @Nullable
-  String mLackPermissionToDownloadMessage = null;
+  protected @Nullable String mUserAgent = null;
+  protected @Nullable String mUserAgentWithApplicationName = null;
+  protected @Nullable String mDownloadingMessage = null;
+  protected @Nullable String mLackPermissionToDownloadMessage = null;
   protected RNCWebView webView;
   protected SwipeRefreshLayout swipeRefreshLayout;
   protected String url;
@@ -305,6 +300,14 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
     return mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
   }
 
+  private String getDownloadingMessage() {
+    return  mDownloadingMessage == null ? DEFAULT_DOWNLOADING_MESSAGE : mDownloadingMessage;
+  }
+
+  private String getLackPermissionToDownloadMessage() {
+    return  mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
+  }
+
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(LinearLayout view, boolean enabled) {
     webView.getSettings().setJavaScriptEnabled(enabled);
@@ -347,6 +350,16 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
 
   @ReactProp(name = "lackPermissionToDownloadMessage")
   public void setLackPermissionToDownlaodMessage(LinearLayout view, String message) {
+    mLackPermissionToDownloadMessage = message;
+  }
+
+  @ReactProp(name = "downloadingMessage")
+  public void setDownloadingMessage(WebView view, String message) {
+    mDownloadingMessage = message;
+  }
+
+  @ReactProp(name = "lackPermissionToDownloadMessage")
+  public void setLackPermissionToDownlaodMessage(WebView view, String message) {
     mLackPermissionToDownloadMessage = message;
   }
 
@@ -717,7 +730,6 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
     }
   }
 
-
   @ReactProp(name = "minimumFontSize")
   public void setMinimumFontSize(LinearLayout view, int fontSize) {
     webView.getSettings().setMinimumFontSize(fontSize);
@@ -923,8 +935,6 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
           mReactContext.removeLifecycleEventListener(this);
         }
       };
-
-      webView.setWebChromeClient(mWebChromeClient);
     } else {
       if (mWebChromeClient != null) {
         mWebChromeClient.onHideCustomView();
@@ -939,6 +949,8 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
       mWebChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
       webView.setWebChromeClient(mWebChromeClient);
     }
+    mWebChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
+    webView.setWebChromeClient(mWebChromeClient);
   }
 
   protected static class RNCWebViewClient extends WebViewClient {
@@ -1287,6 +1299,9 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
     // True if protected media should be allowed, false otherwise
     protected boolean mAllowsProtectedMedia = false;
 
+    // True if protected media should be allowed, false otherwise
+    protected boolean mAllowsProtectedMedia = false;
+
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
       this.mWebView = webView;
@@ -1364,7 +1379,7 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
             androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
           }
         }
-        // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
+        // TODO: RESOURCE_MIDI_SYSEX.
 
         if (androidPermission != null) {
           if (ContextCompat.checkSelfPermission(mReactContext, androidPermission) == PackageManager.PERMISSION_GRANTED) {

@@ -96,7 +96,7 @@ namespace winrt::ReactNativeWebView::implementation {
                           if (isUrlEncodedForm)
                           {
                             auto formContent = winrt::single_threaded_observable_map<winrt::hstring, winrt::hstring>();
-                            auto counter = 0u;
+                            size_t counter = 0u;
                             auto current = formBody.find_first_of("&");
                             while (counter <= formBody.find_last_of("&"))
                             {
@@ -142,7 +142,7 @@ namespace winrt::ReactNativeWebView::implementation {
             else if (propertyName == "messagingEnabled") {
               auto messagingEnabled = propertyValue.To<bool>();
               auto reactWebView = view.as<ReactNativeWebView::ReactWebView>();
-              reactWebView.SetMessagingEnabled(messagingEnabled);
+              reactWebView.MessagingEnabled(messagingEnabled);
             }
         }        
     }
