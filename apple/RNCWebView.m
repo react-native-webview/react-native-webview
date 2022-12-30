@@ -963,13 +963,22 @@ RCTAutoInsetsProtocol>
   WKBackForwardList *backForwardList = _webView.backForwardList;
   NSMutableArray<NSString *> *history = [NSMutableArray array];
   for (WKBackForwardListItem *item in backForwardList.backList) {
-    [history addObject:item.URL.absoluteString];
+    NSMutableDictionary<NSString *, id> *entry = [NSMutableDictionary dictionary];
+        entry[@"uri"] = item.URL.absoluteString;
+        entry[@"title"] = item.title;
+    [history addObject:entry];
   }
   // Add the current URL to the front of the array
-  [history addObject:_webView.URL.absoluteString];
+  NSMutableDictionary<NSString *, id> *entry = [NSMutableDictionary dictionary];
+      entry[@"uri"] = _webView.URL.absoluteString;
+      entry[@"title"] = _webView.title;
+  [history addObject:entry];
   // Add the URLs in the forward list to the end of the array
   for (WKBackForwardListItem *item in backForwardList.forwardList) {
-    [history addObject:item.URL.absoluteString];
+    NSMutableDictionary<NSString *, id> *entry = [NSMutableDictionary dictionary];
+        entry[@"uri"] = item.URL.absoluteString;
+        entry[@"title"] = item.title;
+    [history addObject:entry];
   }
 
   // Add the array of URLs to the event dictionary
