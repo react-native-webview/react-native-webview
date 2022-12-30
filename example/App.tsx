@@ -104,8 +104,8 @@ const TESTS = {
   }
 };
 
-type Props = {};
-type State = {restarting: boolean; currentTest: Object};
+interface Props {}
+interface State {restarting: boolean; currentTest: Object}
 
 export default class App extends Component<Props, State> {
   state = {
@@ -165,13 +165,11 @@ export default class App extends Component<Props, State> {
             title="LocalPageLoad"
             onPress={() => this._changeTest('PageLoad')}
           />
-          {Platform.OS == 'ios' && (
-            <Button
-              testID="testType_downloads"
-              title="Downloads"
-              onPress={() => this._changeTest('Downloads')}
-            />
-          )}
+          <Button
+            testID="testType_downloads"
+            title="Downloads"
+            onPress={() => this._changeTest('Downloads')}
+          />
           {Platform.OS === 'android' && (
             <Button
               testID="testType_uploads"
