@@ -950,10 +950,37 @@ RCTAutoInsetsProtocol>
     @"title": _webView.title ?: @"",
     @"loading" : @(_webView.loading),
     @"canGoBack": @(_webView.canGoBack),
-    @"canGoForward" : @(_webView.canGoForward)
+    @"canGoForward" : @(_webView.canGoForward),
   };
   return [[NSMutableDictionary alloc] initWithDictionary: event];
 }
+
+- (NSMutableDictionary<NSString *, id> *)baseEventWithHistory
+{
+  NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+
+  // Get the array of URLs in the web view's back-forward list
+  WKBackForwardList *backForwardList = _webView.backForwardList;
+  NSMutableArray<NSString *> *history = [NSMutableArray array];
+  for (WKBackForwardListItem *item in backForwardList.backList) {
+    [history addObject:item.URL.absoluteString];
+  }
+  // Add the current URL to the front of the array
+  [history addObject:_webView.URL.absoluteString];
+  // Add the URLs in the forward list to the end of the array
+  for (WKBackForwardListItem *item in backForwardList.forwardList) {
+    [history addObject:item.URL.absoluteString];
+  }
+
+  // Add the array of URLs to the event dictionary
+  event[@"history"] = history;
+
+  // Add the current index in the history to the event dictionary
+  event[@"currentHistoryIndex"] = @(backForwardList.backList.count);
+
+  return event;
+}
+
 
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential {
   clientAuthenticationCredential = credential;
@@ -1184,7 +1211,7 @@ RCTAutoInsetsProtocol>
   if (_onLoadingStart) {
     // We have this check to filter out iframe requests and whatnot
     if (isTopFrame) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      NSMutableDictionary<NSString *, id> *event = [self baseEventWithHistory];
       [event addEntriesFromDictionary: @{
         @"url": (request.URL).absoluteString,
         @"navigationType": navigationTypes[@(navigationType)]
@@ -1352,7 +1379,7 @@ didFinishNavigation:(WKNavigation *)navigation
   }
 
   if (_onLoadingFinish) {
-    _onLoadingFinish([self baseEvent]);
+    _onLoadingFinish([self baseEventWithHistory]);
   }
 }
 

@@ -95,11 +95,28 @@ export interface WebViewNativeEvent {
   lockIdentifier: number;
 }
 
+export interface WebViewNativeEventWithHistory extends WebViewNativeEvent {
+  history: string[];
+  currentHistoryIndex: number;
+}
+
 export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
   progress: number;
 }
 
 export interface WebViewNavigation extends WebViewNativeEvent {
+  navigationType:
+    | 'click'
+    | 'formsubmit'
+    | 'backforward'
+    | 'reload'
+    | 'formresubmit'
+    | 'other';
+  mainDocumentURL?: string;
+}
+
+export interface WebViewNavigationWithHistory
+  extends WebViewNativeEventWithHistory {
   navigationType:
     | 'click'
     | 'formsubmit'
@@ -148,6 +165,8 @@ export type WebViewProgressEvent =
   NativeSyntheticEvent<WebViewNativeProgressEvent>;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
+export type WebViewNavigationEventWithHistory =
+  NativeSyntheticEvent<WebViewNavigationWithHistory>;
 
 export type ShouldStartLoadRequestEvent =
   NativeSyntheticEvent<ShouldStartLoadRequest>;
@@ -294,7 +313,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onLoadingError: (event: WebViewErrorEvent) => void;
   onLoadingFinish: (event: WebViewNavigationEvent) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
-  onLoadingStart: (event: WebViewNavigationEvent) => void;
+  onLoadingStart: (event: WebViewNavigationEventWithHistory) => void;
   onHttpError: (event: WebViewHttpErrorEvent) => void;
   onMessage: (event: WebViewMessageEvent) => void;
   onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
@@ -1185,7 +1204,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that is invoked when the `WebView` starts loading.
    */
-  onLoadStart?: (event: WebViewNavigationEvent) => void;
+  onLoadStart?: (event: WebViewNavigationEventWithHistory) => void;
 
   /**
    * Function that is invoked when the `WebView` load fails.
