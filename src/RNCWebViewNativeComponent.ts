@@ -136,7 +136,7 @@ type WebViewDownloadEvent = Readonly<{
 export interface NativeProps extends ViewProps {
   // Android only
   allowFileAccess?: boolean;
-
+  allowsProtectedMedia?: boolean;
   allowsFullscreenVideo?: boolean;
   androidHardwareAccelerationDisabled?: boolean;
   androidLayerType?: WithDefault<'none' | 'software' | 'hardware', 'none'>;

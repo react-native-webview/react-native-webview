@@ -1592,6 +1592,15 @@ This is the message that is shown in the Toast when the webview is unable to dow
 | ------ | -------- | -------- |
 | string | No       | Android  |
 
+### `allowsProtectedMedia`
+
+Whether or not the Webview can play media protected by DRM. Default is false.
+/!\ Setting this to false won't revoke the permission already granted to the current webpage. In order to do so, you'd have to reload the page as well. /!\
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
 ## Methods
 
 ### `goForward()`[⬆](#methods-index)<!-- Link generated with jump2header -->

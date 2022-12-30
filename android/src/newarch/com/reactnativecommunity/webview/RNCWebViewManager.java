@@ -82,6 +82,12 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     }
 
     @Override
+    @ReactProp(name = "allowsProtectedMedia")
+    public void setAllowsProtectedMedia(RNCWebView view, boolean value) {
+        mRNCWebViewManagerImpl.setAllowsProtectedMedia(view, value);
+    }
+
+    @Override
     @ReactProp(name = "androidHardwareAccelerationDisabled")
     public void setAndroidHardwareAccelerationDisabled(RNCWebView view, boolean value) {
         mRNCWebViewManagerImpl.setAndroidHardwareAccelerationDisabled(view, value);

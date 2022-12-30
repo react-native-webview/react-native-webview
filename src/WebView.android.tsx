@@ -173,8 +173,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onRenderProcessGone={onRenderProcessGone}
     onMessage={onMessage}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-    // @ts-expect-error: buggy ref type ?
-    ref={webViewRef}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ref={webViewRef as any}
     // TODO: find a better way to type this.
     source={resolveAssetSource(source as ImageSourcePropType)}
     style={webViewStyles}

@@ -66,6 +66,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mRNCWebViewManagerImpl.setAllowsFullscreenVideo(view, value);
     }
 
+    @ReactProp(name = "allowsProtectedMedia")
+    public void setAllowsProtectedMedia(RNCWebView view, boolean value) {
+        mRNCWebViewManagerImpl.setAllowsProtectedMedia(view, value);
+    }
+
     @ReactProp(name = "androidHardwareAccelerationDisabled")
     public void setAndroidHardwareAccelerationDisabled(RNCWebView view, boolean value) {
         mRNCWebViewManagerImpl.setAndroidHardwareAccelerationDisabled(view, value);

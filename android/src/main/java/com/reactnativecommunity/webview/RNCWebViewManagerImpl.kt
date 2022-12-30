@@ -1,7 +1,6 @@
 package com.reactnativecommunity.webview
 
 import android.app.DownloadManager
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -33,6 +32,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
     private val TAG = "RNCWebViewManagerImpl"
     private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
     private var mAllowsFullscreenVideo = false
+    private var mAllowsProtectedMedia = false
     private var mDownloadingMessage: String? = null
     private var mLackPermissionToDownloadMessage: String? = null
 
@@ -191,6 +191,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
                         mReactContext.removeLifecycleEventListener(this)
                     }
                 }
+            webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
             webView.webChromeClient = webChromeClient
         } else {
             var webChromeClient = webView.webChromeClient as RNCWebChromeClient?
@@ -200,6 +201,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
                     return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
                 }
             }
+            webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
             webView.webChromeClient = webChromeClient
         }
     }
@@ -485,6 +487,19 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
 
     fun setMinimumFontSize(view: RNCWebView, value: Int) {
         view.settings.minimumFontSize = value
+    }
+
+    fun setAllowsProtectedMedia(view: RNCWebView, enabled: Boolean) {
+      // This variable is used to keep consistency
+      // in case a new WebChromeClient is created
+      // (eg. when mAllowsFullScreenVideo changes)
+      mAllowsProtectedMedia = enabled
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val client = view.webChromeClient
+        if (client != null && client is RNCWebChromeClient) {
+          client.setAllowsProtectedMedia(enabled)
+        }
+      }
     }
 
     fun setNestedScrollEnabled(view: RNCWebView, value: Boolean) {

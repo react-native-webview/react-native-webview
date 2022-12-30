@@ -77,6 +77,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     protected List<String> pendingPermissions = new ArrayList<>();
 
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
+    protected boolean mAllowsProtectedMedia = false;
 
     public RNCWebChromeClient(ReactApplicationContext reactContext, WebView webView) {
         this.mReactContext = reactContext;
@@ -136,10 +137,19 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
                 androidPermission = Manifest.permission.CAMERA;
             } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
-                androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
-            }
+                if (mAllowsProtectedMedia) {
+                  grantedPermissions.add(requestedResource);
+                } else {
+                  /**
+                   * Legacy handling (Kept in case it was working under some conditions (given Android version or something))
+                   *
+                   * Try to ask user to grant permission using Activity.requestPermissions
+                   *
+                   * Find more details here: https://github.com/react-native-webview/react-native-webview/pull/2732
+                   */
+                  androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
+                }            }
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
-
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(mReactContext, androidPermission) == PackageManager.PERMISSION_GRANTED) {
                     grantedPermissions.add(requestedResource);
@@ -326,5 +336,14 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
         progressChangedFilter = filter;
+    }
+
+    /**
+     * Set whether or not protected media should be allowed
+     * /!\ Setting this to false won't revoke permission already granted to the current webpage.
+     * In order to do so, you'd need to reload the page /!\
+     */
+    public void setAllowsProtectedMedia(boolean enabled) {
+      mAllowsProtectedMedia = enabled;
     }
 }
