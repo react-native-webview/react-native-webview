@@ -217,6 +217,14 @@ WebView.isFileUploadSupported().then(res => {
 
 ```
 
+##### MacOS
+
+Add read access for `User Selected File` in `Signing & Capabilities` tab under `App Sandbox`:
+
+<img width="856" alt="settings screenshot" src="https://user-images.githubusercontent.com/36531255/200541359-dde130d0-169e-4b58-8b2f-205442d76fdd.png">
+
+Note: Attempting to open a file input without this permission will crash the webview.
+
 ### Multiple Files Upload
 
 You can control **single** or **multiple** file selection by specifing the [`multiple`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#multiple) attribute on your `input` element:
