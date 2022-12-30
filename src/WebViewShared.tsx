@@ -114,12 +114,10 @@ export const useWebWiewLogic = ({
 }: {
   startInLoadingState?: boolean;
   onNavigationStateChange?: (event: WebViewNavigation) => void;
-  onLoadStart?: (event: WebViewNavigationEvent) => void;
+  onLoadStart?: (event: WebViewNavigationEventWithHistory) => void;
   onLoad?: (event: WebViewNavigationEvent) => void;
   onLoadProgress?: (event: WebViewProgressEvent) => void;
-  onLoadEnd?: (
-    event: WebViewNavigationEventWithHistory | WebViewErrorEvent,
-  ) => void;
+  onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
   onError?: (event: WebViewErrorEvent) => void;
   onHttpErrorProp?: (event: WebViewHttpErrorEvent) => void;
   onMessageProp?: (event: WebViewMessageEvent) => void;
