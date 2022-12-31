@@ -96,7 +96,7 @@ export interface WebViewNativeEvent {
 }
 
 export interface WebViewNativeEventWithHistory extends WebViewNativeEvent {
-  history: { title: string; url: string }[];
+  history: { title: string; uri: string }[];
   currentHistoryIndex: number;
 }
 
