@@ -311,7 +311,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   messagingEnabled: boolean;
   onScroll?: (event: WebViewScrollEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
-  onLoadingFinish: (event: WebViewNavigationEvent) => void;
+  onLoadingFinish: (event: WebViewNavigationEventWithHistory) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
   onLoadingStart: (event: WebViewNavigationEventWithHistory) => void;
   onHttpError: (event: WebViewHttpErrorEvent) => void;
@@ -1199,7 +1199,9 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that is invoked when the `WebView` load succeeds or fails.
    */
-  onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
+  onLoadEnd?: (
+    event: WebViewNavigationEventWithHistory | WebViewErrorEvent,
+  ) => void;
 
   /**
    * Function that is invoked when the `WebView` starts loading.
@@ -1220,7 +1222,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that is invoked when the `WebView` loading starts or ends.
    */
-  onNavigationStateChange?: (event: WebViewNavigation) => void;
+  onNavigationStateChange?: (event: WebViewNavigationWithHistory) => void;
 
   /**
    * Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`.

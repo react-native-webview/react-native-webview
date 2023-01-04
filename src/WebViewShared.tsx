@@ -8,9 +8,9 @@ import {
   WebViewErrorEvent,
   WebViewHttpErrorEvent,
   WebViewMessageEvent,
-  WebViewNavigation,
   WebViewNavigationEvent,
   WebViewNavigationEventWithHistory,
+  WebViewNavigationWithHistory,
   WebViewProgressEvent,
   WebViewRenderProcessGoneEvent,
   WebViewTerminatedEvent,
@@ -113,11 +113,13 @@ export const useWebWiewLogic = ({
   onShouldStartLoadWithRequestCallback,
 }: {
   startInLoadingState?: boolean;
-  onNavigationStateChange?: (event: WebViewNavigation) => void;
+  onNavigationStateChange?: (event: WebViewNavigationWithHistory) => void;
   onLoadStart?: (event: WebViewNavigationEventWithHistory) => void;
   onLoad?: (event: WebViewNavigationEvent) => void;
   onLoadProgress?: (event: WebViewProgressEvent) => void;
-  onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
+  onLoadEnd?: (
+    event: WebViewNavigationEventWithHistory | WebViewErrorEvent,
+  ) => void;
   onError?: (event: WebViewErrorEvent) => void;
   onHttpErrorProp?: (event: WebViewHttpErrorEvent) => void;
   onMessageProp?: (event: WebViewMessageEvent) => void;
@@ -140,7 +142,7 @@ export const useWebWiewLogic = ({
   const startUrl = useRef<string | null>(null);
 
   const updateNavigationState = useCallback(
-    (event: WebViewNavigationEvent) => {
+    (event: WebViewNavigationEventWithHistory) => {
       onNavigationStateChange?.(event.nativeEvent);
     },
     [onNavigationStateChange],
@@ -202,7 +204,7 @@ export const useWebWiewLogic = ({
   // !iOS Only
 
   const onLoadingFinish = useCallback(
-    (event: WebViewNavigationEvent) => {
+    (event: WebViewNavigationEventWithHistory) => {
       onLoad?.(event);
       onLoadEnd?.(event);
       const {
