@@ -925,7 +925,7 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
-  onNavigationStateChange?: (event: WebViewNavigation) => void;
+  onNavigationStateChange?: (event: WebViewNavigationWithHistory) => void;
   onContentSizeChange?: (event: WebViewEvent) => void;
 
   /**
