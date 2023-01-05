@@ -89,6 +89,7 @@ This document lays out the current public properties and methods for the React N
 - [`minimumFontSize`](Reference.md#minimumFontSize)
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
+- [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
 
 ## Methods Index
 
