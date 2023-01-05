@@ -382,6 +382,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
 
     @Override
     public void setTextInteractionEnabled(RNCWebView view, boolean value) {}
+    
+    @Override
+    public void setHasOnFileDownload(RNCWebView view, boolean value) {}
 
     @Override
     public void setMenuItems(RNCWebView view, ReadableArray value) {}

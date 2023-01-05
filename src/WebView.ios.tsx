@@ -186,6 +186,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
       source={resolveAssetSource(source as ImageSourcePropType)}
       style={webViewStyles}
+      hasOnFileDownload={!!onFileDownload}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ref={webViewRef as any}
       {...nativeConfig?.props}

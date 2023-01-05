@@ -161,6 +161,8 @@ export interface NativeProps extends ViewProps {
   textZoom?: Int32;
   thirdPartyCookiesEnabled?: boolean;
   urlPrefixesForDefaultIntent?: readonly string[];
+  // Workaround to watch if listener if defined
+  hasOnScroll?: boolean;
   // !Android only
 
   // iOS only
@@ -203,6 +205,8 @@ export interface NativeProps extends ViewProps {
   onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
   // eslint-disable-next-line @typescript-eslint/array-type
   menuItems?: ReadonlyArray<Readonly<{label: string, key: string}>>;
+  // Workaround to watch if listener if defined
+  hasOnFileDownload?: boolean;
   // !iOS only
 
   allowFileAccessFromFileURLs?: boolean;
@@ -213,7 +217,6 @@ export interface NativeProps extends ViewProps {
     password: string;
   }>;
   cacheEnabled?: boolean;
-  hasOnScroll?: boolean;
   incognito?: boolean;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;

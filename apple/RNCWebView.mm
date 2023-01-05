@@ -131,15 +131,6 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                 webViewEventEmitter->onMessage(data);
             }
         };
-        _view.onFileDownload = [self](NSDictionary* dictionary) {
-            if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnFileDownload data = {
-                    .downloadUrl = std::string([[dictionary valueForKey:@"downloadUrl"] UTF8String])
-                };
-                webViewEventEmitter->onFileDownload(data);
-            }
-        };
         _view.onLoadingFinish = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
                 auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
@@ -381,7 +372,21 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }
         [_view setMenuItems:newMenuItems];
     }
-
+    if (oldViewProps.hasOnFileDownload != newViewProps.hasOnFileDownload) {
+        if (newViewProps.hasOnFileDownload) {
+            _view.onFileDownload = [self](NSDictionary* dictionary) {
+                if (_eventEmitter) {
+                    auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                    facebook::react::RNCWebViewEventEmitter::OnFileDownload data = {
+                        .downloadUrl = std::string([[dictionary valueForKey:@"downloadUrl"] UTF8String])
+                    };
+                    webViewEventEmitter->onFileDownload(data);
+                } 
+            };
+        } else {
+            _view.onFileDownload = nil;        
+        }
+    }
 //
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
     if (oldViewProps.contentMode != newViewProps.contentMode) {
