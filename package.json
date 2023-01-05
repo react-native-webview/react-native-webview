@@ -82,6 +82,7 @@
     "macos",
     "windows",
     "lib",
+    "src",
     "index.js",
     "index.d.ts",
     "react-native-webview.podspec",
