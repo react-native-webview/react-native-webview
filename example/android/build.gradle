@@ -1,7 +1,6 @@
 buildscript {
     def androidTestAppDir = "../../node_modules/react-native-test-app/android"
     apply(from: "${androidTestAppDir}/dependencies.gradle")
-    apply(from: "${androidTestAppDir}/test-app-util.gradle")
 
     repositories {
         mavenCentral()
@@ -9,11 +8,8 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:${androidPluginVersion}")
-
-        if (isNewArchitectureEnabled(project)) {
-            classpath("com.facebook.react:react-native-gradle-plugin")
-            classpath("de.undercouch:gradle-download-task:5.1.0")
+        getReactNativeDependencies().each { dependency ->
+            classpath(dependency)
         }
     }
 }

@@ -7,7 +7,6 @@ import {
   StyleProp,
   ViewStyle,
   NativeMethodsMixin,
-  Constructor,
   UIManagerStatic,
   NativeScrollEvent,
 } from 'react-native';
@@ -56,6 +55,9 @@ interface ErrorState extends BaseState {
 }
 
 export type State = NormalState | ErrorState;
+
+// eslint-disable-next-line @typescript-eslint/no-type-alias, @typescript-eslint/no-explicit-any
+type Constructor<T> = new (...args: any[]) => T;
 
 // eslint-disable-next-line react/prefer-stateless-function
 declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}
