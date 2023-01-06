@@ -128,16 +128,16 @@ static WKContentRuleList * _contentRuleList;
     [[WKContentRuleListStore defaultStore] lookUpContentRuleListForIdentifier: contentRuleId completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
       if (error != nil) {
         NSLog(@"Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedDescription);
-        NSLog(@"Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedRecoverySuggestion);
-        NSLog(@"Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedFailureReason);
+        // NSLog(@"Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedRecoverySuggestion);
+        // NSLog(@"Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedFailureReason);
         NSURL *podBundleURL = [[[NSBundle mainBundle] resourceURL] URLByAppendingPathComponent:podBundleName];
         NSBundle *podBundle = [NSBundle bundleWithURL:podBundleURL];
         NSString *path = [podBundle pathForResource:contentRuleFile ofType:@"json"];
         NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-        NSLog(@"DONDEBUG - PATH FOUND from podBundleURL: %@", podBundleURL);
-        NSLog(@"DONDEBUG - PATH FOUND from podBundle: %@", podBundle);
-        NSLog(@"DONDEBUG - PATH FOUND from path: %@", path);
-        NSLog(@"DONDEBUG - CONTENT FOUND from content: %@", content);
+        // NSLog(@"DONDEBUG - PATH FOUND from podBundleURL: %@", podBundleURL);
+        // NSLog(@"DONDEBUG - PATH FOUND from podBundle: %@", podBundle);
+        // NSLog(@"DONDEBUG - PATH FOUND from path: %@", path);
+        // NSLog(@"DONDEBUG - CONTENT FOUND from content: %@", content);
 
         [[WKContentRuleListStore defaultStore] compileContentRuleListForIdentifier: contentRuleId encodedContentRuleList:content completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
           if (error != nil) {

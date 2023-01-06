@@ -20,7 +20,7 @@ export default class NativeWebpage extends Component<Props, State> {
           source={{ uri: 'https://d3ward.github.io/toolz/adblock' }}
           style={{ width: '100%', height: '100%' }}
           onLoadStart={this.onLoadStart}
-          blockAds={true}
+          blockAds={false}
         />
       </View>
     );
