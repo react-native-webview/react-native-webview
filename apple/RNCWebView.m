@@ -120,16 +120,16 @@ static WKContentRuleList * _contentRuleList;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* iOS 11 */
 + (void)initialize {
-  if (@available(iOS 15.5, *)) {
+  if (@available(iOS 13, *)) {
     NSString *contentRuleId = @"AdsBlockRules";
     NSString *contentRuleFile = @"ads-block-rules";
     NSString *podBundleName = @"RNCWebView.bundle";
     NSConditionLock *lock = [[NSConditionLock alloc] initWithCondition:0];
     [[WKContentRuleListStore defaultStore] lookUpContentRuleListForIdentifier: contentRuleId completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
       if (error != nil) {
-        NSLog(@"Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedDescription);
-        // NSLog(@"Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedRecoverySuggestion);
-        // NSLog(@"Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedFailureReason);
+        // NSLog(@"DONDEBUG - Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedDescription);
+        // NSLog(@"DONDEBUG - Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedRecoverySuggestion);
+        // NSLog(@"DONDEBUG - Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedFailureReason);
         NSURL *podBundleURL = [[[NSBundle mainBundle] resourceURL] URLByAppendingPathComponent:podBundleName];
         NSBundle *podBundle = [NSBundle bundleWithURL:podBundleURL];
         NSString *path = [podBundle pathForResource:contentRuleFile ofType:@"json"];
@@ -155,8 +155,9 @@ static WKContentRuleList * _contentRuleList;
         [lock unlockWithCondition:1];
       }
     }];
+    // NSLog(@"DONDEBUG - OUTSIDE IT ALL");
     // Wait max 200ms for content rule to be loaded.
-    [lock lockWhenCondition:1 beforeDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+    [lock lockWhenCondition:1 beforeDate:[NSDate dateWithTimeIntervalSinceNow:2]];
   }
 }
 #endif
