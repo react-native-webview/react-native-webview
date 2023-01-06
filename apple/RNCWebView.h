@@ -89,6 +89,10 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) WKContentMode contentMode;
 #endif
 
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* iOS 11 */
+@property (nonatomic, assign) BOOL blockAds;
+#endif
+
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
 @property (nonatomic, assign) BOOL limitsNavigationsToAppBoundDomains;
 #endif
