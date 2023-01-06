@@ -61,6 +61,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   originWhitelist = defaultOriginWhitelist,
   useSharedProcessPool= true,
   textInteractionEnabled= true,
+  blockAds= true,
   injectedJavaScript,
   injectedJavaScriptBeforeContentLoaded,
   injectedJavaScriptForMainFrameOnly = true,
@@ -173,6 +174,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       cacheEnabled={cacheEnabled}
       useSharedProcessPool={useSharedProcessPool}
       textInteractionEnabled={textInteractionEnabled}
+      blockAds={blockAds}
       decelerationRate={decelerationRate}
       messagingEnabled={typeof onMessage === 'function'}
       onLoadingError={onLoadingError}

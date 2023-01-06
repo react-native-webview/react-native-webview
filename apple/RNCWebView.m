@@ -90,6 +90,8 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *atEndScript;
 @end
 
+static WKContentRuleList * _contentRuleList;
+
 @implementation RNCWebView
 {
 #if !TARGET_OS_OSX
@@ -115,6 +117,51 @@ RCTAutoInsetsProtocol>
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
 #endif
 }
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* iOS 11 */
++ (void)initialize {
+  if (@available(iOS 13, *)) {
+    NSString *contentRuleId = @"AdsBlockRules";
+    NSString *contentRuleFile = @"ads-block-rules";
+    NSString *podBundleName = @"RNCWebView.bundle";
+    NSConditionLock *lock = [[NSConditionLock alloc] initWithCondition:0];
+    [[WKContentRuleListStore defaultStore] lookUpContentRuleListForIdentifier: contentRuleId completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
+      if (error != nil) {
+        // NSLog(@"DONDEBUG - Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedDescription);
+        // NSLog(@"DONDEBUG - Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedRecoverySuggestion);
+        // NSLog(@"DONDEBUG - Can not find content rule list %@ from store: %@",  contentRuleId, error.localizedFailureReason);
+        NSURL *podBundleURL = [[[NSBundle mainBundle] resourceURL] URLByAppendingPathComponent:podBundleName];
+        NSBundle *podBundle = [NSBundle bundleWithURL:podBundleURL];
+        NSString *path = [podBundle pathForResource:contentRuleFile ofType:@"json"];
+        NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
+        // NSLog(@"DONDEBUG - PATH FOUND from podBundleURL: %@", podBundleURL);
+        // NSLog(@"DONDEBUG - PATH FOUND from podBundle: %@", podBundle);
+        // NSLog(@"DONDEBUG - PATH FOUND from path: %@", path);
+        // NSLog(@"DONDEBUG - CONTENT FOUND from content: %@", content);
+
+        [[WKContentRuleListStore defaultStore] compileContentRuleListForIdentifier: contentRuleId encodedContentRuleList:content completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
+          if (error != nil) {
+            NSLog(@"DONDEBUG - Error compiling content rule list: %@", error.localizedDescription);
+            [lock unlockWithCondition:1];
+          } else {
+            NSLog(@"DONDEBUG - Compiled content rule list and saved in store: %@",  contentRuleList);
+            _contentRuleList = contentRuleList;
+            [lock unlockWithCondition:1];
+          }
+        }];
+      } else {
+        NSLog(@"DONDEBUG - Found content rule list from store: %@",  contentRuleList);
+        _contentRuleList = contentRuleList;
+        [lock unlockWithCondition:1];
+      }
+    }];
+    // NSLog(@"DONDEBUG - OUTSIDE IT ALL");
+    // Wait max 200ms for content rule to be loaded.
+    [lock lockWhenCondition:1 beforeDate:[NSDate dateWithTimeIntervalSinceNow:2]];
+  }
+}
+#endif
+
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -419,6 +466,12 @@ RCTAutoInsetsProtocol>
     wkWebViewConfig.applicationNameForUserAgent = [NSString stringWithFormat:@"%@ %@", wkWebViewConfig.applicationNameForUserAgent, _applicationNameForUserAgent];
   }
   
+  #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* iOS 11 */
+  if (@available(iOS 11.0, *) && _blockAds && _contentRuleList != nil) {
+    [wkWebViewConfig.userContentController addContentRuleList:_contentRuleList];
+  }
+#endif
+
   return wkWebViewConfig;
 }
 

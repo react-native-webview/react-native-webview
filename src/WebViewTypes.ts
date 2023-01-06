@@ -328,6 +328,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
    */
   applicationNameForUserAgent?: string;
   basicAuthCredential?: BasicAuthCredential;
+  blockAds?: boolean;
 }
 
 export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
@@ -1322,5 +1323,10 @@ export interface WebViewSharedProps extends ViewProps {
    * An object that specifies the credentials of a user to be used for basic authentication.
    */
   basicAuthCredential?: BasicAuthCredential;
+
+  /**
+   * Determines whether to block ads. Default is true.
+   */
+  blockAds?: boolean;
 }
 //
