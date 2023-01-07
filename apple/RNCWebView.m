@@ -137,14 +137,14 @@ static WKContentRuleList * _contentRuleList;
         NSLog(@"DONDEBUG - PATH FOUND from podBundleURL: %@", podBundleURL);
         NSLog(@"DONDEBUG - PATH FOUND from podBundle: %@", podBundle);
         NSLog(@"DONDEBUG - PATH FOUND from path: %@", path);
-        NSLog(@"DONDEBUG - CONTENT FOUND from content: %@", content);
+        // NSLog(@"DONDEBUG - CONTENT FOUND from content: %@", content);
 
         [[WKContentRuleListStore defaultStore] compileContentRuleListForIdentifier: contentRuleId encodedContentRuleList:content completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
           if (error != nil) {
             NSLog(@"DONDEBUG - Error compiling content rule list: %@", error.localizedDescription);
             [lock unlockWithCondition:1];
           } else {
-            NSLog(@"DONDEBUG - Compiled content rule list and saved in store: %@",  contentRuleList);
+            NSLog(@"DONDEBUG - Compiled content rule list and saved in store");
             _contentRuleList = contentRuleList;
             [lock unlockWithCondition:1];
           }
