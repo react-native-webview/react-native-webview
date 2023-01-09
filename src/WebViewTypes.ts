@@ -745,6 +745,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   onCustomMenuSelection?: (event: WebViewEvent) => void;
+
+  /**
+   * A Boolean value that indicates whether the webview shows warnings for suspected
+   * fraudulent content, such as malware or phishing attemps.
+   * @platform ios
+   */
+  fraudulentWebsiteWarningEnabled?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
