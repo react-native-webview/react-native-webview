@@ -240,7 +240,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
     @ReactProp(name = "source")
     public void setSource(RNCWebView view, @Nullable ReadableMap value) {
-        mRNCWebViewManagerImpl.setSource(view, value);
+        mRNCWebViewManagerImpl.setSource(view, value, false);
     }
 
     @ReactProp(name = "textZoom")

@@ -218,7 +218,7 @@ PODS:
   - React-jsinspector (0.71.0-rc.5)
   - React-logger (0.71.0-rc.5):
     - glog
-  - react-native-webview (11.23.1):
+  - react-native-webview (11.26.0):
     - React-Core
   - React-perflogger (0.71.0-rc.5)
   - React-RCTActionSheet (0.71.0-rc.5):
@@ -445,7 +445,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: e322db2a13911f17f0ea182faaf5e3c730a8c9a7
   React-jsinspector: 55ec7f756a6b15df4b1b0b2246001a42771190c9
   React-logger: 79c2bd2ce2122aa7c4a2bcb7be274d91ba6fb700
-  react-native-webview: 79e14779d14b1998902a142d7885ca20adfc6bf9
+  react-native-webview: bf7fae0a7188338b787a294ce9977c441abb6f5c
   React-perflogger: 6c81fa72c14bd8c7b34aa989edf59aa9d7baee58
   React-RCTActionSheet: 9fbf08df3759f11aae38c0182ada561eb64c216e
   React-RCTAnimation: 940ad0c37d927dc2a75ebeed34703ba0c9545ac7

@@ -417,27 +417,27 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
 #endif
     
     NSMutableDictionary* source = [[NSMutableDictionary alloc] init];
-    if (!newViewProps.source.uri.empty()) {
-        [source setValue:RCTNSStringFromString(newViewProps.source.uri) forKey:@"uri"];
+    if (!newViewProps.newSource.uri.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.newSource.uri) forKey:@"uri"];
     }
     NSMutableDictionary* headers = [[NSMutableDictionary alloc] init];
-    for (auto & element : newViewProps.source.headers) {
+    for (auto & element : newViewProps.newSource.headers) {
         [headers setValue:RCTNSStringFromString(element.value) forKey:RCTNSStringFromString(element.name)];
     }
     if (headers.count > 0) {
         [source setObject:headers forKey:@"headers"];
     }
-    if (!newViewProps.source.baseUrl.empty()) {
-        [source setValue:RCTNSStringFromString(newViewProps.source.baseUrl) forKey:@"baseUrl"];
+    if (!newViewProps.newSource.baseUrl.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.newSource.baseUrl) forKey:@"baseUrl"];
     }
-    if (!newViewProps.source.body.empty()) {
-        [source setValue:RCTNSStringFromString(newViewProps.source.body) forKey:@"body"];
+    if (!newViewProps.newSource.body.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.newSource.body) forKey:@"body"];
     }
-    if (!newViewProps.source.html.empty()) {
-        [source setValue:RCTNSStringFromString(newViewProps.source.html) forKey:@"html"];
+    if (!newViewProps.newSource.html.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.newSource.html) forKey:@"html"];
     }
-    if (!newViewProps.source.method.empty()) {
-        [source setValue:RCTNSStringFromString(newViewProps.source.method) forKey:@"method"];
+    if (!newViewProps.newSource.method.empty()) {
+        [source setValue:RCTNSStringFromString(newViewProps.newSource.method) forKey:@"method"];
     }
     [_view setSource:source];
     

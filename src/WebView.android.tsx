@@ -20,7 +20,7 @@ import {
   useWebWiewLogic,
 } from './WebViewShared';
 import {
-  AndroidWebViewProps,
+  AndroidWebViewProps, WebViewSourceUri,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -158,6 +158,20 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   const NativeWebView
     = (nativeConfig?.component as (typeof RNCWebView | undefined)) || RNCWebView;
 
+  const sourceResolved = resolveAssetSource(source as ImageSourcePropType)
+  const newSource = typeof sourceResolved === "object" ? Object.entries(sourceResolved as WebViewSourceUri).reduce((prev, [currKey, currValue]) => {
+    return {
+      ...prev,
+      [currKey]: currKey === "headers" && currValue && typeof currValue === "object" ? Object.entries(currValue).map(
+        ([key, value]) => {
+          return {
+            name: key,
+            value
+          }
+        }) : currValue
+    }
+  }, {}) : sourceResolved
+
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
@@ -176,7 +190,9 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ref={webViewRef as any}
     // TODO: find a better way to type this.
-    source={resolveAssetSource(source as ImageSourcePropType)}
+    // @ts-expect-error source is old arch 
+    source={sourceResolved}
+    newSource={newSource}
     style={webViewStyles}
     overScrollMode={overScrollMode}
     javaScriptEnabled={javaScriptEnabled}
@@ -204,8 +220,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
 });
 
 // native implementation should return "true" only for Android 5+
-const {isFileUploadSupported} = RNCWebViewModule;
+const { isFileUploadSupported } = RNCWebViewModule;
 
-const WebView = Object.assign(WebViewComponent, {isFileUploadSupported});
+const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });
 
 export default WebView;

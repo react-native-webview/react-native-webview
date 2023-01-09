@@ -287,9 +287,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     }
 
     @Override
-    @ReactProp(name = "source")
-    public void setSource(RNCWebView view, @Nullable ReadableMap value) {
-        mRNCWebViewManagerImpl.setSource(view, value);
+    @ReactProp(name = "newSource")
+    public void setNewSource(RNCWebView view, @Nullable ReadableMap value) {
+        mRNCWebViewManagerImpl.setSource(view, value, true);
     }
 
     @Override

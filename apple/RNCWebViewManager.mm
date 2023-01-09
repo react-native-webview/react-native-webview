@@ -42,6 +42,8 @@ return [[RNCWebViewImpl alloc] init];
 }
 
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
+// New arch only
+RCT_CUSTOM_VIEW_PROPERTY(newSource, NSDictionary, RNCWebViewImpl) {}
 RCT_EXPORT_VIEW_PROPERTY(onFileDownload, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingStart, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingFinish, RCTDirectEventBlock)
@@ -106,7 +108,8 @@ RCT_EXPORT_VIEW_PROPERTY(onMessage, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onScroll, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(enableApplePay, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(menuItems, NSArray);
-RCT_EXPORT_VIEW_PROPERTY(hasOnFileDownload, BOOL)
+// New arch only
+RCT_CUSTOM_VIEW_PROPERTY(hasOnFileDownload, BOOL, RNCWebViewImpl) {}
 RCT_EXPORT_VIEW_PROPERTY(onCustomMenuSelection, RCTDirectEventBlock)
 RCT_CUSTOM_VIEW_PROPERTY(pullToRefreshEnabled, BOOL, RNCWebViewImpl) {
   view.pullToRefreshEnabled = json == nil ? false : [RCTConvert BOOL: json];

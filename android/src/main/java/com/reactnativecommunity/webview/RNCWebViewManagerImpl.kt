@@ -38,6 +38,7 @@ import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
+import kotlin.collections.HashMap
 
 
 class RNCWebViewManagerImpl(context: ReactApplicationContext) {
@@ -293,7 +294,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
             ?: DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE
     }
 
-    fun setSource(view: RNCWebView, source: ReadableMap?) {
+    fun setSource(view: RNCWebView, source: ReadableMap?, newArch: Boolean = true) {
         if (source != null) {
             if (source.hasKey("html")) {
                 val html = source.getString("html")
@@ -334,15 +335,29 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
                 }
                 val headerMap = HashMap<String, String?>()
                 if (source.hasKey("headers")) {
-                    val headers = source.getMap("headers")
-                    val iter = headers!!.keySetIterator()
-                    while (iter.hasNextKey()) {
+                    if (newArch) {
+                      val headerArray = source.getArray("headers");
+                      for (header in headerArray!!.toArrayList()) {
+                        val headerCasted = header as HashMap<String, String>
+                        val name = headerCasted.get("name") ?: ""
+                        val value = headerCasted.get("value") ?: ""
+                        if ("user-agent" == name.lowercase(Locale.ENGLISH)) {
+                          view.settings.userAgentString = value
+                        } else {
+                          headerMap[name] = value
+                        }
+                      }
+                    } else {
+                      val headers = source.getMap("headers")
+                      val iter = headers!!.keySetIterator()
+                      while (iter.hasNextKey()) {
                         val key = iter.nextKey()
                         if ("user-agent" == key.lowercase(Locale.ENGLISH)) {
-                            view.settings.userAgentString = headers.getString(key)
+                          view.settings.userAgentString = headers.getString(key)
                         } else {
-                            headerMap[key] = headers.getString(key)
+                          headerMap[key] = headers.getString(key)
                         }
+                      }
                     }
                 }
                 view.loadUrl(url!!, headerMap)
