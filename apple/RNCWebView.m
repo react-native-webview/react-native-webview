@@ -157,7 +157,7 @@ static WKContentRuleList * _contentRuleList;
     }];
     NSLog(@"DONDEBUG - OUTSIDE IT ALL");
     // Wait max 200ms for content rule to be loaded.
-    [lock lockWhenCondition:1 beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];
+    [lock lockWhenCondition:1 beforeDate:[NSDate dateWithTimeIntervalSinceNow:30]];
   }
 }
 #endif
