@@ -309,6 +309,13 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     // If there is a detached internal webview attach it to this RNCWebView
     } else if (internalWebViewMap.containsKey(webViewKey)) {
       InternalWebView webView = (InternalWebView) internalWebViewMap.get(webViewKey);
+
+      // The webview might be attached to the temporary parent; if so, remove it first.
+      ViewGroup webViewParent = (ViewGroup)webView.getParent();
+      if (webViewParent != null) {
+        webViewParent.removeView(webView);
+      }
+
       view.attachWebView(webView);
     }
 
@@ -320,6 +327,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       internalWebViewMap.put(webViewKey, webView);
       rncWebViewMap.put(webViewKey, view);
     });
+  }
+
+  @ReactProp(name = "temporaryParentNodeTag")
+  public void setTemporaryParentNodeTag(RNCWebView view, int nodeTag) {
+    view.temporaryParentNodeTag = nodeTag;
   }
 
   @ReactProp(name = "showsHorizontalScrollIndicator")
@@ -912,6 +924,13 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         view.removeWebViewFromParent();
         RNCWebViewMapManager.INSTANCE.getRncWebViewMap().remove(webView.webViewKey);
         RNCWebViewMapManager.INSTANCE.getViewIdMap().remove(webView.getId());
+
+        if (view.temporaryParentNodeTag != 0) {
+          // Re-attach the internal webview to the temporary parent.
+          UIManagerModule uiManagerModule = ((ReactContext) view.getContext()).getNativeModule(UIManagerModule.class);
+          ViewGroup temporaryParentView = (ViewGroup)uiManagerModule.resolveView(view.temporaryParentNodeTag);
+          viewGroup.addView(webView);
+        }
       }
     });
   }
