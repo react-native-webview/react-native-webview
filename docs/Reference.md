@@ -1604,7 +1604,7 @@ Whether or not the Webview can play media protected by DRM. Default is false.
 
 ### `fraudulentWebsiteWarningEnabled`
 
-A Boolean value that indicates whether the web view shows warnings for suspected fraudulent content, such as malware or phishing attemps. The default value is `true`. (iOS 13+)
+A Boolean value that indicates whether the web view shows warnings for suspected fraudulent content, such as malware or phishing attempts. The default value is `true`. (iOS 13+)
 
 | Type    | Required | Default | Platform |
 | ------- | -------- | ------- | -------- |
