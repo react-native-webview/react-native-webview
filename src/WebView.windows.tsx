@@ -126,7 +126,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    messagingEnabled={typeof onMessage === 'function'}
+    messagingEnabled={typeof onMessageProp === 'function'}
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}
     onLoadingProgress={onLoadingProgress}
