@@ -56,7 +56,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   ...otherProps
 }, ref) => {
   const webViewRef = useRef<NativeWebViewWindows | null>(null);
-  
+
   const RCTWebViewString = useWebView2 ? 'RCTWebView2' : 'RCTWebView';
 
   const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean, url: string, lockIdentifier?: number) => {
@@ -123,7 +123,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    messagingEnabled={typeof onMessage === 'function'}
+    messagingEnabled={typeof onMessageProp === 'function'}
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}
     onLoadingProgress={onLoadingProgress}

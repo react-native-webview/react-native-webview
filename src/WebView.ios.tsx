@@ -179,7 +179,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       useSharedProcessPool={useSharedProcessPool}
       textInteractionEnabled={textInteractionEnabled}
       decelerationRate={decelerationRate}
-      messagingEnabled={typeof onMessage === 'function'}
+      messagingEnabled={typeof onMessageProp === 'function'}
       messagingModuleName="" // android ONLY
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
@@ -199,7 +199,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       allowsInlineMediaPlayback={allowsInlineMediaPlayback}
       incognito={incognito}
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
-      // @ts-expect-error source is old arch 
+      // @ts-expect-error source is old arch
       source={sourceResolved}
       newSource={newSource}
       style={webViewStyles}

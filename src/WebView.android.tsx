@@ -175,7 +175,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    messagingEnabled={typeof onMessage === 'function'}
+    messagingEnabled={typeof onMessageProp === 'function'}
     messagingModuleName={messagingModuleName}
 
     hasOnScroll={!!otherProps.onScroll}
@@ -190,7 +190,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ref={webViewRef as any}
     // TODO: find a better way to type this.
-    // @ts-expect-error source is old arch 
+    // @ts-expect-error source is old arch
     source={sourceResolved}
     newSource={newSource}
     style={webViewStyles}
