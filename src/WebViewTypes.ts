@@ -438,8 +438,8 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * settings for `UIScrollViewDecelerationRateNormal` and
    * `UIScrollViewDecelerationRateFast` respectively:
    *
-   *   - normal: 0.998
-   *   - fast: 0.99 (the default for iOS web view)
+   *   - normal: 0.998 (the default for iOS web view)
+   *   - fast: 0.99
    * @platform ios
    */
   decelerationRate?: DecelerationRateConstant | number;

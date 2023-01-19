@@ -37,7 +37,7 @@ const processDecelerationRate = (
   decelerationRate: DecelerationRateConstant | number | undefined,
 ) => {
   let newDecelerationRate = decelerationRate;
-  if (newDecelerationRate === 'normal') {
+  if (newDecelerationRate === 'normal' || newDecelerationRate === undefined) {
     newDecelerationRate = 0.998;
   } else if (newDecelerationRate === 'fast') {
     newDecelerationRate = 0.99;
