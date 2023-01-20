@@ -811,8 +811,8 @@ Example:
 
 A floating-point number that determines how quickly the scroll view decelerates after the user lifts their finger. You may also use the string shortcuts `"normal"` and `"fast"` which match the underlying iOS settings for `UIScrollViewDecelerationRateNormal` and `UIScrollViewDecelerationRateFast` respectively:
 
-- normal: 0.998
-- fast: 0.99 (the default for iOS web view)
+- normal: 0.998 (the default for iOS web view)
+- fast: 0.99 
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
