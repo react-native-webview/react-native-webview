@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '14.1'
+          xcode-version: '14.0'
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up Node.js
