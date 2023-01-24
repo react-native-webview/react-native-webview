@@ -133,6 +133,11 @@ RCTAutoInsetsProtocol>
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
+    
+#if !TARGET_OS_OSX
+    _decelerationRate = UIScrollViewDecelerationRateNormal;
+#endif // !TARGET_OS_OSX
+
 #if !TARGET_OS_OSX
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
