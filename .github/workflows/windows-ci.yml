@@ -17,6 +17,7 @@ jobs:
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.1.3
+      with:
         vs-version: '[17.0,)'
         msbuild-architecture: x64
 
