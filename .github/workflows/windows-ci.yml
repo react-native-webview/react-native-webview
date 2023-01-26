@@ -23,7 +23,7 @@ jobs:
 
 
     - name: Check node modules cache
-      uses: actions/cache@v3.1.2
+      uses: actions/cache@v3
       id: yarn-cache
       with:
         path: ./node_modules
