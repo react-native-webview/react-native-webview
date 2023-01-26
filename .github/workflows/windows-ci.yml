@@ -7,7 +7,7 @@ jobs:
     runs-on: windows-2022
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout Code
 
     - name: Setup Node.js
@@ -23,7 +23,7 @@ jobs:
 
 
     - name: Check node modules cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3.1.2
       id: yarn-cache
       with:
         path: ./node_modules
