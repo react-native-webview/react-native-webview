@@ -441,9 +441,13 @@ RCTAutoInsetsProtocol>
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 
     _webView.customUserAgent = _userAgent;
+
+#if !TARGET_OS_OSX
     if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
       _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
     }
+#endif  // !TARGET_OS_OSX
+
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     if (@available(iOS 13.0, *)) {
       _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
@@ -599,6 +603,7 @@ RCTAutoInsetsProtocol>
 #endif // !TARGET_OS_OSX
 }
 
+#if !TARGET_OS_OSX
 - (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior
 {
   _savedContentInsetAdjustmentBehavior = behavior;
@@ -612,6 +617,8 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.contentOffset = contentOffset;
   }
 }
+#endif // !TARGET_OS_OSX
+
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
 - (void)setAutomaticallyAdjustsScrollIndicatorInsets:(BOOL)automaticallyAdjustsScrollIndicatorInsets{
   _savedAutomaticallyAdjustsScrollIndicatorInsets = automaticallyAdjustsScrollIndicatorInsets;
@@ -623,6 +630,7 @@ RCTAutoInsetsProtocol>
   }
 }
 #endif
+
 /**
  * This method is called whenever JavaScript running within the web view calls:
  *   - window.webkit.messageHandlers[MessageHandlerName].postMessage
@@ -706,26 +714,28 @@ RCTAutoInsetsProtocol>
   }
 
   NSURLRequest *request = [self requestForSource:_source];
+  __weak WKWebView *webView = _webView;
+  NSString *allowingReadAccessToURL = _allowingReadAccessToURL;
 
   [self syncCookiesToWebView:^{
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
     // the same url. We'll expose a call to 'reload' to allow a user to load
     // the existing page.
-    if ([request.URL isEqual:_webView.URL]) {
+    if ([request.URL isEqual:webView.URL]) {
       return;
     }
     if (!request.URL) {
       // Clear the webview
-      [_webView loadHTMLString:@"" baseURL:nil];
+      [webView loadHTMLString:@"" baseURL:nil];
       return;
     }
     if (request.URL.host) {
-      [_webView loadRequest:request];
+      [webView loadRequest:request];
     }
     else {
-      NSURL* readAccessUrl = _allowingReadAccessToURL ? [RCTConvert NSURL:_allowingReadAccessToURL] : request.URL;
-      [_webView loadFileURL:request.URL allowingReadAccessToURL:readAccessUrl];
+      NSURL* readAccessUrl = allowingReadAccessToURL ? [RCTConvert NSURL:allowingReadAccessToURL] : request.URL;
+      [webView loadFileURL:request.URL allowingReadAccessToURL:readAccessUrl];
     }
   }];
 }
@@ -1244,7 +1254,7 @@ RCTAutoInsetsProtocol>
       }
 
       NSString *disposition = nil;
-      if (@available(iOS 13, *)) {
+      if (@available(iOS 13, macOS 10.15, *)) {
         disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
       }
       BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
@@ -1367,13 +1377,15 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (void)cookiesDidChangeInCookieStore:(WKHTTPCookieStore *)cookieStore
 {
-  if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
-    // Write all cookies from WKWebView back to sharedHTTPCookieStorage
-    [cookieStore getAllCookies:^(NSArray* cookies) {
-      for (NSHTTPCookie *cookie in cookies) {
-        [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
-      }
-    }];
+  if (@available(iOS 11.0, *)) {
+    if(_sharedCookiesEnabled) {
+      // Write all cookies from WKWebView back to sharedHTTPCookieStorage
+      [cookieStore getAllCookies:^(NSArray* cookies) {
+        for (NSHTTPCookie *cookie in cookies) {
+          [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+        }
+      }];
+    }
   }
 }
 
@@ -1529,22 +1541,28 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (void)writeCookiesToWebView:(NSArray<NSHTTPCookie *>*)cookies completion:(void (^)(void))completion {
   // The required cookie APIs only became available on iOS 11
-  if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      dispatch_group_t group = dispatch_group_create();
-      for (NSHTTPCookie *cookie in cookies) {
-        dispatch_group_enter(group);
-        [_webView.configuration.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:^{
-          dispatch_group_leave(group);
-        }];
-      }
-      dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-        if (completion) {
-          completion();
+  if (@available(iOS 11.0, *)) {
+    if (_sharedCookiesEnabled) {
+      __weak WKWebView *webView = _webView;
+      dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_group_t group = dispatch_group_create();
+        for (NSHTTPCookie *cookie in cookies) {
+          dispatch_group_enter(group);
+          [webView.configuration.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:^{
+            dispatch_group_leave(group);
+          }];
         }
+        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+          if (completion) {
+            completion();
+          }
+        });
       });
-    });
-  } else if (completion) {
+      return;
+    }
+  }
+
+  if (completion) {
     completion();
   }
 }

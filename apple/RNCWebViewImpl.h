@@ -7,9 +7,13 @@
 
 #import <React/RCTView.h>
 #import <React/RCTDefines.h>
-#import <UIKit/UIScrollView.h>
 #import <WebKit/WKDataDetectorTypes.h>
 #import <WebKit/WebKit.h>
+
+#if !TARGET_OS_OSX
+#import <UIKit/UIScrollView.h>
+#endif  // !TARGET_OS_OSX
+
 #import "RNCWebViewDecisionManager.h"
 
 typedef enum RNCWebViewPermissionGrantType : NSUInteger {
@@ -22,11 +26,13 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 
 @class RNCWebViewImpl;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol RNCWebViewDelegate <NSObject>
 
-- (BOOL)webView:(RNCWebViewImpl *_Nonnull)webView
-shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
-   withCallback:(RCTDirectEventBlock _Nonnull)callback;
+- (BOOL)webView:(RNCWebViewImpl *)webView
+shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
+   withCallback:(RCTDirectEventBlock)callback;
 
 @end
 
@@ -67,7 +73,6 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) BOOL allowsAirPlayForMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;
-@property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
 @property (nonatomic, assign) UIEdgeInsets contentInset;
 @property (nonatomic, assign) BOOL automaticallyAdjustContentInsets;
 @property (nonatomic, assign) BOOL keyboardDisplayRequiresUserAction;
@@ -94,6 +99,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
 @property (nonatomic, copy) RCTDirectEventBlock onCustomMenuSelection;
 #if !TARGET_OS_OSX
+@property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
 @property (nonatomic, weak) UIRefreshControl * _Nullable refreshControl;
 #endif
 
@@ -113,7 +119,10 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
 #endif
 
+#if !TARGET_OS_OSX
 - (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior;
+#endif  // !TARGET_OS_OSX
+
 + (void)setClientAuthenticationCredential:(nullable NSURLCredential*)credential;
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
 - (void)postMessage:(NSString *_Nullable)message;
@@ -128,7 +137,9 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 #endif
 #if !TARGET_OS_OSX
 - (void)addPullToRefreshControl;
-- (void)pullToRefresh:(UIRefreshControl *_Nonnull)refreshControl;
+- (void)pullToRefresh:(UIRefreshControl *)refreshControl;
 #endif
 
 @end
+
+NS_ASSUME_NONNULL_END
