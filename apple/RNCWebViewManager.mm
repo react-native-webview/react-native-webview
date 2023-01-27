@@ -5,6 +5,14 @@
 #import "RNCWebViewSpec/RNCWebViewSpec.h"
 #endif
 
+#if TARGET_OS_OSX
+#define RNCView NSView
+@class NSView;
+#else
+#define RNCView UIView
+@class UIView;
+#endif  // TARGET_OS_OSX
+
 @interface RNCWebViewManager : RCTViewManager
 @end
 
@@ -36,9 +44,9 @@ RCT_ENUM_CONVERTER(RNCWebViewPermissionGrantType, (@{
 
 RCT_EXPORT_MODULE(RNCWebView)
 
-- (UIView *)view
+- (RNCView *)view
 {
-return [[RNCWebViewImpl alloc] init];
+  return [[RNCWebViewImpl alloc] init];
 }
 
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
