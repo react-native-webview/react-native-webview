@@ -1,4 +1,6 @@
 #import <React/RCTViewManager.h>
+#import <React/RCTUIManager.h>
+
 #import "RNCWebViewImpl.h"
 #import "RNCWebViewDecisionManager.h"
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -164,6 +166,46 @@ RCT_CUSTOM_VIEW_PROPERTY(showsVerticalScrollIndicator, BOOL, RNCWebViewImpl) {
 RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebViewImpl) {
   view.keyboardDisplayRequiresUserAction = json == nil ? true : [RCTConvert BOOL: json];
 }
+
+#if !TARGET_OS_OSX
+    #define BASE_VIEW_PER_OS() UIView
+#else
+    #define BASE_VIEW_PER_OS() NSView
+#endif
+
+#define QUICK_RCT_EXPORT_COMMAND_METHOD(name)                                                                                           \
+RCT_EXPORT_METHOD(name:(nonnull NSNumber *)reactTag)                                                                                    \
+{                                                                                                                                       \
+[self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, BASE_VIEW_PER_OS() *> *viewRegistry) {   \
+    RNCWebViewImpl *view = (RNCWebViewImpl *)viewRegistry[reactTag];                                                                    \
+    if (![view isKindOfClass:[RNCWebViewImpl class]]) {                                                                                 \
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);                                         \
+    } else {                                                                                                                            \
+      [view name];                                                                                                                      \
+    }                                                                                                                                   \
+  }];                                                                                                                                   \
+}
+#define QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(name, in_param, out_param)                                                               \
+RCT_EXPORT_METHOD(name:(nonnull NSNumber *)reactTag in_param)                                                                           \
+{                                                                                                                                       \
+[self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, BASE_VIEW_PER_OS() *> *viewRegistry) {   \
+    RNCWebViewImpl *view = (RNCWebViewImpl *)viewRegistry[reactTag];                                                                    \
+    if (![view isKindOfClass:[RNCWebViewImpl class]]) {                                                                                 \
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);                                         \
+    } else {                                                                                                                            \
+      [view name:out_param];                                                                                                            \
+    }                                                                                                                                   \
+  }];                                                                                                                                   \
+}
+
+QUICK_RCT_EXPORT_COMMAND_METHOD(reload)
+QUICK_RCT_EXPORT_COMMAND_METHOD(goBack)
+QUICK_RCT_EXPORT_COMMAND_METHOD(goForward)
+QUICK_RCT_EXPORT_COMMAND_METHOD(stopLoading)
+QUICK_RCT_EXPORT_COMMAND_METHOD(requestFocus)
+
+QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(postMessage, message:(NSString *)message, message)
+QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(injectJavaScript, script:(NSString *)script, script)
 
 RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart
                                         lockIdentifier:(double)lockIdentifier)
