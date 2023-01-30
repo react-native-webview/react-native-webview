@@ -2,13 +2,13 @@ import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'rea
 import {
   Image,
   View,
-  NativeModules,
   ImageSourcePropType,
 } from 'react-native';
 import invariant from 'invariant';
 
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import RNCWebView from "./WebViewNativeComponent.macos";
+import RNCWebViewModule from "./NativeRNCWebView";
 import {
   defaultOriginWhitelist,
   defaultRenderError,
@@ -18,7 +18,6 @@ import {
 import {
   MacOSWebViewProps,
   NativeWebViewMacOS,
-  ViewManager,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -28,8 +27,6 @@ const Commands = codegenNativeCommands({
 });
 
 const { resolveAssetSource } = Image;
-
-const RNCWebViewManager = NativeModules.RNCWebViewManager as ViewManager;
 
 const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
   const ref = useRef(value);
@@ -75,12 +72,8 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
     _url: string,
     lockIdentifier = 0,
   ) => {
-    const viewManager
-      = (nativeConfig?.viewManager)
-      || RNCWebViewManager;
-
-    viewManager.shouldStartLoadWithLockIdentifier(!!shouldStart, lockIdentifier);
-  }, [nativeConfig?.viewManager]);
+    RNCWebViewModule.shouldStartLoadWithLockIdentifier(!!shouldStart, lockIdentifier);
+  }, []);
 
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebWiewLogic({
     onNavigationStateChange,
