@@ -294,98 +294,21 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         return export;
     }
 
-    public static final int COMMAND_GO_BACK = 1;
-    public static final int COMMAND_GO_FORWARD = 2;
-    public static final int COMMAND_RELOAD = 3;
-    public static final int COMMAND_STOP_LOADING = 4;
-    public static final int COMMAND_POST_MESSAGE = 5;
-    public static final int COMMAND_INJECT_JAVASCRIPT = 6;
-    public static final int COMMAND_LOAD_URL = 7;
-    public static final int COMMAND_FOCUS = 8;
-
-    // android commands
-    public static final int COMMAND_CLEAR_FORM_DATA = 1000;
-    public static final int COMMAND_CLEAR_CACHE = 1001;
-    public static final int COMMAND_CLEAR_HISTORY = 1002;
-
-
     @Override
     public @Nullable
     Map<String, Integer> getCommandsMap() {
-        return MapBuilder.<String, Integer>builder()
-        .put("goBack", COMMAND_GO_BACK)
-        .put("goForward", COMMAND_GO_FORWARD)
-        .put("reload", COMMAND_RELOAD)
-        .put("stopLoading", COMMAND_STOP_LOADING)
-        .put("postMessage", COMMAND_POST_MESSAGE)
-        .put("injectJavaScript", COMMAND_INJECT_JAVASCRIPT)
-        .put("loadUrl", COMMAND_LOAD_URL)
-        .put("requestFocus", COMMAND_FOCUS)
-        .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
-        .put("clearCache", COMMAND_CLEAR_CACHE)
-        .put("clearHistory", COMMAND_CLEAR_HISTORY)
-        .build();
+        return mRNCWebViewManagerImpl.getCommandsMap();
     }
 
     @Override
     public void receiveCommand(@NonNull RNCWebView reactWebView, String commandId, @Nullable ReadableArray args) {
-        switch (commandId) {
-        case "goBack":
-            reactWebView.goBack();
-            break;
-        case "goForward":
-            reactWebView.goForward();
-            break;
-        case "reload":
-            reactWebView.reload();
-            break;
-        case "stopLoading":
-            reactWebView.stopLoading();
-            break;
-        case "postMessage":
-            try {
-            JSONObject eventInitDict = new JSONObject();
-            eventInitDict.put("data", args.getString(0));
-            reactWebView.evaluateJavascriptWithFallback("(function () {" +
-                "var event;" +
-                "var data = " + eventInitDict.toString() + ";" +
-                "try {" +
-                "event = new MessageEvent('message', data);" +
-                "} catch (e) {" +
-                "event = document.createEvent('MessageEvent');" +
-                "event.initMessageEvent('message', true, true, data.data, data.origin, data.lastEventId, data.source);" +
-                "}" +
-                "document.dispatchEvent(event);" +
-                "})();");
-            } catch (JSONException e) {
-            throw new RuntimeException(e);
-            }
-            break;
-        case "injectJavaScript":
-            reactWebView.evaluateJavascriptWithFallback(args.getString(0));
-            break;
-        case "loadUrl":
-            if (args == null) {
-            throw new RuntimeException("Arguments for loading an url are null!");
-            }
-            reactWebView.progressChangedFilter.setWaitingForCommandLoadUrl(false);
-            reactWebView.loadUrl(args.getString(0));
-            break;
-        case "requestFocus":
-            reactWebView.requestFocus();
-            break;
-        case "clearFormData":
-            reactWebView.clearFormData();
-            break;
-        case "clearCache":
-            boolean includeDiskFiles = args != null && args.getBoolean(0);
-            reactWebView.clearCache(includeDiskFiles);
-            break;
-        case "clearHistory":
-            reactWebView.clearHistory();
-            break;
-        }
+        mRNCWebViewManagerImpl.receiveCommand(reactWebView, commandId, args);
         super.receiveCommand(reactWebView, commandId, args);
     }
 
+    @Override
+    public void onDropViewInstance(@NonNull RNCWebView view) {
+        mRNCWebViewManagerImpl.onDropViewInstance(view);
+        super.onDropViewInstance(view);
+    }
 }

@@ -11,34 +11,24 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.webkit.ConsoleMessage;
-import android.webkit.CookieManager;
-import android.webkit.DownloadListener;
-import android.webkit.GeolocationPermissions;
-import android.webkit.HttpAuthHandler;
-import android.webkit.JavascriptInterface;
-import android.webkit.RenderProcessGoneDetail;
-import android.webkit.SslErrorHandler;
-import android.webkit.PermissionRequest;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-
+import android.webkit.CookieManager
+import android.webkit.DownloadListener
+import android.webkit.WebSettings
+import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
+import com.facebook.react.uimanager.ThemedReactContext
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
-import kotlin.collections.HashMap
 
 
 class RNCWebViewManagerImpl(context: ReactApplicationContext) {
@@ -57,7 +47,6 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
     private var mUserAgentWithApplicationName: String? = null
     private val HTML_ENCODING = "UTF-8"
     private val HTML_MIME_TYPE = "text/html"
-    private val JAVASCRIPT_INTERFACE = "ReactNativeWebView"
     private val HTTP_METHOD_POST = "POST"
 
     // Use `webView.loadUrl("about:blank")` to reliably reset the view
@@ -265,6 +254,85 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
             }
         }
         (view as RNCWebView).setBasicAuthCredential(basicAuthCredential)
+    }
+
+    fun onDropViewInstance(webView: RNCWebView) {
+        mContext.removeLifecycleEventListener(webView)
+        webView.cleanupCallbacksAndDestroy()
+        webView.mWebChromeClient = null
+    }
+
+    val COMMAND_GO_BACK = 1
+    val COMMAND_GO_FORWARD = 2
+    val COMMAND_RELOAD = 3
+    val COMMAND_STOP_LOADING = 4
+    val COMMAND_POST_MESSAGE = 5
+    val COMMAND_INJECT_JAVASCRIPT = 6
+    val COMMAND_LOAD_URL = 7
+    val COMMAND_FOCUS = 8
+
+    // android commands
+    val COMMAND_CLEAR_FORM_DATA = 1000
+    val COMMAND_CLEAR_CACHE = 1001
+    val COMMAND_CLEAR_HISTORY = 1002
+
+    fun getCommandsMap(): Map<String, Int>? {
+      return MapBuilder.builder<String, Int>()
+        .put("goBack", COMMAND_GO_BACK)
+        .put("goForward", COMMAND_GO_FORWARD)
+        .put("reload", COMMAND_RELOAD)
+        .put("stopLoading", COMMAND_STOP_LOADING)
+        .put("postMessage", COMMAND_POST_MESSAGE)
+        .put("injectJavaScript", COMMAND_INJECT_JAVASCRIPT)
+        .put("loadUrl", COMMAND_LOAD_URL)
+        .put("requestFocus", COMMAND_FOCUS)
+        .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
+        .put("clearCache", COMMAND_CLEAR_CACHE)
+        .put("clearHistory", COMMAND_CLEAR_HISTORY)
+        .build()
+    }
+
+    fun receiveCommand(webView: RNCWebView, commandId: String, args: ReadableArray) {
+      when (commandId) {
+        "goBack" -> webView.goBack()
+        "goForward" -> webView.goForward()
+        "reload" -> webView.reload()
+        "stopLoading" -> webView.stopLoading()
+        "postMessage" -> try {
+          val eventInitDict = JSONObject()
+          eventInitDict.put("data", args.getString(0))
+          webView.evaluateJavascriptWithFallback(
+            "(function () {" +
+              "var event;" +
+              "var data = " + eventInitDict.toString() + ";" +
+              "try {" +
+              "event = new MessageEvent('message', data);" +
+              "} catch (e) {" +
+              "event = document.createEvent('MessageEvent');" +
+              "event.initMessageEvent('message', true, true, data.data, data.origin, data.lastEventId, data.source);" +
+              "}" +
+              "document.dispatchEvent(event);" +
+              "})();"
+          )
+        } catch (e: JSONException) {
+          throw RuntimeException(e)
+        }
+        "injectJavaScript" -> webView.evaluateJavascriptWithFallback(args.getString(0))
+        "loadUrl" -> {
+          if (args == null) {
+            throw RuntimeException("Arguments for loading an url are null!")
+          }
+          webView.progressChangedFilter.setWaitingForCommandLoadUrl(false)
+          webView.loadUrl(args.getString(0))
+        }
+        "requestFocus" -> webView.requestFocus()
+        "clearFormData" -> webView.clearFormData()
+        "clearCache" -> {
+          val includeDiskFiles = args != null && args.getBoolean(0)
+          webView.clearCache(includeDiskFiles)
+        }
+        "clearHistory" -> webView.clearHistory()
+      }
     }
 
     fun getModule(): RNCWebViewModule? {
