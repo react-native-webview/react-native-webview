@@ -47,8 +47,7 @@ const createOnShouldStartLoadWithRequest = (
   ) => void,
   originWhitelist: readonly string[],
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
-) => {
-  return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
+) => ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
     let shouldStart = true;
     const { url, lockIdentifier } = nativeEvent;
 
@@ -69,7 +68,6 @@ const createOnShouldStartLoadWithRequest = (
 
     loadRequest(shouldStart, url, lockIdentifier);
   };
-};
 
 const defaultRenderLoading = () => (
   <View style={styles.loadingOrErrorView}>

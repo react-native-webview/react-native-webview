@@ -157,18 +157,14 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   || RNCWebView;
 
   const sourceResolved = resolveAssetSource(source as ImageSourcePropType)
-  const newSource = typeof sourceResolved === "object" ? Object.entries(sourceResolved as WebViewSourceUri).reduce((prev, [currKey, currValue]) => {
-    return {
+  const newSource = typeof sourceResolved === "object" ? Object.entries(sourceResolved as WebViewSourceUri).reduce((prev, [currKey, currValue]) => ({
       ...prev,
       [currKey]: currKey === "headers" && currValue && typeof currValue === "object" ? Object.entries(currValue).map(
-        ([key, value]) => {
-          return {
+        ([key, value]) => ({
             name: key,
             value
-          }
-        }) : currValue
-    }
-  }, {}) : sourceResolved
+          })) : currValue
+    }), {}) : sourceResolved
 
   const webView = (
     <NativeWebView

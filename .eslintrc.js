@@ -24,6 +24,13 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'react/static-property-placement': 'off',
     'react/state-in-constructor': 'off',
+    'react/function-component-definition': [
+      'error',
+      {
+        namedComponents: 'arrow-function',
+        unnamedComponents: 'arrow-function',
+      },
+    ],
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': [
       'error',
