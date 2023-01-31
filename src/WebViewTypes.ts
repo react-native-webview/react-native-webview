@@ -341,6 +341,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   downloadingMessage?: string;
   lackPermissionToDownloadMessage?: string;
   allowsProtectedMedia?: boolean;
+  shouldOverrideUrlLoadingSynchronousMethodEnabled?: boolean;
 }
 
 export declare type ContentInsetAdjustmentBehavior =
@@ -1127,6 +1128,13 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   allowsProtectedMedia?: boolean;
+
+  /**
+   * Boolean value to control whether Webview#shouldOverrideUrlLoading callbacks will be executed synchronously
+   * Default is false.
+   * @platform android
+   */
+  shouldOverrideUrlLoadingSynchronousMethodEnabled?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {
