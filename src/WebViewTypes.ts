@@ -1,4 +1,4 @@
-/* eslint-disable react/no-multi-comp, max-classes-per-file */
+/* eslint-disable react/no-multi-comp, max-classes-per-file, react/no-unused-prop-types, react/require-default-props */
 
 import { ReactElement, Component, ComponentProps } from 'react';
 import {
@@ -37,39 +37,6 @@ export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<
 export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>;
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>;
 export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>;
-
-type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
-
-interface BaseState {
-  viewState: WebViewState;
-}
-
-interface NormalState extends BaseState {
-  viewState: 'IDLE' | 'LOADING';
-  lastErrorEvent: WebViewError | null;
-}
-
-interface ErrorState extends BaseState {
-  viewState: 'ERROR';
-  lastErrorEvent: WebViewError;
-}
-
-export type State = NormalState | ErrorState;
-
-// eslint-disable-next-line @typescript-eslint/no-type-alias, @typescript-eslint/no-explicit-any
-type Constructor<T> = new (...args: any[]) => T;
-
-// eslint-disable-next-line react/prefer-stateless-function
-declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}
-declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
-  typeof NativeWebViewMacOSComponent;
-export class NativeWebViewMacOS extends NativeWebViewMacOSBase {}
-
-// eslint-disable-next-line react/prefer-stateless-function
-declare class NativeWebViewWindowsComponent extends Component<WindowsNativeWebViewProps> {}
-declare const NativeWebViewWindowsBase: Constructor<NativeMethodsMixin> &
-  typeof NativeWebViewWindowsComponent;
-export class NativeWebViewWindows extends NativeWebViewWindowsBase {}
 
 export interface ContentInsetProp {
   top?: number;
@@ -124,6 +91,25 @@ export interface WebViewError extends WebViewNativeEvent {
   code: number;
   description: string;
 }
+
+type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
+
+interface BaseState {
+  viewState: WebViewState;
+}
+
+interface NormalState extends BaseState {
+  viewState: 'IDLE' | 'LOADING';
+  lastErrorEvent: WebViewError | null;
+}
+
+interface ErrorState extends BaseState {
+  viewState: 'ERROR';
+  lastErrorEvent: WebViewError;
+}
+
+export type State = NormalState | ErrorState;
+
 
 export interface WebViewHttpError extends WebViewNativeEvent {
   description: string;
@@ -241,7 +227,6 @@ export interface WebViewNativeConfig {
    * The native component used to render the WebView.
    */
   component?:
-    | typeof NativeWebViewMacOS
     | typeof NativeWebViewComponent;
   /**
    * Set props directly on the native component WebView. Enables custom props which the
@@ -341,6 +326,181 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
 export interface WindowsNativeWebViewProps extends CommonNativeWebViewProps {
   testID?: string;
 }
+
+export interface WebViewSharedProps extends ViewProps {
+  /**
+   * Loads static html or a uri (with optional headers) in the WebView.
+   */
+  source?: WebViewSource;
+
+  /**
+   * Boolean value to enable JavaScript in the `WebView`. Used on Android only
+   * as JavaScript is enabled by default on iOS. The default value is `true`.
+   * @platform android
+   */
+  javaScriptEnabled?: boolean;
+
+  /**
+   * A Boolean value indicating whether JavaScript can open windows without user interaction.
+   * The default value is `false`.
+   */
+  javaScriptCanOpenWindowsAutomatically?: boolean;
+
+  /**
+   * Stylesheet object to set the style of the container view.
+   */
+  containerStyle?: StyleProp<ViewStyle>;
+
+  /**
+   * Function that returns a view to show if there's an error.
+   */
+  renderError?: (
+    errorDomain: string | undefined,
+    errorCode: number,
+    errorDesc: string,
+  ) => ReactElement; // view to show if there's an error
+
+  /**
+   * Function that returns a loading indicator.
+   */
+  renderLoading?: () => ReactElement;
+
+  /**
+   * Function that is invoked when the `WebView` scrolls.
+   */
+   onScroll?: ComponentProps<typeof NativeWebViewComponent>['onScroll'];
+
+  /**
+   * Function that is invoked when the `WebView` has finished loading.
+   */
+  onLoad?: (event: WebViewNavigationEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` load succeeds or fails.
+   */
+  onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` starts loading.
+   */
+  onLoadStart?: (event: WebViewNavigationEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` load fails.
+   */
+  onError?: (event: WebViewErrorEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` receives an error status code.
+   * Works on iOS and Android (minimum API level 23).
+   */
+  onHttpError?: (event: WebViewHttpErrorEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` loading starts or ends.
+   */
+  onNavigationStateChange?: (event: WebViewNavigation) => void;
+
+  /**
+   * Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`.
+   * Setting this property will inject this global into your webview.
+   *
+   * `window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be
+   * available on the event object, `event.nativeEvent.data`. `data` must be a string.
+   */
+  onMessage?: (event: WebViewMessageEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` is loading.
+   */
+  onLoadProgress?: (event: WebViewProgressEvent) => void;
+
+  /**
+   * Boolean value that forces the `WebView` to show the loading view
+   * on the first load.
+   */
+  startInLoadingState?: boolean;
+
+  /**
+   * Set this to provide JavaScript that will be injected into the web page
+   * when the view loads.
+   */
+  injectedJavaScript?: string;
+
+  /**
+   * Set this to provide JavaScript that will be injected into the web page
+   * once the webview is initialized but before the view loads any content.
+   */
+  injectedJavaScriptBeforeContentLoaded?: string;
+
+  /**
+   * If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
+   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+   */
+  injectedJavaScriptForMainFrameOnly?: boolean;
+
+  /**
+   * If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+   */
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
+
+  /**
+   * Boolean value that determines whether a horizontal scroll indicator is
+   * shown in the `WebView`. The default value is `true`.
+   */
+  showsHorizontalScrollIndicator?: boolean;
+
+  /**
+   * Boolean value that determines whether a vertical scroll indicator is
+   * shown in the `WebView`. The default value is `true`.
+   */
+  showsVerticalScrollIndicator?: boolean;
+
+  /**
+   * Boolean that determines whether HTML5 audio and video requires the user
+   * to tap them before they start playing. The default value is `true`.
+   */
+  mediaPlaybackRequiresUserAction?: boolean;
+
+  /**
+   * List of origin strings to allow being navigated to. The strings allow
+   * wildcards and get matched against *just* the origin (not the full URL).
+   * If the user taps to navigate to a new page but the new page is not in
+   * this whitelist, we will open the URL in Safari.
+   * The default whitelisted origins are "http://*" and "https://*".
+   */
+  readonly originWhitelist?: string[];
+
+  /**
+   * Function that allows custom handling of any web view requests. Return
+   * `true` from the function to continue loading the request and `false`
+   * to stop loading. The `navigationType` is always `other` on android.
+   */
+  onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest;
+
+  /**
+   * Override the native component used to render the WebView. Enables a custom native
+   * WebView which uses the same JavaScript as the original WebView.
+   */
+  nativeConfig?: WebViewNativeConfig;
+
+  /**
+   * Should caching be enabled. Default is true.
+   */
+  cacheEnabled?: boolean;
+
+  /**
+   * Append to the existing user-agent. Overridden if `userAgent` is set.
+   */
+  applicationNameForUserAgent?: string;
+
+  /**
+   * An object that specifies the credentials of a user to be used for basic authentication.
+   */
+  basicAuthCredential?: BasicAuthCredential;
+}
+
 
 export interface WindowsWebViewProps extends WebViewSharedProps {
   useWebView2?: boolean;
@@ -1062,176 +1222,17 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   allowsProtectedMedia?: boolean;
 }
 
-export interface WebViewSharedProps extends ViewProps {
-  /**
-   * Loads static html or a uri (with optional headers) in the WebView.
-   */
-  source?: WebViewSource;
+// eslint-disable-next-line @typescript-eslint/no-type-alias, @typescript-eslint/no-explicit-any
+type Constructor<T> = new (...args: any[]) => T;
 
-  /**
-   * Boolean value to enable JavaScript in the `WebView`. Used on Android only
-   * as JavaScript is enabled by default on iOS. The default value is `true`.
-   * @platform android
-   */
-  javaScriptEnabled?: boolean;
+// eslint-disable-next-line react/prefer-stateless-function
+declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}
+declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
+  typeof NativeWebViewMacOSComponent;
+export class NativeWebViewMacOS extends NativeWebViewMacOSBase {}
 
-  /**
-   * A Boolean value indicating whether JavaScript can open windows without user interaction.
-   * The default value is `false`.
-   */
-  javaScriptCanOpenWindowsAutomatically?: boolean;
-
-  /**
-   * Stylesheet object to set the style of the container view.
-   */
-  containerStyle?: StyleProp<ViewStyle>;
-
-  /**
-   * Function that returns a view to show if there's an error.
-   */
-  renderError?: (
-    errorDomain: string | undefined,
-    errorCode: number,
-    errorDesc: string,
-  ) => ReactElement; // view to show if there's an error
-
-  /**
-   * Function that returns a loading indicator.
-   */
-  renderLoading?: () => ReactElement;
-
-  /**
-   * Function that is invoked when the `WebView` scrolls.
-   */
-   onScroll?: ComponentProps<typeof NativeWebViewComponent>['onScroll'];
-
-  /**
-   * Function that is invoked when the `WebView` has finished loading.
-   */
-  onLoad?: (event: WebViewNavigationEvent) => void;
-
-  /**
-   * Function that is invoked when the `WebView` load succeeds or fails.
-   */
-  onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
-
-  /**
-   * Function that is invoked when the `WebView` starts loading.
-   */
-  onLoadStart?: (event: WebViewNavigationEvent) => void;
-
-  /**
-   * Function that is invoked when the `WebView` load fails.
-   */
-  onError?: (event: WebViewErrorEvent) => void;
-
-  /**
-   * Function that is invoked when the `WebView` receives an error status code.
-   * Works on iOS and Android (minimum API level 23).
-   */
-  onHttpError?: (event: WebViewHttpErrorEvent) => void;
-
-  /**
-   * Function that is invoked when the `WebView` loading starts or ends.
-   */
-  onNavigationStateChange?: (event: WebViewNavigation) => void;
-
-  /**
-   * Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`.
-   * Setting this property will inject this global into your webview.
-   *
-   * `window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be
-   * available on the event object, `event.nativeEvent.data`. `data` must be a string.
-   */
-  onMessage?: (event: WebViewMessageEvent) => void;
-
-  /**
-   * Function that is invoked when the `WebView` is loading.
-   */
-  onLoadProgress?: (event: WebViewProgressEvent) => void;
-
-  /**
-   * Boolean value that forces the `WebView` to show the loading view
-   * on the first load.
-   */
-  startInLoadingState?: boolean;
-
-  /**
-   * Set this to provide JavaScript that will be injected into the web page
-   * when the view loads.
-   */
-  injectedJavaScript?: string;
-
-  /**
-   * Set this to provide JavaScript that will be injected into the web page
-   * once the webview is initialized but before the view loads any content.
-   */
-  injectedJavaScriptBeforeContentLoaded?: string;
-
-  /**
-   * If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
-   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
-   */
-  injectedJavaScriptForMainFrameOnly?: boolean;
-
-  /**
-   * If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
-   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
-   */
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
-
-  /**
-   * Boolean value that determines whether a horizontal scroll indicator is
-   * shown in the `WebView`. The default value is `true`.
-   */
-  showsHorizontalScrollIndicator?: boolean;
-
-  /**
-   * Boolean value that determines whether a vertical scroll indicator is
-   * shown in the `WebView`. The default value is `true`.
-   */
-  showsVerticalScrollIndicator?: boolean;
-
-  /**
-   * Boolean that determines whether HTML5 audio and video requires the user
-   * to tap them before they start playing. The default value is `true`.
-   */
-  mediaPlaybackRequiresUserAction?: boolean;
-
-  /**
-   * List of origin strings to allow being navigated to. The strings allow
-   * wildcards and get matched against *just* the origin (not the full URL).
-   * If the user taps to navigate to a new page but the new page is not in
-   * this whitelist, we will open the URL in Safari.
-   * The default whitelisted origins are "http://*" and "https://*".
-   */
-  readonly originWhitelist?: string[];
-
-  /**
-   * Function that allows custom handling of any web view requests. Return
-   * `true` from the function to continue loading the request and `false`
-   * to stop loading. The `navigationType` is always `other` on android.
-   */
-  onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest;
-
-  /**
-   * Override the native component used to render the WebView. Enables a custom native
-   * WebView which uses the same JavaScript as the original WebView.
-   */
-  nativeConfig?: WebViewNativeConfig;
-
-  /**
-   * Should caching be enabled. Default is true.
-   */
-  cacheEnabled?: boolean;
-
-  /**
-   * Append to the existing user-agent. Overridden if `userAgent` is set.
-   */
-  applicationNameForUserAgent?: string;
-
-  /**
-   * An object that specifies the credentials of a user to be used for basic authentication.
-   */
-  basicAuthCredential?: BasicAuthCredential;
-}
+// eslint-disable-next-line react/prefer-stateless-function
+declare class NativeWebViewWindowsComponent extends Component<WindowsNativeWebViewProps> {}
+declare const NativeWebViewWindowsBase: Constructor<NativeMethodsMixin> &
+  typeof NativeWebViewWindowsComponent;
+export class NativeWebViewWindows extends NativeWebViewWindowsBase {}

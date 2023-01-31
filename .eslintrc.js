@@ -1,6 +1,6 @@
 module.exports = {
   // Airbnb is the base, prettier is here so that eslint doesn't conflict with prettier
-  extends: ['airbnb', 'prettier', 'prettier/react', 'plugin:react-hooks/recommended'],
+  extends: ['airbnb', 'prettier', 'plugin:react-hooks/recommended'],
   parser: '@typescript-eslint/parser',
   plugins: ['react', 'react-native', 'import', '@typescript-eslint'],
   rules: {
@@ -12,6 +12,7 @@ module.exports = {
       'error',
       { devDependencies: true, peerDependencies: true },
     ],
+    'import/extensions': 'off',
     'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }],
     // This rule doesn't play nice with Prettier
     'react/jsx-one-expression-per-line': 'off',
@@ -30,7 +31,6 @@ module.exports = {
         default: 'array',
       },
     ],
-    '@typescript-eslint/generic-type-naming': ['error', '^[a-zA-Z]+$'],
     '@typescript-eslint/no-array-constructor': 'error',
     '@typescript-eslint/no-empty-interface': 'error',
     '@typescript-eslint/no-explicit-any': 'error',
@@ -57,6 +57,7 @@ module.exports = {
         allowAliases: 'always',
         allowCallbacks: 'always',
         allowMappedTypes: 'always',
+        allowGenerics: "always"
       },
     ],
     '@typescript-eslint/no-unused-vars': [
