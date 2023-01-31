@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -48,6 +47,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.facebook.common.logging.FLog;
@@ -684,6 +684,19 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "shouldOverrideUrlLoadingSynchronousMethodEnabled")
+  public void setShouldOverrideUrlLoadingSynchronousMethodEnabled(WebView view, boolean enabled) {
+    if (view instanceof RNCWebView) {
+      ((RNCWebView) view).setShouldOverrideUrlLoadingSynchronousMethodEnabled(enabled);
+    }
+    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      WebViewClient client = WebViewCompat.getWebViewClient(view);
+      if (client != null && client instanceof RNCWebViewClient) {
+        ((RNCWebViewClient)client).setShouldOverrideUrlLoadingSynchronousMethodEnabled(enabled);
+      }
+    }
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -913,6 +926,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
     protected @Nullable BasicAuthCredential basicAuthCredential = null;
+    protected boolean mShouldOverrideUrlLoadingSynchronousMethodEnabled = false;
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
       ignoreErrFailedForThisURL = url;
@@ -920,6 +934,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setBasicAuthCredential(@Nullable BasicAuthCredential credential) {
       basicAuthCredential = credential;
+    }
+
+    public void setShouldOverrideUrlLoadingSynchronousMethodEnabled(boolean shouldOverrideUrlLoadingSynchronousMethodEnabled) {
+      mShouldOverrideUrlLoadingSynchronousMethodEnabled = shouldOverrideUrlLoadingSynchronousMethodEnabled;
     }
 
     @Override
@@ -955,7 +973,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       final RNCWebView rncWebView = (RNCWebView) view;
       final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
 
-      if (!isJsDebugging && rncWebView.mCatalystInstance != null) {
+      if (!isJsDebugging && rncWebView.mCatalystInstance != null && !mShouldOverrideUrlLoadingSynchronousMethodEnabled) {
         final Pair<Integer, AtomicReference<ShouldOverrideCallbackState>> lock = RNCWebViewModule.shouldOverrideUrlLoadingLock.getNewLock();
         final int lockIdentifier = lock.first;
         final AtomicReference<ShouldOverrideCallbackState> lockObject = lock.second;
@@ -1546,6 +1564,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+    protected boolean shouldOverrideUrlLoadingSynchronousMethodEnabled = false;
 
     /**
      * WebView must be created with an context of the current activity
@@ -1577,6 +1596,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setNestedScrollEnabled(boolean nestedScrollEnabled) {
       this.nestedScrollEnabled = nestedScrollEnabled;
+    }
+
+    public void setShouldOverrideUrlLoadingSynchronousMethodEnabled(boolean shouldOverrideUrlLoadingSynchronousMethodEnabled) {
+      this.shouldOverrideUrlLoadingSynchronousMethodEnabled = shouldOverrideUrlLoadingSynchronousMethodEnabled;
     }
 
     @Override
@@ -1624,6 +1647,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       if (client instanceof RNCWebViewClient) {
         mRNCWebViewClient = (RNCWebViewClient) client;
         mRNCWebViewClient.setProgressChangedFilter(progressChangedFilter);
+        mRNCWebViewClient.setShouldOverrideUrlLoadingSynchronousMethodEnabled(shouldOverrideUrlLoadingSynchronousMethodEnabled);
       }
     }
 
