@@ -73,6 +73,8 @@ RCT_EXPORT_VIEW_PROPERTY(allowUniversalAccessFromFileURLs, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsAirPlayForMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaPlaybackRequiresUserAction, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(ignoreSilentHardwareSwitch, BOOL)
+
 #if WEBKIT_IOS_10_APIS_AVAILABLE
 RCT_EXPORT_VIEW_PROPERTY(dataDetectorTypes, WKDataDetectorTypes)
 #endif
