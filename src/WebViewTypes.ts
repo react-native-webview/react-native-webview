@@ -387,6 +387,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   limitsNavigationsToAppBoundDomains?: boolean;
   textInteractionEnabled?: boolean;
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
+  allowTextStyleOptions?: boolean;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -408,6 +409,7 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+  allowTextStyleOptions?: boolean;
 }
 
 export interface WindowsNativeWebViewProps extends CommonNativeWebViewProps {
@@ -745,6 +747,15 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   onCustomMenuSelection?: (event: WebViewEvent) => void;
+
+  /**
+   * When this is set to false, the menu items for selected text do not include the
+   * text style options (Bold, Italic, Underline).
+   * 
+   * Default is true.
+   * @platform ios
+   */
+  allowTextStyleOptions?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {

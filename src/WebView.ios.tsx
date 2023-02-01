@@ -59,8 +59,9 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   javaScriptEnabled = true,
   cacheEnabled = true,
   originWhitelist = defaultOriginWhitelist,
-  useSharedProcessPool= true,
-  textInteractionEnabled= true,
+  useSharedProcessPool = true,
+  textInteractionEnabled = true,
+  allowTextStyleOptions = true,
   injectedJavaScript,
   injectedJavaScriptBeforeContentLoaded,
   injectedJavaScriptForMainFrameOnly = true,
@@ -191,8 +192,10 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       dataDetectorTypes={dataDetectorTypes}
       allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
       allowsInlineMediaPlayback={allowsInlineMediaPlayback}
+      allowTextStyleOptions={allowTextStyleOptions}
       incognito={incognito}
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
+      
       ref={webViewRef}
       // TODO: find a better way to type this.
       source={resolveAssetSource(source as ImageSourcePropType)}

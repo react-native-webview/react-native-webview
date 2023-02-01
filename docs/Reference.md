@@ -90,6 +90,7 @@ This document lays out the current public properties and methods for the React N
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
+- [`allowTextStyleOptions`](Reference.md#allowTextStyleOptions)
 
 ## Methods Index
 
@@ -1604,6 +1605,14 @@ Whether or not the Webview can play media protected by DRM. Default is false.
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
 | boolean | No       | Android  |
+
+### `allowTextStyleOptions`
+
+When this is set to false, the menu items for selected text do not include the text style options (Bold, Italic, Underline). Default is true.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| boolean | No       | iOS  |
 
 ## Methods
 

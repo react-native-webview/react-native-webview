@@ -64,6 +64,29 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @end
 #endif // TARGET_OS_OSX
 
+#if !TARGET_OS_OSX
+@interface RNCWKWebView : WKWebView
+@end
+@implementation RNCWKWebView
+- (BOOL) canPerformAction:(SEL)action withSender:(id)sender
+{
+  NSString *sel = NSStringFromSelector(action);
+  RNCWebView *rncWebView = (RNCWebView *)[self superview];
+  RCTAssert([rncWebView isKindOfClass:[rncWebView class]], @"superview must be an RNCWebView");
+  
+  if(![rncWebView allowTextStyleOptions]) {
+    NSArray* textStyleOptions = @[@"toggleBoldface:", @"toggleItalics:", @"toggleUnderline:"];
+    
+    if([textStyleOptions containsObject:sel]) {
+      return NO;
+    }
+  }
+  
+  return [super canPerformAction:action withSender:sender];
+}
+@end
+#endif
+
 @interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, WKHTTPCookieStoreObserver,
 #if !TARGET_OS_OSX
 UIScrollViewDelegate,
@@ -80,11 +103,7 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
-#if !TARGET_OS_OSX
-@property (nonatomic, copy) WKWebView *webView;
-#else
 @property (nonatomic, copy) RNCWKWebView *webView;
-#endif // !TARGET_OS_OSX
 @property (nonatomic, strong) WKUserScript *postMessageScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
@@ -133,6 +152,7 @@ RCTAutoInsetsProtocol>
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
+    _allowTextStyleOptions = YES;
 #if !TARGET_OS_OSX
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
@@ -427,7 +447,7 @@ RCTAutoInsetsProtocol>
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
 #if !TARGET_OS_OSX
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #else
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
