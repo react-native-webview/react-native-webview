@@ -141,7 +141,6 @@ static WKContentRuleList * _contentRuleList;
           }
         }];
       } else {
-        NSLog(@"DONDEBUG - Found content rule list from store: %@",  contentRuleList);
         _contentRuleList = contentRuleList;
       }
     }];
