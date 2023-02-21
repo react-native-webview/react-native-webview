@@ -369,6 +369,8 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   automaticallyAdjustContentInsets?: boolean;
   autoManageStatusBarEnabled?: boolean;
   bounces?: boolean;
+  horizontalBounces?: boolean;
+  verticalBounces?: boolean;
   contentInset?: ContentInsetProp;
   contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
   contentMode?: ContentMode;
@@ -430,6 +432,14 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   bounces?: boolean;
+
+  /**
+   * Boolean value that determines whether the web view bounces by direction
+   * when it reaches the edge of the content. The default value is `true`.
+   * @platform ios 16
+   */
+  horizontalBounces?: boolean;
+  verticalBounces?: boolean;
 
   /**
    * A floating-point number that determines how quickly the scroll view

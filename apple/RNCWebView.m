@@ -152,6 +152,10 @@ RCTAutoInsetsProtocol>
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
 #endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000
+    _horizontalBounces = YES;
+    _verticalBounces = YES;
+#endif
   }
   
 #if !TARGET_OS_OSX
@@ -446,10 +450,12 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.pagingEnabled = _pagingEnabled;
     //For UIRefreshControl to work correctly, the bounces should always be true
     _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000
     if (@available(iOS 16, *)) {
-      _webView.scrollView.alwaysBounceVertical = _pullToRefreshEnabled || _bounces;
-      _webView.scrollView.alwaysBounceHorizontal = _pullToRefreshEnabled || _bounces;
+      _webView.scrollView.alwaysBounceVertical = _pullToRefreshEnabled || _verticalBounces;
+      _webView.scrollView.alwaysBounceHorizontal = _pullToRefreshEnabled || _horizontalBounces;
     }
+#endif
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
@@ -1450,12 +1456,21 @@ didFinishNavigation:(WKNavigation *)navigation
   _bounces = bounces;
   //For UIRefreshControl to work correctly, the bounces should always be true
   _webView.scrollView.bounces = _pullToRefreshEnabled || bounces;
-  if (@available(iOS 16, *)) {
-    _webView.scrollView.alwaysBounceVertical = _pullToRefreshEnabled || _bounces;
-    _webView.scrollView.alwaysBounceHorizontal = _pullToRefreshEnabled || _bounces;
-  }
 }
 #endif // !TARGET_OS_OSX
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000
+- (void)setHorizontalBounces:(BOOL)horizontalBounces
+{
+  _horizontalBounces = horizontalBounces;
+  _webView.scrollView.alwaysBounceHorizontal = _pullToRefreshEnabled || _horizontalBounces;
+}
+- (void)setVerticalBounces:(BOOL)verticalBounces
+{
+  _verticalBounces = verticalBounces;
+  _webView.scrollView.alwaysBounceVertical = _pullToRefreshEnabled || _verticalBounces;
+}
+#endif
 
 - (void)setInjectedJavaScript:(NSString *)source {
   _injectedJavaScript = source;

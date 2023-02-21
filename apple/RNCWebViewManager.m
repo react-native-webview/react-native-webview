@@ -142,6 +142,15 @@ RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWebView) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];
 }
 
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 /* iOS 16 */
+RCT_CUSTOM_VIEW_PROPERTY(horizontalBounces, BOOL, RNCWebView) {
+  view.horizontalBounces = json == nil ? true : [RCTConvert BOOL: json];
+}
+RCT_CUSTOM_VIEW_PROPERTY(verticalBounces, BOOL, RNCWebView) {
+  view.verticalBounces = json == nil ? true : [RCTConvert BOOL: json];
+}
+#endif
+
 RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, RNCWebView) {
   view.useSharedProcessPool = json == nil ? true : [RCTConvert BOOL: json];
 }
