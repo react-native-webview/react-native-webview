@@ -96,7 +96,7 @@ export {
   defaultRenderError,
 };
 
-export const useWebWiewLogic = ({
+export const useWebViewLogic = ({
   startInLoadingState,
   onNavigationStateChange,
   onLoadStart,
