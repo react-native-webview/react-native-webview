@@ -19,7 +19,7 @@ public class RNCWebViewPackage extends TurboReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         List<ViewManager> viewManagers = new ArrayList<>();
-        viewManagers.add(new RNCWebViewManager(reactContext));
+        viewManagers.add(new RNCWebViewManager());
         return viewManagers;
     }
 

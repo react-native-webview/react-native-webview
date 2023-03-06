@@ -31,12 +31,10 @@ import java.util.HashMap;
 
 public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
-    ReactApplicationContext mCallerContext;
     private final RNCWebViewManagerImpl mRNCWebViewManagerImpl;
 
-    public RNCWebViewManager(ReactApplicationContext reactContext) {
-        mCallerContext = reactContext;
-        mRNCWebViewManagerImpl = new RNCWebViewManagerImpl(reactContext);
+    public RNCWebViewManager() {
+        mRNCWebViewManagerImpl = new RNCWebViewManagerImpl();
     }
 
     @Override
@@ -46,7 +44,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
     @Override
     public RNCWebView createViewInstance(ThemedReactContext context) {
-        return mRNCWebViewManagerImpl.createViewInstance();
+        return mRNCWebViewManagerImpl.createViewInstance(context);
     }
 
     @ReactProp(name = "allowFileAccess")

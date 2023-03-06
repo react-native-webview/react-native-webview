@@ -1,6 +1,7 @@
 import type { HostComponent, ViewProps } from 'react-native';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import {DirectEventHandler,Double, Int32, WithDefault} from 'react-native/Libraries/Types/CodegenTypes';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
 export type WebViewNativeEvent = Readonly<{
   url: string;
@@ -247,6 +248,26 @@ export interface NativeProps extends ViewProps {
   }>;
   userAgent?: string;
 }
+
+export interface NativeCommands {
+  goBack: (viewRef: React.ElementRef<HostComponent<NativeProps>> ) => void;
+  goForward: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  reload: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  stopLoading: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  injectJavaScript: (viewRef: React.ElementRef<HostComponent<NativeProps>>, javascript: string) => void;
+  requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  postMessage: (viewRef: React.ElementRef<HostComponent<NativeProps>>, data: string) => void;
+  // Android Only
+  loadUrl: (viewRef: React.ElementRef<HostComponent<NativeProps>>, url: string) => void;
+  clearFormData: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  clearCache: (viewRef: React.ElementRef<HostComponent<NativeProps>>, includeDiskFiles: boolean) => void;
+  clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  // !Android Only
+}
+
+export const Commands = codegenNativeCommands<NativeCommands>({
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl', 'clearFormData', 'clearCache', 'clearHistory'],
+});
 
 export default codegenNativeComponent<NativeProps>(
   'RNCWebView'

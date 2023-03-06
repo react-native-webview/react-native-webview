@@ -3,7 +3,6 @@ package com.reactnativecommunity.webview;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
@@ -36,9 +35,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     private final ViewManagerDelegate<RNCWebView> mDelegate;
     private final RNCWebViewManagerImpl mRNCWebViewManagerImpl;
 
-    public RNCWebViewManager(ReactApplicationContext context) {
+    public RNCWebViewManager() {
         mDelegate = new RNCWebViewManagerDelegate<>(this);
-        mRNCWebViewManagerImpl = new RNCWebViewManagerImpl(context);
+        mRNCWebViewManagerImpl = new RNCWebViewManagerImpl();
     }
 
     @Nullable
@@ -56,7 +55,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     @NonNull
     @Override
     protected RNCWebView createViewInstance(@NonNull ThemedReactContext context) {
-        return mRNCWebViewManagerImpl.createViewInstance();
+        return mRNCWebViewManagerImpl.createViewInstance(context);
     }
 
     @Override
@@ -402,7 +401,82 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
         mRNCWebViewManagerImpl.setUserAgent(view, value);
     }
 
-    @Override
+    // These will never be called because we use the shared impl for now
+  @Override
+  public void goBack(RNCWebView view) {
+    view.goBack();
+  }
+
+  @Override
+  public void goForward(RNCWebView view) {
+    view.goForward();
+  }
+
+  @Override
+  public void reload(RNCWebView view) {
+    view.reload();
+  }
+
+  @Override
+  public void stopLoading(RNCWebView view) {
+    view.stopLoading();
+  }
+
+  @Override
+  public void injectJavaScript(RNCWebView view, String javascript) {
+      view.evaluateJavascriptWithFallback(javascript);
+  }
+
+  @Override
+  public void requestFocus(RNCWebView view) {
+      view.requestFocus();
+  }
+
+  @Override
+  public void postMessage(RNCWebView view, String data) {
+      try {
+        JSONObject eventInitDict = new JSONObject();
+        eventInitDict.put("data", data);
+        view.evaluateJavascriptWithFallback(
+          "(function () {" +
+            "var event;" +
+            "var data = " + eventInitDict.toString() + ";" +
+            "try {" +
+            "event = new MessageEvent('message', data);" +
+            "} catch (e) {" +
+            "event = document.createEvent('MessageEvent');" +
+            "event.initMessageEvent('message', true, true, data.data, data.origin, data.lastEventId, data.source);" +
+            "}" +
+            "document.dispatchEvent(event);" +
+            "})();"
+        );
+      } catch (JSONException e) {
+        throw  new RuntimeException(e);
+      }
+  }
+
+  @Override
+  public void loadUrl(RNCWebView view, String url) {
+      view.loadUrl(url);
+  }
+
+  @Override
+  public void clearFormData(RNCWebView view) {
+      view.clearFormData();
+  }
+
+  @Override
+  public void clearCache(RNCWebView view, boolean includeDiskFiles) {
+      view.clearCache(includeDiskFiles);
+  }
+
+  @Override
+  public void clearHistory(RNCWebView view) {
+      view.clearHistory();
+  }
+  // !These will never be called
+
+  @Override
     protected void addEventEmitters(@NonNull ThemedReactContext reactContext, RNCWebView view) {
         // Do not register default touch emitter and let WebView implementation handle touches
         view.setWebViewClient(new RNCWebViewClient());

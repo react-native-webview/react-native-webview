@@ -17,7 +17,6 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
@@ -31,7 +30,7 @@ import java.net.URL
 import java.util.*
 
 
-class RNCWebViewManagerImpl(context: ReactApplicationContext) {
+class RNCWebViewManagerImpl {
     companion object {
         const val NAME = "RNCWebView"
     }
@@ -58,12 +57,10 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
         "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files."
 
 
-    private var mContext: ReactApplicationContext = context
-
-    fun createViewInstance(): RNCWebView {
-        val webView = RNCWebView(mContext)
-        setupWebChromeClient(mContext, webView)
-        mContext.addLifecycleEventListener(webView)
+    fun createViewInstance(context: ThemedReactContext): RNCWebView {
+        val webView = RNCWebView(context)
+        setupWebChromeClient(webView)
+        context.addLifecycleEventListener(webView)
         mWebViewConfig.configWebView(webView)
         val settings = webView.settings
         settings.builtInZoomControls = true
@@ -86,7 +83,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
-            val module = getModule() ?: return@DownloadListener
+            val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {
                 DownloadManager.Request(Uri.parse(url))
             } catch (e: IllegalArgumentException) {
@@ -129,14 +126,13 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
     }
 
     private fun setupWebChromeClient(
-        reactContext: ReactApplicationContext,
         webView: RNCWebView,
     ) {
-        val activity = reactContext.currentActivity
+        val activity = webView.themedReactContext.currentActivity
         if (mAllowsFullscreenVideo && activity != null) {
             val initialRequestedOrientation = activity.requestedOrientation
             val webChromeClient: RNCWebChromeClient =
-                object : RNCWebChromeClient(reactContext, webView) {
+                object : RNCWebChromeClient(webView) {
                     override fun getDefaultVideoPoster(): Bitmap? {
                         return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
                     }
@@ -172,7 +168,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
                             // Same view hierarchy (no Modal), just hide the WebView then
                             mWebView.visibility = View.GONE
                         }
-                        mReactContext.addLifecycleEventListener(this)
+                        mWebView.themedReactContext.addLifecycleEventListener(this)
                     }
 
                     override fun onHideCustomView() {
@@ -194,7 +190,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
                         mVideoView = null
                         mCustomViewCallback = null
                         activity.requestedOrientation = initialRequestedOrientation
-                        mReactContext.removeLifecycleEventListener(this)
+                        mWebView.themedReactContext.removeLifecycleEventListener(this)
                     }
                 }
             webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
@@ -202,7 +198,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
         } else {
             var webChromeClient = webView.webChromeClient as RNCWebChromeClient?
             webChromeClient?.onHideCustomView()
-            webChromeClient = object : RNCWebChromeClient(reactContext, webView) {
+            webChromeClient = object : RNCWebChromeClient(webView) {
                 override fun getDefaultVideoPoster(): Bitmap? {
                     return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
                 }
@@ -257,7 +253,7 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
     }
 
     fun onDropViewInstance(webView: RNCWebView) {
-        mContext.removeLifecycleEventListener(webView)
+        webView.themedReactContext.removeLifecycleEventListener(webView)
         webView.cleanupCallbacksAndDestroy()
         webView.mWebChromeClient = null
     }
@@ -333,10 +329,6 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
         }
         "clearHistory" -> webView.clearHistory()
       }
-    }
-
-    fun getModule(): RNCWebViewModule? {
-        return mContext.getNativeModule(RNCWebViewModule::class.java)
     }
 
     fun setMixedContentMode(view: WebView, mixedContentMode: String?) {
@@ -517,12 +509,12 @@ class RNCWebViewManagerImpl(context: ReactApplicationContext) {
 
     fun setAllowsFullscreenVideo(view: RNCWebView, value: Boolean) {
         mAllowsFullscreenVideo = value
-        setupWebChromeClient(mContext, view)
+        setupWebChromeClient(view)
     }
 
     fun setAndroidHardwareAccelerationDisabled(view: RNCWebView, disabled: Boolean) {
         if (disabled) {
-            view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            view.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         }
     }
 

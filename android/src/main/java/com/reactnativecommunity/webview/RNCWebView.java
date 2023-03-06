@@ -22,6 +22,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerHelper;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
@@ -69,7 +70,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
      * Activity Context is required for creation of dialogs internally by WebView
      * Reactive Native needed for access to ReactNative internal system functionality
      */
-    public RNCWebView(ReactApplicationContext reactContext) {
+    public RNCWebView(ThemedReactContext reactContext) {
         super(reactContext);
         this.createCatalystInstance();
         progressChangedFilter = new ProgressChangedFilter();
@@ -167,7 +168,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     protected void createCatalystInstance() {
-        ReactApplicationContext reactContext = (ReactApplicationContext) this.getContext();
+      ThemedReactContext reactContext = (ThemedReactContext) this.getContext();
 
         if (reactContext != null) {
             mCatalystInstance = reactContext.getCatalystInstance();
@@ -210,8 +211,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     public void onMessage(String message) {
-        ReactApplicationContext reactContext = (ReactApplicationContext) this.getContext();
-        RNCWebView mContext = this;
+        ThemedReactContext reactContext = getThemedReactContext();
+        RNCWebView mWebView = this;
 
         if (mRNCWebViewClient != null) {
             WebView webView = this;
@@ -225,7 +226,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     data.putString("data", message);
 
                     if (mCatalystInstance != null) {
-                        mContext.sendDirectMessage("onMessage", data);
+                        mWebView.sendDirectMessage("onMessage", data);
                     } else {
                         dispatchEvent(webView, new TopMessageEvent(webView.getId(), data));
                     }
@@ -282,7 +283,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     protected void dispatchEvent(WebView webView, Event event) {
-        ReactApplicationContext reactContext = (ReactApplicationContext) webView.getContext();
+        ThemedReactContext reactContext = getThemedReactContext();
         int reactTag = webView.getId();
         UIManagerHelper.getEventDispatcherForReactTag(reactContext, reactTag).dispatchEvent(event);
     }
@@ -300,11 +301,15 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         super.destroy();
     }
 
-    protected class RNCWebViewBridge {
-        RNCWebView mContext;
+  public ThemedReactContext getThemedReactContext() {
+    return (ThemedReactContext) this.getContext();
+  }
+
+  protected class RNCWebViewBridge {
+        RNCWebView mWebView;
 
         RNCWebViewBridge(RNCWebView c) {
-            mContext = c;
+          mWebView = c;
         }
 
         /**
@@ -313,7 +318,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
          */
         @JavascriptInterface
         public void postMessage(String message) {
-            mContext.onMessage(message);
+          mWebView.onMessage(message);
         }
     }
 

@@ -444,9 +444,58 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     [super updateProps:props oldProps:oldProps];
 }
 
+- (void)handleCommand:(nonnull const NSString *)commandName args:(nonnull const NSArray *)args {
+    RCTRNCWebViewHandleCommand(self, commandName, args);
+}
+
+
 Class<RCTComponentViewProtocol> RNCWebViewCls(void)
 {
     return RNCWebView.class;
+}
+
+- (void)goBack {
+    [_view goBack];
+}
+
+- (void)goForward {
+    [_view goForward];
+}
+
+- (void)injectJavaScript:(nonnull NSString *)javascript {
+    [_view injectJavaScript:javascript];
+}
+
+- (void)loadUrl:(nonnull NSString *)url {
+    // android only
+}
+
+- (void)postMessage:(nonnull NSString *)data {
+    [_view postMessage:data];
+}
+
+- (void)reload {
+    [_view reload];
+}
+
+- (void)requestFocus {
+    [_view requestFocus];
+}
+
+- (void)stopLoading {
+    [_view stopLoading];
+}
+
+- (void)clearFormData {
+    // android only
+}
+
+- (void)clearCache:(BOOL)includeDiskFiles {
+    // android only
+}
+
+- (void)clearHistory {
+    // android only
 }
 
 @end

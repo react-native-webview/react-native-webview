@@ -4,14 +4,14 @@ import {
   Image,
   View,
   ImageSourcePropType,
+  HostComponent,
 } from 'react-native';
 
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
-import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
 import invariant from 'invariant';
 
-import RNCWebView from "./RNCWebViewNativeComponent";
+import RNCWebView, {Commands, NativeProps} from "./RNCWebViewNativeComponent";
 import RNCWebViewModule from "./NativeRNCWebView";
 import {
   defaultOriginWhitelist,
@@ -24,10 +24,6 @@ import {
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
-
-const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'clearFormData', 'clearCache', 'clearHistory', 'loadUrl'],
-});
 
 const { resolveAssetSource } = Image;
 
@@ -72,15 +68,15 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   ...otherProps
 }, ref) => {
   const messagingModuleName = useRef<string>(`WebViewMessageHandler${uniqueRef += 1}`).current;
-  const webViewRef = useRef<typeof RNCWebView | null>(null);
+  const webViewRef = useRef<React.ComponentRef<HostComponent<NativeProps>> | null>(null);
 
   const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean,
     url: string,
     lockIdentifier?: number) => {
     if (lockIdentifier) {
       RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
-    } else if (shouldStart) {
-      Commands.loadUrl(webViewRef, url);
+    } else if (shouldStart && webViewRef.current) {
+      Commands.loadUrl(webViewRef.current, url);
     }
   }, []);
 
@@ -101,20 +97,23 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   })
 
   useImperativeHandle(ref, () => ({
-    goForward: () => Commands.goForward(webViewRef.current),
-    goBack: () => Commands.goBack(webViewRef.current),
+    goForward: () => webViewRef.current && Commands.goForward(webViewRef.current),
+    goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
     reload: () => {
       setViewState(
         'LOADING',
-      ); Commands.reload(webViewRef.current)
+      );
+      if (webViewRef.current) {
+        Commands.reload(webViewRef.current)
+      }
     },
-    stopLoading: () => Commands.stopLoading(webViewRef.current),
-    postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
-    injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
-    requestFocus: () => Commands.requestFocus(webViewRef.current),
-    clearFormData: () => Commands.clearFormData(webViewRef.current),
-    clearCache: (includeDiskFiles: boolean) => Commands.clearCache(webViewRef.current, includeDiskFiles),
-    clearHistory: () => Commands.clearHistory(webViewRef.current),
+    stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
+    postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
+    injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
+    requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
+    clearFormData: () => webViewRef.current && Commands.clearFormData(webViewRef.current),
+    clearCache: (includeDiskFiles: boolean) => webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
+    clearHistory: () => webViewRef.current && Commands.clearHistory(webViewRef.current),
   }), [setViewState, webViewRef]);
 
   const directEventCallbacks = useMemo(() => ({
@@ -187,8 +186,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onRenderProcessGone={onRenderProcessGone}
     onMessage={onMessage}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ref={webViewRef as any}
+    ref={webViewRef}
     // TODO: find a better way to type this.
     // @ts-expect-error source is old arch
     source={sourceResolved}
