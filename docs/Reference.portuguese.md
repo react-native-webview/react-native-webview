@@ -95,7 +95,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`stopLoading`](Reference.portuguese.md#stoploading)
 - [`injectJavaScript`](Reference.portuguese.md#injectjavascriptstr)
 - [`clearFormData`](Reference.portuguese.md#clearFormData)
-- [`clearCache`](Reference.portuguese.md#clearCache)
+- [`clearCache`](Reference.portuguese.md#clearCachebool)
 - [`clearHistory`](Reference.portuguese.md#clearHistory)
 - [`requestFocus`](Reference.portuguese.md#requestFocus)
 - [`postMessage`](Reference.portuguese.md#postmessagestr)
@@ -1502,6 +1502,10 @@ Exemplo:
 
 Uma matriz de objetos de itens de menu personalizados que serão anexados ao UIMenu que aparece ao selecionar o texto (aparecerá após 'Copiar' e 'Compartilhar...'). Usado em conjunto com `onCustomMenuSelection`
 
+| Tipo                                                               | Requerido | Plataforma |
+| ------------------------------------------------------------------ | --------  | --------   |
+| array of objects: {label: string, key: string}                     | Não       | iOS        |
+
 Exemplo:
 
 ```javascript
@@ -1511,6 +1515,10 @@ Exemplo:
 ### `onCustomMenuSelection`
 
 Função chamada quando um item de menu personalizado é selecionado. Ele recebe um evento Nativo, que inclui três chaves personalizadas: `label`, `key` e `selectedText`.
+
+| Tipo                                                               | Requerido | Plataforma |
+| ------------------------------------------------------------------ | --------  | --------   |
+| function                                                           | Não       | iOS        |
 
 ```javascript
 <WebView 

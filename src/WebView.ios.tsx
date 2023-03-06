@@ -174,7 +174,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       useSharedProcessPool={useSharedProcessPool}
       textInteractionEnabled={textInteractionEnabled}
       decelerationRate={decelerationRate}
-      messagingEnabled={typeof onMessage === 'function'}
+      messagingEnabled={typeof onMessageProp === 'function'}
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
       onLoadingProgress={onLoadingProgress}
