@@ -99,7 +99,7 @@ This document lays out the current public properties and methods for the React N
 - [`stopLoading`](Reference.md#stoploading)
 - [`injectJavaScript`](Reference.md#injectjavascriptstr)
 - [`clearFormData`](Reference.md#clearFormData)
-- [`clearCache`](Reference.md#clearCache)
+- [`clearCache`](Reference.md#clearCachebool)
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
 - [`postMessage`](Reference.md#postmessagestr)
