@@ -1,3 +1,7 @@
+// react-native-test-app sets reactNativeVersion to a numeric value (e.g. "6805"),
+// but react-native-blob-utils reads this and expects it to be in semantic version format
+ext.reactNativeVersion = "0.68.5"
+
 buildscript {
     def androidTestAppDir = "../../node_modules/react-native-test-app/android"
     apply(from: "${androidTestAppDir}/dependencies.gradle")
