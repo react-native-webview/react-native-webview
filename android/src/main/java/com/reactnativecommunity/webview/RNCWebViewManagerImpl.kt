@@ -56,9 +56,12 @@ class RNCWebViewManagerImpl {
     private val DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE =
         "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files."
 
+    fun createRNCWebViewInstance(context: ThemedReactContext): RNCWebView {
+        return RNCWebView(context)
+    }
 
     fun createViewInstance(context: ThemedReactContext): RNCWebView {
-        val webView = RNCWebView(context)
+        val webView = createRNCWebViewInstance(context)
         setupWebChromeClient(webView)
         context.addLifecycleEventListener(webView)
         mWebViewConfig.configWebView(webView)
