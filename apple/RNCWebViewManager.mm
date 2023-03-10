@@ -1,6 +1,7 @@
 #import <React/RCTViewManager.h>
 #import <React/RCTUIManager.h>
 
+#import "RNCWebViewManager.h"
 #import "RNCWebViewImpl.h"
 #import "RNCWebViewDecisionManager.h"
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -14,9 +15,6 @@
 #define RNCView UIView
 @class UIView;
 #endif  // TARGET_OS_OSX
-
-@interface RNCWebViewManager : RCTViewManager
-@end
 
 @implementation RCTConvert (WKWebView)
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
