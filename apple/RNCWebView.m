@@ -50,12 +50,21 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
 @end
 @implementation RNCWKWebView_
+
 - (BOOL)canPerformAction:(SEL)action 
               withSender:(id)sender{
+  
   if (!self.menuItems) {              
     return YES;
   }
   return NO;
+}
+
+- (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AVAILABLE(ios(13.0))  {
+    if (@available(iOS 16.0, *)) {
+        [builder removeMenuForIdentifier:UIMenuLookup];
+    }
+    [super buildMenuWithBuilder:builder];
 }
 @end
 #endif // !TARGET_OS_OSX
@@ -504,6 +513,11 @@ RCTAutoInsetsProtocol>
     longPress.numberOfTouchesRequired = 1;
     longPress.cancelsTouchesInView = YES;
     [self addGestureRecognizer:longPress];
+
+  //#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 /* __IPHONE_16_0 */
+  //  UIEditMenuInteraction *editMenuInteraction = [[UIEditMenuInteraction alloc] initWithDelegate: self];
+  //  [self addInteraction:editMenuInteraction];
+  //#endif
   }
 #endif // !TARGET_OS_OSX
 }
