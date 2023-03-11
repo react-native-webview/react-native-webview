@@ -515,11 +515,6 @@ RCTAutoInsetsProtocol>
     longPress.numberOfTouchesRequired = 1;
     longPress.cancelsTouchesInView = YES;
     [self addGestureRecognizer:longPress];
-
-  //#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 /* __IPHONE_16_0 */
-  //  UIEditMenuInteraction *editMenuInteraction = [[UIEditMenuInteraction alloc] initWithDelegate: self];
-  //  [self addInteraction:editMenuInteraction];
-  //#endif
   }
 #endif // !TARGET_OS_OSX
 }
