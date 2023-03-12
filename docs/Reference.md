@@ -59,8 +59,6 @@ This document lays out the current public properties and methods for the React N
 - [`allowFileAccessFromFileURLs`](Reference.md#allowFileAccessFromFileURLs)
 - [`allowUniversalAccessFromFileURLs`](Reference.md#allowUniversalAccessFromFileURLs)
 - [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
-- [`url`](Reference.md#url)
-- [`html`](Reference.md#html)
 - [`keyboardDisplayRequiresUserAction`](Reference.md#keyboardDisplayRequiresUserAction)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
@@ -1158,26 +1156,6 @@ A String value that indicates which URLs the WebView's file can then reference i
 | Type   | Required | Platform      |
 | ------ | -------- | ------------- |
 | string | No       | iOS and macOS |
-
----
-
-### `url`[⬆](#props-index)<!-- Link generated with jump2header -->
-
-**Deprecated.** Use the `source` prop instead.
-
-| Type   | Required |
-| ------ | -------- |
-| string | No       |
-
----
-
-### `html`[⬆](#props-index)<!-- Link generated with jump2header -->
-
-**Deprecated.** Use the `source` prop instead.
-
-| Type   | Required |
-| ------ | -------- |
-| string | No       |
 
 ---
 

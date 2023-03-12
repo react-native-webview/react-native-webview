@@ -59,8 +59,6 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`allowFileAccessFromFileURLs`](Reference.portuguese.md#allowFileAccessFromFileURLs)
 - [`allowUniversalAccessFromFileURLs`](Reference.portuguese.md#allowUniversalAccessFromFileURLs)
 - [`allowingReadAccessToURL`](Reference.portuguese.md#allowingReadAccessToURL)
-- [`url`](Reference.portuguese.md#url)
-- [`html`](Reference.portuguese.md#html)
 - [`keyboardDisplayRequiresUserAction`](Reference.portuguese.md#keyboardDisplayRequiresUserAction)
 - [`hideKeyboardAccessoryView`](Reference.portuguese.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.portuguese.md#allowsbackforwardnavigationgestures)
@@ -1147,26 +1145,6 @@ Um valor String que indica quais URLs o arquivo da WebView pode referenciar em s
 | Tipo   | Requerido | Plataforma    |
 | ------ | --------- | ------------- |
 | string | Não       | iOS e macOS   |
-
----
-
-### `url`[⬆](#props-index)<!-- Link gerado com jump2header -->
-
-**Descontinuado.** Em vez disso, use a propriedade `source`.
-
-| Tipo   | Requerido |
-| ------ | --------- |
-| string | Não       |
-
----
-
-### `html`[⬆](#props-index)<!-- Link gerado com jump2header -->
-
-**Descontinuado.** Em vez disso, use a propriedade `source`.
-
-| Tipo   | Requerido |
-| ------ | --------- |
-| string | Não       |
 
 ---
 
