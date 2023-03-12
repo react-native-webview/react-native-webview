@@ -161,7 +161,6 @@ export interface NativeProps extends ViewProps {
   setSupportMultipleWindows?: boolean;
   textZoom?: Int32;
   thirdPartyCookiesEnabled?: boolean;
-  urlPrefixesForDefaultIntent?: readonly string[];
   // Workaround to watch if listener if defined
   hasOnScroll?: boolean;
   // !Android only

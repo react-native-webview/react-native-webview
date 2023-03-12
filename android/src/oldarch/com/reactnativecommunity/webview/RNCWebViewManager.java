@@ -255,11 +255,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mRNCWebViewManagerImpl.setThirdPartyCookiesEnabled(view, value);
     }
 
-    @ReactProp(name = "urlPrefixesForDefaultIntent")
-    public void setUrlPrefixesForDefaultIntent(RNCWebView view, @Nullable ReadableArray value) {
-        mRNCWebViewManagerImpl.setUrlPrefixesForDefaultIntent(view, value);
-    }
-
     @ReactProp(name = "userAgent")
     public void setUserAgent(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setUserAgent(view, value);

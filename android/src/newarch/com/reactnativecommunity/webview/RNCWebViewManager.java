@@ -306,12 +306,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
         mRNCWebViewManagerImpl.setThirdPartyCookiesEnabled(view, value);
     }
 
-    @Override
-    @ReactProp(name = "urlPrefixesForDefaultIntent")
-    public void setUrlPrefixesForDefaultIntent(RNCWebView view, @Nullable ReadableArray value) {
-        mRNCWebViewManagerImpl.setUrlPrefixesForDefaultIntent(view, value);
-    }
-
     /* iOS PROPS - no implemented here */
     @Override
     public void setAllowingReadAccessToURL(RNCWebView view, @Nullable String value) {}
@@ -384,7 +378,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
 
     @Override
     public void setTextInteractionEnabled(RNCWebView view, boolean value) {}
-    
+
     @Override
     public void setHasOnFileDownload(RNCWebView view, boolean value) {}
 

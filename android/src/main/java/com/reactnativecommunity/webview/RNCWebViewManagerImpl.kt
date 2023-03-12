@@ -638,10 +638,4 @@ class RNCWebViewManagerImpl {
     fun setThirdPartyCookiesEnabled(view: RNCWebView, enabled: Boolean) {
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, enabled)
     }
-
-    fun setUrlPrefixesForDefaultIntent(view: RNCWebView, value: ReadableArray?) {
-       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && value != null) {
-           (view.webViewClient as RNCWebViewClient).setUrlPrefixesForDefaultIntent(value)
-       }
-    }
 }

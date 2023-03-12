@@ -922,15 +922,6 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   setSupportMultipleWindows?: boolean;
 
   /**
-   * Used on Android only, controls whether the given list of URL prefixes should
-   * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
-   * default activity intent for those URL instead of loading it within the webview.
-   * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
-   * @platform android
-   */
-  readonly urlPrefixesForDefaultIntent?: string[];
-
-  /**
    * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
    * as Hardware Acceleration is a feature only for Android. The default value is `false`.
    * @platform android

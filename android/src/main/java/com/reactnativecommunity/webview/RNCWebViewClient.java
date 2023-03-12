@@ -40,7 +40,6 @@ public class RNCWebViewClient extends WebViewClient {
 
     protected boolean mLastLoadFailed = false;
     protected @Nullable
-    ReadableArray mUrlPrefixesForDefaultIntent;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
     protected @Nullable RNCBasicAuthCredential basicAuthCredential = null;
@@ -306,10 +305,6 @@ public class RNCWebViewClient extends WebViewClient {
         event.putBoolean("canGoBack", webView.canGoBack());
         event.putBoolean("canGoForward", webView.canGoForward());
         return event;
-    }
-
-    public void setUrlPrefixesForDefaultIntent(ReadableArray specialUrls) {
-        mUrlPrefixesForDefaultIntent = specialUrls;
     }
 
     public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
