@@ -922,13 +922,6 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   setSupportMultipleWindows?: boolean;
 
   /**
-   * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
-   * as Hardware Acceleration is a feature only for Android. The default value is `false`.
-   * @platform android
-   */
-  androidHardwareAccelerationDisabled?: boolean;
-
-  /**
    * https://developer.android.com/reference/android/webkit/WebView#setLayerType(int,%20android.graphics.Paint)
    * Sets the layerType. Possible values are:
    *

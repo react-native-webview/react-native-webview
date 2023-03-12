@@ -515,12 +515,6 @@ class RNCWebViewManagerImpl {
         setupWebChromeClient(view)
     }
 
-    fun setAndroidHardwareAccelerationDisabled(view: RNCWebView, disabled: Boolean) {
-        if (disabled) {
-            view.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        }
-    }
-
     fun setAndroidLayerType(view: RNCWebView, layerTypeString: String?) {
         val layerType = when (layerTypeString) {
             "hardware" -> View.LAYER_TYPE_HARDWARE

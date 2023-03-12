@@ -139,7 +139,6 @@ export interface NativeProps extends ViewProps {
   allowFileAccess?: boolean;
   allowsProtectedMedia?: boolean;
   allowsFullscreenVideo?: boolean;
-  androidHardwareAccelerationDisabled?: boolean;
   androidLayerType?: WithDefault<'none' | 'software' | 'hardware', 'none'>;
   cacheMode?: WithDefault<'LOAD_DEFAULT' | 'LOAD_CACHE_ELSE_NETWORK' | 'LOAD_NO_CACHE' | 'LOAD_CACHE_ONLY', 'LOAD_DEFAULT'>;
   domStorageEnabled?: boolean;

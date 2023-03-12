@@ -90,12 +90,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     }
 
     @Override
-    @ReactProp(name = "androidHardwareAccelerationDisabled")
-    public void setAndroidHardwareAccelerationDisabled(RNCWebView view, boolean value) {
-        mRNCWebViewManagerImpl.setAndroidHardwareAccelerationDisabled(view, value);
-    }
-
-    @Override
     @ReactProp(name = "androidLayerType")
     public void setAndroidLayerType(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setAndroidLayerType(view, value);

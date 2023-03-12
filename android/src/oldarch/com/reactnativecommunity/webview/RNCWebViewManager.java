@@ -73,11 +73,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mRNCWebViewManagerImpl.setAllowsProtectedMedia(view, value);
     }
 
-    @ReactProp(name = "androidHardwareAccelerationDisabled")
-    public void setAndroidHardwareAccelerationDisabled(RNCWebView view, boolean value) {
-        mRNCWebViewManagerImpl.setAndroidHardwareAccelerationDisabled(view, value);
-    }
-
     @ReactProp(name = "androidLayerType")
     public void setAndroidLayerType(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setAndroidLayerType(view, value);
