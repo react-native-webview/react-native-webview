@@ -21,10 +21,12 @@ namespace winrt::ReactNativeWebView::implementation {
         void MessagingEnabled(bool enabled) noexcept;
         bool MessagingEnabled() const noexcept;
         void NavigateToHtml(winrt::hstring html);
+        void NavigateWithHeaders(winrt::hstring uri, IMapView<winrt::hstring, winrt::hstring> headers);
         ~ReactWebView2();
 
     private:
         winrt::hstring m_navigateToHtml = L"";
+        std::optional<std::pair<winrt::hstring, winrt::hstring>> m_navigationWithHeaders;
         bool m_messagingEnabled{ true };
 
         winrt::Microsoft::UI::Xaml::Controls::WebView2 m_webView{ nullptr };
