@@ -29,4 +29,5 @@
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
 #if HAS_WEBVIEW2
 #include <winrt/Microsoft.Web.WebView2.Core.h>
+#include <winrt/Windows.Storage.Streams.h>
 #endif
