@@ -1,9 +1,9 @@
 namespace ReactNativeWebView{
-	[default_interface]
-	runtimeclass ReactWebView : Windows.UI.Xaml.Controls.ContentPresenter{
-		ReactWebView(Microsoft.ReactNative.IReactContext context);
-		Boolean MessagingEnabled;
-	};
+    [default_interface]
+    runtimeclass ReactWebView : Windows.UI.Xaml.Controls.ContentPresenter{
+        ReactWebView(Microsoft.ReactNative.IReactContext context);
+        Boolean MessagingEnabled;
+    };
 #if __has_include(<VersionMacros.h>)
 #include <VersionMacros.h>
 #else
@@ -11,12 +11,12 @@ namespace ReactNativeWebView{
 #endif
 
 #if RNW_VERSION_AT_LEAST(0,68,0) && defined(WINUI2_HAS_WEBVIEW2)
-	[default_interface]
-	runtimeclass ReactWebView2 : Windows.UI.Xaml.Controls.ContentPresenter{
-		ReactWebView2(Microsoft.ReactNative.IReactContext context);
-		void NavigateToHtml(String html);
-		void NavigateWithHeaders(String uri, Windows.Foundation.Collections.IMapView<String, String> headers);
-		Boolean MessagingEnabled;
-	};
+    [default_interface]
+    runtimeclass ReactWebView2 : Windows.UI.Xaml.Controls.ContentPresenter{
+        ReactWebView2(Microsoft.ReactNative.IReactContext context);
+        void NavigateToHtml(String html);
+        void NavigateWithHeaders(String uri, Windows.Foundation.Collections.IMapView<String, String> headers);
+        Boolean MessagingEnabled;
+    };
 #endif
 } // namespace ReactNativeWebView
