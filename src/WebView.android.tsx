@@ -30,7 +30,20 @@ import styles from './WebView.styles';
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'clearFormData', 'clearCache', 'clearHistory', 'loadUrl'],
+  supportedCommands: [
+    'goBack',
+    'goForward',
+    'reload',
+    'stopLoading',
+    'injectJavaScript',
+    'requestFocus',
+    'postMessage',
+    'clearFormData',
+    'clearCache',
+    'clearHistory',
+    'loadUrl',
+    'print',
+  ],
 });
 
 const { resolveAssetSource } = Image;
@@ -119,6 +132,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     clearFormData: () => Commands.clearFormData(webViewRef.current),
     clearCache: (includeDiskFiles: boolean) => Commands.clearCache(webViewRef.current, includeDiskFiles),
     clearHistory: () => Commands.clearHistory(webViewRef.current),
+    print: (params: { name: string; isLandscape?: boolean }) => Commands.print(webViewRef.current, params),
   }), [setViewState, webViewRef]);
 
   const directEventCallbacks = useMemo(() => ({

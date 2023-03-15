@@ -20,7 +20,8 @@ type WebViewCommands =
   | 'postMessage'
   | 'injectJavaScript'
   | 'loadUrl'
-  | 'requestFocus';
+  | 'requestFocus'
+  | 'print';
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
@@ -123,6 +124,10 @@ export type DecelerationRateConstant = 'normal' | 'fast';
 export interface WebViewMessage extends WebViewNativeEvent {
   data: string;
 }
+export interface WebViewPrint extends WebViewNativeEvent {
+  file?: string;
+  error?: string;
+}
 
 export interface WebViewError extends WebViewNativeEvent {
   /**
@@ -155,6 +160,8 @@ export type ShouldStartLoadRequestEvent =
 export type FileDownloadEvent = NativeSyntheticEvent<FileDownload>;
 
 export type WebViewMessageEvent = NativeSyntheticEvent<WebViewMessage>;
+
+export type WebViewPrintEvent = NativeSyntheticEvent<WebViewPrint>;
 
 export type WebViewErrorEvent = NativeSyntheticEvent<WebViewError>;
 
@@ -311,6 +318,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   basicAuthCredential?: BasicAuthCredential;
 }
 
+
 export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   cacheMode?: CacheMode;
   allowFileAccess?: boolean;
@@ -341,6 +349,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   downloadingMessage?: string;
   lackPermissionToDownloadMessage?: string;
   allowsProtectedMedia?: boolean;
+  onPrint?: (event: WebViewPrintEvent) => void;
 }
 
 export declare type ContentInsetAdjustmentBehavior =
@@ -387,6 +396,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   limitsNavigationsToAppBoundDomains?: boolean;
   textInteractionEnabled?: boolean;
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
+  onPrint?: (event: WebViewPrintEvent) => void;
 }
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -1211,6 +1221,12 @@ export interface WebViewSharedProps extends ViewProps {
    * available on the event object, `event.nativeEvent.data`. `data` must be a string.
    */
   onMessage?: (event: WebViewMessageEvent) => void;
+
+  /**
+   * Function called when print event is received.
+   * @param event contains path of generated file or error message
+   */
+  onPrint?: (event: WebViewPrintEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` is loading.

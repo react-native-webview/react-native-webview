@@ -25,6 +25,26 @@ static NSDictionary* customCertificatesForHost;
 
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
+
+@interface UIPrintPageRenderer (PDF)
+- (NSMutableData *)generatePdfData;
+@end
+
+@implementation UIPrintPageRenderer (PDF)
+- (NSMutableData *)generatePdfData {
+  NSMutableData *pdfData = [[NSMutableData alloc] init];
+  UIGraphicsBeginPDFContextToData(pdfData, self.paperRect, nil);
+  [self prepareForDrawingPages:NSMakeRange(0, self.numberOfPages)];
+  CGRect printRect = UIGraphicsGetPDFContextBounds();
+  for (NSInteger pdfPage = 0; pdfPage < self.numberOfPages; pdfPage++) {
+    UIGraphicsBeginPDFPage();
+    [self drawPageAtIndex:pdfPage inRect:printRect];  
+  }
+  UIGraphicsEndPDFContext();
+  return pdfData;
+}
+@end
+
 #if !TARGET_OS_OSX
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -80,6 +100,7 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
+@property (nonatomic, copy) RCTDirectEventBlock onPrint;
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) WKWebView *webView;
 #else
@@ -930,6 +951,56 @@ RCTAutoInsetsProtocol>
                       RCTJSONStringify(eventInitDict, NULL)
   ];
   [self injectJavaScript: source];
+}
+
+#define kPaperSizeA4 CGSizeMake(595.2,841.8)
+
+- (NSMutableData *)createPdfFileWithPrintFormatter:(UIViewPrintFormatter *)printFormatter isLandscape:(BOOL)isLandscape {
+  CGRect originalBounds = self.bounds;
+
+  float width = kPaperSizeA4.width;
+  float height = kPaperSizeA4.height;
+
+  if(isLandscape) {
+    width = kPaperSizeA4.height;
+    height = kPaperSizeA4.width;
+  }
+
+  self.bounds = CGRectMake(originalBounds.origin.x, originalBounds.origin.y, originalBounds.size.width, _webView.scrollView.contentSize.height);
+  CGRect pdfPageFrame = CGRectMake(0, 0, width, height);
+  UIPrintPageRenderer *printPageRenderer = [[UIPrintPageRenderer alloc] init];
+  [printPageRenderer addPrintFormatter:printFormatter startingAtPageAtIndex:0];
+  [printPageRenderer setValue:[NSValue valueWithCGRect:pdfPageFrame] forKey:@"paperRect"];
+  [printPageRenderer setValue:[NSValue valueWithCGRect:pdfPageFrame] forKey:@"printableRect"];
+  self.bounds = originalBounds;
+  return [printPageRenderer generatePdfData];
+}
+
+- (NSString *)saveWebViewPdfWithData:(NSMutableData *)data documentName:(NSString *)documentName {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+  NSString *docDirectoryPath = [paths objectAtIndex:0];
+  NSURL *pdfPath = [NSURL fileURLWithPath:[docDirectoryPath stringByAppendingPathComponent:(documentName != nil ? documentName : @"result.pdf")]];
+  if ([data writeToURL:pdfPath atomically:YES]) {
+    return pdfPath.path;
+  } else {
+    return @""; 
+  }
+}
+
+
+- (void)print:(NSDictionary *_Nonnull)options
+{
+  NSString *name = options[@"name"];
+  BOOL isLandscape = options[@"isLandscape"];
+
+  NSMutableData *pdfData = [self createPdfFileWithPrintFormatter:_webView.viewPrintFormatter isLandscape:isLandscape];
+  NSString *result = [self saveWebViewPdfWithData:pdfData documentName:name];
+
+  if (_onPrint) {
+    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    [event addEntriesFromDictionary: @{@"file": result}];
+    _onPrint(event);
+  }
 }
 
 - (void)layoutSubviews

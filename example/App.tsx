@@ -20,6 +20,7 @@ import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
+import Print from './examples/Print';
 
 const TESTS = {
   Messaging: {
@@ -101,7 +102,15 @@ const TESTS = {
     render() {
       return <ApplePay />;
     },
-  }
+  },
+  Print: {
+    title: 'Print ',
+    testId: 'Print',
+    description: 'Test to print to pdf a webpage',
+    render() {
+      return <Print />;
+    },
+  },
 };
 
 type Props = {};
@@ -188,11 +197,18 @@ export default class App extends Component<Props, State> {
             onPress={() => this._changeTest('NativeWebpage')}
           />
           {Platform.OS === 'ios' && (
-              <Button
-                  testID="testType_applePay"
-                  title="ApplePay"
-                  onPress={() => this._changeTest('ApplePay')}
-              />
+            <Button
+              testID="testType_applePay"
+              title="ApplePay"
+              onPress={() => this._changeTest('ApplePay')}
+            />
+          )}
+          {(Platform.OS === 'ios' || Platform.OS === 'android') && (
+            <Button
+              testID="testType_print"
+              title="Print"
+              onPress={() => this._changeTest('Print')}
+            />
           )}
         </View>
 

@@ -59,6 +59,15 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      * Tells this WebView to clear its internal back/forward list.
      */
     clearHistory?: () => void;
+
+    /**
+     * (Android and IOS only)
+     * Prints the current page.
+     * @param options
+     * @param options.name Name of the print job
+     * @param options.isLandscape Whether to print in landscape
+     */
+    print: (options: { name: string; isLandscape?: boolean }) => void;
 }
 
 export {WebView};

@@ -24,6 +24,7 @@ This document lays out the current public properties and methods for the React N
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`onScroll`](Reference.md#onscroll)
+- [`onPrint`](Reference.md#onprint)
 - [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
@@ -103,6 +104,7 @@ This document lays out the current public properties and methods for the React N
 - [`clearHistory`](Reference.md#clearHistory)
 - [`requestFocus`](Reference.md#requestFocus)
 - [`postMessage`](Reference.md#postmessagestr)
+- [`print`](Reference.md#print)
 
 ---
 
@@ -645,6 +647,35 @@ contentSize
 layoutMeasurement
 velocity
 zoomScale
+```
+
+---
+
+### `onPrint`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when print event is finished.
+
+| Type     | Required | Platform                     |
+| -------- | -------- | ---------------------------- |
+| function | No       | iOS, Android |
+
+Example:
+
+```jsx
+<Webview
+  source={{ uri: 'https://reactnative.dev' }}
+  onPrint={syntheticEvent => {
+    const { file, error } = syntheticEvent.nativeEvent
+    console.log(file);
+  }}
+/>
+```
+
+Function passed to `onPrint` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+file
+error
 ```
 
 ---
@@ -1664,6 +1695,14 @@ postMessage('message');
 ```
 
 Post a message to WebView, handled by [`onMessage`](Reference.md#onmessage).
+
+
+### `print({name:string, isLandscape?:boolean})`[⬆](#methods-index)<!-- Link generated with jump2header -->
+
+```javascript
+print({name: 'file.pdf'});
+```
+Print current webpage, result is handled with [`onPrint`](Reference.md#onprint).
 
 ### `clearFormData()`[⬆](#methods-index)<!-- Link generated with jump2header -->
 
