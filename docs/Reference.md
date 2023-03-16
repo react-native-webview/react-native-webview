@@ -90,6 +90,7 @@ This document lays out the current public properties and methods for the React N
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
+- [`androidDebuggingEnabled`](Reference.md#androidDebuggingEnabled)
 
 ## Methods Index
 
@@ -1603,6 +1604,15 @@ Whether or not the Webview can play media protected by DRM. Default is false.
 
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
+| boolean | No       | Android  |
+
+### `androidDebuggingEnabled`
+
+Boolean value to control whether web contents can be debugged or not (see [`debugging docs`](Debugging.md#android--chrome)).
+Default is false. Supported as of API level 19
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
 | boolean | No       | Android  |
 
 ## Methods

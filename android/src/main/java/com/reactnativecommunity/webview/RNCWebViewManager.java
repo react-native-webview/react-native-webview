@@ -684,6 +684,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
   }
 
+  @ReactProp(name = "androidDebuggingEnabled")
+  public void setAndroidDebuggingEnabled(WebView view, boolean enabled) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      view.setWebContentsDebuggingEnabled(enabled);
+    }
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches

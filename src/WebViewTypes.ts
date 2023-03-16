@@ -1127,6 +1127,13 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   allowsProtectedMedia?: boolean;
+
+  /**
+   * Boolean value to control whether web contents can be debugged or not (see docs/Debugging.md).
+   * Default is false. Supported as of API level 19
+   * @platform android
+   */
+  androidDebuggingEnabled?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {
