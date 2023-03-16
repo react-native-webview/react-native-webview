@@ -341,6 +341,7 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   downloadingMessage?: string;
   lackPermissionToDownloadMessage?: string;
   allowsProtectedMedia?: boolean;
+  androidDebuggingEnabled?: boolean;
 }
 
 export declare type ContentInsetAdjustmentBehavior =
