@@ -15,6 +15,7 @@ namespace ReactNativeWebView{
     runtimeclass ReactWebView2 : Windows.UI.Xaml.Controls.ContentPresenter{
         ReactWebView2(Microsoft.ReactNative.IReactContext context);
         void NavigateToHtml(String html);
+        void NavigateWithHeaders(String uri, Windows.Foundation.Collections.IMapView<String, String> headers);
         Boolean MessagingEnabled;
     };
 #endif
