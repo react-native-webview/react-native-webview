@@ -300,14 +300,6 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
     return mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
   }
 
-  private String getDownloadingMessage() {
-    return  mDownloadingMessage == null ? DEFAULT_DOWNLOADING_MESSAGE : mDownloadingMessage;
-  }
-
-  private String getLackPermissionToDownloadMessage() {
-    return  mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
-  }
-
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(LinearLayout view, boolean enabled) {
     webView.getSettings().setJavaScriptEnabled(enabled);
@@ -776,7 +768,6 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
 
   @Override
   public void receiveCommand(@NonNull LinearLayout root, String commandId, @Nullable ReadableArray args) {
-    Log.d(TAG, "receiveCommand: " + root.getId());
     switch (commandId) {
       case "goBack":
         webView.goBack();
@@ -1297,10 +1288,6 @@ public class RNCWebViewManager extends SimpleViewManager<LinearLayout> {
 
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     // True if protected media should be allowed, false otherwise
-    protected boolean mAllowsProtectedMedia = false;
-
-    // True if protected media should be allowed, false otherwise
-    protected boolean mAllowsProtectedMedia = false;
 
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
