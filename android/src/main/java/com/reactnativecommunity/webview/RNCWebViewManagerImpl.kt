@@ -61,7 +61,11 @@ class RNCWebViewManagerImpl {
     }
 
     fun createViewInstance(context: ThemedReactContext): RNCWebView {
-        val webView = createRNCWebViewInstance(context)
+      val webView = createRNCWebViewInstance(context)
+      return createViewInstance(context, webView);
+    }
+
+    fun createViewInstance(context: ThemedReactContext, webView: RNCWebView): RNCWebView {
         setupWebChromeClient(webView)
         context.addLifecycleEventListener(webView)
         mWebViewConfig.configWebView(webView)
