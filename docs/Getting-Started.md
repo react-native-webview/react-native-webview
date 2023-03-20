@@ -91,9 +91,9 @@ If your app is RNW v0.68 or higher, follow these steps:
 
   i. Let autolinking handle adding the `ReactNativeWebView` project to your app.
 
-  iii. Customize your app's WinUI 2.x version to version 2.8.0-prerelease.210927001 or higher. See [here](https://microsoft.github.io/react-native-windows/docs/customizing-sdk-versions) for instructions. The WinUI 2.x support for WebView2 is not yet available in "stable" releases, so for now you will need to use a prerelease version.
+  ii. Customize your app's WinUI 2.x version to version 2.8.0-prerelease.210927001 or higher. See [here](https://microsoft.github.io/react-native-windows/docs/customizing-sdk-versions) for instructions. The WinUI 2.x support for WebView2 is not yet available in "stable" releases, so for now you will need to use a prerelease version.
   
-  iv. You may need to specify the `Microsoft.Web.WebView2` package in your app's `packages.config` file. If this is needed, you will get a build error listing the version of the package that you needed to specify. Simply add the package to your `packages.config`, and you should be good to go.
+  iii. You may need to specify the `Microsoft.Web.WebView2` package in your app's `packages.config` file. If this is needed, you will get a build error listing the version of the package that you needed to specify. Simply add the package to your `packages.config`, and you should be good to go.
 
 Now you can access the WinUI WebView2 control from your app's JavaScript via the `useWebView2` prop.
 

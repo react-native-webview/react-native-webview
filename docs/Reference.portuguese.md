@@ -95,7 +95,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`stopLoading`](Reference.portuguese.md#stoploading)
 - [`injectJavaScript`](Reference.portuguese.md#injectjavascriptstr)
 - [`clearFormData`](Reference.portuguese.md#clearFormData)
-- [`clearCache`](Reference.portuguese.md#clearCache)
+- [`clearCache`](Reference.portuguese.md#clearCachebool)
 - [`clearHistory`](Reference.portuguese.md#clearHistory)
 - [`requestFocus`](Reference.portuguese.md#requestFocus)
 - [`postMessage`](Reference.portuguese.md#postmessagestr)
