@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import <React/RCTViewManager.h>
+#import "React/RCTViewManager.h"
 
 @interface RNCWebViewManager : RCTViewManager
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;

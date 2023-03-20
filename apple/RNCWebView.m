@@ -1250,14 +1250,11 @@ static WKContentRuleList * _contentRuleList;
 
   // TODO: Why is this 13? Provide alternative for older versions or set minimum version to 13
   void (^block)(void) = ^(void) {
-    NSLog(@"before iosCheck");
     if (@available(iOS 13, *)) {
       NSString *contentRuleId = @"AdsBlockRules";
       NSString *contentRuleFile = @"ads-block-rules";
       NSString *podBundleName = @"RNCWebView.bundle";
-      NSLog(@"DONDEBUG - before lookUpContentRuleListForIdentifier");
       [[WKContentRuleListStore defaultStore] lookUpContentRuleListForIdentifier: contentRuleId completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
-        NSLog(@"DONDEBUG - inside lookUpContentRuleListForIdentifier");
         if (error != nil) {
           NSURL *podBundleURL = [[[NSBundle mainBundle] resourceURL] URLByAppendingPathComponent:podBundleName];
           NSBundle *podBundle = [NSBundle bundleWithURL:podBundleURL];
@@ -1265,10 +1262,7 @@ static WKContentRuleList * _contentRuleList;
           NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
 
           [[WKContentRuleListStore defaultStore] compileContentRuleListForIdentifier: contentRuleId encodedContentRuleList:content completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
-            if (error != nil) {
-              NSLog(@"DONDEBUG - Error compiling content rule list: %@", error.localizedDescription);
-            } else {
-              NSLog(@"DONDEBUG - Compiled content rule list and saved in store");
+            if (error == nil) {
               // TODO: add message post back saying adblock list loaded?
               _contentRuleList = contentRuleList;
               [webView.configuration.userContentController addContentRuleList:contentRuleList];
@@ -1277,20 +1271,15 @@ static WKContentRuleList * _contentRuleList;
             decisionHandler(WKNavigationActionPolicyAllow);
           }];
         } else {
-          NSLog(@"DONDEBUG - in breakout");
           _contentRuleList = contentRuleList;
           dispatch_group_leave(dispatchGroup);
           decisionHandler(WKNavigationActionPolicyAllow);
         }
       }];
-      NSLog(@"DONDEBUG - CONTENT RULE LIST FAIL");
     }
   };
-  
-  NSLog(@"DONDEBUG - BEFORE WAITED FOR CONTENT RULE LIST");
-  dispatch_async(dispatch_get_main_queue(), block);
-  NSLog(@"DONDEBUG - after async WAITED FOR CONTENT RULE LIST");
 
+  dispatch_async(dispatch_get_main_queue(), block);
 }
 
 /**

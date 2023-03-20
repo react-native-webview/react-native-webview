@@ -379,6 +379,7 @@ export declare type MediaCapturePermissionGrantType =
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
 export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
+  history?: string[];
   allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;
   allowsInlineMediaPlayback?: boolean;
@@ -439,6 +440,7 @@ export interface WindowsWebViewProps extends WebViewSharedProps {
 }
 
 export interface IOSWebViewProps extends WebViewSharedProps {
+  history?: string[];
   /**
    * Does not store any data within the lifetime of the WebView.
    */

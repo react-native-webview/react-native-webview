@@ -1,131 +1,135 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
-  Keyboard,
-  Button,
-  Platform,
+  // Text,
+  // TouchableOpacity,
+  // View,
+  // Keyboard,
+  // Button,
+  // Platform,
 } from 'react-native';
 
-import Alerts from './examples/Alerts';
-import Scrolling from './examples/Scrolling';
-import Background from './examples/Background';
-import Downloads from './examples/Downloads';
-import Uploads from './examples/Uploads';
-import Injection from './examples/Injection';
-import LocalPageLoad from './examples/LocalPageLoad';
-import Messaging from './examples/Messaging';
+// import Alerts from './examples/Alerts';
+// import Scrolling from './examples/Scrolling';
+// import Background from './examples/Background';
+// import Downloads from './examples/Downloads';
+// import Uploads from './examples/Uploads';
+// import Injection from './examples/Injection';
+// import LocalPageLoad from './examples/LocalPageLoad';
+// import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
-import ApplePay from './examples/ApplePay';
+// import ApplePay from './examples/ApplePay';
 
-const TESTS = {
-  Messaging: {
-    title: 'Messaging',
-    testId: 'messaging',
-    description: 'js-webview postMessage messaging test',
-    render() {
-      return <Messaging />;
-    },
-  },
-  Alerts: {
-    title: 'Alerts',
-    testId: 'alerts',
-    description: 'Alerts tests',
-    render() {
-      return <Alerts />;
-    },
-  },
-  Scrolling: {
-    title: 'Scrolling',
-    testId: 'scrolling',
-    description: 'Scrolling event test',
-    render() {
-      return <Scrolling />;
-    },
-  },
-  Background: {
-    title: 'Background',
-    testId: 'background',
-    description: 'Background color test',
-    render() {
-      return <Background />;
-    },
-  },
-  Downloads: {
-    title: 'Downloads',
-    testId: 'downloads',
-    description: 'File downloads test',
-    render() {
-      return <Downloads />;
-    },
-  },
-  Uploads: {
-    title: 'Uploads',
-    testId: 'uploads',
-    description: 'Upload test',
-    render() {
-      return <Uploads />;
-    },
-  },
-  Injection: {
-    title: 'Injection',
-    testId: 'injection',
-    description: 'Injection test',
-    render() {
-      return <Injection />;
-    },
-  },
-  PageLoad: {
-    title: 'LocalPageLoad',
-    testId: 'LocalPageLoad',
-    description: 'Local Page load test',
-    render() {
-      return <LocalPageLoad />;
-    },
-  },
-  NativeWebpage: {
-    title: 'NativeWebpage',
-    testId: 'NativeWebpage',
-    description: 'Test to open a new webview with a link',
-    render() {
-      return <NativeWebpage />;
-    },
-  },
-  ApplePay: {
-    title: 'Apple Pay ',
-    testId: 'ApplePay',
-    description: 'Test to open a apple pay supported page',
-    render() {
-      return <ApplePay />;
-    },
-  }
-};
+// const TESTS = {
+//   Messaging: {
+//     title: 'Messaging',
+//     testId: 'messaging',
+//     description: 'js-webview postMessage messaging test',
+//     render() {
+//       return <Messaging />;
+//     },
+//   },
+//   Alerts: {
+//     title: 'Alerts',
+//     testId: 'alerts',
+//     description: 'Alerts tests',
+//     render() {
+//       return <Alerts />;
+//     },
+//   },
+//   Scrolling: {
+//     title: 'Scrolling',
+//     testId: 'scrolling',
+//     description: 'Scrolling event test',
+//     render() {
+//       return <Scrolling />;
+//     },
+//   },
+//   Background: {
+//     title: 'Background',
+//     testId: 'background',
+//     description: 'Background color test',
+//     render() {
+//       return <Background />;
+//     },
+//   },
+//   Downloads: {
+//     title: 'Downloads',
+//     testId: 'downloads',
+//     description: 'File downloads test',
+//     render() {
+//       return <Downloads />;
+//     },
+//   },
+//   Uploads: {
+//     title: 'Uploads',
+//     testId: 'uploads',
+//     description: 'Upload test',
+//     render() {
+//       return <Uploads />;
+//     },
+//   },
+//   Injection: {
+//     title: 'Injection',
+//     testId: 'injection',
+//     description: 'Injection test',
+//     render() {
+//       return <Injection />;
+//     },
+//   },
+//   PageLoad: {
+//     title: 'LocalPageLoad',
+//     testId: 'LocalPageLoad',
+//     description: 'Local Page load test',
+//     render() {
+//       return <LocalPageLoad />;
+//     },
+//   },
+//   NativeWebpage: {
+//     title: 'NativeWebpage',
+//     testId: 'NativeWebpage',
+//     description: 'Test to open a new webview with a link',
+//     render() {
+//       return <NativeWebpage />;
+//     },
+//   },
+//   ApplePay: {
+//     title: 'Apple Pay ',
+//     testId: 'ApplePay',
+//     description: 'Test to open a apple pay supported page',
+//     render() {
+//       return <ApplePay />;
+//     },
+//   },
+// };
 
-type Props = {};
-type State = {restarting: boolean; currentTest: Object};
+// type Props = {};
+// type State = { restarting: boolean; currentTest: Object };
 
-export default class App extends Component<Props, State> {
-  state = {
-    restarting: false,
-    currentTest: TESTS.Alerts,
-  };
+// eslint-disable-next-line react/prefer-stateless-function
+export default class App extends Component {
+  // state = {
+  //   restarting: false,
+  //   currentTest: TESTS.NativeWebpage,
+  // };
 
-  _simulateRestart = () => {
-    this.setState({restarting: true}, () => this.setState({restarting: false}));
-  };
+  // _simulateRestart = () => {
+  //   this.setState({ restarting: true }, () =>
+  //     this.setState({ restarting: false }),
+  //   );
+  // };
 
-  _changeTest = (testName) => {
-    this.setState({currentTest: TESTS[testName]});
-  };
+  // _changeTest = (testName) => {
+  //   this.setState({ currentTest: TESTS[testName] });
+  // };
 
   render() {
-    const {restarting, currentTest} = this.state;
+    // const { restarting, currentTest } = this.state;
     return (
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity
+        <NativeWebpage />
+        {/* <TouchableOpacity
           style={styles.closeKeyboardView}
           onPress={() => Keyboard.dismiss()}
           testID="closeKeyboard"
@@ -135,7 +139,8 @@ export default class App extends Component<Props, State> {
           testID="restart_button"
           onPress={this._simulateRestart}
           style={styles.restartButton}
-          activeOpacity={0.6}>
+          activeOpacity={0.6}
+        >
           <Text>Simulate Restart</Text>
         </TouchableOpacity>
 
@@ -188,19 +193,20 @@ export default class App extends Component<Props, State> {
             onPress={() => this._changeTest('NativeWebpage')}
           />
           {Platform.OS === 'ios' && (
-              <Button
-                  testID="testType_applePay"
-                  title="ApplePay"
-                  onPress={() => this._changeTest('ApplePay')}
-              />
+            <Button
+              testID="testType_applePay"
+              title="ApplePay"
+              onPress={() => this._changeTest('ApplePay')}
+            />
           )}
-        </View>
+        </View> */}
 
-        {restarting ? null : (
+        {/* {restarting ? null : (
           <View
             testID={`example-${currentTest.testId}`}
             key={currentTest.title}
-            style={styles.exampleContainer}>
+            style={styles.exampleContainer}
+          >
             <Text style={styles.exampleTitle}>{currentTest.title}</Text>
             <Text style={styles.exampleDescription}>
               {currentTest.description}
@@ -209,7 +215,7 @@ export default class App extends Component<Props, State> {
               {currentTest.render()}
             </View>
           </View>
-        )}
+        )} */}
       </SafeAreaView>
     );
   }
