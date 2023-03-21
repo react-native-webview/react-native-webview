@@ -86,7 +86,7 @@ namespace winrt::ReactNativeWebView::implementation {
                         webView.Source(winrt::Uri(to_hstring(uriString)));
                     }
                     else {
-                        bool hasHeaders = srcMap.find("headers") != srcMap.end();
+                        const auto hasHeaders = srcMap.find("headers") != srcMap.end();
 
                         if (hasHeaders) {
                             auto headers = winrt::single_threaded_map<winrt::hstring, winrt::hstring>();
@@ -97,7 +97,7 @@ namespace winrt::ReactNativeWebView::implementation {
                                 headers.Insert(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
                             }
 
-                            auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
+                            const auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
                             reactWebView2.NavigateWithHeaders(to_hstring(uriString), headers.GetView());
                         }
                         else {
