@@ -51,9 +51,9 @@ const NativeWebpage = () => {
         ref={ref}
         source={{ uri }}
         style={{ width: '100%', flex: 1, borderWidth: 1, borderColor: 'gray' }}
-        history={history}
-        onNavigationStateChange={onNavigationStateChange}
-        onLoadStart={onLoadStart}
+        // history={history}
+        // onNavigationStateChange={onNavigationStateChange}
+        // onLoadStart={onLoadStart}
         // blockAds={false}
       />
       <View

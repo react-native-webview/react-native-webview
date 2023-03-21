@@ -318,7 +318,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onLoadingStart: (event: WebViewNavigationEventWithHistory) => void;
   onHttpError: (event: WebViewHttpErrorEvent) => void;
   onMessage: (event: WebViewMessageEvent) => void;
-  // onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
+  onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
   // TODO: find a better way to type this.
@@ -380,7 +380,8 @@ export declare type MediaCapturePermissionGrantType =
 
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
-export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
+export interface IOSNativeWebViewProps
+  extends Omit<CommonNativeWebViewProps, 'onShouldStartLoadWithRequest'> {
   history?: string[];
   allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;

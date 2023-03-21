@@ -226,8 +226,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         onHttpError={onHttpError}
         onRenderProcessGone={onRenderProcessGone}
         onMessage={onMessage}
-        // onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         ref={webViewRef}
         // TODO: find a better way to type this.
         source={resolveAssetSource(source as ImageSourcePropType)}

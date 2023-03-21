@@ -180,7 +180,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
         onLoadingStart={onLoadingStart}
         onHttpError={onHttpError}
         onMessage={onMessage}
-        // onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         ref={webViewRef}
         // TODO: find a better way to type this.
         source={resolveAssetSource(source as ImageSourcePropType)}
