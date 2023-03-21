@@ -124,7 +124,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
 
     const {
       onLoadingStart,
-      onShouldStartLoadWithRequest,
+      // onShouldStartLoadWithRequest,
       onMessage,
       viewState,
       setViewState,
@@ -203,9 +203,9 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
 
     const decelerationRate = processDecelerationRate(decelerationRateProp);
 
-    const NativeWebView =
-      (nativeConfig?.component as typeof NativeWebViewIOS | undefined) ||
-      RNCWebView;
+    const NativeWebView
+      = (nativeConfig?.component as typeof NativeWebViewIOS | undefined)
+      || RNCWebView;
 
     const webView = (
       <NativeWebView
