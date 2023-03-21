@@ -980,7 +980,7 @@ static WKContentRuleList * _contentRuleList;
         @"canGoBack": @(_webView.canGoBack),
         @"canGoForward" : @(_webView.canGoForward),
         @"background": backgroundString,
-        @"statusBarStyle": (luminance > 0.5) ? @"light" : @"dark"
+        @"statusBarStyle": (luminance > 0.5) ? @"dark" : @"light"
     };
     return [[NSMutableDictionary alloc] initWithDictionary: event];
 }
