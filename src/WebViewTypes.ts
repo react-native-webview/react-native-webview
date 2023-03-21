@@ -98,6 +98,8 @@ export interface WebViewNativeEvent {
 export interface WebViewNativeEventWithHistory extends WebViewNativeEvent {
   history: { title: string; uri: string }[];
   currentHistoryIndex: number;
+  background: string;
+  statusBarStyle: 'dark' | 'light';
 }
 
 export interface WebViewNativeProgressEvent extends WebViewNativeEvent {

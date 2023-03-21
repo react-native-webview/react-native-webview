@@ -1,10 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Button, View, Text } from 'react-native';
 
 import WebView from 'react-native-webview';
 
 const NativeWebpage = () => {
-  const [uri, setUri] = useState('https://opensea.io');
+  const [bg, setBg] = useState('white');
+  const [statusBarStyle, setStatusBarStyle] = useState('light');
+  const [uri, setUri] = useState('https://amazon.com');
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
 
@@ -18,27 +20,40 @@ const NativeWebpage = () => {
     ref.current?.goForward();
   };
 
+  const onLoadStart = ({ nativeEvent }) => {
+    console.log(nativeEvent);
+    setBg(nativeEvent.background);
+    setStatusBarStyle(nativeEvent.statusBarStyle);
+  };
+
   const onNavigationStateChange = (e) => {
     setCanGoBack(e.canGoBack);
     setCanGoForward(e.canGoForward);
     setUri(e.url);
   };
 
+  const history = useMemo(() => {
+    return ['https://google.com', 'https://yahoo.com', 'https://opensea.io'];
+  }, []);
+
   return (
     <View style={{ height: '100%' }}>
-      <View style={{ padding: 16, borderWidth: 1, borderColor: 'gray' }}>
-        <Text>{uri}</Text>
+      <Button
+        title="The Verge"
+        onPress={() => setUri('https://theverge.com')}
+      />
+      <View style={{ padding: 16, backgroundColor: bg }}>
+        <Text style={{ color: statusBarStyle === 'light' ? '#000' : '#fff' }}>
+          {uri}
+        </Text>
       </View>
       <WebView
         ref={ref}
         source={{ uri }}
         style={{ width: '100%', flex: 1, borderWidth: 1, borderColor: 'gray' }}
-        history={[
-          'https://google.com',
-          'https://yahoo.com',
-          'https://opensea.io',
-        ]}
+        history={history}
         onNavigationStateChange={onNavigationStateChange}
+        onLoadStart={onLoadStart}
         // blockAds={false}
       />
       <View

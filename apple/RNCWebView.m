@@ -959,14 +959,30 @@ static WKContentRuleList * _contentRuleList;
 
 - (NSMutableDictionary<NSString *, id> *)baseEvent
 {
-  NSDictionary *event = @{
-    @"url": _webView.URL.absoluteString ?: @"",
-    @"title": _webView.title ?: @"",
-    @"loading" : @(_webView.loading),
-    @"canGoBack": @(_webView.canGoBack),
-    @"canGoForward" : @(_webView.canGoForward),
-  };
-  return [[NSMutableDictionary alloc] initWithDictionary: event];
+    UIColor *background = [UIColor systemBackgroundColor];
+    if (@available(iOS 15.0, *)) {
+        background = _webView.themeColor ?: _webView.underPageBackgroundColor ?: [UIColor systemBackgroundColor];
+    }
+
+    const CGFloat *backgroundComponents = CGColorGetComponents(background.CGColor);
+
+    NSString *backgroundString = [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(backgroundComponents[0] * 255), lroundf(backgroundComponents[1] * 255), lroundf(backgroundComponents[2] * 255)];
+
+    CGFloat red, green, blue, alpha;
+    [background getRed:&red green:&green blue:&blue alpha:&alpha];
+    
+    CGFloat luminance = (0.299 * red + 0.587 * green + 0.114 * blue);
+    
+    NSDictionary *event = @{
+        @"url": _webView.URL.absoluteString ?: @"",
+        @"title": _webView.title ?: @"",
+        @"loading" : @(_webView.loading),
+        @"canGoBack": @(_webView.canGoBack),
+        @"canGoForward" : @(_webView.canGoForward),
+        @"background": backgroundString,
+        @"statusBarStyle": (luminance > 0.5) ? @"light" : @"dark"
+    };
+    return [[NSMutableDictionary alloc] initWithDictionary: event];
 }
 
 - (NSMutableDictionary<NSString *, id> *)baseEventWithHistory
