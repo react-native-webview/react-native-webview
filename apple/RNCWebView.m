@@ -465,39 +465,37 @@ RCTAutoInsetsProtocol>
     
     [self setBackgroundColor: _savedBackgroundColor];
     
-    if (!reusedWebViewInstance) {
 #if !TARGET_OS_OSX
-      _webView.scrollView.delegate = self;
+    _webView.scrollView.delegate = self;
 #endif // !TARGET_OS_OSX
-      _webView.UIDelegate = self;
-      _webView.navigationDelegate = self;
+    _webView.UIDelegate = self;
+    _webView.navigationDelegate = self;
 #if !TARGET_OS_OSX
-      if (_pullToRefreshEnabled) {
-        [self addPullToRefreshControl];
-      }
-      _webView.scrollView.scrollEnabled = _scrollEnabled;
-      _webView.scrollView.pagingEnabled = _pagingEnabled;
-      //For UIRefreshControl to work correctly, the bounces should always be true
-      _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
-      _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
-      _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
-      _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
+    if (_pullToRefreshEnabled) {
+      [self addPullToRefreshControl];
+    }
+    _webView.scrollView.scrollEnabled = _scrollEnabled;
+    _webView.scrollView.pagingEnabled = _pagingEnabled;
+    //For UIRefreshControl to work correctly, the bounces should always be true
+    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
+    _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
+    _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
+    _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
 #endif // !TARGET_OS_OSX
-      _webView.allowsLinkPreview = _allowsLinkPreview;
-      _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
-      
-      _webView.customUserAgent = _userAgent;
+    _webView.allowsLinkPreview = _allowsLinkPreview;
+    _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
+    
+    _webView.customUserAgent = _userAgent;
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-      if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-        _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
-      }
+    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+      _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
+    }
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-      if (@available(iOS 13.0, *)) {
-        _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
-      }
-#endif
+    if (@available(iOS 13.0, *)) {
+      _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
     }
+#endif
     
     // We have to remove the old observer via removeWKWebViewFromSuperView when reusing the WKWebView instance,
     // so whether we're reusing the instance or not, we always have to add the observer that references the new
