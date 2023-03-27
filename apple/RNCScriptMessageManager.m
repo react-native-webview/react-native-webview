@@ -34,19 +34,19 @@
 @implementation RNCScriptMessageManager
 
 + (id) sharedManager {
-    static RNCScriptMessageManager *_sharedManager = nil;
-    @synchronized(self) {
-      if(_sharedManager== nil) {
-        _sharedManager = [[super alloc] init];
-      }
-      return _sharedManager;
+  static RNCScriptMessageManager *_sharedManager = nil;
+  @synchronized(self) {
+    if(_sharedManager== nil) {
+      _sharedManager = [[super alloc] init];
     }
+    return _sharedManager;
+  }
 }
 
 - (NSMutableDictionary *)sharedMessageHandlerDictionary {
   if (!_sharedMessageHandlerDictionary) {
     _sharedMessageHandlerDictionary = [[NSMutableDictionary alloc] init];
-    }
+  }
   return _sharedMessageHandlerDictionary;
 }
 

@@ -9,20 +9,20 @@
 @implementation RNCWebViewMapManager
 
 + (id) sharedManager {
-    static RNCWebViewMapManager *_sharedManager = nil;
-    @synchronized(self) {
-      if(_sharedManager == nil) {
-        _sharedManager = [[super alloc] init];
-      }
-      return _sharedManager;
+  static RNCWebViewMapManager *_sharedManager = nil;
+  @synchronized(self) {
+    if(_sharedManager == nil) {
+      _sharedManager = [[super alloc] init];
     }
+    return _sharedManager;
+  }
 }
 
 - (NSMutableDictionary *)sharedRNCWebViewDictionary; {
   if (!_sharedRNCWebViewDictionary) {
     _sharedRNCWebViewDictionary = [[NSMutableDictionary alloc] init];
-    }
-    return _sharedRNCWebViewDictionary;
+  }
+  return _sharedRNCWebViewDictionary;
 }
 
 @end

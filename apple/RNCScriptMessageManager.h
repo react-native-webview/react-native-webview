@@ -11,8 +11,8 @@
 + (instancetype) sharedManager;
 - (NSMutableDictionary *)sharedMessageHandlerDictionary;
 - (void)addScriptMessageHandlerWithName:(NSString *)name
-                      withUserContentController: (WKUserContentController *)userContentController
-                      withWebViewKey: (NSString *)webViewKey;
+              withUserContentController: (WKUserContentController *)userContentController
+                         withWebViewKey: (NSString *)webViewKey;
 - (void)removeScriptMessageHandlerWithUserContentController: (WKUserContentController *)userContentController
                                              withWebViewKey: (NSString *)webViewKey;
 @end

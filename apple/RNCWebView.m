@@ -432,7 +432,7 @@ RCTAutoInsetsProtocol>
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
     NSMutableDictionary *sharedWKWebViewDictionary= [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
-      
+    
     if ([self shouldReuseWebView]) {
       WKWebView *webViewForKey = sharedWKWebViewDictionary[_webViewKey];
       if (webViewForKey != nil) {
@@ -446,7 +446,7 @@ RCTAutoInsetsProtocol>
     }
     
     bool reusedWebViewInstance = _webView != nil;
-
+    
     if (_webView == nil) {
 #if !TARGET_OS_OSX
       _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
@@ -454,13 +454,13 @@ RCTAutoInsetsProtocol>
       _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
     }
-      
+    
     if (_webViewKey != nil) {
-        NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-        sharedRNCWebViewDictionary[_webViewKey] = self;
-        if (_webView != nil) {
-          sharedWKWebViewDictionary[_webViewKey] = _webView;
-        }
+      NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+      sharedRNCWebViewDictionary[_webViewKey] = self;
+      if (_webView != nil) {
+        sharedWKWebViewDictionary[_webViewKey] = _webView;
+      }
     }
     
     [self setBackgroundColor: _savedBackgroundColor];
@@ -472,21 +472,21 @@ RCTAutoInsetsProtocol>
       _webView.UIDelegate = self;
       _webView.navigationDelegate = self;
 #if !TARGET_OS_OSX
-    if (_pullToRefreshEnabled) {
-      [self addPullToRefreshControl];
-    }
-    _webView.scrollView.scrollEnabled = _scrollEnabled;
-    _webView.scrollView.pagingEnabled = _pagingEnabled;
-    //For UIRefreshControl to work correctly, the bounces should always be true
-    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
-    _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
-    _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
-    _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
+      if (_pullToRefreshEnabled) {
+        [self addPullToRefreshControl];
+      }
+      _webView.scrollView.scrollEnabled = _scrollEnabled;
+      _webView.scrollView.pagingEnabled = _pagingEnabled;
+      //For UIRefreshControl to work correctly, the bounces should always be true
+      _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
+      _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
+      _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
+      _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
 #endif // !TARGET_OS_OSX
-    _webView.allowsLinkPreview = _allowsLinkPreview;
-    _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
-    
-    _webView.customUserAgent = _userAgent;
+      _webView.allowsLinkPreview = _allowsLinkPreview;
+      _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
+      
+      _webView.customUserAgent = _userAgent;
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
       if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
         _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
@@ -503,11 +503,11 @@ RCTAutoInsetsProtocol>
     // so whether we're reusing the instance or not, we always have to add the observer that references the new
     // RNCWebView instance.
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
-
+    
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
-      
+    
     if (!reusedWebViewInstance) {
       [self visitSource];
     }
@@ -542,14 +542,14 @@ RCTAutoInsetsProtocol>
   if (_webViewKey != nil) {
     NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
     RNCWebView *rncWebView = sharedRNCWebViewDictionary[_webViewKey];
-      
+    
     // When this view is being unmounted, only remove the WKWebView from the superview
     // if this RNCWebView is the "active" view.
     if (rncWebView == self) {
       [self removeWKWebViewFromSuperView:self];
     }
   }
-
+  
   [super removeFromSuperview];
 }
 
@@ -1031,7 +1031,7 @@ RCTAutoInsetsProtocol>
 
 
 + (NSMutableDictionary<NSString *, id>*)createEventFromMessage:(WKScriptMessage *_Nonnull)message
-        withMessageBodyKey: (NSString *_Nonnull)messageBodyKey withWebView:(WKWebView *)webView {
+                                            withMessageBodyKey: (NSString *_Nonnull)messageBodyKey withWebView:(WKWebView *)webView {
   NSMutableDictionary<NSString *, id> *event = [RNCWebView baseEventWithWebView:webView];
   [event addEntriesFromDictionary: @{messageBodyKey: message.body}];
   
@@ -1633,7 +1633,7 @@ didFinishNavigation:(WKNavigation *)navigation
 - (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
   [wkWebViewConfig.userContentController removeAllUserScripts];
   [self removeScriptHandlerForMessages:wkWebViewConfig.userContentController];
-
+  
   if(self.enableApplePay){
     if (self.postMessageScript){
       [self addScriptHandlerForMessages:wkWebViewConfig.userContentController];
@@ -1770,7 +1770,7 @@ didFinishNavigation:(WKNavigation *)navigation
     [[RNCScriptMessageManager sharedManager] addScriptMessageHandlerWithName:MessageHandlerName withUserContentController:userContentController withWebViewKey: _webViewKey];
   } else {
     [userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
-                                                                     name:MessageHandlerName];
+                                              name:MessageHandlerName];
   }
 }
 

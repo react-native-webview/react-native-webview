@@ -205,16 +205,16 @@ RCT_EXPORT_METHOD(injectJavaScriptWithWebViewKey:(nonnull NSString *)webViewKey
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, __unused NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
     NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
     WKWebView *wkWebView = sharedWKWebViewDictionary[webViewKey];
-
+    
     if (wkWebView != nil) {
       [wkWebView evaluateJavaScript:script completionHandler:nil];
       resolve(nil);
     } else {
       reject(
-        @"err",
-        [NSString stringWithFormat:@"Failed to inject JavaScript with webViewKey: %@. WKWebView is nil", webViewKey],
-        nil
-      );
+             @"err",
+             [NSString stringWithFormat:@"Failed to inject JavaScript with webViewKey: %@. WKWebView is nil", webViewKey],
+             nil
+             );
     }
   }];
 }
@@ -322,7 +322,7 @@ RCT_EXPORT_METHOD(releaseWebView:(nonnull NSString *)webViewKey)
     sharedWKWebViewDictionary[webViewKey] = nil;
     
     RNCWebView *rncWebView = sharedRNCWebViewDictionary[webViewKey];
-      
+    
     if (rncWebView != nil) {
       [rncWebView cleanUpWebView];
       sharedRNCWebViewDictionary[webViewKey] = nil;
