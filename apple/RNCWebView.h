@@ -115,10 +115,10 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 - (void)stopLoading;
 - (void)requestFocus;
 - (void)releaseWebView;
+- (void)cleanUpWebView;
 #if !TARGET_OS_OSX
 - (void)addPullToRefreshControl;
 - (void)pullToRefresh:(UIRefreshControl *_Nonnull)refreshControl;
-- (void)cleanUpWebView;
 #endif
 
 @end
