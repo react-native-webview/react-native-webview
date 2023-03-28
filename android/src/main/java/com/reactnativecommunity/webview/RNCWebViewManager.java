@@ -295,22 +295,23 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
   @ReactProp(name = "webViewKey")
   public void setWebViewKey(RNCWebView view, String webViewKey) {
     Map<String, WebView> internalWebViewMap = RNCWebViewMapManager.INSTANCE.getInternalWebViewMap();
-    Map<String, RNCWebView> rncWebViewMap = RNCWebViewMapManager.INSTANCE.getRncWebViewMap();
 
-    // If there is an existing RNCWebView that has an internal webview, re-attach it to this view
-    if (rncWebViewMap.containsKey(webViewKey)) {
-      RNCWebView existingView = rncWebViewMap.get(webViewKey);
-      InternalWebView existingWebView = existingView.detachWebView();
-      view.attachWebView(existingWebView);
-
-      // The chrome client was originally setup on instance creation but might be pointing to the wrong webview
-      // so it's reset here.
-      // Not entirely sure why there is a single instance of the webchrome client for all webviews?
-      setupWebChromeClient((ThemedReactContext) existingWebView.getContext(), existingWebView);
-
-    // If there is a detached internal webview attach it to this RNCWebView
-    } else if (internalWebViewMap.containsKey(webViewKey)) {
+    if (internalWebViewMap.containsKey(webViewKey)) {
       InternalWebView webView = (InternalWebView) internalWebViewMap.get(webViewKey);
+
+      RNCWebView existingRncWebView = (RNCWebView) webView.getParent();
+
+      // If the internal WebView is attached to an existing RNCWebView, first detach
+      // it from the existing RNCWebView.
+      if (existingRncWebView != null) {
+        existingRncWebView.detachWebView();
+
+        // The chrome client was originally setup on instance creation but might be pointing to the wrong webview
+        // so it's reset here.
+        // Not entirely sure why there is a single instance of the webchrome client for all webviews?
+        setupWebChromeClient((ThemedReactContext) existingRncWebView.getContext(), webView);
+      }
+
       view.attachWebView(webView);
     }
 
@@ -320,7 +321,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
       webView.setWebViewKey(webViewKey);
       RNCWebViewMapManager.INSTANCE.getViewIdMap().put(webView.getId(), view.getId());
       internalWebViewMap.put(webViewKey, webView);
-      rncWebViewMap.put(webViewKey, view);
     });
   }
 
@@ -872,7 +872,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mWebChromeClient = null;
       } else {
         view.removeWebViewFromParent();
-        RNCWebViewMapManager.INSTANCE.getRncWebViewMap().remove(webView.webViewKey);
         RNCWebViewMapManager.INSTANCE.getViewIdMap().remove(webView.getId());
       }
     });
