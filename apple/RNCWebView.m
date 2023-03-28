@@ -10,7 +10,6 @@
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
 #import "RNCWKWebViewMapManager.h"
-#import "RNCWebViewMapManager.h"
 #import "RNCScriptMessageManager.h"
 #import "ScriptMessageEventEmitter.h"
 
@@ -437,8 +436,8 @@ RCTAutoInsetsProtocol>
       WKWebView *webViewForKey = sharedWKWebViewDictionary[_webViewKey];
       if (webViewForKey != nil) {
         _webView = webViewForKey;
-        NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-        RNCWebView *rncWebView = sharedRNCWebViewDictionary[_webViewKey];
+        RNCWebView *rncWebView = webViewForKey.superview;
+
         if (rncWebView != nil) {
           [self removeWKWebViewFromSuperView:rncWebView];
         }
@@ -456,8 +455,6 @@ RCTAutoInsetsProtocol>
     }
     
     if (_webViewKey != nil) {
-      NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-      sharedRNCWebViewDictionary[_webViewKey] = self;
       if (_webView != nil) {
         sharedWKWebViewDictionary[_webViewKey] = _webView;
       }
@@ -538,14 +535,7 @@ RCTAutoInsetsProtocol>
   }
   
   if (_webViewKey != nil) {
-    NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-    RNCWebView *rncWebView = sharedRNCWebViewDictionary[_webViewKey];
-    
-    // When this view is being unmounted, only remove the WKWebView from the superview
-    // if this RNCWebView is the "active" view.
-    if (rncWebView == self) {
-      [self removeWKWebViewFromSuperView:self];
-    }
+    [self removeWKWebViewFromSuperView:self];
   }
   
   [super removeFromSuperview];
@@ -572,10 +562,6 @@ RCTAutoInsetsProtocol>
 {
   // If _webView is getting added to a new super view, we need to first both remove it from the old
   // superview and also remove the observer which can reference the old super view.
-  if (_webViewKey != nil) {
-    NSMutableDictionary *sharedRNCWebViewDictionary = [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
-    sharedRNCWebViewDictionary[_webViewKey] = nil;
-  }
   [_webView removeObserver:webViewObserver forKeyPath:@"estimatedProgress"];
   [_webView removeFromSuperview];
 }

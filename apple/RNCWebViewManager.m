@@ -11,7 +11,6 @@
 #import <React/RCTDefines.h>
 #import "RNCWebView.h"
 #import "RNCWKWebViewMapManager.h"
-#import "RNCWebViewMapManager.h"
 #import <WebKit/WebKit.h>
 
 @interface RNCWebViewManager () <RNCWebViewDelegate>
@@ -317,15 +316,15 @@ RCT_EXPORT_METHOD(releaseWebView:(nonnull NSString *)webViewKey)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, __unused NSDictionary<NSNumber *, RNCWebView *> *viewRegistry) {
     NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
-    NSMutableDictionary *sharedRNCWebViewDictionary= [[RNCWebViewMapManager sharedManager] sharedRNCWebViewDictionary];
+    
+    WKWebView *wkWebView = sharedWKWebViewDictionary[webViewKey];
     
     sharedWKWebViewDictionary[webViewKey] = nil;
     
-    RNCWebView *rncWebView = sharedRNCWebViewDictionary[webViewKey];
+    RNCWebView *rncWebView = wkWebView.superview;
     
     if (rncWebView != nil) {
       [rncWebView cleanUpWebView];
-      sharedRNCWebViewDictionary[webViewKey] = nil;
     }
   }];
 }
