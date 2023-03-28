@@ -11,7 +11,7 @@ export default class WebViewProxy implements IWebViewProxy {
     this.webViewKey = webViewKey;
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   injectJavaScript(_script: string): Promise<void> {
     // no-op
     return Promise.resolve();
