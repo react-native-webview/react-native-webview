@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {View, Button, Text} from 'react-native';
-import {WebView, releaseWebView, injectJavaScriptWithWebViewKey, addOnMessageListenerForWebViewKey} from 'react-native-webview';
+import {WebView, getWebViewProxy} from 'react-native-webview';
 import PortalGate from '../portals/PortalGate';
 import PortalProvider from '../portals/PortalProvider';
 import { PortalContext } from '../portals/PortalContext';
@@ -13,6 +13,8 @@ const IFRAME_WIDTH = 360;
 const PORTALS_PAGE = 0;
 const NONPORTALS_PAGE = 1;  
 const INCREMENT_SECONDS_COUNTER_MESSAGE = 'INCREMENT_SECONDS_COUNTER_MESSAGE';
+
+const webViewProxy = getWebViewProxy(WEB_VIEW_KEY);
 
 // based on https://dev.to/yezyilomo/global-state-management-in-react-with-global-variables-and-hooks-state-management-doesn-t-have-to-be-so-hard-2n2c
 function GlobalState(initialValue) {
@@ -109,7 +111,7 @@ export default function Portals() {
   const [pageNumber, setPageNumber] = React.useState(PORTALS_PAGE);
 
   React.useEffect(() => {
-    const subscription = addOnMessageListenerForWebViewKey(WEB_VIEW_KEY, (eventData) => {
+    const subscription = webViewProxy.addOnMessageListener((eventData) => {
       if (eventData.data === INCREMENT_SECONDS_COUNTER_MESSAGE) {
         secondsCounter.setValue(secondsCounter.getValue() + 1);
       }
@@ -163,23 +165,24 @@ function PortalGatesPage() {
           messagingWithWebViewKeyEnabled
         />
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [releaseCounter]);
 
   const teleportToBlueGate = React.useCallback(() => {
     teleport(gates, GREEN_GATE_NAME, undefined);
     teleport(gates, BLUE_GATE_NAME, webView);
-  }, [teleport, webView]);
+  }, [teleport, webView, gates]);
 
   const teleportToGreenGate = React.useCallback(() => {
     teleport(gates, BLUE_GATE_NAME, undefined);
     teleport(gates, GREEN_GATE_NAME, webView);
-  }, [teleport, webView])
+  }, [teleport, webView, gates])
 
   const release = React.useCallback(() => {
     teleport(gates, GREEN_GATE_NAME, undefined);
     teleport(gates, BLUE_GATE_NAME, undefined);
     setReleaseCounter(releaseCounter + 1);
-    releaseWebView(WEB_VIEW_KEY);
+    webViewProxy.releaseWebView();
   }, []);
 
   React.useEffect(() => {
@@ -212,7 +215,7 @@ function PortalGatesPage() {
 }
 
 const injectConsoleLogJavaScript = () => {
-  injectJavaScriptWithWebViewKey(WEB_VIEW_KEY,
+  webViewProxy.injectJavaScript(
     `
       (function() {
         console.log('running JavaScript injected from outside of WebView');
@@ -222,7 +225,7 @@ const injectConsoleLogJavaScript = () => {
 
 function NonPortalsPage() {
   const release = () => {
-    releaseWebView(WEB_VIEW_KEY);
+    webViewProxy.releaseWebView();
   };
 
   const [seconds] = useGlobalState(secondsCounter);
