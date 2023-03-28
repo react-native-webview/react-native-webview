@@ -1,8 +1,8 @@
 import { requireNativeComponent } from "react-native";
 import type { NativeWebViewAndroid } from "./WebViewTypes";
 
-const RNCWebView: typeof NativeWebViewAndroid = requireNativeComponent(
-  'RNCWebView',
+const RNCWebViewContainer: typeof NativeWebViewAndroid = requireNativeComponent(
+  'RNCWebViewContainer',
 );
 
-export default RNCWebView;
+export default RNCWebViewContainer;

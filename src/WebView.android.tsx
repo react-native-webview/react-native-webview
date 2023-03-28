@@ -13,7 +13,7 @@ import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codeg
 
 import invariant from 'invariant';
 
-import RNCWebView from "./WebViewNativeComponent.android";
+import RNCWebViewContainer from "./WebViewNativeComponent.android";
 import {
   defaultOriginWhitelist,
   defaultRenderError,
@@ -160,7 +160,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
 
 
   const NativeWebView
-    = (nativeConfig?.component as (typeof NativeWebViewAndroid | undefined)) || RNCWebView;
+    = (nativeConfig?.component as (typeof NativeWebViewAndroid | undefined)) || RNCWebViewContainer;
 
   const webView = <NativeWebView
     key="webViewKey"

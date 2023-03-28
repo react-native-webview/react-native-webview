@@ -158,20 +158,20 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   @ReactMethod
   public void releaseWebView(final String webViewKey) {
     UiThreadUtil.runOnUiThread(() -> {
-      RNCWebViewManager.InternalWebView webView = (RNCWebViewManager.InternalWebView) RNCWebViewMapManager.INSTANCE.getInternalWebViewMap().get(webViewKey);
+      RNCWebViewManager.RNCWebView webView = (RNCWebViewManager.RNCWebView) RNCWebViewMapManager.INSTANCE.getRncWebViewMap().get(webViewKey);
 
       if (webView == null) {
         FLog.w(TAG, "Failed to release webview with webViewKey: " + webViewKey);
         return;
       }
 
-      RNCWebView rncWebView = (RNCWebView) webView.getParent();
+      RNCWebViewContainer rncWebViewContainer = (RNCWebViewContainer) webView.getParent();
 
       // Detach internal webview from the wrapper RNCWebView
-      if (rncWebView != null) {
-        RNCWebViewManager.InternalWebView internalWebView = rncWebView.detachWebView();
-        if (internalWebView != webView) {
-          throw new IllegalStateException("internalWebViewMap has a mismatched webview with key: " + webViewKey);
+      if (rncWebViewContainer != null) {
+        RNCWebViewManager.RNCWebView rncWebView = rncWebViewContainer.detachWebView();
+        if (rncWebView != webView) {
+          throw new IllegalStateException("mismatched webview with key: " + webViewKey);
         }
       }
 
@@ -181,14 +181,14 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
         webView.cleanupCallbacksAndDestroy();
       }
 
-      RNCWebViewMapManager.INSTANCE.getInternalWebViewMap().remove(webViewKey);
+      RNCWebViewMapManager.INSTANCE.getRncWebViewMap().remove(webViewKey);
     });
   }
 
   @ReactMethod
   public void injectJavaScriptWithWebViewKey(final String webViewKey, final String script, final Promise promise) {
     UiThreadUtil.runOnUiThread(() -> {
-      RNCWebViewManager.InternalWebView webView = (RNCWebViewManager.InternalWebView) RNCWebViewMapManager.INSTANCE.getInternalWebViewMap().get(webViewKey);
+      RNCWebViewManager.RNCWebView webView = (RNCWebViewManager.RNCWebView) RNCWebViewMapManager.INSTANCE.getRncWebViewMap().get(webViewKey);
       if (webView != null) {
         webView.evaluateJavascriptWithFallback(script);
         promise.resolve(null);
