@@ -430,7 +430,7 @@ RCTAutoInsetsProtocol>
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
-    NSMutableDictionary *sharedWKWebViewDictionary= [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
+    NSMutableDictionary *sharedWKWebViewDictionary = [[RNCWKWebViewMapManager sharedManager] sharedWKWebViewDictionary];
     
     if ([self shouldReuseWebView]) {
       WKWebView *webViewForKey = sharedWKWebViewDictionary[_webViewKey];
