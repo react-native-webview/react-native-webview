@@ -72,6 +72,7 @@ const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
 const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
   (
     {
+      onBackgroundChange,
       javaScriptEnabled = true,
       cacheEnabled = true,
       originWhitelist = defaultOriginWhitelist,
@@ -211,6 +212,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       <NativeWebView
         key="webViewKey"
         {...otherProps}
+        onBackgroundChange={onBackgroundChange}
         javaScriptEnabled={javaScriptEnabled}
         cacheEnabled={cacheEnabled}
         useSharedProcessPool={useSharedProcessPool}

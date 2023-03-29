@@ -241,6 +241,8 @@ static WKContentRuleList * _contentRuleList;
 
 - (void)dealloc
 {
+    [_webView removeObserver:self forKeyPath:@"themeColor"];
+    [_webView removeObserver:self forKeyPath:@"underPageBackgroundColor"];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (@available(iOS 11.0, *)) {
         [self.webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
@@ -466,6 +468,11 @@ static WKContentRuleList * _contentRuleList;
 #endif // !TARGET_OS_OSX
         _webView.allowsLinkPreview = _allowsLinkPreview;
         [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
+        
+        // Listen to WebView background color changes
+        [_webView addObserver:self forKeyPath:@"themeColor" options:NSKeyValueObservingOptionNew context:nil];
+        [_webView addObserver:self forKeyPath:@"underPageBackgroundColor" options:NSKeyValueObservingOptionNew context:nil];
+        
         _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
         
         _webView.customUserAgent = _userAgent;
@@ -590,7 +597,21 @@ static WKContentRuleList * _contentRuleList;
             [event addEntriesFromDictionary:@{@"progress":[NSNumber numberWithDouble:self.webView.estimatedProgress]}];
             _onLoadingProgress(event);
         }
-    }else{
+    }
+    else if (([keyPath isEqualToString:@"themeColor"] || [keyPath isEqualToString:@"underPageBackgroundColor"]) && object == self.webView) {
+    
+        UIColor *themeColor = _webView.themeColor;
+        UIColor *underPageBackgroundColor = _webView.underPageBackgroundColor;
+        
+        UIColor *newBackgroundColor = themeColor ?: underPageBackgroundColor;
+        
+        if (newBackgroundColor) {
+            NSLog(@"Theme Color: %@", [self hexStringFromColor:themeColor]);
+            NSLog(@"Under Page Background Color: %@", [self hexStringFromColor:underPageBackgroundColor]);
+            _onBackgroundChange(@{@"background": [self hexStringFromColor:newBackgroundColor]});
+        }
+    }
+    else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
@@ -957,12 +978,28 @@ static WKContentRuleList * _contentRuleList;
 #endif // !TARGET_OS_OSX
 }
 
+- (NSString *)hexStringFromColor:(UIColor *)color {
+    if (!color) {
+        return @"null";
+    }
+    
+    CGFloat red, green, blue, alpha;
+    [color getRed:&red green:&green blue:&blue alpha:&alpha];
+    
+    return [NSString stringWithFormat:@"#%02lX%02lX%02lX",
+            lroundf(red * 255),
+            lroundf(green * 255),
+            lroundf(blue * 255)];
+}
+
 - (NSMutableDictionary<NSString *, id> *)baseEvent
 {
     UIColor *background = [UIColor systemBackgroundColor];
     if (@available(iOS 15.0, *)) {
         background = _webView.themeColor ?: _webView.underPageBackgroundColor ?: [UIColor systemBackgroundColor];
     }
+    
+    
     
     const CGFloat *backgroundComponents = CGColorGetComponents(background.CGColor);
     

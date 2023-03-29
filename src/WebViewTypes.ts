@@ -382,6 +382,7 @@ export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
 export interface IOSNativeWebViewProps
   extends Omit<CommonNativeWebViewProps, 'onShouldStartLoadWithRequest'> {
+  onBackgroundChange: (event: any) => void;
   history?: string[];
   allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;
@@ -443,6 +444,7 @@ export interface WindowsWebViewProps extends WebViewSharedProps {
 }
 
 export interface IOSWebViewProps extends WebViewSharedProps {
+  onBackgroundChange: (event: any) => void;
   history?: string[];
   /**
    * Does not store any data within the lifetime of the WebView.

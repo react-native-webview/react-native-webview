@@ -54,6 +54,7 @@ RCT_EXPORT_MODULE()
 }
 
 
+RCT_EXPORT_VIEW_PROPERTY(onBackgroundChange, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
 RCT_EXPORT_VIEW_PROPERTY(onFileDownload, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingStart, RCTDirectEventBlock)

@@ -37,6 +37,8 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 
 @interface RNCWebView : RCTView
 
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onBackgroundChange;
+
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
 @property (nonatomic, assign) BOOL messagingEnabled;

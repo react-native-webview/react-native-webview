@@ -4,6 +4,7 @@ import { Button, View, Text } from 'react-native';
 import WebView from 'react-native-webview';
 
 const NativeWebpage = () => {
+  console.log('here');
   const [bg, setBg] = useState('white');
   const [statusBarStyle, setStatusBarStyle] = useState('light');
   const [uri, setUri] = useState('https://amazon.com');
@@ -27,9 +28,13 @@ const NativeWebpage = () => {
   };
 
   const onNavigationStateChange = (e) => {
+    console.log('yoooo');
     setCanGoBack(e.canGoBack);
     setCanGoForward(e.canGoForward);
     setUri(e.url);
+  };
+  const onBackgroundChange = (e) => {
+    console.log(e.nativeEvent);
   };
 
   const history = useMemo(() => {
@@ -40,7 +45,7 @@ const NativeWebpage = () => {
     <View style={{ height: '100%' }}>
       <Button
         title="The Verge"
-        onPress={() => setUri('https://theverge.com')}
+        onPress={() => setUri('https://hackernews.com')}
       />
       <View style={{ padding: 16, backgroundColor: bg }}>
         <Text style={{ color: statusBarStyle === 'light' ? '#000' : '#fff' }}>
@@ -52,8 +57,9 @@ const NativeWebpage = () => {
         source={{ uri }}
         style={{ width: '100%', flex: 1, borderWidth: 1, borderColor: 'gray' }}
         // history={history}
-        // onNavigationStateChange={onNavigationStateChange}
+        onNavigationStateChange={onNavigationStateChange}
         // onLoadStart={onLoadStart}
+        onBackgroundChange={onBackgroundChange}
         // blockAds={false}
       />
       <View
