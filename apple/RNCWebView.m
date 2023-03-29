@@ -454,7 +454,7 @@ RCTAutoInsetsProtocol>
 #endif // !TARGET_OS_OSX
     }
     
-    if (_webViewKey != nil) {
+    if ([self shouldReuseWebView]) {
       if (_webView != nil) {
         sharedWKWebViewDictionary[_webViewKey] = _webView;
       }
@@ -529,12 +529,9 @@ RCTAutoInsetsProtocol>
 
 - (void)removeFromSuperview
 {
-  bool keepWebViewInstance = _webViewKey != nil;
-  if (!keepWebViewInstance) {
+  if (![self shouldReuseWebView]) {
     [self cleanUpWebView];
-  }
-  
-  if (_webViewKey != nil) {
+  } else {
     [self removeWKWebViewFromSuperView:self];
   }
   
