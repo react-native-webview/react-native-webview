@@ -2,14 +2,14 @@ import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'rea
 import {
   Image,
   View,
-  NativeModules,
   ImageSourcePropType,
+  HostComponent,
 } from 'react-native';
 import invariant from 'invariant';
 
-// @ts-expect-error react-native doesn't have this type
-import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import RNCWebView from "./WebViewNativeComponent.ios";
+import RNCWebView, {Commands, NativeProps} from "./RNCWebViewNativeComponent";
+import RNCWebViewModule from "./NativeRNCWebView";
+
 import {
   defaultOriginWhitelist,
   defaultRenderError,
@@ -19,18 +19,12 @@ import {
 import {
   IOSWebViewProps,
   DecelerationRateConstant,
-  NativeWebViewIOS,
-  ViewManager,
+  WebViewSourceUri,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
 
-const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
-
-const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
-});
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -44,8 +38,6 @@ const processDecelerationRate = (
   }
   return newDecelerationRate;
 };
-
-const RNCWebViewManager = NativeModules.RNCWebViewManager as ViewManager;
 
 const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
   const ref = useRef(value);
@@ -91,19 +83,15 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
   ...otherProps
 }, ref) => {
-  const webViewRef = useRef<NativeWebViewIOS | null>(null);
+  const webViewRef = useRef<React.ComponentRef<HostComponent<NativeProps>> | null>(null);
 
   const onShouldStartLoadWithRequestCallback = useCallback((
     shouldStart: boolean,
     _url: string,
     lockIdentifier = 0,
   ) => {
-    const viewManager
-      = (nativeConfig?.viewManager)
-      || RNCWebViewManager;
-
-    viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
-  }, [nativeConfig?.viewManager]);
+    RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
+  }, []);
 
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebWiewLogic({
     onNavigationStateChange,
@@ -122,17 +110,20 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   });
 
   useImperativeHandle(ref, () => ({
-    goForward: () => Commands.goForward(webViewRef.current),
-    goBack: () => Commands.goBack(webViewRef.current),
+    goForward: () => webViewRef.current && Commands.goForward(webViewRef.current),
+    goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
     reload: () => {
       setViewState(
         'LOADING',
-      ); Commands.reload(webViewRef.current)
+      );
+      if (webViewRef.current) {
+        Commands.reload(webViewRef.current)
+      }
     },
-    stopLoading: () => Commands.stopLoading(webViewRef.current),
-    postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
-    injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
-    requestFocus: () => Commands.requestFocus(webViewRef.current),
+    stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
+    postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
+    injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
+    requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
   }), [setViewState, webViewRef]);
 
 
@@ -148,9 +139,9 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   } else if (viewState === 'ERROR') {
     invariant(lastErrorEvent != null, 'lastErrorEvent expected to be non-null');
     otherView = (renderError || defaultRenderError)(
-      lastErrorEvent.domain,
-      lastErrorEvent.code,
-      lastErrorEvent.description,
+      lastErrorEvent?.domain,
+      lastErrorEvent?.code ?? 0,
+      lastErrorEvent?.description ?? '',
     );
   } else if (viewState !== 'IDLE') {
     console.error(`RNCWebView invalid state encountered: ${viewState}`);
@@ -162,8 +153,22 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   const decelerationRate = processDecelerationRate(decelerationRateProp);
 
   const NativeWebView
-  = (nativeConfig?.component as typeof NativeWebViewIOS | undefined)
+  = (nativeConfig?.component as typeof RNCWebView | undefined)
   || RNCWebView;
+
+  const sourceResolved = resolveAssetSource(source as ImageSourcePropType)
+  const newSource = typeof sourceResolved === "object" ? Object.entries(sourceResolved as WebViewSourceUri).reduce((prev, [currKey, currValue]) => {
+    return {
+      ...prev,
+      [currKey]: currKey === "headers" && currValue && typeof currValue === "object" ? Object.entries(currValue).map(
+        ([key, value]) => {
+          return {
+            name: key,
+            value
+          }
+        }) : currValue
+    }
+  }, {}) : sourceResolved
 
   const webView = (
     <NativeWebView
@@ -175,6 +180,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       textInteractionEnabled={textInteractionEnabled}
       decelerationRate={decelerationRate}
       messagingEnabled={typeof onMessageProp === 'function'}
+      messagingModuleName="" // android ONLY
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
       onLoadingProgress={onLoadingProgress}
@@ -188,15 +194,17 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
       injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
       injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
-      dataDetectorTypes={dataDetectorTypes}
+      dataDetectorTypes={!dataDetectorTypes || Array.isArray(dataDetectorTypes) ? dataDetectorTypes : [dataDetectorTypes]}
       allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
       allowsInlineMediaPlayback={allowsInlineMediaPlayback}
       incognito={incognito}
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
-      ref={webViewRef}
-      // TODO: find a better way to type this.
-      source={resolveAssetSource(source as ImageSourcePropType)}
+      newSource={newSource}
       style={webViewStyles}
+      hasOnFileDownload={!!onFileDownload}
+      ref={webViewRef}
+      // @ts-expect-error old arch only
+      source={sourceResolved}
       {...nativeConfig?.props}
     />
   );

@@ -21,6 +21,8 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: Install npm dependencies
         run: yarn --frozen-lockfile
+      - name: Install macos dependencies
+        run: yarn add:macos
       - name: Install Pods
         run: pod install
         working-directory: example/macos

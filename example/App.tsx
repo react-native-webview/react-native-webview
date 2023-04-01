@@ -104,8 +104,8 @@ const TESTS = {
   }
 };
 
-type Props = {};
-type State = {restarting: boolean; currentTest: Object};
+interface Props {}
+interface State {restarting: boolean; currentTest: Object}
 
 export default class App extends Component<Props, State> {
   state = {

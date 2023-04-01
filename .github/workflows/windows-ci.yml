@@ -4,35 +4,28 @@ on: [pull_request]
 jobs:
   run-windows-tests:
     name: Build & run tests
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout Code
 
     - name: Setup Node.js
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: '^14'
+        cache: 'yarn'
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.0.2
-
-    - name: Check node modules cache
-      uses: actions/cache@v1
-      id: yarn-cache
+      uses: microsoft/setup-msbuild@v1.1.3
       with:
-        path: ./node_modules
-        key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+        vs-version: '[17.0,)'
+        msbuild-architecture: x64
 
     - name: Install node modules
-      if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: yarn --pure-lockfile
 
     - name: yarn build
-      if: steps.yarn-cache.outputs.cache-hit == 'true'
       run: |
         yarn build
         yarn tsc
