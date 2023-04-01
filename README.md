@@ -5,7 +5,7 @@
 [![NPM Version](https://img.shields.io/npm/v/react-native-webview.svg?style=flat-square)](https://www.npmjs.com/package/react-native-webview)
 ![Npm Downloads](https://img.shields.io/npm/dm/react-native-webview.svg)
 
-**React Native WebView** is a modern, well-supported, WebView for React Native. It is intended to be a replacement for the built-in WebView (which was [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
+**React Native WebView** is a community maintained WebView component for React Native. It is intended to be a replacement for the built-in WebView (which was [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
 ### Maintainers
 
@@ -40,7 +40,6 @@ Read our [Getting Started Guide](docs/Getting-Started.md). If any step seems unc
 ### Versioning
 
 This project follows [semantic versioning](https://semver.org/). We do not hesitate to release breaking changes but they will be in a major version.
-
 
 ### Usage
 
