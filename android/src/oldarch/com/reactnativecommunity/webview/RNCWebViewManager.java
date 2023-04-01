@@ -47,6 +47,10 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         return mRNCWebViewManagerImpl.createViewInstance(context);
     }
 
+    public RNCWebView createViewInstance(ThemedReactContext context, RNCWebView webView) {
+      return mRNCWebViewManagerImpl.createViewInstance(context, webView);
+    }
+
     @ReactProp(name = "allowFileAccess")
     public void setAllowFileAccess(RNCWebView view, boolean value) {
         mRNCWebViewManagerImpl.setAllowFileAccess(view, value);
