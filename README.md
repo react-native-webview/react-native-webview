@@ -20,6 +20,8 @@ Windows and macOS are managed by Microsoft, notably:
 - [Alexander Sklar](https://github.com/asklar) ([Twitter @alexsklar](https://twitter.com/alexsklar)) from [React Native for Windows](https://microsoft.github.io/react-native-windows/)
 - [Chiara Mooney](https://github.com/chiaramooney) from [React Native for Windows @ Microsoft](https://microsoft.github.io/react-native-windows/)
 
+Shout-out to [Jamon Holmgren](https://github.com/jamonholmgren) from [Infinite Red](https://infinite.red) for helping a lot with the repo when he had more available time.
+
 ### Disclaimer
 
 Maintaining WebView is very complex, because it is often used for many different usecases (rendering svgs, pdfs, login flows, and much more). We also support many platforms and both architecture of react-native.
