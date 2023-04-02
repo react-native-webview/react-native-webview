@@ -482,7 +482,7 @@ In React Native WebView, you can set a custom header like this:
 
 This will set the header on the first load, but not on subsequent page navigations.
 
-In order to work around this, you can track the current URL, intercept new page loads, and navigate to them yourself ([original credit for this technique to Chirag Shah from Big Binary](https://blog.bigbinary.com/2016/07/26/passing-request-headers-on-each-webview-request-in-react-native.html)):
+In order to work around this, you can track the current URL, intercept new page loads, and navigate to them yourself ([original credit for this technique to Chirag Shah from Big Binary](https://www.bigbinary.com/blog/passing-request-headers-on-each-webview-request-in-react-native)):
 
 ```jsx
 const CustomHeaderWebView = (props) => {
