@@ -1,4 +1,4 @@
-#import <foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 #import <React/RCTLog.h>
 #import <WebKit/WebKit.h>
 
