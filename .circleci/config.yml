@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/code
   docker:
-    - image: cimg/node:14.17.6-browsers
+    - image: cimg/node:18.13.0-browsers
 
 version: 2
 jobs:
