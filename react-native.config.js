@@ -4,7 +4,6 @@ const project = (() => {
   try {
     const {
       androidManifestPath,
-      iosProjectPath,
       windowsProjectPath,
     } = require('react-native-test-app');
     return {
@@ -15,7 +14,7 @@ const project = (() => {
         ),
       },
       ios: {
-        project: iosProjectPath('example/ios'),
+        sourceDir: 'example/ios',
       },
       windows: fs.existsSync('example/windows/WebviewExample.sln') && {
         sourceDir: path.join('example', 'windows'),

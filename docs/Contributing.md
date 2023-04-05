@@ -59,8 +59,7 @@ The Windows example app will be built, the Metro bundler will launch, and the ex
 In a new `react-native init` project, do this:
 
 ```
-$ yarn add ../react-native-webview
-$ react-native link react-native-webview
+$ yarn add <path to local react-native-webview>
 ```
 
 You may run into a problem where the `jest-haste-map` module map says react-native was added twice:
@@ -83,11 +82,15 @@ And then re-run the packager:
 $ react-native start --reset-cache
 ```
 
-When you make a change, you'll probably need to unlink, remove, re-add, and re-link `react-native-webview`:
+You may also see a console warning about "Invalid hook call," followed by a render error that "null is not an object (evaluating 'dispatcher.useRef')." Resolving this is similar to the above, but this time remove `react-native-webview/node_modules/react`.
+
+(if you remove `react` before `react-native`, you may see another render error for "View config getter callback for component 'RNCWebView' must be a function," just remove `react-native` as well to fix this)
+
+When you make a change, you'll probably need to remove and re-add `react-native-webview`:
 
 ```
-$ react-native unlink react-native-webview && yarn remove react-native-webview
-$ yarn add ../react-native-webview && react-native link react-native-webview
+$ yarn remove react-native-webview
+$ yarn add ../react-native-webview
 ```
 
 ## Notes
