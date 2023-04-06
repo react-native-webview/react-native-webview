@@ -488,6 +488,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
 
   /**
    * The custom user agent string.
+   * @platform ios
    */
   userAgent?: string;
 
