@@ -223,6 +223,7 @@ export interface NativeProps extends ViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   javaScriptEnabled?: boolean;
+  webviewDebuggingEnabled?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
   onLoadingError: DirectEventHandler<WebViewErrorEvent>;
