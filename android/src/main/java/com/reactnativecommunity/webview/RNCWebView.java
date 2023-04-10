@@ -143,7 +143,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             dispatchEvent(
                     this,
                     new ContentSizeChangeEvent(
-                            this.getId(),
+                            RNCWebView.getId(this),
                             w,
                             h
                     )
@@ -326,7 +326,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     if (mCatalystInstance != null) {
                         mWebView.sendDirectMessage("onMessage", data);
                     } else {
-                        dispatchEvent(webView, new TopMessageEvent(webView.getId(), data));
+                        dispatchEvent(webView, new TopMessageEvent(RNCWebView.getId(webView), data));
                     }
                 }
             });
@@ -337,7 +337,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             if (mCatalystInstance != null) {
                 this.sendDirectMessage("onMessage", eventData);
             } else {
-                dispatchEvent(this, new TopMessageEvent(this.getId(), eventData));
+                dispatchEvent(this, new TopMessageEvent(RNCWebView.getId(this), eventData));
             }
         }
     }
@@ -365,7 +365,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
         if (mOnScrollDispatchHelper.onScrollChanged(x, y)) {
             ScrollEvent event = ScrollEvent.obtain(
-                    this.getId(),
+                    RNCWebView.getId(this),
                     ScrollEventType.SCROLL,
                     x,
                     y,
@@ -382,7 +382,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     protected void dispatchEvent(WebView webView, Event event) {
         ThemedReactContext reactContext = getThemedReactContext();
-        int reactTag = webView.getId();
+        int reactTag = RNCWebView.getId(webView);
         UIManagerHelper.getEventDispatcherForReactTag(reactContext, reactTag).dispatchEvent(event);
     }
 
@@ -401,6 +401,13 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
   public ThemedReactContext getThemedReactContext() {
     return (ThemedReactContext) this.getContext();
+  }
+
+  /**
+   * A helper to get react tag id by given WebView
+   */
+  public static int getId(WebView webView) {
+    return ((View) webView.getParent()).getId();
   }
 
   protected class RNCWebViewBridge {
