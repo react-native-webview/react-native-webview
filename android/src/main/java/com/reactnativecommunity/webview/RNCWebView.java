@@ -309,6 +309,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
    * A helper to get react tag id by given WebView
    */
   public static int getId(WebView webView) {
+    if (webView.getParent() == null) {
+      return -1;
+    }
     return ((View) webView.getParent()).getId();
   }
 
