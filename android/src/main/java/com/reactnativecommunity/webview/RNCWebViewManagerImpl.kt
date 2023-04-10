@@ -714,6 +714,9 @@ class RNCWebViewManagerImpl {
  */
 class RNCWebViewWrapper(context: Context, webView: RNCWebView) : FrameLayout(context) {
   init {
+    // We make the WebView as transparent on top of the container,
+    // and let React Native sets background color for the container.
+    webView.setBackgroundColor(Color.TRANSPARENT)
     addView(webView)
   }
 
