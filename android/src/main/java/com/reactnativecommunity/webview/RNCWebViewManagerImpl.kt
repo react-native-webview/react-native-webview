@@ -705,20 +705,3 @@ class RNCWebViewManagerImpl {
         RNCWebView.setWebContentsDebuggingEnabled(enabled)
     }
 }
-
-/**
- * A [FrameLayout] container to hold the [RNCWebView].
- * We need this to prevent WebView crash when the WebView is out of viewport and
- * [com.facebook.react.views.view.ReactViewGroup] clips the canvas.
- * The WebView will then create an empty offscreen surface and NPE.
- */
-class RNCWebViewWrapper(context: Context, webView: RNCWebView) : FrameLayout(context) {
-  init {
-    // We make the WebView as transparent on top of the container,
-    // and let React Native sets background color for the container.
-    webView.setBackgroundColor(Color.TRANSPARENT)
-    addView(webView)
-  }
-
-  val webView: RNCWebView = getChildAt(0) as RNCWebView
-}
