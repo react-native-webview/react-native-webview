@@ -440,6 +440,13 @@ RCTAutoInsetsProtocol>
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
     _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 
+#ifdef DEBUG
+    // https://webkit.org/blog/13936/enabling-the-inspection-of-web-content-in-apps/
+    if (@available(macOS 13.3, iOS 16.4, tvOS 16.4, *)) {
+      webView.inspectable = YES;
+    }
+#endif
+
     _webView.customUserAgent = _userAgent;
 
 #if !TARGET_OS_OSX
