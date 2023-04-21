@@ -31,7 +31,7 @@ The Android example app will built, the Metro Bundler will launch, and the examp
 #### For iOS:
 
 ```sh
-pod install --project-directory=ios
+cd example; pod install --project-directory=ios
 yarn ios
 ```
 
@@ -40,7 +40,8 @@ The iOS example app will be built, the Metro bundler will launch, and the exampl
 #### For macOS:
 
 ```sh
-pod install --project-directory=macos
+yarn add:macos
+cd example; pod install --project-directory=macos
 yarn macos
 ```
 
