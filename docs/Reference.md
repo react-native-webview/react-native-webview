@@ -1382,7 +1382,7 @@ Example:
 
 ---
 
-### `mediaCapturePermissionGrantType`
+### `mediaCapturePermissionGrantType`[⬆](#props-index)
 
 This property specifies how to handle media capture permission requests. Defaults to `prompt`, resulting in the user being prompted repeatedly. Available on iOS 15 and later.
 
@@ -1408,7 +1408,7 @@ Example:
 
 ---
 
-### `autoManageStatusBarEnabled`
+### `autoManageStatusBarEnabled`[⬆](#props-index)
 
 If set to `true`, the status bar will be automatically hidden/shown by WebView, specifically when full screen video is being watched. If `false`, WebView will not manage the status bar at all. The default value is `true`.
 
@@ -1422,7 +1422,7 @@ Example:
 <WebView autoManageStatusBarEnabled={false} />
 ```
 
-### `setSupportMultipleWindows`
+### `setSupportMultipleWindows`[⬆](#props-index)
 
 Sets whether the WebView supports multiple windows. See [Android documentation]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') for more information.
 Setting this to false can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
@@ -1437,7 +1437,7 @@ Example:
 <WebView setSupportMultipleWindows={false} />
 ```
 
-### `enableApplePay`
+### `enableApplePay`[⬆](#props-index)
 
 A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support. Once set, websites will be able to invoke Apple Pay from React Native Webview.
 This comes with a cost features like [`injectJavaScript`](Reference.md#injectjavascriptstr), html5 History, [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled), [`injectedJavaScript`](Reference.md#injectedjavascript), [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded) will not work  See [Apple Pay Release Note](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API).
@@ -1457,7 +1457,7 @@ Example:
 <WebView enableApplePay={true} />
 ```
 
-### `forceDarkOn`
+### `forceDarkOn`[⬆](#props-index)
 
 Configuring Dark Theme
 
@@ -1474,7 +1474,8 @@ Example:
 ```javascript
 <WebView forceDarkOn={false} />
 ```
-### `menuItems`
+
+### `menuItems`[⬆](#props-index)
 
 An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
 
@@ -1488,7 +1489,7 @@ Example:
 <WebView menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]} />
 ```
 
-### `onCustomMenuSelection`
+### `onCustomMenuSelection`[⬆](#props-index)
 
 Function called when a custom menu item is selected.  It receives a Native event, which includes three custom keys: `label`, `key` and `selectedText`.
 
@@ -1507,7 +1508,7 @@ Function called when a custom menu item is selected.  It receives a Native event
 />
 ```
 
-### `basicAuthCredential`
+### `basicAuthCredential`[⬆](#props-index)
 
 An object that specifies the credentials of a user to be used for basic authentication.
 
@@ -1518,7 +1519,7 @@ An object that specifies the credentials of a user to be used for basic authenti
 | ------ | -------- |
 | object | No       |
 
-### `useWebView2`
+### `useWebView2`[⬆](#props-index)
 
 Use WinUI WebView2 control instead of WebView control as the native webview. The WebView2 control is a WinUI control that renders web content using the Microsoft Edge (Chromium) rendering engine. Option can be toggled at runtime and supports Fast Refresh.
 
@@ -1532,7 +1533,7 @@ Example:
 <WebView useWebView2={true} />
 ```
 
-### `minimumFontSize`
+### `minimumFontSize`[⬆](#props-index)
 
 Android enforces a minimum font size based on this value. A non-negative integer between 1 and 72. Any number outside the specified range will be pinned. Default value is 8. If you are using smaller font sizes and are having trouble fitting the whole window onto one screen, try setting this to a smaller value.
 
@@ -1546,7 +1547,7 @@ Example:
 <WebView minimumFontSize={1} />
 ```
 
-### `downloadingMessage`
+### `downloadingMessage`[⬆](#props-index)
 
 This is the message that is shown in the Toast when downloading a file via WebView. Default message is "Downloading".
 
@@ -1554,7 +1555,7 @@ This is the message that is shown in the Toast when downloading a file via WebVi
 | ------ | -------- | -------- |
 | string | No       | Android  |
 
-### `lackPermissionToDownloadMessage`
+### `lackPermissionToDownloadMessage`[⬆](#props-index)
 
 This is the message that is shown in the Toast when the webview is unable to download a file. Default message is "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.".
 
@@ -1562,7 +1563,7 @@ This is the message that is shown in the Toast when the webview is unable to dow
 | ------ | -------- | -------- |
 | string | No       | Android  |
 
-### `allowsProtectedMedia`
+### `allowsProtectedMedia`[⬆](#props-index)
 
 Whether or not the Webview can play media protected by DRM. Default is false.
 /!\ Setting this to false won't revoke the permission already granted to the current webpage. In order to do so, you'd have to reload the page as well. /!\
