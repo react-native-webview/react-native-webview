@@ -87,6 +87,7 @@ This document lays out the current public properties and methods for the React N
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
+- [`webviewDebuggingEnabled`](Reference.md#webviewDebuggingEnabled)
 
 ## Methods Index
 
@@ -1571,6 +1572,15 @@ Whether or not the Webview can play media protected by DRM. Default is false.
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | Android  |
+
+### `webviewDebuggingEnabled`[⬆](#props-index)
+
+Whether or not the webview can be debugged remotely using Safari / Chrome.
+Default is false. Supported on iOS as of 16.4, previous versions always allow debugging by default.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS & Android  |
 
 ## Methods
 
