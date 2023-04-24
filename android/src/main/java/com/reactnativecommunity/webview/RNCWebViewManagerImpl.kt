@@ -29,6 +29,8 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
 
+val invalidCharRegex = "[\\\\/%\"]".toRegex()
+
 
 class RNCWebViewManagerImpl {
     companion object {
@@ -98,6 +100,10 @@ class RNCWebViewManagerImpl {
                 return@DownloadListener
             }
             val fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
+
+            // Sanitize filename by replacing invalid characters with "_"
+            fileName = fileName.replace(invalidCharRegex, "_")
+
             val downloadMessage = "Downloading $fileName"
 
             //Attempt to add cookie, if it exists
