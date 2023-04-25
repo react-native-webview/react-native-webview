@@ -99,7 +99,7 @@ class RNCWebViewManagerImpl {
                 Log.w(TAG, "Unsupported URI, aborting download", e)
                 return@DownloadListener
             }
-            val fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
+            var fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
 
             // Sanitize filename by replacing invalid characters with "_"
             fileName = fileName.replace(invalidCharRegex, "_")
