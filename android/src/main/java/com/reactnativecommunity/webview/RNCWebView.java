@@ -4,10 +4,14 @@ import androidx.annotation.Nullable;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -28,6 +32,7 @@ import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.scroll.OnScrollDispatchHelper;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
@@ -36,6 +41,8 @@ import com.reactnativecommunity.webview.events.TopMessageEvent;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
 
 public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
@@ -133,6 +140,62 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     )
             );
         }
+    }
+  protected @Nullable
+  List<Map<String, String>> menuItems;
+
+@Override
+    public ActionMode startActionMode(ActionMode.Callback callback, int type) {
+      if(menuItems == null ){
+        return super.startActionMode(callback, type);
+      }
+
+      return super.startActionMode(new ActionMode.Callback2() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+          for (int i = 0; i < menuItems.size(); i++) {
+            menu.add(Menu.NONE, i, i, (menuItems.get(i)).get("label"));
+          }
+          return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+          return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+          WritableMap wMap = Arguments.createMap();
+          RNCWebView.this.evaluateJavascript("", "");
+          Map<String, String> menuItemMap = menuItems.get(item.getItemId());
+          wMap.putString("label", menuItemMap.get("label"));
+          wMap.putString("key", menuItemMap.get("key"));
+          wMap.putString("selectedText", selectionText);
+          ThemedReactContext reactContext = getThemedReactContext();
+          reactContext
+            .getJSModule(RCTEventEmitter.class)
+            .receiveEvent(getId(), "customMenuSelection", wMap);
+          mode.finish();
+          return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+          mode = null;
+        }
+
+        @Override
+        public void onGetContentRect (ActionMode mode,
+                View view,
+                Rect outRect){
+            if (callback instanceof ActionMode.Callback2) {
+                ((ActionMode.Callback2) callback).onGetContentRect(mode, view, outRect);
+            } else {
+                super.onGetContentRect(mode, view, outRect);
+            }
+          }
+      }, type);
     }
 
     @Override
