@@ -37,8 +37,12 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.scroll.OnScrollDispatchHelper;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
+import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -142,20 +146,25 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             );
         }
     }
-  protected @Nullable
-  List<Map<String, String>> menuItems;
 
-@Override
+    protected @Nullable
+    List<Map<String, String>> menuCustomItems;
+
+    public void setMenuCustomItems(List<Map<String, String>> menuCustomItems) {
+      this.menuCustomItems = menuCustomItems;
+    }
+
+    @Override
     public ActionMode startActionMode(ActionMode.Callback callback, int type) {
-      if(menuItems == null ){
+      if(menuCustomItems == null ){
         return super.startActionMode(callback, type);
       }
 
       return super.startActionMode(new ActionMode.Callback2() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-          for (int i = 0; i < menuItems.size(); i++) {
-            menu.add(Menu.NONE, i, i, (menuItems.get(i)).get("label"));
+          for (int i = 0; i < menuCustomItems.size(); i++) {
+            menu.add(Menu.NONE, i, i, (menuCustomItems.get(i)).get("label"));
           }
           return true;
         }
@@ -169,18 +178,19 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
           WritableMap wMap = Arguments.createMap();
           RNCWebView.this.evaluateJavascript(
-            "(function(){return window.getSelection().toString()})()",
+            "(function(){return {selection: window.getSelection().toString()} })()",
             new ValueCallback<String>() {
               @Override
-              public void onReceiveValue(String selectionText) {
-                Map<String, String> menuItemMap = menuItems.get(item.getItemId());
+              public void onReceiveValue(String selectionJson) {
+                Map<String, String> menuItemMap = menuCustomItems.get(item.getItemId());
                 wMap.putString("label", menuItemMap.get("label"));
                 wMap.putString("key", menuItemMap.get("key"));
+                String selectionText = "";
+                try {
+                  selectionText = new JSONObject(selectionJson).getString("selection");
+                } catch (JSONException ignored) {}
                 wMap.putString("selectedText", selectionText);
-                ThemedReactContext reactContext = getThemedReactContext();
-                reactContext
-                    .getJSModule(RCTEventEmitter.class)
-                    .receiveEvent(getId(), "customMenuSelection", wMap);
+                dispatchEvent(RNCWebView.this, new TopCustomMenuSelectionEvent(RNCWebView.this.getId(), wMap));
                 mode.finish();
               }
             }

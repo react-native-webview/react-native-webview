@@ -14,6 +14,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.viewmanagers.RNCWebViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNCWebViewManagerInterface;
 import com.facebook.react.views.scroll.ScrollEventType;
+import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
@@ -205,6 +206,12 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     }
 
     @Override
+    @ReactProp(name = "menuItems")
+    public void setMenuItems(RNCWebView view, @Nullable ReadableArray items) {
+        mRNCWebViewManagerImpl.setMenuCustomItems(view, items);
+    }
+
+    @Override
     @ReactProp(name = "messagingEnabled")
     public void setMessagingEnabled(RNCWebView view, boolean value) {
         mRNCWebViewManagerImpl.setMessagingEnabled(view, value);
@@ -377,9 +384,6 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     public void setHasOnFileDownload(RNCWebView view, boolean value) {}
 
     @Override
-    public void setMenuItems(RNCWebView view, ReadableArray value) {}
-
-    @Override
     public void setMediaCapturePermissionGrantType(RNCWebView view, @Nullable String value) {}
     /* !iOS PROPS - no implemented here */
 
@@ -488,6 +492,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
         export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
         export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
         export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
+        export.put(TopCustomMenuSelectionEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomMenuSelection"));
         return export;
     }
 
