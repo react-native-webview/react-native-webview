@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -167,16 +168,23 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
           WritableMap wMap = Arguments.createMap();
-          RNCWebView.this.evaluateJavascript("", "");
-          Map<String, String> menuItemMap = menuItems.get(item.getItemId());
-          wMap.putString("label", menuItemMap.get("label"));
-          wMap.putString("key", menuItemMap.get("key"));
-          wMap.putString("selectedText", selectionText);
-          ThemedReactContext reactContext = getThemedReactContext();
-          reactContext
-            .getJSModule(RCTEventEmitter.class)
-            .receiveEvent(getId(), "customMenuSelection", wMap);
-          mode.finish();
+          RNCWebView.this.evaluateJavascript(
+            "(function(){return window.getSelection().toString()})()",
+            new ValueCallback<String>() {
+              @Override
+              public void onReceiveValue(String selectionText) {
+                Map<String, String> menuItemMap = menuItems.get(item.getItemId());
+                wMap.putString("label", menuItemMap.get("label"));
+                wMap.putString("key", menuItemMap.get("key"));
+                wMap.putString("selectedText", selectionText);
+                ThemedReactContext reactContext = getThemedReactContext();
+                reactContext
+                    .getJSModule(RCTEventEmitter.class)
+                    .receiveEvent(getId(), "customMenuSelection", wMap);
+                mode.finish();
+              }
+            }
+          );
           return true;
         }
 
