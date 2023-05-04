@@ -1121,6 +1121,26 @@ RCTAutoInsetsProtocol>
     decisionHandler(WKPermissionDecisionPrompt);
   }
 }
+- (void)                         webView:(WKWebView *)webView
+  requestDeviceOrientationAndMotionPermissionForOrigin:(WKSecurityOrigin *)origin
+                        initiatedByFrame:(WKFrameInfo *)frame
+                         decisionHandler:(void (^)(WKPermissionDecision decision))decisionHandler {
+  if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt || _mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny) {
+    if ([origin.host isEqualToString:webView.URL.host]) {
+      decisionHandler(WKPermissionDecisionGrant);
+    } else {
+      WKPermissionDecision decision = _mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt ? WKPermissionDecisionPrompt : WKPermissionDecisionDeny;
+      decisionHandler(decision);
+    }
+  } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Deny) {
+    decisionHandler(WKPermissionDecisionDeny);
+  } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Grant) {
+    decisionHandler(WKPermissionDecisionGrant);
+  } else {
+    decisionHandler(WKPermissionDecisionPrompt);
+  }
+}
+
 #endif
 
 #if !TARGET_OS_OSX
