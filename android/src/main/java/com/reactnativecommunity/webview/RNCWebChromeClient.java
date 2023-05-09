@@ -311,7 +311,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         String[] acceptTypes = fileChooserParams.getAcceptTypes();
         boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
 
-        return this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple);
+        return this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple, fileChooserParams.isCaptureEnabled());
     }
 
     @Override
