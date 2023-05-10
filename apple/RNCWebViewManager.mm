@@ -203,6 +203,7 @@ QUICK_RCT_EXPORT_COMMAND_METHOD(requestFocus)
 
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(postMessage, message:(NSString *)message, message)
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(injectJavaScript, script:(NSString *)script, script)
+QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(injectJavaScriptBeforeContentLoaded, script:(NSString *)script, script)
 
 RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart
                                         lockIdentifier:(double)lockIdentifier)

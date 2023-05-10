@@ -109,6 +109,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
     postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
+    injectJavaScriptBeforeContentLoaded: (data: string) => webViewRef.current && Commands.injectJavaScriptBeforeContentLoaded(webViewRef.current, data),
     requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
     clearFormData: () => webViewRef.current && Commands.clearFormData(webViewRef.current),
     clearCache: (includeDiskFiles: boolean) => webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),

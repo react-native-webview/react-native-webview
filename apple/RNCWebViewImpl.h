@@ -127,6 +127,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 + (void)setCustomCertificatesForHost:(nullable NSDictionary *)certificates;
 - (void)postMessage:(NSString *_Nullable)message;
 - (void)injectJavaScript:(NSString *_Nullable)script;
+- (void)injectJavaScriptBeforeContentLoaded:(NSString *_Nullable)script;
 - (void)goForward;
 - (void)goBack;
 - (void)reload;

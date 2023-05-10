@@ -23,7 +23,7 @@ import {
 import styles from './WebView.styles';
 
 const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'injectJavaScriptBeforeContentLoaded', 'requestFocus', 'postMessage', 'loadUrl'],
 });
 
 const { resolveAssetSource } = Image;
@@ -101,6 +101,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
     stopLoading: () => Commands.stopLoading(webViewRef.current),
     postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
+    injectJavaScriptBeforeContentLoaded: (data: string) => Commands.injectJavaScriptBeforeContentLoaded(webViewRef.current, data),
     requestFocus: () => Commands.requestFocus(webViewRef.current),
   }), [setViewState, webViewRef]);
 

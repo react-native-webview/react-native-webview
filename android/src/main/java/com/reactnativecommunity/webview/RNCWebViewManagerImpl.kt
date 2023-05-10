@@ -273,6 +273,7 @@ class RNCWebViewManagerImpl {
     val COMMAND_INJECT_JAVASCRIPT = 6
     val COMMAND_LOAD_URL = 7
     val COMMAND_FOCUS = 8
+    val COMMAND_INJECT_JAVASCRIPT_BEFORE_CONTENT_LOADED = 9
 
     // android commands
     val COMMAND_CLEAR_FORM_DATA = 1000
@@ -289,6 +290,7 @@ class RNCWebViewManagerImpl {
         .put("injectJavaScript", COMMAND_INJECT_JAVASCRIPT)
         .put("loadUrl", COMMAND_LOAD_URL)
         .put("requestFocus", COMMAND_FOCUS)
+        .put("injectJavaScriptBeforeContentLoaded", COMMAND_INJECT_JAVASCRIPT_BEFORE_CONTENT_LOADED)
         .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
         .put("clearCache", COMMAND_CLEAR_CACHE)
         .put("clearHistory", COMMAND_CLEAR_HISTORY)
@@ -321,6 +323,7 @@ class RNCWebViewManagerImpl {
           throw RuntimeException(e)
         }
         "injectJavaScript" -> webView.evaluateJavascriptWithFallback(args.getString(0))
+        "injectJavaScriptBeforeContentLoaded" -> setInjectedJavaScriptBeforeContentLoaded(webView, args.getString(0))
         "loadUrl" -> {
           if (args == null) {
             throw RuntimeException("Arguments for loading an url are null!")

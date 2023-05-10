@@ -466,6 +466,10 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
     [_view injectJavaScript:javascript];
 }
 
+- (void)injectJavaScriptBeforeContentLoaded:(nonnull NSString *)javascript {
+    [_view injectJavaScriptBeforeContentLoaded:javascript];
+}
+
 - (void)loadUrl:(nonnull NSString *)url {
     // android only
 }

@@ -1394,6 +1394,11 @@ didFinishNavigation:(WKNavigation *)navigation
   [self evaluateJS: script thenCall: nil];
 }
 
+- (void)injectJavaScriptBeforeContentLoaded:(NSString *)script
+{
+  [self setInjectedJavaScriptBeforeContentLoaded: script];
+}
+
 - (void)goForward
 {
   [_webView goForward];

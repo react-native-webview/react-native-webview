@@ -29,7 +29,7 @@ import {
 import styles from './WebView.styles';
 
 const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'injectJavaScriptBeforeContentLoaded', 'requestFocus', 'postMessage', 'loadUrl'],
 });
 const { resolveAssetSource } = Image;
 

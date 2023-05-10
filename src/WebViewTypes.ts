@@ -20,6 +20,7 @@ type WebViewCommands =
   | 'stopLoading'
   | 'postMessage'
   | 'injectJavaScript'
+  | 'injectJavaScriptBeforeContentLoaded'
   | 'loadUrl'
   | 'requestFocus';
 

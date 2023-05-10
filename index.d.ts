@@ -25,12 +25,17 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     /**
      * Stop loading the current page.
      */
-    stopLoading(): void;
+    stopLoading: () => void;
 
     /**
      * Executes the JavaScript string.
      */
     injectJavaScript: (script: string) => void;
+
+    /**
+     * Sets the JavaScript to be injected when the webpage loads.
+     */
+    injectJavaScriptBeforeContentLoaded: (script: string) => void;
 
     /**
      * Focuses on WebView redered page.

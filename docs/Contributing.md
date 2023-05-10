@@ -31,6 +31,7 @@ The Android example app will built, the Metro Bundler will launch, and the examp
 #### For iOS:
 
 ```sh
+cd example
 pod install --project-directory=ios
 yarn ios
 ```

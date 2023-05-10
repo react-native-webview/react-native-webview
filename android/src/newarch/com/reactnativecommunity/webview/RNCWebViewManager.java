@@ -416,6 +416,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
   }
 
   @Override
+  public void injectJavaScriptBeforeContentLoaded(RNCWebView view, String javascript) {
+    mRNCWebViewManagerImpl.setInjectedJavaScriptBeforeContentLoaded(view, value);
+  }
+
+  @Override
   public void requestFocus(RNCWebView view) {
       view.requestFocus();
   }
