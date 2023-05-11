@@ -417,7 +417,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
 
   @Override
   public void injectJavaScriptBeforeContentLoaded(RNCWebView view, String javascript) {
-    mRNCWebViewManagerImpl.setInjectedJavaScriptBeforeContentLoaded(view, value);
+    mRNCWebViewManagerImpl.setInjectedJavaScriptBeforeContentLoaded(view, javascript);
   }
 
   @Override
