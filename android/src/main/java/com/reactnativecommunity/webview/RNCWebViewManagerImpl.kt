@@ -478,6 +478,10 @@ class RNCWebViewManagerImpl {
         view.injectedJavaScriptBeforeContentLoadedForMainFrameOnly = value
     }
 
+    fun setInjectJSObject(view: RNCWebView, value: String?) {
+        view.injectJSObject(value)
+    }
+
     fun setJavaScriptCanOpenWindowsAutomatically(view: RNCWebView, value: Boolean) {
         view.settings.javaScriptCanOpenWindowsAutomatically = value
     }

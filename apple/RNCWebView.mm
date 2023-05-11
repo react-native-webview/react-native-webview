@@ -415,6 +415,10 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }
     }
 #endif
+
+    if (oldViewProps.injectedJavaScriptBeforeContentLoaded != newViewProps.injectedJavaScriptBeforeContentLoaded) {
+        [_view setInjectedJavaScriptBeforeContentLoaded: RCTNSStringFromString(newViewProps.injectedJavaScriptBeforeContentLoaded)];
+    }
     
     NSMutableDictionary* source = [[NSMutableDictionary alloc] init];
     if (!newViewProps.newSource.uri.empty()) {

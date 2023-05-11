@@ -162,6 +162,7 @@ export interface NativeProps extends ViewProps {
   thirdPartyCookiesEnabled?: boolean;
   // Workaround to watch if listener if defined
   hasOnScroll?: boolean;
+  injectJSObject?: string;
   // !Android only
 
   // iOS only
