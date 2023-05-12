@@ -374,7 +374,6 @@ By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the J
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
 > Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
 
-
 #### The `injectJavaScript` method
 
 While convenient, the downside to the previously mentioned `injectedJavaScript` prop is that it only runs once. That's why we also expose a method on the webview ref called `injectJavaScript` (note the slightly different name!).
