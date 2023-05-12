@@ -1219,9 +1219,4 @@ export interface WebViewSharedProps extends ViewProps {
    * An object that specifies the credentials of a user to be used for basic authentication.
    */
   basicAuthCredential?: BasicAuthCredential;
-
-  /**
-   * Inject a JavaScript object to be accessed as a JSON string via JavaScript in the WebView.
-   */
-  injectJavaScriptObject?: object;
 }

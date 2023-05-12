@@ -366,7 +366,7 @@ export default class App extends Component {
 This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes.
 
 > **Warning**
-> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)). Consider using `injectJavaScriptObject` instead.
+> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)).
 
 By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform. However, although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
 
@@ -374,48 +374,6 @@ By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the J
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
 > Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
 
-
-#### the `injectJavaScriptObject` prop (Android Only)
-
-Due to the Android race condition mentioned above, this more reliable prop was added. While you cannot execute arbitrary JavaScript, you can make any JS object available to the JS run in the webview prior to the page load completing.
-
-```html
-<html>
-  <head>
-    <script>
-      window.onload = (event) => {
-        document.getElementById('output').innerHTML = JSON.parse(injectedObject.toString()).authToken;
-      }
-    </script>
-  </head>
-  <body>
-    <p id="output">undefined</p>
-  </body>
-</html>
-```
-
-Note: `injectedObject.toString()` returns the JSON encoded object passed in to `injectJavaScriptObject`. It must be passed to `JSON.parse` before it's properties can be accessed.
-
-```jsx
-import React, { Component } from 'react';
-import { View } from 'react-native';
-import { WebView } from 'react-native-webview';
-
-export default class App extends Component {
-  render() {
-    return (
-      <View style={{ flex: 1 }}>
-        <WebView
-          source={{
-            html: HTML
-          }}
-          injectJavaScriptObject={{ authToken: 'myAuthToken' }}
-        />
-      </View>
-    );
-  }
-}
-```
 
 #### The `injectJavaScript` method
 

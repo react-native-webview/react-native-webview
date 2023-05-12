@@ -37,15 +37,6 @@ import com.reactnativecommunity.webview.events.TopMessageEvent;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
- class JsObject {
-    protected String value;
-    public JsObject(String newValue) {
-        value = newValue;
-    }
-    @JavascriptInterface
-    public String toString() { return value; }
- }
-
 public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String injectedJS;
@@ -216,13 +207,6 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                 injectedJSBeforeContentLoaded != null &&
                 !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
-        }
-    }
-
-    public void injectJavaScriptObject(String obj) {
-        if (getSettings().getJavaScriptEnabled()) {
-            WebView webView = this;
-            webView.addJavascriptInterface(new JsObject(obj), "injectedObject");
         }
     }
 

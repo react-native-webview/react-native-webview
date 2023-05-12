@@ -64,7 +64,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   source,
   nativeConfig,
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-  injectJavaScriptObject,
   ...otherProps
 }, ref) => {
   const messagingModuleName = useRef<string>(`WebViewMessageHandler${uniqueRef += 1}`).current;
@@ -205,7 +204,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     setBuiltInZoomControls={setBuiltInZoomControls}
     setDisplayZoomControls={setDisplayZoomControls}
     nestedScrollEnabled={nestedScrollEnabled}
-    injectJavaScriptObject={JSON.stringify(injectJavaScriptObject)}
     {...nativeConfig?.props}
   />
 
