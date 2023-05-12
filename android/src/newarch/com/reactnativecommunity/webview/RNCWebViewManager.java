@@ -181,9 +181,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
 
     }
 
-    @ReactProp(name = "injectJSObject")
-    public void setInjectJSObject(RNCWebView view, @Nullable String value) {
-        mRNCWebViewManagerImpl.setInjectJSObject(view, value);
+    @ReactProp(name = "injectJavaScriptObject")
+    public void setInjectJavaScriptObject(RNCWebView view, @Nullable String value) {
+        mRNCWebViewManagerImpl.setInjectJavaScriptObject(view, value);
     }
 
     @Override

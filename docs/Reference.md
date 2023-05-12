@@ -197,7 +197,7 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
 
 > **Warning**
-> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)).
+> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)). Consider `injectJavaScriptObject` instead.
 
 | Type   | Required | Platform                           |
 | ------ | -------- | ---------------------------------- |
@@ -244,6 +244,40 @@ If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. if
 | Type | Required | Platform                                          |
 | ---- | -------- | ------------------------------------------------- |
 | bool | No       | iOS and macOS (only `true` supported for Android) |
+
+---
+
+### `injectJavaScriptObject`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Inject any JavaScript object into the webview so it is available to the JS running on the page.
+
+| Type | Required | Platform                                          |
+| ---- | -------- | ------------------------------------------------- |
+| obj | No       | Android only |
+
+Example:
+
+Set an auth token to be used in JavaScript.
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  injectJavaScriptObject={{ authToken: 'myAuthToken' }}
+/>;
+```
+
+```html
+<html>
+  <head>
+    <script>
+      window.onload = (event) => {
+        const authToken = JSON.parse(injectedObject.toString()).authToken;
+        ...
+      }
+    </script>
+  </head>
+</html>
+```
 
 ---
 

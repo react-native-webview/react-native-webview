@@ -219,7 +219,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         }
     }
 
-    public void injectJSObject(String obj) {
+    public void injectJavaScriptObject(String obj) {
         if (getSettings().getJavaScriptEnabled()) {
             WebView webView = this;
             webView.addJavascriptInterface(new JsObject(obj), "injectedObject");
