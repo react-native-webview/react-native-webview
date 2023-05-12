@@ -154,7 +154,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
 
     }
 
-    @ReactProp(name = "avaOcriptbject")
+    @ReactProp(name = "injectJavaScriptObject")
     public void setInjectJavaScriptObject(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setInjectJavaScriptObject(view, value);
     }
