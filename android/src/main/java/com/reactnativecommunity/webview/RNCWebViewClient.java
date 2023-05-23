@@ -65,17 +65,23 @@ public class RNCWebViewClient extends WebViewClient {
     }
 
     @Override
+    public void doUpdateVisitedHistory (WebView webView, String url, boolean isReload) {
+      super.doUpdateVisitedHistory(webView, url, isReload);
+
+      ((RNCWebView) webView).dispatchEvent(
+        webView,
+        new TopLoadingStartEvent(
+          webView.getId(),
+          createWebViewEvent(webView, url)));
+    }
+
+    @Override
     public void onPageStarted(WebView webView, String url, Bitmap favicon) {
-        super.onPageStarted(webView, url, favicon);
-        mLastLoadFailed = false;
+      super.onPageStarted(webView, url, favicon);
+      mLastLoadFailed = false;
 
-        RNCWebView reactWebView = (RNCWebView) webView;
-        reactWebView.callInjectedJavaScriptBeforeContentLoaded();
-        int reactTag = webView.getId();
-
-        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingStartEvent(
-            webView.getId(),
-            createWebViewEvent(webView, url)));
+      RNCWebView reactWebView = (RNCWebView) webView;
+      reactWebView.callInjectedJavaScriptBeforeContentLoaded();
     }
 
     @Override
