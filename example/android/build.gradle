@@ -1,6 +1,6 @@
 // react-native-test-app sets reactNativeVersion to a numeric value (e.g. "6805"),
 // but react-native-blob-utils reads this and expects it to be in semantic version format
-ext.reactNativeVersion = "0.68.5"
+ext.reactNativeVersion = "0.71.3"
 
 buildscript {
     def androidTestAppDir = "../../node_modules/react-native-test-app/android"
@@ -15,20 +15,5 @@ buildscript {
         getReactNativeDependencies().each { dependency ->
             classpath(dependency)
         }
-    }
-}
-
-allprojects {
-    repositories {
-       exclusiveContent {
-           filter {
-               includeGroup "com.facebook.react"
-           }
-           forRepository {
-               maven {
-                   url "$rootDir/../../node_modules/react-native/android"
-               }
-           }
-       }
     }
 }
