@@ -21,10 +21,12 @@ namespace winrt::ReactNativeWebView::implementation {
         void MessagingEnabled(bool enabled) noexcept;
         bool MessagingEnabled() const noexcept;
         void NavigateToHtml(winrt::hstring html);
+        void NavigateWithHeaders(winrt::hstring uri, IMapView<winrt::hstring, winrt::hstring> headers);
         ~ReactWebView2();
 
     private:
         winrt::hstring m_navigateToHtml = L"";
+        std::optional<std::pair<winrt::hstring, IMapView<winrt::hstring, winrt::hstring>>> m_navigationWithHeaders;
         bool m_messagingEnabled{ true };
 
         winrt::Microsoft::UI::Xaml::Controls::WebView2 m_webView{ nullptr };
@@ -35,6 +37,7 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::Microsoft::UI::Xaml::Controls::WebView2::CoreWebView2Initialized_revoker m_CoreWebView2InitializedRevoker{};
         void HandleMessageFromJS(winrt::hstring const& message);
         void RegisterEvents();
+        void WriteCookiesToWebView2(winrt::hstring cookies);
         void WriteWebViewNavigationEventArg(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter);
         void OnNavigationStarting(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationStartingEventArgs const& args);
         void OnNavigationCompleted(winrt::Microsoft::UI::Xaml::Controls::WebView2 const& sender, winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationCompletedEventArgs const& args);

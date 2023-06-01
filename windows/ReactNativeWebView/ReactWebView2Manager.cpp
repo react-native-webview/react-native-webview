@@ -16,6 +16,8 @@ namespace winrt {
     using namespace Microsoft::UI::Xaml::Controls;
     using namespace Windows::Web::Http;
     using namespace Windows::Web::Http::Headers;
+    using namespace Microsoft::Web::WebView2::Core;
+    using namespace Windows::Storage::Streams;
 }
 
 namespace winrt::ReactNativeWebView::implementation {
@@ -28,8 +30,8 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
     winrt::FrameworkElement ReactWebView2Manager::CreateView() noexcept {
-      auto view = winrt::ReactNativeWebView::ReactWebView2(m_reactContext);
-      return view;
+        auto view = winrt::ReactNativeWebView::ReactWebView2(m_reactContext);
+        return view;
     }
 
     // IViewManagerWithReactContext
@@ -79,7 +81,29 @@ namespace winrt::ReactNativeWebView::implementation {
                         auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
                         uriString.replace(0, std::size(file), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
-                    webView.Source(winrt::Uri(to_hstring(uriString)));
+
+                    if (uriString.find("ms-appdata://") == 0 || uriString.find("ms-appx-web://") == 0) {
+                        webView.Source(winrt::Uri(to_hstring(uriString)));
+                    }
+                    else {
+                        const auto hasHeaders = srcMap.find("headers") != srcMap.end();
+
+                        if (hasHeaders) {
+                            auto headers = winrt::single_threaded_map<winrt::hstring, winrt::hstring>();
+
+                            for (auto const& header : srcMap.at("headers").AsObject()) {
+                                auto const& headerKey = header.first;
+                                auto const& headerValue = header.second;
+                                headers.Insert(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
+                            }
+
+                            const auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
+                            reactWebView2.NavigateWithHeaders(to_hstring(uriString), headers.GetView());
+                        }
+                        else {
+                            webView.Source(winrt::Uri(to_hstring(uriString)));
+                        }
+                    }
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
                     auto htmlString = srcMap.at("html").AsString();
@@ -92,7 +116,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
                 reactWebView2.MessagingEnabled(messagingEnabled);
             }
-        }        
+        }
     }
 
     // IViewManagerWithExportedEventTypeConstants
@@ -147,7 +171,7 @@ namespace winrt::ReactNativeWebView::implementation {
         }
         else if (commandId == L"injectJavaScript") {
             webView.ExecuteScriptAsync(winrt::to_hstring(commandArgs[0].AsString()));
-        } 
+        }
     }
 
 } // namespace winrt::ReactNativeWebView::implementation
