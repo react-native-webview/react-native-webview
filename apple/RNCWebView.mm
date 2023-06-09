@@ -291,6 +291,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(useSharedProcessPool)
     REMAP_WEBVIEW_STRING_PROP(userAgent)
     REMAP_WEBVIEW_PROP(sharedCookiesEnabled)
+    REMAP_WEBVIEW_PROP(autoSelectClientCertificateEnabled)
     #if !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(decelerationRate)
     #endif // !TARGET_OS_OSX

@@ -142,6 +142,10 @@ RCT_CUSTOM_VIEW_PROPERTY(sharedCookiesEnabled, BOOL, RNCWebViewImpl) {
   view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(autoSelectClientCertificateEnabled, BOOL, RNCWebViewImpl) {
+  view.autoSelectClientCertificateEnabled = true;
+}
+
 #if !TARGET_OS_OSX
 RCT_CUSTOM_VIEW_PROPERTY(decelerationRate, CGFloat, RNCWebViewImpl) {
   view.decelerationRate = json == nil ? UIScrollViewDecelerationRateNormal : [RCTConvert CGFloat: json];
