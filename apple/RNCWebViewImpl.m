@@ -1011,6 +1011,24 @@ RCTAutoInsetsProtocol>
   customCertificatesForHost = certificates;
 }
 
+
+- (NSArray *)getIdentities {
+  NSMutableDictionary *query = [[NSMutableDictionary alloc] init];
+  [query setObject:(__bridge id)kSecClassIdentity forKey:(__bridge id)kSecClass];
+  [query setObject:(__bridge id)kSecMatchLimitAll forKey:(__bridge id)kSecMatchLimit];
+  [query setObject:@YES forKey:(__bridge id)kSecReturnRef];
+  
+  CFArrayRef identityRefs = NULL;
+  OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&identityRefs);
+  
+  if (status != noErr) {
+    return nil;
+  }
+  
+  NSArray *identities = (__bridge_transfer NSArray *)identityRefs;
+  return identities;
+}
+
 - (void)                    webView:(WKWebView *)webView
   didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
                   completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential * _Nullable))completionHandler
@@ -1020,6 +1038,37 @@ RCTAutoInsetsProtocol>
     host = webView.URL.host;
   }
   if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
+    if(self.autoSelectClientCertificateEnabled) {
+      NSArray *identities = [self getIdentities];
+      // Check server's acceptable distinguished names
+      NSArray *distinguishedNames = challenge.protectionSpace.distinguishedNames;
+      
+      NSMutableArray *acceptableIdentities = [[NSMutableArray alloc] init];
+      for (id ident in identities) {
+        SecIdentityRef identityRef = (__bridge SecIdentityRef)ident;
+        SecCertificateRef certificateRef;
+        SecIdentityCopyCertificate(identityRef, &certificateRef);
+        
+        // Check if this certificate's issuer is in the list of acceptable distinguished names
+        CFDataRef issuerDataRef = SecCertificateCopyNormalizedIssuerSequence(certificateRef);
+        if ([distinguishedNames containsObject:(__bridge id)issuerDataRef]) {
+          [acceptableIdentities addObject:ident];
+        }
+        
+        if (issuerDataRef) {
+          CFRelease(issuerDataRef);
+        }
+      }
+      
+      if (acceptableIdentities.count > 0) {
+        // select the first identity no matter how many acceptable identites were suitable
+        SecIdentityRef selectedIdentity = (__bridge SecIdentityRef)acceptableIdentities[0];
+        NSURLCredential *credential = [NSURLCredential credentialWithIdentity:selectedIdentity certificates:nil persistence:NSURLCredentialPersistenceForSession];
+        completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+        return;
+      }
+    }
+    
     completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
     return;
   }
@@ -1055,6 +1104,7 @@ RCTAutoInsetsProtocol>
   }
   completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
 }
+
 
 #pragma mark - WKNavigationDelegate methods
 

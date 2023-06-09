@@ -327,6 +327,7 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowsAirPlayForMediaPlayback?: boolean;
   allowsLinkPreview?: boolean;
   automaticallyAdjustContentInsets?: boolean;
+  autoSelectClientCertificateEnabled?: boolean;
   bounces?: boolean;
   contentInset?: ContentInsetProp;
   contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
@@ -570,6 +571,18 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   allowUniversalAccessFromFileURLs?: boolean;
+
+  /**
+   * A Boolean value indicating whether auto-selection of the client
+   * certificate is enabled or not. If auto-selection is enabled,
+   * the client certificate selection will be based on the acceptable
+   * certificate-issuing authorities requested from the server.
+   * If multiple certificates are available, the first one will be selected.
+   *
+   * The default value is `false`.
+   * @platform ios
+   */
+  autoSelectClientCertificateEnabled?: boolean;
 
   /**
    * Function that is invoked when the WebKit WebView content process gets terminated.
@@ -839,6 +852,18 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
    * @platform macos
    */
   allowUniversalAccessFromFileURLs?: boolean;
+
+  /**
+   * A Boolean value indicating whether auto-selection of the client
+   * certificate is enabled or not. If auto-selection is enabled,
+   * the client certificate selection will be based on the acceptable
+   * certificate-issuing authorities requested from the server.
+   * If multiple certificates are available, the first one will be selected.
+   *
+   * The default value is `false`.
+   * @platform macos
+   */
+   autoSelectClientCertificateEnabled?: boolean;
 
   /**
    * Function that is invoked when the WebKit WebView content process gets terminated.
