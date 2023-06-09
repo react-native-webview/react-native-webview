@@ -83,6 +83,7 @@ RCT_EXPORT_VIEW_PROPERTY(cacheEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsLinkPreview, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowingReadAccessToURL, NSString)
 RCT_EXPORT_VIEW_PROPERTY(basicAuthCredential, NSDictionary)
+RCT_EXPORT_VIEW_PROPERTY(autoSelectClientCertificateEnabled, BOOL)
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
 RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentBehavior)
@@ -140,10 +141,6 @@ RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, RNCWebViewImpl) {
 
 RCT_CUSTOM_VIEW_PROPERTY(sharedCookiesEnabled, BOOL, RNCWebViewImpl) {
   view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
-}
-
-RCT_CUSTOM_VIEW_PROPERTY(autoSelectClientCertificateEnabled, BOOL, RNCWebViewImpl) {
-  view.autoSelectClientCertificateEnabled = true;
 }
 
 #if !TARGET_OS_OSX
