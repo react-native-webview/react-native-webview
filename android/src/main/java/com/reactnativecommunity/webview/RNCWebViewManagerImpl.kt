@@ -29,6 +29,7 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
 
+val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
 class RNCWebViewManagerImpl {
     companion object {
@@ -97,7 +98,11 @@ class RNCWebViewManagerImpl {
                 Log.w(TAG, "Unsupported URI, aborting download", e)
                 return@DownloadListener
             }
-            val fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
+            var fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
+
+            // Sanitize filename by replacing invalid characters with "_"
+            fileName = fileName.replace(invalidCharRegex, "_")
+
             val downloadMessage = "Downloading $fileName"
 
             //Attempt to add cookie, if it exists
@@ -594,6 +599,10 @@ class RNCWebViewManagerImpl {
       }
     }
 
+    fun setMenuCustomItems(view: RNCWebView, value: ReadableArray) {
+        view.setMenuCustomItems(value.toArrayList() as List<Map<String, String>>)
+    }
+
     fun setNestedScrollEnabled(view: RNCWebView, value: Boolean) {
         view.nestedScrollEnabled = value
     }
@@ -635,5 +644,9 @@ class RNCWebViewManagerImpl {
 
     fun setThirdPartyCookiesEnabled(view: RNCWebView, enabled: Boolean) {
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, enabled)
+    }
+
+    fun setWebviewDebuggingEnabled(view: RNCWebView, enabled: Boolean) {
+        RNCWebView.setWebContentsDebuggingEnabled(enabled)
     }
 }
