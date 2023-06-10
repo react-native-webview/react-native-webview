@@ -2,38 +2,31 @@ import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'rea
 import {
   Image,
   View,
-  NativeModules,
   ImageSourcePropType,
 } from 'react-native';
 import invariant from 'invariant';
 
-// @ts-expect-error react-native doesn't have this type
-import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import RNCWebView from "./WebViewNativeComponent.macos";
+import RNCWebViewModule from "./NativeRNCWebView";
 import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
-  useWebWiewLogic,
+  useWebViewLogic,
 } from './WebViewShared';
 import {
   MacOSWebViewProps,
   NativeWebViewMacOS,
-  ViewManager,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
-
-
-const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
   supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
 });
 
 const { resolveAssetSource } = Image;
-
-const RNCWebViewManager = NativeModules.RNCWebViewManager as ViewManager;
 
 const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
   const ref = useRef(value);
@@ -79,14 +72,10 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
     _url: string,
     lockIdentifier = 0,
   ) => {
-    const viewManager
-      = (nativeConfig?.viewManager)
-      || RNCWebViewManager;
+    RNCWebViewModule.shouldStartLoadWithLockIdentifier(!!shouldStart, lockIdentifier);
+  }, []);
 
-    viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
-  }, [nativeConfig?.viewManager]);
-
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebWiewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -149,7 +138,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
       javaScriptEnabled={javaScriptEnabled}
       cacheEnabled={cacheEnabled}
       useSharedProcessPool={useSharedProcessPool}
-      messagingEnabled={typeof onMessage === 'function'}
+      messagingEnabled={typeof onMessageProp === 'function'}
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
       onLoadingProgress={onLoadingProgress}

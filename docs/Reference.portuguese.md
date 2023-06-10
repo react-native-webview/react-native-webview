@@ -36,7 +36,6 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`domStorageEnabled`](Reference.portuguese.md#domstorageenabled)
 - [`javaScriptEnabled`](Reference.portuguese.md#javascriptenabled)
 - [`javaScriptCanOpenWindowsAutomatically`](Reference.portuguese.md#javascriptcanopenwindowsautomatically)
-- [`androidHardwareAccelerationDisabled`](Reference.portuguese.md#androidHardwareAccelerationDisabled)
 - [`androidLayerType`](Reference.portuguese.md#androidLayerType)
 - [`mixedContentMode`](Reference.portuguese.md#mixedcontentmode)
 - [`thirdPartyCookiesEnabled`](Reference.portuguese.md#thirdpartycookiesenabled)
@@ -60,8 +59,6 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`allowFileAccessFromFileURLs`](Reference.portuguese.md#allowFileAccessFromFileURLs)
 - [`allowUniversalAccessFromFileURLs`](Reference.portuguese.md#allowUniversalAccessFromFileURLs)
 - [`allowingReadAccessToURL`](Reference.portuguese.md#allowingReadAccessToURL)
-- [`url`](Reference.portuguese.md#url)
-- [`html`](Reference.portuguese.md#html)
 - [`keyboardDisplayRequiresUserAction`](Reference.portuguese.md#keyboardDisplayRequiresUserAction)
 - [`hideKeyboardAccessoryView`](Reference.portuguese.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.portuguese.md#allowsbackforwardnavigationgestures)
@@ -95,7 +92,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`stopLoading`](Reference.portuguese.md#stoploading)
 - [`injectJavaScript`](Reference.portuguese.md#injectjavascriptstr)
 - [`clearFormData`](Reference.portuguese.md#clearFormData)
-- [`clearCache`](Reference.portuguese.md#clearCache)
+- [`clearCache`](Reference.portuguese.md#clearCachebool)
 - [`clearHistory`](Reference.portuguese.md#clearHistory)
 - [`requestFocus`](Reference.portuguese.md#requestFocus)
 - [`postMessage`](Reference.portuguese.md#postmessagestr)
@@ -841,16 +838,6 @@ Um valor booleano que indica se o JavaScript pode abrir janelas sem interação 
 
 ---
 
-### `androidHardwareAccelerationDisabled`[⬆](#props-index)<!-- Link gerado com jump2header -->
-
-**Descontinuado.** Em vez disso, use o prop `androidLayerType`.
-
-| Tipo | Requerido | Plataforma |
-| ---- | --------- | ---------- |
-| bool | Não       | Android    |
-
----
-
 ### `androidLayerType`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
 Especifica o tipo de camada.
@@ -860,8 +847,6 @@ Os valores possíveis para `androidLayerType` são:
 - `none` (padrão) - A visualização não possui uma camada.
 - `software` - A visão tem uma camada de software. Uma camada de software é apoiada por um bitmap e faz com que a exibição seja renderizada usando o pipeline de renderização de software do Android, mesmo se a aceleração de hardware estiver habilitada.
 - `hardware` - A visualização tem uma camada de hardware. Uma camada de hardware é apoiada por uma textura específica de hardware e faz com que a exibição seja renderizada usando o pipeline de renderização de hardware do Android, mas somente se a aceleração de hardware estiver ativada para a hierarquia de exibição.
-
-Evite definir as props `androidLayerType` e `androidHardwareAccelerationDisabled` ao mesmo tempo, pois isso pode causar um comportamento indefinido.
 
 | Tipo   | Requerido | Plataforma |
 | ------ | --------- | ---------- |
@@ -1160,26 +1145,6 @@ Um valor String que indica quais URLs o arquivo da WebView pode referenciar em s
 | Tipo   | Requerido | Plataforma    |
 | ------ | --------- | ------------- |
 | string | Não       | iOS e macOS   |
-
----
-
-### `url`[⬆](#props-index)<!-- Link gerado com jump2header -->
-
-**Descontinuado.** Em vez disso, use a propriedade `source`.
-
-| Tipo   | Requerido |
-| ------ | --------- |
-| string | Não       |
-
----
-
-### `html`[⬆](#props-index)<!-- Link gerado com jump2header -->
-
-**Descontinuado.** Em vez disso, use a propriedade `source`.
-
-| Tipo   | Requerido |
-| ------ | --------- |
-| string | Não       |
 
 ---
 
@@ -1521,7 +1486,7 @@ Função chamada quando um item de menu personalizado é selecionado. Ele recebe
 | function                                                           | Não       | iOS        |
 
 ```javascript
-<WebView 
+<WebView
   menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Guardar para depois', key: 'saveForLater' }]}
   onCustomMenuSelection={(webViewEvent) => {
     const { label } = webViewEvent.nativeEvent; // O nome do item de menu, ou seja, 'Tweet'
