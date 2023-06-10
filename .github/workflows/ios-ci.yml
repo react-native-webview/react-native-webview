@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        extraEnv: [, RCT_NEW_ARCH_ENABLED=1]
+        extraEnv: [FOO=BAR, RCT_NEW_ARCH_ENABLED=1]
     runs-on: macos-latest
     steps:
       - name: Checkout
