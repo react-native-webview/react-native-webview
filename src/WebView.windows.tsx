@@ -20,7 +20,7 @@ import {
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import invariant from 'invariant';
 import {RCTWebView, RCTWebView2} from "./WebViewNativeComponent.windows";
-import { useWebWiewLogic, defaultOriginWhitelist, defaultRenderError, defaultRenderLoading, } from './WebViewShared';
+import { useWebViewLogic, defaultOriginWhitelist, defaultRenderError, defaultRenderLoading, } from './WebViewShared';
 import {
   NativeWebViewWindows,
   WindowsWebViewProps,
@@ -71,7 +71,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     }
   }, [RCTWebViewString]);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebWiewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,

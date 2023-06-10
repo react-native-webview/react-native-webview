@@ -36,6 +36,7 @@ import com.facebook.react.modules.core.PermissionListener;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.SecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -314,7 +315,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
         try {
             dm.enqueue(mDownloadRequest);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | SecurityException e) {
             Log.w("RNCWebViewModule", "Unsupported URI, aborting download", e);
             return;
         }
