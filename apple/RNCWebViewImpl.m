@@ -433,9 +433,9 @@ RCTAutoInsetsProtocol>
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-    _webView.menuItems = _menuItems;
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
+    _webView.menuItems = _menuItems;
     _webView.scrollView.delegate = self;
 #endif // !TARGET_OS_OSX
     _webView.UIDelegate = self;
@@ -502,17 +502,16 @@ RCTAutoInsetsProtocol>
 #endif
 {
   if (_webView) {
-    if (_menuItems) {
-      UIMenuController *menuController = [UIMenuController sharedMenuController];
-      menuController.menuItems = nil;
-    }
-
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
     [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
     [_webView removeFromSuperview];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = nil;
+    if (_menuItems) {
+      UIMenuController *menuController = [UIMenuController sharedMenuController];
+      menuController.menuItems = nil;
+    }
 #endif // !TARGET_OS_OSX
     _webView = nil;
     if (_onContentProcessDidTerminate) {
