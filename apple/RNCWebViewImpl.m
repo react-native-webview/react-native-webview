@@ -59,8 +59,9 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
               withSender:(id)sender{
 
   if (!self.menuItems) {
-    return YES;
+      return [super canPerformAction:action withSender:sender];
   }
+
   return NO;
 }
 - (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AVAILABLE(ios(13.0))  {
@@ -432,11 +433,11 @@ RCTAutoInsetsProtocol>
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
 #if !TARGET_OS_OSX
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #else
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
 #endif // !TARGET_OS_OSX
-
+      _webView.menuItems = _menuItems;
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = self;
@@ -505,6 +506,11 @@ RCTAutoInsetsProtocol>
 #endif
 {
   if (_webView) {
+      if (_menuItems) {
+          UIMenuController *menuController = [UIMenuController sharedMenuController];
+          menuController.menuItems = nil;
+      }
+
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
     [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
