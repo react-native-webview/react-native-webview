@@ -260,6 +260,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mRNCWebViewManagerImpl.setThirdPartyCookiesEnabled(view, value);
     }
 
+    @ReactProp(name = "webviewDebuggingEnabled")
+    public void setWebviewDebuggingEnabled(RNCWebView view, boolean value) {
+        mRNCWebViewManagerImpl.setWebviewDebuggingEnabled(view, value);
+    }
+
     @ReactProp(name = "userAgent")
     public void setUserAgent(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setUserAgent(view, value);

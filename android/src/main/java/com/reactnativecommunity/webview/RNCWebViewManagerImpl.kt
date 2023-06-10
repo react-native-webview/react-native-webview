@@ -645,4 +645,8 @@ class RNCWebViewManagerImpl {
     fun setThirdPartyCookiesEnabled(view: RNCWebView, enabled: Boolean) {
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, enabled)
     }
+
+    fun setWebviewDebuggingEnabled(view: RNCWebView, enabled: Boolean) {
+        RNCWebView.setWebContentsDebuggingEnabled(enabled)
+    }
 }

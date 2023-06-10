@@ -307,6 +307,12 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
         mRNCWebViewManagerImpl.setThirdPartyCookiesEnabled(view, value);
     }
 
+    @Override
+    @ReactProp(name = "webviewDebuggingEnabled")
+    public void setWebviewDebuggingEnabled(RNCWebView view, boolean value) {
+        mRNCWebViewManagerImpl.setWebviewDebuggingEnabled(view, value);
+    }
+
     /* iOS PROPS - no implemented here */
     @Override
     public void setAllowingReadAccessToURL(RNCWebView view, @Nullable String value) {}

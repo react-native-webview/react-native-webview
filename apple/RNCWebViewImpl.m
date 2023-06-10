@@ -470,6 +470,13 @@ RCTAutoInsetsProtocol>
     }
 #endif
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 130300 || \
+    __IPHONE_OS_VERSION_MAX_ALLOWED >= 160400 || \
+    __TV_OS_VERSION_MAX_ALLOWED >= 160400
+    if (@available(macOS 13.3, iOS 16.4, tvOS 16.4, *))
+      _webView.inspectable = _webviewDebuggingEnabled;
+#endif
+
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
@@ -494,6 +501,16 @@ RCTAutoInsetsProtocol>
   _allowsBackForwardNavigationGestures = allowsBackForwardNavigationGestures;
   _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 }
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 130300 || \
+    __IPHONE_OS_VERSION_MAX_ALLOWED >= 160400 || \
+    __TV_OS_VERSION_MAX_ALLOWED >= 160400
+- (void)setWebviewDebuggingEnabled:(BOOL)webviewDebuggingEnabled {
+  _webviewDebuggingEnabled = webviewDebuggingEnabled;
+  if (@available(macOS 13.3, iOS 16.4, tvOS 16.4, *))
+      _webView.inspectable = _webviewDebuggingEnabled;
+}
+#endif
 
 #ifdef RCT_NEW_ARCH_ENABLED
 - (void)destroyWebView
