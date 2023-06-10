@@ -206,6 +206,7 @@ export interface NativeProps extends ViewProps {
   menuItems?: ReadonlyArray<Readonly<{label: string, key: string}>>;
   // Workaround to watch if listener if defined
   hasOnFileDownload?: boolean;
+  fraudulentWebsiteWarningEnabled?: boolean;
   // !iOS only
 
   allowFileAccessFromFileURLs?: boolean;
