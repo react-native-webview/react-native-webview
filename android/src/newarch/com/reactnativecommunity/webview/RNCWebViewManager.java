@@ -391,6 +391,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
 
     @Override
     public void setMediaCapturePermissionGrantType(RNCWebView view, @Nullable String value) {}
+
+    @Override
+    public void setFraudulentWebsiteWarningEnabled(RNCWebView view, boolean value) {}
     /* !iOS PROPS - no implemented here */
 
     @Override

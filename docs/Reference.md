@@ -1573,6 +1573,14 @@ Whether or not the Webview can play media protected by DRM. Default is false.
 | ------- | -------- | -------- |
 | boolean | No       | Android  |
 
+### `fraudulentWebsiteWarningEnabled`[⬆](#props-index)
+
+A Boolean value that indicates whether the web view shows warnings for suspected fraudulent content, such as malware or phishing attempts. The default value is `true`. (iOS 13+)
+
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | true    | iOS      |
+
 ### `webviewDebuggingEnabled`[⬆](#props-index)
 
 Whether or not the webview can be debugged remotely using Safari / Chrome.

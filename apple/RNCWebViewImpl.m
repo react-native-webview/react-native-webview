@@ -354,6 +354,14 @@ RCTAutoInsetsProtocol>
     prefs.javaScriptEnabled = NO;
     _prefsUsed = YES;
   }
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
+  if (@available(iOS 13.0, *)) {
+    if (!_fraudulentWebsiteWarningEnabled) {
+        prefs.fraudulentWebsiteWarningEnabled = NO;
+        _prefsUsed = YES;
+    }
+  }
+#endif
   if (_allowUniversalAccessFromFileURLs) {
     [wkWebViewConfig setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
   }

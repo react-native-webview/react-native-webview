@@ -6,23 +6,22 @@ on:
   pull_request:
 jobs:
   build:
+    strategy:
+      matrix:
+        extraEnv: [FOO=BAR, RCT_NEW_ARCH_ENABLED=1]
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up Node.js
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
-      - name: Cache /node_modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          node-version: 18
+          cache: 'yarn'
       - name: Install npm dependencies
         run: yarn --frozen-lockfile
       - name: Install Pods
-        run: pod install
+        run: ${{matrix.extraEnv}} pod install
         working-directory: example/ios
       - name: Build iOS test app
         run: |

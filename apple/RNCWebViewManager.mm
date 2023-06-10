@@ -108,6 +108,10 @@ RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, RNCWebViewPermissionGrantType)
 #endif
 
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
+RCT_EXPORT_VIEW_PROPERTY(fraudulentWebsiteWarningEnabled, BOOL)
+#endif
+
 /**
  * Expose methods to enable messaging the webview.
  */

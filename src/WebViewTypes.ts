@@ -680,6 +680,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
     selectedText: string;
   }
   }) => void;
+
+  /**
+   * A Boolean value that indicates whether the webview shows warnings for suspected
+   * fraudulent content, such as malware or phishing attempts.
+   * @platform ios
+   */
+  fraudulentWebsiteWarningEnabled?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {

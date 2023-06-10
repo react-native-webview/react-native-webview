@@ -106,6 +106,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
 @property (nonatomic, assign) WKContentMode contentMode;
+@property (nonatomic, assign) BOOL fraudulentWebsiteWarningEnabled;
 #endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */

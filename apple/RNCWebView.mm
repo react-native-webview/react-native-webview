@@ -286,6 +286,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_STRING_PROP(allowingReadAccessToURL)
     
     REMAP_WEBVIEW_PROP(messagingEnabled)
+    REMAP_WEBVIEW_PROP(fraudulentWebsiteWarningEnabled)
     REMAP_WEBVIEW_PROP(enableApplePay)
     REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
     REMAP_WEBVIEW_PROP(bounces)
