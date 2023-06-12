@@ -1050,7 +1050,7 @@ RCTAutoInsetsProtocol>
         SecIdentityCopyCertificate(identityRef, &certificateRef);
         
         // Check if this certificate's issuer is in the list of acceptable distinguished names
-        CFDataRef issuerDataRef = SecCertificateCopyNormalizedIssuerContent(certificateRef, NULL);
+        CFDataRef issuerDataRef = SecCertificateCopyNormalizedIssuerSequence(certificateRef);
         if ([distinguishedNames containsObject:(__bridge id)issuerDataRef]) {
           [acceptableIdentities addObject:ident];
         }
@@ -1061,17 +1061,15 @@ RCTAutoInsetsProtocol>
       }
       
       if (acceptableIdentities.count > 0) {
-        // select the first identity no matter how many acceptable identites were selected
+        // select the first identity no matter how many acceptable identites were suitable
         SecIdentityRef selectedIdentity = (__bridge SecIdentityRef)acceptableIdentities[0];
         NSURLCredential *credential = [NSURLCredential credentialWithIdentity:selectedIdentity certificates:nil persistence:NSURLCredentialPersistenceForSession];
         completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
-      } else {
-        completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
+        return;
       }
-    } else {
-      completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
     }
     
+    completionHandler(NSURLSessionAuthChallengeUseCredential, clientAuthenticationCredential);
     return;
   }
   if ([[challenge protectionSpace] serverTrust] != nil && customCertificatesForHost != nil && host != nil) {
