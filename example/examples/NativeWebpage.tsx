@@ -22,6 +22,7 @@ export default class NativeWebpage extends Component<Props, State> {
           onLoadStart={(event) => {
             console.log("onLoadStart", event.nativeEvent);
           }}
+          autoSelectClientCertificateEnabled={true}
         />
       </View>
     );

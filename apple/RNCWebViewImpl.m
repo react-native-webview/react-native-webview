@@ -988,7 +988,6 @@ RCTAutoInsetsProtocol>
     host = webView.URL.host;
   }
   if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodClientCertificate) {
-    NSLog(@"vahagn %@", self.autoSelectClientCertificateEnabled);
     if(self.autoSelectClientCertificateEnabled) {
       NSArray *identities = [self getIdentities];
       // Check server's acceptable distinguished names
@@ -1012,6 +1011,7 @@ RCTAutoInsetsProtocol>
       }
       
       if (acceptableIdentities.count > 0) {
+        // select the first identity no matter how many acceptable identites were selected
         SecIdentityRef selectedIdentity = (__bridge SecIdentityRef)acceptableIdentities[0];
         NSURLCredential *credential = [NSURLCredential credentialWithIdentity:selectedIdentity certificates:nil persistence:NSURLCredentialPersistenceForSession];
         completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
