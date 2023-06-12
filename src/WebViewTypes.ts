@@ -580,7 +580,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * If multiple certificates are available, the first one will be selected.
    *
    * The default value is `false`.
-   * @platform macos
+   * @platform ios
    */
   autoSelectClientCertificateEnabled?: boolean;
 
