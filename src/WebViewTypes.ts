@@ -280,6 +280,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
+  webviewDebuggingEnabled?: boolean;
   messagingEnabled: boolean;
   onScroll?: (event: WebViewScrollEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
@@ -692,6 +693,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
     selectedText: string;
   }
   }) => void;
+
+  /**
+   * A Boolean value that indicates whether the webview shows warnings for suspected
+   * fraudulent content, such as malware or phishing attempts.
+   * @platform ios
+   */
+  fraudulentWebsiteWarningEnabled?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
@@ -1244,4 +1252,9 @@ export interface WebViewSharedProps extends ViewProps {
    * An object that specifies the credentials of a user to be used for basic authentication.
    */
   basicAuthCredential?: BasicAuthCredential;
+
+  /**
+   * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
+   */
+  webviewDebuggingEnabled?: boolean;
 }

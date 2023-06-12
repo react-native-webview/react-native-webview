@@ -31,7 +31,6 @@ import java.util.*
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
-
 class RNCWebViewManagerImpl {
     companion object {
         const val NAME = "RNCWebView"
@@ -600,6 +599,10 @@ class RNCWebViewManagerImpl {
       }
     }
 
+    fun setMenuCustomItems(view: RNCWebView, value: ReadableArray) {
+        view.setMenuCustomItems(value.toArrayList() as List<Map<String, String>>)
+    }
+
     fun setNestedScrollEnabled(view: RNCWebView, value: Boolean) {
         view.nestedScrollEnabled = value
     }
@@ -641,5 +644,9 @@ class RNCWebViewManagerImpl {
 
     fun setThirdPartyCookiesEnabled(view: RNCWebView, enabled: Boolean) {
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, enabled)
+    }
+
+    fun setWebviewDebuggingEnabled(view: RNCWebView, enabled: Boolean) {
+        RNCWebView.setWebContentsDebuggingEnabled(enabled)
     }
 }

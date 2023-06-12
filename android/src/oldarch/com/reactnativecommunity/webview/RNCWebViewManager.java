@@ -12,6 +12,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.views.scroll.ScrollEventType;
+import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
@@ -179,6 +180,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mRNCWebViewManagerImpl.setMessagingEnabled(view, value);
     }
 
+    @ReactProp(name = "menuItems")
+    public void setMenuCustomItems(RNCWebView view, @Nullable ReadableArray items) {
+        mRNCWebViewManagerImpl.setMenuCustomItems(view, items);
+    }
+
     @ReactProp(name = "messagingModuleName")
     public void setMessagingModuleName(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setMessagingModuleName(view, value);
@@ -254,6 +260,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mRNCWebViewManagerImpl.setThirdPartyCookiesEnabled(view, value);
     }
 
+    @ReactProp(name = "webviewDebuggingEnabled")
+    public void setWebviewDebuggingEnabled(RNCWebView view, boolean value) {
+        mRNCWebViewManagerImpl.setWebviewDebuggingEnabled(view, value);
+    }
+
     @ReactProp(name = "userAgent")
     public void setUserAgent(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setUserAgent(view, value);
@@ -283,6 +294,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
         export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
         export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
+        export.put(TopCustomMenuSelectionEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomMenuSelection"));
         return export;
     }
 

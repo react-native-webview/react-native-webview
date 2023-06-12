@@ -206,6 +206,7 @@ export interface NativeProps extends ViewProps {
   menuItems?: ReadonlyArray<Readonly<{label: string, key: string}>>;
   // Workaround to watch if listener if defined
   hasOnFileDownload?: boolean;
+  fraudulentWebsiteWarningEnabled?: boolean;
   autoSelectClientCertificateEnabled?: boolean;
   // !iOS only
 
@@ -224,6 +225,7 @@ export interface NativeProps extends ViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   javaScriptEnabled?: boolean;
+  webviewDebuggingEnabled?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
   onLoadingError: DirectEventHandler<WebViewErrorEvent>;

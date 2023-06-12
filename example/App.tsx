@@ -20,6 +20,7 @@ import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
+import CustomMenu from './examples/CustomMenu';
 
 const TESTS = {
   Messaging: {
@@ -100,6 +101,14 @@ const TESTS = {
     description: 'Test to open a apple pay supported page',
     render() {
       return <ApplePay />;
+    },
+  },
+  CustomMenu: {
+    title: 'Custom Menu',
+    testId: 'CustomMenu',
+    description: 'Test to custom context menu shown on highlighting text',
+    render() {
+      return <CustomMenu />;
     },
   }
 };
@@ -194,6 +203,11 @@ export default class App extends Component<Props, State> {
                   onPress={() => this._changeTest('ApplePay')}
               />
           )}
+          <Button
+            testID="testType_customMenu"
+            title="CustomMenu"
+            onPress={() => this._changeTest('CustomMenu')}
+          />
         </View>
 
         {restarting ? null : (
