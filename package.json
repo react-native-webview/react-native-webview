@@ -36,8 +36,7 @@
   },
   "dependencies": {
     "escape-string-regexp": "2.0.0",
-    "invariant": "2.2.4",
-    "react-native-macos": "0.68.62"
+    "invariant": "2.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

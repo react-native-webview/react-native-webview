@@ -218,7 +218,7 @@ PODS:
   - React-jsinspector (0.68.62)
   - React-logger (0.68.62):
     - glog
-  - react-native-webview (12.2.0):
+  - react-native-webview (12.0.0-rc.0):
     - React-Core
   - React-perflogger (0.68.62)
   - React-RCTActionSheet (0.68.62):
@@ -285,7 +285,7 @@ PODS:
     - React-jsi (= 0.68.62)
     - React-logger (= 0.68.62)
     - React-perflogger (= 0.68.62)
-  - ReactTestApp-DevSupport (2.3.12):
+  - ReactTestApp-DevSupport (2.3.2):
     - React-Core
     - React-jsi
   - ReactTestApp-Resources (1.0.0-dev)
@@ -423,7 +423,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 1862151d3f809499c82d7f66a3ca624b4d6b49d9
   React-jsinspector: 39348b9a3417419aea646f41cba625e1a7bbbd30
   React-logger: 7a2e45e85d0fe59edb6d4fb2cbcbb9981ab9486e
-  react-native-webview: 35e076d88994c63f4435de2058e4091d1c92415e
+  react-native-webview: bf1329769290feefad471977132b5fb6c8288f71
   React-perflogger: 20ae52b52ce2c0e1e257e0c0502f8f08a0b43ff9
   React-RCTActionSheet: 2a62f3135a621bbf90504a28205cf5ef05b27bea
   React-RCTAnimation: 219eb987ed34c38cbf13096062da7ddc142f0fac
@@ -436,10 +436,10 @@ SPEC CHECKSUMS:
   React-RCTVibration: c25bc2b1d5bea3f2fd8bd1931c3a23df604c7a57
   React-runtimeexecutor: 71d892141f53ed18c108d97ce49083d7792c8cca
   ReactCommon: 2ac737725b34d197ba527a4055a842374633de3d
-  ReactTestApp-DevSupport: a33bfbe09dd21ff4ea512b117831db06174955b7
+  ReactTestApp-DevSupport: 1646ce70be36400a60ca18608284f3f7099a35c1
   ReactTestApp-Resources: 8539dac0f8d2ef3821827a537e37812104c6ff78
   Yoga: 6c7edb98bf534779ae3d0af1790018da859047c9
 
 PODFILE CHECKSUM: 3ad7b6f02d15d45c80a21a9adca7ac8f2d66eaac
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.11.3
