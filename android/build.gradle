@@ -44,6 +44,7 @@ if (isNewArchitectureEnabled()) {
 apply plugin: 'kotlin-android'
 
 android {
+    namespace = "com.reactnativecommunity.webview"
     compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
 
     defaultConfig {
