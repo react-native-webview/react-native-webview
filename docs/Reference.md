@@ -22,6 +22,7 @@ This document lays out the current public properties and methods for the React N
 - [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
+- [`onOpenWindow`](Reference.md#onopenwindow)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`onScroll`](Reference.md#onscroll)
 - [`originWhitelist`](Reference.md#originwhitelist)
@@ -573,6 +574,37 @@ navigationType (iOS only)
 target
 title
 url
+```
+
+---
+
+### `onOpenWindow`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the `WebView` should open a new window.
+
+This happens when the JS calls `window.open('http://someurl', '_blank')` or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onOpenWindow={(syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    const { targetUrl } = nativeEvent
+    console.log('Intercepted OpenWindow for', targetUrl)
+  }}
+/>
+```
+
+Function passed to onOpenWindow is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+targetUrl
 ```
 
 ---
