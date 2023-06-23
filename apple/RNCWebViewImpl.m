@@ -323,7 +323,15 @@ RCTAutoInsetsProtocol>
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
+    NSURL *url = navigationAction.request.URL;
+
+    if (_onOpenWindow) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"targetUrl": url.absoluteString}];
+      _onOpenWindow(event);
+    } else {
+      [webView loadRequest:navigationAction.request];
+    }
   }
   return nil;
 }

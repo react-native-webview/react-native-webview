@@ -584,6 +584,16 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
 
   /**
+   * Function that is invoked when the `WebView` should open a new window.
+   * 
+   * This happens when the JS calls `window.open('http://someurl', '_blank')`
+   * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+   *
+   * @platform ios
+   */
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
+
+  /**
    * If `true` (default), loads the `injectedJavaScript` only into the main frame.
    * If `false`, loads it into all frames (e.g. iframes).
    * @platform ios
