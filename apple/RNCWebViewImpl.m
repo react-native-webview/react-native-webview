@@ -1273,6 +1273,7 @@ RCTAutoInsetsProtocol>
             @"url": (request.URL).absoluteString,
             @"navigationType": navigationTypes[@(navigationType)],
             @"isTopFrame": @(isTopFrame),
+            @"hasTargetFrame": @(hasTargetFrame),
             @"lockIdentifier": @(lockIdentifier)
         }];
         _onShouldStartLoadWithRequest(event);
