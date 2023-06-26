@@ -25,6 +25,9 @@ export type WebViewMessageEvent = Readonly<{
   lockIdentifier: Double;
   data: string;
 }>
+export type WebViewOpenWindowEvent = Readonly<{
+  targetUrl: string;
+}>
 export type WebViewHttpErrorEvent = Readonly<{
   url: string;
   loading: boolean;
@@ -233,6 +236,7 @@ export interface NativeProps extends ViewProps {
   onLoadingStart: DirectEventHandler<WebViewNavigationEvent>;
   onHttpError: DirectEventHandler<WebViewHttpErrorEvent>;
   onMessage: DirectEventHandler<WebViewMessageEvent>;
+  onOpenWindow?: DirectEventHandler<WebViewOpenWindowEvent>;
   onScroll?: DirectEventHandler<ScrollEvent>;
   onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
   showsHorizontalScrollIndicator?: boolean;
