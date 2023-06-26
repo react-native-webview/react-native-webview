@@ -60,6 +60,8 @@ public class RNCWebViewClient extends WebViewClient {
 
             reactWebView.callInjectedJavaScript();
 
+            reactWebView.injectBlobDownloaderJS();
+
             emitFinishEvent(webView, url);
         }
     }

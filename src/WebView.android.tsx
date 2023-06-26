@@ -41,6 +41,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   allowFileAccess = false,
   saveFormDataDisabled = false,
   cacheEnabled = true,
+  blobDownloadingEnabled = false,
   androidLayerType = "none",
   originWhitelist = defaultOriginWhitelist,
   setSupportMultipleWindows = true,
@@ -79,7 +80,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     }
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onRenderProcessGone } = useWebViewLogic({
+  const { onLoadingStart,  onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onRenderProcessGone } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -175,7 +176,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     {...otherProps}
     messagingEnabled={typeof onMessageProp === 'function'}
     messagingModuleName={messagingModuleName}
-
+    blobDownloadingEnabled={blobDownloadingEnabled}
     hasOnScroll={!!otherProps.onScroll}
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}

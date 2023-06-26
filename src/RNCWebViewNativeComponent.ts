@@ -227,6 +227,7 @@ export interface NativeProps extends ViewProps {
   webviewDebuggingEnabled?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
   messagingEnabled: boolean;
+  blobDownloadingEnabled: boolean;
   onLoadingError: DirectEventHandler<WebViewErrorEvent>;
   onLoadingFinish: DirectEventHandler<WebViewNavigationEvent>;
   onLoadingProgress: DirectEventHandler<WebViewNativeProgressEvent>;

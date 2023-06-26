@@ -180,6 +180,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mRNCWebViewManagerImpl.setMessagingEnabled(view, value);
     }
 
+    @ReactProp(name = "blobDownloadingEnabled")
+    public void setBlobDownloadingEnabled(RNCWebView view, boolean value) {
+        mRNCWebViewManagerImpl.setBlobDownloadingEnabled(view, value);
+    }
+
     @ReactProp(name = "menuItems")
     public void setMenuCustomItems(RNCWebView view, @Nullable ReadableArray items) {
         mRNCWebViewManagerImpl.setMenuCustomItems(view, items);

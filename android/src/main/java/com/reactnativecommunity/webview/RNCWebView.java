@@ -6,9 +6,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Build;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
+import android.util.Base64;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +22,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.CatalystInstance;
@@ -44,6 +48,11 @@ import com.reactnativecommunity.webview.events.TopMessageEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -56,6 +65,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     String injectedJSBeforeContentLoaded;
     protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
 
+    protected static final String DOWNLOAD_INTERFACE = "ReactNativeWebViewDownloader";
+
+    String downloadingMessage = "File Downloaded!";
+
     /**
      * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
      * than the main frame, so these two properties are mostly here just for parity with iOS & macOS.
@@ -64,6 +77,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
 
     protected boolean messagingEnabled = false;
+
+    protected boolean downloadingBlobEnabled = false;
     protected @Nullable
     String messagingModuleName;
     protected @Nullable
@@ -248,6 +263,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return new RNCWebViewBridge(webView);
     }
 
+  protected RNCWebViewDownloadBridge createRNCWebViewDownloadBlobBridge(RNCWebView webView) {
+    return new RNCWebViewDownloadBridge(webView);
+  }
+
     protected void createCatalystInstance() {
       ThemedReactContext reactContext = (ThemedReactContext) this.getContext();
 
@@ -271,6 +290,26 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         }
     }
 
+  @SuppressLint("AddJavascriptInterface")
+  public void setDownloadingBlobEnabled(boolean enabled) {
+    if (downloadingBlobEnabled == enabled) {
+      return;
+    }
+
+      downloadingBlobEnabled = enabled;
+
+    if (enabled) {
+      addJavascriptInterface(createRNCWebViewDownloadBlobBridge(this), DOWNLOAD_INTERFACE);
+    } else {
+      removeJavascriptInterface(DOWNLOAD_INTERFACE);
+    }
+  }
+
+
+  public void setDownloadingMessage(String message) {
+      downloadingMessage = message;
+  }
+
     protected void evaluateJavascriptWithFallback(String script) {
         evaluateJavascript(script, null);
     }
@@ -281,6 +320,22 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                 !TextUtils.isEmpty(injectedJS)) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
         }
+    }
+
+    public void injectBlobDownloaderJS(){
+      // get blobDownloaderJS from assets and inject it
+      String blobDownloaderJS = null;
+      try {
+        InputStream inputStream = this.getContext().getAssets().open("blobDownloader.js");
+        int size = inputStream.available();
+        byte[] buffer = new byte[size];
+        inputStream.read(buffer);
+        inputStream.close();
+        blobDownloaderJS = new String(buffer, "UTF-8");
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      evaluateJavascriptWithFallback("(function() {\n" + blobDownloaderJS + ";\n})();" );
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
@@ -401,7 +456,70 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         public void postMessage(String message) {
           mWebView.onMessage(message);
         }
+
+
+
     }
+
+  protected class RNCWebViewDownloadBridge {
+    RNCWebView mWebView;
+
+    RNCWebViewDownloadBridge(RNCWebView c) {
+      mWebView = c;
+    }
+
+    /**
+     * This method is called whenever JavaScript running within the web view calls:
+     * - window[JAVASCRIPT_INTERFACE].postMessage
+     */
+
+    @JavascriptInterface
+    public void downloadFile(String json) {
+      //parse json
+      try {
+        JSONObject jsonObject = null;
+        jsonObject = new JSONObject(json);
+        String url = jsonObject.getString("data");
+        String fileName = jsonObject.getString("fileName");
+        //decode base64 string and save to file
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        File file = new File(path, fileName);
+
+          if(!path.exists())
+            path.mkdirs();
+
+
+          // if file exists, change name to avoid overwrite
+          int i = 1;
+          while(file.exists()) {
+            file = new File(path, fileName.substring(0, fileName.lastIndexOf(".")) + "(" + i + ")" + fileName.substring(fileName.lastIndexOf(".")));
+            i++;
+          }
+
+          if(!file.exists())
+            file.createNewFile();
+
+          String base64EncodedString = url.substring(url.indexOf(",") + 1);
+          byte[] decodedBytes = Base64.decode(base64EncodedString, Base64.DEFAULT);
+          OutputStream os = new FileOutputStream(file);
+          os.write(decodedBytes);
+          os.close();
+
+          Toast.makeText(mWebView.getContext(), downloadingMessage, Toast.LENGTH_LONG).show();
+
+
+
+      } catch (JSONException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        Log.i("ReactNative", "IOException: " + e.getMessage());
+        e.printStackTrace();
+      }
+
+
+    }
+  }
 
 
     protected static class ProgressChangedFilter {
