@@ -24,6 +24,7 @@ import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
 
 import android.graphics.Color;
+import android.webkit.WebChromeClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -169,6 +170,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
     @ReactProp(name = "lackPermissionToDownloadMessage")
     public void setLackPermissionToDownloadMessage(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setLackPermissionToDownloadMessage(value);
+    }
+
+    @ReactProp(name = "hasOnOpenWindowEvent")
+    public void setHasOnOpenWindowEvent(RNCWebView view, boolean hasEvent) {
+        mRNCWebViewManagerImpl.setHasOnOpenWindowEvent(view, hasEvent);
     }
 
     @ReactProp(name = "mediaPlaybackRequiresUserAction")

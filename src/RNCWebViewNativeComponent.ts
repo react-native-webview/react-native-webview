@@ -237,6 +237,7 @@ export interface NativeProps extends ViewProps {
   onHttpError: DirectEventHandler<WebViewHttpErrorEvent>;
   onMessage: DirectEventHandler<WebViewMessageEvent>;
   onOpenWindow?: DirectEventHandler<WebViewOpenWindowEvent>;
+  hasOnOpenWindowEvent?: boolean;
   onScroll?: DirectEventHandler<ScrollEvent>;
   onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
   showsHorizontalScrollIndicator?: boolean;

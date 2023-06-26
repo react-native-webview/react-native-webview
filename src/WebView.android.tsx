@@ -187,6 +187,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onRenderProcessGone={onRenderProcessGone}
     onMessage={onMessage}
     onOpenWindow={onOpenWindow}
+    hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
     ref={webViewRef}
     // TODO: find a better way to type this.

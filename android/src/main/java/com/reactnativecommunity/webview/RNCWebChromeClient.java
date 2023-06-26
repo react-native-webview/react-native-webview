@@ -79,6 +79,8 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected boolean mAllowsProtectedMedia = false;
 
+    protected boolean mHasOnOpenWindowEvent = false;
+
     public RNCWebChromeClient(RNCWebView webView) {
         this.mWebView = webView;
     }
@@ -88,20 +90,22 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
         final WebView newWebView = new WebView(view.getContext());
 
-        newWebView.setWebViewClient(new WebViewClient(){
+        if(mHasOnOpenWindowEvent) {
+            newWebView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading (WebView subview, String url) {
-            WritableMap event = Arguments.createMap();
-            event.putString("targetUrl", url);
+                WritableMap event = Arguments.createMap();
+                event.putString("targetUrl", url);
 
-            ((RNCWebView) view).dispatchEvent(
-                view,
-                new TopOpenWindowEvent(view.getId(), event)
-            );
+                ((RNCWebView) view).dispatchEvent(
+                    view,
+                    new TopOpenWindowEvent(view.getId(), event)
+                );
 
-            return true;
+                return true;
             }
-        });
+            });
+        }
 
         final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
         transport.setWebView(newWebView);
@@ -360,5 +364,9 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
      */
     public void setAllowsProtectedMedia(boolean enabled) {
       mAllowsProtectedMedia = enabled;
+    }
+
+    public void setHasOnOpenWindowEvent(boolean hasEvent) {
+      mHasOnOpenWindowEvent = hasEvent;
     }
 }
