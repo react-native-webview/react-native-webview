@@ -394,6 +394,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
 
     @Override
     public void setFraudulentWebsiteWarningEnabled(RNCWebView view, boolean value) {}
+
+    @Override
+    public void setAutoSelectClientCertificateEnabled(RNCWebView view, boolean value) {}
     /* !iOS PROPS - no implemented here */
 
     @Override
