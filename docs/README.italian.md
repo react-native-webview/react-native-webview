@@ -58,6 +58,6 @@ MIT
 
 ### Traduzioni
 Questo readme è disponibile nelle seguenti lingue:
-- [Francese](docs/README.french.md) 
-- [Inglese](README.md)
-- [Portoghese brasiliano](docs/README.portuguese.md)
+- [Francese](README.french.md) 
+- [Inglese](../README.md)
+- [Portoghese brasiliano](README.portuguese.md)

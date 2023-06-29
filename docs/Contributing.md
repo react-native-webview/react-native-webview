@@ -102,3 +102,4 @@ $ yarn add ../react-native-webview
 This file is available in:
 
 - [Brazilian portuguese](Contributing.portuguese.md)
+- [Italian](Contributing.italian.md)

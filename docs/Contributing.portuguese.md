@@ -100,3 +100,4 @@ $ yarn add ../react-native-webview && react-native link react-native-webview
 Esse arquivo está disponível em:
 
 - [Inglês](Contributing.md)
+- [Italiano](Contributing.italian.md)
