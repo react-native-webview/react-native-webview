@@ -221,4 +221,4 @@ export default class CustomWebView extends Component {
 Esse arquivo está disponível em:
 
 - [Inglês](Custom-Android.md)
-- [Italian](Custom-Android.italian.md)
+- [Italiano](Custom-Android.italian.md)

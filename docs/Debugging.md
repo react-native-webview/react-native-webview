@@ -99,3 +99,4 @@ Settings -> System -> About Phone -> Developer options -> enable USB debugging
 This file is available at:
 
 - [Brazilian portuguese](Debugging.portuguese.md)
+- [Italian](Debugging.italian.md)
