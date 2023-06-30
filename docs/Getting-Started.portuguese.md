@@ -128,3 +128,4 @@ Em seguida, confira o [Referência da API](Reference.portuguese.md) ou o [Guia d
 Esse arquivo está disponível em:
 
 - [Inglês](Getting-Started.md)
+- [Italiano](Getting-Started.italian.md)
