@@ -44,14 +44,14 @@ const MyWebComponent = () => {
 }
 ```
 
-Per ulteriori informazioni, leggi il [riferimento alle API](./docs/Reference.md) e la [guida](./docs/Guide.md). Se sei interessato a dare il tuo contributo, consulta la [guida per i collaboratori](./docs/Contributing.md).
+Per ulteriori informazioni, leggi il [riferimento alle API](Reference.italian.md) e la [guida](Guide.italian.md). Se sei interessato a dare il tuo contributo, consulta la [guida per i collaboratori](Contributing.italian.md).
 
 ### Problemi comuni
 - Se riscontri `Invariant Violation: Native component for "RNCWebView does not exist"`, probabilmente significa che hai dimenticato di eseguire `react-native link` o c'è stato qualche errore durante il processo di collegamento.
 - In caso di un errore di compilazione durante l'operazione `:app:mergeDexRelease`, devi abilitare il supporto multidex in `android/app/build.gradle`, come discusso in [questa issue](https://github.com/react-native-webview/react-native-webview/issues/1344#issuecomment-650544648).
 
 ### Contribuire
-Le contribuzioni sono benvenute, per maggiori informazioni consulta la pagina [Contributing.md](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Contributing.md).
+Le contribuzioni sono benvenute, per maggiori informazioni consulta la pagina [Contributing.md](Contributing.italian.md).
 
 ### Licenza
 MIT
