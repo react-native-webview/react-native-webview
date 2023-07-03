@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Linking, View, ActivityIndicator, Text, Platform } from 'react-native';
 import {
   OnShouldStartLoadWithRequest,
+  OnUrlRejectedCallback,
   ShouldStartLoadRequestEvent,
   WebViewError,
   WebViewErrorEvent,
@@ -46,6 +47,7 @@ const createOnShouldStartLoadWithRequest = (
     lockIdentifier: number,
   ) => void,
   originWhitelist: readonly string[],
+  onUrlRejectedCallback: OnUrlRejectedCallback,
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
   return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
@@ -53,15 +55,7 @@ const createOnShouldStartLoadWithRequest = (
     const { url, lockIdentifier } = nativeEvent;
 
     if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      Linking.canOpenURL(url).then((supported) => {
-        if (supported) {
-          return Linking.openURL(url);
-        }
-        console.warn(`Can't open url: ${url}`);
-        return undefined;
-      }).catch(e => {
-        console.warn('Error opening URL: ', e);
-      });
+      onUrlRejectedCallback(url);
       shouldStart = false;
     } else if (onShouldStartLoadWithRequest) {
       shouldStart = onShouldStartLoadWithRequest(nativeEvent);
@@ -111,6 +105,7 @@ export const useWebViewLogic = ({
   originWhitelist,
   onShouldStartLoadWithRequestProp,
   onShouldStartLoadWithRequestCallback,
+  onUrlRejectedProp,
 }: {
   startInLoadingState?: boolean
   onNavigationStateChange?: (event: WebViewNavigation) => void;
@@ -126,6 +121,7 @@ export const useWebViewLogic = ({
   originWhitelist: readonly string[];
   onShouldStartLoadWithRequestProp?: OnShouldStartLoadWithRequest;
   onShouldStartLoadWithRequestCallback: (shouldStart: boolean, url: string, lockIdentifier?: number | undefined) => void;
+  onUrlRejectedProp?: (url: string) => void;
 }) => {
 
   const [viewState, setViewState] = useState<'IDLE' | 'LOADING' | 'ERROR'>(startInLoadingState ? "LOADING" : "IDLE");
@@ -136,6 +132,23 @@ export const useWebViewLogic = ({
   const updateNavigationState = useCallback((event: WebViewNavigationEvent) => {
     onNavigationStateChange?.(event.nativeEvent);
   }, [onNavigationStateChange]);
+
+  const onUrlRejectedCallback = useCallback(async (url: string) => {
+    if (onUrlRejectedProp) {
+      onUrlRejectedProp(url);
+    } else {
+      try {
+        const supported = await Linking.canOpenURL(`${url}`);
+        if (supported) {
+          await Linking.openURL(`${url}`);
+        } else {
+          console.warn(`Can't open url: ${url}`);
+        }
+      } catch (e) {
+        console.warn(`Error opening URL: ${e}`);
+      }
+    }
+  }, [onUrlRejectedProp]);
 
   const onLoadingStart = useCallback((event: WebViewNavigationEvent) => {
     // Needed for android
@@ -171,7 +184,7 @@ export const useWebViewLogic = ({
 
   // iOS Only
   const onContentProcessDidTerminate = useCallback((event: WebViewTerminatedEvent) => {
-      onContentProcessDidTerminateProp?.(event);
+    onContentProcessDidTerminateProp?.(event);
   }, [onContentProcessDidTerminateProp]);
   // !iOS Only
 
@@ -201,12 +214,13 @@ export const useWebViewLogic = ({
     onLoadProgress?.(event);
   }, [onLoadProgress]);
 
-  const onShouldStartLoadWithRequest = useMemo(() =>  createOnShouldStartLoadWithRequest(
-      onShouldStartLoadWithRequestCallback,
-      originWhitelist,
-      onShouldStartLoadWithRequestProp,
-    )
-  , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
+  const onShouldStartLoadWithRequest = useMemo(() => createOnShouldStartLoadWithRequest(
+    onShouldStartLoadWithRequestCallback,
+    originWhitelist,
+    onUrlRejectedCallback,
+    onShouldStartLoadWithRequestProp,
+  )
+    , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback, onUrlRejectedCallback])
 
   return {
     onShouldStartLoadWithRequest,

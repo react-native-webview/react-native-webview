@@ -52,6 +52,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
   onLoadProgress,
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
+  onUrlRejected: onUrlRejectedProp,
   renderLoading,
   renderError,
   style,
@@ -88,6 +89,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
     originWhitelist,
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
+    onUrlRejectedProp,
   });
 
   useImperativeHandle(ref, () => ({

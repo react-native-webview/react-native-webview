@@ -57,6 +57,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   onHttpError: onHttpErrorProp,
   onRenderProcessGone: onRenderProcessGoneProp,
   onMessage: onMessageProp,
+  onUrlRejected: onUrlRejectedProp,
   renderLoading,
   renderError,
   style,
@@ -93,6 +94,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     originWhitelist,
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
+    onUrlRejectedProp,
   })
 
   useImperativeHandle(ref, () => ({

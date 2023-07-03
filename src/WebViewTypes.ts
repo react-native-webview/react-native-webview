@@ -259,6 +259,10 @@ export type OnShouldStartLoadWithRequest = (
   event: ShouldStartLoadRequest,
 ) => boolean;
 
+export type OnUrlRejectedCallback = (
+  url: string,
+) => void;
+
 export interface BasicAuthCredential {
   /**
    * A username used for basic authentication.
@@ -1232,4 +1236,8 @@ export interface WebViewSharedProps extends ViewProps {
    * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
    */
   webviewDebuggingEnabled?: boolean;
+  /**
+   * Optional function that allows custom handling of any urls that are not whitelisted
+   */
+  onUrlRejected?: (url: string) => void;
 }

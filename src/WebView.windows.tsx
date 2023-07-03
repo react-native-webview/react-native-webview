@@ -45,6 +45,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   onLoadProgress,
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
+  onUrlRejected: onUrlRejectedProp,
   renderLoading,
   renderError,
   style,
@@ -84,7 +85,8 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     originWhitelist,
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
-  })
+    onUrlRejectedProp,
+  });
 
   useImperativeHandle(ref, () => ({
     goForward: () => Commands.goForward(webViewRef.current),

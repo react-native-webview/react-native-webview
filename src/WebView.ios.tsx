@@ -69,6 +69,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onFileDownload,
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
+  onUrlRejected: onUrlRejectedProp,
   renderLoading,
   renderError,
   style,
@@ -108,6 +109,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
     onContentProcessDidTerminateProp,
+    onUrlRejectedProp,
   });
 
   useImperativeHandle(ref, () => ({
