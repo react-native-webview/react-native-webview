@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -208,6 +210,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     settings.setAllowFileAccess(false);
     settings.setAllowContentAccess(false);
+
+    // alipay+ settings
+    settings.setSupportZoom(true);
+    settings.setAppCacheEnabled(true);
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
       settings.setAllowFileAccessFromFileURLs(false);
       setAllowUniversalAccessFromFileURLs(webView, false);
@@ -1002,6 +1009,81 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       final RNCWebView rncWebView = (RNCWebView) view;
       final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
 
+      if (!android.webkit.URLUtil.isNetworkUrl(url) && !android.webkit.URLUtil.isJavaScriptUrl(url)) {
+        final Uri uri;
+        Intent intent = null;
+
+        try {
+          uri = Uri.parse(url);
+          intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+
+        } catch (Exception e){
+          return false;
+        }
+
+        if ("intent".equals(uri.getScheme())) {
+          try {
+            Log.d("LOG", "intent startActivity");
+            WritableMap data = createIntentEvent(view, uri.toString(), intent);
+            ((RNCWebView) view).dispatchEvent(view, new TopMessageEvent(view.getId(), data));
+            return true;
+          } catch (ActivityNotFoundException e) {
+            final String packageName = intent.getPackage();
+            Log.d("LOG", "ActivityNotFoundException packageName :" + packageName);
+            if (!TextUtils.isEmpty(packageName)) {
+              WritableMap data = createIntentEvent(view, "market://details?id=" + packageName, intent);
+              ((RNCWebView) view).dispatchEvent(view, new TopMessageEvent(view.getId(), data));
+              return true;
+            }
+          }
+        } else if ("supertoss".equals(uri.getScheme())) {//TOSS
+          try {
+            Log.d("LOG", "TOSS startActivity");
+            WritableMap data = createIntentEvent(view, uri.toString(), intent);
+            ((RNCWebView) view).dispatchEvent(view, new TopMessageEvent(view.getId(), data));
+            return true;
+          } catch (ActivityNotFoundException e) {
+          Log.d("LOG", "Activi tyNotFoundException TOSS");
+            WritableMap data = createIntentEvent(view, "market://details?id=viva.republica.toss", intent);
+            ((RNCWebView) view).dispatchEvent(view, new TopMessageEvent(view.getId(), data));
+          return true;
+        } catch (Exception e) {
+          return false;
+        }
+      } else if("nidlogin".equals(uri.getScheme())) {//NAVERPAY
+        try {
+          Log.d("LOG", "NAVERPAY startActivity");
+          WritableMap data = createIntentEvent(view, uri.toString(), intent);
+          ((RNCWebView) view).dispatchEvent(view, new TopMessageEvent(view.getId(), data));
+          return true;
+        } catch (ActivityNotFoundException e) {
+          Log.d("LOG", "ActivityNotFoundException NAVERPAY");
+          WritableMap data = createIntentEvent(view, "market://details?id=com.nhn.android.search", intent);
+          return true;
+        }
+        catch (Exception e) {
+          return false;
+        }
+      } else {
+        try {
+          Log.d("LOG", "else startActivity");
+          WritableMap data = createIntentEvent(view, uri.toString(), intent);
+          ((RNCWebView) view).dispatchEvent(view, new TopMessageEvent(view.getId(), data));
+          return true;
+        } catch (ActivityNotFoundException e) {
+          final String packageName = intent.getPackage();
+          Log.d("LOG", "4091_else startActivity ActivityNotFoundException packageName :" + packageName);
+          if (!TextUtils.isEmpty(packageName)) {
+            WritableMap data = createIntentEvent(view, "market://details?id=" + packageName, intent);
+            ((RNCWebView) view).dispatchEvent(view, new TopMessageEvent(view.getId(), data));
+            return true;
+          }
+        } catch (Exception e) {
+          return false;
+        }
+      }
+    }
+
       if (!isJsDebugging && rncWebView.mCatalystInstance != null) {
         final Pair<Integer, AtomicReference<ShouldOverrideCallbackState>> lock = RNCWebViewModule.shouldOverrideUrlLoadingLock.getNewLock();
         final int lockIdentifier = lock.first;
@@ -1230,6 +1312,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       event.putString("title", webView.getTitle());
       event.putBoolean("canGoBack", webView.canGoBack());
       event.putBoolean("canGoForward", webView.canGoForward());
+      return event;
+    }
+
+    protected WritableMap createIntentEvent(WebView webView, String url, Intent intent) {
+      WritableMap event = createWebViewEvent(webView, url);
+      Map data = new HashMap();
+      data.put("id", "INTENT");
+      data.put("scheme", intent.getScheme());
+      data.put("package", intent.getPackage());
+      event.putString("data", (new JSONObject(data)).toString());
       return event;
     }
 
