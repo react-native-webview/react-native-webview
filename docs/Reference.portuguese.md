@@ -1465,11 +1465,11 @@ Exemplo:
 ```
 ### `menuItems`
 
-Uma matriz de objetos de itens de menu personalizados que serão anexados ao UIMenu que aparece ao selecionar o texto (aparecerá após 'Copiar' e 'Compartilhar...'). Usado em conjunto com `onCustomMenuSelection`
+Uma matriz de objetos de itens de menu personalizados que serão exibidos ao selecionar o texto. Uma matriz vazia suprimirá o menu. Usado em conjunto com `onCustomMenuSelection`
 
 | Tipo                                                               | Requerido | Plataforma |
 | ------------------------------------------------------------------ | --------  | --------   |
-| array of objects: {label: string, key: string}                     | Não       | iOS        |
+| array of objects: {label: string, key: string}                     | Não       | iOS, Android        |
 
 Exemplo:
 
@@ -1483,7 +1483,7 @@ Função chamada quando um item de menu personalizado é selecionado. Ele recebe
 
 | Tipo                                                               | Requerido | Plataforma |
 | ------------------------------------------------------------------ | --------  | --------   |
-| function                                                           | Não       | iOS        |
+| function                                                           | Não       | iOS, Android        |
 
 ```javascript
 <WebView
