@@ -1,8 +1,6 @@
 import { Component } from 'react';
 // eslint-disable-next-line
-import { IOSWebViewProps, AndroidWebViewProps, WindowsWebViewProps } from './lib/WebViewTypes';
-
-export { FileDownload, WebViewMessageEvent, WebViewNavigation } from "./lib/WebViewTypes";
+import { IOSWebViewProps, AndroidWebViewProps, WindowsWebViewProps, WebViewCookies } from './lib/WebViewTypes';
 
 export type WebViewProps = IOSWebViewProps & AndroidWebViewProps & WindowsWebViewProps;
 
@@ -23,9 +21,11 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     reload: () => void;
 
     /**
-     * Stop loading the current page.
+     * Get cookies from httpCookieStore(WKHTTPCookieStore).
+     * 
+     * - iOS only (android result is always null)
      */
-    stopLoading(): void;
+    getCookies: (callback: (cookies: WebViewCookies | null) => void) => void;
 
     /**
      * Executes the JavaScript string.
@@ -59,6 +59,11 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      * Tells this WebView to clear its internal back/forward list.
      */
     clearHistory?: () => void;
+
+    /**
+     * Stop loading the current page.
+     */
+    stopLoading(): void;
 }
 
 export {WebView};

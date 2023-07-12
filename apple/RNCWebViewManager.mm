@@ -51,6 +51,7 @@ RCT_EXPORT_MODULE(RNCWebView)
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
 // New arch only
 RCT_CUSTOM_VIEW_PROPERTY(newSource, NSDictionary, RNCWebViewImpl) {}
+RCT_EXPORT_VIEW_PROPERTY(onBlobDownload, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onFileDownload, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingStart, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingFinish, RCTDirectEventBlock)
@@ -200,6 +201,7 @@ RCT_EXPORT_METHOD(name:(nonnull NSNumber *)reactTag in_param)                   
   }];                                                                                                                                   \
 }
 
+
 QUICK_RCT_EXPORT_COMMAND_METHOD(reload)
 QUICK_RCT_EXPORT_COMMAND_METHOD(goBack)
 QUICK_RCT_EXPORT_COMMAND_METHOD(goForward)
@@ -208,6 +210,10 @@ QUICK_RCT_EXPORT_COMMAND_METHOD(requestFocus)
 
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(postMessage, message:(NSString *)message, message)
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(injectJavaScript, script:(NSString *)script, script)
+
+#pragma mark - Classting Custom
+QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(getCookies, callback:(RCTResponseSenderBlock)callback, callback)
+// classting custom end
 
 RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart
                                         lockIdentifier:(double)lockIdentifier)

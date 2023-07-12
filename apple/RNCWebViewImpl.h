@@ -10,6 +10,11 @@
 #import <WebKit/WKDataDetectorTypes.h>
 #import <WebKit/WebKit.h>
 
+#pragma mark - Classting Custom
+#import <React/RCTBridgeModule.h>
+#import "AdPopcornSSPWKScriptMessageHandler.h"
+// classting custom end
+
 #if !TARGET_OS_OSX
 #import <UIKit/UIScrollView.h>
 #endif  // !TARGET_OS_OSX
@@ -45,6 +50,12 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @end
 
 @interface RNCWebViewImpl : RCTView
+
+#pragma mark - Classting Custom
+@property (nonatomic, copy) RCTDirectEventBlock onBlobDownload;
+@property (nonatomic, copy) AdPopcornSSPWKScriptMessageHandler *adPopcornScriptMessageHandler;
+// classting custom end
+
 @property (nonatomic, copy) RCTDirectEventBlock onFileDownload;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
@@ -132,6 +143,9 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)goForward;
 - (void)goBack;
 - (void)reload;
+#pragma mark - Classting Custom
+- (void)getCookies:(RCTResponseSenderBlock)callback;
+// classting custom end
 - (void)stopLoading;
 - (void)requestFocus;
 #ifdef RCT_NEW_ARCH_ENABLED

@@ -21,7 +21,8 @@ type WebViewCommands =
   | 'postMessage'
   | 'injectJavaScript'
   | 'loadUrl'
-  | 'requestFocus';
+  | 'requestFocus'
+  | 'getCookies';
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 
@@ -106,8 +107,13 @@ export interface ShouldStartLoadRequest extends WebViewNavigation {
   isTopFrame: boolean;
 }
 
+export interface BlobDownload {
+  base64String: string;
+}
+
 export interface FileDownload {
   downloadUrl: string;
+  disposition?: string;
 }
 
 export type DecelerationRateConstant = 'normal' | 'fast';
@@ -143,6 +149,8 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 
 export type ShouldStartLoadRequestEvent =
   NativeSyntheticEvent<ShouldStartLoadRequest>;
+
+export type BlobDownloadEvent = NativeSyntheticEvent<BlobDownload>;
 
 export type FileDownloadEvent = NativeSyntheticEvent<FileDownload>;
 
@@ -232,8 +240,25 @@ export interface WebViewCustomMenuItems {
 
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
+export interface WebViewCookie {
+  name: string;
+  value: string;
+  path?: string;
+  domain?: string;
+  version?: string;
+  expires?: string;
+  secure?: boolean;
+  httpOnly?: boolean;
+}
+
+export interface WebViewCookies {
+  [key: string]: WebViewCookie;
+}
+
 export interface ViewManager {
+  startLoadWithResult: Function;
   shouldStartLoadWithLockIdentifier: Function;
+  getCookies: (reactTagId: number, callback: (cookies: WebViewCookies | null) => void) => void;
 }
 
 export interface WebViewNativeConfig {
@@ -309,14 +334,14 @@ export declare type ContentInsetAdjustmentBehavior =
   | 'never'
   | 'always';
 
+export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
+
 export declare type MediaCapturePermissionGrantType =
   | 'grantIfSameHostElsePrompt'
   | 'grantIfSameHostElseDeny'
   | 'deny'
   | 'grant'
   | 'prompt';
-
-export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowingReadAccessToURL?: string;
@@ -616,6 +641,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    *
    * If not provided, the default is to let the webview try to render the file.
    */
+  onBlobDownload?: (event: BlobDownloadEvent) => void;
   onFileDownload?: (event: FileDownloadEvent) => void;
 
   /**
@@ -929,6 +955,22 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   setSupportMultipleWindows?: boolean;
+
+  /**
+   * Used on Android only, controls whether the given list of URL prefixes should
+   * make {@link com.facebook.react.views.webview.ReactWebViewClient} to launch a
+   * default activity intent for those URL instead of loading it within the webview.
+   * Use this to list URLs that WebView cannot handle, e.g. a PDF url.
+   * @platform android
+   */
+  readonly urlPrefixesForDefaultIntent?: string[];
+
+  /**
+   * Boolean value to disable Hardware Acceleration in the `WebView`. Used on Android only
+   * as Hardware Acceleration is a feature only for Android. The default value is `false`.
+   * @platform android
+   */
+  androidHardwareAccelerationDisabled?: boolean;
 
   /**
    * https://developer.android.com/reference/android/webkit/WebView#setLayerType(int,%20android.graphics.Paint)

@@ -17,6 +17,12 @@
 
 #import "objc/runtime.h"
 
+#pragma mark Classting Custom
+#import <React/RCTBridgeModule.h>
+#import <Photos/Photos.h> // import for save gifs
+#import "AdPopcornSSPWKScriptMessageHandler.h"
+// classting custom end
+
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
@@ -24,6 +30,17 @@ static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
+
+#pragma mark - Classting Custom
+static NSString *const IOSFunc = @"IOSFunc";
+static NSString *const AdpopcornSSP = @"apssp";
+static inline BOOL isEmpty(id value)
+{
+  return value == nil
+    || ([value respondsToSelector:@selector(length)] && [(NSData *)value length] == 0)
+    || ([value respondsToSelector:@selector(count)] && [(NSArray *)value count] == 0);
+}
+// classting custom end
 
 #if !TARGET_OS_OSX
 // runtime trick to remove WKWebView keyboard default toolbar
@@ -415,6 +432,14 @@ RCTAutoInsetsProtocol>
   // Shim the HTML5 history API:
   [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                             name:HistoryShimName];
+  #pragma mark - Classting Custom
+  [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+                                                            name:IOSFunc];
+    
+  _adPopcornScriptMessageHandler = [[AdPopcornSSPWKScriptMessageHandler alloc] initWithDelegate:nil];
+  [wkWebViewConfig.userContentController addScriptMessageHandler:_adPopcornScriptMessageHandler name:AdpopcornSSP];
+  // classting custom end
+
   [self resetupScripts:wkWebViewConfig];
 
   if(@available(macos 10.11, ios 9.0, *)) {
@@ -492,6 +517,7 @@ RCTAutoInsetsProtocol>
       _webView.inspectable = _webviewDebuggingEnabled;
 #endif
 
+    _adPopcornScriptMessageHandler.webView = _webView;
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
@@ -696,6 +722,12 @@ RCTAutoInsetsProtocol>
       [event addEntriesFromDictionary: @{@"navigationType": message.body}];
       _onLoadingFinish(event);
     }
+  } else if ([message.name isEqualToString:IOSFunc]) {
+    if (_onBlobDownload) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"base64String": message.body}];
+      _onBlobDownload(event);
+    } 
   } else if ([message.name isEqualToString:MessageHandlerName]) {
     if (_onMessage) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
@@ -1216,6 +1248,110 @@ RCTAutoInsetsProtocol>
     NSURLRequest *request = navigationAction.request;
     BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
 
+    # pragma mark - Classting Custom
+
+    NSArray *allowFileExtensions = @[@"doc",@"hwp",@"xls",@"ppt",@"docx",@"xlsx",@"pptx",@"pdf",@"zip",@"jpeg",@"jpg",@"png",@"gif",@"mp3",@"mp4",@"avi",@"mov"];
+    NSString *fileExtension = request.URL.absoluteString.pathExtension;
+    BOOL isDownload = [allowFileExtensions containsObject:[fileExtension lowercaseString]];
+
+    if ([request.URL.absoluteString rangeOfString:@"data:"].location != NSNotFound) {
+      @try {
+        NSString *base64String = request.URL.absoluteString;
+        NSString *mimeType = [[request.URL.absoluteString componentsSeparatedByString:@";"][0] componentsSeparatedByString:@":"][1];
+
+        if ([mimeType rangeOfString:@"image"].location == NSNotFound) {
+          return;
+        }
+
+        NSURL *url = [NSURL URLWithString:base64String];
+        NSData *data = [NSData dataWithContentsOfURL:url];
+
+        if ([mimeType rangeOfString:@"gif"].location == NSNotFound) {
+          UIImage *convertedImage = [UIImage imageWithData:data scale:1.0];
+          UIImageWriteToSavedPhotosAlbum(convertedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+        } else {
+          [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+            PHAssetCreationRequest *assetRequest;
+            assetRequest = [PHAssetCreationRequest creationRequestForAsset];
+            PHAssetResourceCreationOptions *options = [[PHAssetResourceCreationOptions alloc] init];
+            [assetRequest addResourceWithType:PHAssetResourceTypePhoto data:data options:options];
+          } completionHandler:^(BOOL success, NSError * _Nullable error) {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"AlertButtonConfirm", "") style:UIAlertActionStyleDefault
+                        handler:^(UIAlertAction * action) {}];
+
+                  UIViewController *viewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+                  if (viewController.presentedViewController && !viewController.presentedViewController.isBeingDismissed) {
+                    viewController = viewController.presentedViewController;
+                  }
+
+                  UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
+                                                  message:@""
+                                                  preferredStyle:UIAlertControllerStyleAlert];
+
+
+                  [alert addAction:defaultAction];
+
+                  NSLayoutConstraint *constraint = [NSLayoutConstraint
+                      constraintWithItem:alert.view
+                      attribute:NSLayoutAttributeHeight
+                      relatedBy:NSLayoutRelationLessThanOrEqual
+                      toItem:nil
+                      attribute:NSLayoutAttributeNotAnAttribute
+                      multiplier:1
+                      constant:viewController.view.frame.size.height*2.0f];
+
+                  [alert.view addConstraint:constraint];
+
+                  if (error) {
+                    alert.message = NSLocalizedString(@"AlertMessageDownloadFailure", "");
+                  } else {
+                    alert.message = NSLocalizedString(@"AlertMessageDownloadSuccess", "");
+                  }
+
+                  [viewController presentViewController:alert animated:YES completion:^{}];
+              });
+          }];
+        }
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
+      } @catch (id exception) {
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
+      }
+    }
+
+    if ([request.URL.absoluteString rangeOfString:@"blob:"].location != NSNotFound) {
+      @try {
+        NSString *blobString = request.URL.absoluteString;
+        NSURL *url = [NSURL URLWithString:blobString];
+        NSString *downloadBlobUrl = [NSString stringWithFormat:@"var xhr = new XMLHttpRequest();   \n"
+                  "  xhr.open('GET', '%@', true);                                                     \n"
+                  "  xhr.responseType = 'blob';                                                       \n"
+                  "  xhr.onload = function(e) {                                                       \n"
+                  "    if (this.status == 200) {                                                      \n"
+                  "      var blob = this.response;                                                    \n"
+                  "      var reader = new FileReader();                                               \n"
+                  "      reader.readAsDataURL(blob);                                                  \n"
+                  "      reader.onloadend = function() {                                              \n"
+                  "        base64data = reader.result;                                                \n"
+                  "        window.webkit.messageHandlers.%@.postMessage(base64data);                  \n"
+                  "      }                                                                            \n"
+                  "    }                                                                              \n"
+                  "  }                                                                                \n"
+                  "  xhr.send();                                                                      \n"
+                  "true", url, IOSFunc];
+          
+        [self evaluateJS: downloadBlobUrl thenCall: nil];
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
+      } @catch (id exception) {
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
+      }
+    }
+    // classting custom end
+
     if (_onShouldStartLoadWithRequest) {
         NSMutableDictionary<NSString *, id> *event = [self baseEvent];
         int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
@@ -1259,7 +1395,7 @@ RCTAutoInsetsProtocol>
 
     if (_onLoadingStart) {
         // We have this check to filter out iframe requests and whatnot
-        if (isTopFrame) {
+        if (isTopFrame && !isDownload) {
             NSMutableDictionary<NSString *, id> *event = [self baseEvent];
             [event addEntriesFromDictionary: @{
                 @"url": (request.URL).absoluteString,
@@ -1313,7 +1449,15 @@ RCTAutoInsetsProtocol>
       NSString *disposition = nil;
       if (@available(iOS 13, macOS 10.15, *)) {
         disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
+      } else {
+        #pragma mark - Classting Custom
+        if ([response respondsToSelector:@selector(allHeaderFields)]) {
+          NSDictionary *headerFields = [response allHeaderFields];
+          disposition = headerFields[@"Content-Disposition"];
+        }
+        // classting custom end
       }
+
       BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
       if (isAttachment || !navigationResponse.canShowMIMEType) {
         if (_onFileDownload) {
@@ -1322,6 +1466,9 @@ RCTAutoInsetsProtocol>
           NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
           [downloadEvent addEntriesFromDictionary: @{
             @"downloadUrl": (response.URL).absoluteString,
+            #pragma mark - Classting Custom
+            @"disposition": disposition,
+            // classting custom end
           }];
           _onFileDownload(downloadEvent);
         }
@@ -1476,6 +1623,39 @@ didFinishNavigation:(WKNavigation *)navigation
     [_webView reload];
   }
 }
+
+#pragma mark - Classting Custom
+- (void)getCookies:(RCTResponseSenderBlock)callback
+{
+  WKHTTPCookieStore* cookieStore = _webView.configuration.websiteDataStore.httpCookieStore;
+  [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *_Nonnull allCookies) {
+    NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
+    for (NSHTTPCookie *cookie in allCookies) {
+      [cookies setObject:[self createCookieData:cookie] forKey:cookie.name];
+    }
+    callback(@[cookies]);
+  }];
+}
+
+-(NSDictionary *)createCookieData:(NSHTTPCookie *)cookie
+{
+  NSMutableDictionary *cookieData = [NSMutableDictionary dictionary];
+  [cookieData setObject:cookie.name forKey:@"name"];
+  [cookieData setObject:cookie.value forKey:@"value"];
+  [cookieData setObject:cookie.path forKey:@"path"];
+  [cookieData setObject:cookie.domain forKey:@"domain"];
+  [cookieData setObject:[NSString stringWithFormat:@"%@", @(cookie.version)] forKey:@"version"];
+  if (!isEmpty(cookie.expiresDate)) {
+    NSDateFormatter* formatter = [NSDateFormatter new];
+    [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"];
+    [cookieData setObject:[formatter stringFromDate:cookie.expiresDate] forKey:@"expires"];
+  }
+  [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.secure] forKey:@"secure"];
+  [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.HTTPOnly] forKey:@"httpOnly"];
+  return cookieData;
+}
+// classting custom end
+
 #if !TARGET_OS_OSX
 - (void)addPullToRefreshControl
 {

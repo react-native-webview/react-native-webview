@@ -2,6 +2,7 @@ import type { HostComponent, ViewProps } from 'react-native';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import {DirectEventHandler,Double, Int32, WithDefault} from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import type { BlobDownload, FileDownload, WebViewCookies } from './WebViewTypes';
 
 export type WebViewNativeEvent = Readonly<{
   url: string;
@@ -128,9 +129,8 @@ type WebViewRenderProcessGoneEvent = Readonly<{
   didCrash: boolean;
 }>
 
-type WebViewDownloadEvent = Readonly<{
-  downloadUrl: string;
-}>
+type WebViewBlobDownloadEvent = Readonly<BlobDownload>;
+type WebViewFileDownloadEvent = Readonly<FileDownload>;
 
 // type MenuItem = Readonly<{label: string, key: string}>;
 
@@ -201,7 +201,8 @@ export interface NativeProps extends ViewProps {
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;
   onCustomMenuSelection?: DirectEventHandler<WebViewCustomMenuSelectionEvent>;
-  onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
+  onBlobDownload?: DirectEventHandler<WebViewBlobDownloadEvent>;
+  onFileDownload?: DirectEventHandler<WebViewFileDownloadEvent>;
   // eslint-disable-next-line @typescript-eslint/array-type
   menuItems?: ReadonlyArray<Readonly<{label: string, key: string}>>;
   // Workaround to watch if listener if defined
@@ -257,6 +258,8 @@ export interface NativeCommands {
   injectJavaScript: (viewRef: React.ElementRef<HostComponent<NativeProps>>, javascript: string) => void;
   requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   postMessage: (viewRef: React.ElementRef<HostComponent<NativeProps>>, data: string) => void;
+  // iOS Only
+  getCookies: (viewRef: React.ElementRef<HostComponent<NativeProps>>, callback: (cookies: WebViewCookies | null) => void) => void;
   // Android Only
   loadUrl: (viewRef: React.ElementRef<HostComponent<NativeProps>>, url: string) => void;
   clearFormData: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
@@ -266,7 +269,7 @@ export interface NativeCommands {
 }
 
 export const Commands = codegenNativeCommands<NativeCommands>({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl', 'clearFormData', 'clearCache', 'clearHistory'],
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'getCookies', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl', 'clearFormData', 'clearCache', 'clearHistory'],
 });
 
 export default codegenNativeComponent<NativeProps>(

@@ -20,7 +20,7 @@ import {
   useWebViewLogic,
 } from './WebViewShared';
 import {
-  AndroidWebViewProps, WebViewSourceUri,
+  AndroidWebViewProps, WebViewCookies, WebViewSourceUri,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -107,6 +107,10 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
       }
     },
     stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
+    getCookies: (callback: (cookies: WebViewCookies | null) => void) => {
+      // iOS 에서만 지원
+      callback(null);
+    },
     postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
@@ -175,7 +179,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     {...otherProps}
     messagingEnabled={typeof onMessageProp === 'function'}
     messagingModuleName={messagingModuleName}
-
     hasOnScroll={!!otherProps.onScroll}
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}

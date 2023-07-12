@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="message.toast.download_success">Downloaded successfully</string>
+  <string name="message.toast.download_failure">Download failed</string>
+</resources>

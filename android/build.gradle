@@ -12,6 +12,15 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${safeExtGet('kotlinVersion')}")
         classpath("com.android.tools.build:gradle:7.0.4")
     }
+
+    allprojects {
+        repositories {
+            mavenCentral()
+            maven {
+                url "https://jitpack.io"
+            }
+        }
+    }
 }
 
 def getExtOrIntegerDefault(prop) {
@@ -82,6 +91,9 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
     implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
+    implementation 'com.github.classtinginc:android-image-picker:1.1.9'
+    implementation 'com.google.code.gson:gson:2.8.3'
+    implementation 'com.igaworks.ssp:IgawAdPopcornSSP:3.2.1'
 }
 
 if (isNewArchitectureEnabled()) {

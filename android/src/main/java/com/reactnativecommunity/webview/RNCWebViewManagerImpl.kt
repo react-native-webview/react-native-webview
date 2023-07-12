@@ -1,20 +1,24 @@
 package com.reactnativecommunity.webview
 
+import android.Manifest
 import android.app.DownloadManager
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.webkit.CookieManager
-import android.webkit.DownloadListener
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
@@ -22,12 +26,19 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.uimanager.ThemedReactContext
+import com.igaworks.ssp.part.hybrid.AdPopcornSSPJsBridge
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
+import java.io.FileOutputStream
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
+import java.net.URLDecoder
+import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
@@ -89,49 +100,75 @@ class RNCWebViewManagerImpl {
         if (ReactBuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
+
+        webView.addJavascriptInterface(
+          AdPopcornSSPJsBridge(webView.context, webView),
+          AdPopcornSSPJsBridge.INTERFACE_NAME
+        )
+
+        webView.addJavascriptInterface(
+          BlobDownloadInterface(context),
+          BlobDownloadInterface.INTERFACE_NAME
+        )
+
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
-            val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
-            val request: DownloadManager.Request = try {
-                DownloadManager.Request(Uri.parse(url))
-            } catch (e: IllegalArgumentException) {
-                Log.w(TAG, "Unsupported URI, aborting download", e)
-                return@DownloadListener
-            }
-            var fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
 
-            // Sanitize filename by replacing invalid characters with "_"
-            fileName = fileName.replace(invalidCharRegex, "_")
+            when {
+              url.startsWith("data:") -> {
+                BlobDownloadInterface.downloadBase64(context, url, contentDisposition, mimetype)
+              }
+              url.startsWith("blob:") -> {
+                webView.loadUrl(BlobDownloadInterface.getDownloadScript(url))
+              }
+              else -> {
+                val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
+                val request: DownloadManager.Request = try {
+                    DownloadManager.Request(Uri.parse(url))
+                } catch (e: IllegalArgumentException) {
+                    Log.w(TAG, "Unsupported URI, aborting download", e)
+                    return@DownloadListener
+                }
 
-            val downloadMessage = "Downloading $fileName"
+                var fileName = URLUtil.parseContentDisposition(contentDisposition)
+                if (fileName == null) {
+                  fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
+                }
 
-            //Attempt to add cookie, if it exists
-            var urlObj: URL? = null
-            try {
-                urlObj = URL(url)
-                val baseUrl = urlObj.protocol + "://" + urlObj.host
-                val cookie = CookieManager.getInstance().getCookie(baseUrl)
-                request.addRequestHeader("Cookie", cookie)
-            } catch (e: MalformedURLException) {
-                Log.w(TAG, "Error getting cookie for DownloadManager", e)
-            }
+                // Sanitize filename by replacing invalid characters with "_"
+                fileName = fileName.replace(invalidCharRegex, "_")
 
-            //Finish setting up request
-            request.addRequestHeader("User-Agent", userAgent)
-            request.setTitle(fileName)
-            request.setDescription(downloadMessage)
-            request.allowScanningByMediaScanner()
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-            module.setDownloadRequest(request)
-            if (module.grantFileDownloaderPermissions(
-                    getDownloadingMessageOrDefault(),
-                    getLackPermissionToDownloadMessageOrDefault()
-                )
-            ) {
-                module.downloadFile(
-                    getDownloadingMessageOrDefault()
-                )
+                val downloadMessage = "Downloading $fileName"
+
+                //Attempt to add cookie, if it exists
+                var urlObj: URL? = null
+                try {
+                    urlObj = URL(url)
+                    val baseUrl = urlObj.protocol + "://" + urlObj.host
+                    val cookie = CookieManager.getInstance().getCookie(baseUrl)
+                    request.addRequestHeader("Cookie", cookie)
+                } catch (e: MalformedURLException) {
+                    Log.w(TAG, "Error getting cookie for DownloadManager", e)
+                }
+
+                //Finish setting up request
+                request.addRequestHeader("User-Agent", userAgent)
+                request.setTitle(fileName)
+                request.setDescription(downloadMessage)
+                request.allowScanningByMediaScanner()
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+                module.setDownloadRequest(request)
+                if (module.grantFileDownloaderPermissions(
+                        getDownloadingMessageOrDefault(),
+                        getLackPermissionToDownloadMessageOrDefault()
+                    )
+                ) {
+                    module.downloadFile(
+                        getDownloadingMessageOrDefault()
+                    )
+                }
+              }
             }
         })
         return webView
@@ -207,7 +244,7 @@ class RNCWebViewManagerImpl {
                 }
             webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
             webView.webChromeClient = webChromeClient
-        } else {
+        } else if (webView.webChromeClient is RNCWebChromeClient) {
             var webChromeClient = webView.webChromeClient as RNCWebChromeClient?
             webChromeClient?.onHideCustomView()
             webChromeClient = object : RNCWebChromeClient(webView) {
@@ -631,7 +668,6 @@ class RNCWebViewManagerImpl {
 
     fun setSetDisplayZoomControls(view: RNCWebView, value: Boolean) {
         view.settings.displayZoomControls = value
-
     }
 
     fun setSetSupportMultipleWindows(view: RNCWebView, value: Boolean) {
@@ -646,7 +682,106 @@ class RNCWebViewManagerImpl {
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, enabled)
     }
 
+
     fun setWebviewDebuggingEnabled(view: RNCWebView, enabled: Boolean) {
         RNCWebView.setWebContentsDebuggingEnabled(enabled)
+    }
+
+    class BlobDownloadInterface(private val mReactContext: ThemedReactContext) {
+      companion object {
+        private val CONTENT_DISPOSITION_PATTERN = Pattern.compile(
+          "(.*)filename=\"(.*)\"(.*)",
+          Pattern.CASE_INSENSITIVE
+        );
+        private const val DOWNLOAD_FUNCTION_NAME = "download"
+        const val INTERFACE_NAME = "AndroidBlobDownloader"
+
+        fun getDownloadScript(url: String): String {
+          return """
+            javascript: var xhr = new XMLHttpRequest();
+            xhr.open('GET', '$url', true);
+            xhr.responseType = 'blob';
+            xhr.onload = function(e) {
+              if (this.status == 200) {
+                var blob = this.response;
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = function() {
+                  var base64data = reader.result;
+                  $INTERFACE_NAME.$DOWNLOAD_FUNCTION_NAME(base64data);
+                }
+              }
+            };
+            xhr.send();
+          """.trimIndent()
+        }
+
+        fun downloadBase64(context: ThemedReactContext, url: String, contentDisposition: String? = null, mimetype: String? = null) {
+          val activity = context.currentActivity
+          if (activity == null) {
+            Log.w("ClasstingWebView", "activity is null")
+          } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 100)
+          } else {
+            try {
+              val base64EncodedString = url.substring(url.indexOf(",") + 1)
+              val fileBytes = Base64.decode(base64EncodedString, Base64.DEFAULT)
+
+              var filename: String? = null
+              if (contentDisposition != null) {
+                filename = URLUtil.parseContentDisposition(contentDisposition)
+              }
+
+              if (filename == null) {
+                val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(
+                  mimetype ?: url.substring(url.indexOf(":") + 1, url.indexOf(";"))
+                )
+                val name = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+                filename = "$name.$ext"
+              }
+
+              val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/Classting");
+              val file = File(path, filename)
+
+              if (!path.exists()) {
+                path.mkdirs()
+              }
+
+              if (!file.exists()) {
+                file.createNewFile()
+              }
+
+              var os = FileOutputStream(file)
+              os.write(fileBytes)
+              os.close()
+
+              MediaScannerConnection.scanFile(
+                context,
+                arrayOf(file.absolutePath),
+                null,
+              ) { _, _ ->
+                activity.runOnUiThread {
+                  if (url != null) {
+                    val successMsg = activity.getString(R.string.message_toast_download_success)
+                    Toast.makeText(context, successMsg, Toast.LENGTH_LONG).show()
+                  }
+                }
+              }
+            } catch (e: Exception) {
+              Log.e("ClasstingWebView", "base64 download failed", e)
+              activity.runOnUiThread {
+                val failureMsg = activity.getString(R.string.message_toast_download_failure)
+                Toast.makeText(context, failureMsg, Toast.LENGTH_LONG).show()
+              }
+            }
+          }
+        }
+      }
+
+      // DOWNLOAD_FUNCTION_NAME 와 메소드 이름이 동일해야함
+      @JavascriptInterface
+      fun download(base64Data: String) {
+        downloadBase64(mReactContext, base64Data)
+      }
     }
 }

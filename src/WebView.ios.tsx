@@ -20,6 +20,7 @@ import {
   IOSWebViewProps,
   DecelerationRateConstant,
   WebViewSourceUri,
+  WebViewCookies,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -125,6 +126,11 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
+    getCookies: (callback: (cookies: WebViewCookies | null) => void) => {
+      if (webViewRef.current) {
+        Commands.getCookies(webViewRef.current, callback);
+      }
+    },
   }), [setViewState, webViewRef]);
 
 

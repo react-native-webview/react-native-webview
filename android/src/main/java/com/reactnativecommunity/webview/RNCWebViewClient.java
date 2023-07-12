@@ -1,7 +1,9 @@
 package com.reactnativecommunity.webview;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.SystemClock;
@@ -87,7 +89,21 @@ public class RNCWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         final RNCWebView rncWebView = (RNCWebView) view;
-        final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
+        final ReactContext context = (ReactContext) view.getContext();
+        final boolean isJsDebugging = context.getJavaScriptContextHolder().get() == 0;
+
+        if (url.equals("about:blank")) {
+          return false;
+        } else if (url.startsWith("intent://")) {
+          try {
+            Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+            Uri uri = Uri.parse(intent.getDataString());
+            context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            return true;
+          } catch (Exception e) {
+            // noop
+          }
+        }
 
         if (!isJsDebugging && rncWebView.mCatalystInstance != null) {
             final Pair<Double, AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState>> lock = RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.getNewLock();
