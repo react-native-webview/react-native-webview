@@ -934,7 +934,7 @@ I possibili valori per `overScrollMode` sono:
 
 ### `contentInset`[⬆](#props-index)
 
-The amount by which the web view content is inset from the edges of the scroll view. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
+La quantità di spazio tra il contenuto della WebView e i bordi della ScrollView. Impostato di default su {top: 0, left: 0, bottom: 0, right: 0}.
 
 | Tipo                                                               | Obbligatorio | Piattaforma  |
 | ------------------------------------------------------------------ | ------------ | ------------ |
@@ -1531,7 +1531,7 @@ Ferma il caricamento della pagina corrente.
 injectJavaScript('... javascript string ...');
 ```
 
-Executes the JavaScript string.
+Esegue il codice JavaScript fornito come stringa di testo.
 
 Per saperne di più leggi la guida [Comunicazione tra JS e Native](Guide.italian.md#comunicazione-tra-js-e-native).
 

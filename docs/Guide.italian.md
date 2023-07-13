@@ -205,7 +205,7 @@ WebView.isFileUploadSupported().then(res => {
 ```
 
 ##### MacOS
-Add read access for `User Selected File` in `Signing & Capabilities` tab under `App Sandbox`:
+Aggiungi l'accesso in lettura per il `User Selected File` nella scheda `Signing & Capabilities` sotto `App Sandbox`:
 
 <img width="856" alt="Screenshot della sezione Signing & Capabilities in XCode" src="https://user-images.githubusercontent.com/36531255/200541359-dde130d0-169e-4b58-8b2f-205442d76fdd.png">
 
