@@ -601,7 +601,7 @@ Example:
 />
 ```
 
-Function passed to onContentProcessDidTerminate is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+Function passed to `onContentProcessDidTerminate` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
 
 ```
 canGoBack
@@ -690,7 +690,7 @@ The function passed to `renderError` will be called with the name of the error
 
 ### `renderLoading`[⬆](#props-index)
 
-Function that returns a loading indicator. The startInLoadingState prop must be set to true in order to use this prop.
+Function that returns a loading indicator. The `startInLoadingState` prop must be set to `true` in order to use this prop.
 
 | Type     | Required | Platform            |
 | -------- | -------- | ------------------- |
@@ -1152,7 +1152,7 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 ### `allowingReadAccessToURL`[⬆](#props-index)
 
-A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in for WebViews that are loaded with a source.uri set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in source.uri itself.
+A String value that indicates which URLs the WebView's file can then reference in scripts, AJAX requests, and CSS imports. This is only used in for WebViews that are loaded with a `source.uri` set to a `'file://'` URL. If not provided, the default is to only allow read access to the URL provided in `source.uri` itself.
 
 | Type   | Required | Platform      |
 | ------ | -------- | ------------- |
@@ -1162,7 +1162,7 @@ A String value that indicates which URLs the WebView's file can then reference i
 
 ### `keyboardDisplayRequiresUserAction`[⬆](#props-index)
 
-If false, web content can programmatically display the keyboard. The default value is `true`.
+If `false`, web content can programmatically display the keyboard. The default value is `true`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1172,7 +1172,7 @@ If false, web content can programmatically display the keyboard. The default val
 
 ### `hideKeyboardAccessoryView`[⬆](#props-index)
 
-If true, this will hide the keyboard accessory view (< > and Done).
+If `true`, this will hide the keyboard accessory view (< > and Done).
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1182,7 +1182,7 @@ If true, this will hide the keyboard accessory view (< > and Done).
 
 ### `allowsBackForwardNavigationGestures`[⬆](#props-index)
 
-If true, this will be able horizontal swipe gestures. The default value is `false`.
+If `true`, this will be able horizontal swipe gestures. The default value is `false`.
 
 | Type    | Required | Platform      |
 | ------- | -------- | ------------- |
@@ -1202,7 +1202,7 @@ Does not store any data within the lifetime of the WebView.
 
 ### `allowFileAccess`[⬆](#props-index)
 
-If true, this will allow access to the file system via `file://` URI's. The default value is `false`.
+If `true`, this will allow access to the file system via `file://` URI's. The default value is `false`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1249,7 +1249,7 @@ Possible values are:
 
 ### `pagingEnabled`[⬆](#props-index)
 
-If the value of this property is true, the scroll view stops on multiples of the scroll view’s bounds when the user scrolls. The default value is false.
+If the value of this property is `true`, the scroll view stops on multiples of the scroll view’s bounds when the user scrolls. The default value is `false`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1259,7 +1259,7 @@ If the value of this property is true, the scroll view stops on multiples of the
 
 ### `allowsLinkPreview`[⬆](#props-index)
 
-A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is true; before that, the default value is false.
+A Boolean value that determines whether pressing on a link displays a preview of the destination for the link. In iOS this property is available on devices that support 3D Touch. In iOS 10 and later, the default value is `true`; before that, the default value is `false`.
 
 | Type    | Required | Platform      |
 | ------- | -------- | ------------- |
@@ -1289,7 +1289,9 @@ When setting the standard textZoom (100) parameter size, this undesirable effect
 
 Example:
 
-`<WebView textZoom={100} />`
+```jsx
+<WebView textZoom={100} />
+```
 
 ---
 
@@ -1305,7 +1307,7 @@ Boolean value that determines whether a pull to refresh gesture is available in 
 
 (ios only)
 
-When set to true the hardware silent switch is ignored. Default: `false`
+When set to `true` the hardware silent switch is ignored. Default: `false`
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1348,7 +1350,7 @@ Example:
 
 ### `limitsNavigationsToAppBoundDomains`[⬆](#props-index)
 
-If true indicates to WebKit that a WKWebView will only navigate to app-bound domains. Only applicable for iOS 14 or greater.
+If `true` indicates to WebKit that a WKWebView will only navigate to app-bound domains. Only applicable for iOS 14 or greater.
 
 Once set, any attempt to navigate away from an app-bound domain will fail with the error “App-bound domain failure.”
 Applications can specify up to 10 “app-bound” domains using a new Info.plist key `WKAppBoundDomains`. For more information see [App-Bound Domains](https://webkit.org/blog/10882/app-bound-domains/).
@@ -1369,7 +1371,7 @@ Example:
 
 If false indicates to WebKit that a WKWebView will not interact with text, thus not showing a text selection loop. Only applicable for iOS 14.5 or greater.
 
-Defaults to true.
+Defaults to `true`.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1403,7 +1405,7 @@ Note that a grant may still result in a prompt, for example if the user has neve
 
 Example:
 
-```javascript
+```jsx
 <WebView mediaCapturePermissionGrantType={'grantIfSameHostElsePrompt'} />
 ```
 
@@ -1419,14 +1421,14 @@ If set to `true`, the status bar will be automatically hidden/shown by WebView, 
 
 Example:
 
-```javascript
+```jsx
 <WebView autoManageStatusBarEnabled={false} />
 ```
 
 ### `setSupportMultipleWindows`[⬆](#props-index)
 
 Sets whether the WebView supports multiple windows. See [Android documentation]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') for more information.
-Setting this to false can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
+Setting this to `false` can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
 
 | Type    | Required | Default | Platform |
 | ------- | -------- | ------- | -------- |
@@ -1486,7 +1488,7 @@ An array of custom menu item objects that will be appended to the UIMenu that ap
 
 Example:
 
-```javascript
+```jsx
 <WebView menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]} />
 ```
 
@@ -1498,7 +1500,7 @@ Function called when a custom menu item is selected.  It receives a Native event
 | ------------------------------------------------------------------ | -------- | -------- |
 | function                                                           | No       | iOS      |
 
-```javascript
+```jsx
 <WebView
   menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]}
   onCustomMenuSelection={(webViewEvent) => {
@@ -1530,7 +1532,7 @@ Use WinUI WebView2 control instead of WebView control as the native webview. The
 
 Example:
 
-```javascript
+```jsx
 <WebView useWebView2={true} />
 ```
 
@@ -1544,7 +1546,7 @@ Android enforces a minimum font size based on this value. A non-negative integer
 
 Example:
 
-```javascript
+```jsx
 <WebView minimumFontSize={1} />
 ```
 
@@ -1566,8 +1568,8 @@ This is the message that is shown in the Toast when the webview is unable to dow
 
 ### `allowsProtectedMedia`[⬆](#props-index)
 
-Whether or not the Webview can play media protected by DRM. Default is false.
-/!\ Setting this to false won't revoke the permission already granted to the current webpage. In order to do so, you'd have to reload the page as well. /!\
+Whether or not the Webview can play media protected by DRM. Default is `false`.
+⚠️ Setting this to `false` won't revoke the permission already granted to the current webpage. In order to do so, you'd have to reload the page as well. ⚠️
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1584,7 +1586,7 @@ A Boolean value that indicates whether the web view shows warnings for suspected
 ### `webviewDebuggingEnabled`[⬆](#props-index)
 
 Whether or not the webview can be debugged remotely using Safari / Chrome.
-Default is false. Supported on iOS as of 16.4, previous versions always allow debugging by default.
+Default is `false`. Supported on iOS as of 16.4, previous versions always allow debugging by default.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1686,6 +1688,7 @@ Also check out our [Getting Started Guide](Getting-Started.md) and [In-Depth Gui
 
 ## Translations
 
-This file is available at:
+This file is available in:
 
 - [Brazilian portuguese](Reference.portuguese.md)
+- [Italian](Reference.italian.md)
