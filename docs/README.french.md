@@ -74,4 +74,5 @@ Voir [Contributing.md](https://github.com/react-native-webview/react-native-webv
 This readme is available in:
 
 - [English](../README.md)
+- [Italian](README.italian.md)
 - [Brazilian portuguese](README.portuguese.md)

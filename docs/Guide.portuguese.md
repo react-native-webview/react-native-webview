@@ -550,3 +550,4 @@ O vídeo no `iOS` sempre ignorará a chave de silêncio do hardware.
 Esse arquivo está disponível em:
 
 - [Inglês](Guide.md)
+- [Italiano](Guide.italian.md)

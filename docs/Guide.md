@@ -204,7 +204,7 @@ Normally, apps that do not have permission to use the camera can prompt the user
 
 File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
 
-```
+```jsx
 import { WebView } from "react-native-webview";
 
 WebView.isFileUploadSupported().then(res => {
@@ -608,6 +608,7 @@ Video on `iOS` will always ignore the hardware silence switch.
 
 ## Translations
 
-This file is available at:
+This file is available in:
 
 - [Brazilian portuguese](Guide.portuguese.md)
+- [Italian](Guide.italian.md)
