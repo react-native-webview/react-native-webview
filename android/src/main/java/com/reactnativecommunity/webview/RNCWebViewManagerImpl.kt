@@ -13,8 +13,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.CookieManager
 import android.webkit.DownloadListener
+import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.annotation.RequiresApi
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
@@ -24,6 +26,8 @@ import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.uimanager.ThemedReactContext
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.BufferedInputStream
+import java.io.ByteArrayOutputStream
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
@@ -81,6 +85,7 @@ class RNCWebViewManagerImpl {
         setAllowUniversalAccessFromFileURLs(webView, false)
         setMixedContentMode(webView, "never")
 
+
         // Fixes broken full-screen modals/galleries due to body height being 0.
         webView.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -90,6 +95,16 @@ class RNCWebViewManagerImpl {
             WebView.setWebContentsDebuggingEnabled(true)
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+
+            Log.i("ReactNative", mimetype);
+            if(url.startsWith("blob:")){
+                Log.i("ReactNative", "Downloading " + url);
+                downloadBlob(url, webView)
+                return@DownloadListener
+            }
+            // print the url
+
+
             webView.setIgnoreErrFailedForThisURL(url)
             val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {
@@ -104,6 +119,8 @@ class RNCWebViewManagerImpl {
             fileName = fileName.replace(invalidCharRegex, "_")
 
             val downloadMessage = "Downloading $fileName"
+
+            
 
             //Attempt to add cookie, if it exists
             var urlObj: URL? = null
@@ -135,6 +152,31 @@ class RNCWebViewManagerImpl {
             }
         })
         return webView
+    }
+
+
+
+  class RNCWebViewBridge internal constructor() {
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @JavascriptInterface
+    fun downloadFile() {
+      Log.i("ReactNative", "invoked by js");
+    }
+
+
+  }
+
+    fun downloadBlob(url : String, webview: RNCWebView){
+       injectJs(webview, "window.reactNativeDownloadBlobUrl('" + url + "');");
+    }
+
+    fun injectJs(webview: RNCWebView, js: String){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+          webview.evaluateJavascript(js, null);
+        } else {
+          webview.loadUrl("javascript:$js");
+        }
     }
 
     private fun setupWebChromeClient(
@@ -498,6 +540,11 @@ class RNCWebViewManagerImpl {
     fun setMessagingEnabled(view: RNCWebView, value: Boolean) {
         view.setMessagingEnabled(value)
     }
+
+  fun setBlobDownloadingEnabled(view: RNCWebView, value: Boolean) {
+    view.setDownloadingBlobEnabled(value)
+    view.setDownloadingMessage(getDownloadingMessageOrDefault())
+  }
 
     fun setMediaPlaybackRequiresUserAction(view: RNCWebView, value: Boolean) {
         view.settings.mediaPlaybackRequiresUserGesture = value

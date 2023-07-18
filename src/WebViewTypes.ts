@@ -1069,6 +1069,13 @@ export interface WebViewSharedProps extends ViewProps {
   javaScriptEnabled?: boolean;
 
   /**
+   * Boolean value to enable downloading blob files in the `WebView`.
+   * default value is `false`.
+   * @platform android
+   */
+  blobDownloadingEnabled?: boolean;
+
+  /**
    * A Boolean value indicating whether JavaScript can open windows without user interaction.
    * The default value is `false`.
    */
