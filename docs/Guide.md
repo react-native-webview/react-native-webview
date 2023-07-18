@@ -56,7 +56,7 @@ class MyWeb extends Component {
 
 ### Loading local HTML files
 
-Note: This is currently not working as discussed in [#428](https://github.com/react-native-webview/react-native-webview/issues/428) and [#518](https://github.com/react-native-webview/react-native-webview/issues/518). Possible workarounds include bundling all assets with webpack or similar, or running a [local webserver](https://github.com/futurepress/react-native-static-server).
+Note: This is currently not working as discussed in [#428](https://github.com/react-native-webview/react-native-webview/issues/428) and [#518](https://github.com/react-native-webview/react-native-webview/issues/518). Possible workarounds include bundling all assets with webpack or similar, or running a [local webserver](https://github.com/birdofpreyru/react-native-static-server).
 
 <details><summary>Show non-working method</summary>
 
