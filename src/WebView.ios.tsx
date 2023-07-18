@@ -4,6 +4,8 @@ import {
   View,
   ImageSourcePropType,
   HostComponent,
+  NativeModules,
+  findNodeHandle,
 } from 'react-native';
 import invariant from 'invariant';
 
@@ -21,11 +23,12 @@ import {
   DecelerationRateConstant,
   WebViewSourceUri,
   WebViewCookies,
+  ViewManager,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-
+const RNCWebViewManager = NativeModules.RNCWebView as ViewManager;
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -127,8 +130,12 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
     getCookies: (callback: (cookies: WebViewCookies | null) => void) => {
-      if (webViewRef.current) {
-        Commands.getCookies(webViewRef.current, callback);
+      let reactTagId = null;
+      // eslint-disable-next-line no-cond-assign
+      if (webViewRef.current && typeof (reactTagId = findNodeHandle(webViewRef.current)) === 'number') {
+        RNCWebViewManager.getCookies(reactTagId, callback);
+      } else {
+        callback(null);
       }
     },
   }), [setViewState, webViewRef]);
