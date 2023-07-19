@@ -14,7 +14,7 @@ import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
-  useWebWiewLogic,
+  useWebViewLogic,
 } from './WebViewShared';
 import {
   IOSWebViewProps,
@@ -48,6 +48,7 @@ const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
 }
 
 const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
+  fraudulentWebsiteWarningEnabled = true,
   javaScriptEnabled = true,
   cacheEnabled = true,
   originWhitelist = defaultOriginWhitelist,
@@ -93,7 +94,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebWiewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -174,6 +175,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     <NativeWebView
       key="webViewKey"
       {...otherProps}
+      fraudulentWebsiteWarningEnabled={fraudulentWebsiteWarningEnabled}
       javaScriptEnabled={javaScriptEnabled}
       cacheEnabled={cacheEnabled}
       useSharedProcessPool={useSharedProcessPool}

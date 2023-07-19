@@ -26,7 +26,7 @@ yarn install
 yarn android
 ```
 
-The Android example app will built, the Metro Bundler will launch, and the example app will be installed and started in the Android emulator.
+The Android example app will built, the Metro bundler will launch, and the example app will be installed and started in the Android emulator.
 
 #### For iOS:
 
@@ -99,7 +99,7 @@ $ yarn add ../react-native-webview
 - After pulling this repo and installing all dependencies, you can run tests using the command: `yarn ci`
 
 ## Translations
-
-This file is available at:
+This file is available in:
 
 - [Brazilian portuguese](Contributing.portuguese.md)
+- [Italian](Contributing.italian.md)

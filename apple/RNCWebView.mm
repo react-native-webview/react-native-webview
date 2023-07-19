@@ -271,6 +271,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(allowFileAccessFromFileURLs)
     REMAP_WEBVIEW_PROP(allowUniversalAccessFromFileURLs)
     REMAP_WEBVIEW_PROP(allowsInlineMediaPlayback)
+    REMAP_WEBVIEW_PROP(webviewDebuggingEnabled)
     REMAP_WEBVIEW_PROP(allowsAirPlayForMediaPlayback)
     REMAP_WEBVIEW_PROP(mediaPlaybackRequiresUserAction)
     REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
@@ -285,6 +286,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_STRING_PROP(allowingReadAccessToURL)
     
     REMAP_WEBVIEW_PROP(messagingEnabled)
+    REMAP_WEBVIEW_PROP(fraudulentWebsiteWarningEnabled)
     REMAP_WEBVIEW_PROP(enableApplePay)
     REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
     REMAP_WEBVIEW_PROP(bounces)

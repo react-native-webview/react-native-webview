@@ -1620,3 +1620,5 @@ Confira também nosso [Guia de Introdução](Getting-Started.portuguese.md) e [G
 Esse arquivo está disponível em:
 
 - [Inglês](Reference.md)
+- [Italiano](Reference.italian.md)
+
