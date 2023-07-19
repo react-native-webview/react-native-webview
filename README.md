@@ -79,3 +79,4 @@ This readme is available in:
 
 - [Brazilian portuguese](docs/README.portuguese.md)
 - [French](docs/README.french.md)
+- [Italian](docs/README.italian.md)

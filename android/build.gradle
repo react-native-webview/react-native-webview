@@ -64,7 +64,11 @@ android {
 }
 
 def reactNativePath = findNodeModulePath(projectDir, "react-native")
-def codegenPath = findNodeModulePath(projectDir, "react-native-codegen")
+def codegenPath = findNodeModulePath(projectDir, "@react-native/codegen")
+if (codegenPath == null) {
+  // Compat for 0.71 and lower (to be removed)
+  codegenPath = findNodeModulePath(projectDir, "react-native-codegen")
+}
 
 repositories {
     maven {

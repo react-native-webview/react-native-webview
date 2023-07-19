@@ -36,6 +36,7 @@ import com.facebook.react.modules.core.PermissionListener;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.SecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -261,14 +262,15 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         }
     }
 
-    public boolean startPhotoPickerIntent(final String[] acceptTypes, final boolean allowMultiple, ValueCallback<Uri[]> callback) {
+    public boolean startPhotoPickerIntent(final String[] acceptTypes, final boolean allowMultiple, final ValueCallback<Uri[]> callback, final boolean isCaptureEnabled) {
         mFilePathCallback = callback;
         Activity activity = mContext.getCurrentActivity();
 
         ArrayList<Parcelable> extraIntents = new ArrayList<>();
+        Intent photoIntent = null;
         if (!needsCameraPermission()) {
             if (acceptsImages(acceptTypes)) {
-                Intent photoIntent = getPhotoIntent();
+                photoIntent = getPhotoIntent();
                 if (photoIntent != null) {
                     extraIntents.add(photoIntent);
                 }
@@ -281,16 +283,24 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
             }
         }
 
-        Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
-
         Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-        chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
-
-        if (chooserIntent.resolveActivity(activity.getPackageManager()) != null) {
-            activity.startActivityForResult(chooserIntent, PICKER);
+        if (isCaptureEnabled) {
+            chooserIntent = photoIntent;
         } else {
-            Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
+            Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
+
+            chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
+        }
+
+        if (chooserIntent != null) {
+            if (chooserIntent.resolveActivity(activity.getPackageManager()) != null) {
+                activity.startActivityForResult(chooserIntent, PICKER);
+            } else {
+                Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
+            }
+        } else {
+            Log.w("RNCWebViewModule", "there is no Camera permission");
         }
 
         return true;
@@ -305,7 +315,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
         try {
             dm.enqueue(mDownloadRequest);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | SecurityException e) {
             Log.w("RNCWebViewModule", "Unsupported URI, aborting download", e);
             return;
         }

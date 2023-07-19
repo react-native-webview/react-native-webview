@@ -56,7 +56,7 @@ class MyWeb extends Component {
 
 ### Loading local HTML files
 
-Note: This is currently not working as discussed in [#428](https://github.com/react-native-webview/react-native-webview/issues/428) and [#518](https://github.com/react-native-webview/react-native-webview/issues/518). Possible workarounds include bundling all assets with webpack or similar, or running a [local webserver](https://github.com/futurepress/react-native-static-server).
+Note: This is currently not working as discussed in [#428](https://github.com/react-native-webview/react-native-webview/issues/428) and [#518](https://github.com/react-native-webview/react-native-webview/issues/518). Possible workarounds include bundling all assets with webpack or similar, or running a [local webserver](https://github.com/birdofpreyru/react-native-static-server).
 
 <details><summary>Show non-working method</summary>
 
@@ -204,7 +204,7 @@ Normally, apps that do not have permission to use the camera can prompt the user
 
 File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
 
-```
+```jsx
 import { WebView } from "react-native-webview";
 
 WebView.isFileUploadSupported().then(res => {
@@ -608,6 +608,7 @@ Video on `iOS` will always ignore the hardware silence switch.
 
 ## Translations
 
-This file is available at:
+This file is available in:
 
 - [Brazilian portuguese](Guide.portuguese.md)
+- [Italian](Guide.italian.md)

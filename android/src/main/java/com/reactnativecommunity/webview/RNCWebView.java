@@ -4,13 +4,18 @@ import androidx.annotation.Nullable;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -28,14 +33,21 @@ import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.scroll.OnScrollDispatchHelper;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
+import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
 
 public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
@@ -133,6 +145,75 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     )
             );
         }
+    }
+
+    protected @Nullable
+    List<Map<String, String>> menuCustomItems;
+
+    public void setMenuCustomItems(List<Map<String, String>> menuCustomItems) {
+      this.menuCustomItems = menuCustomItems;
+    }
+
+    @Override
+    public ActionMode startActionMode(ActionMode.Callback callback, int type) {
+      if(menuCustomItems == null ){
+        return super.startActionMode(callback, type);
+      }
+
+      return super.startActionMode(new ActionMode.Callback2() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+          for (int i = 0; i < menuCustomItems.size(); i++) {
+            menu.add(Menu.NONE, i, i, (menuCustomItems.get(i)).get("label"));
+          }
+          return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+          return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+          WritableMap wMap = Arguments.createMap();
+          RNCWebView.this.evaluateJavascript(
+            "(function(){return {selection: window.getSelection().toString()} })()",
+            new ValueCallback<String>() {
+              @Override
+              public void onReceiveValue(String selectionJson) {
+                Map<String, String> menuItemMap = menuCustomItems.get(item.getItemId());
+                wMap.putString("label", menuItemMap.get("label"));
+                wMap.putString("key", menuItemMap.get("key"));
+                String selectionText = "";
+                try {
+                  selectionText = new JSONObject(selectionJson).getString("selection");
+                } catch (JSONException ignored) {}
+                wMap.putString("selectedText", selectionText);
+                dispatchEvent(RNCWebView.this, new TopCustomMenuSelectionEvent(RNCWebView.this.getId(), wMap));
+                mode.finish();
+              }
+            }
+          );
+          return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+          mode = null;
+        }
+
+        @Override
+        public void onGetContentRect (ActionMode mode,
+                View view,
+                Rect outRect){
+            if (callback instanceof ActionMode.Callback2) {
+                ((ActionMode.Callback2) callback).onGetContentRect(mode, view, outRect);
+            } else {
+                super.onGetContentRect(mode, view, outRect);
+            }
+          }
+      }, type);
     }
 
     @Override
