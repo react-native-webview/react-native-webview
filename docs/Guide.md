@@ -375,16 +375,16 @@ By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the J
 > Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
 
 
-#### the `injectJavaScriptObject` prop (Android Only)
+#### The `injectJavaScriptObject` prop (Android Only)
 
-Due to the Android race condition mentioned above, this more reliable prop was added. While you cannot execute arbitrary JavaScript, you can make any JS object available to the JS run in the webview prior to the page load completing.
+Due to the Android race condition mentioned above, this more reliable prop was added. While you cannot execute arbitrary JavaScript, you can make an arbitrary JS object available to the JS run in the webview prior to the page load completing.
 
 ```html
 <html>
   <head>
     <script>
       window.onload = (event) => {
-        document.getElementById('output').innerHTML = JSON.parse(injectedObject.toString()).authToken;
+        document.getElementById('output').innerHTML = JSON.parse(window.RNCWebViewBridge.injectedObject()).customValue;
       }
     </script>
   </head>
@@ -394,7 +394,7 @@ Due to the Android race condition mentioned above, this more reliable prop was a
 </html>
 ```
 
-Note: `injectedObject.toString()` returns the JSON encoded object passed in to `injectJavaScriptObject`. It must be passed to `JSON.parse` before it's properties can be accessed.
+Note: `RNCWebViewBridge.injectedObject()` returns the JSON encoded object passed in to `injectJavaScriptObject`. It must be passed to `JSON.parse` before it's properties can be accessed.
 
 ```jsx
 import React, { Component } from 'react';

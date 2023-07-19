@@ -37,21 +37,13 @@ import com.reactnativecommunity.webview.events.TopMessageEvent;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
- class JsObject {
-    protected String value;
-    public JsObject(String newValue) {
-        value = newValue;
-    }
-    @JavascriptInterface
-    public String toString() { return value; }
- }
-
 public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String injectedJS;
     protected @Nullable
     String injectedJSBeforeContentLoaded;
     protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
+    RNCWebViewBridge bridge;
 
     /**
      * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
@@ -172,8 +164,11 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return mRNCWebViewClient;
     }
 
-    protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
-        return new RNCWebViewBridge(webView);
+    protected RNCWebViewBridge getRNCWebViewBridge(RNCWebView webView) {
+        if (!bridge) {
+            bridge = new RNCWebViewBridge(webView);
+        }
+        return bridge;
     }
 
     protected void createCatalystInstance() {
@@ -193,7 +188,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         messagingEnabled = enabled;
 
         if (enabled) {
-            addJavascriptInterface(createRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
+            addJavascriptInterface(getRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
         } else {
             removeJavascriptInterface(JAVASCRIPT_INTERFACE);
         }
@@ -221,8 +216,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     public void injectJavaScriptObject(String obj) {
         if (getSettings().getJavaScriptEnabled()) {
-            WebView webView = this;
-            webView.addJavascriptInterface(new JsObject(obj), "injectedObject");
+            RNCWebViewBridge b = getRNCWebViewBridge(this);
+            b.setInjectedObject(obj)
+            addJavascriptInterface(b, JAVASCRIPT_INTERFACE);
         }
     }
 
@@ -323,9 +319,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
   protected class RNCWebViewBridge {
         RNCWebView mWebView;
+        String injectedObject;
 
         RNCWebViewBridge(RNCWebView c) {
           mWebView = c;
+        }
+
+        setInjectedObject(String s) {
+            injectedObject = s;
         }
 
         /**
@@ -336,6 +337,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         public void postMessage(String message) {
           mWebView.onMessage(message);
         }
+
+        @JavascriptInterface
+        public String injectedObject() { return value; }
     }
 
 

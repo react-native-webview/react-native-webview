@@ -257,12 +257,14 @@ Inject any JavaScript object into the webview so it is available to the JS runni
 
 Example:
 
-Set an auth token to be used in JavaScript.
+Set a value to be used in JavaScript.
+
+Note: Any value in the object will be accessible to *all* frames of the webpage. If sensitive values are present please ensure that you have a strict Content Security Policy set up to avoid data leaking.
 
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  injectJavaScriptObject={{ authToken: 'myAuthToken' }}
+  injectJavaScriptObject={{ customValue: 'myCustomValue' }}
 />;
 ```
 
@@ -271,7 +273,7 @@ Set an auth token to be used in JavaScript.
   <head>
     <script>
       window.onload = (event) => {
-        const authToken = JSON.parse(injectedObject.toString()).authToken;
+        const customValue = JSON.parse(window.RNCWebViewBridge.injectedObject()).customValue;
         ...
       }
     </script>

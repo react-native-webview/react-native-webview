@@ -478,7 +478,7 @@ class RNCWebViewManagerImpl {
         view.injectedJavaScriptBeforeContentLoadedForMainFrameOnly = value
     }
 
-    fun setInjectJavaScriptObject(view: RNCWebView, value: String?) {
+    fun setInjectedJavaScriptObject(view: RNCWebView, value: String?) {
         view.injectJavaScriptObject(value)
     }
 
