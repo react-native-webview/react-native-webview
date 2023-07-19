@@ -59,3 +59,4 @@ lib/
 .settings/
 msbuild.binlog
 example/msbuild.binlog
+.history
