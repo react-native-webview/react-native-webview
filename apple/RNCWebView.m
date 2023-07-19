@@ -64,7 +64,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @end
 #endif // TARGET_OS_OSX
 
-@interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler,
+@interface RNCWebView () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, WKHTTPCookieStoreObserver,
 #if !TARGET_OS_OSX
 UIScrollViewDelegate,
 #endif // !TARGET_OS_OSX
@@ -80,6 +80,7 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
+@property (nonatomic, copy) RCTDirectEventBlock onOpenWindow;
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) WKWebView *webView;
 #else
@@ -234,6 +235,9 @@ RCTAutoInsetsProtocol>
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+  if (@available(iOS 11.0, *)) {
+    [self.webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
+  }
 }
 
 - (void)tappedMenuItem:(NSString *)eventType
@@ -310,7 +314,15 @@ RCTAutoInsetsProtocol>
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
+    NSURL *url = navigationAction.request.URL;
+
+    if (_onOpenWindow) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"targetUrl": url.absoluteString}];
+      _onOpenWindow(event);
+    } else {
+      [webView loadRequest:navigationAction.request];
+    }
   }
   return nil;
 }
@@ -324,6 +336,14 @@ RCTAutoInsetsProtocol>
     prefs.javaScriptEnabled = NO;
     _prefsUsed = YES;
   }
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
+  if (@available(iOS 13.0, *)) {
+    if (!_fraudulentWebsiteWarningEnabled) {
+        prefs.fraudulentWebsiteWarningEnabled = NO;
+        _prefsUsed = YES;
+    }
+  }
+#endif
   if (_allowUniversalAccessFromFileURLs) {
     [wkWebViewConfig setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
   }
@@ -712,7 +732,7 @@ RCTAutoInsetsProtocol>
       [_webView loadHTMLString:@"" baseURL:nil];
       return;
     }
-    if (request.URL.host) {
+    if (request.URL.host || [request.URL.absoluteString isEqualToString:@"about:blank"]) {
       [_webView loadRequest:request];
     }
     else {
@@ -1140,7 +1160,22 @@ RCTAutoInsetsProtocol>
   WKNavigationType navigationType = navigationAction.navigationType;
   NSURLRequest *request = navigationAction.request;
   BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
-  
+  BOOL hasTargetFrame = navigationAction.targetFrame != nil;
+
+  if (_onOpenWindow && !hasTargetFrame) {
+    // When OnOpenWindow should be called, we want to prevent the navigation
+    // If not prevented, the `decisionHandler` is called first and after that `createWebViewWithConfiguration` is called
+    // In that order the WebView's ref would be updated with the target URL even if `createWebViewWithConfiguration` does not call `loadRequest`
+    // So the WebView's document stays on the current URL, but the WebView's ref is replaced by the target URL
+    // By preventing the navigation here, we also prevent the WebView's ref mutation
+    // The counterpart is that we have to manually call `_onOpenWindow` here, because no navigation means no call to `createWebViewWithConfiguration`
+    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    [event addEntriesFromDictionary: @{@"targetUrl": request.URL.absoluteString}];
+    decisionHandler(WKNavigationActionPolicyCancel);
+    _onOpenWindow(event);
+    return;
+  }
+
   if (_onShouldStartLoadWithRequest) {
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     if (request.mainDocumentURL) {
@@ -1151,7 +1186,8 @@ RCTAutoInsetsProtocol>
     [event addEntriesFromDictionary: @{
       @"url": (request.URL).absoluteString,
       @"navigationType": navigationTypes[@(navigationType)],
-      @"isTopFrame": @(isTopFrame)
+      @"isTopFrame": @(isTopFrame),
+      @"hasTargetFrame": @(hasTargetFrame),
     }];
     if (![self.delegate webView:self
       shouldStartLoadForRequest:event
@@ -1327,21 +1363,24 @@ RCTAutoInsetsProtocol>
 - (void)webView:(WKWebView *)webView
 didFinishNavigation:(WKNavigation *)navigation
 {
+  if (_ignoreSilentHardwareSwitch) {
+    [self forceIgnoreSilentHardwareSwitch:true];
+  }
+
+  if (_onLoadingFinish) {
+    _onLoadingFinish([self baseEvent]);
+  }
+}
+
+- (void)cookiesDidChangeInCookieStore:(WKHTTPCookieStore *)cookieStore
+{
   if(_sharedCookiesEnabled && @available(iOS 11.0, *)) {
     // Write all cookies from WKWebView back to sharedHTTPCookieStorage
-    [webView.configuration.websiteDataStore.httpCookieStore getAllCookies:^(NSArray* cookies) {
+    [cookieStore getAllCookies:^(NSArray* cookies) {
       for (NSHTTPCookie *cookie in cookies) {
         [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
       }
     }];
-  }
-  
-  if (_ignoreSilentHardwareSwitch) {
-    [self forceIgnoreSilentHardwareSwitch:true];
-  }
-  
-  if (_onLoadingFinish) {
-    _onLoadingFinish([self baseEvent]);
   }
 }
 
@@ -1559,7 +1598,9 @@ didFinishNavigation:(WKNavigation *)navigation
       if(!_incognito && !_cacheEnabled) {
         wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
       }
-      [self syncCookiesToWebView:nil];
+      [self syncCookiesToWebView:^{
+        [wkWebViewConfig.websiteDataStore.httpCookieStore addObserver:self];
+      }];
     } else {
       NSMutableString *script = [NSMutableString string];
       

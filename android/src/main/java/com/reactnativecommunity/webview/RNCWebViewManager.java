@@ -84,6 +84,7 @@ import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
+import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
 import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
 
@@ -161,6 +162,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   protected RNCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
+  protected boolean mHasOnOpenWindowEvent = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
   protected @Nullable String mDownloadingMessage = null;
@@ -309,6 +311,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "lackPermissionToDownloadMessage")
   public void setLackPermissionToDownlaodMessage(WebView view, String message) {
     mLackPermissionToDownloadMessage = message;
+  }
+
+  @ReactProp(name = "hasOnOpenWindowEvent")
+  public void setHasOnOpenWindowEvent(WebView view, boolean hasEvent) {
+    mHasOnOpenWindowEvent = hasEvent;
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+      WebChromeClient client = view.getWebChromeClient();
+      if (client instanceof RNCWebChromeClient) {
+        ((RNCWebChromeClient) client).setHasOnOpenWindowEvent(hasEvent);
+      }
+    }
   }
 
   @ReactProp(name = "cacheEnabled")
@@ -694,6 +707,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
     export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
     export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
+    export.put(TopOpenWindowEvent.EVENT_NAME, MapBuilder.of("registrationName", "onOpenWindow"));
     return export;
   }
 
@@ -876,6 +890,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         }
       };
 
+      mWebChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent);
       webView.setWebChromeClient(mWebChromeClient);
     } else {
       if (mWebChromeClient != null) {
@@ -889,6 +904,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         }
       };
 
+      mWebChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent);
       webView.setWebChromeClient(mWebChromeClient);
     }
   }
@@ -1227,6 +1243,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
 
+    protected boolean hasOnOpenWindowEvent = false;
+
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
       this.mWebView = webView;
@@ -1236,6 +1254,24 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
 
       final WebView newWebView = new WebView(view.getContext());
+      
+      if(hasOnOpenWindowEvent) {
+        newWebView.setWebViewClient(new WebViewClient(){
+          @Override
+          public boolean shouldOverrideUrlLoading (WebView subview, String url) {
+            WritableMap event = Arguments.createMap();
+            event.putString("targetUrl", url);
+
+            ((RNCWebView) view).dispatchEvent(
+              view,
+              new TopOpenWindowEvent(view.getId(), event)
+            );
+
+            return true;
+          }
+        });
+      }
+
       final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
       transport.setWebView(newWebView);
       resultMsg.sendToTarget();
@@ -1479,6 +1515,10 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
       progressChangedFilter = filter;
+    }
+
+    public void setHasOnOpenWindowEvent(boolean hasEvent) {
+      hasOnOpenWindowEvent = hasEvent;
     }
   }
 

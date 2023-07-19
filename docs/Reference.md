@@ -22,6 +22,7 @@ This document lays out the current public properties and methods for the React N
 - [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
+- [`onOpenWindow`](Reference.md#onopenwindow)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`onScroll`](Reference.md#onscroll)
 - [`originWhitelist`](Reference.md#originwhitelist)
@@ -575,6 +576,37 @@ url
 
 ---
 
+### `onOpenWindow`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the `WebView` should open a new window.
+
+This happens when the JS calls `window.open('http://someurl', '_blank')` or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onOpenWindow={(syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    const { targetUrl } = nativeEvent
+    console.log('Intercepted OpenWindow for', targetUrl)
+  }}
+/>
+```
+
+Function passed to onOpenWindow is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+targetUrl
+```
+
+---
+
 ### `onContentProcessDidTerminate`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Function that is invoked when the `WebView` content process is terminated. 
@@ -751,7 +783,10 @@ lockIdentifier
 mainDocumentURL (iOS only)
 navigationType (iOS only)
 isTopFrame (iOS only)
+hasTargetFrame (iOS only)
 ```
+
+The `hasTargetFrame` prop is a boolean that is `false` when the navigation targets a new window or tab, otherwise it should be `true` ([more info](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe)). Note that this prop should always be `true` when `onOpenWindow` event is registered on the WebView because the `false` case is intercepted by this event.
 
 ---
 
@@ -1508,6 +1543,10 @@ Example:
 
 An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
 
+| Type                                                               | Required | Platform |
+| ------------------------------------------------------------------ | -------- | -------- |
+| array of objects: {label: string, key: string}                     | No       | iOS      |
+
 Example:
 
 ```javascript
@@ -1517,6 +1556,10 @@ Example:
 ### `onCustomMenuSelection`
 
 Function called when a custom menu item is selected.  It receives a Native event, which includes three custom keys: `label`, `key` and `selectedText`.
+
+| Type                                                               | Required | Platform |
+| ------------------------------------------------------------------ | -------- | -------- |
+| function                                                           | No       | iOS      |
 
 ```javascript
 <WebView 
@@ -1583,6 +1626,20 @@ This is the message that is shown in the Toast when the webview is unable to dow
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
 | string | No       | Android  |
+
+### `fraudulentWebsiteWarningEnabled`
+
+A Boolean value that indicates whether the web view shows warnings for suspected fraudulent content, such as malware or phishing attemps. The default value is `true`. (iOS 13+)
+
+| Type    | Required | Default | Platform |
+| ------- | -------- | ------- | -------- |
+| boolean | No       | true    | iOS      |
+
+Example:
+
+```javascript
+<WebView fraudulentWebsiteWarningEnabled={true} />
+```
 
 ## Methods
 
