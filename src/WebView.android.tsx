@@ -23,6 +23,7 @@ import {
 import {
   AndroidWebViewProps,
   NativeWebViewAndroid,
+  WebViewProgressEvent,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -89,7 +90,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     }
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, onOpenWindow, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onRenderProcessGone } = useWebWiewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, onOpenWindow, viewState, setViewState, lastErrorEvent, setLastErrorEvent ,onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onRenderProcessGone } = useWebWiewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -105,6 +106,21 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
   })
+
+  const handleLoadingProgress = useCallback((event: WebViewProgressEvent) => {
+    if (
+      event.nativeEvent.progress === 1
+      && event.nativeEvent.url === null
+    ) {
+      setViewState('ERROR');
+      setLastErrorEvent(event.nativeEvent);
+      console.log('onLoadProgress', event.nativeEvent);
+    }
+
+    if (onLoadingProgress) {
+      onLoadingProgress(event);
+    }
+  }, [onLoadingProgress, setViewState, setLastErrorEvent])
 
   useImperativeHandle(ref, () => ({
     goForward: () => Commands.goForward(webViewRef.current),
@@ -171,7 +187,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
 
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}
-    onLoadingProgress={onLoadingProgress}
+    onLoadingProgress={handleLoadingProgress}
     onLoadingStart={onLoadingStart}
     onHttpError={onHttpError}
     onRenderProcessGone={onRenderProcessGone}
