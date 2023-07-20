@@ -17,7 +17,7 @@ import {
 } from './WebViewTypes';
 import styles from './WebView.styles';
 
-const ERROR_CODE = {
+export const ERROR_CODE = {
   CONNECTION_FAILED: -1001000,
 }
 
