@@ -10,6 +10,7 @@ import {
   WebViewMessageEvent,
   WebViewNavigation,
   WebViewNavigationEvent,
+  WebViewOpenWindowEvent,
   WebViewProgressEvent,
   WebViewRenderProcessGoneEvent,
   WebViewTerminatedEvent,
@@ -106,6 +107,7 @@ export const useWebViewLogic = ({
   onError,
   onHttpErrorProp,
   onMessageProp,
+  onOpenWindowProp,
   onRenderProcessGoneProp,
   onContentProcessDidTerminateProp,
   originWhitelist,
@@ -121,6 +123,7 @@ export const useWebViewLogic = ({
   onError?: (event: WebViewErrorEvent) => void;
   onHttpErrorProp?: (event: WebViewHttpErrorEvent) => void;
   onMessageProp?: (event: WebViewMessageEvent) => void;
+  onOpenWindowProp?: (event: WebViewOpenWindowEvent) => void;
   onRenderProcessGoneProp?: (event: WebViewRenderProcessGoneEvent) => void;
   onContentProcessDidTerminateProp?: (event: WebViewTerminatedEvent) => void;
   originWhitelist: readonly string[];
@@ -208,6 +211,12 @@ export const useWebViewLogic = ({
     )
   , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
 
+  // Android and iOS Only
+  const onOpenWindow = useCallback((event: WebViewOpenWindowEvent) => {
+    onOpenWindowProp?.(event);
+  }, [onOpenWindowProp]);
+  // !Android and iOS Only
+
   return {
     onShouldStartLoadWithRequest,
     onLoadingStart,
@@ -218,6 +227,7 @@ export const useWebViewLogic = ({
     onRenderProcessGone,
     onContentProcessDidTerminate,
     onMessage,
+    onOpenWindow,
     viewState,
     setViewState,
     lastErrorEvent,

@@ -21,6 +21,7 @@ import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
 import CustomMenu from './examples/CustomMenu';
+import OpenWindow from './examples/OpenWindow';
 
 const TESTS = {
   Messaging: {
@@ -109,6 +110,14 @@ const TESTS = {
     description: 'Test to custom context menu shown on highlighting text',
     render() {
       return <CustomMenu />;
+    },
+  },
+  OpenWindow: {
+    title: 'Open Window',
+    testId: 'OpenWindow',
+    description: 'Test to intercept new window events',
+    render() {
+      return <OpenWindow />;
     },
   }
 };
@@ -207,6 +216,11 @@ export default class App extends Component<Props, State> {
             testID="testType_customMenu"
             title="CustomMenu"
             onPress={() => this._changeTest('CustomMenu')}
+          />
+          <Button
+            testID="testType_openwindow"
+            title="OpenWindow"
+            onPress={() => this._changeTest('OpenWindow')}
           />
         </View>
 

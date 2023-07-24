@@ -21,8 +21,11 @@ import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
+import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
 import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
+
+import android.webkit.WebChromeClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -197,6 +200,12 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     @ReactProp(name = "lackPermissionToDownloadMessage")
     public void setLackPermissionToDownloadMessage(RNCWebView view, @Nullable String value) {
         mRNCWebViewManagerImpl.setLackPermissionToDownloadMessage(value);
+    }
+
+    @Override
+    @ReactProp(name = "hasOnOpenWindowEvent")
+    public void setHasOnOpenWindowEvent(RNCWebView view, boolean hasEvent) {
+        mRNCWebViewManagerImpl.setHasOnOpenWindowEvent(view, hasEvent);
     }
 
     @Override
@@ -502,6 +511,7 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
         export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
         export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
         export.put(TopCustomMenuSelectionEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomMenuSelection"));
+        export.put(TopOpenWindowEvent.EVENT_NAME, MapBuilder.of("registrationName", "onOpenWindow"));
         return export;
     }
 

@@ -134,6 +134,10 @@ export interface WebViewRenderProcessGoneDetail {
   didCrash: boolean;
 }
 
+export interface WebViewOpenWindow {
+  targetUrl: string;
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent =
@@ -156,6 +160,8 @@ export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
 
 export type WebViewRenderProcessGoneEvent =
   NativeSyntheticEvent<WebViewRenderProcessGoneDetail>;
+
+export type WebViewOpenWindowEvent = NativeSyntheticEvent<WebViewOpenWindow>;
 
 export type WebViewScrollEvent = NativeSyntheticEvent<NativeScrollEvent>;
 
@@ -578,6 +584,16 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
 
   /**
+   * Function that is invoked when the `WebView` should open a new window.
+   * 
+   * This happens when the JS calls `window.open('http://someurl', '_blank')`
+   * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+   *
+   * @platform ios
+   */
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
+
+  /**
    * If `true` (default), loads the `injectedJavaScript` only into the main frame.
    * If `false`, loads it into all frames (e.g. iframes).
    * @platform ios
@@ -856,6 +872,16 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Works only on Android (minimum API level 26).
    */
   onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` should open a new window.
+   * 
+   * This happens when the JS calls `window.open('http://someurl', '_blank')`
+   * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+   *
+   * @platform android
+   */
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
 
   /**
    * https://developer.android.com/reference/android/webkit/WebSettings.html#setCacheMode(int)
