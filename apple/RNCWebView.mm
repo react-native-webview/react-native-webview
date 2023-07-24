@@ -389,6 +389,21 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             _view.onFileDownload = nil;        
         }
     }
+    if (oldViewProps.hasOnOpenWindowEvent != newViewProps.hasOnOpenWindowEvent) {
+        if (newViewProps.hasOnOpenWindowEvent) {
+            _view.onOpenWindow = [self](NSDictionary* dictionary) {
+                if (_eventEmitter) {
+                    auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                    facebook::react::RNCWebViewEventEmitter::OnOpenWindow data = {
+                        .targetUrl = std::string([[dictionary valueForKey:@"targetUrl"] UTF8String])
+                    };
+                    webViewEventEmitter->onOpenWindow(data);
+                }
+            };
+        } else {
+            _view.onOpenWindow = nil;
+        }
+    }
 //
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
     if (oldViewProps.contentMode != newViewProps.contentMode) {
