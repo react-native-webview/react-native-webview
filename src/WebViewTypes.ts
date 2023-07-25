@@ -661,9 +661,9 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   enableApplePay?: boolean;
 
   /**
-   * An array of objects which will be added to the UIMenu controller when selecting text.
-   * These will appear after a long press to select text.
-   * @platform ios
+   * An array of custom menu item objects that will be shown when selecting text. 
+   * An empty array will suppress the menu. 
+   * Used in tandem with `onCustomMenuSelection`
    */
   menuItems?: WebViewCustomMenuItems[];
 
@@ -672,7 +672,6 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * It passes a WebViewEvent with a `nativeEvent`, where custom keys are passed:
    * `customMenuKey`: the string of the menu item
    * `selectedText`: the text selected on the document
-   * @platform ios
    */
   onCustomMenuSelection?: (event: {nativeEvent: {
     label: string;
@@ -1053,6 +1052,26 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   allowsProtectedMedia?: boolean;
+
+  /**
+   * An array of custom menu item objects that will be shown when selecting text. 
+   * An empty array will suppress the menu. 
+   * Used in tandem with `onCustomMenuSelection`
+   */
+  menuItems?: WebViewCustomMenuItems[];
+
+  /**
+   * The function fired when selecting a custom menu item created by `menuItems`.
+   * It passes a WebViewEvent with a `nativeEvent`, where custom keys are passed:
+   * `customMenuKey`: the string of the menu item
+   * `selectedText`: the text selected on the document
+   */
+  onCustomMenuSelection?: (event: {nativeEvent: {
+    label: string;
+    key: string;
+    selectedText: string;
+  }
+  }) => void;
 }
 
 export interface WebViewSharedProps extends ViewProps {
