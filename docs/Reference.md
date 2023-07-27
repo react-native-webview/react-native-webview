@@ -1304,7 +1304,7 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 ### `sharedCookiesEnabled`[⬆](#props-index)
 
-Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
+Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should be used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type    | Required | Platform      |
 | ------- | -------- | ------------- |
