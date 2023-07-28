@@ -357,6 +357,15 @@ RCTAutoInsetsProtocol>
 {
   WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
   WKPreferences *prefs = [[WKPreferences alloc]init];
+#if TARGET_OS_OSX
+  if (@available(macOS 13.3, *)) {
+    self.webView.inspectable = _isInspectable;
+  }
+#else
+  if (@available(iOS 16.4, *)) {
+    self.webView.inspectable = _isInspectable;
+  }
+#endif
   BOOL _prefsUsed = NO;
   if (!_javaScriptEnabled) {
     prefs.javaScriptEnabled = NO;

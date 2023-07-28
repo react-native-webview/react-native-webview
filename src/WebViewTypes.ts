@@ -703,6 +703,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   fraudulentWebsiteWarningEnabled?: boolean;
+
+  /**
+   * Boolean value to enable the WebView to be inspected in Safari.
+   * @platform ios
+   */
+  isInspectable?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
@@ -861,6 +867,12 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
    * @platform macos
    */
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+
+  /**
+   * Boolean value to enable the WebView to be inspected in Safari.
+   * @platform ios
+   */
+  isInspectable?: boolean;
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {

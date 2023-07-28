@@ -136,6 +136,7 @@ export default class Injection extends Component<Props, State> {
                 window.top.document.getElementById('namedFramesAtAfterContentLoadedEle').textContent = "Names of iframes that called afterContentLoaded: " + JSON.stringify(window.top.injectedIframesAfterContentLoaded);
               }
               `}
+              isInspectable
             />
           </View>
         </View>
