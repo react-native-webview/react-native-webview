@@ -99,3 +99,4 @@ Settings -> Configurações -> Sobre telefone -> Opções de desenvolvedor -> at
 Esse arquivo está disponível em:
 
 - [Inglês](Debugging.md)
+- [Italiano](Debugging.italian.md)

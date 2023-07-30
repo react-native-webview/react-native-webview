@@ -69,6 +69,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onFileDownload,
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
+  onOpenWindow: onOpenWindowProp,
   renderLoading,
   renderError,
   style,
@@ -94,7 +95,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebViewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onContentProcessDidTerminate } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -103,6 +104,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     onLoadProgress,
     onLoadStart,
     onMessageProp,
+    onOpenWindowProp,
     startInLoadingState,
     originWhitelist,
     onShouldStartLoadWithRequestProp,
@@ -190,6 +192,8 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       onLoadingStart={onLoadingStart}
       onHttpError={onHttpError}
       onMessage={onMessage}
+      onOpenWindow={onOpenWindowProp && onOpenWindow}
+      hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
       onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
       onContentProcessDidTerminate={onContentProcessDidTerminate}
       injectedJavaScript={injectedJavaScript}

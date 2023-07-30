@@ -42,6 +42,7 @@ class RNCWebViewManagerImpl {
     private var mAllowsProtectedMedia = false
     private var mDownloadingMessage: String? = null
     private var mLackPermissionToDownloadMessage: String? = null
+    private var mHasOnOpenWindowEvent = false
 
     private var mUserAgent: String? = null
     private var mUserAgentWithApplicationName: String? = null
@@ -206,6 +207,7 @@ class RNCWebViewManagerImpl {
                     }
                 }
             webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
+            webChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent);
             webView.webChromeClient = webChromeClient
         } else {
             var webChromeClient = webView.webChromeClient as RNCWebChromeClient?
@@ -216,6 +218,7 @@ class RNCWebViewManagerImpl {
                 }
             }
             webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
+            webChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent);
             webView.webChromeClient = webChromeClient
         }
     }
@@ -580,6 +583,11 @@ class RNCWebViewManagerImpl {
 
     fun setLackPermissionToDownloadMessage(value: String?) {
         mLackPermissionToDownloadMessage = value
+    }
+
+    fun setHasOnOpenWindowEvent(view: RNCWebView, value: Boolean) {
+        mHasOnOpenWindowEvent = value
+        setupWebChromeClient(view)
     }
 
     fun setMinimumFontSize(view: RNCWebView, value: Int) {
