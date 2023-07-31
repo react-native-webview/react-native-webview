@@ -51,10 +51,11 @@ It's possible to debug WebView contents in the iOS simulator or on a device usin
 
 #### Steps:
 
+1. Enable the `webViewDebuggingEnabled` prop on your WebView
 1. Open Safari Preferences -> "Advanced" tab -> enable checkbox "Show Develop menu in menu bar"
-2. Start app with React Native WebView in iOS simulator or iOS device
-3. Safari -> Develop -> [device name] -> [app name] -> [url - title]
-4. You can now debug the WebView contents just as you would on the web
+1. Start app with React Native WebView in iOS simulator or iOS device
+1. Safari -> Develop -> [device name] -> [app name] -> [url - title]
+1. You can now debug the WebView contents just as you would on the web
 
 ##### Notes:
 
