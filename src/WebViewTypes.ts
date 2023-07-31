@@ -677,9 +677,9 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   enableApplePay?: boolean;
 
   /**
-   * An array of objects which will be added to the UIMenu controller when selecting text.
+   * An array of objects which will be shown when selecting text. An empty array will suppress the menu.
    * These will appear after a long press to select text.
-   * @platform ios
+   * @platform ios, android
    */
   menuItems?: WebViewCustomMenuItems[];
 
@@ -688,7 +688,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * It passes a WebViewEvent with a `nativeEvent`, where custom keys are passed:
    * `customMenuKey`: the string of the menu item
    * `selectedText`: the text selected on the document
-   * @platform ios
+   * @platform ios, android
    */
   onCustomMenuSelection?: (event: {nativeEvent: {
     label: string;

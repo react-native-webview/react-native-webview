@@ -1515,11 +1515,11 @@ Example:
 
 ### `menuItems`[⬆](#props-index)
 
-An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
+An array of custom menu item objects that will be shown when selecting text. An empty array will suppress the menu.  Used in tandem with `onCustomMenuSelection`
 
 | Type                                                               | Required | Platform |
 | ------------------------------------------------------------------ | -------- | -------- |
-| array of objects: {label: string, key: string}                     | No       | iOS      |
+| array of objects: {label: string, key: string}                     | No       | iOS, Android      |
 
 Example:
 
@@ -1533,7 +1533,7 @@ Function called when a custom menu item is selected.  It receives a Native event
 
 | Type                                                               | Required | Platform |
 | ------------------------------------------------------------------ | -------- | -------- |
-| function                                                           | No       | iOS      |
+| function                                                           | No       | iOS, Android      |
 
 ```jsx
 <WebView
