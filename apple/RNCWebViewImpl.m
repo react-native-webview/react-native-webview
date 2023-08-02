@@ -323,7 +323,15 @@ RCTAutoInsetsProtocol>
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
+    NSURL *url = navigationAction.request.URL;
+
+    if (_onOpenWindow) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"targetUrl": url.absoluteString}];
+      _onOpenWindow(event);
+    } else {
+      [webView loadRequest:navigationAction.request];
+    }
   }
   return nil;
 }
@@ -436,16 +444,9 @@ RCTAutoInsetsProtocol>
   return wkWebViewConfig;
 }
 
-// react-native-mac os does not support didMoveToSuperView https://github.com/microsoft/react-native-macos/blob/main/React/Base/RCTUIKit.h#L388
-#if !TARGET_OS_OSX
-- (void)didMoveToSuperview
-{
-  if (_webView == nil) {
-#else
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
-#endif // !TARGET_OS_OSX
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
     [self setBackgroundColor: _savedBackgroundColor];
@@ -1215,6 +1216,21 @@ RCTAutoInsetsProtocol>
     WKNavigationType navigationType = navigationAction.navigationType;
     NSURLRequest *request = navigationAction.request;
     BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
+    BOOL hasTargetFrame = navigationAction.targetFrame != nil;
+
+    if (_onOpenWindow && !hasTargetFrame) {
+      // When OnOpenWindow should be called, we want to prevent the navigation
+      // If not prevented, the `decisionHandler` is called first and after that `createWebViewWithConfiguration` is called
+      // In that order the WebView's ref would be updated with the target URL even if `createWebViewWithConfiguration` does not call `loadRequest`
+      // So the WebView's document stays on the current URL, but the WebView's ref is replaced by the target URL
+      // By preventing the navigation here, we also prevent the WebView's ref mutation
+      // The counterpart is that we have to manually call `_onOpenWindow` here, because no navigation means no call to `createWebViewWithConfiguration`
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"targetUrl": request.URL.absoluteString}];
+      decisionHandler(WKNavigationActionPolicyCancel);
+      _onOpenWindow(event);
+      return;
+    }
 
     if (_onShouldStartLoadWithRequest) {
         NSMutableDictionary<NSString *, id> *event = [self baseEvent];
@@ -1250,6 +1266,7 @@ RCTAutoInsetsProtocol>
             @"url": (request.URL).absoluteString,
             @"navigationType": navigationTypes[@(navigationType)],
             @"isTopFrame": @(isTopFrame),
+            @"hasTargetFrame": @(hasTargetFrame),
             @"lockIdentifier": @(lockIdentifier)
         }];
         _onShouldStartLoadWithRequest(event);
