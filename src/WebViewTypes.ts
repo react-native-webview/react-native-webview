@@ -1231,7 +1231,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Inject a JavaScript object to be accessed as a JSON string via JavaScript in the WebView.
    */
-  injectJavaScriptObject?: object;
+  injectedJavaScriptObject?: object;
   
   /**
    * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).

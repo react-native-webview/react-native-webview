@@ -298,7 +298,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         }
     }
 
-    public void injectJavaScriptObject(String obj) {
+    public void injectedJavaScriptObject(String obj) {
         if (getSettings().getJavaScriptEnabled()) {
             RNCWebViewBridge b = createRNCWebViewBridge(this);
             b.setInjectedObject(obj);
