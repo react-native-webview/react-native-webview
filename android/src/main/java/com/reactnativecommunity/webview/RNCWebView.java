@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import android.view.ActionMode;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -245,9 +247,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return mRNCWebViewClient;
     }
 
-    protected RNCWebViewBridge getRNCWebViewBridge(RNCWebView webView) {
-        if (!bridge) {
+    public boolean getMessagingEnabled() {
+        return this.messagingEnabled;
+    }
+
+    protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
+        if (bridge == null) {
             bridge = new RNCWebViewBridge(webView);
+            addJavascriptInterface(bridge, JAVASCRIPT_INTERFACE);
         }
         return bridge;
     }
@@ -268,11 +275,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
         messagingEnabled = enabled;
 
-        if (enabled) {
-            addJavascriptInterface(getRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
-        } else {
-            removeJavascriptInterface(JAVASCRIPT_INTERFACE);
-        }
+        createRNCWebViewBridge(this);
     }
 
     protected void evaluateJavascriptWithFallback(String script) {
@@ -297,9 +300,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     public void injectJavaScriptObject(String obj) {
         if (getSettings().getJavaScriptEnabled()) {
-            RNCWebViewBridge b = getRNCWebViewBridge(this);
-            b.setInjectedObject(obj)
-            addJavascriptInterface(b, JAVASCRIPT_INTERFACE);
+            RNCWebViewBridge b = createRNCWebViewBridge(this);
+            b.setInjectedObject(obj);
         }
     }
 
@@ -399,6 +401,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
   }
 
   protected class RNCWebViewBridge {
+        private String TAG = "RNCWebViewBridge";
         RNCWebView mWebView;
         String injectedObject;
 
@@ -406,7 +409,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
           mWebView = c;
         }
 
-        setInjectedObject(String s) {
+        public void setInjectedObject(String s) {
             injectedObject = s;
         }
 
@@ -416,11 +419,15 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
          */
         @JavascriptInterface
         public void postMessage(String message) {
-          mWebView.onMessage(message);
+            if (mWebView.getMessagingEnabled()) {
+                mWebView.onMessage(message);
+            } else {
+                FLog.w(TAG, "ReactNativeWebView.postMessage method was called but messaging is disabled. Pass an onMessage handler to the WebView.");
+            }
         }
 
         @JavascriptInterface
-        public String injectedObject() { return value; }
+        public String injectedObject() { return injectedObject; }
     }
 
 
