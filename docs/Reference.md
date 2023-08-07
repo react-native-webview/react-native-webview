@@ -22,6 +22,7 @@ This document lays out the current public properties and methods for the React N
 - [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
+- [`onOpenWindow`](Reference.md#onopenwindow)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`onScroll`](Reference.md#onscroll)
 - [`originWhitelist`](Reference.md#originwhitelist)
@@ -613,6 +614,37 @@ url
 
 ---
 
+### `onOpenWindow`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the `WebView` should open a new window.
+
+This happens when the JS calls `window.open('http://someurl', '_blank')` or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onOpenWindow={(syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    const { targetUrl } = nativeEvent
+    console.log('Intercepted OpenWindow for', targetUrl)
+  }}
+/>
+```
+
+Function passed to onOpenWindow is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+targetUrl
+```
+
+---
+
 ### `onContentProcessDidTerminate`[⬆](#props-index)
 
 Function that is invoked when the `WebView` content process is terminated.
@@ -789,7 +821,10 @@ lockIdentifier
 mainDocumentURL (iOS only)
 navigationType (iOS only)
 isTopFrame (iOS only)
+hasTargetFrame (iOS only)
 ```
+
+The `hasTargetFrame` prop is a boolean that is `false` when the navigation targets a new window or tab, otherwise it should be `true` ([more info](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe)). Note that this prop should always be `true` when `onOpenWindow` event is registered on the WebView because the `false` case is intercepted by this event.
 
 ---
 
@@ -1305,7 +1340,7 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 ### `sharedCookiesEnabled`[⬆](#props-index)
 
-Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
+Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should be used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type    | Required | Platform      |
 | ------- | -------- | ------------- |
@@ -1516,11 +1551,11 @@ Example:
 
 ### `menuItems`[⬆](#props-index)
 
-An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
+An array of custom menu item objects that will be shown when selecting text. An empty array will suppress the menu.  Used in tandem with `onCustomMenuSelection`
 
 | Type                                                               | Required | Platform |
 | ------------------------------------------------------------------ | -------- | -------- |
-| array of objects: {label: string, key: string}                     | No       | iOS      |
+| array of objects: {label: string, key: string}                     | No       | iOS, Android      |
 
 Example:
 
@@ -1534,7 +1569,7 @@ Function called when a custom menu item is selected.  It receives a Native event
 
 | Type                                                               | Required | Platform |
 | ------------------------------------------------------------------ | -------- | -------- |
-| function                                                           | No       | iOS      |
+| function                                                           | No       | iOS, Android      |
 
 ```jsx
 <WebView
