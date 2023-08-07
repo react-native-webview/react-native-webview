@@ -484,7 +484,7 @@ class RNCWebViewManagerImpl {
     }
 
     fun setInjectedJavaScriptObject(view: RNCWebView, value: String?) {
-        view.injectedJavaScriptObject(value)
+        view.setInjectedJavaScriptObject(value)
     }
 
     fun setJavaScriptCanOpenWindowsAutomatically(view: RNCWebView, value: Boolean) {
