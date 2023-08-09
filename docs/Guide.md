@@ -384,7 +384,7 @@ Due to the Android race condition mentioned above, this more reliable prop was a
   <head>
     <script>
       window.onload = (event) => {
-        document.getElementById('output').innerHTML = JSON.parse(window.ReactNativeWebView.injectedObject()).customValue;
+        document.getElementById('output').innerHTML = JSON.parse(window.ReactNativeWebView.injectedObjectJson()).customValue;
       }
     </script>
   </head>
@@ -394,7 +394,7 @@ Due to the Android race condition mentioned above, this more reliable prop was a
 </html>
 ```
 
-Note: `ReactNativeWebView.injectedObject()` returns the JSON encoded object passed in to `injectedJavaScriptObject`. It must be passed to `JSON.parse` before it's properties can be accessed.
+Note: `ReactNativeWebView.injectedObjectJson()` returns the JSON encoded object passed in to `injectedJavaScriptObject`. It must be passed to `JSON.parse` before it's properties can be accessed.
 
 ```jsx
 import React, { Component } from 'react';

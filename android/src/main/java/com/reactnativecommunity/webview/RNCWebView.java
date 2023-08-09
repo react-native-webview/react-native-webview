@@ -304,7 +304,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     public void setInjectedJavaScriptObject(String obj) {
         if (getSettings().getJavaScriptEnabled()) {
             RNCWebViewBridge b = createRNCWebViewBridge(this);
-            b.setInjectedObject(obj);
+            b.setInjectedObjectJson(obj);
         }
     }
 
@@ -412,7 +412,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
           mWebView = c;
         }
 
-        public void setInjectedObject(String s) {
+        public void setInjectedObjectJsonJson(String s) {
             injectedObjectJson = s;
         }
 
@@ -430,7 +430,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         }
 
         @JavascriptInterface
-        public String injectedObject() { return injectedObjectJson; }
+        public String injectedObjectJson() { return injectedObjectJson; }
     }
 
 

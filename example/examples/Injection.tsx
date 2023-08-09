@@ -53,6 +53,7 @@ export default class Injection extends Component<Props, State> {
               onMessage={() => {}}
               injectedJavaScriptBeforeContentLoadedForMainFrameOnly={false}
               injectedJavaScriptForMainFrameOnly={false}
+              injectedJavaScriptObject={{ hello: "world" }}
 
               /* We set this property in each frame */
               injectedJavaScriptBeforeContentLoaded={`
