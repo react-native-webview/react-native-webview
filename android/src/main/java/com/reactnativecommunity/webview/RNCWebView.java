@@ -412,7 +412,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
           mWebView = c;
         }
 
-        public void setInjectedObjectJsonJson(String s) {
+        public void setInjectedObjectJson(String s) {
             injectedObjectJson = s;
         }
 
