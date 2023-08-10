@@ -334,7 +334,7 @@ class RNCWebViewManagerImpl {
             throw RuntimeException("Arguments for loading an url are null!")
           }
           webView.progressChangedFilter.setWaitingForCommandLoadUrl(false)
-          webView.loadUrl(args.getString(0))
+          webView.loadUrl(args.getString(0) ?: "")
         }
         "requestFocus" -> webView.requestFocus()
         "clearFormData" -> webView.clearFormData()
