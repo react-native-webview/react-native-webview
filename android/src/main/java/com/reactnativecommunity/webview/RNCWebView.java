@@ -54,6 +54,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     String injectedJS;
     protected @Nullable
     String injectedJSBeforeContentLoaded;
+    protected @Nullable
+    String userAgentString;
+
     protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
 
     /**
@@ -254,6 +257,11 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         if (reactContext != null) {
             mCatalystInstance = reactContext.getCatalystInstance();
         }
+    }
+
+    public @Nullable
+    String getUserAgentString() {
+        return this.userAgentString;
     }
 
     @SuppressLint("AddJavascriptInterface")

@@ -223,12 +223,12 @@ class RNCWebViewManagerImpl {
         }
     }
 
-    fun setUserAgent(view: WebView, userAgent: String?) {
+    fun setUserAgent(view: RNCWebView, userAgent: String?) {
         mUserAgent = userAgent
         setUserAgentString(view)
     }
 
-    fun setApplicationNameForUserAgent(view: WebView, applicationName: String?) {
+    fun setApplicationNameForUserAgent(view: RNCWebView, applicationName: String?) {
         when {
             applicationName != null -> {
                 val defaultUserAgent = WebSettings.getDefaultUserAgent(view.context)
@@ -241,20 +241,20 @@ class RNCWebViewManagerImpl {
         setUserAgentString(view)
     }
 
-    private fun setUserAgentString(view: WebView) {
+    private fun setUserAgentString(view: RNCWebView) {
+
         when {
             mUserAgent != null -> {
-                view.settings.userAgentString = mUserAgent
+                view.userAgentString = mUserAgent
             }
             mUserAgentWithApplicationName != null -> {
-                view.settings.userAgentString = mUserAgentWithApplicationName
+                view.userAgentString = mUserAgentWithApplicationName
             }
             else -> {
-                view.settings.userAgentString = WebSettings.getDefaultUserAgent(view.context)
+                view.userAgentString =  WebSettings.getDefaultUserAgent(view.context)
             }
         }
     }
-
     fun setBasicAuthCredential(view: WebView, credential: ReadableMap?) {
         var basicAuthCredential: RNCBasicAuthCredential? = null
         if (credential != null) {
