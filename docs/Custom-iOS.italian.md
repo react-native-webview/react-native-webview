@@ -137,7 +137,7 @@ Una volta esposti i metodi, puoi farvi riferimento nella tua classe di web view 
 Se si aprono pagine web che richiedono un certificato client per l'autenticazione, è possibile creare una credenziale e passarla alla webview:
 
 ```
-[RNCWebView setClientAuthenticationCredential:credential];
+[RNCWebViewImpl setClientAuthenticationCredential:credential];
 ```
 
 Ciò può essere abbinato a una chiamata da JavaScript per passare una stringa etichetta per il certificato memorizzato nel portachiavi iCloud (Keychain) e utilizzare chiamate native per recuperare il certificato e creare un oggetto di credenziale. Questa chiamata può essere effettuata ovunque abbia senso per la tua applicazione (e.g. come parte dello stack di autenticazione dell'utente). L'unico requisito è effettuare questa chiamata prima di visualizzare qualsiasi webview.
@@ -146,6 +146,8 @@ Ciò può essere abbinato a una chiamata da JavaScript per passare una stringa e
 Se è necessario connettersi a un server che ha un certificato firmato o se si desidera eseguire l'SSL Pinning sulle richieste della webview, è necessario passare un dizionario con l'host come chiave e il certificato come valore di ciascun elemento:
 
 ```objc
+#import "RNCWebViewImpl.h"
+
 -(void)installCerts {
 
   // Usa il bundle in cui sono presenti i certificati nel formato DER.
@@ -161,7 +163,7 @@ Se è necessario connettersi a un server che ha un certificato firmato o se si d
   
   [certMap setObject:(__bridge id _Nonnull)(certificate) forKey:@"example.com"];
 
-  [RNCWebView setCustomCertificatesForHost:certMap];
+  [RNCWebViewImpl setCustomCertificatesForHost:certMap];
 }
 
 ```

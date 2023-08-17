@@ -137,7 +137,7 @@ Depois que eles forem expostos, você poderá referenciá-los em sua classe de v
 Se você abrir páginas da Web que precisam de um Certificado de Cliente para Autenticação, poderá criar uma credencial e passá-la para a visualização da Web:
 
 ```
-[RNCWebView setClientAuthenticationCredential:credential];
+[RNCWebViewImpl setClientAuthenticationCredential:credential];
 ```
 
 Isso pode ser combinado com uma chamada do Javascript para passar um rótulo de texto para o certificado armazenado no chaveiro e usar chamadas nativas para buscar o certificado e criar um objeto de credencial. Essa chamada pode ser feita em qualquer lugar que faça sentido para seu aplicativo (por exemplo, como parte da pilha de autenticação do usuário). O único requisito é fazer essa chamada antes de exibir qualquer webview.
@@ -148,6 +148,8 @@ Se você precisa se conectar a um servidor que possui um certificado autoassinad
 
 
 ```objc
+#import "RNCWebViewImpl.h"
+
 -(void)installCerts {
 
   // Get the bundle where the certificates in DER format are present.
@@ -163,7 +165,7 @@ Se você precisa se conectar a um servidor que possui um certificado autoassinad
   
   [certMap setObject:(__bridge id _Nonnull)(certificate) forKey:@"example.com"];
 
-  [RNCWebView setCustomCertificatesForHost:certMap];
+  [RNCWebViewImpl setCustomCertificatesForHost:certMap];
 }
 
 ```
