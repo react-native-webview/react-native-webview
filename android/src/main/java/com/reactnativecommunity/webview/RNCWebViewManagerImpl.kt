@@ -74,7 +74,7 @@ class RNCWebViewManagerImpl {
         val settings = webView.settings
         settings.builtInZoomControls = true
         settings.displayZoomControls = false
-        settings.domStorageEnabled = true
+        settings.domStorageEnabled = false
         settings.setSupportMultipleWindows(true)
         settings.allowFileAccess = false
         settings.allowContentAccess = false
