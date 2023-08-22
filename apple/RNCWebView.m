@@ -453,7 +453,7 @@ RCTAutoInsetsProtocol>
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000
     if (@available(iOS 16, *)) {
       _webView.scrollView.alwaysBounceVertical = _pullToRefreshEnabled || _verticalBounces;
-      _webView.scrollView.alwaysBounceHorizontal = _pullToRefreshEnabled || _horizontalBounces;
+      _webView.scrollView.alwaysBounceHorizontal = _horizontalBounces;
     }
 #endif
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
@@ -1463,7 +1463,7 @@ didFinishNavigation:(WKNavigation *)navigation
 - (void)setHorizontalBounces:(BOOL)horizontalBounces
 {
   _horizontalBounces = horizontalBounces;
-  _webView.scrollView.alwaysBounceHorizontal = _pullToRefreshEnabled || _horizontalBounces;
+  _webView.scrollView.alwaysBounceHorizontal = _horizontalBounces;
 }
 - (void)setVerticalBounces:(BOOL)verticalBounces
 {
