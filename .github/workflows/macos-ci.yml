@@ -21,7 +21,8 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: Install npm dependencies
         run: yarn --frozen-lockfile
-      - name: Install macos dependencies
+      - name: Install macOS dependencies
+        if: false # Enable this if react-native-macos falls behind
         run: yarn add:macos
       - name: Install Pods
         run: pod install
