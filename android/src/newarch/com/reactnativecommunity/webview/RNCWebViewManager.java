@@ -221,6 +221,10 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     }
 
     @Override
+    @ReactProp(name = "suppressMenuItems ")
+    public void setSuppressMenuItems(RNCWebView view, @Nullable ReadableArray items) {}
+
+    @Override
     @ReactProp(name = "messagingEnabled")
     public void setMessagingEnabled(RNCWebView view, boolean value) {
         mRNCWebViewManagerImpl.setMessagingEnabled(view, value);

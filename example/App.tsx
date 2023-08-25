@@ -22,6 +22,7 @@ import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
 import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
+import SuppressMenuItems from './examples/Suppress';
 
 const TESTS = {
   Messaging: {
@@ -119,6 +120,14 @@ const TESTS = {
     render() {
       return <OpenWindow />;
     },
+  },
+  SuppressMenuItems: {
+    title: 'SuppressMenuItems',
+    testId: 'SuppressMenuItems',
+    description: 'SuppressMenuItems in editable content',
+    render() {
+      return <SuppressMenuItems />;
+    }
   }
 };
 
@@ -221,6 +230,11 @@ export default class App extends Component<Props, State> {
             testID="testType_openwindow"
             title="OpenWindow"
             onPress={() => this._changeTest('OpenWindow')}
+          />
+          <Button
+            testID="testType_suppressMenuItems"
+            title="SuppressMenuItems"
+            onPress={() => this._changeTest('SuppressMenuItems')}
           />
         </View>
 

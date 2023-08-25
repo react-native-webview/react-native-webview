@@ -51,13 +51,42 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @interface RNCWKWebView : WKWebView
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
+@property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;
 #endif // !TARGET_OS_OSX
 @end
 @implementation RNCWKWebView
 #if !TARGET_OS_OSX
+- (NSString *)stringFromAction:(SEL) action {
+  NSString *sel = NSStringFromSelector(action);
+
+  NSDictionary *map = @{
+      @"cut:":               @"cut",
+      @"copy:":              @"copy",
+      @"paste:":             @"paste",
+      @"delete:":            @"delete",
+      @"select:":             @"select",
+      @"selectAll:":         @"selectAll",
+      @"_promptForReplace:": @"replace",
+      @"_define:":           @"lookup",
+      @"_translate:":        @"translate",
+      @"toggleBoldface:":    @"bold",
+      @"toggleItalics:":     @"italic",
+      @"toggleUnderline:":   @"underline",
+      @"_share:":            @"share",
+  };
+    
+  return map[sel] ?: sel;
+}
+
 - (BOOL)canPerformAction:(SEL)action
               withSender:(id)sender{
-
+  if(self.suppressMenuItems) {
+      NSString * sel = [self stringFromAction:action];
+      if ([self.suppressMenuItems containsObject: sel]) {
+          return NO;
+      }
+  }
+  
   if (!self.menuItems) {
       return [super canPerformAction:action withSender:sender];
   }
@@ -452,6 +481,7 @@ RCTAutoInsetsProtocol>
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     _webView.menuItems = _menuItems;
+    _webView.suppressMenuItems = _suppressMenuItems;
     _webView.scrollView.delegate = self;
 #endif // !TARGET_OS_OSX
     _webView.UIDelegate = self;
@@ -797,6 +827,11 @@ RCTAutoInsetsProtocol>
 -(void)setMenuItems:(NSArray<NSDictionary *> *)menuItems {
     _menuItems = menuItems;
     _webView.menuItems = menuItems;
+}
+
+-(void)setSuppressMenuItems:(NSArray<NSString *> *)suppressMenuItems {
+    _suppressMenuItems = suppressMenuItems;
+    _webView.suppressMenuItems = suppressMenuItems;
 }
 
 -(void)setKeyboardDisplayRequiresUserAction:(BOOL)keyboardDisplayRequiresUserAction

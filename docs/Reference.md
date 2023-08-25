@@ -77,6 +77,7 @@ This document lays out the current public properties and methods for the React N
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
 - [`textInteractionEnabled`](Reference.md#textInteractionEnabled)
+- [`suppressMenuItems`](Reference.md#suppressMenuItems)
 - [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
@@ -1419,6 +1420,30 @@ Example:
 ```
 
 ---
+
+### `suppressMenuItems`[⬆](#props-index)
+
+Allows to suppress menu item from the default context menu.
+
+Possible values are:
+
+- `cut`
+- `copy`
+- `paste`
+- `delete`
+- `select`
+- `selectAll`
+- `replace`
+- `lookup`
+- `translate`
+- `bold`
+- `italic`
+- `underline`
+- `share`
+
+| Type             | Required | Default      | Platform |
+| ---------------- | -------- | ------------ | -------- |
+| array of strings | No       | []           | iOS      |
 
 ### `mediaCapturePermissionGrantType`[⬆](#props-index)
 
