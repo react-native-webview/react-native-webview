@@ -1423,7 +1423,7 @@ Example:
 
 ### `suppressMenuItems`[⬆](#props-index)
 
-Allowes to suppress menu item from the default context menu.
+Allows to suppress menu item from the default context menu.
 
 Possible values are:
 
