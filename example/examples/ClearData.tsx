@@ -26,10 +26,6 @@ export default class ClearData extends Component<Props, State> {
   render() {
     return (
       <View style={{ height: 1000 }}>
-        {/* <Button
-          title='Clear cookies'
-          onPress={this.clearCookiesAndReload}
-        /> */}
         <Button
           title="Clear cache (diskFiles)"
           onPress={() => this.clearCacheAndReload(true)}
