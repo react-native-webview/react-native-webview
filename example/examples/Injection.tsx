@@ -102,10 +102,10 @@ export default class Injection extends Component<Props, State> {
                 window.self.document.body.style.backgroundColor = "cyan";
               }
 
-              // Example usage of injectedJavaScriptObject({hello: 'world'})
+              // Example usage of injectedJavaScriptObject({hello: 'world'}), see above
               const injectedObjectJson = window.ReactNativeWebView.injectedObjectJson();
               const injectedObject = JSON.parse(injectedObjectJson);
-              console.log(injectedObject); // Should be: { hello: 'world' }
+              console.log("injectedJavaScriptObject: ", injectedObject); // injectedJavaScriptObject: { hello: 'world' }
 
               if(window.self === window.top){
                 function declareSuccessOfAfterContentLoaded(head){
