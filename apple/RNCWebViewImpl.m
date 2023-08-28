@@ -1570,6 +1570,37 @@ didFinishNavigation:(WKNavigation *)navigation
 #endif // !TARGET_OS_OSX
 }
 
+- (void)clearCache:(BOOL)includeDiskFiles
+{
+  NSMutableSet *dataTypes = [NSMutableSet setWithArray:@[
+    WKWebsiteDataTypeMemoryCache,
+    WKWebsiteDataTypeOfflineWebApplicationCache,
+  ]];
+  if (@available(iOS 11.3, *)) {
+    [dataTypes addObject:WKWebsiteDataTypeFetchCache];
+  }
+  if (includeDiskFiles) {
+    [dataTypes addObjectsFromArray:@[
+      WKWebsiteDataTypeDiskCache,
+      WKWebsiteDataTypeSessionStorage,
+      WKWebsiteDataTypeLocalStorage,
+      WKWebsiteDataTypeWebSQLDatabases,
+      WKWebsiteDataTypeIndexedDBDatabases
+    ]];
+  }
+  [self removeData:dataTypes];
+}
+
+- (void)removeData:(NSSet *)dataTypes
+{
+  if (_webView == nil) {
+      return;
+  }
+  NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+
+  [_webView.configuration.websiteDataStore removeDataOfTypes:dataTypes modifiedSince:dateFrom completionHandler:^{}];
+}
+
 #if !TARGET_OS_OSX
 - (void)setBounces:(BOOL)bounces
 {

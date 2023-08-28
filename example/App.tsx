@@ -23,6 +23,7 @@ import ApplePay from './examples/ApplePay';
 import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
+import ClearData from './examples/ClearData';
 
 const TESTS = {
   Messaging: {
@@ -55,6 +56,14 @@ const TESTS = {
     description: 'Background color test',
     render() {
       return <Background />;
+    },
+  },
+  ClearData: {
+    title: 'ClearData',
+    testId: 'clearData',
+    description: 'Clear data test',
+    render() {
+      return <ClearData />;
     },
   },
   Downloads: {
@@ -235,6 +244,11 @@ export default class App extends Component<Props, State> {
             testID="testType_suppressMenuItems"
             title="SuppressMenuItems"
             onPress={() => this._changeTest('SuppressMenuItems')}
+          />
+          <Button
+            testID="testType_clearData"
+            title="ClearData"
+            onPress={() => this._changeTest('ClearData')}
           />
         </View>
 
