@@ -14,11 +14,6 @@ export default class ClearData extends Component<Props, State> {
     this.webView = React.createRef();
   }
 
-  // clearCookiesAndReload = () => {
-  //   this.webView.current.clearCookies();
-  //   this.webView.current.reload();
-  // }
-
   clearCacheAndReload = (includeDiskFiles: boolean) => {
     this.webView.current.clearCache(includeDiskFiles);
     this.webView.current.reload();
