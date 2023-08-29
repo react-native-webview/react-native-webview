@@ -1724,13 +1724,13 @@ Removes the autocomplete popup from the currently focused form field, if present
 
 ### `clearCache(bool)`[⬆](#methods-index)
 
-(android only)
-
 ```javascript
-clearCache(true)
+clearCache(true);
 ```
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
+
+In iOS, includeDiskFiles will also remove data from the web storages and databases.[developer.apple.com reference](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata)
 
 ### `clearHistory()`[⬆](#methods-index)
 

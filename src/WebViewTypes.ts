@@ -21,9 +21,10 @@ type WebViewCommands =
   | 'postMessage'
   | 'injectJavaScript'
   | 'loadUrl'
-  | 'requestFocus';
+  | 'requestFocus'
+  | 'clearCache';
 
-type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
+type AndroidWebViewCommands = 'clearHistory' | 'clearFormData';
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (name: string) => {
