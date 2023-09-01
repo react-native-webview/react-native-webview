@@ -374,6 +374,15 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }
         [_view setMenuItems:newMenuItems];
     }
+    if(oldViewProps.suppressMenuItems != newViewProps.suppressMenuItems) {
+        NSMutableArray *suppressMenuItems = [NSMutableArray array];
+
+        for (const auto &menuItem: newViewProps.suppressMenuItems) {
+            [suppressMenuItems addObject: RCTNSStringFromString(menuItem)];
+        }
+        
+        [_view setSuppressMenuItems:suppressMenuItems];
+    }
     if (oldViewProps.hasOnFileDownload != newViewProps.hasOnFileDownload) {
         if (newViewProps.hasOnFileDownload) {
             _view.onFileDownload = [self](NSDictionary* dictionary) {

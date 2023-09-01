@@ -77,6 +77,7 @@ This document lays out the current public properties and methods for the React N
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
 - [`textInteractionEnabled`](Reference.md#textInteractionEnabled)
+- [`suppressMenuItems`](Reference.md#suppressMenuItems)
 - [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
@@ -1456,6 +1457,30 @@ Example:
 
 ---
 
+### `suppressMenuItems`[⬆](#props-index)
+
+Allows to suppress menu item from the default context menu.
+
+Possible values are:
+
+- `cut`
+- `copy`
+- `paste`
+- `delete`
+- `select`
+- `selectAll`
+- `replace`
+- `lookup`
+- `translate`
+- `bold`
+- `italic`
+- `underline`
+- `share`
+
+| Type             | Required | Default      | Platform |
+| ---------------- | -------- | ------------ | -------- |
+| array of strings | No       | []           | iOS      |
+
 ### `mediaCapturePermissionGrantType`[⬆](#props-index)
 
 This property specifies how to handle media capture permission requests. Defaults to `prompt`, resulting in the user being prompted repeatedly. Available on iOS 15 and later.
@@ -1735,13 +1760,13 @@ Removes the autocomplete popup from the currently focused form field, if present
 
 ### `clearCache(bool)`[⬆](#methods-index)
 
-(android only)
-
 ```javascript
-clearCache(true)
+clearCache(true);
 ```
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
+
+In iOS, includeDiskFiles will also remove data from the web storages and databases.[developer.apple.com reference](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata)
 
 ### `clearHistory()`[⬆](#methods-index)
 
