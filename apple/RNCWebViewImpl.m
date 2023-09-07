@@ -569,6 +569,7 @@ RCTAutoInsetsProtocol>
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
     [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
     [_webView removeFromSuperview];
+    [_webView pauseAllMediaPlaybackWithCompletionHandler:nil];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = nil;
     if (_menuItems) {
