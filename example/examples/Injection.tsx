@@ -104,8 +104,17 @@ export default class Injection extends Component<Props, State> {
 
               // Example usage of injectedJavaScriptObject({hello: 'world'}), see above
               const injectedObjectJson = window.ReactNativeWebView.injectedObjectJson();
-              const injectedObject = JSON.parse(injectedObjectJson);
-              console.log("injectedJavaScriptObject: ", injectedObject); // injectedJavaScriptObject: { hello: 'world' }
+              
+              // injectedJavaScriptObject is only available on Android
+              if (injectedObjectJson) {
+                const injectedObject = JSON.parse(injectedObjectJson);
+                console.log("injectedJavaScriptObject: ", injectedObject); // injectedJavaScriptObject: { hello: 'world' }
+
+                var injectedJavaScriptObjectEle = document.createElement('p');
+                injectedJavaScriptObjectEle.textContent = "injectedJavaScriptObject: " + injectedObjectJson;
+                injectedJavaScriptObjectEle.id = "injectedJavaScriptObjectEle";
+                document.body.appendChild(injectedJavaScriptObjectEle);
+              }
 
               if(window.self === window.top){
                 function declareSuccessOfAfterContentLoaded(head){
