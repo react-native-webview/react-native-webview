@@ -185,6 +185,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
 
     }
 
+    @ReactProp(name = "injectedJavaScriptObject")
+    public void setInjectedJavaScriptObject(RNCWebView view, @Nullable String value) {
+        mRNCWebViewManagerImpl.setInjectedJavaScriptObject(view, value);
+    }
+
     @Override
     @ReactProp(name = "javaScriptCanOpenWindowsAutomatically")
     public void setJavaScriptCanOpenWindowsAutomatically(RNCWebView view, boolean value) {

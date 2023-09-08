@@ -200,7 +200,7 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
 
 > **Warning**
-> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)).
+> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)). Consider `injectedJavaScriptObject` instead.
 
 | Type   | Required | Platform                           |
 | ------ | -------- | ---------------------------------- |
@@ -247,6 +247,44 @@ If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. if
 | Type | Required | Platform                                          |
 | ---- | -------- | ------------------------------------------------- |
 | bool | No       | iOS and macOS (only `true` supported for Android) |
+
+---
+
+### `injectedJavaScriptObject`[⬆](#props-index)
+
+Inject any JavaScript object into the webview so it is available to the JS running on the page.
+
+| Type | Required | Platform                                          |
+| ---- | -------- | ------------------------------------------------- |
+| obj | No       | Android only |
+
+Example:
+
+Set a value to be used in JavaScript.
+
+Note: Any value in the object will be accessible to *all* frames of the webpage. If sensitive values are present please ensure that you have a strict Content Security Policy set up to avoid data leaking.
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  injectedJavaScriptObject={{ customValue: 'myCustomValue' }}
+/>;
+```
+
+```html
+<html>
+  <head>
+    <script>
+      window.onload = (event) => {
+        if (window.ReactNativeWebView.injectedObjectJson()) {
+            const customValue = JSON.parse(window.ReactNativeWebView.injectedObjectJson()).customValue;
+            ...
+        }
+      }
+    </script>
+  </head>
+</html>
+```
 
 ---
 
