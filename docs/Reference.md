@@ -276,8 +276,10 @@ Note: Any value in the object will be accessible to *all* frames of the webpage.
   <head>
     <script>
       window.onload = (event) => {
-        const customValue = JSON.parse(window.ReactNativeWebView.injectedObjectJson()).customValue;
-        ...
+        if (window.ReactNativeWebView.injectedObjectJson()) {
+            const customValue = JSON.parse(window.ReactNativeWebView.injectedObjectJson()).customValue;
+            ...
+        }
       }
     </script>
   </head>
