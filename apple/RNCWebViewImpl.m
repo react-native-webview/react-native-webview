@@ -787,6 +787,19 @@ RCTAutoInsetsProtocol>
     [_webView loadHTMLString:html baseURL:baseURL];
     return;
   }
+  
+  NSDictionary *headers = [RCTConvert NSDictionary:_source[@"headers"]];
+  NSArray *allKeys = [headers allKeys];
+
+  for (NSString *key in allKeys) {
+    NSString *value = [headers objectForKey:key];
+    NSString *lowercaseKey = [key lowercaseString];
+
+    if([lowercaseKey isEqualToString:@"user-agent"]) {
+      _webView.customUserAgent = value;
+    }
+  }
+
   // Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
   NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]];
   if(headerCookie) {
