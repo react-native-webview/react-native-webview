@@ -185,6 +185,11 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
 
     }
 
+    @ReactProp(name = "injectedJavaScriptObject")
+    public void setInjectedJavaScriptObject(RNCWebView view, @Nullable String value) {
+        mRNCWebViewManagerImpl.setInjectedJavaScriptObject(view, value);
+    }
+
     @Override
     @ReactProp(name = "javaScriptCanOpenWindowsAutomatically")
     public void setJavaScriptCanOpenWindowsAutomatically(RNCWebView view, boolean value) {
@@ -219,6 +224,10 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     public void setMenuItems(RNCWebView view, @Nullable ReadableArray items) {
         mRNCWebViewManagerImpl.setMenuCustomItems(view, items);
     }
+
+    @Override
+    @ReactProp(name = "suppressMenuItems ")
+    public void setSuppressMenuItems(RNCWebView view, @Nullable ReadableArray items) {}
 
     @Override
     @ReactProp(name = "messagingEnabled")
