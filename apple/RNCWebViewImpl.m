@@ -177,6 +177,7 @@ RCTAutoInsetsProtocol>
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
     _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
+    _injectedJavaScriptObject= nil;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -1620,6 +1621,12 @@ didFinishNavigation:(WKNavigation *)navigation
   if(_webView != nil){
     [self resetupScripts:_webView.configuration];
   }
+}
+
+- (void)setInjectedJavaScriptObject:(NSDictionary *)source
+{
+  _injectedJavaScriptObject = source;
+  RCTLogWarn(@"%@", [NSString stringWithFormat:@"_injectedJavaScriptObject %@", _injectedJavaScriptObject]);
 }
 
 - (void)setEnableApplePay:(BOOL)enableApplePay {
