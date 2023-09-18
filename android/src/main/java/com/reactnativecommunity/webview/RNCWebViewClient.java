@@ -1,6 +1,7 @@
 package com.reactnativecommunity.webview;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Build;
@@ -17,6 +18,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.util.Pair;
+import androidx.webkit.WebViewAssetLoader;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
@@ -35,284 +37,303 @@ import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEven
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RNCWebViewClient extends WebViewClient {
-    private static String TAG = "RNCWebViewClient";
-    protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
+  private static String TAG = "RNCWebViewClient";
+  protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
+  private static WebViewAssetLoader assetLoader;
 
-    protected boolean mLastLoadFailed = false;
-    protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
-    protected @Nullable String ignoreErrFailedForThisURL = null;
-    protected @Nullable RNCBasicAuthCredential basicAuthCredential = null;
+  protected boolean mLastLoadFailed = false;
+  protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
+  protected @Nullable String ignoreErrFailedForThisURL = null;
+  protected @Nullable RNCBasicAuthCredential basicAuthCredential = null;
 
-    public void setIgnoreErrFailedForThisURL(@Nullable String url) {
-        ignoreErrFailedForThisURL = url;
+  public RNCWebViewClient(Context context) {
+    super();
+    if (assetLoader == null) {
+      WebViewAssetLoader.Builder builder = new WebViewAssetLoader.Builder()
+        .setDomain("local-asset.frontapp.com")
+        .addPathHandler("/assets/", new ResourcePathHandler(context));
+      if (BuildConfig.DEBUG) {
+        builder.addPathHandler("/dev-assets/", new DevResourcePathHandler(context));
+      }
+      assetLoader = builder.build();
     }
+  }
 
-    public void setBasicAuthCredential(@Nullable RNCBasicAuthCredential credential) {
-        basicAuthCredential = credential;
-    }
+  public void setIgnoreErrFailedForThisURL(@Nullable String url) {
+    ignoreErrFailedForThisURL = url;
+  }
 
-    @Override
-    public void onPageFinished(WebView webView, String url) {
-        super.onPageFinished(webView, url);
+  public void setBasicAuthCredential(@Nullable RNCBasicAuthCredential credential) {
+    basicAuthCredential = credential;
+  }
 
-        if (!mLastLoadFailed) {
-            RNCWebView reactWebView = (RNCWebView) webView;
+  @Override
+  public void onPageFinished(WebView webView, String url) {
+    super.onPageFinished(webView, url);
 
-            reactWebView.callInjectedJavaScript();
-
-            emitFinishEvent(webView, url);
-        }
-    }
-
-    @Override
-    public void doUpdateVisitedHistory (WebView webView, String url, boolean isReload) {
-      super.doUpdateVisitedHistory(webView, url, isReload);
-
-      ((RNCWebView) webView).dispatchEvent(
-        webView,
-        new TopLoadingStartEvent(
-          webView.getId(),
-          createWebViewEvent(webView, url)));
-    }
-
-    @Override
-    public void onPageStarted(WebView webView, String url, Bitmap favicon) {
-      super.onPageStarted(webView, url, favicon);
-      mLastLoadFailed = false;
-
+    if (!mLastLoadFailed) {
       RNCWebView reactWebView = (RNCWebView) webView;
-      reactWebView.callInjectedJavaScriptBeforeContentLoaded();
+
+      reactWebView.callInjectedJavaScript();
+
+      emitFinishEvent(webView, url);
     }
+  }
 
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        final RNCWebView rncWebView = (RNCWebView) view;
-        final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
+  @Override
+  public void doUpdateVisitedHistory(WebView webView, String url, boolean isReload) {
+    super.doUpdateVisitedHistory(webView, url, isReload);
 
-        if (!isJsDebugging && rncWebView.mCatalystInstance != null) {
-            final Pair<Double, AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState>> lock = RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.getNewLock();
-            final double lockIdentifier = lock.first;
-            final AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = lock.second;
+    ((RNCWebView) webView).dispatchEvent(
+      webView,
+      new TopLoadingStartEvent(
+        webView.getId(),
+        createWebViewEvent(webView, url)));
+  }
 
-            final WritableMap event = createWebViewEvent(view, url);
-            event.putDouble("lockIdentifier", lockIdentifier);
-            rncWebView.sendDirectMessage("onShouldStartLoadWithRequest", event);
+  @Override
+  public void onPageStarted(WebView webView, String url, Bitmap favicon) {
+    super.onPageStarted(webView, url, favicon);
+    mLastLoadFailed = false;
 
-            try {
-                assert lockObject != null;
-                synchronized (lockObject) {
-                    final long startTime = SystemClock.elapsedRealtime();
-                    while (lockObject.get() == RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.UNDECIDED) {
-                        if (SystemClock.elapsedRealtime() - startTime > SHOULD_OVERRIDE_URL_LOADING_TIMEOUT) {
-                            FLog.w(TAG, "Did not receive response to shouldOverrideUrlLoading in time, defaulting to allow loading.");
-                            RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-                            return false;
-                        }
-                        lockObject.wait(SHOULD_OVERRIDE_URL_LOADING_TIMEOUT);
-                    }
-                }
-            } catch (InterruptedException e) {
-                FLog.e(TAG, "shouldOverrideUrlLoading was interrupted while waiting for result.", e);
-                RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-                return false;
+    RNCWebView reactWebView = (RNCWebView) webView;
+    reactWebView.callInjectedJavaScriptBeforeContentLoaded();
+  }
+
+  @Override
+  public boolean shouldOverrideUrlLoading(WebView view, String url) {
+    final RNCWebView rncWebView = (RNCWebView) view;
+    final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
+
+    if (!isJsDebugging && rncWebView.mCatalystInstance != null) {
+      final Pair<Double, AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState>> lock = RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.getNewLock();
+      final double lockIdentifier = lock.first;
+      final AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = lock.second;
+
+      final WritableMap event = createWebViewEvent(view, url);
+      event.putDouble("lockIdentifier", lockIdentifier);
+      rncWebView.sendDirectMessage("onShouldStartLoadWithRequest", event);
+
+      try {
+        assert lockObject != null;
+        synchronized (lockObject) {
+          final long startTime = SystemClock.elapsedRealtime();
+          while (lockObject.get() == RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.UNDECIDED) {
+            if (SystemClock.elapsedRealtime() - startTime > SHOULD_OVERRIDE_URL_LOADING_TIMEOUT) {
+              FLog.w(TAG, "Did not receive response to shouldOverrideUrlLoading in time, defaulting to allow loading.");
+              RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
+              return false;
             }
-
-            final boolean shouldOverride = lockObject.get() == RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.SHOULD_OVERRIDE;
-            RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-
-            return shouldOverride;
-        } else {
-            FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
-            progressChangedFilter.setWaitingForCommandLoadUrl(true);
-
-            int reactTag = view.getId();
-            UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag).dispatchEvent(new TopShouldStartLoadWithRequestEvent(
-                    reactTag,
-                    createWebViewEvent(view, url)));
-            return true;
+            lockObject.wait(SHOULD_OVERRIDE_URL_LOADING_TIMEOUT);
+          }
         }
+      } catch (InterruptedException e) {
+        FLog.e(TAG, "shouldOverrideUrlLoading was interrupted while waiting for result.", e);
+        RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
+        return false;
+      }
+
+      final boolean shouldOverride = lockObject.get() == RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.SHOULD_OVERRIDE;
+      RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
+
+      return shouldOverride;
+    } else {
+      FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
+      progressChangedFilter.setWaitingForCommandLoadUrl(true);
+
+      int reactTag = view.getId();
+      UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag).dispatchEvent(new TopShouldStartLoadWithRequestEvent(
+        reactTag,
+        createWebViewEvent(view, url)));
+      return true;
+    }
+  }
+
+  @TargetApi(Build.VERSION_CODES.N)
+  @Override
+  public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+    final String url = request.getUrl().toString();
+    return this.shouldOverrideUrlLoading(view, url);
+  }
+
+  @Override
+  public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+    if (basicAuthCredential != null) {
+      handler.proceed(basicAuthCredential.username, basicAuthCredential.password);
+      return;
+    }
+    super.onReceivedHttpAuthRequest(view, handler, host, realm);
+  }
+
+  @Override
+  public WebResourceResponse shouldInterceptRequest(WebView view,
+                                                    WebResourceRequest request) {
+    return assetLoader.shouldInterceptRequest(request.getUrl());
+  }
+
+  @Override
+  public void onReceivedSslError(final WebView webView, final SslErrorHandler handler, final SslError error) {
+    // onReceivedSslError is called for most requests, per Android docs: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%2520android.webkit.SslErrorHandler,%2520android.net.http.SslError)
+    // WebView.getUrl() will return the top-level window URL.
+    // If a top-level navigation triggers this error handler, the top-level URL will be the failing URL (not the URL of the currently-rendered page).
+    // This is desired behavior. We later use these values to determine whether the request is a top-level navigation or a subresource request.
+    String topWindowUrl = webView.getUrl();
+    String failingUrl = error.getUrl();
+
+    // Cancel request after obtaining top-level URL.
+    // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
+    // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
+    handler.cancel();
+
+    if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
+      // If error is not due to top-level navigation, then do not call onReceivedError()
+      Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: " + failingUrl);
+      return;
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-        final String url = request.getUrl().toString();
-        return this.shouldOverrideUrlLoading(view, url);
+    int code = error.getPrimaryError();
+    String description = "";
+    String descriptionPrefix = "SSL error: ";
+
+    // https://developer.android.com/reference/android/net/http/SslError.html
+    switch (code) {
+      case SslError.SSL_DATE_INVALID:
+        description = "The date of the certificate is invalid";
+        break;
+      case SslError.SSL_EXPIRED:
+        description = "The certificate has expired";
+        break;
+      case SslError.SSL_IDMISMATCH:
+        description = "Hostname mismatch";
+        break;
+      case SslError.SSL_INVALID:
+        description = "A generic error occurred";
+        break;
+      case SslError.SSL_NOTYETVALID:
+        description = "The certificate is not yet valid";
+        break;
+      case SslError.SSL_UNTRUSTED:
+        description = "The certificate authority is not trusted";
+        break;
+      default:
+        description = "Unknown SSL Error";
+        break;
     }
 
-    @Override
-    public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
-        if (basicAuthCredential != null) {
-            handler.proceed(basicAuthCredential.username, basicAuthCredential.password);
-            return;
-        }
-        super.onReceivedHttpAuthRequest(view, handler, host, realm);
+    description = descriptionPrefix + description;
+
+    this.onReceivedError(
+      webView,
+      code,
+      description,
+      failingUrl
+    );
+  }
+
+  @Override
+  public void onReceivedError(
+    WebView webView,
+    int errorCode,
+    String description,
+    String failingUrl) {
+
+    if (ignoreErrFailedForThisURL != null
+      && failingUrl.equals(ignoreErrFailedForThisURL)
+      && errorCode == -1
+      && description.equals("net::ERR_FAILED")) {
+
+      // This is a workaround for a bug in the WebView.
+      // See these chromium issues for more context:
+      // https://bugs.chromium.org/p/chromium/issues/detail?id=1023678
+      // https://bugs.chromium.org/p/chromium/issues/detail?id=1050635
+      // This entire commit should be reverted once this bug is resolved in chromium.
+      setIgnoreErrFailedForThisURL(null);
+      return;
     }
 
-    @Override
-    public void onReceivedSslError(final WebView webView, final SslErrorHandler handler, final SslError error) {
-        // onReceivedSslError is called for most requests, per Android docs: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%2520android.webkit.SslErrorHandler,%2520android.net.http.SslError)
-        // WebView.getUrl() will return the top-level window URL.
-        // If a top-level navigation triggers this error handler, the top-level URL will be the failing URL (not the URL of the currently-rendered page).
-        // This is desired behavior. We later use these values to determine whether the request is a top-level navigation or a subresource request.
-        String topWindowUrl = webView.getUrl();
-        String failingUrl = error.getUrl();
+    super.onReceivedError(webView, errorCode, description, failingUrl);
+    mLastLoadFailed = true;
 
-        // Cancel request after obtaining top-level URL.
-        // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
-        // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
-        handler.cancel();
+    // In case of an error JS side expect to get a finish event first, and then get an error event
+    // Android WebView does it in the opposite way, so we need to simulate that behavior
+    emitFinishEvent(webView, failingUrl);
 
-        if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
-            // If error is not due to top-level navigation, then do not call onReceivedError()
-            Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
-            return;
-        }
+    WritableMap eventData = createWebViewEvent(webView, failingUrl);
+    eventData.putDouble("code", errorCode);
+    eventData.putString("description", description);
 
-        int code = error.getPrimaryError();
-        String description = "";
-        String descriptionPrefix = "SSL error: ";
+    int reactTag = webView.getId();
+    UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingErrorEvent(webView.getId(), eventData));
+  }
 
-        // https://developer.android.com/reference/android/net/http/SslError.html
-        switch (code) {
-            case SslError.SSL_DATE_INVALID:
-                description = "The date of the certificate is invalid";
-                break;
-            case SslError.SSL_EXPIRED:
-                description = "The certificate has expired";
-                break;
-            case SslError.SSL_IDMISMATCH:
-                description = "Hostname mismatch";
-                break;
-            case SslError.SSL_INVALID:
-                description = "A generic error occurred";
-                break;
-            case SslError.SSL_NOTYETVALID:
-                description = "The certificate is not yet valid";
-                break;
-            case SslError.SSL_UNTRUSTED:
-                description = "The certificate authority is not trusted";
-                break;
-            default:
-                description = "Unknown SSL Error";
-                break;
-        }
+  @RequiresApi(api = Build.VERSION_CODES.M)
+  @Override
+  public void onReceivedHttpError(
+    WebView webView,
+    WebResourceRequest request,
+    WebResourceResponse errorResponse) {
+    super.onReceivedHttpError(webView, request, errorResponse);
 
-        description = descriptionPrefix + description;
+    if (request.isForMainFrame()) {
+      WritableMap eventData = createWebViewEvent(webView, request.getUrl().toString());
+      eventData.putInt("statusCode", errorResponse.getStatusCode());
+      eventData.putString("description", errorResponse.getReasonPhrase());
 
-        this.onReceivedError(
-                webView,
-                code,
-                description,
-                failingUrl
-        );
+      int reactTag = webView.getId();
+      UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopHttpErrorEvent(webView.getId(), eventData));
+    }
+  }
+
+  @TargetApi(Build.VERSION_CODES.O)
+  @Override
+  public boolean onRenderProcessGone(WebView webView, RenderProcessGoneDetail detail) {
+    // WebViewClient.onRenderProcessGone was added in O.
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      return false;
+    }
+    super.onRenderProcessGone(webView, detail);
+
+    if (detail.didCrash()) {
+      Log.e(TAG, "The WebView rendering process crashed.");
+    } else {
+      Log.w(TAG, "The WebView rendering process was killed by the system.");
     }
 
-    @Override
-    public void onReceivedError(
-            WebView webView,
-            int errorCode,
-            String description,
-            String failingUrl) {
-
-        if (ignoreErrFailedForThisURL != null
-                && failingUrl.equals(ignoreErrFailedForThisURL)
-                && errorCode == -1
-                && description.equals("net::ERR_FAILED")) {
-
-            // This is a workaround for a bug in the WebView.
-            // See these chromium issues for more context:
-            // https://bugs.chromium.org/p/chromium/issues/detail?id=1023678
-            // https://bugs.chromium.org/p/chromium/issues/detail?id=1050635
-            // This entire commit should be reverted once this bug is resolved in chromium.
-            setIgnoreErrFailedForThisURL(null);
-            return;
-        }
-
-        super.onReceivedError(webView, errorCode, description, failingUrl);
-        mLastLoadFailed = true;
-
-        // In case of an error JS side expect to get a finish event first, and then get an error event
-        // Android WebView does it in the opposite way, so we need to simulate that behavior
-        emitFinishEvent(webView, failingUrl);
-
-        WritableMap eventData = createWebViewEvent(webView, failingUrl);
-        eventData.putDouble("code", errorCode);
-        eventData.putString("description", description);
-
-        int reactTag = webView.getId();
-        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingErrorEvent(webView.getId(), eventData));
+    // if webView is null, we cannot return any event
+    // since the view is already dead/disposed
+    // still prevent the app crash by returning true.
+    if (webView == null) {
+      return true;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    public void onReceivedHttpError(
-            WebView webView,
-            WebResourceRequest request,
-            WebResourceResponse errorResponse) {
-        super.onReceivedHttpError(webView, request, errorResponse);
+    WritableMap event = createWebViewEvent(webView, webView.getUrl());
+    event.putBoolean("didCrash", detail.didCrash());
+    int reactTag = webView.getId();
+    UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopRenderProcessGoneEvent(webView.getId(), event));
 
-        if (request.isForMainFrame()) {
-            WritableMap eventData = createWebViewEvent(webView, request.getUrl().toString());
-            eventData.putInt("statusCode", errorResponse.getStatusCode());
-            eventData.putString("description", errorResponse.getReasonPhrase());
+    // returning false would crash the app.
+    return true;
+  }
 
-            int reactTag = webView.getId();
-            UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopHttpErrorEvent(webView.getId(), eventData));
-        }
-    }
+  protected void emitFinishEvent(WebView webView, String url) {
+    int reactTag = webView.getId();
+    UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingFinishEvent(webView.getId(), createWebViewEvent(webView, url)));
+  }
 
-    @TargetApi(Build.VERSION_CODES.O)
-    @Override
-    public boolean onRenderProcessGone(WebView webView, RenderProcessGoneDetail detail) {
-        // WebViewClient.onRenderProcessGone was added in O.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return false;
-        }
-        super.onRenderProcessGone(webView, detail);
+  protected WritableMap createWebViewEvent(WebView webView, String url) {
+    WritableMap event = Arguments.createMap();
+    event.putDouble("target", webView.getId());
+    // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
+    // like onPageFinished
+    event.putString("url", url);
+    event.putBoolean("loading", !mLastLoadFailed && webView.getProgress() != 100);
+    event.putString("title", webView.getTitle());
+    event.putBoolean("canGoBack", webView.canGoBack());
+    event.putBoolean("canGoForward", webView.canGoForward());
+    return event;
+  }
 
-        if(detail.didCrash()){
-            Log.e(TAG, "The WebView rendering process crashed.");
-        }
-        else{
-            Log.w(TAG, "The WebView rendering process was killed by the system.");
-        }
-
-        // if webView is null, we cannot return any event
-        // since the view is already dead/disposed
-        // still prevent the app crash by returning true.
-        if(webView == null){
-            return true;
-        }
-
-        WritableMap event = createWebViewEvent(webView, webView.getUrl());
-        event.putBoolean("didCrash", detail.didCrash());
-        int reactTag = webView.getId();
-        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopRenderProcessGoneEvent(webView.getId(), event));
-
-        // returning false would crash the app.
-        return true;
-    }
-
-    protected void emitFinishEvent(WebView webView, String url) {
-        int reactTag = webView.getId();
-        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingFinishEvent(webView.getId(), createWebViewEvent(webView, url)));
-    }
-
-    protected WritableMap createWebViewEvent(WebView webView, String url) {
-        WritableMap event = Arguments.createMap();
-        event.putDouble("target", webView.getId());
-        // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
-        // like onPageFinished
-        event.putString("url", url);
-        event.putBoolean("loading", !mLastLoadFailed && webView.getProgress() != 100);
-        event.putString("title", webView.getTitle());
-        event.putBoolean("canGoBack", webView.canGoBack());
-        event.putBoolean("canGoForward", webView.canGoForward());
-        return event;
-    }
-
-    public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
-        progressChangedFilter = filter;
-    }
+  public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
+    progressChangedFilter = filter;
+  }
 }
