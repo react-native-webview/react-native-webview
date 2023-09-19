@@ -99,7 +99,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
                 ((RNCWebView) view).dispatchEvent(
                     view,
-                    new TopOpenWindowEvent(view.getId(), event)
+                    new TopOpenWindowEvent(RNCWebViewWrapper.getReactTagFromWebView(view), event)
                 );
 
                 return true;

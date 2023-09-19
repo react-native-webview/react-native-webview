@@ -186,7 +186,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     }
 
     @ReactProp(name = "injectedJavaScriptObject")
-    public void setInjectedJavaScriptObject(RNCWebView view, @Nullable String value) {
+    public void setInjectedJavaScriptObject(RNCWebViewWrapper view, @Nullable String value) {
         mRNCWebViewManagerImpl.setInjectedJavaScriptObject(view, value);
     }
 
@@ -209,7 +209,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
 
     @Override
     @ReactProp(name = "hasOnOpenWindowEvent")
-    public void setHasOnOpenWindowEvent(RNCWebView view, boolean hasEvent) {
+    public void setHasOnOpenWindowEvent(RNCWebViewWrapper view, boolean hasEvent) {
         mRNCWebViewManagerImpl.setHasOnOpenWindowEvent(view, hasEvent);
     }
 
@@ -221,13 +221,13 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
 
     @Override
     @ReactProp(name = "menuItems")
-    public void setMenuItems(RNCWebView view, @Nullable ReadableArray items) {
+    public void setMenuItems(RNCWebViewWrapper view, @Nullable ReadableArray items) {
         mRNCWebViewManagerImpl.setMenuCustomItems(view, items);
     }
 
     @Override
     @ReactProp(name = "suppressMenuItems ")
-    public void setSuppressMenuItems(RNCWebView view, @Nullable ReadableArray items) {}
+    public void setSuppressMenuItems(RNCWebViewWrapper view, @Nullable ReadableArray items) {}
 
     @Override
     @ReactProp(name = "messagingEnabled")
@@ -327,7 +327,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
 
     @Override
     @ReactProp(name = "webviewDebuggingEnabled")
-    public void setWebviewDebuggingEnabled(RNCWebView view, boolean value) {
+    public void setWebviewDebuggingEnabled(RNCWebViewWrapper view, boolean value) {
         mRNCWebViewManagerImpl.setWebviewDebuggingEnabled(view, value);
     }
 

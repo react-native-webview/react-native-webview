@@ -41,8 +41,8 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
         return mRNCWebViewManagerImpl.createViewInstance(context);
     }
 
-    public RNCWebViewWrapper createViewInstance(ThemedReactContext context, RNCWebView webView) {
-      return mRNCWebViewManagerImpl.createViewInstance(context, webView);
+    public RNCWebViewWrapper createViewInstance(ThemedReactContext context, RNCWebViewWrapper view) {
+      return mRNCWebViewManagerImpl.createViewInstance(context, view.getWebView());
     }
 
     @ReactProp(name = "allowFileAccess")
@@ -149,7 +149,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
     }
 
     @ReactProp(name = "injectedJavaScriptObject")
-    public void setInjectedJavaScriptObject(RNCWebView view, @Nullable String value) {
+    public void setInjectedJavaScriptObject(RNCWebViewWrapper view, @Nullable String value) {
         mRNCWebViewManagerImpl.setInjectedJavaScriptObject(view, value);
     }
 
@@ -169,7 +169,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
     }
 
     @ReactProp(name = "hasOnOpenWindowEvent")
-    public void setHasOnOpenWindowEvent(RNCWebView view, boolean hasEvent) {
+    public void setHasOnOpenWindowEvent(RNCWebViewWrapper view, boolean hasEvent) {
         mRNCWebViewManagerImpl.setHasOnOpenWindowEvent(view, hasEvent);
     }
 
@@ -184,7 +184,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
     }
 
     @ReactProp(name = "menuItems")
-    public void setMenuCustomItems(RNCWebView view, @Nullable ReadableArray items) {
+    public void setMenuCustomItems(RNCWebViewWrapper view, @Nullable ReadableArray items) {
         mRNCWebViewManagerImpl.setMenuCustomItems(view, items);
     }
 
@@ -264,7 +264,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
     }
 
     @ReactProp(name = "webviewDebuggingEnabled")
-    public void setWebviewDebuggingEnabled(RNCWebView view, boolean value) {
+    public void setWebviewDebuggingEnabled(RNCWebViewWrapper view, boolean value) {
         mRNCWebViewManagerImpl.setWebviewDebuggingEnabled(view, value);
     }
 

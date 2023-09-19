@@ -1,7 +1,6 @@
 package com.reactnativecommunity.webview
 
 import android.app.DownloadManager
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -16,7 +15,6 @@ import android.webkit.CookieManager
 import android.webkit.DownloadListener
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.widget.FrameLayout
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
@@ -29,7 +27,7 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
-import java.util.*
+import java.util.Locale
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
@@ -500,12 +498,12 @@ class RNCWebViewManagerImpl {
         view.injectedJavaScriptBeforeContentLoadedForMainFrameOnly = value
     }
 
-    fun setInjectedJavaScriptObject(view: RNCWebView, value: String?) {
+    fun setInjectedJavaScriptObject(viewWrapper: RNCWebViewWrapper, value: String?) {
         val view = viewWrapper.webView
         view.setInjectedJavaScriptObject(value)
     }
 
-    fun setJavaScriptCanOpenWindowsAutomatically(view: RNCWebView, value: Boolean) {
+    fun setJavaScriptCanOpenWindowsAutomatically(viewWrapper: RNCWebViewWrapper, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.javaScriptCanOpenWindowsAutomatically = value
     }
@@ -619,13 +617,13 @@ class RNCWebViewManagerImpl {
         mLackPermissionToDownloadMessage = value
     }
 
-    fun setHasOnOpenWindowEvent(view: RNCWebView, value: Boolean) {
+    fun setHasOnOpenWindowEvent(viewWrapper: RNCWebViewWrapper, value: Boolean) {
         val view = viewWrapper.webView
         mHasOnOpenWindowEvent = value
         setupWebChromeClient(view)
     }
 
-    fun setMinimumFontSize(view: RNCWebView, value: Int) {
+    fun setMinimumFontSize(viewWrapper: RNCWebViewWrapper, value: Int) {
         val view = viewWrapper.webView
         view.settings.minimumFontSize = value
     }
@@ -644,12 +642,12 @@ class RNCWebViewManagerImpl {
       }
     }
 
-    fun setMenuCustomItems(view: RNCWebView, value: ReadableArray) {
+    fun setMenuCustomItems(viewWrapper: RNCWebViewWrapper, value: ReadableArray) {
         val view = viewWrapper.webView
         view.setMenuCustomItems(value.toArrayList() as List<Map<String, String>>)
     }
 
-    fun setNestedScrollEnabled(view: RNCWebView, value: Boolean) {
+    fun setNestedScrollEnabled(viewWrapper: RNCWebViewWrapper, value: Boolean) {
         val view = viewWrapper.webView
         view.nestedScrollEnabled = value
     }
@@ -701,7 +699,7 @@ class RNCWebViewManagerImpl {
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, enabled)
     }
 
-    fun setWebviewDebuggingEnabled(view: RNCWebView, enabled: Boolean) {
+    fun setWebviewDebuggingEnabled(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
         RNCWebView.setWebContentsDebuggingEnabled(enabled)
     }
 }

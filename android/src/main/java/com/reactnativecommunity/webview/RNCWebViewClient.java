@@ -71,7 +71,7 @@ public class RNCWebViewClient extends WebViewClient {
       ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingStartEvent(
-          webView.getId(),
+          RNCWebViewWrapper.getReactTagFromWebView(webView),
           createWebViewEvent(webView, url)));
     }
 
