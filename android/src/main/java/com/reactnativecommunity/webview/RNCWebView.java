@@ -460,11 +460,6 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
       mWebView = webView;
     }
 
-    /**
-     * This method is called whenever JavaScript running within the web view calls:
-     * - window[JAVASCRIPT_INTERFACE].postMessage
-     */
-
     @JavascriptInterface
     public void downloadFile(String json) {
       // parse json
