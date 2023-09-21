@@ -456,8 +456,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
   protected class RNCWebViewDownloadBridge {
     RNCWebView mWebView;
 
-    RNCWebViewDownloadBridge(RNCWebView c) {
-      mWebView = c;
+    RNCWebViewDownloadBridge(RNCWebView webView) {
+      mWebView = webView;
     }
 
     /**
