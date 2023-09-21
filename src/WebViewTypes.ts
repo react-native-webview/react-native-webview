@@ -1034,11 +1034,11 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   minimumFontSize?: number;
 
   /**
-   * Sets the message to be shown in the toast when downloading via the webview.
+   * Sets the message to be shown in the toast after file is downloaded via the webview.
    * Default is 'Downloading'.
    * @platform android
    */
-  downloadingMessage?: string;
+  downloadedMessage?: string;
 
   /**
    * Sets the message to be shown in the toast when webview is unable to download due to permissions issue.

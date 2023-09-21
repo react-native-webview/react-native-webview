@@ -67,7 +67,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     protected static final String DOWNLOAD_INTERFACE = "ReactNativeWebViewDownloader";
 
-    String downloadingMessage = "File Downloaded!";
+    String downloadedMessage = "File Downloaded!";
 
     /**
      * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
@@ -306,8 +306,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
   }
 
 
-  public void setDownloadingMessage(String message) {
-      downloadingMessage = message;
+  public void setDownloadedMessage(String message) {
+      downloadedMessage = message;
   }
 
     protected void evaluateJavascriptWithFallback(String script) {
@@ -506,7 +506,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
           os.write(decodedBytes);
           os.close();
 
-          Toast.makeText(mWebView.getContext(), downloadingMessage, Toast.LENGTH_LONG).show();
+          Toast.makeText(mWebView.getContext(), downloadedMessage, Toast.LENGTH_LONG).show();
 
 
 

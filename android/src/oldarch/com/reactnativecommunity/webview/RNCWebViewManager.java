@@ -108,9 +108,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView> {
         mRNCWebViewManagerImpl.setDomStorageEnabled(view, value);
     }
 
-    @ReactProp(name = "downloadingMessage")
-    public void setDownloadingMessage(RNCWebView view, @Nullable String value) {
-        mRNCWebViewManagerImpl.setDownloadingMessage(value);
+    @ReactProp(name = "downloadedMessage")
+    public void setDownloadedMessage(RNCWebView view, @Nullable String value) {
+        mRNCWebViewManagerImpl.setDownloadedMessage(value);
     }
 
     @ReactProp(name = "forceDarkOn")

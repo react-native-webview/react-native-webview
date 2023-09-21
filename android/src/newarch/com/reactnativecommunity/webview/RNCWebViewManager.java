@@ -127,9 +127,9 @@ public class RNCWebViewManager extends SimpleViewManager<RNCWebView>
     }
 
     @Override
-    @ReactProp(name = "downloadingMessage")
-    public void setDownloadingMessage(RNCWebView view, @Nullable String value) {
-        mRNCWebViewManagerImpl.setDownloadingMessage(value);
+    @ReactProp(name = "downloadedMessage")
+    public void setDownloadedMessage(RNCWebView view, @Nullable String value) {
+        mRNCWebViewManagerImpl.setDownloadedMessage(value);
     }
 
     @Override

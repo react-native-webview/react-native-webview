@@ -44,7 +44,7 @@ class RNCWebViewManagerImpl {
     private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
     private var mAllowsFullscreenVideo = false
     private var mAllowsProtectedMedia = false
-    private var mDownloadingMessage: String? = null
+    private var mDownloadedMessage: String? = null
     private var mLackPermissionToDownloadMessage: String? = null
 
     private var mUserAgent: String? = null
@@ -142,12 +142,12 @@ class RNCWebViewManagerImpl {
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
             module.setDownloadRequest(request)
             if (module.grantFileDownloaderPermissions(
-                    getDownloadingMessageOrDefault(),
+                    getDownloadedMessageOrDefault(),
                     getLackPermissionToDownloadMessageOrDefault()
                 )
             ) {
                 module.downloadFile(
-                    getDownloadingMessageOrDefault()
+                    getDownloadedMessageOrDefault()
                 )
             }
         })
@@ -399,8 +399,8 @@ class RNCWebViewManagerImpl {
         view.settings.allowUniversalAccessFromFileURLs = allow
     }
 
-    private fun getDownloadingMessageOrDefault(): String? {
-        return mDownloadingMessage ?: DEFAULT_DOWNLOADING_MESSAGE
+    private fun getDownloadedMessageOrDefault(): String? {
+        return mDownloadedMessage ?: DEFAULT_DOWNLOADING_MESSAGE
     }
 
     private fun getLackPermissionToDownloadMessageOrDefault(): String? {
@@ -543,7 +543,7 @@ class RNCWebViewManagerImpl {
 
   fun setBlobDownloadingEnabled(view: RNCWebView, value: Boolean) {
     view.setDownloadingBlobEnabled(value)
-    view.setDownloadingMessage(getDownloadingMessageOrDefault())
+    view.setDownloadedMessage(getDownloadedMessageOrDefault())
   }
 
     fun setMediaPlaybackRequiresUserAction(view: RNCWebView, value: Boolean) {
@@ -594,8 +594,8 @@ class RNCWebViewManagerImpl {
         view.settings.domStorageEnabled = value
     }
 
-    fun setDownloadingMessage(value: String?) {
-        mDownloadingMessage = value
+    fun setDownloadedMessage(value: String?) {
+        mDownloadedMessage = value
     }
 
     fun setForceDarkOn(view: RNCWebView, enabled: Boolean) {
