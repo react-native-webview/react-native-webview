@@ -464,8 +464,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     public void downloadFile(String json) {
       // parse json
       try {
-        JSONObject jsonObject = null;
-        jsonObject = new JSONObject(json);
+        JSONObject jsonObject = new JSONObject(json);
         String url = jsonObject.getString("data");
         String fileName = jsonObject.getString("fileName");
         // decode base64 string and save to file
