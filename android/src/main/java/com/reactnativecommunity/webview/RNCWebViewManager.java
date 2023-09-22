@@ -1320,9 +1320,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         String androidPermission = null;
 
         if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
-          androidPermission = Manifest.permission.RECORD_AUDIO;
+          // androidPermission = Manifest.permission.RECORD_AUDIO;
+          continue;
         } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
-          androidPermission = Manifest.permission.CAMERA;
+          // androidPermission = Manifest.permission.CAMERA;
+          continue;
         } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
           androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
         }
