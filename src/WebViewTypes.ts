@@ -724,6 +724,11 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   fraudulentWebsiteWarningEnabled?: boolean;
+
+  /**
+   * Inject a JavaScript object to be accessed as a JSON string via JavaScript in the WebView.
+   */
+  injectedJavaScriptObject?: object;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
