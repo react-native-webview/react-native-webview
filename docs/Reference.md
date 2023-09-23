@@ -11,6 +11,7 @@ This document lays out the current public properties and methods for the React N
 - [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded)
 - [`injectedJavaScriptForMainFrameOnly`](Reference.md#injectedjavascriptformainframeonly)
 - [`injectedJavaScriptBeforeContentLoadedForMainFrameOnly`](Reference.md#injectedjavascriptbeforecontentloadedformainframeonly)
+- [`injectedJavaScriptObject`](Reference.md#injectedjavascriptobject)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
