@@ -256,7 +256,7 @@ Inject any JavaScript object into the webview so it is available to the JS runni
 
 | Type | Required | Platform                                          |
 | ---- | -------- | ------------------------------------------------- |
-| obj | No       | Android only |
+| obj | No       | iOS, Android |
 
 Example:
 
