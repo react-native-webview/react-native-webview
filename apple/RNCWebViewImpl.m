@@ -1632,7 +1632,7 @@ didFinishNavigation:(WKNavigation *)navigation
       stringWithFormat:
        @"window.%@ ??= {};"
       "window.%@.injectedObjectJson = function () {"
-      "  return '%@';"
+      "  return `%@`;"
       "};", MessageHandlerName, MessageHandlerName, source
     ]
     injectionTime:WKUserScriptInjectionTimeAtDocumentStart
