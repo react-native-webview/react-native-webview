@@ -1641,7 +1641,6 @@ didFinishNavigation:(WKNavigation *)navigation
     // forMainFrameOnly:_messagingEnabledForMainFrameOnly
     forMainFrameOnly:YES
   ];
-  RCTLogWarn(@"%@", [NSString stringWithFormat:@"_injectedJavaScriptObject %@", source]);
 }
 
 - (void)setEnableApplePay:(BOOL)enableApplePay {
