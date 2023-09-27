@@ -11,6 +11,7 @@ This document lays out the current public properties and methods for the React N
 - [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded)
 - [`injectedJavaScriptForMainFrameOnly`](Reference.md#injectedjavascriptformainframeonly)
 - [`injectedJavaScriptBeforeContentLoadedForMainFrameOnly`](Reference.md#injectedjavascriptbeforecontentloadedformainframeonly)
+- [`injectedJavaScriptObject`](Reference.md#injectedjavascriptobject)
 - [`mediaPlaybackRequiresUserAction`](Reference.md#mediaplaybackrequiresuseraction)
 - [`nativeConfig`](Reference.md#nativeconfig)
 - [`onError`](Reference.md#onerror)
@@ -22,6 +23,7 @@ This document lays out the current public properties and methods for the React N
 - [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
+- [`onOpenWindow`](Reference.md#onopenwindow)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`onScroll`](Reference.md#onscroll)
 - [`originWhitelist`](Reference.md#originwhitelist)
@@ -76,6 +78,7 @@ This document lays out the current public properties and methods for the React N
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
 - [`textInteractionEnabled`](Reference.md#textInteractionEnabled)
+- [`suppressMenuItems`](Reference.md#suppressMenuItems)
 - [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
@@ -198,7 +201,7 @@ Make sure the string evaluates to a valid type (`true` works) and doesn't otherw
 On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
 
 > **Warning**
-> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)).
+> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)). Consider `injectedJavaScriptObject` instead.
 
 | Type   | Required | Platform                           |
 | ------ | -------- | ---------------------------------- |
@@ -245,6 +248,44 @@ If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. if
 | Type | Required | Platform                                          |
 | ---- | -------- | ------------------------------------------------- |
 | bool | No       | iOS and macOS (only `true` supported for Android) |
+
+---
+
+### `injectedJavaScriptObject`[⬆](#props-index)
+
+Inject any JavaScript object into the webview so it is available to the JS running on the page.
+
+| Type | Required | Platform                                          |
+| ---- | -------- | ------------------------------------------------- |
+| obj | No       | Android only |
+
+Example:
+
+Set a value to be used in JavaScript.
+
+Note: Any value in the object will be accessible to *all* frames of the webpage. If sensitive values are present please ensure that you have a strict Content Security Policy set up to avoid data leaking.
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  injectedJavaScriptObject={{ customValue: 'myCustomValue' }}
+/>;
+```
+
+```html
+<html>
+  <head>
+    <script>
+      window.onload = (event) => {
+        if (window.ReactNativeWebView.injectedObjectJson()) {
+            const customValue = JSON.parse(window.ReactNativeWebView.injectedObjectJson()).customValue;
+            ...
+        }
+      }
+    </script>
+  </head>
+</html>
+```
 
 ---
 
@@ -577,6 +618,37 @@ url
 
 ---
 
+### `onOpenWindow`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Function that is invoked when the `WebView` should open a new window.
+
+This happens when the JS calls `window.open('http://someurl', '_blank')` or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+
+| Type     | Required |
+| -------- | -------- |
+| function | No       |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onOpenWindow={(syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    const { targetUrl } = nativeEvent
+    console.log('Intercepted OpenWindow for', targetUrl)
+  }}
+/>
+```
+
+Function passed to onOpenWindow is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+targetUrl
+```
+
+---
+
 ### `onContentProcessDidTerminate`[⬆](#props-index)
 
 Function that is invoked when the `WebView` content process is terminated.
@@ -753,7 +825,10 @@ lockIdentifier
 mainDocumentURL (iOS only)
 navigationType (iOS only)
 isTopFrame (iOS only)
+hasTargetFrame (iOS only)
 ```
+
+The `hasTargetFrame` prop is a boolean that is `false` when the navigation targets a new window or tab, otherwise it should be `true` ([more info](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe)). Note that this prop should always be `true` when `onOpenWindow` event is registered on the WebView because the `false` case is intercepted by this event.
 
 ---
 
@@ -1269,7 +1344,7 @@ A Boolean value that determines whether pressing on a link displays a preview of
 
 ### `sharedCookiesEnabled`[⬆](#props-index)
 
-Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
+Set `true` if shared cookies from `[NSHTTPCookieStorage sharedHTTPCookieStorage]` should be used for every load request in the WebView. The default value is `false`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type    | Required | Platform      |
 | ------- | -------- | ------------- |
@@ -1385,6 +1460,30 @@ Example:
 
 ---
 
+### `suppressMenuItems`[⬆](#props-index)
+
+Allows to suppress menu item from the default context menu.
+
+Possible values are:
+
+- `cut`
+- `copy`
+- `paste`
+- `delete`
+- `select`
+- `selectAll`
+- `replace`
+- `lookup`
+- `translate`
+- `bold`
+- `italic`
+- `underline`
+- `share`
+
+| Type             | Required | Default      | Platform |
+| ---------------- | -------- | ------------ | -------- |
+| array of strings | No       | []           | iOS      |
+
 ### `mediaCapturePermissionGrantType`[⬆](#props-index)
 
 This property specifies how to handle media capture permission requests. Defaults to `prompt`, resulting in the user being prompted repeatedly. Available on iOS 15 and later.
@@ -1480,11 +1579,11 @@ Example:
 
 ### `menuItems`[⬆](#props-index)
 
-An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
+An array of custom menu item objects that will be shown when selecting text. An empty array will suppress the menu.  Used in tandem with `onCustomMenuSelection`
 
 | Type                                                               | Required | Platform |
 | ------------------------------------------------------------------ | -------- | -------- |
-| array of objects: {label: string, key: string}                     | No       | iOS      |
+| array of objects: {label: string, key: string}                     | No       | iOS, Android      |
 
 Example:
 
@@ -1498,7 +1597,7 @@ Function called when a custom menu item is selected.  It receives a Native event
 
 | Type                                                               | Required | Platform |
 | ------------------------------------------------------------------ | -------- | -------- |
-| function                                                           | No       | iOS      |
+| function                                                           | No       | iOS, Android      |
 
 ```jsx
 <WebView
@@ -1664,13 +1763,13 @@ Removes the autocomplete popup from the currently focused form field, if present
 
 ### `clearCache(bool)`[⬆](#methods-index)
 
-(android only)
-
 ```javascript
-clearCache(true)
+clearCache(true);
 ```
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
+
+In iOS, includeDiskFiles will also remove data from the web storages and databases.[developer.apple.com reference](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata)
 
 ### `clearHistory()`[⬆](#methods-index)
 

@@ -21,6 +21,9 @@ import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
 import CustomMenu from './examples/CustomMenu';
+import OpenWindow from './examples/OpenWindow';
+import SuppressMenuItems from './examples/Suppress';
+import ClearData from './examples/ClearData';
 
 const TESTS = {
   Messaging: {
@@ -53,6 +56,14 @@ const TESTS = {
     description: 'Background color test',
     render() {
       return <Background />;
+    },
+  },
+  ClearData: {
+    title: 'ClearData',
+    testId: 'clearData',
+    description: 'Clear data test',
+    render() {
+      return <ClearData />;
     },
   },
   Downloads: {
@@ -110,6 +121,22 @@ const TESTS = {
     render() {
       return <CustomMenu />;
     },
+  },
+  OpenWindow: {
+    title: 'Open Window',
+    testId: 'OpenWindow',
+    description: 'Test to intercept new window events',
+    render() {
+      return <OpenWindow />;
+    },
+  },
+  SuppressMenuItems: {
+    title: 'SuppressMenuItems',
+    testId: 'SuppressMenuItems',
+    description: 'SuppressMenuItems in editable content',
+    render() {
+      return <SuppressMenuItems />;
+    }
   }
 };
 
@@ -207,6 +234,21 @@ export default class App extends Component<Props, State> {
             testID="testType_customMenu"
             title="CustomMenu"
             onPress={() => this._changeTest('CustomMenu')}
+          />
+          <Button
+            testID="testType_openwindow"
+            title="OpenWindow"
+            onPress={() => this._changeTest('OpenWindow')}
+          />
+          <Button
+            testID="testType_suppressMenuItems"
+            title="SuppressMenuItems"
+            onPress={() => this._changeTest('SuppressMenuItems')}
+          />
+          <Button
+            testID="testType_clearData"
+            title="ClearData"
+            onPress={() => this._changeTest('ClearData')}
           />
         </View>
 

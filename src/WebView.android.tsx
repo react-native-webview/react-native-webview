@@ -57,6 +57,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   onHttpError: onHttpErrorProp,
   onRenderProcessGone: onRenderProcessGoneProp,
   onMessage: onMessageProp,
+  onOpenWindow: onOpenWindowProp,
   renderLoading,
   renderError,
   style,
@@ -64,6 +65,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   source,
   nativeConfig,
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+  injectedJavaScriptObject,
   ...otherProps
 }, ref) => {
   const messagingModuleName = useRef<string>(`WebViewMessageHandler${uniqueRef += 1}`).current;
@@ -79,7 +81,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     }
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onRenderProcessGone } = useWebViewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onRenderProcessGone } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -89,6 +91,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onLoadStart,
     onRenderProcessGoneProp,
     onMessageProp,
+    onOpenWindowProp,
     startInLoadingState,
     originWhitelist,
     onShouldStartLoadWithRequestProp,
@@ -184,6 +187,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onHttpError={onHttpError}
     onRenderProcessGone={onRenderProcessGone}
     onMessage={onMessage}
+    onOpenWindow={onOpenWindow}
+    hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
     ref={webViewRef}
     // TODO: find a better way to type this.
@@ -204,6 +209,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     setBuiltInZoomControls={setBuiltInZoomControls}
     setDisplayZoomControls={setDisplayZoomControls}
     nestedScrollEnabled={nestedScrollEnabled}
+    injectedJavaScriptObject={JSON.stringify(injectedJavaScriptObject)}
     {...nativeConfig?.props}
   />
 
