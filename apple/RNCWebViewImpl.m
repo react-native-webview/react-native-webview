@@ -1322,7 +1322,8 @@ RCTAutoInsetsProtocol>
     }
 
     // Allow all navigation by default
-    decisionHandler(WKNavigationActionPolicyAllow);
+    // SED Except for universal app links: https://github.com/WebKit/WebKit/blob/5919cb323ca10a52b6c40b8ce2d408d3a3c956a2/Source/WebKit/UIProcess/API/Cocoa/WKNavigation
+    decisionHandler(WKNavigationActionPolicyAllow + 2);
 }
 
 /**
