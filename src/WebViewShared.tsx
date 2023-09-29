@@ -7,7 +7,6 @@ import {
   WebViewError,
   WebViewErrorEvent,
   WebViewHttpErrorEvent,
-  WebViewMessageEvent,
   WebViewNavigation,
   WebViewNavigationEvent,
   WebViewOpenWindowEvent,
@@ -23,6 +22,8 @@ const extractOrigin = (url: string): string => {
   const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
   return result === null ? '' : result[0];
 };
+
+export function noop() {}
 
 const originWhitelistToRegex = (originWhitelist: string): string =>
   `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}`;
@@ -106,7 +107,6 @@ export const useWebViewLogic = ({
   onLoadEnd,
   onError,
   onHttpErrorProp,
-  onMessageProp,
   onOpenWindowProp,
   onRenderProcessGoneProp,
   onContentProcessDidTerminateProp,
@@ -122,7 +122,6 @@ export const useWebViewLogic = ({
   onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
   onError?: (event: WebViewErrorEvent) => void;
   onHttpErrorProp?: (event: WebViewHttpErrorEvent) => void;
-  onMessageProp?: (event: WebViewMessageEvent) => void;
   onOpenWindowProp?: (event: WebViewOpenWindowEvent) => void;
   onRenderProcessGoneProp?: (event: WebViewRenderProcessGoneEvent) => void;
   onContentProcessDidTerminateProp?: (event: WebViewTerminatedEvent) => void;
@@ -190,10 +189,6 @@ export const useWebViewLogic = ({
     updateNavigationState(event);
   }, [onLoad, onLoadEnd, updateNavigationState]);
 
-  const onMessage = useCallback((event: WebViewMessageEvent) => {
-    onMessageProp?.(event);
-  }, [onMessageProp]);
-
   const onLoadingProgress = useCallback((event: WebViewProgressEvent) => {
     const { nativeEvent: { progress } } = event;
     // patch for Android only
@@ -226,7 +221,6 @@ export const useWebViewLogic = ({
     onHttpError,
     onRenderProcessGone,
     onContentProcessDidTerminate,
-    onMessage,
     onOpenWindow,
     viewState,
     setViewState,

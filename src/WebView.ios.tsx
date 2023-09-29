@@ -14,6 +14,7 @@ import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
+  noop,
   useWebViewLogic,
 } from './WebViewShared';
 import {
@@ -68,7 +69,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onContentProcessDidTerminate: onContentProcessDidTerminateProp,
   onFileDownload,
   onHttpError: onHttpErrorProp,
-  onMessage: onMessageProp,
+  onMessage,
   onOpenWindow: onOpenWindowProp,
   renderLoading,
   renderError,
@@ -95,7 +96,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onContentProcessDidTerminate } = useWebViewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onContentProcessDidTerminate } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -103,7 +104,6 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     onLoadEnd,
     onLoadProgress,
     onLoadStart,
-    onMessageProp,
     onOpenWindowProp,
     startInLoadingState,
     originWhitelist,
@@ -184,7 +184,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       useSharedProcessPool={useSharedProcessPool}
       textInteractionEnabled={textInteractionEnabled}
       decelerationRate={decelerationRate}
-      messagingEnabled={typeof onMessageProp === 'function'}
+      messagingEnabled={!!onMessage}
       messagingModuleName="" // android ONLY
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
@@ -192,7 +192,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       onFileDownload={onFileDownload}
       onLoadingStart={onLoadingStart}
       onHttpError={onHttpError}
-      onMessage={onMessage}
+      onMessage={onMessage || noop}
       onOpenWindow={onOpenWindowProp && onOpenWindow}
       hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
       onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}

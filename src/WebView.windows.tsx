@@ -20,7 +20,15 @@ import {
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import invariant from 'invariant';
 import {RCTWebView, RCTWebView2} from "./WebViewNativeComponent.windows";
-import { useWebViewLogic, defaultOriginWhitelist, defaultRenderError, defaultRenderLoading, } from './WebViewShared';
+
+import {
+  defaultOriginWhitelist,
+  defaultRenderError,
+  defaultRenderLoading,
+  noop,
+  useWebViewLogic,
+} from './WebViewShared';
+
 import {
   NativeWebViewWindows,
   WindowsWebViewProps,
@@ -44,7 +52,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   onLoadEnd,
   onLoadProgress,
   onHttpError: onHttpErrorProp,
-  onMessage: onMessageProp,
+  onMessage,
   renderLoading,
   renderError,
   style,
@@ -71,7 +79,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     }
   }, [RCTWebViewString]);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebViewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -79,7 +87,6 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     onLoadEnd,
     onLoadProgress,
     onLoadStart,
-    onMessageProp,
     startInLoadingState,
     originWhitelist,
     onShouldStartLoadWithRequestProp,
@@ -123,13 +130,13 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    messagingEnabled={typeof onMessageProp === 'function'}
+    messagingEnabled={!!onMessage}
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}
     onLoadingProgress={onLoadingProgress}
     onLoadingStart={onLoadingStart}
     onHttpError={onHttpError}
-    onMessage={onMessage}
+    onMessage={onMessage || noop}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
     ref={webViewRef}
     // TODO: find a better way to type this.

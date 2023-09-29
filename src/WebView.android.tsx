@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactElement, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { forwardRef, ReactElement, useCallback, useImperativeHandle, useRef } from 'react';
 
 import {
   Image,
@@ -6,8 +6,6 @@ import {
   ImageSourcePropType,
   HostComponent,
 } from 'react-native';
-
-import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
 
 import invariant from 'invariant';
 
@@ -17,6 +15,7 @@ import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
+  noop,
   useWebViewLogic,
 } from './WebViewShared';
 import {
@@ -56,7 +55,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   onLoadProgress,
   onHttpError: onHttpErrorProp,
   onRenderProcessGone: onRenderProcessGoneProp,
-  onMessage: onMessageProp,
+  onMessage,
   onOpenWindow: onOpenWindowProp,
   renderLoading,
   renderError,
@@ -81,7 +80,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     }
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onRenderProcessGone } = useWebViewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onRenderProcessGone } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -90,7 +89,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onLoadProgress,
     onLoadStart,
     onRenderProcessGoneProp,
-    onMessageProp,
     onOpenWindowProp,
     startInLoadingState,
     originWhitelist,
@@ -117,15 +115,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     clearCache: (includeDiskFiles: boolean) => webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
     clearHistory: () => webViewRef.current && Commands.clearHistory(webViewRef.current),
   }), [setViewState, webViewRef]);
-
-  const directEventCallbacks = useMemo(() => ({
-    onShouldStartLoadWithRequest,
-    onMessage,
-  }), [onMessage, onShouldStartLoadWithRequest]);
-
-  useEffect(() => {
-    BatchedBridge.registerCallableModule(messagingModuleName, directEventCallbacks);
-  }, [messagingModuleName, directEventCallbacks])
 
   let otherView: ReactElement | undefined;
   if (viewState === 'LOADING') {
@@ -176,7 +165,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    messagingEnabled={typeof onMessageProp === 'function'}
+    messagingEnabled={!!onMessage}
     messagingModuleName={messagingModuleName}
 
     hasOnScroll={!!otherProps.onScroll}
@@ -186,7 +175,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onLoadingStart={onLoadingStart}
     onHttpError={onHttpError}
     onRenderProcessGone={onRenderProcessGone}
-    onMessage={onMessage}
+    onMessage={onMessage || noop}
     onOpenWindow={onOpenWindow}
     hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}

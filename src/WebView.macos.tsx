@@ -13,6 +13,7 @@ import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
+  noop,
   useWebViewLogic,
 } from './WebViewShared';
 import {
@@ -51,7 +52,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
   onLoadEnd,
   onLoadProgress,
   onHttpError: onHttpErrorProp,
-  onMessage: onMessageProp,
+  onMessage,
   renderLoading,
   renderError,
   style,
@@ -75,7 +76,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
     RNCWebViewModule.shouldStartLoadWithLockIdentifier(!!shouldStart, lockIdentifier);
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebViewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -83,7 +84,6 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
     onLoadEnd,
     onLoadProgress,
     onLoadStart,
-    onMessageProp,
     startInLoadingState,
     originWhitelist,
     onShouldStartLoadWithRequestProp,
@@ -138,13 +138,13 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(({
       javaScriptEnabled={javaScriptEnabled}
       cacheEnabled={cacheEnabled}
       useSharedProcessPool={useSharedProcessPool}
-      messagingEnabled={typeof onMessageProp === 'function'}
+      messagingEnabled={!!onMessage}
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
       onLoadingProgress={onLoadingProgress}
       onLoadingStart={onLoadingStart}
       onHttpError={onHttpError}
-      onMessage={onMessage}
+      onMessage={onMessage || noop}
       onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
       onContentProcessDidTerminate={onContentProcessDidTerminate}
       injectedJavaScript={injectedJavaScript}
