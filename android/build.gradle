@@ -58,7 +58,7 @@ apply plugin: 'kotlin-android'
 android {
     def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
     if (supportsNamespace()) {
-        namespace "com.mylib"
+        namespace "com.reactnativecommunity.webview"
 
         sourceSets {
             main {
