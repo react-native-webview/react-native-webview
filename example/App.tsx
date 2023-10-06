@@ -24,6 +24,8 @@ import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
+import Snapshot from './examples/Snapshot';
+import Webarchive from './examples/Webarchive';
 
 const TESTS = {
   Messaging: {
@@ -137,7 +139,23 @@ const TESTS = {
     render() {
       return <SuppressMenuItems />;
     }
-  }
+  },
+  Snapshot: {
+    title: 'Snapshot',
+    testId: 'snapshot',
+    description: 'Snapshot tests',
+    render() {
+      return <Snapshot />;
+    },
+  },
+  Webarchive: {
+    title: 'Webarchive',
+    testId: 'webarchive',
+    description: 'Web Archive tests',
+    render() {
+      return <Webarchive />;
+    },
+  },
 };
 
 interface Props {}
@@ -149,9 +167,11 @@ export default class App extends Component<Props, State> {
     currentTest: TESTS.Alerts,
   };
 
+
   _simulateRestart = () => {
     this.setState({restarting: true}, () => this.setState({restarting: false}));
   };
+
 
   _changeTest = (testName) => {
     this.setState({currentTest: TESTS[testName]});
@@ -249,6 +269,16 @@ export default class App extends Component<Props, State> {
             testID="testType_clearData"
             title="ClearData"
             onPress={() => this._changeTest('ClearData')}
+          />
+          <Button
+            testID="testType_snapshot"
+            title="Snapshot"
+            onPress={() => this._changeTest('Snapshot')}
+          />
+          <Button
+            testID="testType_webarchive"
+            title="Webarchive"
+            onPress={() => this._changeTest('Webarchive')}
           />
         </View>
 

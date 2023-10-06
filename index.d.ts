@@ -59,6 +59,22 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      * Tells this WebView to clear its internal back/forward list.
      */
     clearHistory?: () => void;
+
+    /**
+     * (iOS only)
+     * Captures the current visible view snapshot and save it to a file.
+     */
+    takeSnapshot: (
+        filename: string
+    ) => Promise<string>;
+
+    /**
+     * (iOS only)
+     * Creates a web archive (webarchive) file from the current page and saves it to a file.
+     */
+    createWebArchive: (
+        filename: string,
+    ) => Promise<string>;
 }
 
 export {WebView};

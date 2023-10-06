@@ -8,6 +8,7 @@
 #import "RNCWebViewImpl.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import <React/RCTBridgeModule.h>
 #import "RNCWKProcessPoolManager.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
@@ -1590,6 +1591,48 @@ didFinishNavigation:(WKNavigation *)navigation
     ]];
   }
   [self removeData:dataTypes];
+}
+
+- (void)takeSnapshot:(NSString *)filename resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject
+{
+  if (@available(iOS 11.0, *)) {
+    if (_webView == nil) {
+        return;
+    }    
+    [_webView takeSnapshotWithConfiguration:nil completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
+      if (snapshotImage != nil) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];        
+        [UIImagePNGRepresentation(snapshotImage) writeToFile:filePath atomically:YES];
+        resolve(filePath);
+      }
+      else {
+        reject(@"failure", @"Unable to take snapshot", nil);
+      }      
+    }];
+  }
+}
+
+- (void)createWebArchive:(NSString *)filename resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject
+{
+  if (@available(iOS 14.0, *)) {
+    if (_webView == nil) {
+        return;
+    }    
+    [_webView createWebArchiveDataWithCompletionHandler:^(NSData * _Nullable webArchiveData, NSError * _Nullable error) {
+      if (webArchiveData != nil) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];        
+        [webArchiveData writeToFile:filePath atomically:YES];
+        resolve(filePath);
+      }
+      else {
+        reject(@"failure", @"Unable to create webarchive", nil);
+      }
+    }];
+  }
 }
 
 - (void)removeData:(NSSet *)dataTypes
