@@ -67,17 +67,16 @@ export default class Snapshot extends Component<Props, State> {
     }
   }  
 
-  _snapshot = async () => {
-    this.setState({ text: "Starting" });  
+  _snapshot = () => {
+    //this.setState({ text: "Starting" });  
     const start = Date.now();
-    try {
-      const filePath = await this.webView.current.takeSnapshot("foo3.png");
-      const end = Date.now();
-      this.setState({ text: "Snapshot took " + (end - start) + "ms" });  
-    }
-    catch(e) {
-
-    }
+    this.webView.current.takeSnapshot("foo10.png", (err) => {
+      this.setState({text: "Error: " + err});
+    }, 
+    (filepath) => {
+          const end = Date.now();
+         this.setState({ text: "Snapshot " + (end - start) + "ms" });        
+    });
 
   }
 

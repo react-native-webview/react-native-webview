@@ -49,7 +49,7 @@ export type WebViewErrorEvent = Readonly<{
   domain?: string;
   code: Int32;
   description: string;
-}>
+}> 
 
 export type WebViewNativeProgressEvent = Readonly< {
   url: string;
@@ -271,8 +271,8 @@ export interface NativeCommands {
   clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   // !Android Only
   // iOS Only
-  takeSnapshot: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => Promise<string>;
-  createWebArchive: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => Promise<string>;
+  takeSnapshot: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => void;
+  createWebArchive: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => void;
   // !iOS Only
 }
 

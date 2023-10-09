@@ -138,8 +138,8 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)stopLoading;
 - (void)requestFocus;
 - (void)clearCache:(BOOL)includeDiskFiles;
-- (void)takeSnapshot:(NSString *)filename resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject;
-- (void)createWebArchive:(NSString *)filename resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject;
+- (void)takeSnapshot:(NSString *)filename;
+- (void)createWebArchive:(NSString *)filename;
 #ifdef RCT_NEW_ARCH_ENABLED
 - (void)destroyWebView;
 #endif

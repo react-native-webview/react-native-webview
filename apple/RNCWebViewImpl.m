@@ -1593,7 +1593,7 @@ didFinishNavigation:(WKNavigation *)navigation
   [self removeData:dataTypes];
 }
 
-- (void)takeSnapshot:(NSString *)filename resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject
+- (void)takeSnapshot:(NSString *)filename
 {
   if (@available(iOS 11.0, *)) {
     if (_webView == nil) {
@@ -1605,16 +1605,16 @@ didFinishNavigation:(WKNavigation *)navigation
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];        
         [UIImagePNGRepresentation(snapshotImage) writeToFile:filePath atomically:YES];
-        resolve(filePath);
+        success(@[filePath ]);
       }
       else {
-        reject(@"failure", @"Unable to take snapshot", nil);
+        err(@[ @"Unable to take snapshot" ]);
       }      
     }];
   }
 }
 
-- (void)createWebArchive:(NSString *)filename resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject
+- (void)createWebArchive:(NSString *)filename
 {
   if (@available(iOS 14.0, *)) {
     if (_webView == nil) {
@@ -1626,10 +1626,10 @@ didFinishNavigation:(WKNavigation *)navigation
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];        
         [webArchiveData writeToFile:filePath atomically:YES];
-        resolve(filePath);
+        success(@[filePath]);
       }
       else {
-        reject(@"failure", @"Unable to create webarchive", nil);
+        err(@[@"Unable to create webArchive"]);
       }
     }];
   }
