@@ -25,7 +25,9 @@ type WebViewCommands =
   | 'clearCache';
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearFormData';
+// CLK: supporting takeSnapshot and createWebArchive
 type IOSWebViewCommands = 'takeSnapshot' | 'createWebArchive';
+// CLK
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (name: string) => {
@@ -117,6 +119,18 @@ export type DecelerationRateConstant = 'normal' | 'fast';
 export interface WebViewMessage extends WebViewNativeEvent {
   data: string;
 }
+
+// CLK: Supporting onSnapshotCreated and onWebArchiveCreated
+export interface WebViewSnapshotEvent extends WebViewNativeEvent {  
+  filepath: string;
+}
+
+export interface WebViewWebArchiveEvent extends WebViewNativeEvent {  
+  filepath: string;
+}
+
+
+// CLK
 
 export interface WebViewError extends WebViewNativeEvent {
   /**
@@ -725,6 +739,26 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   fraudulentWebsiteWarningEnabled?: boolean;
+
+  // CLK: Supporting onSnapshotCreated and onWebArchiveCreated
+  /**
+     * Function that is invoked after a snapshot has been created.
+     * 
+     * This happens when the JS calls `takeSnapshot('foo.png')`
+     *
+     * @platform ios
+     */
+  onSnapshotCreated?: (event: WebViewSnapshotEvent) => void;
+
+  /**
+     * Function that is invoked after a web archive has been created.
+     * 
+     * This happens when the JS calls `createWebArchive('foo.webarchive')`
+     *
+     * @platform ios
+     */
+  onWebArchiveCreated?: (event: WebViewWebArchiveEvent) => void;
+  // CLK
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Text, View, TouchableOpacity} from 'react-native';
+import {Text, View, TouchableOpacity, PanResponder, Platform} from 'react-native';
 
-import WebView from 'react-native-webview';
+import WebView, {WebViewSnapshotEvent} from 'react-native-webview';
 
 const HTML = `
 <!DOCTYPE html>\n
@@ -63,21 +63,18 @@ export default class Snapshot extends Component<Props, State> {
     super(props);
     this.webView = React.createRef();
     this.state = {
-        text: "Not Started"
+        text: "Not Started",
     }
   }  
 
   _snapshot = () => {
-    //this.setState({ text: "Starting" });  
-    const start = Date.now();
-    this.webView.current.takeSnapshot("foo10.png", (err) => {
-      this.setState({text: "Error: " + err});
-    }, 
-    (filepath) => {
-          const end = Date.now();
-         this.setState({ text: "Snapshot " + (end - start) + "ms" });        
-    });
+    this.setState({ start: Date.now(), text: "Starting" });  
+    this.webView.current.takeSnapshot("foo11.png");
+  }
 
+  _onSnapShotCreated = ({event} : {event: WebViewSnapshotEvent}) => {
+    const end = Date.now();
+    this.setState({ text: "Snapshot1 " + (end - this.state.start) + "ms" });
   }
 
   render() {
@@ -88,18 +85,24 @@ export default class Snapshot extends Component<Props, State> {
           onPress={this._snapshot}
 
           activeOpacity={0.6}>
-            <Text>Snapshot</Text>
+            <Text>Take Snapshot</Text>
         </TouchableOpacity>
-
         <Text>
             { this.state.text }
         </Text>
-
         <WebView
           ref={this.webView}
           source={{html: HTML}}
           automaticallyAdjustContentInsets={false}
+          onSnapshotCreated={this._onSnapShotCreated}
         />
+
+        <WebView
+          source={{html: HTML}}
+          automaticallyAdjustContentInsets={false}
+          onSnapshotCreated={this._onSnapShotCreated2}
+        />
+
       </View>
     );
   }

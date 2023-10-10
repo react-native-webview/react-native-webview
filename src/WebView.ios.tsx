@@ -70,6 +70,10 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
   onOpenWindow: onOpenWindowProp,
+  // CLK: support for takeSnapshow and createWebArchive
+  onSnapshotCreated: onSnapshotCreatedProp,
+  onWebArchiveCreated: onWebArchiveCreatedProp,
+  // CLK
   renderLoading,
   renderError,
   style,
@@ -95,7 +99,8 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onContentProcessDidTerminate } = useWebViewLogic({
+  // CLK: support for takeSnapshow and createWebArchive
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onContentProcessDidTerminate, onSnapshotCreated, onWebArchiveCreated } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -110,6 +115,8 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
     onContentProcessDidTerminateProp,
+    onSnapshotCreatedProp,
+    onWebArchiveCreatedProp
   });
 
   useImperativeHandle(ref, () => ({
@@ -131,7 +138,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     takeSnapshot: (filename: string) => webViewRef.current && Commands.takeSnapshot(webViewRef.current, filename),
     createWebArchive: (filename: string) => webViewRef.current && Commands.createWebArchive(webViewRef.current, filename),
   }), [setViewState, webViewRef]);
-
+  // CLK
 
   useWarnIfChanges(allowsInlineMediaPlayback, 'allowsInlineMediaPlayback');
   useWarnIfChanges(allowsAirPlayForMediaPlayback, 'allowsAirPlayForMediaPlayback');
@@ -212,6 +219,10 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       style={webViewStyles}
       hasOnFileDownload={!!onFileDownload}
       ref={webViewRef}
+      // CLK: support for takeSnapshow and createWebArchive
+      onSnapshotCreated={onSnapshotCreatedProp && onSnapshotCreated}
+      onWebArchiveCreated={onWebArchiveCreatedProp && onWebArchiveCreated}
+      // CLK
       // @ts-expect-error old arch only
       source={sourceResolved}
       {...nativeConfig?.props}

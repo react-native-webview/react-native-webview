@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Text, View, TouchableOpacity} from 'react-native';
 
-import WebView from 'react-native-webview';
+import WebView, {WebViewWebArchiveEvent} from 'react-native-webview';
 
 const HTML = `
 <!DOCTYPE html>\n
@@ -62,15 +62,24 @@ export default class Webarchive extends Component<Props, State> {
   constructor(props) {
     super(props);
     this.webView = React.createRef();
+    this.state = {
+      text: "Not Started"
+    }    
   }  
 
   _createWebArchive = () => {
-    this.webView.current.createWebArchive("foo3.webarchive");
+    this.setState({ start: Date.now(), text: "Starting" }); 
+    this.webView.current.createWebArchive("youtube.webarchive");
+  };
+
+  _onWebArchiveCreated = ({event}: {event: WebViewWebArchiveEvent}) => { 
+    const end = Date.now();
+    this.setState({ text: "Archive " + (end - this.state.start) + "ms" });
   };
 
   render() {
     return (
-      <View style={{ height: 120 }}>
+      <View style={{ height: 480 }}>
         <TouchableOpacity
           testID="webarchive_button"
           onPress={this._createWebArchive}
@@ -79,10 +88,16 @@ export default class Webarchive extends Component<Props, State> {
             <Text>Create Webarchive</Text>
         </TouchableOpacity>
 
+        <Text>
+            { this.state.text }
+        </Text>
+
         <WebView
           ref={this.webView}
-          source={{html: HTML}}
+          source={{ uri: 'https://www.youtube.com' }}
           automaticallyAdjustContentInsets={false}
+          onWebArchiveCreated={this._onWebArchiveCreated}
+          scrollEnabled={true}
         />
       </View>
     );

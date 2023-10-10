@@ -1593,6 +1593,7 @@ didFinishNavigation:(WKNavigation *)navigation
   [self removeData:dataTypes];
 }
 
+// CLK: takeSnapshot changes
 - (void)takeSnapshot:(NSString *)filename
 {
   if (@available(iOS 11.0, *)) {
@@ -1605,11 +1606,14 @@ didFinishNavigation:(WKNavigation *)navigation
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];        
         [UIImagePNGRepresentation(snapshotImage) writeToFile:filePath atomically:YES];
-        success(@[filePath ]);
+        NSMutableDictionary<NSString *, id> *snapshotEvent = [self baseEvent];
+        [snapshotEvent addEntriesFromDictionary: @{
+          @"filepath": filePath,
+        }];
+        if(_onSnapshotCreated) {
+          _onSnapshotCreated(snapshotEvent);
+        }
       }
-      else {
-        err(@[ @"Unable to take snapshot" ]);
-      }      
     }];
   }
 }
@@ -1626,14 +1630,18 @@ didFinishNavigation:(WKNavigation *)navigation
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];        
         [webArchiveData writeToFile:filePath atomically:YES];
-        success(@[filePath]);
-      }
-      else {
-        err(@[@"Unable to create webArchive"]);
+        NSMutableDictionary<NSString *, id> *webArchiveEvent = [self baseEvent];
+        [webArchiveEvent addEntriesFromDictionary: @{
+          @"filepath": filePath,
+        }];
+        if(_onWebArchiveCreated) {
+          _onWebArchiveCreated(webArchiveEvent);
+        }
       }
     }];
   }
 }
+// CLK
 
 - (void)removeData:(NSSet *)dataTypes
 {

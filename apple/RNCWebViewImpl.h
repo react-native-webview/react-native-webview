@@ -57,7 +57,10 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 @property (nonatomic, copy) RCTDirectEventBlock onOpenWindow;
-
+// CLK: Added events to support takeSnapshot and createWebArchive
+@property (nonatomic, copy) RCTDirectEventBlock onSnapshotCreated;
+@property (nonatomic, copy) RCTDirectEventBlock onWebArchiveCreated;
+// CLK
 
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
