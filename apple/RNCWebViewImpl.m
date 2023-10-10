@@ -48,10 +48,60 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @end
 #endif // !TARGET_OS_OSX
 
-#if TARGET_OS_OSX
 @interface RNCWKWebView : WKWebView
+#if !TARGET_OS_OSX
+@property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
+@property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;
+#endif // !TARGET_OS_OSX
 @end
 @implementation RNCWKWebView
+#if !TARGET_OS_OSX
+- (NSString *)stringFromAction:(SEL) action {
+  NSString *sel = NSStringFromSelector(action);
+
+  NSDictionary *map = @{
+      @"cut:":               @"cut",
+      @"copy:":              @"copy",
+      @"paste:":             @"paste",
+      @"delete:":            @"delete",
+      @"select:":             @"select",
+      @"selectAll:":         @"selectAll",
+      @"_promptForReplace:": @"replace",
+      @"_define:":           @"lookup",
+      @"_translate:":        @"translate",
+      @"toggleBoldface:":    @"bold",
+      @"toggleItalics:":     @"italic",
+      @"toggleUnderline:":   @"underline",
+      @"_share:":            @"share",
+  };
+    
+  return map[sel] ?: sel;
+}
+
+- (BOOL)canPerformAction:(SEL)action
+              withSender:(id)sender{
+  if(self.suppressMenuItems) {
+      NSString * sel = [self stringFromAction:action];
+      if ([self.suppressMenuItems containsObject: sel]) {
+          return NO;
+      }
+  }
+  
+  if (!self.menuItems) {
+      return [super canPerformAction:action withSender:sender];
+  }
+
+  return NO;
+}
+- (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AVAILABLE(ios(13.0))  {
+    if (@available(iOS 16.0, *)) {
+      if(self.menuItems){
+        [builder removeMenuForIdentifier:UIMenuLookup];
+      }
+    }
+    [super buildMenuWithBuilder:builder];
+}
+#else // TARGET_OS_OSX
 - (void)scrollWheel:(NSEvent *)theEvent {
   RNCWebViewImpl *rncWebView = (RNCWebViewImpl *)[self superview];
   RCTAssert([rncWebView isKindOfClass:[rncWebView class]], @"superview must be an RNCWebViewImpl");
@@ -61,8 +111,8 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   }
   [super scrollWheel:theEvent];
 }
-@end
 #endif // TARGET_OS_OSX
+@end
 
 @interface RNCWebViewImpl () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, WKHTTPCookieStoreObserver,
 #if !TARGET_OS_OSX
@@ -70,11 +120,7 @@ UIScrollViewDelegate,
 #endif // !TARGET_OS_OSX
 RCTAutoInsetsProtocol>
 
-#if !TARGET_OS_OSX
-@property (nonatomic, copy) WKWebView *webView;
-#else
 @property (nonatomic, copy) RNCWKWebView *webView;
-#endif // !TARGET_OS_OSX
 @property (nonatomic, strong) WKUserScript *postMessageScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
@@ -196,10 +242,15 @@ RCTAutoInsetsProtocol>
 // Listener for long presses
 - (void)startLongPress:(UILongPressGestureRecognizer *)pressSender
 {
-  // When a long press ends, bring up our custom UIMenu
-  if(pressSender.state == UIGestureRecognizerStateEnded) {
-    if (!self.menuItems || self.menuItems.count == 0) {
-      return;
+    if (pressSender.state != UIGestureRecognizerStateEnded || !self.menuItems) {
+        return;
+    }
+    // When a long press ends, bring up our custom UIMenu if defined
+    if (self.menuItems.count == 0) {
+        UIMenuController *menuController = [UIMenuController sharedMenuController];
+        menuController.menuItems = nil;
+        [menuController setMenuVisible:NO animated:YES];
+        return;
     }
     UIMenuController *menuController = [UIMenuController sharedMenuController];
     NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
@@ -210,13 +261,11 @@ RCTAutoInsetsProtocol>
       NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
       UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
                                                     action: NSSelectorFromString(sel)];
-
       [menuControllerItems addObject: item];
     }
 
     menuController.menuItems = menuControllerItems;
     [menuController setMenuVisible:YES animated:YES];
-  }
 }
 
 #endif // !TARGET_OS_OSX
@@ -303,7 +352,15 @@ RCTAutoInsetsProtocol>
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
+    NSURL *url = navigationAction.request.URL;
+
+    if (_onOpenWindow) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"targetUrl": url.absoluteString}];
+      _onOpenWindow(event);
+    } else {
+      [webView loadRequest:navigationAction.request];
+    }
   }
   return nil;
 }
@@ -334,6 +391,14 @@ RCTAutoInsetsProtocol>
     prefs.javaScriptEnabled = NO;
     _prefsUsed = YES;
   }
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
+  if (@available(iOS 13.0, *)) {
+    if (!_fraudulentWebsiteWarningEnabled) {
+        prefs.fraudulentWebsiteWarningEnabled = NO;
+        _prefsUsed = YES;
+    }
+  }
+#endif
   if (_allowUniversalAccessFromFileURLs) {
     [wkWebViewConfig setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
   }
@@ -412,14 +477,11 @@ RCTAutoInsetsProtocol>
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
-#if !TARGET_OS_OSX
-    _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-#else
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-#endif // !TARGET_OS_OSX
-
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
+    _webView.menuItems = _menuItems;
+    _webView.suppressMenuItems = _suppressMenuItems;
     _webView.scrollView.delegate = self;
 #endif // !TARGET_OS_OSX
     _webView.UIDelegate = self;
@@ -454,6 +516,13 @@ RCTAutoInsetsProtocol>
     }
 #endif
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 130300 || \
+    __IPHONE_OS_VERSION_MAX_ALLOWED >= 160400 || \
+    __TV_OS_VERSION_MAX_ALLOWED >= 160400
+    if (@available(macOS 13.3, iOS 16.4, tvOS 16.4, *))
+      _webView.inspectable = _webviewDebuggingEnabled;
+#endif
+
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
@@ -479,6 +548,16 @@ RCTAutoInsetsProtocol>
   _webView.allowsBackForwardNavigationGestures = _allowsBackForwardNavigationGestures;
 }
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 130300 || \
+    __IPHONE_OS_VERSION_MAX_ALLOWED >= 160400 || \
+    __TV_OS_VERSION_MAX_ALLOWED >= 160400
+- (void)setWebviewDebuggingEnabled:(BOOL)webviewDebuggingEnabled {
+  _webviewDebuggingEnabled = webviewDebuggingEnabled;
+  if (@available(macOS 13.3, iOS 16.4, tvOS 16.4, *))
+      _webView.inspectable = _webviewDebuggingEnabled;
+}
+#endif
+
 #ifdef RCT_NEW_ARCH_ENABLED
 - (void)destroyWebView
 #else
@@ -492,6 +571,10 @@ RCTAutoInsetsProtocol>
     [_webView removeFromSuperview];
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = nil;
+    if (_menuItems) {
+      UIMenuController *menuController = [UIMenuController sharedMenuController];
+      menuController.menuItems = nil;
+    }
 #endif // !TARGET_OS_OSX
     _webView = nil;
     if (_onContentProcessDidTerminate) {
@@ -741,6 +824,16 @@ RCTAutoInsetsProtocol>
 }
 
 #if !TARGET_OS_OSX
+-(void)setMenuItems:(NSArray<NSDictionary *> *)menuItems {
+    _menuItems = menuItems;
+    _webView.menuItems = menuItems;
+}
+
+-(void)setSuppressMenuItems:(NSArray<NSString *> *)suppressMenuItems {
+    _suppressMenuItems = suppressMenuItems;
+    _webView.suppressMenuItems = suppressMenuItems;
+}
+
 -(void)setKeyboardDisplayRequiresUserAction:(BOOL)keyboardDisplayRequiresUserAction
 {
   if (_webView == nil) {
@@ -1158,6 +1251,21 @@ RCTAutoInsetsProtocol>
     WKNavigationType navigationType = navigationAction.navigationType;
     NSURLRequest *request = navigationAction.request;
     BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
+    BOOL hasTargetFrame = navigationAction.targetFrame != nil;
+
+    if (_onOpenWindow && !hasTargetFrame) {
+      // When OnOpenWindow should be called, we want to prevent the navigation
+      // If not prevented, the `decisionHandler` is called first and after that `createWebViewWithConfiguration` is called
+      // In that order the WebView's ref would be updated with the target URL even if `createWebViewWithConfiguration` does not call `loadRequest`
+      // So the WebView's document stays on the current URL, but the WebView's ref is replaced by the target URL
+      // By preventing the navigation here, we also prevent the WebView's ref mutation
+      // The counterpart is that we have to manually call `_onOpenWindow` here, because no navigation means no call to `createWebViewWithConfiguration`
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{@"targetUrl": request.URL.absoluteString}];
+      decisionHandler(WKNavigationActionPolicyCancel);
+      _onOpenWindow(event);
+      return;
+    }
 
     if (_onShouldStartLoadWithRequest) {
         NSMutableDictionary<NSString *, id> *event = [self baseEvent];
@@ -1193,6 +1301,7 @@ RCTAutoInsetsProtocol>
             @"url": (request.URL).absoluteString,
             @"navigationType": navigationTypes[@(navigationType)],
             @"isTopFrame": @(isTopFrame),
+            @"hasTargetFrame": @(hasTargetFrame),
             @"lockIdentifier": @(lockIdentifier)
         }];
         _onShouldStartLoadWithRequest(event);
@@ -1459,6 +1568,37 @@ didFinishNavigation:(WKNavigation *)navigation
 #if !TARGET_OS_OSX
   [_webView becomeFirstResponder];
 #endif // !TARGET_OS_OSX
+}
+
+- (void)clearCache:(BOOL)includeDiskFiles
+{
+  NSMutableSet *dataTypes = [NSMutableSet setWithArray:@[
+    WKWebsiteDataTypeMemoryCache,
+    WKWebsiteDataTypeOfflineWebApplicationCache,
+  ]];
+  if (@available(iOS 11.3, *)) {
+    [dataTypes addObject:WKWebsiteDataTypeFetchCache];
+  }
+  if (includeDiskFiles) {
+    [dataTypes addObjectsFromArray:@[
+      WKWebsiteDataTypeDiskCache,
+      WKWebsiteDataTypeSessionStorage,
+      WKWebsiteDataTypeLocalStorage,
+      WKWebsiteDataTypeWebSQLDatabases,
+      WKWebsiteDataTypeIndexedDBDatabases
+    ]];
+  }
+  [self removeData:dataTypes];
+}
+
+- (void)removeData:(NSSet *)dataTypes
+{
+  if (_webView == nil) {
+      return;
+  }
+  NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+
+  [_webView.configuration.websiteDataStore removeDataOfTypes:dataTypes modifiedSince:dateFrom completionHandler:^{}];
 }
 
 #if !TARGET_OS_OSX

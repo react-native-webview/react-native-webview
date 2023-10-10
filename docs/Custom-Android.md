@@ -217,6 +217,6 @@ export default class CustomWebView extends Component {
 ```
 ## Translations
 
-This file is available at:
-
+This file is available in:
 - [Brazilian portuguese](Custom-Android.portuguese.md)
+- [Italian](Custom-Android.italian.md)

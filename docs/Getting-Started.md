@@ -45,7 +45,7 @@ Android - react-native-webview version <6:
 This module does not require any extra step after running the link command 🎉
 
 Android - react-native-webview version >=6.X.X:
-Please make sure AndroidX is enabled in your project by editting `android/gradle.properties` and adding 2 lines:
+Please make sure AndroidX is enabled in your project by editing `android/gradle.properties` and adding 2 lines:
 
 ```
 android.useAndroidX=true
@@ -137,6 +137,6 @@ Next, check out the [API Reference](Reference.md) or [In-Depth Guide](Guide.md).
 
 ## Translations
 
-This file is available at:
-
+This file is available in:
 - [Brazilian portuguese](Getting-Started.portuguese.md)
+- [Italian](Getting-Started.italian.md)

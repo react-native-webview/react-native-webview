@@ -55,6 +55,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
+@property (nonatomic, copy) RCTDirectEventBlock onOpenWindow;
 
 
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
@@ -70,6 +71,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL pagingEnabled;
 @property (nonatomic, assign) CGFloat decelerationRate;
 @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
+@property (nonatomic, assign) BOOL webviewDebuggingEnabled;
 @property (nonatomic, assign) BOOL allowsAirPlayForMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;
@@ -97,6 +99,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL pullToRefreshEnabled;
 @property (nonatomic, assign) BOOL enableApplePay;
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
+@property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;
 @property (nonatomic, copy) RCTDirectEventBlock onCustomMenuSelection;
 #if !TARGET_OS_OSX
 @property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
@@ -105,6 +108,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
 @property (nonatomic, assign) WKContentMode contentMode;
+@property (nonatomic, assign) BOOL fraudulentWebsiteWarningEnabled;
 #endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
@@ -132,6 +136,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)reload;
 - (void)stopLoading;
 - (void)requestFocus;
+- (void)clearCache:(BOOL)includeDiskFiles;
 #ifdef RCT_NEW_ARCH_ENABLED
 - (void)destroyWebView;
 #endif

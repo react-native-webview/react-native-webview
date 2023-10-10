@@ -271,6 +271,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(allowFileAccessFromFileURLs)
     REMAP_WEBVIEW_PROP(allowUniversalAccessFromFileURLs)
     REMAP_WEBVIEW_PROP(allowsInlineMediaPlayback)
+    REMAP_WEBVIEW_PROP(webviewDebuggingEnabled)
     REMAP_WEBVIEW_PROP(allowsAirPlayForMediaPlayback)
     REMAP_WEBVIEW_PROP(mediaPlaybackRequiresUserAction)
     REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
@@ -285,6 +286,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_STRING_PROP(allowingReadAccessToURL)
     
     REMAP_WEBVIEW_PROP(messagingEnabled)
+    REMAP_WEBVIEW_PROP(fraudulentWebsiteWarningEnabled)
     REMAP_WEBVIEW_PROP(enableApplePay)
     REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
     REMAP_WEBVIEW_PROP(bounces)
@@ -372,6 +374,15 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }
         [_view setMenuItems:newMenuItems];
     }
+    if(oldViewProps.suppressMenuItems != newViewProps.suppressMenuItems) {
+        NSMutableArray *suppressMenuItems = [NSMutableArray array];
+
+        for (const auto &menuItem: newViewProps.suppressMenuItems) {
+            [suppressMenuItems addObject: RCTNSStringFromString(menuItem)];
+        }
+        
+        [_view setSuppressMenuItems:suppressMenuItems];
+    }
     if (oldViewProps.hasOnFileDownload != newViewProps.hasOnFileDownload) {
         if (newViewProps.hasOnFileDownload) {
             _view.onFileDownload = [self](NSDictionary* dictionary) {
@@ -385,6 +396,21 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             };
         } else {
             _view.onFileDownload = nil;        
+        }
+    }
+    if (oldViewProps.hasOnOpenWindowEvent != newViewProps.hasOnOpenWindowEvent) {
+        if (newViewProps.hasOnOpenWindowEvent) {
+            _view.onOpenWindow = [self](NSDictionary* dictionary) {
+                if (_eventEmitter) {
+                    auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                    facebook::react::RNCWebViewEventEmitter::OnOpenWindow data = {
+                        .targetUrl = std::string([[dictionary valueForKey:@"targetUrl"] UTF8String])
+                    };
+                    webViewEventEmitter->onOpenWindow(data);
+                }
+            };
+        } else {
+            _view.onOpenWindow = nil;
         }
     }
 //

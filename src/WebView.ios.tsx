@@ -48,6 +48,7 @@ const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
 }
 
 const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
+  fraudulentWebsiteWarningEnabled = true,
   javaScriptEnabled = true,
   cacheEnabled = true,
   originWhitelist = defaultOriginWhitelist,
@@ -68,6 +69,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onFileDownload,
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
+  onOpenWindow: onOpenWindowProp,
   renderLoading,
   renderError,
   style,
@@ -93,7 +95,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebViewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onContentProcessDidTerminate } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -102,6 +104,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     onLoadProgress,
     onLoadStart,
     onMessageProp,
+    onOpenWindowProp,
     startInLoadingState,
     originWhitelist,
     onShouldStartLoadWithRequestProp,
@@ -124,6 +127,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
+    clearCache: (includeDiskFiles: boolean) => webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
   }), [setViewState, webViewRef]);
 
 
@@ -174,6 +178,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     <NativeWebView
       key="webViewKey"
       {...otherProps}
+      fraudulentWebsiteWarningEnabled={fraudulentWebsiteWarningEnabled}
       javaScriptEnabled={javaScriptEnabled}
       cacheEnabled={cacheEnabled}
       useSharedProcessPool={useSharedProcessPool}
@@ -188,6 +193,8 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       onLoadingStart={onLoadingStart}
       onHttpError={onHttpError}
       onMessage={onMessage}
+      onOpenWindow={onOpenWindowProp && onOpenWindow}
+      hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
       onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
       onContentProcessDidTerminate={onContentProcessDidTerminate}
       injectedJavaScript={injectedJavaScript}

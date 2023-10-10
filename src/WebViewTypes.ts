@@ -21,9 +21,10 @@ type WebViewCommands =
   | 'postMessage'
   | 'injectJavaScript'
   | 'loadUrl'
-  | 'requestFocus';
+  | 'requestFocus'
+  | 'clearCache';
 
-type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
+type AndroidWebViewCommands = 'clearHistory' | 'clearFormData';
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (name: string) => {
@@ -134,6 +135,10 @@ export interface WebViewRenderProcessGoneDetail {
   didCrash: boolean;
 }
 
+export interface WebViewOpenWindow {
+  targetUrl: string;
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent =
@@ -156,6 +161,8 @@ export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
 
 export type WebViewRenderProcessGoneEvent =
   NativeSyntheticEvent<WebViewRenderProcessGoneDetail>;
+
+export type WebViewOpenWindowEvent = NativeSyntheticEvent<WebViewOpenWindow>;
 
 export type WebViewScrollEvent = NativeSyntheticEvent<NativeScrollEvent>;
 
@@ -230,6 +237,20 @@ export interface WebViewCustomMenuItems {
   label: string;
 }
 
+export declare type SuppressMenuItem = 
+  | "cut"
+  | "copy"
+  | "paste"
+  | "replace"
+  | "bold"
+  | "italic"
+  | "underline"
+  | "select"
+  | "selectAll"
+  | "translate"
+  | "lookup"
+  | "share";
+
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
 export interface ViewManager {
@@ -280,6 +301,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
+  webviewDebuggingEnabled?: boolean;
   messagingEnabled: boolean;
   onScroll?: (event: WebViewScrollEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
@@ -577,6 +599,16 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
 
   /**
+   * Function that is invoked when the `WebView` should open a new window.
+   * 
+   * This happens when the JS calls `window.open('http://someurl', '_blank')`
+   * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+   *
+   * @platform ios
+   */
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
+
+  /**
    * If `true` (default), loads the `injectedJavaScript` only into the main frame.
    * If `false`, loads it into all frames (e.g. iframes).
    * @platform ios
@@ -660,18 +692,24 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   enableApplePay?: boolean;
 
   /**
-   * An array of objects which will be added to the UIMenu controller when selecting text.
+   * An array of objects which will be shown when selecting text. An empty array will suppress the menu.
    * These will appear after a long press to select text.
-   * @platform ios
+   * @platform ios, android
    */
   menuItems?: WebViewCustomMenuItems[];
+
+  /**
+   * An array of strings which will be suppressed from the menu.
+   * @platform ios
+   */
+  suppressMenuItems?: SuppressMenuItem[];
 
   /**
    * The function fired when selecting a custom menu item created by `menuItems`.
    * It passes a WebViewEvent with a `nativeEvent`, where custom keys are passed:
    * `customMenuKey`: the string of the menu item
    * `selectedText`: the text selected on the document
-   * @platform ios
+   * @platform ios, android
    */
   onCustomMenuSelection?: (event: {nativeEvent: {
     label: string;
@@ -679,6 +717,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
     selectedText: string;
   }
   }) => void;
+
+  /**
+   * A Boolean value that indicates whether the webview shows warnings for suspected
+   * fraudulent content, such as malware or phishing attempts.
+   * @platform ios
+   */
+  fraudulentWebsiteWarningEnabled?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
@@ -848,6 +893,16 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Works only on Android (minimum API level 26).
    */
   onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` should open a new window.
+   * 
+   * This happens when the JS calls `window.open('http://someurl', '_blank')`
+   * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+   *
+   * @platform android
+   */
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
 
   /**
    * https://developer.android.com/reference/android/webkit/WebSettings.html#setCacheMode(int)
@@ -1219,4 +1274,14 @@ export interface WebViewSharedProps extends ViewProps {
    * An object that specifies the credentials of a user to be used for basic authentication.
    */
   basicAuthCredential?: BasicAuthCredential;
+
+  /**
+   * Inject a JavaScript object to be accessed as a JSON string via JavaScript in the WebView.
+   */
+  injectedJavaScriptObject?: object;
+  
+  /**
+   * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
+   */
+  webviewDebuggingEnabled?: boolean;
 }
