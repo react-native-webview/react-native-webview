@@ -220,10 +220,10 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       hasOnFileDownload={!!onFileDownload}
       ref={webViewRef}
       // CLK: support for takeSnapshow and createWebArchive
+      // @ts-expect-error old arch only
       onSnapshotCreated={onSnapshotCreatedProp && onSnapshotCreated}
       onWebArchiveCreated={onWebArchiveCreatedProp && onWebArchiveCreated}
       // CLK
-      // @ts-expect-error old arch only
       source={sourceResolved}
       {...nativeConfig?.props}
     />
