@@ -72,9 +72,10 @@ export default class Webarchive extends Component<Props, State> {
     this.webView.current.createWebArchive("youtube.webarchive");
   };
 
-  _onWebArchiveCreated = ({event}: {event: WebViewWebArchiveEvent}) => { 
+  _onWebArchiveCreated = ({nativeEvent: event} : { nativeEvent : WebViewWebArchiveEvent}) => { 
     const end = Date.now();
-    this.setState({ text: "Archive " + (end - this.state.start) + "ms" });
+    console.dir(event);
+    this.setState({ text: event.filepath });
   };
 
   render() {
