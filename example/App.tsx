@@ -153,7 +153,7 @@ const TESTS: { [test: string]: Test } = {
   Empty: {
     title: 'Empty',
     testId: 'Empty',
-    description: 'Does not error if passed a null or undefined source',
+    description: "Does not error if passed a null or undefined source. This test shouldn't display anything, but merely should not crash",
     render() {
       return <Empty />;
     }
