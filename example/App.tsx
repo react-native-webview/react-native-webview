@@ -8,12 +8,14 @@ import {
   Keyboard,
   Button,
   Platform,
+  PlatformOSType,
 } from 'react-native';
 
 import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
 import Downloads from './examples/Downloads';
+import Empty from './examples/Empty';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
@@ -25,7 +27,15 @@ import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 
-const TESTS = {
+interface Test {
+    title: string;
+    testId: string;
+    description: string;
+    render: () => React.ReactNode;
+    platforms?: PlatformOSType[];
+}
+
+const TESTS: { [test: string]: Test } = {
   Messaging: {
     title: 'Messaging',
     testId: 'messaging',
@@ -81,6 +91,7 @@ const TESTS = {
     render() {
       return <Uploads />;
     },
+    platforms: ['android', 'macos'],
   },
   Injection: {
     title: 'Injection',
@@ -113,6 +124,7 @@ const TESTS = {
     render() {
       return <ApplePay />;
     },
+    platforms: ['ios']
   },
   CustomMenu: {
     title: 'Custom Menu',
@@ -136,6 +148,14 @@ const TESTS = {
     description: 'SuppressMenuItems in editable content',
     render() {
       return <SuppressMenuItems />;
+    }
+  },
+  Empty: {
+    title: 'Empty',
+    testId: 'Empty',
+    description: 'Does not error if passed a null or undefined source',
+    render() {
+      return <Empty />;
     }
   }
 };
@@ -176,80 +196,17 @@ export default class App extends Component<Props, State> {
         </TouchableOpacity>
 
         <View style={styles.testPickerContainer}>
-          <Button
-            testID="testType_alerts"
-            title="Alerts"
-            onPress={() => this._changeTest('Alerts')}
-          />
-          <Button
-            testID="testType_scrolling"
-            title="Scrolling"
-            onPress={() => this._changeTest('Scrolling')}
-          />
-          <Button
-            testID="testType_background"
-            title="Background"
-            onPress={() => this._changeTest('Background')}
-          />
-          <Button
-            testID="testType_injection"
-            title="Injection"
-            onPress={() => this._changeTest('Injection')}
-          />
-          <Button
-            testID="testType_pageLoad"
-            title="LocalPageLoad"
-            onPress={() => this._changeTest('PageLoad')}
-          />
-          <Button
-            testID="testType_downloads"
-            title="Downloads"
-            onPress={() => this._changeTest('Downloads')}
-          />
-          {(Platform.OS === 'android' || Platform.OS === 'macos') && (
-            <Button
-              testID="testType_uploads"
-              title="Uploads"
-              onPress={() => this._changeTest('Uploads')}
-            />
-          )}
-          <Button
-            testID="testType_messaging"
-            title="Messaging"
-            onPress={() => this._changeTest('Messaging')}
-          />
-          <Button
-            testID="testType_nativeWebpage"
-            title="NativeWebpage"
-            onPress={() => this._changeTest('NativeWebpage')}
-          />
-          {Platform.OS === 'ios' && (
-              <Button
-                  testID="testType_applePay"
-                  title="ApplePay"
-                  onPress={() => this._changeTest('ApplePay')}
-              />
-          )}
-          <Button
-            testID="testType_customMenu"
-            title="CustomMenu"
-            onPress={() => this._changeTest('CustomMenu')}
-          />
-          <Button
-            testID="testType_openwindow"
-            title="OpenWindow"
-            onPress={() => this._changeTest('OpenWindow')}
-          />
-          <Button
-            testID="testType_suppressMenuItems"
-            title="SuppressMenuItems"
-            onPress={() => this._changeTest('SuppressMenuItems')}
-          />
-          <Button
-            testID="testType_clearData"
-            title="ClearData"
-            onPress={() => this._changeTest('ClearData')}
-          />
+          {Object.values(TESTS).map(test => {
+              if (test.platforms && !test.platforms.includes(Platform.OS)) return null;
+              return (
+                  <Button
+                      key={test.testId}
+                      testID={test.testId}
+                      title={test.title}
+                      onPress={() => this._changeTest(test.testId)}
+                  />
+              )
+          })}
         </View>
 
         {restarting ? null : (
