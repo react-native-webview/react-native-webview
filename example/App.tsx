@@ -173,7 +173,7 @@ export default class App extends Component<Props, State> {
     this.setState({restarting: true}, () => this.setState({restarting: false}));
   };
 
-  _changeTest = (testName) => {
+  _changeTest = (testName: string) => {
     this.setState({currentTest: TESTS[testName]});
   };
 
@@ -196,14 +196,14 @@ export default class App extends Component<Props, State> {
         </TouchableOpacity>
 
         <View style={styles.testPickerContainer}>
-          {Object.values(TESTS).map(test => {
+          {Object.entries(TESTS).map(([key, test]) => {
               if (test.platforms && !test.platforms.includes(Platform.OS)) return null;
               return (
                   <Button
-                      key={test.testId}
+                      key={key}
                       testID={test.testId}
                       title={test.title}
-                      onPress={() => this._changeTest(test.testId)}
+                      onPress={() => this._changeTest(key)}
                   />
               )
           })}
