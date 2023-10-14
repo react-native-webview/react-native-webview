@@ -1,8 +1,6 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import {
-  Image,
   View,
-  ImageSourcePropType,
   HostComponent,
 } from 'react-native';
 import invariant from 'invariant';
@@ -14,19 +12,18 @@ import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
+  resolveAssetSourceAndReplaceHeaders,
   useWebViewLogic,
 } from './WebViewShared';
 import {
   IOSWebViewProps,
   DecelerationRateConstant,
-  WebViewSourceUri,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
 
 
-const { resolveAssetSource } = Image;
 const processDecelerationRate = (
   decelerationRate: DecelerationRateConstant | number | undefined,
 ) => {
@@ -160,19 +157,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   = (nativeConfig?.component as typeof RNCWebView | undefined)
   || RNCWebView;
 
-  const sourceResolved = resolveAssetSource(source as ImageSourcePropType)
-  const newSource = typeof sourceResolved === "object" ? Object.entries(sourceResolved as WebViewSourceUri).reduce((prev, [currKey, currValue]) => {
-    return {
-      ...prev,
-      [currKey]: currKey === "headers" && currValue && typeof currValue === "object" ? Object.entries(currValue).map(
-        ([key, value]) => {
-          return {
-            name: key,
-            value
-          }
-        }) : currValue
-    }
-  }, {}) : sourceResolved
+  const { newSource, sourceResolved } = resolveAssetSourceAndReplaceHeaders(source)
 
   const webView = (
     <NativeWebView

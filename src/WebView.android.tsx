@@ -1,9 +1,7 @@
 import React, { forwardRef, ReactElement, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 
 import {
-  Image,
   View,
-  ImageSourcePropType,
   HostComponent,
 } from 'react-native';
 
@@ -17,15 +15,12 @@ import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
+  resolveAssetSourceAndReplaceHeaders,
   useWebViewLogic,
 } from './WebViewShared';
-import {
-  AndroidWebViewProps, WebViewSourceUri,
-} from './WebViewTypes';
+import {AndroidWebViewProps} from './WebViewTypes';
 
 import styles from './WebView.styles';
-
-const { resolveAssetSource } = Image;
 
 /**
  * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
@@ -159,19 +154,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   const NativeWebView
     = (nativeConfig?.component as (typeof RNCWebView | undefined)) || RNCWebView;
 
-  const sourceResolved = resolveAssetSource(source as ImageSourcePropType)
-  const newSource = typeof sourceResolved === "object" ? Object.entries(sourceResolved as WebViewSourceUri).reduce((prev, [currKey, currValue]) => {
-    return {
-      ...prev,
-      [currKey]: currKey === "headers" && currValue && typeof currValue === "object" ? Object.entries(currValue).map(
-        ([key, value]) => {
-          return {
-            name: key,
-            value
-          }
-        }) : currValue
-    }
-  }, {}) : sourceResolved
+  const { newSource, sourceResolved } = resolveAssetSourceAndReplaceHeaders(source)
 
   const webView = <NativeWebView
     key="webViewKey"

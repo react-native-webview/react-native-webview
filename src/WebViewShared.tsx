@@ -1,6 +1,15 @@
 import escapeStringRegexp from 'escape-string-regexp';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Linking, View, ActivityIndicator, Text, Platform } from 'react-native';
+import {
+  Linking,
+  View,
+  ActivityIndicator,
+  Text,
+  Platform,
+  ImageResolvedAssetSource,
+  ImageSourcePropType,
+  Image,
+} from 'react-native';
 import {
   OnShouldStartLoadWithRequest,
   ShouldStartLoadRequestEvent,
@@ -13,6 +22,7 @@ import {
   WebViewOpenWindowEvent,
   WebViewProgressEvent,
   WebViewRenderProcessGoneEvent,
+  WebViewSource,
   WebViewTerminatedEvent,
 } from './WebViewTypes';
 import styles from './WebView.styles';
@@ -233,3 +243,28 @@ export const useWebViewLogic = ({
     lastErrorEvent,
   }
 };
+
+/**
+ * Resolve a source for the WebView so we change headers to the format needed
+ * for passing into the source parameter of the NativeWebView
+ */
+export function resolveAssetSourceAndReplaceHeaders(source: WebViewSource | null | undefined) {
+  // Note: even though resolveAssetSource has typings that say it always
+  // returns a value, it will return null if passed a source that's not a
+  // ImageSourcePropType
+  const sourceResolved: ImageResolvedAssetSource | null = Image.resolveAssetSource(source as ImageSourcePropType)
+  const newSource = typeof sourceResolved === "object" && sourceResolved ? Object.entries(sourceResolved).reduce((prev, [currKey, currValue]) => {
+    return {
+      ...prev,
+      [currKey]: currKey === "headers" && currValue && typeof currValue === "object" ? Object.entries(currValue).map(
+          ([key, value]) => {
+            return {
+              name: key,
+              value
+            }
+          }) : currValue
+    }
+  }, {}) : sourceResolved
+
+  return { sourceResolved, newSource }
+}
