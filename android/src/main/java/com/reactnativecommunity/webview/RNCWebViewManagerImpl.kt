@@ -268,6 +268,21 @@ class RNCWebViewManagerImpl {
         viewWrapper.webView.setBasicAuthCredential(basicAuthCredential)
     }
 
+    fun setGigyaCredentials(viewWrapper: RNCWebViewWrapper, credential: ReadableMap?) {
+        var gigyaCredentials: RNCGigyaCredentials? = null
+        if (credential != null) {
+            if (credential.hasKey("sessionToken") && credential.hasKey("sessionSecret") && credential.hasKey("apiKey") && credential.hasKey("apiDomain")) {
+                val sessionToken = credential.getString("sessionToken")
+                val sessionSecret = credential.getString("sessionSecret")
+                val apiKey = credential.getString("apiKey")
+                val apiDomain = credential.getString("apiDomain")
+
+                gigyaCredentials = RNCGigyaCredentials(sessionToken, sessionSecret, apiKey, apiDomain)
+            }
+        }
+        viewWrapper.webView.setGigyaCredentials(gigyaCredentials)
+    }    
+
     fun onDropViewInstance(viewWrapper: RNCWebViewWrapper) {
         val webView = viewWrapper.webView
         webView.themedReactContext.removeLifecycleEventListener(webView)
