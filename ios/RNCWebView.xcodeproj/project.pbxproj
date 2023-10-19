@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */; };
+		5B9B8EEF2AE121FA00A27B5D /* RNCGigya.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9B8EEE2AE121FA00A27B5D /* RNCGigya.swift */; };
 		E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351B21446E6C00F9801F /* RNCWebViewManager.m */; };
 		E91B351E21446E6C00F9801F /* RNCWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = E91B351C21446E6C00F9801F /* RNCWebView.m */; };
 /* End PBXBuildFile section */
@@ -28,6 +29,8 @@
 		134814201AA4EA6300B7C361 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNCWKProcessPoolManager.m; path = ../apple/RNCWKProcessPoolManager.m; sourceTree = "<group>"; };
 		3515965F21A3C87E00623BFA /* RNCWKProcessPoolManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNCWKProcessPoolManager.h; path = ../apple/RNCWKProcessPoolManager.h; sourceTree = "<group>"; };
+		5B9B8EED2AE121FA00A27B5D /* RNCWebView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNCWebView-Bridging-Header.h"; sourceTree = "<group>"; };
+		5B9B8EEE2AE121FA00A27B5D /* RNCGigya.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCGigya.swift; sourceTree = "<group>"; };
 		E91B351921446E6C00F9801F /* RNCWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNCWebViewManager.h; path = ../apple/RNCWebViewManager.h; sourceTree = "<group>"; };
 		E91B351A21446E6C00F9801F /* RNCWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNCWebView.h; path = ../apple/RNCWebView.h; sourceTree = "<group>"; };
 		E91B351B21446E6C00F9801F /* RNCWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNCWebViewManager.m; path = ../apple/RNCWebViewManager.m; sourceTree = "<group>"; };
@@ -56,6 +59,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				5B9B8EEE2AE121FA00A27B5D /* RNCGigya.swift */,
 				E91B351A21446E6C00F9801F /* RNCWebView.h */,
 				E91B351C21446E6C00F9801F /* RNCWebView.m */,
 				E91B351921446E6C00F9801F /* RNCWebViewManager.h */,
@@ -63,6 +67,7 @@
 				3515965F21A3C87E00623BFA /* RNCWKProcessPoolManager.h */,
 				3515965D21A3C86000623BFA /* RNCWKProcessPoolManager.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				5B9B8EED2AE121FA00A27B5D /* RNCWebView-Bridging-Header.h */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -99,6 +104,7 @@
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 1500;
 					};
 				};
 			};
@@ -125,6 +131,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E91B351D21446E6C00F9801F /* RNCWebViewManager.m in Sources */,
+				5B9B8EEF2AE121FA00A27B5D /* RNCGigya.swift in Sources */,
 				E91B351E21446E6C00F9801F /* RNCWebView.m in Sources */,
 				3515965E21A3C86000623BFA /* RNCWKProcessPoolManager.m in Sources */,
 			);
@@ -217,6 +224,7 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../node_modules/react-native/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -227,12 +235,16 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNCWebView;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNCWebView-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../node_modules/react-native/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -243,6 +255,8 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNCWebView;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNCWebView-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
