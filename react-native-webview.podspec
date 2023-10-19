@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
   s.source       = { :git => "https://github.com/react-native-webview/react-native-webview.git", :tag => "v#{s.version}" }
 
-  s.source_files    = "apple/**/*.{h,m,mm,swift}"
+  s.source_files    = "ios/**/*.{h,m,mm,swift}"
 
   s.dependency "React-Core"
   s.dependency "Gigya"
