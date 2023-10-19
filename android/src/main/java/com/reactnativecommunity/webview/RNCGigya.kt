@@ -1,5 +1,6 @@
 package com.reactnativecommunity.webview
 
+import android.app.Application
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -11,8 +12,8 @@ import com.gigya.android.sdk.ui.plugin.IGigyaWebBridge
 
 class RNCGigya {
   var gigya = Gigya.getInstance(GigyaAccount::class.java)
-
-  fun init(sessionToken: String, sessionSecret: String, apiKey: String, apiDomain: String, webview: WebView) {
+  fun initialize(sessionToken: String, sessionSecret: String, apiKey: String, apiDomain: String, webview: WebView, context: Application) {
+    Gigya.setApplication(context)
     gigya.init(apiKey, apiDomain)
     attachBridge(webview)
     logUser(sessionToken, sessionSecret)
