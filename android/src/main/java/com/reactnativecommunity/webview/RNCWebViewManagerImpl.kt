@@ -101,7 +101,6 @@ class RNCWebViewManagerImpl {
           apiDomain = "eu1.gigya.com",
           webView
         )
-      }
 
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
