@@ -16,7 +16,7 @@
 #endif // !TARGET_OS_OSX
 
 #import "objc/runtime.h"
-#import "RNCWebView-Swift.h"
+#import "react_native_webview-Swift.h"
 
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
@@ -471,17 +471,14 @@ RCTAutoInsetsProtocol>
     wkWebViewConfig.applicationNameForUserAgent = [NSString stringWithFormat:@"%@ %@", wkWebViewConfig.applicationNameForUserAgent, _applicationNameForUserAgent];
   }
   
-  if (_gigyaCredentials) {
-//    RNCGigya * instance = [RNCGigya sharedInstance];
-    
+  if (_gigyaCredentials) {  
     UIViewController *controller = [self topViewController];
     NSString *sessionToken = [_gigyaCredentials valueForKey:@"sessionToken"];
     NSString *sessionSecret = [_gigyaCredentials valueForKey:@"sessionSecret"];
     NSString *apiKey = [_gigyaCredentials valueForKey:@"apiKey"];
     NSString *apiDomain = [_gigyaCredentials valueForKey:@"apiDomain"];
       
-    [[[RNCGigya alloc] init] initialize:controller webview:_webView sessionToken:sessionToken sessionSecret:sessionSecret apiKey:apiKey apiDomain:apiDomain];
-//    [[RNCGigya new] initialize:controller webview:_webView sessionToken:sessionToken sessionSecret:sessionSecret apiKey:apiKey apiDomain:apiDomain];
+    [[[RNCGigya alloc] init] initializeWithController:controller webview:_webView sessionToken:sessionToken sessionSecret:sessionSecret apiKey:apiKey apiDomain:apiDomain];
   }
 
   return wkWebViewConfig;
