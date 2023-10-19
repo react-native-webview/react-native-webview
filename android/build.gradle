@@ -104,6 +104,7 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
     implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
+    implementation files('libs/gigya-android-sdk-core-v7.0.5.aar')
 }
 
 if (isNewArchitectureEnabled()) {
