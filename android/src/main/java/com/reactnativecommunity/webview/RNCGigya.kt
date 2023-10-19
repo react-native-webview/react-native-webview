@@ -10,13 +10,16 @@ import com.gigya.android.sdk.account.models.GigyaAccount
 import com.gigya.android.sdk.session.SessionInfo
 import com.gigya.android.sdk.ui.plugin.IGigyaWebBridge
 
-class RNCGigya {
+class RNCGigya(context: Application) {
   var gigya = Gigya.getInstance(GigyaAccount::class.java)
-  fun initialize(sessionToken: String, sessionSecret: String, apiKey: String, apiDomain: String, webview: WebView, context: Application) {
-    Gigya.setApplication(context)
+
+  init {
+      Gigya.setApplication(context)
+  }
+  fun initialize(sessionToken: String, sessionSecret: String, apiKey: String, apiDomain: String, webview: WebView) {
     gigya.init(apiKey, apiDomain)
     attachBridge(webview)
-    logUser(sessionToken, sessionSecret)
+    logUser(sessionToken = sessionToken, sessionSecret = sessionSecret)
   }
 
   private fun logUser(sessionToken: String, sessionSecret: String) {
