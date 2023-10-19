@@ -16,7 +16,7 @@
 #endif // !TARGET_OS_OSX
 
 #import "objc/runtime.h"
-#import "RNCWebView-Briding-Header.h"
+#import "RNCWebView-Bridging-Header.h"
 
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";

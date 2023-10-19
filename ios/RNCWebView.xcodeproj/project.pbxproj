@@ -29,8 +29,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		5B9B8EED2AE121FA00A27B5D /* RNCWebView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNCWebView-Bridging-Header.h"; sourceTree = "<group>"; };
-		5B9B8EEE2AE121FA00A27B5D /* RNCGigya.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCGigya.swift; sourceTree = "<group>"; };
+		5B9B8EED2AE121FA00A27B5D /* RNCWebView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "RNCWebView-Bridging-Header.h"; path = "../apple/RNCWebView-Bridging-Header.h"; sourceTree = "<group>"; };
+		5B9B8EEE2AE121FA00A27B5D /* RNCGigya.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RNCGigya.swift; path = ../apple/RNCGigya.swift; sourceTree = "<group>"; };
 		5B9B8EFF2AE1251900A27B5D /* RNCWebViewImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNCWebViewImpl.h; path = ../apple/RNCWebViewImpl.h; sourceTree = "<group>"; };
 		5B9B8F002AE1251900A27B5D /* RNCWebViewDecisionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNCWebViewDecisionManager.m; path = ../apple/RNCWebViewDecisionManager.m; sourceTree = "<group>"; };
 		5B9B8F012AE1251900A27B5D /* RNCWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNCWebView.h; path = ../apple/RNCWebView.h; sourceTree = "<group>"; };
