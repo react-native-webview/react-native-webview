@@ -37,7 +37,7 @@
 		5B3C85842AE14EBA0041643B /* RNCGigya.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCGigya.swift; sourceTree = "<group>"; };
 		5B3C85852AE14EBA0041643B /* RNCWebView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RNCWebView.mm; sourceTree = "<group>"; };
 		5B3C85862AE14EBA0041643B /* RNCWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCWebView.h; sourceTree = "<group>"; };
-		5B3C85872AE14EBA0041643B /* RNCWebView-Swift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNCWebView-Swift.h"; sourceTree = "<group>"; };
+		5B3C85872AE14EBA0041643B /* RNCWebView-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNCWebView-Bridging-Header.h"; sourceTree = "<group>"; };
 		5B3C85882AE14EBA0041643B /* RNCWebViewImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCWebViewImpl.m; sourceTree = "<group>"; };
 		5B3C85892AE14EBA0041643B /* RNCWebViewDecisionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCWebViewDecisionManager.h; sourceTree = "<group>"; };
 		5B3C858A2AE14EBA0041643B /* RNCWebViewDecisionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCWebViewDecisionManager.m; sourceTree = "<group>"; };
@@ -66,7 +66,7 @@
 			isa = PBXGroup;
 			children = (
 				5B3C85842AE14EBA0041643B /* RNCGigya.swift */,
-				5B3C85872AE14EBA0041643B /* RNCWebView-Swift.h */,
+				5B3C85872AE14EBA0041643B /* RNCWebView-Bridging-Header.h */,
 				5B3C85862AE14EBA0041643B /* RNCWebView.h */,
 				5B3C85852AE14EBA0041643B /* RNCWebView.mm */,
 				5B3C85892AE14EBA0041643B /* RNCWebViewDecisionManager.h */,
@@ -193,7 +193,6 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "RNCWebView-Swift.h";
 			};
 			name = Debug;
 		};
@@ -230,7 +229,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "RNCWebView-Swift.h";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -249,7 +247,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNCWebView;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RNCWebView-Swift.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "RNCWebView-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -269,7 +267,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNCWebView;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RNCWebView-Swift.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "RNCWebView-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

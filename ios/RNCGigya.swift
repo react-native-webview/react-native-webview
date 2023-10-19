@@ -13,10 +13,7 @@ import Gigya
 
 @objc public class RNCGigya: NSObject {
   
-  @objc
-  public static let sharedInstance = RNCGigya()
-  
-  func initialize(controller: UIViewController, webview: WKWebView, sessionToken: String, sessionSecret: String, apiKey: String, apiDomain: String) {
+  @objc public func initialize(controller: UIViewController, webview: WKWebView, sessionToken: String, sessionSecret: String, apiKey: String, apiDomain: String) {
     gigya.initFor(apiKey: apiKey, apiDomain: apiDomain)
 
     self.attachBridge(controller: controller, webview: webview)
