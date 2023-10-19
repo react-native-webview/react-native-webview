@@ -16,6 +16,7 @@
 #endif // !TARGET_OS_OSX
 
 #import "objc/runtime.h"
+#import "RNCWebView-Briding-Header.h"
 
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
@@ -468,6 +469,14 @@ RCTAutoInsetsProtocol>
 
   if (_applicationNameForUserAgent) {
     wkWebViewConfig.applicationNameForUserAgent = [NSString stringWithFormat:@"%@ %@", wkWebViewConfig.applicationNameForUserAgent, _applicationNameForUserAgent];
+  }
+  
+  if (_gigyaCredentials) {
+    RNCGigya *instance = [[RNCGigya alloc] init];
+    
+    UIViewController *controller = [self topViewController];
+    
+    [instance initialize:controller webview:_webView sessionToken:_gigyaCredentials.sessionToken sessionSecret:_gigyaCredentials.sessionSecret apiKey:_gigyaCredentials.apiKey apiDomain:_gigyaCredentials.apiDomain];
   }
 
   return wkWebViewConfig;
