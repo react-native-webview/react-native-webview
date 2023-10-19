@@ -471,16 +471,6 @@ RCTAutoInsetsProtocol>
     wkWebViewConfig.applicationNameForUserAgent = [NSString stringWithFormat:@"%@ %@", wkWebViewConfig.applicationNameForUserAgent, _applicationNameForUserAgent];
   }
   
-  if (_gigyaCredentials) {  
-    UIViewController *controller = [self topViewController];
-    NSString *sessionToken = [_gigyaCredentials valueForKey:@"sessionToken"];
-    NSString *sessionSecret = [_gigyaCredentials valueForKey:@"sessionSecret"];
-    NSString *apiKey = [_gigyaCredentials valueForKey:@"apiKey"];
-    NSString *apiDomain = [_gigyaCredentials valueForKey:@"apiDomain"];
-      
-    [[[RNCGigya alloc] init] initializeWithController:controller webview:_webView sessionToken:sessionToken sessionSecret:sessionSecret apiKey:apiKey apiDomain:apiDomain];
-  }
-
   return wkWebViewConfig;
 }
 
@@ -535,6 +525,17 @@ RCTAutoInsetsProtocol>
 #endif
 
     [self addSubview:_webView];
+    
+    if (_gigyaCredentials) {
+      UIViewController *controller = [self topViewController];
+      NSString *sessionToken = [_gigyaCredentials valueForKey:@"sessionToken"];
+      NSString *sessionSecret = [_gigyaCredentials valueForKey:@"sessionSecret"];
+      NSString *apiKey = [_gigyaCredentials valueForKey:@"apiKey"];
+      NSString *apiDomain = [_gigyaCredentials valueForKey:@"apiDomain"];
+        
+      [[[RNCGigya alloc] init] initializeWithController:controller webview:_webView sessionToken:sessionToken sessionSecret:sessionSecret apiKey:apiKey apiDomain:apiDomain];
+    }
+    
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
     [self visitSource];
