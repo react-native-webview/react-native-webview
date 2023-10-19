@@ -472,11 +472,15 @@ RCTAutoInsetsProtocol>
   }
   
   if (_gigyaCredentials) {
-    RNCGigya *instance = [[RNCGigya alloc] init];
-    
+    RNCGigya * instance = [RNCGigya sharedInstance];
+
     UIViewController *controller = [self topViewController];
+    NSString *sessionToken = [_gigyaCredentials valueForKey:@"sessionToken"];
+    NSString *sessionSecret = [_gigyaCredentials valueForKey:@"sessionSecret"];
+    NSString *apiKey = [_gigyaCredentials valueForKey:@"apiKey"];
+    NSString *apiDomain = [_gigyaCredentials valueForKey:@"apiDomain"];
     
-    [instance initialize:controller webview:_webView sessionToken:_gigyaCredentials.sessionToken sessionSecret:_gigyaCredentials.sessionSecret apiKey:_gigyaCredentials.apiKey apiDomain:_gigyaCredentials.apiDomain];
+    [instance initialize:controller webview:_webView sessionToken:sessionToken sessionSecret:sessionSecret apiKey:apiKey apiDomain:apiDomain];
   }
 
   return wkWebViewConfig;

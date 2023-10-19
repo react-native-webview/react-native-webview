@@ -12,10 +12,10 @@ import WebKit
 import Gigya
 
 @objc
-class RNCGigya: NSObject {
+public class RNCGigya: NSObject {
   
   @objc
-  static let shared = RNCGigya()
+  public static let sharedInstance = RNCGigya()
   
   func initialize(controller: UIViewController, webview: WKWebView, sessionToken: String, sessionSecret: String, apiKey: String, apiDomain: String) {
     gigya.initFor(apiKey: apiKey, apiDomain: apiDomain)
