@@ -11,8 +11,7 @@ import UIKit
 import WebKit
 import Gigya
 
-@objc
-public class RNCGigya: NSObject {
+@objc public class RNCGigya: NSObject {
   
   @objc
   public static let sharedInstance = RNCGigya()
