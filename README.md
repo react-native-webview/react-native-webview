@@ -1,6 +1,7 @@
 # React Native WebView
 
 Forked from `react-native-webview/react-native-webview`
+
 Add Gigya implementation with the prop `gigyaCredentials`
 
 ![star this repo](https://img.shields.io/github/stars/react-native-webview/react-native-webview?style=flat-square)
