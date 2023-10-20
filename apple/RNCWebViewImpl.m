@@ -1679,16 +1679,15 @@ didFinishNavigation:(WKNavigation *)navigation
   }
 }
 
-- (void)writeCookiesToWebView:(NSArray<NSHTTPCookie *>*)cookies completion:(void (^)(void))completion {
+- (void)writeCookies:(NSArray<NSHTTPCookie *>*)cookies toWebDataStore:(WKWebsiteDataStore*)store andOnCompletion:(void (^)(void))completion {
   // The required cookie APIs only became available on iOS 11
   if (@available(iOS 11.0, *)) {
-    if (_sharedCookiesEnabled) {
-      __weak WKWebView *webView = _webView;
+    if (_sharedCookiesEnabled && store) {
       dispatch_async(dispatch_get_main_queue(), ^{
         dispatch_group_t group = dispatch_group_create();
         for (NSHTTPCookie *cookie in cookies) {
           dispatch_group_enter(group);
-          [webView.configuration.websiteDataStore.httpCookieStore setCookie:cookie completionHandler:^{
+          [store.httpCookieStore setCookie:cookie completionHandler:^{
             dispatch_group_leave(group);
           }];
         }
@@ -1707,9 +1706,18 @@ didFinishNavigation:(WKNavigation *)navigation
   }
 }
 
+- (void)writeCookiesToWebView:(NSArray<NSHTTPCookie *>*)cookies completion:(void (^)(void))completion {
+  [self writeCookies:cookies toWebDataStore:webView.configuration.websiteDataStore andOnCompletion:completion];
+}
+
 - (void)syncCookiesToWebView:(void (^)(void))completion {
   NSArray<NSHTTPCookie *> *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
   [self writeCookiesToWebView:cookies completion:completion];
+}
+
+- (void)syncCookiesToWebDataStore:(WKWebsiteDataStore*)store andCompetion:(void (^)(void))completion {
+  NSArray<NSHTTPCookie *> *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
+  [self writeCookies:cookies toWebDataStore:store andOnCompletion:completion];
 }
 
 - (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
@@ -1756,7 +1764,7 @@ didFinishNavigation:(WKNavigation *)navigation
       if(!_incognito && !_cacheEnabled) {
         wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
       }
-      [self syncCookiesToWebView:^{
+      [self syncCookiesToWebDataStore:wkWebViewConfig.websiteDataStore andCompetion:^{
         [wkWebViewConfig.websiteDataStore.httpCookieStore addObserver:self];
       }];
     } else {
