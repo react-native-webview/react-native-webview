@@ -112,6 +112,12 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     }
 
     @Override
+    @ReactProp(name = "gigyaCredentials")
+    public void setGigyaCredentials(RNCWebViewWrapper view, @Nullable ReadableMap value) {
+        mRNCWebViewManagerImpl.setGigyaCredentials(view, value);
+    }    
+
+    @Override
     @ReactProp(name = "cacheEnabled")
     public void setCacheEnabled(RNCWebViewWrapper view, boolean value) {
         mRNCWebViewManagerImpl.setCacheEnabled(view, value);

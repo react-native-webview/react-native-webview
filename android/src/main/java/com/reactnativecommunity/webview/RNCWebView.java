@@ -88,6 +88,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         mRNCWebViewClient.setBasicAuthCredential(credential);
     }
 
+    public void setGigyaCredentials(RNCGigyaCredentials credential) {
+        mRNCWebViewClient.setGigyaCredentials(credential);
+    }
+
     public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
         this.sendContentSizeChangeEvents = sendContentSizeChangeEvents;
     }

@@ -221,6 +221,12 @@ export interface NativeProps extends ViewProps {
     username: string;
     password: string;
   }>;
+  gigyaCredentials?: Readonly<{
+    sessionToken: string
+    sessionSecret: string
+    apiKey: string
+    apiDomain: string;
+  }>;
   cacheEnabled?: boolean;
   incognito?: boolean;
   injectedJavaScript?: string;

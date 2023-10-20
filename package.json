@@ -78,7 +78,6 @@
     "android/src",
     "android/build.gradle",
     "android/gradle.properties",
-    "apple",
     "ios",
     "macos",
     "windows",

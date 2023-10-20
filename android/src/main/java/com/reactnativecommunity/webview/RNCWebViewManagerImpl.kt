@@ -1,5 +1,6 @@
 package com.reactnativecommunity.webview
 
+import android.app.Application
 import android.app.DownloadManager
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
@@ -90,6 +91,7 @@ class RNCWebViewManagerImpl {
         if (ReactBuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
+
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
             val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
@@ -267,6 +269,28 @@ class RNCWebViewManagerImpl {
         }
         viewWrapper.webView.setBasicAuthCredential(basicAuthCredential)
     }
+
+    fun setGigyaCredentials(viewWrapper: RNCWebViewWrapper, credential: ReadableMap?) {
+        var gigyaCredentials: RNCGigyaCredentials? = null
+        if (credential != null) {
+            if (credential.hasKey("sessionToken") && credential.hasKey("sessionSecret") && credential.hasKey("apiKey") && credential.hasKey("apiDomain")) {
+                val sessionToken = credential.getString("sessionToken")
+                val sessionSecret = credential.getString("sessionSecret")
+                val apiKey = credential.getString("apiKey")
+                val apiDomain = credential.getString("apiDomain")
+
+                gigyaCredentials = RNCGigyaCredentials(sessionToken, sessionSecret, apiKey, apiDomain)
+
+                if (sessionToken != null && sessionSecret != null && apiKey != null && apiDomain != null) {
+                    val application = viewWrapper.webView.themedReactContext.currentActivity?.application as Application
+                    val gigya = RNCGigya(application, apiKey, apiDomain)
+
+                    gigya.initialize(sessionToken, sessionSecret, viewWrapper.webView)
+                }
+            }
+        }
+        viewWrapper.webView.setGigyaCredentials(gigyaCredentials)
+    }    
 
     fun onDropViewInstance(viewWrapper: RNCWebViewWrapper) {
         val webView = viewWrapper.webView

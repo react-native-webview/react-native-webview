@@ -12,13 +12,14 @@ Pod::Spec.new do |s|
 
   s.authors      = package['author']
   s.homepage     = package['homepage']
-  s.platforms    = { :ios => "9.0", :osx => "10.13" }
+  s.platforms    = { :ios => "10.0", :osx => "10.13" }
 
   s.source       = { :git => "https://github.com/react-native-webview/react-native-webview.git", :tag => "v#{s.version}" }
 
-  s.source_files    = "apple/**/*.{h,m,mm,swift}"
+  s.source_files    = "ios/**/*.{h,m,mm,swift}"
 
   s.dependency "React-Core"
+  s.dependency "Gigya"
 
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
     s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"

@@ -42,6 +42,7 @@ public class RNCWebViewClient extends WebViewClient {
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
     protected @Nullable RNCBasicAuthCredential basicAuthCredential = null;
+    protected @Nullable RNCGigyaCredentials gigyaCredentials = null;
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
         ignoreErrFailedForThisURL = url;
@@ -49,6 +50,10 @@ public class RNCWebViewClient extends WebViewClient {
 
     public void setBasicAuthCredential(@Nullable RNCBasicAuthCredential credential) {
         basicAuthCredential = credential;
+    }
+
+    public void setGigyaCredentials(@Nullable RNCGigyaCredentials credential) {
+        gigyaCredentials = credential;
     }
 
     @Override

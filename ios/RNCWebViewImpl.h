@@ -96,6 +96,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL ignoreSilentHardwareSwitch;
 @property (nonatomic, copy) NSString * _Nullable allowingReadAccessToURL;
 @property (nonatomic, copy) NSDictionary * _Nullable basicAuthCredential;
+@property (nonatomic, copy) NSDictionary * _Nullable gigyaCredentials;
 @property (nonatomic, assign) BOOL pullToRefreshEnabled;
 @property (nonatomic, assign) BOOL enableApplePay;
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
