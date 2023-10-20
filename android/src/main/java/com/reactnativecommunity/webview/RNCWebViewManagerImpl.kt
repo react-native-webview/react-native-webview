@@ -92,16 +92,6 @@ class RNCWebViewManagerImpl {
             WebView.setWebContentsDebuggingEnabled(true)
         }
 
-        val gigya = RNCGigya(context.reactApplicationContext as Application)
-
-        gigya.initialize(
-          sessionToken = "st2.s.AcbH61XIZw.YDOwVc11AiKBacHbguHpSIXYvWpAfcP9au5Am0ldPqIhtB2eZQp-skwt393k4q5R0CeMF3t0yghvqN4ShsWCq49ZHv20GBV9GDsh9NBLPHhcKJWTOzMEptBpE_Gwq6lw.Gt6UCTZoOF4APoqedLA3flmsrIwMryLA-QZMWXloRRfN1bZ1cz1PvNqtKNGY3pcloSxORceZ8LGh5jP_y__N8A.sc3",
-          sessionSecret = "2m/tMFFFNbUpoJacMFSpSGZ4+mE=",
-          apiKey = "3_mxmNYnDyZK7sYZxbq3pVDpGmhzSW9zk5kdOM92VB6vLwyeOBy8UTUjtCyDNYfHmq",
-          apiDomain = "eu1.gigya.com",
-          webView
-        )
-
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
             val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
@@ -290,6 +280,13 @@ class RNCWebViewManagerImpl {
                 val apiDomain = credential.getString("apiDomain")
 
                 gigyaCredentials = RNCGigyaCredentials(sessionToken, sessionSecret, apiKey, apiDomain)
+
+                if (sessionToken != null && sessionSecret != null && apiKey != null && apiDomain != null) {
+                    val application = viewWrapper.webView.themedReactContext.currentActivity?.application as Application
+                    val gigya = RNCGigya(application, apiKey, apiDomain)
+
+                    gigya.initialize(sessionToken, sessionSecret, viewWrapper.webView)
+                }
             }
         }
         viewWrapper.webView.setGigyaCredentials(gigyaCredentials)
