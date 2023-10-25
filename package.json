@@ -1,16 +1,17 @@
 {
-  "name": "react-native-webview",
-  "description": "React Native WebView component for iOS, Android, macOS, and Windows",
+  "name": "react-native-gigya-webview",
+  "description": "React Native WebView fork with Gigya integration to attach login session",
   "main": "index.js",
   "main-internal": "src/index.ts",
   "typings": "index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "contributors": [
-    "Thibault Malbranche <malbranche.thibault@gmail.com>"
+    "Thibault Malbranche <malbranche.thibault@gmail.com>",
+    "Martin Frouin <martin.frouin@derniercri.io>"
   ],
   "license": "MIT",
   "version": "13.6.2",
-  "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
+  "homepage": "https://github.com/derniercri/react-native-gigya-webview#readme",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -72,7 +73,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-webview/react-native-webview.git"
+    "url": "https://github.com/derniercri/react-native-gigya-webview.git"
   },
   "files": [
     "android/src",
