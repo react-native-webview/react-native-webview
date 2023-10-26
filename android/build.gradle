@@ -101,11 +101,11 @@ repositories {
 }
 
 dependencies {
-    api project(':gigya-sdk')
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'com.facebook.react:react-native:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
     implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
+  implementation files('gigya-sdk/gigya-android-sdk-core-v7.0.5.aar')
 }
 
 configurations.maybeCreate("default")

@@ -1,2 +1,0 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('gigya-android-sdk-core-v7.0.5.aar'))
