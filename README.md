@@ -1,4 +1,4 @@
-# React Native WebView
+# React Native Gigya WebView
 
 Forked from [react-native-webview/react-native-webview](https://github.com/react-native-webview/react-native-webview)
 
