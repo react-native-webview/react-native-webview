@@ -101,6 +101,11 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     @Override
+    public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
+      return true;
+    }
+
+    @Override
     public void onHostResume() {
         // do nothing
     }
