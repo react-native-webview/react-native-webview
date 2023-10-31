@@ -724,6 +724,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   fraudulentWebsiteWarningEnabled?: boolean;
+
+  /**
+   * A hex color value used to set background and caret color of selection.
+   * @platform ios
+  */
+  tintColor?: string;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {

@@ -483,6 +483,7 @@ RCTAutoInsetsProtocol>
     _webView.menuItems = _menuItems;
     _webView.suppressMenuItems = _suppressMenuItems;
     _webView.scrollView.delegate = self;
+    _webView.tintColor = _tintColor;
 #endif // !TARGET_OS_OSX
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
@@ -1010,6 +1011,12 @@ RCTAutoInsetsProtocol>
 {
   _showsVerticalScrollIndicator = showsVerticalScrollIndicator;
   _webView.scrollView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+}
+
+- (void)setTintColor:(UIColor*)tintColor
+{
+    _tintColor = tintColor;
+    _webView.tintColor = tintColor;
 }
 #endif // !TARGET_OS_OSX
 

@@ -74,6 +74,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   renderError,
   style,
   containerStyle,
+  tintColor,
   source,
   nativeConfig,
   allowsInlineMediaPlayback,
@@ -208,6 +209,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
       newSource={newSource}
       style={webViewStyles}
+      tintColor={tintColor}
       hasOnFileDownload={!!onFileDownload}
       ref={webViewRef}
       // @ts-expect-error old arch only
