@@ -91,6 +91,7 @@ This document lays out the current public properties and methods for the React N
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
 - [`webviewDebuggingEnabled`](Reference.md#webviewDebuggingEnabled)
+- [`tintColor`](Reference.md#tintColor)
 
 ## Methods Index
 
@@ -1690,6 +1691,14 @@ Default is `false`. Supported on iOS as of 16.4, previous versions always allow 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS & Android  |
+
+### `tintColor`[⬆](#props-index)
+
+Set background and caret color of selection.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
 
 ## Methods
 
