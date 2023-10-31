@@ -9,21 +9,22 @@ Secondly, we'd like the contribution experience to be as good as possible. While
 After you fork the repo, clone it to your machine, and make your changes, you'll want to test them in an app.
 
 There are two methods of testing:
-1) Testing within a clone of react-native-webview
-2) Testing in a new `react-native init` project
+
+1. Testing within a clone of react-native-webview
+2. Testing in a new `react-native init` project
 
 ### Testing within react-native-webview
 
 #### For all platforms:
 
 ```sh
-yarn install
+npm install
 ```
 
 #### For Android:
 
 ```sh
-yarn android
+npm run android
 ```
 
 The Android example app will built, the Metro bundler will launch, and the example app will be installed and started in the Android emulator.
@@ -32,7 +33,7 @@ The Android example app will built, the Metro bundler will launch, and the examp
 
 ```sh
 pod install --project-directory=example/ios
-yarn ios
+npm run ios
 ```
 
 The iOS example app will be built, the Metro bundler will launch, and the example app will be installed and started in the Simulator.
@@ -41,7 +42,7 @@ The iOS example app will be built, the Metro bundler will launch, and the exampl
 
 ```sh
 pod install --project-directory=macos
-yarn macos
+npm run macos
 ```
 
 The macOS example app will be built, the Metro bundler will launch, and the example app will be installed and started.
@@ -49,7 +50,7 @@ The macOS example app will be built, the Metro bundler will launch, and the exam
 #### For Windows:
 
 ```sh
-yarn windows
+npm run windows
 ```
 
 The Windows example app will be built, the Metro bundler will launch, and the example app will be installed and started.
@@ -59,7 +60,7 @@ The Windows example app will be built, the Metro bundler will launch, and the ex
 In a new `react-native init` project, do this:
 
 ```
-$ yarn add <path to local react-native-webview>
+$ npm install <path to local react-native-webview>
 ```
 
 You may run into a problem where the `jest-haste-map` module map says react-native was added twice:
@@ -89,16 +90,17 @@ You may also see a console warning about "Invalid hook call," followed by a rend
 When you make a change, you'll probably need to remove and re-add `react-native-webview`:
 
 ```
-$ yarn remove react-native-webview
-$ yarn add ../react-native-webview
+$ npm remove react-native-webview
+$ npm install ../react-native-webview
 ```
 
 ## Notes
 
 - We use TypeScript.
-- After pulling this repo and installing all dependencies, you can run tests using the command: `yarn ci`
+- After pulling this repo and installing all dependencies, you can run tests using the command: `npm ci`
 
 ## Translations
+
 This file is available in:
 
 - [Brazilian portuguese](Contributing.portuguese.md)

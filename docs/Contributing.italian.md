@@ -9,21 +9,22 @@ In secondo luogo, desideriamo che l'esperienza di contribuzione sia il migliore 
 Dopo aver forkato il reposito, clonalo sulla tuo computer e apporta le modifiche. Successivamente, potrai testarle in un'applicazione.
 
 Ci sono due metodi per testare:
-1) testare all'interno di una copia di react-native-webview;
-2) testare in un nuovo progetto creato con `react-native init`.
+
+1. testare all'interno di una copia di react-native-webview;
+2. testare in un nuovo progetto creato con `react-native init`.
 
 ### Testare in react-native-webview
 
 #### Per tutte le piattaforme:
 
 ```sh
-yarn install
+npm install
 ```
 
 #### Per Android:
 
 ```sh
-yarn android
+npm run android
 ```
 
 L'applicazione di esempio per Android verrà compilata, Metro bundler si avvierà e l'applicazione verrà installata e avviata nell'emulatore Android.
@@ -32,7 +33,7 @@ L'applicazione di esempio per Android verrà compilata, Metro bundler si avvier�
 
 ```sh
 pod install --project-directory=example/ios
-yarn ios
+npm run ios
 ```
 
 L'app di esempio per iOS verrà compilata, Metro bundler verrà avviato e l'app verrà installata e avviata nel simulatore.
@@ -41,7 +42,7 @@ L'app di esempio per iOS verrà compilata, Metro bundler verrà avviato e l'app 
 
 ```sh
 pod install --project-directory=example/macos
-yarn macos
+npm run macos
 ```
 
 L'app di esempio per macOS verrà compilata, Metro bundler verrà avviato e l'app verrà installata e avviata.
@@ -49,7 +50,7 @@ L'app di esempio per macOS verrà compilata, Metro bundler verrà avviato e l'ap
 #### Per Windows:
 
 ```sh
-yarn windows
+npm run windows
 ```
 
 L'app di esempio per Windows verrà compilata, Metro bundler verrà avviato e l'app verrà installata e avviata.
@@ -59,7 +60,7 @@ L'app di esempio per Windows verrà compilata, Metro bundler verrà avviato e l'
 In un nuovo progetto `react-native init`, fai quanto segue:
 
 ```
-$ yarn add <percorso locale a react-native-webview>
+$ npm install <percorso locale a react-native-webview>
 ```
 
 Potresti riscontrare un problema in cui la mappatura dei moduli `jest-haste-map` segnala che react-native è stato aggiunto due volte.
@@ -89,15 +90,18 @@ Potresti anche visualizzare un avviso sulla console riguardante "Invalid hook ca
 Quando apporti una modifica, molto probabilmente dovrai rimuovere e aggiungere nuovamente `react-native-webview`:
 
 ```
-$ yarn remove react-native-webview
-$ yarn add ../react-native-webview
+$ npm remove react-native-webview
+$ npm install ../react-native-webview
 ```
 
 ## Note
+
 - Usiamo TypeScript.
-- Dopo aver scaricato quest repo e installato tutte le dipendenze, puoi eseguire i test usando il comando: `yarn ci`.
+- Dopo aver scaricato quest repo e installato tutte le dipendenze, puoi eseguire i test usando il comando: `npm ci`.
 
 ### Traduzioni
+
 Questo file è disponibile nelle seguenti lingue:
+
 - [Inglese](Contributing.md)
 - [Portoghese brasiliano](Contributing.portuguese.md)

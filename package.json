@@ -17,14 +17,14 @@
     "macos": "react-native run-macos --scheme WebviewExample --project-path example/macos",
     "start": "cd example && react-native start",
     "windows": "install-windows-test-app --project-directory example/windows && react-native run-windows --root example --arch x64",
-    "ci": "CI=true && yarn lint",
-    "ci:publish": "yarn semantic-release",
-    "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
-    "build": "yarn tsc",
-    "prepare": "yarn build",
+    "ci": "CI=true && npm run lint",
+    "ci:publish": "npx semantic-release",
+    "lint": "npx tsc --noEmit && npm run eslint ./src --ext .ts,.tsx",
+    "build": "npx tsc",
+    "prepare": "npm run build",
     "appium": "appium",
-    "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.js",
-    "add:macos": "yarn add react-native-macos@0.71.33"
+    "test:windows": "npm run jest --setupFiles=./jest-setups/jest.setup.js",
+    "add:macos": "npm install react-native-macos@0.71.33"
   },
   "rn-docs": {
     "title": "Webview",
@@ -37,6 +37,10 @@
   "dependencies": {
     "escape-string-regexp": "2.0.0",
     "invariant": "2.2.4"
+  },
+  "overrides": {
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "eslint": "6.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
