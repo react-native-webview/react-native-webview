@@ -5,7 +5,7 @@ Veja como começar rapidamente com o React Native WebView.
 ## 1. Adicione react-native-webview às suas dependências
 
 ```
-$ yarn add react-native-webview
+$ npm install react-native-webview
 ```
 
 (ou)
@@ -35,9 +35,9 @@ Se estiver usando CocoaPods, no diretório `ios/` ou `macos/` execute:
 ```
 $ pod install
 ```
+
 Embora você possa vincular manualmente da maneira antiga usando [tutorial do react-native](https://reactnative.dev/docs/linking-libraries-ios), achamos mais fácil usar o CocoaPods.
 Se você deseja usar o CocoaPods e ainda não o configurou, consulte [esse artigo](https://engineering.brigad.co/demystifying-react-native-modules-linking-ae6c017a6b4a).
-
 
 ### Android:
 
@@ -51,6 +51,7 @@ Verifique se o AndroidX está ativado em seu projeto editando `android/gradle.pr
 android.useAndroidX=true
 android.enableJetifier=true
 ```
+
 Para instalação manual no Android, consulte [este artigo](https://engineering.brigad.co/demystifying-react-native-modules-linking-964399ec731b), onde você pode encontrar as etapas detalhadas sobre como vincular qualquer projeto react-native.
 
 ### Windows:

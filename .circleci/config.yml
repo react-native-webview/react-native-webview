@@ -12,15 +12,15 @@ jobs:
       - restore_cache:
           name: Restore node modules
           keys:
-            - node_modules-{{ arch }}-{{ checksum "yarn.lock" }}
+            - node_modules-{{ arch }}-{{ checksum "package-lock.json" }}
 
       - run:
           name: Install dependencies
-          command: yarn --pure-lockfile
+          command: npm ci
 
       - save_cache:
           name: Save node modules
-          key: node_modules-{{ arch }}-{{ checksum "yarn.lock" }}
+          key: node_modules-{{ arch }}-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
 
@@ -31,11 +31,11 @@ jobs:
       - restore_cache:
           name: Restore node modules
           keys:
-            - node_modules-{{ arch }}-{{ checksum "yarn.lock" }}
+            - node_modules-{{ arch }}-{{ checksum "package-lock.json" }}
 
       - run:
           name: Lint checks
-          command: yarn ci
+          command: npm run ci
 
   publish:
     <<: *defaults
@@ -44,11 +44,11 @@ jobs:
       - restore_cache:
           name: Restore node modules
           keys:
-            - node_modules-{{ arch }}-{{ checksum "yarn.lock" }}
+            - node_modules-{{ arch }}-{{ checksum "package-lock.json" }}
 
       - run:
           name: Publish to NPM
-          command: yarn ci:publish
+          command: npm run ci:publish
 
 workflows:
   version: 2
