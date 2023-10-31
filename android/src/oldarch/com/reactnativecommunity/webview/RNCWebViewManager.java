@@ -250,7 +250,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
 
     @ReactProp(name = "source")
     public void setSource(RNCWebViewWrapper view, @Nullable ReadableMap value) {
-        mRNCWebViewManagerImpl.setSource(view, value, false);
+        mRNCWebViewManagerImpl.setSource(view, value);
     }
 
     @ReactProp(name = "textZoom")
@@ -271,6 +271,11 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
     @ReactProp(name = "userAgent")
     public void setUserAgent(RNCWebViewWrapper view, @Nullable String value) {
         mRNCWebViewManagerImpl.setUserAgent(view, value);
+    }
+
+    @ReactProp(name = "paymentRequestEnabled")
+    public void setPaymentRequestEnabled(RNCWebViewWrapper view, boolean value) {
+        mRNCWebViewManagerImpl.setPaymentRequestEnabled(view, value);
     }
 
     @Override
@@ -312,6 +317,12 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
     public void receiveCommand(@NonNull RNCWebViewWrapper reactWebView, String commandId, @Nullable ReadableArray args) {
         mRNCWebViewManagerImpl.receiveCommand(reactWebView, commandId, args);
         super.receiveCommand(reactWebView, commandId, args);
+    }
+
+    @Override
+    protected void onAfterUpdateTransaction(@NonNull RNCWebViewWrapper view) {
+        super.onAfterUpdateTransaction(view);
+        mRNCWebViewManagerImpl.onAfterUpdateTransaction(view);
     }
 
     @Override
