@@ -58,6 +58,9 @@ apply plugin: 'kotlin-android'
 android {
     if (supportsNamespace()) {
         namespace "com.reactnativecommunity.webview"
+        buildFeatures {
+            buildConfig true
+        }
 
         sourceSets {
             main {
