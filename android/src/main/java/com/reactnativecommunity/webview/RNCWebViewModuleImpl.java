@@ -267,25 +267,25 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         Activity activity = mContext.getCurrentActivity();
 
         ArrayList<Parcelable> extraIntents = new ArrayList<>();
-        Intent photoIntent = null;
+        Intent mediaIntent = null;
         if (!needsCameraPermission()) {
             if (acceptsImages(acceptTypes)) {
-                photoIntent = getPhotoIntent();
-                if (photoIntent != null) {
-                    extraIntents.add(photoIntent);
+                mediaIntent = getPhotoIntent();
+                if (mediaIntent != null) {
+                    extraIntents.add(mediaIntent);
                 }
             }
             if (acceptsVideo(acceptTypes)) {
-                Intent videoIntent = getVideoIntent();
-                if (videoIntent != null) {
-                    extraIntents.add(videoIntent);
+                mediaIntent = getVideoIntent();
+                if (mediaIntent != null) {
+                    extraIntents.add(mediaIntent);
                 }
             }
         }
 
         Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
         if (isCaptureEnabled) {
-            chooserIntent = photoIntent;
+            chooserIntent = mediaIntent;
         } else {
             Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
 
