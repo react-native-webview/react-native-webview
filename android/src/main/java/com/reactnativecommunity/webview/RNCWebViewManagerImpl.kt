@@ -4,9 +4,12 @@ import android.app.DownloadManager
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.media.MediaScannerConnection
+import android.media.MediaScannerConnection.OnScanCompletedListener
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -17,13 +20,20 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.WritableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.uimanager.ThemedReactContext
+import com.reactnativecommunity.webview.events.TopDownloadEvent
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
@@ -91,6 +101,39 @@ class RNCWebViewManagerImpl {
             WebView.setWebContentsDebuggingEnabled(true)
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+            if (url.startsWith("data:")) {
+              val path: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absoluteFile
+              val filetype = url.substring(url.indexOf("/") + 1, url.indexOf(";"))
+              val filename = System.currentTimeMillis().toString() + "." + filetype
+              val file = File(path, filename)
+              try {
+                if (!path.exists()) path.mkdirs()
+                if (!file.exists()) file.createNewFile()
+                val base64EncodedString = url.substring(url.indexOf(",") + 1)
+                val decodedBytes: ByteArray = Base64.decode(base64EncodedString, Base64.DEFAULT)
+                val os: OutputStream = FileOutputStream(file)
+                os.write(decodedBytes)
+                os.close()
+                MediaScannerConnection.scanFile(context.getApplicationContext(), arrayOf<String>(file.toString()), null,
+                  object : OnScanCompletedListener {
+                    override fun onScanCompleted(path: String, uri: Uri) {
+                      Log.i("ExternalStorage", "Scanned $path:")
+                      Log.i("ExternalStorage", "-> uri=$uri")
+                    }
+                  })
+                val event: WritableMap = Arguments.createMap()
+                event.putString("url", url)
+                event.putString("contentDisposition", contentDisposition)
+                event.putString("mimetype", mimetype)
+                webView.dispatchEvent(
+                  webView,
+                  TopDownloadEvent(webView.id, event))
+              } catch (e: IOException) {
+                Log.w(TAG, "Error writing $file", e)
+              }
+              return@DownloadListener
+            }
+
             webView.setIgnoreErrFailedForThisURL(url)
             val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {

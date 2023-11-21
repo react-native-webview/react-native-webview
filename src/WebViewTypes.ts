@@ -11,7 +11,7 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 
-import type NativeWebViewComponent from './RNCWebViewNativeComponent'
+import type NativeWebViewComponent from './RNCWebViewNativeComponent';
 
 type WebViewCommands =
   | 'goForward'
@@ -237,19 +237,19 @@ export interface WebViewCustomMenuItems {
   label: string;
 }
 
-export declare type SuppressMenuItem = 
-  | "cut"
-  | "copy"
-  | "paste"
-  | "replace"
-  | "bold"
-  | "italic"
-  | "underline"
-  | "select"
-  | "selectAll"
-  | "translate"
-  | "lookup"
-  | "share";
+export declare type SuppressMenuItem =
+  | 'cut'
+  | 'copy'
+  | 'paste'
+  | 'replace'
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'select'
+  | 'selectAll'
+  | 'translate'
+  | 'lookup'
+  | 'share';
 
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
@@ -261,9 +261,7 @@ export interface WebViewNativeConfig {
   /**
    * The native component used to render the WebView.
    */
-  component?:
-    | typeof NativeWebViewMacOS
-    | typeof NativeWebViewComponent;
+  component?: typeof NativeWebViewMacOS | typeof NativeWebViewComponent;
   /**
    * Set props directly on the native component WebView. Enables custom props which the
    * original WebView doesn't pass through.
@@ -600,7 +598,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
 
   /**
    * Function that is invoked when the `WebView` should open a new window.
-   * 
+   *
    * This happens when the JS calls `window.open('http://someurl', '_blank')`
    * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
    *
@@ -711,11 +709,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * `selectedText`: the text selected on the document
    * @platform ios, android
    */
-  onCustomMenuSelection?: (event: {nativeEvent: {
-    label: string;
-    key: string;
-    selectedText: string;
-  }
+  onCustomMenuSelection?: (event: {
+    nativeEvent: {
+      label: string;
+      key: string;
+      selectedText: string;
+    };
   }) => void;
 
   /**
@@ -889,6 +888,12 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   onContentSizeChange?: (event: WebViewEvent) => void;
 
   /**
+   * Function that is invoked when base64 download was completed
+   * Works only on Android.
+   */
+  onDownloadBase64?: (event: WebViewEvent) => void;
+
+  /**
    * Function that is invoked when the `WebView` process crashes or is killed by the OS.
    * Works only on Android (minimum API level 26).
    */
@@ -896,7 +901,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
 
   /**
    * Function that is invoked when the `WebView` should open a new window.
-   * 
+   *
    * This happens when the JS calls `window.open('http://someurl', '_blank')`
    * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
    *
@@ -1143,7 +1148,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that is invoked when the `WebView` scrolls.
    */
-   onScroll?: ComponentProps<typeof NativeWebViewComponent>['onScroll'];
+  onScroll?: ComponentProps<typeof NativeWebViewComponent>['onScroll'];
 
   /**
    * Function that is invoked when the `WebView` has finished loading.
@@ -1279,7 +1284,7 @@ export interface WebViewSharedProps extends ViewProps {
    * Inject a JavaScript object to be accessed as a JSON string via JavaScript in the WebView.
    */
   injectedJavaScriptObject?: object;
-  
+
   /**
    * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
    */
