@@ -27,6 +27,7 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.uimanager.ThemedReactContext
+import com.reactnativecommunity.webview.RNCWebViewWrapper.Companion.getReactTagFromWebView
 import com.reactnativecommunity.webview.events.TopDownloadEvent
 import org.json.JSONException
 import org.json.JSONObject
@@ -127,7 +128,7 @@ class RNCWebViewManagerImpl {
                 event.putString("mimetype", mimetype)
                 webView.dispatchEvent(
                   webView,
-                  TopDownloadEvent(webView.id, event))
+                  TopDownloadEvent(getReactTagFromWebView(webView), event))
               } catch (e: IOException) {
                 Log.w(TAG, "Error writing $file", e)
               }
