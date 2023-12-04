@@ -143,6 +143,7 @@ RCTAutoInsetsProtocol>
   UIStatusBarStyle _savedStatusBarStyle;
 #endif // !TARGET_OS_OSX
   BOOL _savedStatusBarHidden;
+  BOOL _disablePromptDuringLoading; //Disables the display of prompts during site navigation/loading
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
@@ -177,6 +178,7 @@ RCTAutoInsetsProtocol>
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
     _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
+    _disablePromptDuringLoading = YES;
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -649,6 +651,7 @@ RCTAutoInsetsProtocol>
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
   if ([keyPath isEqual:@"estimatedProgress"] && object == self.webView) {
     if(_onLoadingProgress){
+      _disablePromptDuringLoading = YES;
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       [event addEntriesFromDictionary:@{@"progress":[NSNumber numberWithDouble:self.webView.estimatedProgress]}];
       _onLoadingProgress(event);
@@ -726,6 +729,7 @@ RCTAutoInsetsProtocol>
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       [event addEntriesFromDictionary: @{@"navigationType": message.body}];
       _onLoadingFinish(event);
+      _disablePromptDuringLoading = NO;
     }
   } else if ([message.name isEqualToString:MessageHandlerName]) {
     if (_onMessage) {
@@ -1107,11 +1111,13 @@ RCTAutoInsetsProtocol>
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
 #if !TARGET_OS_OSX
-  UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
-  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-    completionHandler();
-  }]];
-  [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.7 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+      completionHandler();
+    }]];
+    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+  });
 #else
   NSAlert *alert = [[NSAlert alloc] init];
   [alert setMessageText:message];
@@ -1150,44 +1156,46 @@ RCTAutoInsetsProtocol>
  * prompt
  */
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
-#if !TARGET_OS_OSX
-  UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
-  [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-    textField.text = defaultText;
-  }];
-  UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-    completionHandler([[alert.textFields lastObject] text]);
-  }];
-  [alert addAction:okAction];
-  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+  if(!_disablePromptDuringLoading) {
+    #if !TARGET_OS_OSX
+      UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
+      [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.text = defaultText;
+      }];
+      UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        completionHandler([[alert.textFields lastObject] text]);
+      }];
+      [alert addAction:okAction];
+      UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        completionHandler(nil);
+      }];
+      [alert addAction:cancelAction];
+      alert.preferredAction = okAction;
+      [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+    #else
+      NSAlert *alert = [[NSAlert alloc] init];
+      [alert setMessageText:prompt];
+      const NSRect RCTSingleTextFieldFrame = NSMakeRect(0.0, 0.0, 275.0, 22.0);
+      NSTextField *textField = [[NSTextField alloc] initWithFrame:RCTSingleTextFieldFrame];
+      textField.cell.scrollable = YES;
+      if (@available(macOS 10.11, *)) {
+        textField.maximumNumberOfLines = 1;
+      }
+      textField.stringValue = defaultText;
+      [alert setAccessoryView:textField];
+      [alert addButtonWithTitle:NSLocalizedString(@"OK", @"OK button")];
+      [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button")];
+      [alert beginSheetModalForWindow:[NSApp keyWindow] completionHandler:^(NSModalResponse response) {
+        if (response == NSAlertFirstButtonReturn) {
+          completionHandler([textField stringValue]);
+        } else {
+          completionHandler(nil);
+        }
+      }];
+    #endif // !TARGET_OS_OSX
+  } else {
     completionHandler(nil);
-  }];
-  [alert addAction:cancelAction];
-  alert.preferredAction = okAction;
-  [[self topViewController] presentViewController:alert animated:YES completion:NULL];
-#else
-  NSAlert *alert = [[NSAlert alloc] init];
-  [alert setMessageText:prompt];
-
-  const NSRect RCTSingleTextFieldFrame = NSMakeRect(0.0, 0.0, 275.0, 22.0);
-  NSTextField *textField = [[NSTextField alloc] initWithFrame:RCTSingleTextFieldFrame];
-  textField.cell.scrollable = YES;
-  if (@available(macOS 10.11, *)) {
-    textField.maximumNumberOfLines = 1;
   }
-  textField.stringValue = defaultText;
-  [alert setAccessoryView:textField];
-
-  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"OK button")];
-  [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button")];
-  [alert beginSheetModalForWindow:[NSApp keyWindow] completionHandler:^(NSModalResponse response) {
-    if (response == NSAlertFirstButtonReturn) {
-      completionHandler([textField stringValue]);
-    } else {
-      completionHandler(nil);
-    }
-  }];
-#endif // !TARGET_OS_OSX
 }
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
@@ -1480,6 +1488,7 @@ didFinishNavigation:(WKNavigation *)navigation
   }
 
   if (_onLoadingFinish) {
+    _disablePromptDuringLoading = NO;
     _onLoadingFinish([self baseEvent]);
   }
 }
