@@ -42,6 +42,9 @@ public class RNCWebViewClient extends WebViewClient {
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
     protected @Nullable RNCBasicAuthCredential basicAuthCredential = null;
+    //Allow list is used to support specific deeplinks in the webview.
+    private final String[] DEEPLINK_ALLOW_LIST = new String[] {"https://twitter.com/i/wallet/verify"};
+
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
         ignoreErrFailedForThisURL = url;
@@ -54,13 +57,17 @@ public class RNCWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView webView, String url) {
         super.onPageFinished(webView, url);
+        // Only return the URL that the web view is currently showing.
+        String visibleUrl = webView.getUrl();
+        Boolean isFinishedLoading = url.equals(visibleUrl);
 
-        if (!mLastLoadFailed) {
+        if (!mLastLoadFailed && isFinishedLoading) {
+            if(Objects.nonNull(mWebChromeClient)) mWebChromeClient.blockJsDuringLoading = false;
             RNCWebView reactWebView = (RNCWebView) webView;
 
             reactWebView.callInjectedJavaScript();
 
-            emitFinishEvent(webView, url);
+            emitFinishEvent(webView, visibleUrl);
         }
     }
 
@@ -78,10 +85,8 @@ public class RNCWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView webView, String url, Bitmap favicon) {
       super.onPageStarted(webView, url, favicon);
+      if(Objects.nonNull(mWebChromeClient)) mWebChromeClient.blockJsDuringLoading = true;
       mLastLoadFailed = false;
-
-      RNCWebView reactWebView = (RNCWebView) webView;
-      reactWebView.callInjectedJavaScriptBeforeContentLoaded();
     }
 
     @Override
@@ -121,6 +126,17 @@ public class RNCWebViewClient extends WebViewClient {
             RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
 
             return shouldOverride;
+        } else if (url != null && Arrays.asList(DEEPLINK_ALLOW_LIST).contains(url)) {
+            // This case is used to support deeplinking within the webview. We are limiting this but
+            // if more links are to be supported we should consider a more scaleable solution. That is
+            // secure and scaleable.
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            if(intent.resolveActivity(view.getContext().getPackageManager()) != null) {
+              view.getContext().startActivity(intent);
+              return true;
+            } else
+              return false;
         } else {
             FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
             progressChangedFilter.setWaitingForCommandLoadUrl(true);
@@ -157,16 +173,14 @@ public class RNCWebViewClient extends WebViewClient {
         // This is desired behavior. We later use these values to determine whether the request is a top-level navigation or a subresource request.
         String topWindowUrl = webView.getUrl();
         String failingUrl = error.getUrl();
-
         // Cancel request after obtaining top-level URL.
         // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
         // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
         handler.cancel();
-
         if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
-            // If error is not due to top-level navigation, then do not call onReceivedError()
-            Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
-            return;
+          // If error is not due to top-level navigation, then do not call onReceivedError()
+          Log.w("RNCWebViewManager", "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
+          return;
         }
 
         int code = error.getPrimaryError();
@@ -260,6 +274,18 @@ public class RNCWebViewClient extends WebViewClient {
             int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
             UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopHttpErrorEvent(reactTag, eventData));
         }
+    }
+
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest request) {
+      String method = request.getMethod();
+      if (method.equals("GET")) {
+        WebResourceResponse response = RNCWebViewManager.this.shouldInterceptRequest(request, true, (RNCWebView)webView);
+        if (response != null) {
+          return response;
+        }
+      }
+      return super.shouldInterceptRequest(webView, request);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
