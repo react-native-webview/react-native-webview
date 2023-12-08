@@ -1600,7 +1600,7 @@ didFinishNavigation:(WKNavigation *)navigation
     if (_webView == nil) {
         return;
     }    
-    [_webView createSnapshotWithConfiguration:nil completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
+    [_webView takeSnapshotWithConfiguration:nil completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
       if (snapshotImage != nil) {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         NSString *cachesDirectory = [paths objectAtIndex:0];
