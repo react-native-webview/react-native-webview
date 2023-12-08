@@ -1602,9 +1602,9 @@ didFinishNavigation:(WKNavigation *)navigation
     }    
     [_webView createSnapshotWithConfiguration:nil completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
       if (snapshotImage != nil) {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
-        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *cachesDirectory = [paths objectAtIndex:0];
+        NSString *filePath = [cachesDirectory stringByAppendingPathComponent:filename];        
         [UIImagePNGRepresentation(snapshotImage) writeToFile:filePath atomically:YES];
         NSMutableDictionary<NSString *, id> *snapshotEvent = [self baseEvent];
         [snapshotEvent addEntriesFromDictionary: @{
@@ -1626,9 +1626,9 @@ didFinishNavigation:(WKNavigation *)navigation
     }    
     [_webView createWebArchiveDataWithCompletionHandler:^(NSData * _Nullable webArchiveData, NSError * _Nullable error) {
       if (webArchiveData != nil) {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
-        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *cachesDirectory = [paths objectAtIndex:0];
+        NSString *filePath = [cachesDirectory stringByAppendingPathComponent:filename];        
         [webArchiveData writeToFile:filePath atomically:YES];
         NSMutableDictionary<NSString *, id> *webArchiveEvent = [self baseEvent];
         [webArchiveEvent addEntriesFromDictionary: @{
