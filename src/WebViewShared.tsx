@@ -137,7 +137,7 @@ export const useWebViewLogic = ({
   originWhitelist: readonly string[];
   onShouldStartLoadWithRequestProp?: OnShouldStartLoadWithRequest;
   onShouldStartLoadWithRequestCallback: (shouldStart: boolean, url: string, lockIdentifier?: number | undefined) => void;
-  // CLK: support for takeSnapshot and createWebArchive
+  // CLK: support for createSnapshot and createWebArchive
   onSnapshotCreatedProp?: (event: WebViewSnapshotEvent) => void;
   onWebArchiveCreatedProp?: (event: WebViewWebArchiveEvent) => void;
   // CLK
@@ -254,7 +254,7 @@ export const useWebViewLogic = ({
     viewState,
     setViewState,
     lastErrorEvent,
-    // CLK: support for takeSnapshot and createWebArchive
+    // CLK: support for createSnapshot and createWebArchive
     onSnapshotCreated,
     onWebArchiveCreated
     // CLK

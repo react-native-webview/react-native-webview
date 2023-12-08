@@ -1593,14 +1593,14 @@ didFinishNavigation:(WKNavigation *)navigation
   [self removeData:dataTypes];
 }
 
-// CLK: takeSnapshot changes
-- (void)takeSnapshot:(NSString *)filename
+// CLK: createSnapshot changes
+- (void)createSnapshot:(NSString *)filename
 {
   if (@available(iOS 11.0, *)) {
     if (_webView == nil) {
         return;
     }    
-    [_webView takeSnapshotWithConfiguration:nil completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
+    [_webView createSnapshotWithConfiguration:nil completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
       if (snapshotImage != nil) {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];

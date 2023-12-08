@@ -135,7 +135,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
     clearCache: (includeDiskFiles: boolean) => webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
-    takeSnapshot: (filename: string) => webViewRef.current && Commands.takeSnapshot(webViewRef.current, filename),
+    createSnapshot: (filename: string) => webViewRef.current && Commands.createSnapshot(webViewRef.current, filename),
     createWebArchive: (filename: string) => webViewRef.current && Commands.createWebArchive(webViewRef.current, filename),
   }), [setViewState, webViewRef]);
   // CLK

@@ -271,13 +271,13 @@ export interface NativeCommands {
   clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   // !Android Only
   // iOS Only
-  takeSnapshot: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => void;
+  createSnapshot: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => void;
   createWebArchive: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => void;
   // !iOS Only
 }
 
 export const Commands = codegenNativeCommands<NativeCommands>({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl', 'clearFormData', 'clearCache', 'clearHistory', 'takeSnapshot', 'createWebArchive'],
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl', 'clearFormData', 'clearCache', 'clearHistory', 'createSnapshot', 'createWebArchive'],
 });
 
 export default codegenNativeComponent<NativeProps>(

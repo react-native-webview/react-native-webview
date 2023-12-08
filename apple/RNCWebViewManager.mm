@@ -227,14 +227,14 @@ RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart
 
 // Can't use RCTResponseSenderBlock or RCTPromiseResolveBlock because of https://github.com/facebook/react-native/issues/30587
 
-RCT_EXPORT_METHOD(takeSnapshot:(nonnull NSNumber *)reactTag filename:(NSString *)filename)
+RCT_EXPORT_METHOD(createSnapshot:(nonnull NSNumber *)reactTag filename:(NSString *)filename)
 {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, BASE_VIEW_PER_OS() *> *viewRegistry) {
         RNCWebViewImpl *view = viewRegistry[reactTag];
         if (![view isKindOfClass:[RNCWebViewImpl class]]) {
             RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
         } else {
-            [view takeSnapshot:filename];
+            [view createSnapshot:filename];
         }
     }];
 }

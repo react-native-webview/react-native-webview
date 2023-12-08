@@ -57,7 +57,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 @property (nonatomic, copy) RCTDirectEventBlock onOpenWindow;
-// CLK: Added events to support takeSnapshot and createWebArchive
+// CLK: Added events to support createSnapshot and createWebArchive
 @property (nonatomic, copy) RCTDirectEventBlock onSnapshotCreated;
 @property (nonatomic, copy) RCTDirectEventBlock onWebArchiveCreated;
 // CLK
@@ -141,7 +141,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)stopLoading;
 - (void)requestFocus;
 - (void)clearCache:(BOOL)includeDiskFiles;
-- (void)takeSnapshot:(NSString *)filename;
+- (void)createSnapshot:(NSString *)filename;
 - (void)createWebArchive:(NSString *)filename;
 #ifdef RCT_NEW_ARCH_ENABLED
 - (void)destroyWebView;

@@ -25,8 +25,8 @@ type WebViewCommands =
   | 'clearCache';
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearFormData';
-// CLK: supporting takeSnapshot and createWebArchive
-type IOSWebViewCommands = 'takeSnapshot' | 'createWebArchive';
+// CLK: supporting createSnapshot and createWebArchive
+type IOSWebViewCommands = 'createSnapshot' | 'createWebArchive';
 // CLK
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
@@ -744,7 +744,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   /**
      * Function that is invoked after a snapshot has been created.
      * 
-     * This happens when the JS calls `takeSnapshot('foo.png')`
+     * This happens when the JS calls `createSnapshot('foo.png')`
      *
      * @platform ios
      */
