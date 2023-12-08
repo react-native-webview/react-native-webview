@@ -70,7 +70,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
   onOpenWindow: onOpenWindowProp,
-  // CLK: support for takeSnapshow and createWebArchive
+  // CLK: support for createSnapshot and createWebArchive
   onSnapshotCreated: onSnapshotCreatedProp,
   onWebArchiveCreated: onWebArchiveCreatedProp,
   // CLK
@@ -99,7 +99,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
   }, []);
 
-  // CLK: support for takeSnapshow and createWebArchive
+  // CLK: support for createSnapshot and createWebArchive
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onContentProcessDidTerminate, onSnapshotCreated, onWebArchiveCreated } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
@@ -219,7 +219,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       style={webViewStyles}
       hasOnFileDownload={!!onFileDownload}
       ref={webViewRef}
-      // CLK: support for takeSnapshow and createWebArchive
+      // CLK: support for createSnapshot and createWebArchive
       // @ts-expect-error old arch only
       onSnapshotCreated={onSnapshotCreatedProp && onSnapshotCreated}
       onWebArchiveCreated={onWebArchiveCreatedProp && onWebArchiveCreated}
