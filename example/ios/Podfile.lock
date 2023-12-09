@@ -467,7 +467,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: a78a0e415dc4b786a4308becf3e3bc6dbbc7b92e
   React-jsinspector: ec4dcbfb1f4e72f04f826a0301eceee5fa7ca540
   React-logger: 35538accacf2583693fbc3ee8b53e69a1776fcee
-  react-native-webview: fd13868c7d24c7c24f58e590e746ae5543e6a6d8
+  react-native-webview: 79e4578a34d0dec71a31c4008496ebd50e56379c
   React-perflogger: 75b0e25075c67565a830985f3c373e2eae5389e0
   React-RCTActionSheet: a0c3e916b327e297d124d9ebe8b0c721840ee04d
   React-RCTAnimation: 3da7025801d7bf0f8cfd94574d6278d5b82a8b88

@@ -74,7 +74,7 @@ export default class Snapshot extends Component<Props, State> {
 
   _onSnapShotCreated = ({nativeEvent: event} : { nativeEvent : WebViewSnapshotEvent}) => {
     const end = Date.now();
-    this.setState({ text: "Snapshot " + (end - this.state.start) + "ms, filepath: " + event.NativeEvent.filepath });
+    this.setState({ text: "Snapshot " + (end - this.state.start) + "ms, filepath: " + event.filepath });
   }
 
   render() {
