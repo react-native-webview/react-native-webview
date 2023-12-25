@@ -253,6 +253,7 @@ RCTAutoInsetsProtocol>
 }
 
 #if USE_EDITMENU_IOS_16
+// Override the method startLongPress
 - (void)startLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
       UIEditMenuConfiguration *configuration = [UIEditMenuConfiguration configurationWithIdentifier:@"webViewEdit" sourcePoint:[gestureRecognizer locationInView:self]];
