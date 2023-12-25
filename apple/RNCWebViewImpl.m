@@ -9,7 +9,13 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#define USE_EDITMENU_IOS_16 defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 && defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= 160000 
 #if !TARGET_OS_OSX
+#if USE_EDITMENU_IOS_16
+#import <UIKit/UIEditMenuInteraction.h>
+#import <UIKit/UIMenu.h>
+#import <UIKit/UIAction.h>
+#endif // USE_EDITMENU_IOS_16
 #import <UIKit/UIKit.h>
 #else
 #import <React/RCTUIKit.h>
@@ -96,6 +102,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 - (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AVAILABLE(ios(13.0))  {
     if (@available(iOS 16.0, *)) {
       if(self.menuItems){
+        if (@available(iOS 17.0, *)) [builder removeMenuForIdentifier:UIMenuAutoFill];
         [builder removeMenuForIdentifier:UIMenuLookup];
       }
     }
@@ -116,6 +123,9 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 @interface RNCWebViewImpl () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, WKHTTPCookieStoreObserver,
 #if !TARGET_OS_OSX
+#if USE_EDITMENU_IOS_16
+UIEditMenuInteractionDelegate,
+#endif // USE_EDITMENU_IOS_16
 UIScrollViewDelegate,
 #endif // !TARGET_OS_OSX
 RCTAutoInsetsProtocol>
@@ -124,6 +134,9 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *postMessageScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
+#if !TARGET_OS_OSX && USE_EDITMENU_IOS_16
+@property (strong, nonatomic) UIEditMenuInteraction *editMenuInteraction;
+#endif // !TARGET_OS_OSX && USE_EDITMENU_IOS_16
 @end
 
 @implementation RNCWebViewImpl
@@ -239,6 +252,36 @@ RCTAutoInsetsProtocol>
   }
 }
 
+#if USE_EDITMENU_IOS_16
+- (void)startLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+      UIEditMenuConfiguration *configuration = [UIEditMenuConfiguration configurationWithIdentifier:@"webViewEdit" sourcePoint:[gestureRecognizer locationInView:self]];
+      [self.editMenuInteraction presentEditMenuWithConfiguration:configuration];
+    }
+}
+
+- (UIMenu *)editMenuInteraction:(UIEditMenuInteraction *)interaction menuForConfiguration:(UIEditMenuConfiguration *)configuration suggestedActions:(NSArray<UIMenuElement *> *)suggestedActions {
+  NSMutableArray *actions = [suggestedActions mutableCopy];
+  NSMutableArray *customMenuActions = [NSMutableArray arrayWithCapacity:self.menuItems.count];
+
+    for(NSDictionary *menuItem in self.menuItems) {
+      NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
+      NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
+      UIAction *item = [UIAction actionWithTitle:menuItemLabel image:nil identifier:nil handler:^(UIAction *action) {
+          [self tappedMenuItem:menuItemKey];
+      }];
+      [customMenuActions addObject: item];
+    }
+    UIMenu *customMenu2 = [UIMenu menuWithChildren:customMenuActions];
+
+  // [actions addObject:customMenu];
+
+  if (@available(iOS 16.0, *)) {
+      return [UIMenu menuWithChildren:customMenu2.children];
+  }
+  return [UIMenu menuWithChildren:actions];
+}
+#else
 // Listener for long presses
 - (void)startLongPress:(UILongPressGestureRecognizer *)pressSender
 {
@@ -268,6 +311,7 @@ RCTAutoInsetsProtocol>
     [menuController setMenuVisible:YES animated:YES];
 }
 
+#endif
 #endif // !TARGET_OS_OSX
 
 - (void)dealloc
