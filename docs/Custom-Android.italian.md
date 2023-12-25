@@ -5,7 +5,7 @@ Prima di procedere, è consigliabile avere un'idea di base  dei concetti legati 
 ## Codice nativo
 Per iniziare, dovrai creare una sottoclasse di `RNCWebViewManager`, `RNCWebView` e `RNCWebViewClient`. Poi, nel gestore della view, sovrascrivi i seguenti metodi:
 
-- `createReactWebViewInstance`
+- `createViewInstance`
 - `getName`
 - `addEventEmitters`
 
@@ -34,8 +34,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   }
 
   @Override
-  protected void addEventEmitters(ThemedReactContext reactContext, RNCWebView view) {
-    view.setWebViewClient(new CustomWebViewClient());
+  protected void addEventEmitters(ThemedReactContext reactContext, RNCWebViewWrapper view) {
+    view.getWebView().setWebViewClient(new CustomWebViewClient());
   }
 }
 ```
@@ -68,8 +68,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   ...
 
   @ReactProp(name = "finalUrl")
-  public void setFinalUrl(WebView view, String url) {
-    ((CustomWebView) view).setFinalUrl(url);
+  public void setFinalUrl(RNCWebViewWrapper view, String url) {
+    ((CustomWebView) view.getWebView()).setFinalUrl(url);
   }
 }
 ```
