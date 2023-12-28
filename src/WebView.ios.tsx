@@ -2,35 +2,29 @@ import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'rea
 import {
   Image,
   View,
-  NativeModules,
   ImageSourcePropType,
+  HostComponent,
 } from 'react-native';
 import invariant from 'invariant';
 
-// @ts-expect-error react-native doesn't have this type
-import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import RNCWebView from "./WebViewNativeComponent.ios";
+import RNCWebView, {Commands, NativeProps} from "./RNCWebViewNativeComponent";
+import RNCWebViewModule from "./NativeRNCWebView";
+
 import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
-  useWebWiewLogic,
+  useWebViewLogic,
 } from './WebViewShared';
 import {
   IOSWebViewProps,
   DecelerationRateConstant,
-  NativeWebViewIOS,
-  ViewManager,
+  WebViewSourceUri,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
 
-const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
-
-const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
-});
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -45,8 +39,6 @@ const processDecelerationRate = (
   return newDecelerationRate;
 };
 
-const RNCWebViewManager = NativeModules.RNCWebViewManager as ViewManager;
-
 const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
   const ref = useRef(value);
   if (ref.current !== value) {
@@ -56,6 +48,7 @@ const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
 }
 
 const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
+  fraudulentWebsiteWarningEnabled = true,
   javaScriptEnabled = true,
   cacheEnabled = true,
   originWhitelist = defaultOriginWhitelist,
@@ -76,6 +69,11 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onFileDownload,
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
+  onOpenWindow: onOpenWindowProp,
+  // CLK: support for createSnapshot and createWebArchive
+  onSnapshotCreated: onSnapshotCreatedProp,
+  onWebArchiveCreated: onWebArchiveCreatedProp,
+  // CLK
   renderLoading,
   renderError,
   style,
@@ -91,21 +89,18 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
   ...otherProps
 }, ref) => {
-  const webViewRef = useRef<NativeWebViewIOS | null>(null);
+  const webViewRef = useRef<React.ComponentRef<HostComponent<NativeProps>> | null>(null);
 
   const onShouldStartLoadWithRequestCallback = useCallback((
     shouldStart: boolean,
     _url: string,
     lockIdentifier = 0,
   ) => {
-    const viewManager
-      = (nativeConfig?.viewManager)
-      || RNCWebViewManager;
+    RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
+  }, []);
 
-    viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
-  }, [nativeConfig?.viewManager]);
-
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebWiewLogic({
+  // CLK: support for createSnapshot and createWebArchive
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, onContentProcessDidTerminate, onSnapshotCreated, onWebArchiveCreated } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -114,27 +109,36 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     onLoadProgress,
     onLoadStart,
     onMessageProp,
+    onOpenWindowProp,
     startInLoadingState,
     originWhitelist,
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
     onContentProcessDidTerminateProp,
+    onSnapshotCreatedProp,
+    onWebArchiveCreatedProp
   });
 
   useImperativeHandle(ref, () => ({
-    goForward: () => Commands.goForward(webViewRef.current),
-    goBack: () => Commands.goBack(webViewRef.current),
+    goForward: () => webViewRef.current && Commands.goForward(webViewRef.current),
+    goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
     reload: () => {
       setViewState(
         'LOADING',
-      ); Commands.reload(webViewRef.current)
+      );
+      if (webViewRef.current) {
+        Commands.reload(webViewRef.current)
+      }
     },
-    stopLoading: () => Commands.stopLoading(webViewRef.current),
-    postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
-    injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
-    requestFocus: () => Commands.requestFocus(webViewRef.current),
+    stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
+    postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
+    injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
+    requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
+    clearCache: (includeDiskFiles: boolean) => webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
+    createSnapshot: (filename: string) => webViewRef.current && Commands.createSnapshot(webViewRef.current, filename),
+    createWebArchive: (filename: string, htmlOnly: boolean) => webViewRef.current && Commands.createWebArchive(webViewRef.current, filename, htmlOnly),
   }), [setViewState, webViewRef]);
-
+  // CLK
 
   useWarnIfChanges(allowsInlineMediaPlayback, 'allowsInlineMediaPlayback');
   useWarnIfChanges(allowsAirPlayForMediaPlayback, 'allowsAirPlayForMediaPlayback');
@@ -148,9 +152,9 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   } else if (viewState === 'ERROR') {
     invariant(lastErrorEvent != null, 'lastErrorEvent expected to be non-null');
     otherView = (renderError || defaultRenderError)(
-      lastErrorEvent.domain,
-      lastErrorEvent.code,
-      lastErrorEvent.description,
+      lastErrorEvent?.domain,
+      lastErrorEvent?.code ?? 0,
+      lastErrorEvent?.description ?? '',
     );
   } else if (viewState !== 'IDLE') {
     console.error(`RNCWebView invalid state encountered: ${viewState}`);
@@ -162,19 +166,35 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   const decelerationRate = processDecelerationRate(decelerationRateProp);
 
   const NativeWebView
-  = (nativeConfig?.component as typeof NativeWebViewIOS | undefined)
+  = (nativeConfig?.component as typeof RNCWebView | undefined)
   || RNCWebView;
+
+  const sourceResolved = resolveAssetSource(source as ImageSourcePropType)
+  const newSource = typeof sourceResolved === "object" ? Object.entries(sourceResolved as WebViewSourceUri).reduce((prev, [currKey, currValue]) => {
+    return {
+      ...prev,
+      [currKey]: currKey === "headers" && currValue && typeof currValue === "object" ? Object.entries(currValue).map(
+        ([key, value]) => {
+          return {
+            name: key,
+            value
+          }
+        }) : currValue
+    }
+  }, {}) : sourceResolved
 
   const webView = (
     <NativeWebView
       key="webViewKey"
       {...otherProps}
+      fraudulentWebsiteWarningEnabled={fraudulentWebsiteWarningEnabled}
       javaScriptEnabled={javaScriptEnabled}
       cacheEnabled={cacheEnabled}
       useSharedProcessPool={useSharedProcessPool}
       textInteractionEnabled={textInteractionEnabled}
       decelerationRate={decelerationRate}
-      messagingEnabled={typeof onMessage === 'function'}
+      messagingEnabled={typeof onMessageProp === 'function'}
+      messagingModuleName="" // android ONLY
       onLoadingError={onLoadingError}
       onLoadingFinish={onLoadingFinish}
       onLoadingProgress={onLoadingProgress}
@@ -182,21 +202,29 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       onLoadingStart={onLoadingStart}
       onHttpError={onHttpError}
       onMessage={onMessage}
+      onOpenWindow={onOpenWindowProp && onOpenWindow}
+      hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
       onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
       onContentProcessDidTerminate={onContentProcessDidTerminate}
       injectedJavaScript={injectedJavaScript}
       injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
       injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
       injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
-      dataDetectorTypes={dataDetectorTypes}
+      dataDetectorTypes={!dataDetectorTypes || Array.isArray(dataDetectorTypes) ? dataDetectorTypes : [dataDetectorTypes]}
       allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
       allowsInlineMediaPlayback={allowsInlineMediaPlayback}
       incognito={incognito}
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
-      ref={webViewRef}
-      // TODO: find a better way to type this.
-      source={resolveAssetSource(source as ImageSourcePropType)}
+      newSource={newSource}
       style={webViewStyles}
+      hasOnFileDownload={!!onFileDownload}
+      ref={webViewRef}
+      // CLK: support for createSnapshot and createWebArchive
+      // @ts-expect-error old arch only
+      onSnapshotCreated={onSnapshotCreatedProp && onSnapshotCreated}
+      onWebArchiveCreated={onWebArchiveCreatedProp && onWebArchiveCreated}
+      // CLK
+      source={sourceResolved}
       {...nativeConfig?.props}
     />
   );

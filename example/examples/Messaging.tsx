@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Alert} from 'react-native';
+import {View, Alert, TextInput} from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -21,13 +21,20 @@ const HTML = `<!DOCTYPE html>\n
   <body>
     <button onclick="sendPostMessage()">Send post message from JS to WebView</button>
     <p id="demo"></p>    
+    <p id="test">Nothing received yet</p>
+
     <script>
       function sendPostMessage() {
         window.ReactNativeWebView.postMessage('Message from JS');
       }
 
       window.addEventListener('message',function(event){
-        console.log("Message received from RN: ",event.data)
+        document.getElementById('test').innerHTML = event.data;
+        console.log("Message received from RN: ",event.data);
+      },false);
+      document.addEventListener('message',function(event){
+        document.getElementById('test').innerHTML = event.data;
+        console.log("Message received from RN: ",event.data);
       },false);
 
     </script>
@@ -48,6 +55,9 @@ export default class Messaging extends Component<Props, State> {
   render() {
     return (
       <View style={{height: 120}}>
+        <TextInput onSubmitEditing={(e) => {
+          this.webView.current.postMessage(e.nativeEvent.text);
+        }}/>
         <WebView
           ref={this.webView}
           source={{html: HTML}}

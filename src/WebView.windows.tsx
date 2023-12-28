@@ -17,19 +17,16 @@ import {
   ImageSourcePropType,
   NativeModules,
 } from 'react-native';
-// @ts-expect-error react-native doesn't have this type
-import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import invariant from 'invariant';
 import {RCTWebView, RCTWebView2} from "./WebViewNativeComponent.windows";
-import { useWebWiewLogic, defaultOriginWhitelist, defaultRenderError, defaultRenderLoading, } from './WebViewShared';
+import { useWebViewLogic, defaultOriginWhitelist, defaultRenderError, defaultRenderLoading, } from './WebViewShared';
 import {
   NativeWebViewWindows,
   WindowsWebViewProps,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
-
-const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
   supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
@@ -59,7 +56,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   ...otherProps
 }, ref) => {
   const webViewRef = useRef<NativeWebViewWindows | null>(null);
-  
+
   const RCTWebViewString = useWebView2 ? 'RCTWebView2' : 'RCTWebView';
 
   const onShouldStartLoadWithRequestCallback = useCallback((shouldStart: boolean, url: string, lockIdentifier?: number) => {
@@ -74,7 +71,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     }
   }, [RCTWebViewString]);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebWiewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -126,7 +123,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    messagingEnabled={typeof onMessage === 'function'}
+    messagingEnabled={typeof onMessageProp === 'function'}
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}
     onLoadingProgress={onLoadingProgress}

@@ -10,8 +10,13 @@ import {
   WebViewMessageEvent,
   WebViewNavigation,
   WebViewNavigationEvent,
+  WebViewOpenWindowEvent,
   WebViewProgressEvent,
   WebViewRenderProcessGoneEvent,
+  // CLK: support for Snapshot and Webarchive
+  WebViewSnapshotEvent,
+  WebViewWebArchiveEvent,
+  // CLK
   WebViewTerminatedEvent,
 } from './WebViewTypes';
 import styles from './WebView.styles';
@@ -96,7 +101,7 @@ export {
   defaultRenderError,
 };
 
-export const useWebWiewLogic = ({
+export const useWebViewLogic = ({
   startInLoadingState,
   onNavigationStateChange,
   onLoadStart,
@@ -106,11 +111,16 @@ export const useWebWiewLogic = ({
   onError,
   onHttpErrorProp,
   onMessageProp,
+  onOpenWindowProp,
   onRenderProcessGoneProp,
   onContentProcessDidTerminateProp,
   originWhitelist,
   onShouldStartLoadWithRequestProp,
   onShouldStartLoadWithRequestCallback,
+  // CLK: support for Snapshot and Webarchive
+  onSnapshotCreatedProp,
+  onWebArchiveCreatedProp,
+  // CLK
 }: {
   startInLoadingState?: boolean
   onNavigationStateChange?: (event: WebViewNavigation) => void;
@@ -121,11 +131,16 @@ export const useWebWiewLogic = ({
   onError?: (event: WebViewErrorEvent) => void;
   onHttpErrorProp?: (event: WebViewHttpErrorEvent) => void;
   onMessageProp?: (event: WebViewMessageEvent) => void;
+  onOpenWindowProp?: (event: WebViewOpenWindowEvent) => void;
   onRenderProcessGoneProp?: (event: WebViewRenderProcessGoneEvent) => void;
   onContentProcessDidTerminateProp?: (event: WebViewTerminatedEvent) => void;
   originWhitelist: readonly string[];
   onShouldStartLoadWithRequestProp?: OnShouldStartLoadWithRequest;
   onShouldStartLoadWithRequestCallback: (shouldStart: boolean, url: string, lockIdentifier?: number | undefined) => void;
+  // CLK: support for createSnapshot and createWebArchive
+  onSnapshotCreatedProp?: (event: WebViewSnapshotEvent) => void;
+  onWebArchiveCreatedProp?: (event: WebViewWebArchiveEvent) => void;
+  // CLK
 }) => {
 
   const [viewState, setViewState] = useState<'IDLE' | 'LOADING' | 'ERROR'>(startInLoadingState ? "LOADING" : "IDLE");
@@ -208,6 +223,23 @@ export const useWebWiewLogic = ({
     )
   , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
 
+  // Android and iOS Only
+  const onOpenWindow = useCallback((event: WebViewOpenWindowEvent) => {
+    onOpenWindowProp?.(event);
+  }, [onOpenWindowProp]);
+  // !Android and iOS Only
+
+  // CLK: OnSnapshotCreated and OnWebArchiveCreated
+  const onSnapshotCreated = useCallback((event: WebViewSnapshotEvent) => {
+    onSnapshotCreatedProp?.(event);
+  }, [onSnapshotCreatedProp]);
+
+  const onWebArchiveCreated = useCallback((event: WebViewWebArchiveEvent) => {
+    onWebArchiveCreatedProp?.(event);
+  }, [onWebArchiveCreatedProp]);
+
+  // CLK
+
   return {
     onShouldStartLoadWithRequest,
     onLoadingStart,
@@ -218,8 +250,13 @@ export const useWebWiewLogic = ({
     onRenderProcessGone,
     onContentProcessDidTerminate,
     onMessage,
+    onOpenWindow,
     viewState,
     setViewState,
     lastErrorEvent,
+    // CLK: support for createSnapshot and createWebArchive
+    onSnapshotCreated,
+    onWebArchiveCreated
+    // CLK
   }
 };
