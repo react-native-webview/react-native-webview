@@ -1630,6 +1630,19 @@ didFinishNavigation:(WKNavigation *)navigation
         NSString *cachesDirectory = [paths objectAtIndex:0];
         NSString *filePath = [cachesDirectory stringByAppendingPathComponent:filename];        
         [webArchiveData writeToFile:filePath atomically:YES];
+        
+        // Strip out all but the main HTML file from the web archive to making uploading faster
+        // TODO: make this optional via an argument
+        NSMutableDictionary *plistDic = [[NSMutableDictionary alloc] initWithContentsOfFile:filePath];
+        NSArray *keys = [plistDic allKeys];
+        for(NSString *key in keys) {
+            if(![key  isEqual: @"WebMainResource"]) {
+                [plistDic removeObjectForKey:key];
+            }
+        }
+        [plistDic writeToFile:filePath atomically:YES];
+
+          
         NSMutableDictionary<NSString *, id> *webArchiveEvent = [self baseEvent];
         [webArchiveEvent addEntriesFromDictionary: @{
           @"filepath": filePath,
