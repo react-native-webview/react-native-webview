@@ -272,7 +272,7 @@ export interface NativeCommands {
   // !Android Only
   // iOS Only
   createSnapshot: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => void;
-  createWebArchive: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => void;
+  createWebArchive: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string, htmlOnly: boolean) => void;
   // !iOS Only
 }
 

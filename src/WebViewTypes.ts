@@ -753,7 +753,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   /**
      * Function that is invoked after a web archive has been created.
      * 
-     * This happens when the JS calls `createWebArchive('foo.webarchive')`
+     * This happens when the JS calls `createWebArchive('foo.webarchive', true)`
      *
      * @platform ios
      */

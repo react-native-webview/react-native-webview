@@ -69,8 +69,9 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     /**
      * (iOS only)
      * Creates a web archive (webarchive) file from the current page and saves it to a file.
+     * If htmlOnly is set to true, save only the html document (no external resources like images etc.)
      */
-    createWebArchive: (filename: string) => void;
+    createWebArchive: (filename: string, htmlOnly: boolean) => void;
 }
 
 export {WebView};

@@ -1618,7 +1618,7 @@ didFinishNavigation:(WKNavigation *)navigation
   }
 }
 
-- (void)createWebArchive:(NSString *)filename
+- (void)createWebArchive:(NSString *)filename htmlOnly:(BOOL)htmlOnly
 {
   if (@available(iOS 14.0, *)) {
     if (_webView == nil) {
@@ -1632,15 +1632,16 @@ didFinishNavigation:(WKNavigation *)navigation
         [webArchiveData writeToFile:filePath atomically:YES];
         
         // Strip out all but the main HTML file from the web archive to making uploading faster
-        // TODO: make this optional via an argument
-        NSMutableDictionary *plistDic = [[NSMutableDictionary alloc] initWithContentsOfFile:filePath];
-        NSArray *keys = [plistDic allKeys];
-        for(NSString *key in keys) {
-            if(![key  isEqual: @"WebMainResource"]) {
-                [plistDic removeObjectForKey:key];
-            }
+        if(htmlOnly) {
+          NSMutableDictionary *plistDic = [[NSMutableDictionary alloc] initWithContentsOfFile:filePath];
+          NSArray *keys = [plistDic allKeys];
+          for(NSString *key in keys) {
+              if(![key  isEqual: @"WebMainResource"]) {
+                  [plistDic removeObjectForKey:key];
+              }
+          }
+          [plistDic writeToFile:filePath atomically:YES];
         }
-        [plistDic writeToFile:filePath atomically:YES];
 
           
         NSMutableDictionary<NSString *, id> *webArchiveEvent = [self baseEvent];

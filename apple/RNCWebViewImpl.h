@@ -142,7 +142,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)requestFocus;
 - (void)clearCache:(BOOL)includeDiskFiles;
 - (void)createSnapshot:(NSString *)filename;
-- (void)createWebArchive:(NSString *)filename;
+- (void)createWebArchive:(NSString *)filename htmlOnly:(BOOL)htmlOnly;
 #ifdef RCT_NEW_ARCH_ENABLED
 - (void)destroyWebView;
 #endif

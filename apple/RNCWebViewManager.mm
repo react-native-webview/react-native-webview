@@ -239,14 +239,14 @@ RCT_EXPORT_METHOD(createSnapshot:(nonnull NSNumber *)reactTag filename:(NSString
     }];
 }
 
-RCT_EXPORT_METHOD(createWebArchive:(nonnull NSNumber *)reactTag filename:(NSString *)filename)
+RCT_EXPORT_METHOD(createWebArchive:(nonnull NSNumber *)reactTag filename:(NSString *)filename htmlOnly:(BOOL)htmlOnly)
 {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, BASE_VIEW_PER_OS() *> *viewRegistry) {
         RNCWebViewImpl *view = viewRegistry[reactTag];
         if (![view isKindOfClass:[RNCWebViewImpl class]]) {
             RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
         } else {
-            [view createWebArchive:filename];
+            [view createWebArchive:filename htmlOnly:htmlOnly];
         }
     }];
 }
