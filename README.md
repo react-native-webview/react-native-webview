@@ -5,7 +5,7 @@
 [![NPM Version](https://img.shields.io/npm/v/react-native-webview.svg?style=flat-square)](https://www.npmjs.com/package/react-native-webview)
 ![Npm Downloads](https://img.shields.io/npm/dm/react-native-webview.svg)
 
-**React Native WebView** is a community maintained WebView component for React Native. It is intended to be a replacement for the built-in WebView (which was [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
+**React Native WebView** is a community-maintained WebView component for React Native. It is intended to be a replacement for the built-in WebView (which was [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
 ### Maintainers
 
@@ -24,15 +24,15 @@ Shout-out to [Jamon Holmgren](https://github.com/jamonholmgren) from [Infinite R
 
 ### Disclaimer
 
-Maintaining WebView is very complex, because it is often used for many different usecases (rendering svgs, pdfs, login flows, and much more). We also support many platforms and both architecture of react-native.
+Maintaining WebView is very complex because it is often used for many different use cases (rendering SVGs, PDFs, login flows, and much more). We also support many platforms and both architectures of react-native.
 
-Since WebView was extracted from React Native core, nearly 500 pull requests have been merged.  
+Since WebView was extracted from the React Native core, nearly 500 pull requests have been merged.  
 Considering that we have limited time, issues will mostly serve as a discussion place for the community, while **we will prioritize reviewing and merging pull requests.** 
 
 ### Platform compatibility
 
 This project is compatible with **iOS**,  **Android**, **Windows** and **macOS**.  
-This project support both **the old** (paper) **and the new architecture** (fabric).  
+This project supports both **the old** (paper) **and the new architecture** (fabric).  
 This project is compatible with [expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
 ### Getting Started
