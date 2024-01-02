@@ -25,6 +25,9 @@ export type WebViewMessageEvent = Readonly<{
   lockIdentifier: Double;
   data: string;
 }>
+export type WebViewOpenWindowEvent = Readonly<{
+  targetUrl: string;
+}>
 export type WebViewHttpErrorEvent = Readonly<{
   url: string;
   loading: boolean;
@@ -162,6 +165,7 @@ export interface NativeProps extends ViewProps {
   thirdPartyCookiesEnabled?: boolean;
   // Workaround to watch if listener if defined
   hasOnScroll?: boolean;
+  injectedJavaScriptObject?: string;
   // !Android only
 
   // iOS only
@@ -204,6 +208,7 @@ export interface NativeProps extends ViewProps {
   onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
   // eslint-disable-next-line @typescript-eslint/array-type
   menuItems?: ReadonlyArray<Readonly<{label: string, key: string}>>;
+  suppressMenuItems?: Readonly<string>[];
   // Workaround to watch if listener if defined
   hasOnFileDownload?: boolean;
   fraudulentWebsiteWarningEnabled?: boolean;
@@ -233,6 +238,8 @@ export interface NativeProps extends ViewProps {
   onLoadingStart: DirectEventHandler<WebViewNavigationEvent>;
   onHttpError: DirectEventHandler<WebViewHttpErrorEvent>;
   onMessage: DirectEventHandler<WebViewMessageEvent>;
+  onOpenWindow?: DirectEventHandler<WebViewOpenWindowEvent>;
+  hasOnOpenWindowEvent?: boolean;
   onScroll?: DirectEventHandler<ScrollEvent>;
   onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
   showsHorizontalScrollIndicator?: boolean;
