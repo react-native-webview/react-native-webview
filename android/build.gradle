@@ -108,13 +108,3 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
     implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
 }
-
-if (isNewArchitectureEnabled()) {
-    react {
-        jsRootDir = file("../src/")
-        libraryName = "rncwebview"
-        codegenJavaPackageName = "com.reactnativecommunity.webview"
-        codegenDir = new File(codegenPath)
-        reactNativeDir = new File(reactNativePath)
-    }
-}
