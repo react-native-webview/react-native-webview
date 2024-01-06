@@ -1210,7 +1210,7 @@ Define se a WebView deve desabilitar o salvamento de dados de formulário. O val
 
 ### `cacheEnabled`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
-Define seao WebView deve usar o cache do navegador.
+Define se a WebView deve usar o cache do navegador.
 
 | Tipo    | Requerido | Padrão | Plataforma           |
 | ------- | --------- | ------- | ------------------- |
