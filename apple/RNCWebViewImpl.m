@@ -75,7 +75,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
       @"toggleUnderline:":   @"underline",
       @"_share:":            @"share",
   };
-    
+
   return map[sel] ?: sel;
 }
 
@@ -87,7 +87,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
           return NO;
       }
   }
-  
+
   if (!self.menuItems) {
       return [super canPerformAction:action withSender:sender];
   }
@@ -1289,7 +1289,8 @@ RCTAutoInsetsProtocol>
                 }
 
                 // Allow all navigation by default
-                decisionHandler(WKNavigationActionPolicyAllow);
+                // SED Except for universal app links: https://github.com/WebKit/WebKit/blob/5919cb323ca10a52b6c40b8ce2d408d3a3c956a2/Source/WebKit/UIProcess/API/Cocoa/WKNavigation
+                decisionHandler(WKNavigationActionPolicyAllow +2);
             });
 
         }];
@@ -1599,12 +1600,12 @@ didFinishNavigation:(WKNavigation *)navigation
   if (@available(iOS 11.0, *)) {
     if (_webView == nil) {
         return;
-    }    
+    }
     [_webView takeSnapshotWithConfiguration:nil completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
       if (snapshotImage != nil) {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         NSString *cachesDirectory = [paths objectAtIndex:0];
-        NSString *filePath = [cachesDirectory stringByAppendingPathComponent:filename];        
+        NSString *filePath = [cachesDirectory stringByAppendingPathComponent:filename];
         [UIImagePNGRepresentation(snapshotImage) writeToFile:filePath atomically:YES];
         NSMutableDictionary<NSString *, id> *snapshotEvent = [self baseEvent];
         [snapshotEvent addEntriesFromDictionary: @{
@@ -1623,14 +1624,14 @@ didFinishNavigation:(WKNavigation *)navigation
   if (@available(iOS 14.0, *)) {
     if (_webView == nil) {
         return;
-    }    
+    }
     [_webView createWebArchiveDataWithCompletionHandler:^(NSData * _Nullable webArchiveData, NSError * _Nullable error) {
       if (webArchiveData != nil) {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         NSString *cachesDirectory = [paths objectAtIndex:0];
-        NSString *filePath = [cachesDirectory stringByAppendingPathComponent:filename];        
+        NSString *filePath = [cachesDirectory stringByAppendingPathComponent:filename];
         [webArchiveData writeToFile:filePath atomically:YES];
-        
+
         // Strip out all but the main HTML file from the web archive to making uploading faster
         if(htmlOnly) {
           NSMutableDictionary *plistDic = [[NSMutableDictionary alloc] initWithContentsOfFile:filePath];
@@ -1643,7 +1644,7 @@ didFinishNavigation:(WKNavigation *)navigation
           [plistDic writeToFile:filePath atomically:YES];
         }
 
-          
+
         NSMutableDictionary<NSString *, id> *webArchiveEvent = [self baseEvent];
         [webArchiveEvent addEntriesFromDictionary: @{
           @"filepath": filePath,
