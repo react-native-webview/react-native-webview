@@ -284,9 +284,10 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(cacheEnabled)
     REMAP_WEBVIEW_PROP(allowsLinkPreview)
     REMAP_WEBVIEW_STRING_PROP(allowingReadAccessToURL)
-    
     REMAP_WEBVIEW_PROP(messagingEnabled)
+    #if !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(fraudulentWebsiteWarningEnabled)
+    #endif // !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(enableApplePay)
     REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
     REMAP_WEBVIEW_PROP(bounces)
@@ -310,7 +311,8 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* iOS 14.5 */
     REMAP_WEBVIEW_PROP(textInteractionEnabled)
 #endif
-    
+
+#if !TARGET_OS_OSX
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
         WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
             if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
@@ -334,6 +336,8 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }
         [_view setDataDetectorTypes:dataDetectorTypes];
     }
+#endif // !TARGET_OS_OSX
+
     if (oldViewProps.contentInset.top != newViewProps.contentInset.top || oldViewProps.contentInset.left != newViewProps.contentInset.left || oldViewProps.contentInset.right != newViewProps.contentInset.right || oldViewProps.contentInset.bottom != newViewProps.contentInset.bottom) {
         UIEdgeInsets edgesInsets = {
             .top = newViewProps.contentInset.top,
@@ -350,6 +354,8 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             @"password": RCTNSStringFromString(newViewProps.basicAuthCredential.password)
         }];
     }
+
+#if !TARGET_OS_OSX
     if (oldViewProps.contentInsetAdjustmentBehavior != newViewProps.contentInsetAdjustmentBehavior) {
         if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Never) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
@@ -361,6 +367,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAlways];
         }
     }
+#endif // !TARGET_OS_OSX
 
     if (oldViewProps.menuItems != newViewProps.menuItems) {
         NSMutableArray *newMenuItems = [NSMutableArray array];
