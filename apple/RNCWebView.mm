@@ -173,7 +173,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
                     .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
                     .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
-                    .loading = std::([[dictionary valueForKey:@"loading"] boolValue])
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue])
                 };
                 webViewEventEmitter->onContentProcessDidTerminate(data);
             }
