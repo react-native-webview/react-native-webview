@@ -512,6 +512,10 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
     [_view stopLoading];
 }
 
+- (void)saveWebArchive:(nonnull NSString *)filename {
+    [_view saveWebArchive:data];
+}
+
 - (void)clearFormData {
     // android only
 }
