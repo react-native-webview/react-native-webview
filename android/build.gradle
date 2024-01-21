@@ -58,6 +58,9 @@ apply plugin: 'kotlin-android'
 android {
     if (supportsNamespace()) {
         namespace "com.reactnativecommunity.webview"
+        buildFeatures {
+            buildConfig true
+        }
 
         sourceSets {
             main {
@@ -104,14 +107,4 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
     implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
-}
-
-if (isNewArchitectureEnabled()) {
-    react {
-        jsRootDir = file("../src/")
-        libraryName = "rncwebview"
-        codegenJavaPackageName = "com.reactnativecommunity.webview"
-        codegenDir = new File(codegenPath)
-        reactNativeDir = new File(reactNativePath)
-    }
 }
