@@ -24,6 +24,7 @@ type WebViewCommands =
   | 'requestFocus';
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
+type WindowsWebViewCommands = 'releaseFocus';
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (name: string) => {
@@ -36,7 +37,7 @@ export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<
 >;
 export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>;
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>;
-export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>;
+export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands | WindowsWebViewCommands>;
 
 type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
 

@@ -16,8 +16,6 @@ namespace winrt {
     using namespace Microsoft::UI::Xaml::Controls;
     using namespace Windows::Web::Http;
     using namespace Windows::Web::Http::Headers;
-    using namespace Microsoft::Web::WebView2::Core;
-    using namespace Windows::Storage::Streams;
 }
 
 namespace winrt::ReactNativeWebView::implementation {
@@ -48,6 +46,7 @@ namespace winrt::ReactNativeWebView::implementation {
         auto nativeProps = winrt::single_threaded_map<hstring, ViewManagerPropertyType>();
         nativeProps.Insert(L"source", ViewManagerPropertyType::Map);
         nativeProps.Insert(L"messagingEnabled", ViewManagerPropertyType::Boolean);
+        nativeProps.Insert(L"injectedJavaScript", ViewManagerPropertyType::String);
         return nativeProps.GetView();
     }
 
@@ -80,29 +79,9 @@ namespace winrt::ReactNativeWebView::implementation {
                     if (isPackagerAsset && uriString.find(file) == 0) {
                         auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
                         uriString.replace(0, std::size(file), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
-                    }
-
-                    if (uriString.find("ms-appdata://") == 0 || uriString.find("ms-appx-web://") == 0) {
-                        webView.Source(winrt::Uri(to_hstring(uriString)));
-                    }
-                    else {
-                        const auto hasHeaders = srcMap.find("headers") != srcMap.end();
-
-                        if (hasHeaders) {
-                            auto headers = winrt::single_threaded_map<winrt::hstring, winrt::hstring>();
-
-                            for (auto const& header : srcMap.at("headers").AsObject()) {
-                                auto const& headerKey = header.first;
-                                auto const& headerValue = header.second;
-                                headers.Insert(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
-                            }
-
-                            const auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
-                            reactWebView2.NavigateWithHeaders(to_hstring(uriString), headers.GetView());
-                        }
-                        else {
-                            webView.Source(winrt::Uri(to_hstring(uriString)));
-                        }
+                    } else {
+                        auto reactWebView2 = view.as<winrt::ReactNativeWebView::ReactWebView2>();
+                        reactWebView2.NavigateWithWebResourceRequest(MakeJSValueTreeReader(JSValue(srcMap.Copy())));
                     }
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
@@ -116,7 +95,13 @@ namespace winrt::ReactNativeWebView::implementation {
                 auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
                 reactWebView2.MessagingEnabled(messagingEnabled);
             }
-        }
+            else if (propertyName == "injectedJavaScript")
+            {
+                auto injectedJavascript = propertyValue.AsString();
+                auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
+                reactWebView2.InjectedJavascript(to_hstring(injectedJavascript));
+            }
+        }        
     }
 
     // IViewManagerWithExportedEventTypeConstants
@@ -126,10 +111,13 @@ namespace winrt::ReactNativeWebView::implementation {
 
     ConstantProviderDelegate ReactWebView2Manager::ExportedCustomDirectEventTypeConstants() noexcept {
         return [](winrt::IJSValueWriter const& constantWriter) {
+            WriteCustomDirectEventTypeConstant(constantWriter, "DOMContentLoaded");
             WriteCustomDirectEventTypeConstant(constantWriter, "LoadingStart");
             WriteCustomDirectEventTypeConstant(constantWriter, "LoadingFinish");
             WriteCustomDirectEventTypeConstant(constantWriter, "LoadingError");
             WriteCustomDirectEventTypeConstant(constantWriter, "Message");
+            WriteCustomDirectEventTypeConstant(constantWriter, "FrameNavigationStart");
+            WriteCustomDirectEventTypeConstant(constantWriter, "FrameNavigationFinish");
         };
     }
 
@@ -141,6 +129,7 @@ namespace winrt::ReactNativeWebView::implementation {
         commands.Append(L"reload");
         commands.Append(L"stopLoading");
         commands.Append(L"injectJavaScript");
+        commands.Append(L"requestFocus");
         return commands.GetView();
     }
 
@@ -171,6 +160,9 @@ namespace winrt::ReactNativeWebView::implementation {
         }
         else if (commandId == L"injectJavaScript") {
             webView.ExecuteScriptAsync(winrt::to_hstring(commandArgs[0].AsString()));
+        }
+        else if (commandId == L"requestFocus") {
+            FocusManager::TryFocusAsync(webView, FocusState::Programmatic);
         }
     }
 

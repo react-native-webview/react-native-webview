@@ -3,6 +3,8 @@ namespace ReactNativeWebView{
     runtimeclass ReactWebView : Windows.UI.Xaml.Controls.ContentPresenter{
         ReactWebView(Microsoft.ReactNative.IReactContext context);
         Boolean MessagingEnabled;
+        void SetInjectedJavascript(String payload);
+        void RequestFocus();
     };
 #if __has_include(<VersionMacros.h>)
 #include <VersionMacros.h>
@@ -15,7 +17,8 @@ namespace ReactNativeWebView{
     runtimeclass ReactWebView2 : Windows.UI.Xaml.Controls.ContentPresenter{
         ReactWebView2(Microsoft.ReactNative.IReactContext context);
         void NavigateToHtml(String html);
-        void NavigateWithHeaders(String uri, Windows.Foundation.Collections.IMapView<String, String> headers);
+        void NavigateWithWebResourceRequest(Microsoft.ReactNative.IJSValueReader request);
+        String InjectedJavascript;
         Boolean MessagingEnabled;
     };
 #endif

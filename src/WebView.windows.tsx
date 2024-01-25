@@ -29,7 +29,7 @@ import {
 import styles from './WebView.styles';
 
 const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'releaseFocus', 'postMessage', 'loadUrl'],
 });
 const { resolveAssetSource } = Image;
 
@@ -98,6 +98,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => Commands.requestFocus(webViewRef.current),
+    releaseFocus: () => Commands.releaseFocus(webViewRef.current),
   }), [setViewState, webViewRef]);
 
   let otherView = null;
