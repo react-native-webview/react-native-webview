@@ -117,6 +117,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @interface RNCWebViewImpl () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, WKHTTPCookieStoreObserver,
 #if !TARGET_OS_OSX
 UIScrollViewDelegate,
+UIGestureRecognizerDelegate,
 #endif // !TARGET_OS_OSX
 RCTAutoInsetsProtocol>
 
@@ -860,7 +861,7 @@ RCTAutoInsetsProtocol>
 
   if(subview == nil) return;
 
-  Class class = subview.class;
+  Class subviewClass = subview.class;
 
   NSOperatingSystemVersion iOS_11_3_0 = (NSOperatingSystemVersion){11, 3, 0};
   NSOperatingSystemVersion iOS_12_2_0 = (NSOperatingSystemVersion){12, 2, 0};
@@ -872,7 +873,7 @@ RCTAutoInsetsProtocol>
   if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_13_0_0]) {
     // iOS 13.0.0 - Future
     SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:activityStateChanges:userObject:");
-    method = class_getInstanceMethod(class, selector);
+    method = class_getInstanceMethod(subviewClass, selector);
     IMP original = method_getImplementation(method);
     override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
@@ -881,7 +882,7 @@ RCTAutoInsetsProtocol>
   else if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_12_2_0]) {
     // iOS 12.2.0 - iOS 13.0.0
     SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:changingActivityState:userObject:");
-    method = class_getInstanceMethod(class, selector);
+    method = class_getInstanceMethod(subviewClass, selector);
     IMP original = method_getImplementation(method);
     override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
@@ -890,7 +891,7 @@ RCTAutoInsetsProtocol>
   else if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion: iOS_11_3_0]) {
     // iOS 11.3.0 - 12.2.0
     SEL selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:changingActivityState:userObject:");
-    method = class_getInstanceMethod(class, selector);
+    method = class_getInstanceMethod(subviewClass, selector);
     IMP original = method_getImplementation(method);
     override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
@@ -898,7 +899,7 @@ RCTAutoInsetsProtocol>
   } else {
     // iOS 9.0 - 11.3.0
     SEL selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:userObject:");
-    method = class_getInstanceMethod(class, selector);
+    method = class_getInstanceMethod(subviewClass, selector);
     IMP original = method_getImplementation(method);
     override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, id arg3) {
       ((void (*)(id, SEL, void*, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3);
