@@ -116,12 +116,12 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(WinUI2_HasWebView2)'=='true'">
-  <ClCompile>
-    <PreprocessorDefinitions>WINUI2_HAS_WEBVIEW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-  </ClCompile>
-  <Midl>
-    <PreprocessorDefinitions>WINUI2_HAS_WEBVIEW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-  </Midl>
+    <ClCompile>
+      <PreprocessorDefinitions>WINUI2_HAS_WEBVIEW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Midl>
+      <PreprocessorDefinitions>WINUI2_HAS_WEBVIEW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ReactWebView.h" />
@@ -131,6 +131,7 @@
     <ClInclude Include="ReactPackageProvider.h">
       <DependentUpon>ReactPackageProvider.idl</DependentUpon>
     </ClInclude>
+    <ClInclude Include="ReactWebViewHelpers.h" />
     <ClInclude Include="ReactWebViewManager.h" />
     <ClInclude Include="WebBridge.h" />
   </ItemGroup>
@@ -145,6 +146,7 @@
       <DependentUpon>ReactPackageProvider.idl</DependentUpon>
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
+    <ClCompile Include="ReactWebViewHelpers.cpp" />
     <ClCompile Include="ReactWebViewManager.cpp" />
     <ClCompile Include="WebBridge.cpp" />
   </ItemGroup>
@@ -157,7 +159,6 @@
     <None Include="packages.config" />
     <None Include="ReactNativeWebView.def" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="PropertySheet.props" />
   </ItemGroup>

@@ -13,6 +13,7 @@ namespace winrt {
     using namespace Windows::UI;
     using namespace Windows::UI::Xaml;
     using namespace Windows::UI::Xaml::Controls;
+    using namespace Windows::UI::Xaml::Input;
     using namespace Microsoft::UI::Xaml::Controls;
     using namespace Windows::Web::Http;
     using namespace Windows::Web::Http::Headers;

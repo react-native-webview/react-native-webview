@@ -76,6 +76,8 @@ namespace winrt::ReactNativeWebView::implementation {
 
         void OnMessagePosted(hstring const& message);
         bool Is17763OrHigher();
+        void WriteCookiesToWebView2(winrt::hstring cookies);
+        void SetupRequest(Microsoft::ReactNative::JSValueObject const& srcMap, winrt::Microsoft::Web::WebView2::Core::CoreWebView2WebResourceRequest const& request);
     };
 } // namespace winrt::ReactNativeWebView2::implementation
 

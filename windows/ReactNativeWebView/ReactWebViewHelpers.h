@@ -13,4 +13,4 @@ namespace winrt::ReactNativeWebView::implementation {
         std::vector<std::string> splitString(const std::string& str, const std::string& delim);
         std::map<std::string, std::string> parseSetCookieHeader(const std::string& setCookieHeader);
     }
-}
+} // namespace winrt::ReactNativeWebView::implementation

@@ -3,6 +3,7 @@
 
 #pragma once 
 
+#include "pch.h"
 #include "winrt/ReactNativeWebView.h"
 
 using namespace winrt::ReactNativeWebView;
@@ -66,4 +67,4 @@ namespace winrt::ReactNativeWebView::implementation {
             return cookie;
         }
     }
-}
+} // namespace winrt::ReactNativeWebView::implementation

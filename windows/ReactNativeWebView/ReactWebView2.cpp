@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "ReactWebView2.h"
+#include "ReactWebViewHelpers.h"
 
 #if HAS_WEBVIEW2
 #include "JSValueXaml.h"
@@ -225,7 +226,10 @@ namespace winrt::ReactNativeWebView::implementation {
     {
         assert(sender);
         if (!m_request.empty()) {
-            SetupRequest(m_request, std::move(args));
+            auto uriString = winrt::to_hstring(m_request.at("uri").AsString());
+            if (args.Request().Uri() == uriString) {
+                SetupRequest(m_request.Copy(), args.Request());
+            }
         }
     }
 
@@ -388,71 +392,66 @@ namespace winrt::ReactNativeWebView::implementation {
     {
         m_request = JSValueObject::ReadFrom(source);
         co_await m_webView.EnsureCoreWebView2Async();
+        assert(m_webView.CoreWebView2());
         if (m_webView.CoreWebView2())
         {
-            auto uriString = winrt::to_hstring(m_request.at("uri").AsString());
-            m_webView.CoreWebView2().AddWebResourceRequestedFilter(
-            uriString, winrt::CoreWebView2WebResourceContext::All);
-            m_webResourceRequestedRevoker = m_webView.CoreWebView2().WebResourceRequested(winrt::auto_revoke,
-                [srcMap = std::move(m_request)](
-                    auto const& /* sender */,
-                    winrt::CoreWebView2WebResourceRequestedEventArgs const& args)
-                {
-                    SetupRequest(MakeJSValueTreeReader(JSValue(srcMap.Copy())), std::move(args));
-                });
-            m_webView.CoreWebView2().Navigate(uriString);
+            auto uri = winrt::Uri(winrt::to_hstring(m_request.at("uri").AsString()));
+            auto webResourceRequest = m_webView.CoreWebView2().Environment().CreateWebResourceRequest(
+                uri.ToString(), winrt::to_hstring(m_request.at("method").AsString()), nullptr, L"");
+                
+            SetupRequest(m_request.Copy(), webResourceRequest);
+
+            m_webView.CoreWebView2().NavigateWithWebResourceRequest(webResourceRequest);
         }
+    }
 
-        void ReactWebView2::WriteCookiesToWebView2(winrt::hstring cookies) {
-            // Persisting cookies passed from JS
-            // Cookies are separated by ;, and adheres to the Set-Cookie HTTP header format of RFC-6265.
+    void ReactWebView2::WriteCookiesToWebView2(winrt::hstring cookies) {
+        // Persisting cookies passed from JS
+        // Cookies are separated by ;, and adheres to the Set-Cookie HTTP header format of RFC-6265.
 
-            auto cookieManager = m_webView.CoreWebView2().CookieManager();
-            auto cookiesList =
-                ReactWebViewHelpers::splitString(winrt::to_string(cookies), ";,");
-            for (const auto& cookie_str : cookiesList) {
-                auto cookieData = ReactWebViewHelpers::parseSetCookieHeader(ReactWebViewHelpers::trimString(cookie_str));
+        auto cookieManager = m_webView.CoreWebView2().CookieManager();
+        auto cookiesList =
+            ReactWebViewHelpers::splitString(winrt::to_string(cookies), ";,");
+        for (const auto& cookie_str : cookiesList) {
+            auto cookieData = ReactWebViewHelpers::parseSetCookieHeader(ReactWebViewHelpers::trimString(cookie_str));
 
-                if (!cookieData.count("Name") || !cookieData.count("Value")) {
+            if (!cookieData.count("Name") || !cookieData.count("Value")) {
+                continue;
+            }
+            auto cookie = cookieManager.CreateCookie(
+                winrt::to_hstring(cookieData["Name"]),
+                winrt::to_hstring(cookieData["Value"]),
+                cookieData.count("Domain")
+                ? winrt::to_hstring(cookieData["Domain"])
+                : L"",
+                cookieData.count("Path")
+                ? winrt::to_hstring(cookieData["Path"]) : L"");
+            cookieManager.AddOrUpdateCookie(cookie);
+        }
+    }
+
+    void ReactWebView2::SetupRequest(Microsoft::ReactNative::JSValueObject const& srcMap, winrt::Microsoft::Web::WebView2::Core::CoreWebView2WebResourceRequest const& request) {
+        bool hasHeaders = srcMap.find("headers") != srcMap.end();
+        auto method = srcMap.find("method") != srcMap.end() ? srcMap.at("method").AsString() : "GET";
+        request.Method(winrt::to_hstring(method));
+        if (method == "POST")
+        {
+            auto formBody = srcMap.at("body").AsString();
+            winrt::InMemoryRandomAccessStream formContent;
+            winrt::IBuffer buffer{winrt::CryptographicBuffer::ConvertStringToBinary(
+                winrt::to_hstring(formBody), winrt::BinaryStringEncoding::Utf8)};
+            formContent.ReadAsync(buffer, buffer.Length(), InputStreamOptions::None);
+            request.Content(formContent);
+        }
+        if (hasHeaders)
+        {
+            for (auto const& header : srcMap.at("headers").AsObject())
+            {
+                auto const& headerKey = header.first;
+                auto const& headerValue = header.second;
+                if (headerValue.IsNull())
                     continue;
-                }
-                auto cookie = cookieManager.CreateCookie(
-                    winrt::to_hstring(cookieData["Name"]),
-                    winrt::to_hstring(cookieData["Value"]),
-                    cookieData.count("Domain")
-                    ? winrt::to_hstring(cookieData["Domain"])
-                    : L"",
-                    cookieData.count("Path")
-                    ? winrt::to_hstring(cookieData["Path"]) : L"");
-                cookieManager.AddOrUpdateCookie(cookie);
-            }
-        }
-
-        void ReactWebView2::SetupRequest(Microsoft::ReactNative::IJSValueReader const& srcMap, winrt::CoreWebView2WebResourceRequestedEventArgs args) {
-            auto uriString = srcMap.at("uri").AsString();
-            args.Request().Uri(winrt::to_hstring(uriString));
-            bool hasHeaders = srcMap.find("headers") != srcMap.end();
-            auto method = srcMap.find("method") != srcMap.end() ? srcMap.at("method").AsString() : "GET";
-            args.Request().Method(winrt::to_hstring(method));
-            if (method == "POST")
-            {
-                auto formBody = srcMap.at("body").AsString();
-                winrt::InMemoryRandomAccessStream formContent;
-                winrt::IBuffer buffer{winrt::CryptographicBuffer::ConvertStringToBinary(
-                    winrt::to_hstring(formBody), winrt::BinaryStringEncoding::Utf8)};
-                formContent.ReadAsync(buffer, buffer.Length(), InputStreamOptions::None);
-                args.Request().Content(formContent);
-            }
-            if (hasHeaders)
-            {
-                for (auto const& header : srcMap.at("headers").AsObject())
-                {
-                    auto const& headerKey = header.first;
-                    auto const& headerValue = header.second;
-                    if (headerValue.IsNull())
-                        continue;
-                    args.Request().Headers().SetHeader(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
-                }
+                request.Headers().SetHeader(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
             }
         }
     }
