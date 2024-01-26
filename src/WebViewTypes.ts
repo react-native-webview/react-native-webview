@@ -21,10 +21,11 @@ type WebViewCommands =
   | 'postMessage'
   | 'injectJavaScript'
   | 'loadUrl'
-  | 'requestFocus';
+  | 'requestFocus'
+  | 'clearCache';
 
-type AndroidWebViewCommands = 'clearHistory' | 'clearCache' | 'clearFormData';
 type WindowsWebViewCommands = 'releaseFocus';
+type AndroidWebViewCommands = 'clearHistory' | 'clearFormData';
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (name: string) => {
@@ -236,6 +237,20 @@ export interface WebViewCustomMenuItems {
    */
   label: string;
 }
+
+export declare type SuppressMenuItem = 
+  | "cut"
+  | "copy"
+  | "paste"
+  | "replace"
+  | "bold"
+  | "italic"
+  | "underline"
+  | "select"
+  | "selectAll"
+  | "translate"
+  | "lookup"
+  | "share";
 
 export type WebViewSource = WebViewSourceUri | WebViewSourceHtml;
 
@@ -683,6 +698,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios, android
    */
   menuItems?: WebViewCustomMenuItems[];
+
+  /**
+   * An array of strings which will be suppressed from the menu.
+   * @platform ios
+   */
+  suppressMenuItems?: SuppressMenuItem[];
 
   /**
    * The function fired when selecting a custom menu item created by `menuItems`.
@@ -1255,6 +1276,11 @@ export interface WebViewSharedProps extends ViewProps {
    */
   basicAuthCredential?: BasicAuthCredential;
 
+  /**
+   * Inject a JavaScript object to be accessed as a JSON string via JavaScript in the WebView.
+   */
+  injectedJavaScriptObject?: object;
+  
   /**
    * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
    */

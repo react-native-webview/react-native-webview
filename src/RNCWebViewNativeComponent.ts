@@ -165,6 +165,7 @@ export interface NativeProps extends ViewProps {
   thirdPartyCookiesEnabled?: boolean;
   // Workaround to watch if listener if defined
   hasOnScroll?: boolean;
+  injectedJavaScriptObject?: string;
   // !Android only
 
   // iOS only
@@ -207,6 +208,7 @@ export interface NativeProps extends ViewProps {
   onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
   // eslint-disable-next-line @typescript-eslint/array-type
   menuItems?: ReadonlyArray<Readonly<{label: string, key: string}>>;
+  suppressMenuItems?: Readonly<string>[];
   // Workaround to watch if listener if defined
   hasOnFileDownload?: boolean;
   fraudulentWebsiteWarningEnabled?: boolean;
