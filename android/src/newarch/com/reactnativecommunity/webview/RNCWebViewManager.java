@@ -420,39 +420,46 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
         mRNCWebViewManagerImpl.setUserAgent(view, value);
     }
 
-    // These will never be called because we use the shared impl for now
   @Override
   public void goBack(RNCWebViewWrapper view) {
-    view.getWebView().goBack();
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().goBack();
   }
 
   @Override
   public void goForward(RNCWebViewWrapper view) {
-    view.getWebView().goForward();
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().goForward();
   }
 
   @Override
   public void reload(RNCWebViewWrapper view) {
-    view.getWebView().reload();
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().reload();
   }
 
   @Override
   public void stopLoading(RNCWebViewWrapper view) {
-    view.getWebView().stopLoading();
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().stopLoading();
   }
 
   @Override
   public void injectJavaScript(RNCWebViewWrapper view, String javascript) {
-      view.getWebView().evaluateJavascriptWithFallback(javascript);
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().evaluateJavascriptWithFallback(javascript);
   }
 
   @Override
   public void requestFocus(RNCWebViewWrapper view) {
-      view.requestFocus();
+    // NOTE: It is handled via receiveCommand().
+    // view.requestFocus();
   }
 
   @Override
   public void postMessage(RNCWebViewWrapper view, String data) {
+    // NOTE: It is handled via receiveCommand().
+    /*
       try {
         JSONObject eventInitDict = new JSONObject();
         eventInitDict.put("data", data);
@@ -472,28 +479,32 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
       } catch (JSONException e) {
         throw  new RuntimeException(e);
       }
+    */
   }
 
   @Override
   public void loadUrl(RNCWebViewWrapper view, String url) {
-      view.getWebView().loadUrl(url);
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().loadUrl(url);
   }
 
   @Override
   public void clearFormData(RNCWebViewWrapper view) {
-      view.getWebView().clearFormData();
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().clearFormData();
   }
 
   @Override
   public void clearCache(RNCWebViewWrapper view, boolean includeDiskFiles) {
-      view.getWebView().clearCache(includeDiskFiles);
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().clearCache(includeDiskFiles);
   }
 
   @Override
   public void clearHistory(RNCWebViewWrapper view) {
-      view.getWebView().clearHistory();
+    // NOTE: It is handled via receiveCommand().
+    // view.getWebView().clearHistory();
   }
-  // !These will never be called
 
   @Override
     protected void addEventEmitters(@NonNull ThemedReactContext reactContext, RNCWebViewWrapper view) {
