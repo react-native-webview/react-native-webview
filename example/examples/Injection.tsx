@@ -53,6 +53,7 @@ export default class Injection extends Component<Props, State> {
               onMessage={() => {}}
               injectedJavaScriptBeforeContentLoadedForMainFrameOnly={false}
               injectedJavaScriptForMainFrameOnly={false}
+              injectedJavaScriptObject={{ hello: "world" }}
 
               /* We set this property in each frame */
               injectedJavaScriptBeforeContentLoaded={`
@@ -99,6 +100,20 @@ export default class Injection extends Component<Props, State> {
                 window.self.document.body.style.backgroundColor = window.self.colourToUse;
               } else {
                 window.self.document.body.style.backgroundColor = "cyan";
+              }
+
+              // Example usage of injectedJavaScriptObject({hello: 'world'}), see above
+              const injectedObjectJson = window.ReactNativeWebView.injectedObjectJson();
+              
+              // injectedJavaScriptObject is only available on Android
+              if (injectedObjectJson) {
+                const injectedObject = JSON.parse(injectedObjectJson);
+                console.log("injectedJavaScriptObject: ", injectedObject); // injectedJavaScriptObject: { hello: 'world' }
+
+                var injectedJavaScriptObjectEle = document.createElement('p');
+                injectedJavaScriptObjectEle.textContent = "injectedJavaScriptObject: " + injectedObjectJson;
+                injectedJavaScriptObjectEle.id = "injectedJavaScriptObjectEle";
+                document.body.appendChild(injectedJavaScriptObjectEle);
               }
 
               if(window.self === window.top){
