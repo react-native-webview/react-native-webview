@@ -9,8 +9,8 @@ using namespace winrt::ReactNativeWebView;
 
 namespace winrt::ReactNativeWebView::implementation {
     namespace ReactWebViewHelpers {
-        std::string trimString(const std::string& str);
-        std::vector<std::string> splitString(const std::string& str, const std::string& delim);
-        std::map<std::string, std::string> parseSetCookieHeader(const std::string& setCookieHeader);
+        std::string TrimString(const std::string& str);
+        std::vector<std::string> SplitString(const std::string& str, const std::string& delim);
+        std::map<std::string, std::string> ParseSetCookieHeader(const std::string& setCookieHeader);
     }
 } // namespace winrt::ReactNativeWebView::implementation

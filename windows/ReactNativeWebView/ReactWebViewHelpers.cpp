@@ -10,7 +10,7 @@ using namespace winrt::ReactNativeWebView;
 
 namespace winrt::ReactNativeWebView::implementation {
     namespace ReactWebViewHelpers {
-        std::string trimString(const std::string& str) {
+        std::string TrimString(const std::string& str) {
             std::string trimmedString = str;
 
             // Trim from start
@@ -22,7 +22,7 @@ namespace winrt::ReactNativeWebView::implementation {
             return trimmedString;
         }
         
-        std::vector<std::string> splitString(
+        std::vector<std::string> SplitString(
             const std::string& str,
             const std::string& delim) {
             std::vector<std::string> tokens;
@@ -31,37 +31,37 @@ namespace winrt::ReactNativeWebView::implementation {
 
             while (endPos != std::string::npos) {
                 auto token = str.substr(startPos, endPos - startPos);
-                tokens.push_back(trimString(token));
+                tokens.push_back(TrimString(token));
 
                 startPos = endPos + delim.length();
                 endPos = str.find(delim, startPos);
             }
 
             auto lastToken = str.substr(startPos);
-            tokens.push_back(trimString(lastToken));
+            tokens.push_back(TrimString(lastToken));
 
             return tokens;
         }
 
-        std::map<std::string, std::string> parseSetCookieHeader(
+        std::map<std::string, std::string> ParseSetCookieHeader(
             const std::string& setCookieHeader) {
             std::map<std::string, std::string> cookie;
 
             // Split the header into individual cookie strings
-            auto cookieStrings = splitString(setCookieHeader, ";");
+            auto cookieStrings = SplitString(setCookieHeader, ";");
 
             // Extract the cookie name and value from the first string
-            auto nameValuePair = splitString(cookieStrings[0], "=");
-            cookie["Name"] = trimString(nameValuePair[0]);
-            cookie["Value"] = trimString(nameValuePair[1]);
+            auto nameValuePair = SplitString(cookieStrings[0], "=");
+            cookie["Name"] = TrimString(nameValuePair[0]);
+            cookie["Value"] = TrimString(nameValuePair[1]);
 
             // Extract the attributes from the remaining strings
             for (std::size_t i = 1; i < cookieStrings.size(); ++i) {
-                auto attributeValuePair = splitString(cookieStrings[i], "=");
+                auto attributeValuePair = SplitString(cookieStrings[i], "=");
                 auto attributeName = attributeValuePair[0];
                 auto attributeValue =
                     attributeValuePair.size() > 1 ? attributeValuePair[1] : "";
-                cookie[attributeName] = trimString(attributeValue);
+                cookie[attributeName] = TrimString(attributeValue);
             }
 
             return cookie;
