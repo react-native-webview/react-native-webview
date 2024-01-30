@@ -141,6 +141,8 @@ namespace winrt::ReactNativeWebView::implementation {
         commands.Append(L"injectJavaScript");
         commands.Append(L"requestFocus");
         commands.Append(L"clearCache");
+        commands.Append(L"postMessage");
+        commands.Append(L"loadUrl");
         return commands.GetView();
     }
 
