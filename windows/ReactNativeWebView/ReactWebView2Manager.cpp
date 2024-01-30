@@ -66,7 +66,8 @@ namespace winrt::ReactNativeWebView::implementation {
 
             if (propertyName == "source") {
                 auto const& srcMap = propertyValue.AsObject();
-                std::string file = "file://";
+                auto reactWebView2 = view.as<winrt::ReactNativeWebView::ReactWebView2>();
+                std::string const fileScheme = "file://";
                 if (srcMap.find("uri") != srcMap.end()) {
                     auto uriString = srcMap.at("uri").AsString();
                     if (uriString.length() == 0) {
@@ -77,17 +78,18 @@ namespace winrt::ReactNativeWebView::implementation {
                     if (srcMap.find("__packager_asset") != srcMap.end()) {
                         isPackagerAsset = srcMap.at("__packager_asset").AsBoolean();
                     }
-                    if (isPackagerAsset && uriString.find(file) == 0) {
+                    if (isPackagerAsset && uriString.find(fileScheme) == 0) {
                         auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
-                        uriString.replace(0, std::size(file), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
+                        uriString.replace(0, std::size(fileScheme), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath); 
+                    }
+                    if (uriString.find("ms-appdata://") == 0 || uriString.find("ms-appx-web://") == 0) {
+                        reactWebView2.NavigateToHtml(to_hstring(uriString));
                     } else {
-                        auto reactWebView2 = view.as<winrt::ReactNativeWebView::ReactWebView2>();
                         reactWebView2.NavigateWithWebResourceRequest(MakeJSValueTreeReader(JSValue(srcMap.Copy())));
                     }
                 }
                 else if (srcMap.find("html") != srcMap.end()) {
                     auto htmlString = srcMap.at("html").AsString();
-                    auto reactWebView2 = view.as<winrt::ReactNativeWebView::ReactWebView2>();
                     reactWebView2.NavigateToHtml(to_hstring(htmlString));
                 }
             }
@@ -179,6 +181,16 @@ namespace winrt::ReactNativeWebView::implementation {
             // The best we can do is clear the cookies, because we cannot access history or local storage.
             auto cookieManager = webView.CoreWebView2().CookieManager();
             cookieManager.DeleteAllCookies();
+        }
+        else if (commandId == L"loadUrl") {
+            auto uri = winrt::Uri(to_hstring(commandArgs[0].AsString()));
+            webView.Source(uri);
+        }
+        else if (commandId == L"postMessage") {
+            if (webView.CoreWebView2() != nullptr) {
+                auto message = commandArgs[0].AsString();
+                webView.CoreWebView2().PostWebMessageAsString(to_hstring(message));
+            }
         }
     }
 

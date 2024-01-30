@@ -24,7 +24,6 @@ type WebViewCommands =
   | 'requestFocus'
   | 'clearCache';
 
-type WindowsWebViewCommands = 'releaseFocus';
 type AndroidWebViewCommands = 'clearHistory' | 'clearFormData';
 
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
