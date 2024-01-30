@@ -102,6 +102,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => Commands.requestFocus(webViewRef.current),
     clearCache: () => Commands.clearCache(webViewRef.current),
+    loadUrl: (url: string) => Commands.loadUrl(webViewRef.current, url),
   }), [setViewState, webViewRef]);
 
   let otherView = null;
