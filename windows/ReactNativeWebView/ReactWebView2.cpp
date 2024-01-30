@@ -415,27 +415,24 @@ namespace winrt::ReactNativeWebView::implementation {
         }
     }
 
-    void ReactWebView2::WriteCookiesToWebView2(winrt::hstring cookies) {
+    void ReactWebView2::WriteCookiesToWebView2(std::string const& cookies) {
         // Persisting cookies passed from JS
         // Cookies are separated by ;, and adheres to the Set-Cookie HTTP header format of RFC-6265.
 
         auto cookieManager = m_webView.CoreWebView2().CookieManager();
-        auto cookiesList =
-            ReactWebViewHelpers::splitString(winrt::to_string(cookies), ";,");
+        auto cookiesList = ReactWebViewHelpers::splitString(cookies, ";,");
         for (const auto& cookie_str : cookiesList) {
             auto cookieData = ReactWebViewHelpers::parseSetCookieHeader(ReactWebViewHelpers::trimString(cookie_str));
 
             if (!cookieData.count("Name") || !cookieData.count("Value")) {
                 continue;
             }
+
             auto cookie = cookieManager.CreateCookie(
                 winrt::to_hstring(cookieData["Name"]),
                 winrt::to_hstring(cookieData["Value"]),
-                cookieData.count("Domain")
-                ? winrt::to_hstring(cookieData["Domain"])
-                : L"",
-                cookieData.count("Path")
-                ? winrt::to_hstring(cookieData["Path"]) : L"");
+                cookieData.count("Domain") ? winrt::to_hstring(cookieData["Domain"]) : L"",
+                cookieData.count("Path") ? winrt::to_hstring(cookieData["Path"]) : L"");
             cookieManager.AddOrUpdateCookie(cookie);
         }
     }
@@ -461,7 +458,11 @@ namespace winrt::ReactNativeWebView::implementation {
                 auto const& headerValue = header.second;
                 if (headerValue.IsNull())
                     continue;
-                request.Headers().SetHeader(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
+                if (headerKey == "Cookie") {
+                    WriteCookiesToWebView2(headerValue.AsString());
+                } else {
+                    request.Headers().SetHeader(winrt::to_hstring(headerKey), winrt::to_hstring(headerValue.AsString()));
+                }
             }
         }
     }
