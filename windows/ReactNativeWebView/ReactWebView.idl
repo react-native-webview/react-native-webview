@@ -5,6 +5,7 @@ namespace ReactNativeWebView{
         Boolean MessagingEnabled;
         void SetInjectedJavascript(String payload);
         void RequestFocus();
+        void PostMessage(String message);
     };
 #if __has_include(<VersionMacros.h>)
 #include <VersionMacros.h>

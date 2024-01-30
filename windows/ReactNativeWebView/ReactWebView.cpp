@@ -180,6 +180,12 @@ namespace winrt::ReactNativeWebView::implementation {
                 });
     }
 
+    void ReactWebView::PostMessage(winrt::hstring const& message) {
+        if (m_messagingEnabled) {
+            HandleMessageFromJS(message);
+        }
+    }
+
     void ReactWebView::OnDOMContentLoaded(winrt::WebView const& webView, winrt::WebViewDOMContentLoadedEventArgs const& /*args*/)
     {
         m_reactContext.DispatchEvent(

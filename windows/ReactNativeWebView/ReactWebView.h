@@ -20,6 +20,7 @@ namespace winrt::ReactNativeWebView::implementation {
         bool MessagingEnabled() const noexcept;
         void SetInjectedJavascript(winrt::hstring const& payload);
         void RequestFocus();
+        void PostMessage(winrt::hstring const& message);
         ~ReactWebView();
 
     private:

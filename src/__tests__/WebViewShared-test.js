@@ -95,8 +95,7 @@ describe('WebViewShared', () => {
         defaultOriginWhitelist,
         alwaysTrueOnShouldStartLoadWithRequest,
       );
-
-      var a = 10;
+      
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'invalid://example.com/', lockIdentifier: 1 } });
 
       await flushPromises();
