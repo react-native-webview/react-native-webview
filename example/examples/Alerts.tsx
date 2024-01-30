@@ -65,6 +65,7 @@ export default class Alerts extends Component<Props, State> {
         <WebView
           source={{html: HTML}}
           automaticallyAdjustContentInsets={false}
+          useWebView2
         />
       </View>
     );
