@@ -48,6 +48,7 @@ namespace winrt::ReactNativeWebView::implementation {
         nativeProps.Insert(L"source", ViewManagerPropertyType::Map);
         nativeProps.Insert(L"messagingEnabled", ViewManagerPropertyType::Boolean);
         nativeProps.Insert(L"injectedJavaScript", ViewManagerPropertyType::String);
+        nativeProps.Insert(L"linkHandlingEnabled", ViewManagerPropertyType::String);
         return nativeProps.GetView();
     }
 
