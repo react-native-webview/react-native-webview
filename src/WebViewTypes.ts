@@ -37,7 +37,7 @@ export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<
 >;
 export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>;
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>;
-export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands | WindowsWebViewCommands>;
+export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>;
 
 type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
 
