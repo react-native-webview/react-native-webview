@@ -140,6 +140,10 @@ export interface WebViewOpenWindow {
   targetUrl: string;
 }
 
+export interface WindowsWebViewOpenWindow {
+  uri: string;
+}
+
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent =
@@ -163,7 +167,7 @@ export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
 export type WebViewRenderProcessGoneEvent =
   NativeSyntheticEvent<WebViewRenderProcessGoneDetail>;
 
-export type WebViewOpenWindowEvent = NativeSyntheticEvent<WebViewOpenWindow>;
+export type WebViewOpenWindowEvent = NativeSyntheticEvent<WebViewOpenWindow|WindowsWebViewOpenWindow>;
 
 export type WebViewScrollEvent = NativeSyntheticEvent<NativeScrollEvent>;
 
@@ -363,10 +367,37 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
 
 export interface WindowsNativeWebViewProps extends CommonNativeWebViewProps {
   testID?: string;
+  linkHandlingEnabled?: boolean;
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
+  onSourceChanged?: (event: WebViewNavigationEvent) => void;
 }
 
 export interface WindowsWebViewProps extends WebViewSharedProps {
+  /**
+   * Boolean value that detenmines whether the web view should use the new chromium based edge webview.
+   */
   useWebView2?: boolean;
+  /**
+   * Function that is invoked when the `WebView` should open a new window.
+   * 
+   * This happens when the JS calls `window.open('http://someurl', '_blank')`
+   * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+   * 
+   * Only works with `useWebView2` set to `true`.
+   *
+   * @platform windows
+   */
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` responds to a request to load a new resource.
+   * Works only on Windows.
+   * 
+   * Only works with `useWebView2` set to `true`.
+   * 
+   * @platform windows
+   */
+  onSourceChanged?: (event: WebViewNavigationEvent) => void;
 }
 
 export interface IOSWebViewProps extends WebViewSharedProps {

@@ -19,6 +19,8 @@ namespace winrt::ReactNativeWebView::implementation {
         ReactWebView2(Microsoft::ReactNative::IReactContext const& reactContext);
         void MessagingEnabled(bool enabled) noexcept;
         bool MessagingEnabled() const noexcept;
+        void LinkHandlingEnabled(bool enabled) noexcept;
+        bool LinkHandlingEnabled() const noexcept;
         void WebResourceRequestSource(Microsoft::ReactNative::JSValueObject const& source) noexcept;
         Microsoft::ReactNative::JSValueObject WebResourceRequestSource() const noexcept;
         void InjectedJavascript(winrt::hstring const& injectedJavascript) noexcept;
@@ -31,6 +33,7 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::hstring m_navigateToHtml = L"";
         winrt::Microsoft::ReactNative::JSValueObject m_request{};
         bool m_messagingEnabled{ true };
+        bool m_linkHandlingEnabled{ true };
         winrt::hstring m_injectedJavascript = L"";
 
 

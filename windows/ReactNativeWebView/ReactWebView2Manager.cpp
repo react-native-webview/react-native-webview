@@ -102,6 +102,11 @@ namespace winrt::ReactNativeWebView::implementation {
                 auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
                 reactWebView2.InjectedJavascript(to_hstring(injectedJavascript));
             }
+            else if (propertyName == "linkHandlingEnabled") {
+                auto linkHandlingEnabled = propertyValue.To<bool>();
+                auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
+                reactWebView2.LinkHandlingEnabled(linkHandlingEnabled);
+            }
         }        
     }
 
@@ -119,6 +124,7 @@ namespace winrt::ReactNativeWebView::implementation {
             WriteCustomDirectEventTypeConstant(constantWriter, "Message");
             WriteCustomDirectEventTypeConstant(constantWriter, "FrameNavigationStart");
             WriteCustomDirectEventTypeConstant(constantWriter, "FrameNavigationFinish");
+            WriteCustomDirectEventTypeConstant(constantWriter, "OpenWindow");
         };
     }
 
@@ -131,6 +137,7 @@ namespace winrt::ReactNativeWebView::implementation {
         commands.Append(L"stopLoading");
         commands.Append(L"injectJavaScript");
         commands.Append(L"requestFocus");
+        commands.Append(L"clearCache");
         return commands.GetView();
     }
 
@@ -157,13 +164,21 @@ namespace winrt::ReactNativeWebView::implementation {
             webView.Reload();
         }
         else if (commandId == L"stopLoading") {
-            webView.CoreWebView2().Stop();
+            if (webView.CoreWebView2() != nullptr) {
+                webView.CoreWebView2().Stop();
+            }
         }
         else if (commandId == L"injectJavaScript") {
             webView.ExecuteScriptAsync(winrt::to_hstring(commandArgs[0].AsString()));
         }
         else if (commandId == L"requestFocus") {
             FocusManager::TryFocusAsync(webView, FocusState::Programmatic);
+        } 
+        else if (commandId == L"clearCache") {
+            // There is no way to clear the cache in WebView2 because it is shared with Edge.
+            // The best we can do is clear the cookies, because we cannot access history or local storage.
+            auto cookieManager = webView.CoreWebView2().CookieManager();
+            cookieManager.DeleteAllCookies();
         }
     }
 

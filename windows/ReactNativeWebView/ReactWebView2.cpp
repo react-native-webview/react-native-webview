@@ -228,7 +228,7 @@ namespace winrt::ReactNativeWebView::implementation {
         if (!m_request.empty()) {
             auto uriString = winrt::to_hstring(m_request.at("uri").AsString());
             if (args.Request().Uri() == uriString) {
-                SetupRequest(m_request.Copy(), args.Request());
+                SetupRequest(m_request, args.Request());
             }
         }
     }
@@ -253,7 +253,7 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
     void ReactWebView2::OnCoreWebView2FrameNavigationStarted(
-        winrt::Microsoft::Web::WebView2::Core::CoreWebView2 const& sender,
+        winrt::Microsoft::Web::WebView2::Core::CoreWebView2 const& /* sender */,
         winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationStartingEventArgs const& /* args */)
     {
         m_reactContext.DispatchEvent(
@@ -268,7 +268,7 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
     void ReactWebView2::OnCoreWebView2FrameNavigationCompleted(
-    winrt::Microsoft::Web::WebView2::Core::CoreWebView2 const& sender,
+    winrt::Microsoft::Web::WebView2::Core::CoreWebView2 const& /* sender */,
     winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationCompletedEventArgs const& /* args */)
     {
         m_reactContext.DispatchEvent(
@@ -283,8 +283,8 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
     void ReactWebView2::OnCoreWebView2SourceChanged(
-        winrt::Microsoft::Web::WebView2::Core::CoreWebView2 const& sender,
-        winrt::Microsoft::Web::WebView2::Core::CoreWebView2SourceChangedEventArgs const& args)
+        winrt::Microsoft::Web::WebView2::Core::CoreWebView2 const& /* sender */,
+        winrt::Microsoft::Web::WebView2::Core::CoreWebView2SourceChangedEventArgs const& /* args */)
     {
         m_reactContext.DispatchEvent(
             *this,
@@ -301,27 +301,29 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::Microsoft::Web::WebView2::Core::CoreWebView2 const& sender,
         winrt::Microsoft::Web::WebView2::Core::CoreWebView2NewWindowRequestedEventArgs const& args)
     {
-
-        try
-        {
-            winrt::Windows::Foundation::Uri uri(args.Uri());
-            winrt::Windows::System::Launcher::LaunchUriAsync(uri);
+        if (m_linkHandlingEnabled) {
+            m_reactContext.DispatchEvent(
+                *this,
+                L"topOpenWindow",
+                [&](winrt::IJSValueWriter const& eventDataWriter) noexcept
+                {
+                    eventDataWriter.WriteObjectBegin();
+                    WriteWebViewNavigationEventArg(m_webView, eventDataWriter);
+                    eventDataWriter.WriteObjectEnd();
+                });
             args.Handled(true);
-        }
-        catch (winrt::hresult_error& e)
-        {
-            // Do Nothing
-        }
-        m_reactContext.DispatchEvent(
-            *this,
-            L"topNewWindowRequested",
-            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept
+        } else {
+            try
             {
-                eventDataWriter.WriteObjectBegin();
-                WriteWebViewNavigationEventArg(m_webView, eventDataWriter);
-                eventDataWriter.WriteObjectEnd();
-            });
-        args.Handled(true);
+                winrt::Windows::Foundation::Uri uri(args.Uri());
+                winrt::Windows::System::Launcher::LaunchUriAsync(uri);
+                args.Handled(true);
+            }
+            catch (winrt::hresult_error& e)
+            {
+                // Do Nothing
+            }
+        }
     }
 
     void ReactWebView2::HandleMessageFromJS(winrt::hstring const& message) {
@@ -357,6 +359,14 @@ namespace winrt::ReactNativeWebView::implementation {
 
     bool ReactWebView2::MessagingEnabled() const noexcept{
         return m_messagingEnabled;
+    }
+
+    void ReactWebView2::LinkHandlingEnabled(bool enabled) noexcept {
+        m_linkHandlingEnabled = enabled;
+    }
+
+    bool ReactWebView2::LinkHandlingEnabled() const noexcept {
+        return m_linkHandlingEnabled;
     }
 
     void ReactWebView2::WebResourceRequestSource(Microsoft::ReactNative::JSValueObject const& source) noexcept
