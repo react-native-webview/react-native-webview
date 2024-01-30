@@ -420,9 +420,9 @@ namespace winrt::ReactNativeWebView::implementation {
         // Cookies are separated by ;, and adheres to the Set-Cookie HTTP header format of RFC-6265.
 
         auto cookieManager = m_webView.CoreWebView2().CookieManager();
-        auto cookiesList = ReactWebViewHelpers::splitString(cookies, ";,");
+        auto cookiesList = ReactWebViewHelpers::SplitString(cookies, ";,");
         for (const auto& cookie_str : cookiesList) {
-            auto cookieData = ReactWebViewHelpers::parseSetCookieHeader(ReactWebViewHelpers::trimString(cookie_str));
+            auto cookieData = ReactWebViewHelpers::ParseSetCookieHeader(ReactWebViewHelpers::TrimString(cookie_str));
 
             if (!cookieData.count("Name") || !cookieData.count("Value")) {
                 continue;
