@@ -291,9 +291,9 @@ Note: Any value in the object will be accessible to *all* frames of the webpage.
 
 ### `mediaPlaybackRequiresUserAction`[⬆](#props-index)
 
-Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `true`. (Android API minimum version 17).
+Boolean that determines whether HTML5 audio and video requires the user to tap them before they start playing. The default value is `false`. (Android API minimum version 17).
 
-NOTE: the default `true` value might cause some videos to hang loading on iOS. Setting it to `false` could fix this issue.
+NOTE: the `true` value might cause some videos to hang loading on iOS. Setting it to `false` could fix this issue.
 
 | Type | Required | Platform            |
 | ---- | -------- | ------------------- |
