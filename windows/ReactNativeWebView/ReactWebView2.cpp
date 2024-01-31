@@ -308,7 +308,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 [&](winrt::IJSValueWriter const& eventDataWriter) noexcept
                 {
                     eventDataWriter.WriteObjectBegin();
-                    WriteWebViewNavigationEventArg(m_webView, eventDataWriter);
+                    WriteProperty(eventDataWriter, L"targetUrl", args.Uri());
                     eventDataWriter.WriteObjectEnd();
                 });
             args.Handled(true);
@@ -346,9 +346,7 @@ namespace winrt::ReactNativeWebView::implementation {
             L"topMessage",
             [&](winrt::Microsoft::ReactNative::IJSValueWriter const& eventDataWriter) noexcept {
                 eventDataWriter.WriteObjectBegin();
-                {
-                    WriteProperty(eventDataWriter, L"data", message);
-                }
+                WriteProperty(eventDataWriter, L"data", message);
                 eventDataWriter.WriteObjectEnd();
             });
     }

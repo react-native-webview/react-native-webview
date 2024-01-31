@@ -128,6 +128,7 @@ namespace winrt::ReactNativeWebView::implementation {
             WriteCustomDirectEventTypeConstant(constantWriter, "FrameNavigationStart");
             WriteCustomDirectEventTypeConstant(constantWriter, "FrameNavigationFinish");
             WriteCustomDirectEventTypeConstant(constantWriter, "OpenWindow");
+            WriteCustomDirectEventTypeConstant(constantWriter, "SourceChanged");
         };
     }
 

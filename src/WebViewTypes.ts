@@ -139,10 +139,6 @@ export interface WebViewOpenWindow {
   targetUrl: string;
 }
 
-export interface WindowsWebViewOpenWindow {
-  uri: string;
-}
-
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent =
@@ -166,7 +162,7 @@ export type WebViewHttpErrorEvent = NativeSyntheticEvent<WebViewHttpError>;
 export type WebViewRenderProcessGoneEvent =
   NativeSyntheticEvent<WebViewRenderProcessGoneDetail>;
 
-export type WebViewOpenWindowEvent = NativeSyntheticEvent<WebViewOpenWindow|WindowsWebViewOpenWindow>;
+export type WebViewOpenWindowEvent = NativeSyntheticEvent<WebViewOpenWindow>;
 
 export type WebViewScrollEvent = NativeSyntheticEvent<NativeScrollEvent>;
 
