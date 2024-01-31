@@ -21,13 +21,15 @@
 #include <winrt/Windows.UI.Popups.h>
 #include <winrt/Windows.UI.Xaml.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Input.h>
 #include <winrt/Windows.UI.Xaml.Markup.h>
 #include <winrt/Windows.UI.Xaml.Navigation.h>
 #include <winrt/Windows.Web.Http.h>
 #include <winrt/Windows.Web.Http.Headers.h>
 #include <winrt/Microsoft.ReactNative.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
+#include <winrt/Windows.Security.Cryptography.h>
+#include <winrt/Windows.Storage.Streams.h>
 #if HAS_WEBVIEW2
 #include <winrt/Microsoft.Web.WebView2.Core.h>
-#include <winrt/Windows.Storage.Streams.h>
 #endif
