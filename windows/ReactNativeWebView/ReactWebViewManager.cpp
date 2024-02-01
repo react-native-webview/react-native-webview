@@ -158,6 +158,8 @@ namespace winrt::ReactNativeWebView::implementation {
             WriteCustomDirectEventTypeConstant(constantWriter, "LoadingFinish");
             WriteCustomDirectEventTypeConstant(constantWriter, "LoadingError");
             WriteCustomDirectEventTypeConstant(constantWriter, "Message");
+            WriteCustomDirectEventTypeConstant(constantWriter, "DOMContentLoaded");
+            WriteCustomDirectEventTypeConstant(constantWriter, "Message");
         };
     }
 
@@ -169,6 +171,8 @@ namespace winrt::ReactNativeWebView::implementation {
         commands.Append(L"reload");
         commands.Append(L"stopLoading");
         commands.Append(L"injectJavaScript");
+        commands.Append(L"postMessage");
+        commands.Append(L"loadUrl");
         return commands.GetView();
     }
 
@@ -199,7 +203,14 @@ namespace winrt::ReactNativeWebView::implementation {
         }
         else if (commandId == L"injectJavaScript") {
             webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
-        } 
+        }
+        else if (commandId == L"postMessage") {
+            auto reactWebView = view.as<ReactNativeWebView::ReactWebView>();
+            reactWebView.PostMessage(to_hstring(commandArgs[0].AsString()));
+        }
+        else if (commandId == L"loadUrl") {
+            webView.Navigate(winrt::Uri(to_hstring(commandArgs[0].AsString())));
+        }
     }
 
 } // namespace winrt::ReactWebView::implementation
