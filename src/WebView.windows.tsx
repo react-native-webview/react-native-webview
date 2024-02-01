@@ -29,7 +29,7 @@ import {
 import styles from './WebView.styles';
 
 const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'clearCache', 'postMessage', 'loadUrl'],
 });
 const { resolveAssetSource } = Image;
 
@@ -43,6 +43,8 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   onLoad,
   onLoadEnd,
   onLoadProgress,
+  onOpenWindow: onOpenWindowProp,
+  onSourceChanged,
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
   renderLoading,
@@ -71,7 +73,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     }
   }, [RCTWebViewString]);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebViewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow } = useWebViewLogic({
     onNavigationStateChange,
     onLoad,
     onError,
@@ -84,6 +86,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     originWhitelist,
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
+    onOpenWindowProp,
   })
 
   useImperativeHandle(ref, () => ({
@@ -98,6 +101,8 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => Commands.requestFocus(webViewRef.current),
+    clearCache: () => Commands.clearCache(webViewRef.current),
+    loadUrl: (url: string) => Commands.loadUrl(webViewRef.current, url),
   }), [setViewState, webViewRef]);
 
   let otherView = null;
@@ -118,12 +123,13 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
   const webViewContainerStyle = [styles.container, containerStyle];
 
   const NativeWebView
-  = useWebView2? RCTWebView2 : RCTWebView;
+  = useWebView2 ? RCTWebView2 : RCTWebView;
 
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
     messagingEnabled={typeof onMessageProp === 'function'}
+    linkHandlingEnabled={typeof onOpenWindowProp === 'function'}
     onLoadingError={onLoadingError}
     onLoadingFinish={onLoadingFinish}
     onLoadingProgress={onLoadingProgress}
@@ -131,6 +137,8 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(({
     onHttpError={onHttpError}
     onMessage={onMessage}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+    onOpenWindow={onOpenWindow}
+    onSourceChanged={onSourceChanged}
     ref={webViewRef}
     // TODO: find a better way to type this.
     source={resolveAssetSource(source as ImageSourcePropType)}
