@@ -1771,6 +1771,8 @@ Clears the resource cache. Note that the cache is per-application, so this will 
 
 In iOS, includeDiskFiles will also remove data from the web storages and databases.[developer.apple.com reference](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata)
 
+In Windows, this has been set to clear cookies, since there is no way to clear the cache in WebView2 because it is shared with Edge. The best we can do is clear the cookies, because we cannot access history or local storage.
+
 ### `clearHistory()`[⬆](#methods-index)
 
 (android only)
