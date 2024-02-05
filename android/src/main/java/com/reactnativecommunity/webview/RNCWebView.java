@@ -1,7 +1,13 @@
 package com.reactnativecommunity.webview;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintJob;
+import android.print.PrintManager;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -77,6 +83,13 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     public RNCWebView(ThemedReactContext reactContext) {
         super(reactContext);
         this.createCatalystInstance();
+
+        // The bridge is necessary to support the window.print() functionality.
+        // Not sure, is there any significant drawback just to always create it,
+        // vs. any noticeable benefit to make the print() support and opt-in feature,
+        // that will ensure the brige creation if a flag is set on WebView in JS layer.
+        this.createRNCWebViewBridge(this);
+
         progressChangedFilter = new ProgressChangedFilter();
     }
 
@@ -282,10 +295,16 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
-        if (getSettings().getJavaScriptEnabled() &&
-                injectedJSBeforeContentLoaded != null &&
-                !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
+        if (getSettings().getJavaScriptEnabled()) {
+          // This is necessary to support window.print() in the loaded web pages.
+          evaluateJavascriptWithFallback(
+            "(function(){window.print=function(){window.ReactNativeWebView.print();};})();"
+          );
+
+          if (injectedJSBeforeContentLoaded != null &&
+            !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
+          }
         }
     }
 
@@ -415,6 +434,26 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             } else {
                 FLog.w(TAG, "ReactNativeWebView.postMessage method was called but messaging is disabled. Pass an onMessage handler to the WebView.");
             }
+        }
+
+        @JavascriptInterface
+        public void print() {
+          // This code is adopted from https://developer.android.com/training/printing/html-docs
+          // but all WebView methods must be called from the same thread, and this bridge method
+          // is called on a different thread, thus the need to post a runnable to the handler.
+          WebView view = this.mWebView;
+          Handler handler = view.getHandler();
+          handler.post(new Runnable() {
+            @Override
+            public void run() {
+              PrintManager manager = (PrintManager) view.getContext().getSystemService(Context.PRINT_SERVICE);
+              String jobName = view.getTitle();
+              PrintDocumentAdapter adapter = view.createPrintDocumentAdapter(jobName);
+              PrintJob job = manager.print(jobName, adapter, new PrintAttributes.Builder().build());
+              // NOTE: Here `job` can be kept around and used to further check on the print job status,
+              // but it is not required, according to the docs, so no need to do it for now.
+            }
+          });
         }
 
         @JavascriptInterface

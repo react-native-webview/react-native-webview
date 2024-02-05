@@ -22,6 +22,7 @@ import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
 import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
+import Printing from './examples/Printing';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 
@@ -32,6 +33,14 @@ const TESTS = {
     description: 'js-webview postMessage messaging test',
     render() {
       return <Messaging />;
+    },
+  },
+  Printing: {
+    title: 'Printing',
+    testId: 'printing',
+    description: 'window.print() support test',
+    render() {
+      return <Printing />;
     },
   },
   Alerts: {
@@ -180,6 +189,11 @@ export default class App extends Component<Props, State> {
             testID="testType_alerts"
             title="Alerts"
             onPress={() => this._changeTest('Alerts')}
+          />
+          <Button
+            testID="testType_printing"
+            title="Printing"
+            onPress={() => this._changeTest('Printing')}
           />
           <Button
             testID="testType_scrolling"
