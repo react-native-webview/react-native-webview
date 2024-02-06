@@ -20,6 +20,7 @@
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
+static NSString *const PrintingHandlerName = @"ReactNativeWebViewPrinting";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
@@ -449,6 +450,9 @@ RCTAutoInsetsProtocol>
   }
 #endif
 
+  // Sets up the window.print() support
+  [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+                                                            name:PrintingHandlerName];
   // Shim the HTML5 history API:
   [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                             name:HistoryShimName];
@@ -567,6 +571,7 @@ RCTAutoInsetsProtocol>
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
+    [_webView.configuration.userContentController removeScriptMessageHandlerForName:PrintingHandlerName];
     [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
     [_webView removeFromSuperview];
 #if !TARGET_OS_OSX
@@ -733,6 +738,12 @@ RCTAutoInsetsProtocol>
       [event addEntriesFromDictionary: @{@"data": message.body}];
       _onMessage(event);
     }
+  } else if ([message.name isEqualToString:PrintingHandlerName]) {
+    [_webView takeSnapshotWithConfiguration:NULL completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
+      UIPrintInteractionController *ctrl = UIPrintInteractionController.sharedPrintController;
+      ctrl.printingItem = snapshotImage;
+      [ctrl presentAnimated:YES completionHandler:nil];
+    }];
   }
 }
 
@@ -1745,6 +1756,19 @@ didFinishNavigation:(WKNavigation *)navigation
   ];
   WKUserScript *script = [[WKUserScript alloc] initWithSource:html5HistoryAPIShimSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
   [wkWebViewConfig.userContentController addUserScript:script];
+
+  // This is for the window.print() support.
+  NSString *windowPrintSource = [NSString stringWithFormat:
+                                   @"(function() {"
+                                    "   window.print = function () {"
+                                    "     window.webkit.messageHandlers.%@.postMessage('');"
+                                    "   };"
+                                    "})();", PrintingHandlerName];
+  WKUserScript *windowPrintScript = [[WKUserScript alloc]
+                                     initWithSource:windowPrintSource
+                                     injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+                                     forMainFrameOnly:YES];
+  [wkWebViewConfig.userContentController addUserScript:windowPrintScript];
 
   if(_sharedCookiesEnabled) {
     // More info to sending cookies with WKWebView
