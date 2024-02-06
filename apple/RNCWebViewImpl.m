@@ -739,7 +739,13 @@ RCTAutoInsetsProtocol>
       _onMessage(event);
     }
   } else if ([message.name isEqualToString:PrintingHandlerName]) {
+    if (@available(iOS 14.0, *)) {
+      _webView.mediaType = @"print";
+    }
     [_webView takeSnapshotWithConfiguration:NULL completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
+      if (@available(iOS 14.0, *)) {
+        self->_webView.mediaType = nil;
+      }
       UIPrintInteractionController *ctrl = UIPrintInteractionController.sharedPrintController;
       ctrl.printingItem = snapshotImage;
       [ctrl presentAnimated:YES completionHandler:nil];
