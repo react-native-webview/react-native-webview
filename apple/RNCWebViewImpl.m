@@ -739,17 +739,9 @@ RCTAutoInsetsProtocol>
       _onMessage(event);
     }
   } else if ([message.name isEqualToString:PrintingHandlerName]) {
-    if (@available(iOS 14.0, *)) {
-      _webView.mediaType = @"print";
-    }
-    [_webView takeSnapshotWithConfiguration:NULL completionHandler:^(UIImage * _Nullable snapshotImage, NSError * _Nullable error) {
-      if (@available(iOS 14.0, *)) {
-        self->_webView.mediaType = nil;
-      }
-      UIPrintInteractionController *ctrl = UIPrintInteractionController.sharedPrintController;
-      ctrl.printingItem = snapshotImage;
-      [ctrl presentAnimated:YES completionHandler:nil];
-    }];
+    UIPrintInteractionController *ctrl = UIPrintInteractionController.sharedPrintController;
+    ctrl.printFormatter = _webView.viewPrintFormatter;
+    [ctrl presentAnimated:YES completionHandler:nil];
   }
 }
 
@@ -1766,9 +1758,9 @@ didFinishNavigation:(WKNavigation *)navigation
   // This is for the window.print() support.
   NSString *windowPrintSource = [NSString stringWithFormat:
                                    @"(function() {"
-                                    "   window.print = function () {"
-                                    "     window.webkit.messageHandlers.%@.postMessage('');"
-                                    "   };"
+                                    " window.print = function() {"
+                                    "   window.webkit.messageHandlers.%@.postMessage('');"
+                                    " };"
                                     "})();", PrintingHandlerName];
   WKUserScript *windowPrintScript = [[WKUserScript alloc]
                                      initWithSource:windowPrintSource

@@ -31,7 +31,7 @@ const HTML = `
 
 const Printing: React.FunctionComponent = () => (
   <View style={{ height: 300 }}>
-    <WebView source={{html: HTML}} />
+    <WebView source={{html: HTML}} webviewDebuggingEnabled />
   </View>
 );
 
