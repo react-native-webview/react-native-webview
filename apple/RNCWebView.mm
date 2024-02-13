@@ -268,6 +268,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_STRING_PROP(injectedJavaScriptBeforeContentLoaded)
     REMAP_WEBVIEW_PROP(injectedJavaScriptForMainFrameOnly)
     REMAP_WEBVIEW_PROP(injectedJavaScriptBeforeContentLoadedForMainFrameOnly)
+    REMAP_WEBVIEW_STRING_PROP(injectedJavaScriptObject)
     REMAP_WEBVIEW_PROP(javaScriptEnabled)
     REMAP_WEBVIEW_PROP(javaScriptCanOpenWindowsAutomatically)
     REMAP_WEBVIEW_PROP(allowFileAccessFromFileURLs)
