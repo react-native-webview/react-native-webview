@@ -502,6 +502,11 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
     [_view injectJavaScript:javascript];
 }
 
+- (void)setTintColor:(UIColor *)TintColor
+{
+    [_view setTintColor:TintColor];
+}
+
 - (void)loadUrl:(nonnull NSString *)url {
     // android only
 }

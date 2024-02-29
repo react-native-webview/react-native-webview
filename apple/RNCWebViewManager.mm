@@ -206,6 +206,26 @@ RCT_EXPORT_METHOD(name:(nonnull NSNumber *)reactTag in_param)                   
   }];                                                                                                                                   \
 }
 
+RCT_EXPORT_METHOD(setTintColor:(nonnull NSNumber *)reactTag red:(int)red green:(int)green blue:(int)blue alpha:(float)alpha)
+{
+[self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, BASE_VIEW_PER_OS() *> *viewRegistry) {
+    RNCWebViewImpl *view = (RNCWebViewImpl *)viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebViewImpl class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
+    } else {
+      UIColor *rgbColor = [UIColor
+          colorWithRed: red / 255.0
+          green: green / 255.0
+          blue: blue / 255.0
+          alpha: alpha
+      ];
+
+      [view setTintColor:rgbColor];
+    }
+  }];
+}
+
+
 QUICK_RCT_EXPORT_COMMAND_METHOD(reload)
 QUICK_RCT_EXPORT_COMMAND_METHOD(goBack)
 QUICK_RCT_EXPORT_COMMAND_METHOD(goForward)
