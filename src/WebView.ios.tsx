@@ -127,10 +127,10 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
     postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
     injectJavaScript: (data: string) => webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
+    setTintColor: (red: number, blue: number, green: number, alpha: number) => webViewRef.current && Commands.setTintColor(webViewRef.current, red, blue, green, alpha),
     requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
     clearCache: (includeDiskFiles: boolean) => webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
   }), [setViewState, webViewRef]);
-
 
   useWarnIfChanges(allowsInlineMediaPlayback, 'allowsInlineMediaPlayback');
   useWarnIfChanges(allowsAirPlayForMediaPlayback, 'allowsAirPlayForMediaPlayback');

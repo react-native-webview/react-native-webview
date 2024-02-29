@@ -32,6 +32,7 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      */
     injectJavaScript: (script: string) => void;
 
+
     /**
      * Focuses on WebView redered page.
      */
@@ -41,7 +42,8 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      * Posts a message to WebView.
      */
     postMessage: (message: string) => void;
-    
+
+    setTintColor: (red: number, green: number, blue: number, alpha: number) => void;
      /**
      * (Android only)
      * Removes the autocomplete popup from the currently focused form field, if present.

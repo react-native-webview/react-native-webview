@@ -692,6 +692,12 @@ RCTAutoInsetsProtocol>
 #endif // !TARGET_OS_OSX
 }
 
+- (void)setTintColor:(UIColor *)TintColor
+{
+     _webView.tintColor = TintColor;
+}
+
+
 #if !TARGET_OS_OSX
 - (void)setContentInsetAdjustmentBehavior:(UIScrollViewContentInsetAdjustmentBehavior)behavior
 {
