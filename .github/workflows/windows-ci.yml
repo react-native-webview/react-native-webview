@@ -7,13 +7,13 @@ jobs:
     runs-on: windows-2022
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       name: Checkout Code
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '^14'
+        node-version: '20'
         cache: 'yarn'
 
     - name: Setup MSBuild
