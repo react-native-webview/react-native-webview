@@ -20,7 +20,7 @@
     "windows": "install-windows-test-app --project-directory example/windows && react-native run-windows --root example --arch x64",
     "ci": "CI=true && yarn lint",
     "ci:publish": "yarn semantic-release",
-    "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
+    "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx,.js,.jsx",
     "build": "babel --extensions \".ts,.tsx\" --out-dir lib src",
     "prepare": "yarn build",
     "appium": "appium",
