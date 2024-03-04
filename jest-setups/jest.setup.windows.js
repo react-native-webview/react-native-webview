@@ -1,1 +1,1 @@
-export const platform = "windows"
+export const platform = 'windows';

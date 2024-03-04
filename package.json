@@ -25,7 +25,7 @@
     "prepare": "yarn build",
     "appium": "appium",
     "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.js",
-    "add:macos": "yarn add react-native-macos@0.71.33"
+    "add:macos": "yarn add react-native-macos@0.73.17"
   },
   "rn-docs": {
     "title": "Webview",
