@@ -129,8 +129,14 @@ type WebViewRenderProcessGoneEvent = Readonly<{
   didCrash: boolean;
 }>
 
-type WebViewBlobDownloadEvent = Readonly<BlobDownload>;
-type WebViewFileDownloadEvent = Readonly<FileDownload>;
+type WebViewBlobDownloadEvent = Readonly<{
+  base64String: string;
+}>;
+
+type WebViewFileDownloadEvent = Readonly<{
+  downloadUrl: string;
+  disposition?: string;
+}>;
 
 // type MenuItem = Readonly<{label: string, key: string}>;
 
