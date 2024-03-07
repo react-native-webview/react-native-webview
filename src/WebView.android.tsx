@@ -30,9 +30,12 @@ import styles from './WebView.styles';
 
 const { resolveAssetSource } = Image;
 
-const registerCallableModule: (name: string, module: Object) => void =
-  require('react-native').registerCallableModule ??
-  BatchedBridge.registerCallableModule.bind(BatchedBridge);
+const registerCallableModule: (name: string, module: Object) => void
+  // `registerCallableModule()` is available in React Native 0.74 and above.
+  // Fallback to use `BatchedBridge.registerCallableModule()` for older versions.
+  // eslint-disable-next-line global-require
+  = require('react-native').registerCallableModule
+  ?? BatchedBridge.registerCallableModule.bind(BatchedBridge);
 
 /**
  * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
@@ -130,16 +133,16 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
       event: ShouldStartLoadRequestEvent & { messagingModuleName?: string },
     ) => {
       if (event.messagingModuleName === messagingModuleName) {
-        delete event.messagingModuleName;
-        onShouldStartLoadWithRequest(event);
+        const { messagingModuleName: _, ...rest } = event;
+        onShouldStartLoadWithRequest(rest);
       }
     },
     onMessage: (
       event: WebViewMessageEvent & { messagingModuleName?: string },
     ) => {
       if (event.messagingModuleName === messagingModuleName) {
-        delete event.messagingModuleName;
-        onMessage(event);
+        const { messagingModuleName: _, ...rest } = event;
+        onMessage(rest);
       }
     },
   }), [messagingModuleName, onMessage, onShouldStartLoadWithRequest]);
