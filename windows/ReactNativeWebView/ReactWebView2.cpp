@@ -404,8 +404,9 @@ namespace winrt::ReactNativeWebView::implementation {
         if (m_webView.CoreWebView2())
         {
             auto uri = winrt::Uri(winrt::to_hstring(m_request.at("uri").AsString()));
+            auto method = (m_request.find("method") != m_request.end()) ? m_request.at("method").AsString() : "GET";
             auto webResourceRequest = m_webView.CoreWebView2().Environment().CreateWebResourceRequest(
-                uri.ToString(), winrt::to_hstring(m_request.at("method").AsString()), nullptr, L"");
+                uri.ToString(), winrt::to_hstring(method), nullptr, L"");
                 
             SetupRequest(m_request.Copy(), webResourceRequest);
 
