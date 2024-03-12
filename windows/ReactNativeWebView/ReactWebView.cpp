@@ -57,6 +57,14 @@ namespace winrt::ReactNativeWebView::implementation {
                     self->OnNavigationFailed(sender, args);
                 }
             });
+
+        m_domContentLoadedRevoker = m_webView.DOMContentLoaded(
+            winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
+                if (auto self = ref.get()) 
+                {
+                    self->OnDOMContentLoaded(sender, args);
+                }
+            });
     }
 
     bool ReactWebView::Is17763OrHigher() {
@@ -118,9 +126,16 @@ namespace winrt::ReactNativeWebView::implementation {
             });
 
         if (m_messagingEnabled) {
-          winrt::hstring message = LR"(window.alert = function(msg) { __REACT_WEB_VIEW_BRIDGE.postMessage(`{"type":"__alert", "message" : "${msg}" }`) }; 
-            window.ReactNativeWebView = {postMessage: function(data) { __REACT_WEB_VIEW_BRIDGE.postMessage(String(data)) }};)";
-          webView.InvokeScriptAsync(L"eval", { message });
+            winrt::hstring windowAlert =
+                L"window.alert = function (msg) "
+                L"{__REACT_WEB_VIEW_BRIDGE.postMessage(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
+            winrt::hstring postMessage =
+                L"window.postMessage = function (data) "
+                L"{__REACT_WEB_VIEW_BRIDGE.postMessage(typeof data == 'string' ? data : JSON.stringify(data))};";
+            winrt::hstring reactNativeWebviewPostMessage =
+                L"window.ReactNativeWebView = {postMessage: function (data) "
+                L"{__REACT_WEB_VIEW_BRIDGE.postMessage(typeof data == 'string' ? data : JSON.stringify(data))}};";
+            webView.InvokeScriptAsync(L"eval", {windowAlert + postMessage + reactNativeWebviewPostMessage});
         }
     }
 
@@ -164,6 +179,53 @@ namespace winrt::ReactNativeWebView::implementation {
                     eventDataWriter.WriteObjectEnd();
                 });
     }
+
+    void ReactWebView::PostMessage(winrt::hstring const& message) {
+        if (m_messagingEnabled) {
+            HandleMessageFromJS(message);
+        }
+    }
+
+    void ReactWebView::OnDOMContentLoaded(winrt::WebView const& webView, winrt::WebViewDOMContentLoadedEventArgs const& /*args*/)
+    {
+        m_reactContext.DispatchEvent(
+            *this,
+            L"topDOMContentLoaded",
+            [&](winrt::IJSValueWriter const& eventDataWriter) noexcept
+            {
+                eventDataWriter.WriteObjectBegin();
+                WriteWebViewNavigationEventArg(webView, eventDataWriter);
+                eventDataWriter.WriteObjectEnd();
+            });
+        // Polyfill for missing globalThis:
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
+        webView.InvokeScriptAsync(
+            L"eval", {L"if(typeof globalThis === 'undefined') { var globalThis = Function('return this')(); }"});
+        // Polyfill for missing BigInt:
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt
+        webView.InvokeScriptAsync(L"eval", {L"window.BigInt = function (data) { return Number(parseFloat(data)); }"});
+        // Polyfill for missing DOMRect: https://developer.mozilla.org/en-US/docs/Web/API/DOMRect
+        webView.InvokeScriptAsync(
+            L"eval",
+            {L"window.DOMRect = function (x = 0, y = 0, width = 0, height = 0) { return Object.assign({ x: x, y: y, "
+             L"height: height, width: width, top: ((y > 0) ? y : (y + height)), right: ((x > 0) ? (x + width) : x), "
+             L"bottom: ((y > 0) ? (y + height) : y), left: ((x > 0) ? x : (x + width)) }); }"});
+        if (!m_injectedJavascript.empty())
+        {
+            webView.InvokeScriptAsync(L"eval", {m_injectedJavascript});
+        }
+    }
+
+    void ReactWebView::SetInjectedJavascript(winrt::hstring const& payload)
+    {
+        m_injectedJavascript = payload;
+    }
+
+    void ReactWebView::RequestFocus()
+    {
+        FocusManager::TryFocusAsync(m_webView, FocusState::Programmatic);
+    }
+
 
     void ReactWebView::MessagingEnabled(bool enabled) noexcept{
       m_messagingEnabled = enabled;

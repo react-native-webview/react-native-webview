@@ -58,6 +58,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   injectedJavaScriptBeforeContentLoaded,
   injectedJavaScriptForMainFrameOnly = true,
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true,
+  injectedJavaScriptObject,
   startInLoadingState,
   onNavigationStateChange,
   onLoadStart,
@@ -201,6 +202,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
       injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
       injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
+      injectedJavaScriptObject={JSON.stringify(injectedJavaScriptObject)}
       dataDetectorTypes={!dataDetectorTypes || Array.isArray(dataDetectorTypes) ? dataDetectorTypes : [dataDetectorTypes]}
       allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
       allowsInlineMediaPlayback={allowsInlineMediaPlayback}

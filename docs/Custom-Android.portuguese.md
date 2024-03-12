@@ -6,7 +6,7 @@ Antes de fazer isso, você deve estar familiarizado com os conceitos de [compone
 
 Para começar, você precisará criar uma subclasse de `RNCWebViewManager`, `RNCWebView` e `RNCWebViewClient`. Em seu gerenciador de visualizações, você precisará substituir:
 
-- `createReactWebViewInstance`
+- `createViewInstance`
 - `getName`
 - `addEventEmitters`
 
@@ -25,8 +25,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   }
 
   @Override
-  protected RNCWebView createRNCWebViewInstance(ThemedReactContext reactContext) {
-    return new CustomWebView(reactContext);
+  protected RNCWebView createViewInstance(ThemedReactContext reactContext) {
+    return super.createViewInstance(reactContext, new CustomWebView(reactContext));
   }
 
   @Override
@@ -35,8 +35,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   }
 
   @Override
-  protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
-    view.setWebViewClient(new CustomWebViewClient());
+  protected void addEventEmitters(ThemedReactContext reactContext, RNCWebViewWrapper view) {
+    view.getWebView().setWebViewClient(new CustomWebViewClient());
   }
 }
 ```
@@ -70,8 +70,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   ...
 
   @ReactProp(name = "finalUrl")
-  public void setFinalUrl(WebView view, String url) {
-    ((CustomWebView) view).setFinalUrl(url);
+  public void setFinalUrl(RNCWebViewWrapper view, String url) {
+    ((CustomWebView) view.getWebView()).setFinalUrl(url);
   }
 }
 ```

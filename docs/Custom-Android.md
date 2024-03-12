@@ -6,7 +6,7 @@ Before you do this, you should be familiar with the concepts in [native UI compo
 
 To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `RNCWebViewClient`. In your view manager, you'll then need to override:
 
-- `createReactWebViewInstance`
+- `createViewInstance`
 - `getName`
 - `addEventEmitters`
 
@@ -35,8 +35,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   }
 
   @Override
-  protected void addEventEmitters(ThemedReactContext reactContext, RNCWebView view) {
-    view.setWebViewClient(new CustomWebViewClient());
+  protected void addEventEmitters(ThemedReactContext reactContext, RNCWebViewWrapper view) {
+    view.getWebView().setWebViewClient(new CustomWebViewClient());
   }
 }
 ```
@@ -70,8 +70,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   ...
 
   @ReactProp(name = "finalUrl")
-  public void setFinalUrl(WebView view, String url) {
-    ((CustomWebView) view).setFinalUrl(url);
+  public void setFinalUrl(RNCWebViewWrapper view, String url) {
+    ((CustomWebView) view.getWebView()).setFinalUrl(url);
   }
 }
 ```
