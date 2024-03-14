@@ -1585,10 +1585,6 @@ An array of custom menu item objects that will be shown when selecting text. An 
 | ------------------------------------------------------------------ | -------- | -------- |
 | array of objects: {label: string, key: string}                     | No       | iOS, Android      |
 
-| Type                                                               | Required | Platform |
-| ------------------------------------------------------------------ | -------- | -------- |
-| array of objects: {label: string, key: string}                     | No       | iOS      |
-
 Example:
 
 ```jsx

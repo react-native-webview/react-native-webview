@@ -1471,10 +1471,6 @@ Uma matriz de objetos de itens de menu personalizados que serão exibidos ao sel
 | ------------------------------------------------------------------ | --------  | --------   |
 | array of objects: {label: string, key: string}                     | Não       | iOS, Android        |
 
-| Tipo                                                               | Requerido | Plataforma |
-| ------------------------------------------------------------------ | --------  | --------   |
-| array of objects: {label: string, key: string}                     | Não       | iOS        |
-
 Exemplo:
 
 ```javascript

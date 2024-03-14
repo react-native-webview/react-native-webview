@@ -1240,95 +1240,95 @@ RCTAutoInsetsProtocol>
   decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
                   decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
-  static NSDictionary<NSNumber *, NSString *> *navigationTypes;
-  static dispatch_once_t onceToken;
+    static NSDictionary<NSNumber *, NSString *> *navigationTypes;
+    static dispatch_once_t onceToken;
 
-  dispatch_once(&onceToken, ^{
-      navigationTypes = @{
-          @(WKNavigationTypeLinkActivated): @"click",
-          @(WKNavigationTypeFormSubmitted): @"formsubmit",
-          @(WKNavigationTypeBackForward): @"backforward",
-          @(WKNavigationTypeReload): @"reload",
-          @(WKNavigationTypeFormResubmitted): @"formresubmit",
-          @(WKNavigationTypeOther): @"other",
-      };
-  });
+    dispatch_once(&onceToken, ^{
+        navigationTypes = @{
+            @(WKNavigationTypeLinkActivated): @"click",
+            @(WKNavigationTypeFormSubmitted): @"formsubmit",
+            @(WKNavigationTypeBackForward): @"backforward",
+            @(WKNavigationTypeReload): @"reload",
+            @(WKNavigationTypeFormResubmitted): @"formresubmit",
+            @(WKNavigationTypeOther): @"other",
+        };
+    });
 
-  WKNavigationType navigationType = navigationAction.navigationType;
-  NSURLRequest *request = navigationAction.request;
-  BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
-  BOOL hasTargetFrame = navigationAction.targetFrame != nil;
+    WKNavigationType navigationType = navigationAction.navigationType;
+    NSURLRequest *request = navigationAction.request;
+    BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
+    BOOL hasTargetFrame = navigationAction.targetFrame != nil;
 
-  if (_onOpenWindow && !hasTargetFrame) {
-    // When OnOpenWindow should be called, we want to prevent the navigation
-    // If not prevented, the `decisionHandler` is called first and after that `createWebViewWithConfiguration` is called
-    // In that order the WebView's ref would be updated with the target URL even if `createWebViewWithConfiguration` does not call `loadRequest`
-    // So the WebView's document stays on the current URL, but the WebView's ref is replaced by the target URL
-    // By preventing the navigation here, we also prevent the WebView's ref mutation
-    // The counterpart is that we have to manually call `_onOpenWindow` here, because no navigation means no call to `createWebViewWithConfiguration`
-    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    [event addEntriesFromDictionary: @{@"targetUrl": request.URL.absoluteString}];
-    decisionHandler(WKNavigationActionPolicyCancel);
-    _onOpenWindow(event);
-    return;
-  }
-
-  if (_onShouldStartLoadWithRequest) {
+    if (_onOpenWindow && !hasTargetFrame) {
+      // When OnOpenWindow should be called, we want to prevent the navigation
+      // If not prevented, the `decisionHandler` is called first and after that `createWebViewWithConfiguration` is called
+      // In that order the WebView's ref would be updated with the target URL even if `createWebViewWithConfiguration` does not call `loadRequest`
+      // So the WebView's document stays on the current URL, but the WebView's ref is replaced by the target URL
+      // By preventing the navigation here, we also prevent the WebView's ref mutation
+      // The counterpart is that we have to manually call `_onOpenWindow` here, because no navigation means no call to `createWebViewWithConfiguration`
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-      int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
-          dispatch_async(dispatch_get_main_queue(), ^{
-              if (!shouldStart) {
-                  decisionHandler(WKNavigationActionPolicyCancel);
-                  return;
-              }
-              if (self->_onLoadingStart) {
-                  // We have this check to filter out iframe requests and whatnot
-                  if (isTopFrame) {
-                      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-                      [event addEntriesFromDictionary: @{
-                          @"url": (request.URL).absoluteString,
-                          @"navigationType": navigationTypes[@(navigationType)]
-                      }];
-                      self->_onLoadingStart(event);
-                  }
-              }
-
-              // Allow all navigation by default
-              decisionHandler(WKNavigationActionPolicyAllow);
-          });
-
-      }];
-      if (request.mainDocumentURL) {
-        [event addEntriesFromDictionary: @{
-          @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
-        }];
-      }
-      [event addEntriesFromDictionary: @{
-          @"url": (request.URL).absoluteString,
-          @"navigationType": navigationTypes[@(navigationType)],
-          @"isTopFrame": @(isTopFrame),
-          @"hasTargetFrame": @(hasTargetFrame),
-          @"lockIdentifier": @(lockIdentifier)
-      }];
-      _onShouldStartLoadWithRequest(event);
-      // decisionHandler(WKNavigationActionPolicyAllow);
+      [event addEntriesFromDictionary: @{@"targetUrl": request.URL.absoluteString}];
+      decisionHandler(WKNavigationActionPolicyCancel);
+      _onOpenWindow(event);
       return;
-  }
+    }
 
-  if (_onLoadingStart) {
-      // We have this check to filter out iframe requests and whatnot
-      if (isTopFrame) {
-          NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    if (_onShouldStartLoadWithRequest) {
+        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+        int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!shouldStart) {
+                    decisionHandler(WKNavigationActionPolicyCancel);
+                    return;
+                }
+                if (self->_onLoadingStart) {
+                    // We have this check to filter out iframe requests and whatnot
+                    if (isTopFrame) {
+                        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+                        [event addEntriesFromDictionary: @{
+                            @"url": (request.URL).absoluteString,
+                            @"navigationType": navigationTypes[@(navigationType)]
+                        }];
+                        self->_onLoadingStart(event);
+                    }
+                }
+
+                // Allow all navigation by default
+                decisionHandler(WKNavigationActionPolicyAllow);
+            });
+
+        }];
+        if (request.mainDocumentURL) {
           [event addEntriesFromDictionary: @{
-              @"url": (request.URL).absoluteString,
-              @"navigationType": navigationTypes[@(navigationType)]
+            @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
           }];
-          _onLoadingStart(event);
-      }
-  }
+        }
+        [event addEntriesFromDictionary: @{
+            @"url": (request.URL).absoluteString,
+            @"navigationType": navigationTypes[@(navigationType)],
+            @"isTopFrame": @(isTopFrame),
+            @"hasTargetFrame": @(hasTargetFrame),
+            @"lockIdentifier": @(lockIdentifier)
+        }];
+        _onShouldStartLoadWithRequest(event);
+        // decisionHandler(WKNavigationActionPolicyAllow);
+        return;
+    }
 
-  // Allow all navigation by default
-  decisionHandler(WKNavigationActionPolicyAllow);
+    if (_onLoadingStart) {
+        // We have this check to filter out iframe requests and whatnot
+        if (isTopFrame) {
+            NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+            [event addEntriesFromDictionary: @{
+                @"url": (request.URL).absoluteString,
+                @"navigationType": navigationTypes[@(navigationType)]
+            }];
+            _onLoadingStart(event);
+        }
+    }
+
+    // Allow all navigation by default
+    decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 /**
