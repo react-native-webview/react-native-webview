@@ -1,137 +1,110 @@
+import java.nio.file.Paths
+
 buildscript {
-  ext.getExtOrDefault = {name ->
-    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNativeWebView_' + name]
-  }
-
-  // The Android Gradle plugin is only required when opening the android folder stand-alone.
-  // This avoids unnecessary downloads and potential conflicts when the library is included as a
-  // module dependency in an application project.
-  if (project == rootProject) {
+    ext.safeExtGet = {prop ->
+        rootProject.ext.has(prop) ? rootProject.ext.get(prop) : project.properties['ReactNativeWebView_' + prop]
+    }
     repositories {
-      mavenCentral()
-      google()
+        google()
+        gradlePluginPortal()
     }
-
     dependencies {
-      classpath("com.android.tools.build:gradle:3.6.0")
-      classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${safeExtGet('kotlinVersion')}")
+        classpath("com.android.tools.build:gradle:7.0.4")
     }
-  } else {
-    repositories {
-      mavenCentral()
-    }
-
-    dependencies {
-      classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}")
-    }
-  }
 }
 
-def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['ReactNativeWebView_' + name]).toInteger()
+def getExtOrIntegerDefault(prop) {
+  return rootProject.ext.has(prop) ? rootProject.ext.get(prop) : (project.properties['ReactNativeWebView_' + prop]).toInteger()
+}
+
+static def findNodeModulePath(baseDir, packageName) {
+    def basePath = baseDir.toPath().normalize()
+    // Node's module resolution algorithm searches up to the root directory,
+    // after which the base path will be null
+    while (basePath) {
+        def candidatePath = Paths.get(basePath.toString(), "node_modules", packageName)
+        if (candidatePath.toFile().exists()) {
+            return candidatePath.toString()
+        }
+        basePath = basePath.getParent()
+    }
+    return null
+}
+
+def isNewArchitectureEnabled() {
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+def supportsNamespace() {
+  def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+  def major = parsed[0].toInteger()
+  def minor = parsed[1].toInteger()
+
+  // Namespace support was added in 7.3.0
+  if (major == 7 && minor >= 3) {
+    return true
+  }
+
+  return major >= 8
 }
 
 apply plugin: 'com.android.library'
+if (isNewArchitectureEnabled()) {
+    apply plugin: 'com.facebook.react'
+}
 apply plugin: 'kotlin-android'
 
 android {
-  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
-  defaultConfig {
-    minSdkVersion getExtOrIntegerDefault('minSdkVersion')
-    targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
-    versionCode 1
-    versionName "1.0"
-  }
-  buildTypes {
-    release {
-      minifyEnabled false
+    if (supportsNamespace()) {
+        namespace "com.reactnativecommunity.webview"
+        buildFeatures {
+            buildConfig true
+        }
+
+        sourceSets {
+            main {
+                manifest.srcFile "src/main/AndroidManifestNew.xml"
+            }
+        }
     }
-  }
-  lintOptions {
-    disable 'GradleCompatible'
-  }
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
+
+    compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+
+    defaultConfig {
+        minSdkVersion getExtOrIntegerDefault('minSdkVersion')
+        targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+    }
+
+    sourceSets {
+        main {
+            if (isNewArchitectureEnabled()) {
+                java.srcDirs += ['src/newarch']
+            } else {
+                java.srcDirs += ['src/oldarch']
+            }
+        }
+    }
+}
+
+def reactNativePath = findNodeModulePath(projectDir, "react-native")
+def codegenPath = findNodeModulePath(projectDir, "@react-native/codegen")
+if (codegenPath == null) {
+  // Compat for 0.71 and lower (to be removed)
+  codegenPath = findNodeModulePath(projectDir, "react-native-codegen")
 }
 
 repositories {
-  mavenCentral()
-  google()
-
-  def found = false
-  def defaultDir = null
-  def androidSourcesName = 'React Native sources'
-
-  if (rootProject.ext.has('reactNativeAndroidRoot')) {
-    defaultDir = rootProject.ext.get('reactNativeAndroidRoot')
-  } else {
-    defaultDir = new File(
-      projectDir,
-      '/../../../node_modules/react-native/android'
-    )
-  }
-
-  if (defaultDir.exists()) {
     maven {
-      url defaultDir.toString()
-      name androidSourcesName
+        url "${reactNativePath}/android"
     }
-
-    logger.info(":${project.name}:reactNativeAndroidRoot ${defaultDir.canonicalPath}")
-    found = true
-  } else {
-    def parentDir = rootProject.projectDir
-
-    1.upto(5, {
-      if (found) return true
-      parentDir = parentDir.parentFile
-
-      def androidSourcesDir = new File(
-        parentDir,
-        'node_modules/react-native'
-      )
-
-      def androidPrebuiltBinaryDir = new File(
-        parentDir,
-        'node_modules/react-native/android'
-      )
-
-      if (androidPrebuiltBinaryDir.exists()) {
-        maven {
-          url androidPrebuiltBinaryDir.toString()
-          name androidSourcesName
-        }
-
-        logger.info(":${project.name}:reactNativeAndroidRoot ${androidPrebuiltBinaryDir.canonicalPath}")
-        found = true
-      } else if (androidSourcesDir.exists()) {
-        maven {
-          url androidSourcesDir.toString()
-          name androidSourcesName
-        }
-
-        logger.info(":${project.name}:reactNativeAndroidRoot ${androidSourcesDir.canonicalPath}")
-        found = true
-      }
-    })
-  }
-
-  if (!found) {
-    throw new GradleException(
-      "${project.name}: unable to locate React Native android sources. " +
-        "Ensure you have you installed React Native as a dependency in your project and try again."
-    )
-  }
+    mavenCentral()
+    google()
 }
 
-def kotlin_version = getExtOrDefault('kotlinVersion')
-def webkit_version = getExtOrDefault('webkitVersion')
-
 dependencies {
-  //noinspection GradleDynamicVersion
-  implementation 'com.facebook.react:react-native:+'
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "androidx.webkit:webkit:$webkit_version"
+    implementation 'com.facebook.react:react-native:+'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
+    implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
 }

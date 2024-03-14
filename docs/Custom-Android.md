@@ -6,7 +6,7 @@ Before you do this, you should be familiar with the concepts in [native UI compo
 
 To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `RNCWebViewClient`. In your view manager, you'll then need to override:
 
-- `createReactWebViewInstance`
+- `createViewInstance`
 - `getName`
 - `addEventEmitters`
 
@@ -25,8 +25,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   }
 
   @Override
-  protected RNCWebView createRNCWebViewInstance(ThemedReactContext reactContext) {
-    return new CustomWebView(reactContext);
+  protected RNCWebView createViewInstance(ThemedReactContext reactContext) {
+    return super.createViewInstance(reactContext, new CustomWebView(reactContext));
   }
 
   @Override
@@ -35,8 +35,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   }
 
   @Override
-  protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
-    view.setWebViewClient(new CustomWebViewClient());
+  protected void addEventEmitters(ThemedReactContext reactContext, RNCWebViewWrapper view) {
+    view.getWebView().setWebViewClient(new CustomWebViewClient());
   }
 }
 ```
@@ -70,8 +70,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
   ...
 
   @ReactProp(name = "finalUrl")
-  public void setFinalUrl(WebView view, String url) {
-    ((CustomWebView) view).setFinalUrl(url);
+  public void setFinalUrl(RNCWebViewWrapper view, String url) {
+    ((CustomWebView) view.getWebView()).setFinalUrl(url);
   }
 }
 ```
@@ -217,6 +217,6 @@ export default class CustomWebView extends Component {
 ```
 ## Translations
 
-This file is available at:
-
+This file is available in:
 - [Brazilian portuguese](Custom-Android.portuguese.md)
+- [Italian](Custom-Android.italian.md)

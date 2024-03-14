@@ -101,7 +101,7 @@ export {
   defaultRenderError,
 };
 
-export const useWebWiewLogic = ({
+export const useWebViewLogic = ({
   startInLoadingState,
   onNavigationStateChange,
   onLoadStart,
@@ -230,11 +230,9 @@ export const useWebWiewLogic = ({
     )
   , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
 
-  // Android and iOS Only
   const onOpenWindow = useCallback((event: WebViewOpenWindowEvent) => {
     onOpenWindowProp?.(event);
   }, [onOpenWindowProp]);
-  // !Android and iOS Only
 
   return {
     onShouldStartLoadWithRequest,
