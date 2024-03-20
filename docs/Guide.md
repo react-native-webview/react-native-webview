@@ -375,7 +375,7 @@ By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the J
 > Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
 
 
-#### The `injectedJavaScriptObject` prop (Android Only)
+#### The `injectedJavaScriptObject` prop
 
 Due to the Android race condition mentioned above, this more reliable prop was added. While you cannot execute arbitrary JavaScript, you can make an arbitrary JS object available to the JS run in the webview prior to the page load completing.
 
