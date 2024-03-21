@@ -20,12 +20,22 @@ import {
   useWebViewLogic,
 } from './WebViewShared';
 import {
-  AndroidWebViewProps, WebViewSourceUri,
+  AndroidWebViewProps,
+  WebViewSourceUri,
+  type WebViewMessageEvent,
+  type ShouldStartLoadRequestEvent,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
 const { resolveAssetSource } = Image;
+
+const registerCallableModule: (name: string, module: Object) => void
+  // `registerCallableModule()` is available in React Native 0.74 and above.
+  // Fallback to use `BatchedBridge.registerCallableModule()` for older versions.
+  // eslint-disable-next-line global-require
+  = require('react-native').registerCallableModule
+  ?? BatchedBridge.registerCallableModule.bind(BatchedBridge);
 
 /**
  * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
@@ -119,12 +129,26 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   }), [setViewState, webViewRef]);
 
   const directEventCallbacks = useMemo(() => ({
-    onShouldStartLoadWithRequest,
-    onMessage,
-  }), [onMessage, onShouldStartLoadWithRequest]);
+    onShouldStartLoadWithRequest: (
+      event: ShouldStartLoadRequestEvent & { messagingModuleName?: string },
+    ) => {
+      if (event.messagingModuleName === messagingModuleName) {
+        const { messagingModuleName: _, ...rest } = event;
+        onShouldStartLoadWithRequest(rest);
+      }
+    },
+    onMessage: (
+      event: WebViewMessageEvent & { messagingModuleName?: string },
+    ) => {
+      if (event.messagingModuleName === messagingModuleName) {
+        const { messagingModuleName: _, ...rest } = event;
+        onMessage(rest);
+      }
+    },
+  }), [messagingModuleName, onMessage, onShouldStartLoadWithRequest]);
 
   useEffect(() => {
-    BatchedBridge.registerCallableModule(messagingModuleName, directEventCallbacks);
+    registerCallableModule('RNCWebViewMessagingModule', directEventCallbacks);
   }, [messagingModuleName, directEventCallbacks])
 
   let otherView: ReactElement | undefined;
