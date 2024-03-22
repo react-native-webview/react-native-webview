@@ -156,10 +156,15 @@ export const useWebViewLogic = ({
     } else {
       console.warn('Encountered an error loading page', event.nativeEvent);
     }
+
+    // This block is only entered if the error is for the main source itself,
+    // not for related assets.
+    if (startUrl.current === event.nativeEvent.url) {
     onLoadEnd?.(event);
     if (event.isDefaultPrevented()) { return };
     setViewState('ERROR');
     setLastErrorEvent(event.nativeEvent);
+    }
   }, [onError, onLoadEnd]);
 
   const onHttpError = useCallback((event: WebViewHttpErrorEvent) => {

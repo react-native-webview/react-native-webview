@@ -3,12 +3,14 @@ package com.reactnativecommunity.webview;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
+import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 import android.webkit.HttpAuthHandler;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -211,9 +213,20 @@ public class RNCWebViewClient extends WebViewClient {
     @Override
     public void onReceivedError(
             WebView webView,
-            int errorCode,
-            String description,
-            String failingUrl) {
+            WebResourceRequest request,
+            WebResourceError error
+    ) {
+
+        Uri uri = request.getUrl();
+
+        // Browsers attempt to fetch favicon for all domains, failure to get it
+        // is relevant to the success of loading the target resource, thus we
+        // just ignore it.
+        if (uri.getPath().equals("/favicon.ico")) return;
+
+        String failingUrl = uri.toString();
+        String description = error.getDescription().toString();
+        int errorCode = error.getErrorCode();
 
         if (ignoreErrFailedForThisURL != null
                 && failingUrl.equals(ignoreErrFailedForThisURL)
@@ -229,12 +242,18 @@ public class RNCWebViewClient extends WebViewClient {
             return;
         }
 
-        super.onReceivedError(webView, errorCode, description, failingUrl);
+        super.onReceivedError(webView, request, error);
+
+        // This block is entered for the main source only, not for any assets
+        // it loads, thus keeping the original logic for related events on JS
+        // side, beside the onError events themselves.
+        if (request.isForMainFrame()) {
         mLastLoadFailed = true;
 
         // In case of an error JS side expect to get a finish event first, and then get an error event
         // Android WebView does it in the opposite way, so we need to simulate that behavior
         emitFinishEvent(webView, failingUrl);
+        }
 
         WritableMap eventData = createWebViewEvent(webView, failingUrl);
         eventData.putDouble("code", errorCode);
