@@ -48,7 +48,7 @@ describe('WebViewShared', () => {
     test('loadRequest is called without onShouldStartLoadWithRequest override', async () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
-        defaultOriginWhitelist,
+        defaultOriginWhitelist
       );
 
       onShouldStartLoadWithRequest({
@@ -61,14 +61,14 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenCalledWith(
         true,
         'https://www.example.com/',
-        1,
+        1
       );
     });
 
     test('Linking.openURL is called without onShouldStartLoadWithRequest override', async () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
-        defaultOriginWhitelist,
+        defaultOriginWhitelist
       );
 
       onShouldStartLoadWithRequest({
@@ -81,7 +81,7 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenCalledWith(
         false,
         'invalid://example.com/',
-        2,
+        2
       );
     });
 
@@ -89,7 +89,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        alwaysTrueOnShouldStartLoadWithRequest,
+        alwaysTrueOnShouldStartLoadWithRequest
       );
 
       onShouldStartLoadWithRequest({
@@ -102,7 +102,7 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(
         true,
         'https://www.example.com/',
-        1,
+        1
       );
     });
 
@@ -110,7 +110,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        alwaysTrueOnShouldStartLoadWithRequest,
+        alwaysTrueOnShouldStartLoadWithRequest
       );
 
       onShouldStartLoadWithRequest({
@@ -120,14 +120,14 @@ describe('WebViewShared', () => {
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith(
-        'invalid://example.com/',
+        'invalid://example.com/'
       );
       // We don't expect the URL to have been loaded in the WebView because it
       // is not in the origin whitelist
       expect(loadRequest).toHaveBeenLastCalledWith(
         false,
         'invalid://example.com/',
-        1,
+        1
       );
     });
 
@@ -135,7 +135,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        alwaysFalseOnShouldStartLoadWithRequest,
+        alwaysFalseOnShouldStartLoadWithRequest
       );
 
       onShouldStartLoadWithRequest({
@@ -148,14 +148,14 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(
         false,
         'https://www.example.com/',
-        1,
+        1
       );
     });
 
     test('loadRequest with limited whitelist', async () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
-        ['https://*'],
+        ['https://*']
       );
 
       onShouldStartLoadWithRequest({
@@ -168,7 +168,7 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(
         true,
         'https://www.example.com/',
-        1,
+        1
       );
 
       onShouldStartLoadWithRequest({
@@ -181,7 +181,7 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(
         false,
         'http://insecure.com/',
-        2,
+        2
       );
 
       onShouldStartLoadWithRequest({
@@ -191,12 +191,12 @@ describe('WebViewShared', () => {
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith(
-        'git+https://insecure.com/',
+        'git+https://insecure.com/'
       );
       expect(loadRequest).toHaveBeenLastCalledWith(
         false,
         'git+https://insecure.com/',
-        3,
+        3
       );
 
       onShouldStartLoadWithRequest({
@@ -206,12 +206,12 @@ describe('WebViewShared', () => {
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith(
-        'fakehttps://insecure.com/',
+        'fakehttps://insecure.com/'
       );
       expect(loadRequest).toHaveBeenLastCalledWith(
         false,
         'fakehttps://insecure.com/',
-        4,
+        4
       );
     });
 
@@ -224,7 +224,7 @@ describe('WebViewShared', () => {
           'dash-https://*',
           '0invalid://*',
           '+invalid://*',
-        ],
+        ]
       );
 
       onShouldStartLoadWithRequest({
@@ -239,7 +239,7 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(
         true,
         'plus+https://www.example.com/',
-        1,
+        1
       );
 
       onShouldStartLoadWithRequest({
@@ -252,7 +252,7 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(
         true,
         'DOT.https://www.example.com/',
-        2,
+        2
       );
 
       onShouldStartLoadWithRequest({
@@ -268,7 +268,7 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(
         true,
         'dash-https://www.example.com/',
-        3,
+        3
       );
 
       onShouldStartLoadWithRequest({
@@ -278,12 +278,12 @@ describe('WebViewShared', () => {
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith(
-        '0invalid://www.example.com/',
+        '0invalid://www.example.com/'
       );
       expect(loadRequest).toHaveBeenLastCalledWith(
         false,
         '0invalid://www.example.com/',
-        4,
+        4
       );
 
       onShouldStartLoadWithRequest({
@@ -293,12 +293,12 @@ describe('WebViewShared', () => {
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith(
-        '+invalid://www.example.com/',
+        '+invalid://www.example.com/'
       );
       expect(loadRequest).toHaveBeenLastCalledWith(
         false,
         '+invalid://www.example.com/',
-        5,
+        5
       );
 
       onShouldStartLoadWithRequest({
@@ -311,12 +311,12 @@ describe('WebViewShared', () => {
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith(
-        'FAKE+plus+https://www.example.com/',
+        'FAKE+plus+https://www.example.com/'
       );
       expect(loadRequest).toHaveBeenLastCalledWith(
         false,
         'FAKE+plus+https://www.example.com/',
-        6,
+        6
       );
     });
   });

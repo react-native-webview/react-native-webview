@@ -39,7 +39,7 @@ const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
   const ref = useRef(value);
   if (ref.current !== value) {
     console.warn(
-      `Changes to property ${name} do nothing after the initial render.`,
+      `Changes to property ${name} do nothing after the initial render.`
     );
     ref.current = value;
   }
@@ -76,7 +76,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       ...otherProps
     },
-    ref,
+    ref
   ) => {
     const webViewRef = useRef<NativeWebViewMacOS | null>(null);
 
@@ -84,10 +84,10 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
       (shouldStart: boolean, _url: string, lockIdentifier = 0) => {
         RNCWebViewModule.shouldStartLoadWithLockIdentifier(
           !!shouldStart,
-          lockIdentifier,
+          lockIdentifier
         );
       },
-      [],
+      []
     );
 
     const {
@@ -133,18 +133,18 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
           Commands.injectJavaScript(webViewRef.current, data),
         requestFocus: () => Commands.requestFocus(webViewRef.current),
       }),
-      [setViewState, webViewRef],
+      [setViewState, webViewRef]
     );
 
     useWarnIfChanges(allowsInlineMediaPlayback, 'allowsInlineMediaPlayback');
     useWarnIfChanges(
       allowsAirPlayForMediaPlayback,
-      'allowsAirPlayForMediaPlayback',
+      'allowsAirPlayForMediaPlayback'
     );
     useWarnIfChanges(incognito, 'incognito');
     useWarnIfChanges(
       mediaPlaybackRequiresUserAction,
-      'mediaPlaybackRequiresUserAction',
+      'mediaPlaybackRequiresUserAction'
     );
 
     let otherView = null;
@@ -153,12 +153,12 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
     } else if (viewState === 'ERROR') {
       invariant(
         lastErrorEvent != null,
-        'lastErrorEvent expected to be non-null',
+        'lastErrorEvent expected to be non-null'
       );
       otherView = (renderError || defaultRenderError)(
         lastErrorEvent.domain,
         lastErrorEvent.code,
-        lastErrorEvent.description,
+        lastErrorEvent.description
       );
     } else if (viewState !== 'IDLE') {
       console.error(`RNCWebView invalid state encountered: ${viewState}`);
@@ -209,7 +209,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
         {otherView}
       </View>
     );
-  },
+  }
 );
 
 // no native implementation for macOS, depends only on permissions

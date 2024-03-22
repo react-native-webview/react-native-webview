@@ -9,7 +9,7 @@ export interface Spec extends TurboModule {
   isFileUploadSupported(): Promise<boolean>;
   shouldStartLoadWithLockIdentifier(
     shouldStart: boolean,
-    lockIdentifier: Double,
+    lockIdentifier: Double
   ): void;
 }
 

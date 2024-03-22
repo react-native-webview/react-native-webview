@@ -270,7 +270,7 @@ export interface WebViewNativeConfig {
 }
 
 export type OnShouldStartLoadWithRequest = (
-  event: ShouldStartLoadRequest,
+  event: ShouldStartLoadRequest
 ) => boolean;
 
 export interface BasicAuthCredential {
@@ -1153,7 +1153,7 @@ export interface WebViewSharedProps extends ViewProps {
   renderError?: (
     errorDomain: string | undefined,
     errorCode: number,
-    errorDesc: string,
+    errorDesc: string
   ) => ReactElement; // view to show if there's an error
 
   /**
