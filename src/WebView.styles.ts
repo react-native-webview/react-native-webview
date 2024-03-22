@@ -1,15 +1,6 @@
-import { StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-interface Styles {
-  container: ViewStyle;
-  errorText: TextStyle;
-  errorTextTitle: TextStyle;
-  loadingOrErrorView: ViewStyle;
-  webView: ViewStyle;
-  loadingProgressBar: ViewStyle;
-}
-
-const styles = StyleSheet.create<Styles>({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
@@ -21,7 +12,7 @@ const styles = StyleSheet.create<Styles>({
     alignItems: 'center',
     height: '100%',
     width: '100%',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   loadingProgressBar: {
     height: 20,
@@ -38,6 +29,12 @@ const styles = StyleSheet.create<Styles>({
   },
   webView: {
     backgroundColor: '#ffffff',
+  },
+  flexStart: {
+    alignSelf: 'flex-start',
+  },
+  colorRed: {
+    color: 'red',
   },
 });
 
