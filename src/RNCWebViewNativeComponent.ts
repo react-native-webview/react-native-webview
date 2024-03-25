@@ -244,6 +244,7 @@ export interface NativeProps extends ViewProps {
   // Workaround to watch if listener if defined
   hasOnFileDownload?: boolean;
   fraudulentWebsiteWarningEnabled?: boolean;
+  autoSelectClientCertificateEnabled?: boolean;
   // !iOS only
 
   allowFileAccessFromFileURLs?: boolean;

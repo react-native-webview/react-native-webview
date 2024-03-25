@@ -412,6 +412,9 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
 
     @Override
     public void setFraudulentWebsiteWarningEnabled(RNCWebViewWrapper view, boolean value) {}
+
+    @Override
+    public void setAutoSelectClientCertificateEnabled(RNCWebViewWrapper view, boolean value) {}
     /* !iOS PROPS - no implemented here */
 
     @Override
