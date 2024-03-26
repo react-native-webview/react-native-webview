@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.annotation.RequiresApi;
@@ -191,6 +193,10 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                     });
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
+                    //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+                    Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    posButton.setEnabled(false);
+                    this.runDelayed(() -> posButton.setEnabled(true), 500);
                 } else {
                     requestedAndroidPermissions.add(androidPermission);
                 }
@@ -213,6 +219,10 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         requestPermissions(requestedAndroidPermissions);
     }
 
+    private void runDelayed(Runnable function, long delayMillis) {
+        Handler handler = new Handler();
+        handler.postDelayed(function, delayMillis);
+    }
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -241,6 +251,11 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+            //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+            Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            posButton.setEnabled(false);
+            this.runDelayed(() -> posButton.setEnabled(true), 500);
+
         }
     }
 
