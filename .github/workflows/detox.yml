@@ -6,15 +6,16 @@ jobs:
     name: 'Running tests'
     runs-on: 'macOS-latest'
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 20
+          cache: 'yarn'
       - name: Setup - Install Yarn
         run: YARN_GPG=NO curl -o- -L https://yarnpkg.com/install.sh | bash
       - name: Setup - Install NPM Dependencies
         run: yarn --frozen-lockfile
-      - name: Setup - Install CocoaPods CLI
-        run: sudo gem install cocoapods -v 1.8.4
       - name: Run tests
         run: yarn ci

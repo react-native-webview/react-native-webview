@@ -2,30 +2,29 @@ const project = (() => {
   const fs = require('fs');
   const path = require('path');
   try {
-    const {
-      androidManifestPath,
-      windowsProjectPath,
-    } = require('react-native-test-app');
-    return {
+    const { configureProjects } = require('react-native-test-app');
+
+    return configureProjects({
       android: {
         sourceDir: path.join('example', 'android'),
-        manifestPath: androidManifestPath(
-          path.join(__dirname, 'example', 'android'),
-        ),
+        manifestPath: path.join(__dirname, 'example', 'android'),
       },
       ios: {
         sourceDir: 'example/ios',
       },
       windows: fs.existsSync('example/windows/WebviewExample.sln') && {
         sourceDir: path.join('example', 'windows'),
-        solutionFile: 'WebviewExample.sln',
-        project: windowsProjectPath(path.join(__dirname, 'example', 'windows')),
+        solutionFile: path.join('example', 'windows', 'WebviewExample.sln'),
+        project: path.join(__dirname, 'example', 'windows'),
       },
-    };
-  } catch (_) {
+    });
+  } catch (e) {
+    console.log('Hello?', e);
     return undefined;
   }
 })();
+
+// console.log(project);
 
 module.exports = {
   dependencies: {

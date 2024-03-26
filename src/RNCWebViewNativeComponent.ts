@@ -1,6 +1,11 @@
 import type { HostComponent, ViewProps } from 'react-native';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import {DirectEventHandler,Double, Int32, WithDefault} from 'react-native/Libraries/Types/CodegenTypes';
+import {
+  DirectEventHandler,
+  Double,
+  Int32,
+  WithDefault,
+} from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
 export type WebViewNativeEvent = Readonly<{
@@ -10,12 +15,12 @@ export type WebViewNativeEvent = Readonly<{
   canGoBack: boolean;
   canGoForward: boolean;
   lockIdentifier: Double;
-}>
+}>;
 export type WebViewCustomMenuSelectionEvent = Readonly<{
   label: string;
   key: string;
   selectedText: string;
-}>
+}>;
 export type WebViewMessageEvent = Readonly<{
   url: string;
   loading: boolean;
@@ -24,10 +29,10 @@ export type WebViewMessageEvent = Readonly<{
   canGoForward: boolean;
   lockIdentifier: Double;
   data: string;
-}>
+}>;
 export type WebViewOpenWindowEvent = Readonly<{
   targetUrl: string;
-}>
+}>;
 export type WebViewHttpErrorEvent = Readonly<{
   url: string;
   loading: boolean;
@@ -37,7 +42,7 @@ export type WebViewHttpErrorEvent = Readonly<{
   lockIdentifier: Double;
   description: string;
   statusCode: Int32;
-}>
+}>;
 
 export type WebViewErrorEvent = Readonly<{
   url: string;
@@ -49,9 +54,9 @@ export type WebViewErrorEvent = Readonly<{
   domain?: string;
   code: Int32;
   description: string;
-}>
+}>;
 
-export type WebViewNativeProgressEvent = Readonly< {
+export type WebViewNativeProgressEvent = Readonly<{
   url: string;
   loading: boolean;
   title: string;
@@ -59,9 +64,9 @@ export type WebViewNativeProgressEvent = Readonly< {
   canGoForward: boolean;
   lockIdentifier: Double;
   progress: Double;
-}>
+}>;
 
-export type WebViewNavigationEvent = Readonly< {
+export type WebViewNavigationEvent = Readonly<{
   url: string;
   loading: boolean;
   title: string;
@@ -76,9 +81,9 @@ export type WebViewNavigationEvent = Readonly< {
     | 'formresubmit'
     | 'other';
   mainDocumentURL?: string;
-}>
+}>;
 
-export type ShouldStartLoadRequestEvent  = Readonly<{
+export type ShouldStartLoadRequestEvent = Readonly<{
   url: string;
   loading: boolean;
   title: string;
@@ -94,46 +99,46 @@ export type ShouldStartLoadRequestEvent  = Readonly<{
     | 'other';
   mainDocumentURL?: string;
   isTopFrame: boolean;
-}>
+}>;
 
 type ScrollEvent = Readonly<{
   contentInset: {
-    bottom: Double,
-    left: Double,
-    right: Double,
-    top: Double,
-  },
+    bottom: Double;
+    left: Double;
+    right: Double;
+    top: Double;
+  };
   contentOffset: {
-    y: Double,
-    x: Double,
-  },
+    y: Double;
+    x: Double;
+  };
   contentSize: {
-    height: Double,
-    width: Double,
-  },
+    height: Double;
+    width: Double;
+  };
   layoutMeasurement: {
-    height: Double,
-    width: Double,
-  },
+    height: Double;
+    width: Double;
+  };
   targetContentOffset?: {
-    y: Double,
-    x: Double,
-  },
+    y: Double;
+    x: Double;
+  };
   velocity?: {
-    y: Double,
-    x: Double,
-  },
-  zoomScale?: Double,
-  responderIgnoreScroll?: boolean,
-}>
+    y: Double;
+    x: Double;
+  };
+  zoomScale?: Double;
+  responderIgnoreScroll?: boolean;
+}>;
 
 type WebViewRenderProcessGoneEvent = Readonly<{
   didCrash: boolean;
-}>
+}>;
 
 type WebViewDownloadEvent = Readonly<{
   downloadUrl: string;
-}>
+}>;
 
 // type MenuItem = Readonly<{label: string, key: string}>;
 
@@ -143,7 +148,13 @@ export interface NativeProps extends ViewProps {
   allowsProtectedMedia?: boolean;
   allowsFullscreenVideo?: boolean;
   androidLayerType?: WithDefault<'none' | 'software' | 'hardware', 'none'>;
-  cacheMode?: WithDefault<'LOAD_DEFAULT' | 'LOAD_CACHE_ELSE_NETWORK' | 'LOAD_NO_CACHE' | 'LOAD_CACHE_ONLY', 'LOAD_DEFAULT'>;
+  cacheMode?: WithDefault<
+    | 'LOAD_DEFAULT'
+    | 'LOAD_CACHE_ELSE_NETWORK'
+    | 'LOAD_NO_CACHE'
+    | 'LOAD_CACHE_ONLY',
+    'LOAD_DEFAULT'
+  >;
   domStorageEnabled?: boolean;
   downloadingMessage?: string;
   forceDarkOn?: boolean;
@@ -182,11 +193,26 @@ export interface NativeProps extends ViewProps {
     bottom?: Double;
     right?: Double;
   }>;
-  contentInsetAdjustmentBehavior?: WithDefault<'never' | 'automatic' | 'scrollableAxes' | 'always', 'never'>;
-  contentMode?: WithDefault<'recommended' | 'mobile' | 'desktop', 'recommended'>;
+  contentInsetAdjustmentBehavior?: WithDefault<
+    'never' | 'automatic' | 'scrollableAxes' | 'always',
+    'never'
+  >;
+  contentMode?: WithDefault<
+    'recommended' | 'mobile' | 'desktop',
+    'recommended'
+  >;
   dataDetectorTypes?: WithDefault<
-    // eslint-disable-next-line @typescript-eslint/array-type
-    ReadonlyArray<'address' | 'link' | 'calendarEvent' | 'trackingNumber' | 'flightNumber' | 'lookupSuggestion' | 'phoneNumber' | 'all' | 'none'>,
+    ReadonlyArray<
+      | 'address'
+      | 'link'
+      | 'calendarEvent'
+      | 'trackingNumber'
+      | 'flightNumber'
+      | 'lookupSuggestion'
+      | 'phoneNumber'
+      | 'all'
+      | 'none'
+    >,
     'phoneNumber'
   >;
   decelerationRate?: Double;
@@ -195,7 +221,14 @@ export interface NativeProps extends ViewProps {
   hideKeyboardAccessoryView?: boolean;
   keyboardDisplayRequiresUserAction?: boolean;
   limitsNavigationsToAppBoundDomains?: boolean;
-  mediaCapturePermissionGrantType?: WithDefault<'prompt' | 'grant' | 'deny' | 'grantIfSameHostElsePrompt' | 'grantIfSameHostElseDeny', 'prompt'>;
+  mediaCapturePermissionGrantType?: WithDefault<
+    | 'prompt'
+    | 'grant'
+    | 'deny'
+    | 'grantIfSameHostElsePrompt'
+    | 'grantIfSameHostElseDeny',
+    'prompt'
+  >;
   pagingEnabled?: boolean;
   pullToRefreshEnabled?: boolean;
   scrollEnabled?: boolean;
@@ -205,8 +238,8 @@ export interface NativeProps extends ViewProps {
   onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;
   onCustomMenuSelection?: DirectEventHandler<WebViewCustomMenuSelectionEvent>;
   onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
-  // eslint-disable-next-line @typescript-eslint/array-type
-  menuItems?: ReadonlyArray<Readonly<{label: string, key: string}>>;
+
+  menuItems?: ReadonlyArray<Readonly<{ label: string; key: string }>>;
   suppressMenuItems?: Readonly<string>[];
   // Workaround to watch if listener if defined
   hasOnFileDownload?: boolean;
@@ -244,11 +277,11 @@ export interface NativeProps extends ViewProps {
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
   newSource: Readonly<{
-    uri?: string
+    uri?: string;
     method?: string;
     body?: string;
-    // eslint-disable-next-line @typescript-eslint/array-type
-    headers?: ReadonlyArray<Readonly<{name: string, value: string}>>;
+
+    headers?: ReadonlyArray<Readonly<{ name: string; value: string }>>;
     html?: string;
     baseUrl?: string;
   }>;
@@ -257,23 +290,49 @@ export interface NativeProps extends ViewProps {
 }
 
 export interface NativeCommands {
-  goBack: (viewRef: React.ElementRef<HostComponent<NativeProps>> ) => void;
+  goBack: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   goForward: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   reload: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   stopLoading: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
-  injectJavaScript: (viewRef: React.ElementRef<HostComponent<NativeProps>>, javascript: string) => void;
+  injectJavaScript: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
+    javascript: string
+  ) => void;
   requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
-  postMessage: (viewRef: React.ElementRef<HostComponent<NativeProps>>, data: string) => void;
+  postMessage: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
+    data: string
+  ) => void;
   // Android Only
-  loadUrl: (viewRef: React.ElementRef<HostComponent<NativeProps>>, url: string) => void;
-  clearFormData: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
-  clearCache: (viewRef: React.ElementRef<HostComponent<NativeProps>>, includeDiskFiles: boolean) => void;
+  loadUrl: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
+    url: string
+  ) => void;
+  clearFormData: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>
+  ) => void;
+  clearCache: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
+    includeDiskFiles: boolean
+  ) => void;
   clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   // !Android Only
 }
 
 export const Commands = codegenNativeCommands<NativeCommands>({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl', 'clearFormData', 'clearCache', 'clearHistory'],
+  supportedCommands: [
+    'goBack',
+    'goForward',
+    'reload',
+    'stopLoading',
+    'injectJavaScript',
+    'requestFocus',
+    'postMessage',
+    'loadUrl',
+    'clearFormData',
+    'clearCache',
+    'clearHistory',
+  ],
 });
 
 export default codegenNativeComponent<NativeProps>(
