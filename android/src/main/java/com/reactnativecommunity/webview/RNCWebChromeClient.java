@@ -3,6 +3,8 @@ package com.reactnativecommunity.webview;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -150,11 +152,14 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
         for (String requestedResource : request.getResources()) {
             String androidPermission = null;
+            String requestPermissionIdentifier = null;
 
             if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
                 androidPermission = Manifest.permission.RECORD_AUDIO;
+                requestPermissionIdentifier = "microphone";
             } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
                 androidPermission = Manifest.permission.CAMERA;
+                requestPermissionIdentifier = "camera";
             } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
                 if (mAllowsProtectedMedia) {
                   grantedPermissions.add(requestedResource);
@@ -169,9 +174,23 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                   androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
                 }            }
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
+            String alertMessage = String.format("Allow this app to use your " + requestPermissionIdentifier + "?");
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
-                    grantedPermissions.add(requestedResource);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+                    builder.setMessage(alertMessage);
+                    builder.setCancelable(false);
+                    String finalAndroidPermission = androidPermission;
+                    builder.setPositiveButton("Allow", (dialog, which) -> {
+                        permissionRequest = request;
+                        grantedPermissions.add(finalAndroidPermission);
+                        requestPermissions(grantedPermissions);
+                    });
+                    builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                        request.deny();
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
                 } else {
                     requestedAndroidPermissions.add(androidPermission);
                 }
@@ -180,8 +199,10 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
         // If all the permissions are already granted, send the response to the WebView synchronously
         if (requestedAndroidPermissions.isEmpty()) {
-            request.grant(grantedPermissions.toArray(new String[0]));
-            grantedPermissions = null;
+            if (!grantedPermissions.isEmpty()) {
+                request.grant(grantedPermissions.toArray(new String[0]));
+                grantedPermissions = null;
+            }
             return;
         }
 
