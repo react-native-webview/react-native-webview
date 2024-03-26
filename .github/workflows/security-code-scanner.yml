@@ -39,5 +39,5 @@ jobs:
             storybook/
             test*/
           rules_excluded: example
-          mixpanel_project_token: ${{ secrets.SECURITY_CODE_SCANNER_MIXPANEL_TOKEN }}
+          project_metrics_token: ${{ secrets.SECURITY_SCAN_METRICS_TOKEN }}
           slack_webhook: ${{ secrets.APPSEC_BOT_SLACK_WEBHOOK }}
