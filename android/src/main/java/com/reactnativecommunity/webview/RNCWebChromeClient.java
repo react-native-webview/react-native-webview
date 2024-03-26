@@ -229,7 +229,18 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
 
         } else {
-            callback.invoke(origin, true, false);
+            String alertMessage = String.format("Allow this app to use your location?");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+            builder.setMessage(alertMessage);
+            builder.setCancelable(false);
+            builder.setPositiveButton("Allow", (dialog, which) -> {
+                callback.invoke(origin, true, false);
+            });
+            builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                callback.invoke(origin, false, false);
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
     }
 
@@ -390,4 +401,3 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     public void setHasOnOpenWindowEvent(boolean hasEvent) {
       mHasOnOpenWindowEvent = hasEvent;
     }
-}
