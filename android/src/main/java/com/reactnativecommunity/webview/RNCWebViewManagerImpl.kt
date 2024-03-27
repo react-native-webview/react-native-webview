@@ -719,3 +719,4 @@ class RNCWebViewManagerImpl {
     fun setWebviewDebuggingEnabled(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
         RNCWebView.setWebContentsDebuggingEnabled(enabled)
     }
+}
