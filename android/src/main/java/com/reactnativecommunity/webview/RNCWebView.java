@@ -19,7 +19,9 @@ import androidx.annotation.Nullable;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.CatalystInstance;
+import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -59,9 +61,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String messagingModuleName;
     protected @Nullable
-    RNCWebViewClient mRNCWebViewClient;
+    RNCWebViewMessagingModule mMessagingJSModule;
     protected @Nullable
-    CatalystInstance mCatalystInstance;
+    RNCWebViewClient mRNCWebViewClient;
     protected boolean sendContentSizeChangeEvents = false;
     private OnScrollDispatchHelper mOnScrollDispatchHelper;
     protected boolean hasScrollEvent = false;
@@ -76,7 +78,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
      */
     public RNCWebView(ThemedReactContext reactContext) {
         super(reactContext);
-        this.createCatalystInstance();
+        mMessagingJSModule = ((ThemedReactContext) this.getContext()).getReactApplicationContext().getJSModule(RNCWebViewMessagingModule.class);
         progressChangedFilter = new ProgressChangedFilter();
     }
 
@@ -248,14 +250,6 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return bridge;
     }
 
-    protected void createCatalystInstance() {
-      ThemedReactContext reactContext = (ThemedReactContext) this.getContext();
-
-        if (reactContext != null) {
-            mCatalystInstance = reactContext.getCatalystInstance();
-        }
-    }
-
     @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
         if (messagingEnabled == enabled) {
@@ -311,8 +305,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, webView.getUrl());
                     data.putString("data", message);
 
-                    if (mCatalystInstance != null) {
-                        mWebView.sendDirectMessage("onMessage", data);
+                    if (mMessagingJSModule != null) {
+                        dispatchDirectMessage(data);
                     } else {
                         dispatchEvent(webView, new TopMessageEvent(RNCWebViewWrapper.getReactTagFromWebView(webView), data));
                     }
@@ -322,22 +316,29 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             WritableMap eventData = Arguments.createMap();
             eventData.putString("data", message);
 
-            if (mCatalystInstance != null) {
-                this.sendDirectMessage("onMessage", eventData);
+            if (mMessagingJSModule != null) {
+                dispatchDirectMessage(eventData);
             } else {
                 dispatchEvent(this, new TopMessageEvent(RNCWebViewWrapper.getReactTagFromWebView(this), eventData));
             }
         }
     }
 
-    protected void sendDirectMessage(final String method, WritableMap data) {
+    protected void dispatchDirectMessage(WritableMap data) {
         WritableNativeMap event = new WritableNativeMap();
         event.putMap("nativeEvent", data);
+        event.putString("messagingModuleName", messagingModuleName);
 
-        WritableNativeArray params = new WritableNativeArray();
-        params.pushMap(event);
+        mMessagingJSModule.onMessage(event);
+    }
 
-        mCatalystInstance.callFunction(messagingModuleName, method, params);
+    protected boolean dispatchDirectShouldStartLoadWithRequest(WritableMap data) {
+        WritableNativeMap event = new WritableNativeMap();
+        event.putMap("nativeEvent", data);
+        event.putString("messagingModuleName", messagingModuleName);
+
+        mMessagingJSModule.onShouldStartLoadWithRequest(event);
+        return true;
     }
 
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
@@ -389,6 +390,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
   public ThemedReactContext getThemedReactContext() {
     return (ThemedReactContext) this.getContext();
+  }
+
+  public ReactApplicationContext getReactApplicationContext() {
+      return this.getThemedReactContext().getReactApplicationContext();
   }
 
   protected class RNCWebViewBridge {
