@@ -170,10 +170,10 @@ RCTAutoInsetsProtocol>
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
-#endif // !TARGET_OS_OSX
+#endif // !TARGET_OS_IOS
     _injectedJavaScript = nil;
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
@@ -230,7 +230,7 @@ RCTAutoInsetsProtocol>
   return self;
 }
 
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
   // Only allow long press gesture
   if ([otherGestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]]) {
@@ -269,7 +269,7 @@ RCTAutoInsetsProtocol>
     [menuController setMenuVisible:YES animated:YES];
 }
 
-#endif // !TARGET_OS_OSX
+#endif // TARGET_OS_IOS
 
 - (void)dealloc
 {
@@ -594,7 +594,7 @@ RCTAutoInsetsProtocol>
 #endif
 }
 
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
 -(void)showFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -650,7 +650,7 @@ RCTAutoInsetsProtocol>
     }];
   }
 }
-#endif // !TARGET_OS_OSX
+#endif // TARGET_OS_IOS
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
   if ([keyPath isEqual:@"estimatedProgress"] && object == self.webView) {
