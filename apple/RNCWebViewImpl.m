@@ -191,7 +191,7 @@ RCTAutoInsetsProtocol>
 #endif
   }
 
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
   [[NSNotificationCenter defaultCenter]addObserver:self
                                           selector:@selector(appDidBecomeActive)
                                               name:UIApplicationDidBecomeActiveNotification
@@ -226,7 +226,7 @@ RCTAutoInsetsProtocol>
                                                object:nil];
 
   }
-#endif // !TARGET_OS_OSX
+#endif // TARGET_OS_IOS
   return self;
 }
 
@@ -597,6 +597,7 @@ RCTAutoInsetsProtocol>
 #if TARGET_OS_IOS
 -(void)showFullScreenVideoStatusBars
 {
+#
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   if (!_autoManageStatusBarEnabled) {
     return;
@@ -650,7 +651,7 @@ RCTAutoInsetsProtocol>
     }];
   }
 }
-#endif // TARGET_OS_IOS
+#endif // !TARGET_OS_IOS
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
   if ([keyPath isEqual:@"estimatedProgress"] && object == self.webView) {
