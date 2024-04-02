@@ -25,7 +25,7 @@ static NSDictionary* customCertificatesForHost;
 
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
 @interface _SwizzleHelperWK : UIView
@@ -46,7 +46,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   return nil;
 }
 @end
-#endif // !TARGET_OS_OSX
+#endif // TARGET_OS_IOS
 
 @interface RNCWKWebView : WKWebView
 #if !TARGET_OS_OSX
@@ -189,6 +189,12 @@ RCTAutoInsetsProtocol>
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
 #endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 /* iOS 15 */
+    if (@available(iOS 16.0, *)) {
+      _editMenuInteraction = [[UIEditMenuInteraction alloc] initWithDelegate:self];
+      [self addInteraction:_editMenuInteraction];
+    }
+#endif
   }
 
 #if TARGET_OS_IOS
@@ -230,7 +236,7 @@ RCTAutoInsetsProtocol>
   return self;
 }
 
-#if TARGET_OS_IOS
+#if !TARGET_OS_OSX
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
   // Only allow long press gesture
   if ([otherGestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]]) {
@@ -246,30 +252,52 @@ RCTAutoInsetsProtocol>
     if (pressSender.state != UIGestureRecognizerStateEnded || !self.menuItems) {
         return;
     }
-    // When a long press ends, bring up our custom UIMenu if defined
-    if (self.menuItems.count == 0) {
+    if (@available(iOS 16.0, *)) {
+      CGPoint location = [pressSender locationInView:self];
+      UIEditMenuConfiguration *config = [UIEditMenuConfiguration configurationWithIdentifier:nil sourcePoint:location];
+      [_editMenuInteraction presentEditMenuWithConfiguration:config];
+    } else {
+      // When a long press ends, bring up our custom UIMenu if defined
+      if (self.menuItems.count == 0) {
         UIMenuController *menuController = [UIMenuController sharedMenuController];
         menuController.menuItems = nil;
-        [menuController setMenuVisible:NO animated:YES];
+        [menuController showMenuFromView:self rect:self.bounds];
         return;
-    }
-    UIMenuController *menuController = [UIMenuController sharedMenuController];
-    NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
+      }
 
-    for(NSDictionary *menuItem in self.menuItems) {
-      NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
-      NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
-      NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
-      UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
-                                                    action: NSSelectorFromString(sel)];
-      [menuControllerItems addObject: item];
+      UIMenuController *menuController = [UIMenuController sharedMenuController];
+      NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
+      
+      for(NSDictionary *menuItem in self.menuItems) {
+        NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
+        NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
+        NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
+        UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
+                                                      action: NSSelectorFromString(sel)];
+        [menuControllerItems addObject: item];
+      }
+      menuController.menuItems = menuControllerItems;
+      [menuController showMenuFromView:self rect:self.bounds];
     }
-
-    menuController.menuItems = menuControllerItems;
-    [menuController setMenuVisible:YES animated:YES];
 }
 
-#endif // TARGET_OS_IOS
+- (UIMenu *)editMenuInteraction:(UIEditMenuInteraction *)interaction menuForConfiguration:(UIEditMenuConfiguration *)configuration suggestedActions:(NSArray<UIMenuElement *> *)suggestedActions API_AVAILABLE(ios(16.0))
+{
+  NSMutableArray<UICommand *> *menuItems = [NSMutableArray new];
+  for(NSDictionary *menuItem in self.menuItems) {
+    NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
+    NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
+    NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
+    UICommand *command = [UICommand commandWithTitle:menuItemLabel
+                                               image:nil
+                                              action:NSSelectorFromString(sel)
+                                        propertyList:nil];
+    [menuItems addObject:command];
+  }
+  UIMenu *menu = [UIMenu menuWithChildren:menuItems];
+  return menu;
+}
+#endif // !TARGET_OS_OSX
 
 - (void)dealloc
 {
@@ -529,6 +557,7 @@ RCTAutoInsetsProtocol>
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
     [self visitSource];
   }
+
 #if !TARGET_OS_OSX
   // Allow this object to recognize gestures
   if (self.menuItems != nil) {
@@ -841,6 +870,7 @@ RCTAutoInsetsProtocol>
     _webView.suppressMenuItems = suppressMenuItems;
 }
 
+#if TARGET_OS_IOS
 -(void)setKeyboardDisplayRequiresUserAction:(BOOL)keyboardDisplayRequiresUserAction
 {
   if (_webView == nil) {
@@ -945,6 +975,7 @@ RCTAutoInsetsProtocol>
 
   object_setClass(subview, newClass);
 }
+#endif // TARGET_OS_IOS
 
 // UIScrollViewDelegate method
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
