@@ -173,7 +173,7 @@ RCTAutoInsetsProtocol>
 #if TARGET_OS_IOS
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
-#endif // !TARGET_OS_IOS
+#endif // TARGET_OS_IOS
     _injectedJavaScript = nil;
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
