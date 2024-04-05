@@ -211,11 +211,9 @@ export const useWebViewLogic = ({
     )
   , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
 
-  // Android and iOS Only
   const onOpenWindow = useCallback((event: WebViewOpenWindowEvent) => {
     onOpenWindowProp?.(event);
   }, [onOpenWindowProp]);
-  // !Android and iOS Only
 
   return {
     onShouldStartLoadWithRequest,

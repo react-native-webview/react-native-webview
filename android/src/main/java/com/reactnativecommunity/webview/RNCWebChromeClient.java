@@ -99,7 +99,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
                 ((RNCWebView) view).dispatchEvent(
                     view,
-                    new TopOpenWindowEvent(view.getId(), event)
+                    new TopOpenWindowEvent(RNCWebViewWrapper.getReactTagFromWebView(view), event)
                 );
 
                 return true;
@@ -130,15 +130,15 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         if (progressChangedFilter.isWaitingForCommandLoadUrl()) {
             return;
         }
+        int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
         WritableMap event = Arguments.createMap();
-        event.putDouble("target", webView.getId());
+        event.putDouble("target", reactTag);
         event.putString("title", webView.getTitle());
         event.putString("url", url);
         event.putBoolean("canGoBack", webView.canGoBack());
         event.putBoolean("canGoForward", webView.canGoForward());
         event.putDouble("progress", (float) newProgress / 100);
 
-        int reactTag = webView.getId();
         UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(reactTag, event));
     }
 
