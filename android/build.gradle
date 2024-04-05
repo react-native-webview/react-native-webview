@@ -113,7 +113,7 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
     implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
-    implementation 'com.github.classtinginc:android-image-picker:1.1.13'
+    implementation 'com.github.classtinginc:android-image-picker:1.1.24'
     implementation 'com.google.code.gson:gson:2.8.3'
     implementation 'com.igaworks.ssp:IgawAdPopcornSSP:3.2.1'
 }
