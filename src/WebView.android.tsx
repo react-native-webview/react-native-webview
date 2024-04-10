@@ -4,13 +4,13 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useMemo,
   useRef,
 } from 'react';
 
 import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
 
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
+import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 
 import invariant from 'invariant';
 
@@ -33,12 +33,27 @@ import styles from './WebView.styles';
 
 const { resolveAssetSource } = Image;
 
+const directEventEmitter = new EventEmitter();
+
 const registerCallableModule: (name: string, module: Object) => void =
   // `registerCallableModule()` is available in React Native 0.74 and above.
   // Fallback to use `BatchedBridge.registerCallableModule()` for older versions.
 
   require('react-native').registerCallableModule ??
   BatchedBridge.registerCallableModule.bind(BatchedBridge);
+
+registerCallableModule('RNCWebViewMessagingModule', {
+  onShouldStartLoadWithRequest: (
+    event: ShouldStartLoadRequestEvent & { messagingModuleName?: string }
+  ) => {
+    directEventEmitter.emit('onShouldStartLoadWithRequest', event);
+  },
+  onMessage: (
+    event: WebViewMessageEvent & { messagingModuleName?: string }
+  ) => {
+    directEventEmitter.emit('onMessage', event);
+  },
+});
 
 /**
  * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
@@ -168,33 +183,39 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       [setViewState, webViewRef]
     );
 
-    const directEventCallbacks = useMemo(
-      () => ({
-        onShouldStartLoadWithRequest: (
-          event: ShouldStartLoadRequestEvent & { messagingModuleName?: string }
-        ) => {
-          if (event.messagingModuleName === messagingModuleName) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { messagingModuleName: _, ...rest } = event;
-            onShouldStartLoadWithRequest(rest);
+    useEffect(() => {
+      const onShouldStartLoadWithRequestSubscription =
+        directEventEmitter.addListener(
+          'onShouldStartLoadWithRequest',
+          (
+            event: ShouldStartLoadRequestEvent & {
+              messagingModuleName?: string;
+            }
+          ) => {
+            if (event.messagingModuleName === messagingModuleName) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { messagingModuleName: _, ...rest } = event;
+              onShouldStartLoadWithRequest(rest);
+            }
           }
-        },
-        onMessage: (
-          event: WebViewMessageEvent & { messagingModuleName?: string }
-        ) => {
+        );
+
+      const onMessageSubscription = directEventEmitter.addListener(
+        'onMessage',
+        (event: WebViewMessageEvent & { messagingModuleName?: string }) => {
           if (event.messagingModuleName === messagingModuleName) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { messagingModuleName: _, ...rest } = event;
             onMessage(rest);
           }
-        },
-      }),
-      [messagingModuleName, onMessage, onShouldStartLoadWithRequest]
-    );
+        }
+      );
 
-    useEffect(() => {
-      registerCallableModule('RNCWebViewMessagingModule', directEventCallbacks);
-    }, [messagingModuleName, directEventCallbacks]);
+      return () => {
+        onShouldStartLoadWithRequestSubscription.remove();
+        onMessageSubscription.remove();
+      };
+    }, [messagingModuleName, onMessage, onShouldStartLoadWithRequest]);
 
     let otherView: ReactElement | undefined;
     if (viewState === 'LOADING') {
