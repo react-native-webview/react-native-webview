@@ -22,7 +22,8 @@
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx,.js,.jsx",
     "build": "babel --extensions \".ts,.tsx\" --out-dir lib src",
-    "prepare": "yarn build",
+    "prepare:types": "tsc --noEmit false --emitDeclarationOnly --declaration --rootDir src --outDir lib",
+    "prepare": "yarn prepare:types && yarn build",
     "appium": "appium",
     "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.js",
     "add:macos": "yarn add react-native-macos@0.73.17"
