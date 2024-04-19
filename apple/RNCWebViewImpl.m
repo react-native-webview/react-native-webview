@@ -274,12 +274,10 @@ RCTAutoInsetsProtocol>
       }];
       [customMenuActions addObject: item];
     }
-    UIMenu *customMenu2 = [UIMenu menuWithChildren:customMenuActions];
-
-  // [actions addObject:customMenu];
+    UIMenu *customMenu = [UIMenu menuWithChildren:customMenuActions];
 
   if (@available(iOS 16.0, *)) {
-      return [UIMenu menuWithChildren:customMenu2.children];
+      return [UIMenu menuWithChildren:customMenu.children];
   }
   return [UIMenu menuWithChildren:actions];
 }
