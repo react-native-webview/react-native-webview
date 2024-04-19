@@ -12,6 +12,9 @@ const project = (() => {
       ios: {
         sourceDir: 'example/ios',
       },
+      visionos: {
+        sourceDir: 'example/ios',
+      },
       windows: fs.existsSync('example/windows/WebviewExample.sln') && {
         sourceDir: path.join('example', 'windows'),
         solutionFile: path.join('example', 'windows', 'WebviewExample.sln'),

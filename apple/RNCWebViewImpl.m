@@ -171,8 +171,10 @@ RCTAutoInsetsProtocol>
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
 #if !TARGET_OS_OSX
+#if !TARGET_OS_VISION
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
+#endif
 #endif // !TARGET_OS_OSX
     _injectedJavaScript = nil;
     _injectedJavaScriptForMainFrameOnly = YES;
@@ -250,7 +252,9 @@ RCTAutoInsetsProtocol>
     if (self.menuItems.count == 0) {
         UIMenuController *menuController = [UIMenuController sharedMenuController];
         menuController.menuItems = nil;
+#if !TARGET_OS_VISION
         [menuController setMenuVisible:NO animated:YES];
+#endif
         return;
     }
     UIMenuController *menuController = [UIMenuController sharedMenuController];
@@ -266,7 +270,9 @@ RCTAutoInsetsProtocol>
     }
 
     menuController.menuItems = menuControllerItems;
+#if !TARGET_OS_VISION
     [menuController setMenuVisible:YES animated:YES];
+#endif
 }
 
 #endif // !TARGET_OS_OSX
@@ -603,9 +609,11 @@ RCTAutoInsetsProtocol>
   }
 
   _isFullScreenVideoOpen = YES;
+#if !TARGET_OS_VISION
   RCTUnsafeExecuteOnMainQueueSync(^{
     [RCTSharedApplication() setStatusBarStyle:self->_savedStatusBarStyle animated:YES];
   });
+#endif
 #pragma clang diagnostic pop
 }
 
@@ -617,10 +625,12 @@ RCTAutoInsetsProtocol>
   }
 
   _isFullScreenVideoOpen = NO;
+#if !TARGET_OS_VISION
   RCTUnsafeExecuteOnMainQueueSync(^{
     [RCTSharedApplication() setStatusBarHidden:self->_savedStatusBarHidden animated:YES];
     [RCTSharedApplication() setStatusBarStyle:self->_savedStatusBarStyle animated:YES];
   });
+#endif
 #pragma clang diagnostic pop
 }
 
