@@ -21,6 +21,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -389,6 +390,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
   public ThemedReactContext getThemedReactContext() {
     return (ThemedReactContext) this.getContext();
+  }
+
+  public ReactApplicationContext getReactApplicationContext() {
+      return this.getThemedReactContext().getReactApplicationContext();
   }
 
   protected class RNCWebViewBridge {
