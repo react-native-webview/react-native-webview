@@ -1,5 +1,5 @@
 {
-  "name": "react-native-webview",
+  "name": "@metamask/react-native-webview",
   "description": "React Native WebView component for iOS, Android, macOS, and Windows",
   "main": "index.js",
   "main-internal": "src/index.ts",
@@ -11,7 +11,7 @@
   ],
   "license": "MIT",
   "version": "13.6.3",
-  "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
+  "homepage": "https://github.com/MetaMask/react-native-webview-mm#readme",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -73,7 +73,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-webview/react-native-webview.git"
+    "url": "https://github.com/MetaMask/react-native-webview-mm.git"
   },
   "files": [
     "android/src",

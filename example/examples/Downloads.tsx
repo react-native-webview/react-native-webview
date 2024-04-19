@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Alert, Platform, View} from 'react-native';
 
-import WebView, {FileDownload} from 'react-native-webview';
+import WebView, {FileDownload} from '@metamask/react-native-webview';
 
 const HTML = `
 <!DOCTYPE html>\n

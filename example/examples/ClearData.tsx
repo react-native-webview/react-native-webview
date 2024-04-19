@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Button } from 'react-native';
 
-import WebView from 'react-native-webview';
+import WebView from '@metamask/react-native-webview';
 
 type Props = {};
 type State = {};

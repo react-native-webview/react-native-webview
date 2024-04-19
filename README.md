@@ -1,18 +1,18 @@
 # React Native WebView
 
-![star this repo](https://img.shields.io/github/stars/react-native-webview/react-native-webview?style=flat-square)
+![star this repo](https://img.shields.io/github/stars/MetaMask/react-native-webview-mm?style=flat-square)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![NPM Version](https://img.shields.io/npm/v/react-native-webview.svg?style=flat-square)](https://www.npmjs.com/package/react-native-webview)
-![Npm Downloads](https://img.shields.io/npm/dm/react-native-webview.svg)
+[![NPM Version](https://img.shields.io/npm/v/@metamask/react-native-webview.svg?style=flat-square)](https://www.npmjs.com/package/@metamask/react-native-webview)
+![Npm Downloads](https://img.shields.io/npm/dm/@metamask/react-native-webview.svg)
 
 **React Native WebView** is a community maintained WebView component for React Native. It is intended to be a replacement for the built-in WebView (which was [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
 ### Maintainers
 
-**Many thanks to these companies** for providing us with time to work on open source.  
+**Many thanks to these companies** for providing us with time to work on open source.
 Please note that maintainers spend a lot of free time working on this too so feel free to sponsor them, **it really makes a difference.**
 
-- [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://www.brigad.co/en-gb/about-us)  
+- [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://www.brigad.co/en-gb/about-us)
 [*Sponsor me* ❤️ !](https://github.com/sponsors/Titozzz)
 
 
@@ -26,13 +26,13 @@ Shout-out to [Jamon Holmgren](https://github.com/jamonholmgren) from [Infinite R
 
 Maintaining WebView is very complex, because it is often used for many different usecases (rendering svgs, pdfs, login flows, and much more). We also support many platforms and both architecture of react-native.
 
-Since WebView was extracted from React Native core, nearly 500 pull requests have been merged.  
-Considering that we have limited time, issues will mostly serve as a discussion place for the community, while **we will prioritize reviewing and merging pull requests.** 
+Since WebView was extracted from React Native core, nearly 500 pull requests have been merged.
+Considering that we have limited time, issues will mostly serve as a discussion place for the community, while **we will prioritize reviewing and merging pull requests.**
 
 ### Platform compatibility
 
-This project is compatible with **iOS**,  **Android**, **Windows** and **macOS**.  
-This project support both **the old** (paper) **and the new architecture** (fabric).  
+This project is compatible with **iOS**,  **Android**, **Windows** and **macOS**.
+This project support both **the old** (paper) **and the new architecture** (fabric).
 This project is compatible with [expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
 ### Getting Started
@@ -50,7 +50,7 @@ Import the `WebView` component from `react-native-webview` and use it like so:
 ```tsx
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { WebView } from '@metamask/react-native-webview';
 
 // ...
 const MyWebComponent = () => {
@@ -63,11 +63,11 @@ For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide
 ### Common issues
 
 - If you're getting `Invariant Violation: Native component for "RNCWebView does not exist"` it likely means you forgot to run `react-native link` or there was some error with the linking process
-- If you encounter a build error during the task `:app:mergeDexRelease`, you need to enable multidex support in `android/app/build.gradle` as discussed in [this issue](https://github.com/react-native-webview/react-native-webview/issues/1344#issuecomment-650544648)
+- If you encounter a build error during the task `:app:mergeDexRelease`, you need to enable multidex support in `android/app/build.gradle` as discussed in [this issue](https://github.com/MetaMask/react-native-webview-mm/issues/1344#issuecomment-650544648)
 
 #### Contributing
 
-Contributions are welcome, see [Contributing.md](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Contributing.md)
+Contributions are welcome, see [Contributing.md](https://github.com/MetaMask/react-native-webview-mm/blob/master/docs/Contributing.md)
 
 ### License
 

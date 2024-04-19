@@ -248,7 +248,7 @@ PODS:
   - React-jsinspector (0.71.33)
   - React-logger (0.71.33):
     - glog
-  - react-native-webview (13.3.1):
+  - @metamask/react-native-webview (13.3.1):
     - React-Core
   - React-perflogger (0.71.33)
   - React-RCTActionSheet (0.71.33):
@@ -363,7 +363,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../../node_modules/react-native-macos/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../node_modules/react-native-macos/ReactCommon/jsinspector`)
   - React-logger (from `../../node_modules/react-native-macos/ReactCommon/logger`)
-  - react-native-webview (from `../..`)
+  - @metamask/react-native-webview (from `../..`)
   - React-perflogger (from `../../node_modules/react-native-macos/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../../node_modules/react-native-macos/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../node_modules/react-native-macos/Libraries/NativeAnimation`)
@@ -426,7 +426,7 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native-macos/ReactCommon/jsinspector"
   React-logger:
     :path: "../../node_modules/react-native-macos/ReactCommon/logger"
-  react-native-webview:
+  @metamask/react-native-webview:
     :path: "../.."
   React-perflogger:
     :path: "../../node_modules/react-native-macos/ReactCommon/reactperflogger"
@@ -484,7 +484,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 9d1f2ab1d5bce258038eb202728210cab73581af
   React-jsinspector: b482ed08c8233d528c5917e1a916827e2357ab24
   React-logger: 9cca25c5cbc2bdc03dd79010992d17cbac337139
-  react-native-webview: c2b70afb1d910cdd8810375aecc6c2894e2ba061
+  @metamask/react-native-webview: c2b70afb1d910cdd8810375aecc6c2894e2ba061
   React-perflogger: b2d0d3a34cb21df25dfdef7331c8eace64ebbac4
   React-RCTActionSheet: e2852db033ff9909d9e31f78a16a8b1a0d72b0b3
   React-RCTAnimation: af9d4eba93cbb7bf6b2b70ff30f4dde1ae47a4a6
