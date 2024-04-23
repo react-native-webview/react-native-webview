@@ -455,7 +455,7 @@ Per risolvere questo problema, è possibile tenere traccia dell'URL corrente, in
 
 ```jsx
 const CustomHeaderWebView = (props) => {
-  const { uri, onLoadStart, ...restProps } = props;
+  const { uri, ...restProps } = props;
   const [currentURI, setURI] = useState(props.source.uri);
   const newSource = { ...props.source, uri: currentURI };
 

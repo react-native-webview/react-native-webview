@@ -471,7 +471,7 @@ Para contornar isso, você pode rastrear o URL atual, interceptar novos carregam
 
 ```jsx
 const CustomHeaderWebView = (props) => {
-  const { uri, onLoadStart, ...restProps } = props;
+  const { uri, ...restProps } = props;
   const [currentURI, setURI] = useState(props.source.uri);
   const newSource = { ...props.source, uri: currentURI };
 
