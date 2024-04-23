@@ -206,7 +206,7 @@ namespace winrt::ReactNativeWebView::implementation {
         }
     }
 
-    void ReactWebView2::OnCoreWebView2Initialized(mux::WebView2 const& sender, winrt::CoreWebView2InitializedEventArgs const& /* args */) {
+    void ReactWebView2::OnCoreWebView2Initialized(mux::WebView2 const& sender, mux::CoreWebView2InitializedEventArgs const& /* args */) {
         assert(sender.CoreWebView2());
 
         RegisterCoreWebView2Events();
