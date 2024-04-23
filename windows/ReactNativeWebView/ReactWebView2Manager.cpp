@@ -6,17 +6,19 @@
 #include "ReactWebView2.h"
 #include "JSValueXaml.h"
 
+namespace mux {
+    using namespace winrt::Microsoft::UI::Xaml::Controls;
+}
+
 namespace winrt {
     using namespace Microsoft::ReactNative;
     using namespace Windows::Foundation;
     using namespace Windows::Foundation::Collections;
-    using namespace Windows::UI;
-    using namespace Windows::UI::Xaml;
-    using namespace Windows::UI::Xaml::Controls;
-    using namespace Windows::UI::Xaml::Input;
-    using namespace Microsoft::UI::Xaml::Controls;
     using namespace Windows::Web::Http;
     using namespace Windows::Web::Http::Headers;
+    using namespace xaml;
+    using namespace xaml::Controls;
+    using namespace xaml::Input;
 }
 
 namespace winrt::ReactNativeWebView::implementation {
@@ -57,7 +59,7 @@ namespace winrt::ReactNativeWebView::implementation {
         IJSValueReader const& propertyMapReader) noexcept {
         auto control = view.as<winrt::ContentPresenter>();
         auto content = control.Content();
-        auto webView = content.as<winrt::WebView2>();
+        auto webView = content.as<mux::WebView2>();
         const JSValueObject& propertyMap = JSValueObject::ReadFrom(propertyMapReader);
 
         for (auto const& pair : propertyMap) {
@@ -81,7 +83,7 @@ namespace winrt::ReactNativeWebView::implementation {
                     }
                     if (isPackagerAsset && uriString.find(fileScheme) == 0) {
                         auto bundleRootPath = winrt::to_string(ReactNativeHost().InstanceSettings().BundleRootPath());
-                        uriString.replace(0, std::size(fileScheme), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath); 
+                        uriString.replace(0, std::size(fileScheme), bundleRootPath.empty() ? "ms-appx-web:///Bundle/" : bundleRootPath);
                     }
                     if (uriString.find("ms-appdata://") == 0 || uriString.find("ms-appx-web://") == 0) {
                         reactWebView2.NavigateToHtml(to_hstring(uriString));
@@ -110,7 +112,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
                 reactWebView2.LinkHandlingEnabled(linkHandlingEnabled);
             }
-        }        
+        }
     }
 
     // IViewManagerWithExportedEventTypeConstants
@@ -153,7 +155,7 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::IJSValueReader const& commandArgsReader) noexcept {
         auto control = view.as<winrt::ContentPresenter>();
         auto content = control.Content();
-        auto webView = content.as<winrt::WebView2>();
+        auto webView = content.as<mux::WebView2>();
         auto commandArgs = JSValue::ReadArrayFrom(commandArgsReader);
 
         if (commandId == L"goForward") {
@@ -179,7 +181,7 @@ namespace winrt::ReactNativeWebView::implementation {
         }
         else if (commandId == L"requestFocus") {
             FocusManager::TryFocusAsync(webView, FocusState::Programmatic);
-        } 
+        }
         else if (commandId == L"clearCache") {
             // There is no way to clear the cache in WebView2 because it is shared with Edge.
             // The best we can do is clear the cookies, because we cannot access history or local storage.
