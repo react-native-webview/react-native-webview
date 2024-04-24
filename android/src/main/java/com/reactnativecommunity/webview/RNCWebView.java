@@ -1,8 +1,17 @@
 package com.reactnativecommunity.webview;
 
+import androidx.annotation.Nullable;
+
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
+import android.os.Environment;
 import android.text.TextUtils;
+import android.util.AttributeSet;
+
+import android.util.Base64;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,13 +22,10 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-
-import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.CatalystInstance;
-import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
@@ -27,17 +33,28 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerHelper;
+import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
+import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.scroll.OnScrollDispatchHelper;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
+import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -47,8 +64,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String injectedJSBeforeContentLoaded;
     protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
-    protected @Nullable
-    RNCWebViewBridge bridge;
+
+    protected static final String DOWNLOAD_INTERFACE = "ReactNativeWebViewDownloader";
+
+    String downloadingMessage = "File Downloaded!";
 
     /**
      * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
@@ -58,12 +77,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
 
     protected boolean messagingEnabled = false;
+
+    protected boolean downloadingBlobEnabled = false;
     protected @Nullable
     String messagingModuleName;
     protected @Nullable
-    RNCWebViewMessagingModule mMessagingJSModule;
-    protected @Nullable
     RNCWebViewClient mRNCWebViewClient;
+    protected @Nullable
+    CatalystInstance mCatalystInstance;
     protected boolean sendContentSizeChangeEvents = false;
     private OnScrollDispatchHelper mOnScrollDispatchHelper;
     protected boolean hasScrollEvent = false;
@@ -78,7 +99,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
      */
     public RNCWebView(ThemedReactContext reactContext) {
         super(reactContext);
-        mMessagingJSModule = ((ThemedReactContext) this.getContext()).getReactApplicationContext().getJSModule(RNCWebViewMessagingModule.class);
+        this.createCatalystInstance();
         progressChangedFilter = new ProgressChangedFilter();
     }
 
@@ -133,7 +154,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             dispatchEvent(
                     this,
                     new ContentSizeChangeEvent(
-                            RNCWebViewWrapper.getReactTagFromWebView(this),
+                            this.getId(),
                             w,
                             h
                     )
@@ -184,7 +205,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                   selectionText = new JSONObject(selectionJson).getString("selection");
                 } catch (JSONException ignored) {}
                 wMap.putString("selectedText", selectionText);
-                dispatchEvent(RNCWebView.this, new TopCustomMenuSelectionEvent(RNCWebViewWrapper.getReactTagFromWebView(RNCWebView.this), wMap));
+                dispatchEvent(RNCWebView.this, new TopCustomMenuSelectionEvent(RNCWebView.this.getId(), wMap));
                 mode.finish();
               }
             }
@@ -238,16 +259,20 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return mRNCWebViewClient;
     }
 
-    public boolean getMessagingEnabled() {
-        return this.messagingEnabled;
+    protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
+        return new RNCWebViewBridge(webView);
     }
 
-    protected RNCWebViewBridge createRNCWebViewBridge(RNCWebView webView) {
-        if (bridge == null) {
-            bridge = new RNCWebViewBridge(webView);
-            addJavascriptInterface(bridge, JAVASCRIPT_INTERFACE);
+  protected RNCWebViewDownloadBridge createRNCWebViewDownloadBlobBridge(RNCWebView webView) {
+    return new RNCWebViewDownloadBridge(webView);
+  }
+
+    protected void createCatalystInstance() {
+      ThemedReactContext reactContext = (ThemedReactContext) this.getContext();
+
+        if (reactContext != null) {
+            mCatalystInstance = reactContext.getCatalystInstance();
         }
-        return bridge;
     }
 
     @SuppressLint("AddJavascriptInterface")
@@ -259,9 +284,31 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         messagingEnabled = enabled;
 
         if (enabled) {
-            createRNCWebViewBridge(this);
+            addJavascriptInterface(createRNCWebViewBridge(this), JAVASCRIPT_INTERFACE);
+        } else {
+            removeJavascriptInterface(JAVASCRIPT_INTERFACE);
         }
     }
+
+  @SuppressLint("AddJavascriptInterface")
+  public void setDownloadingBlobEnabled(boolean enabled) {
+    if (downloadingBlobEnabled == enabled) {
+      return;
+    }
+
+      downloadingBlobEnabled = enabled;
+
+    if (enabled) {
+      addJavascriptInterface(createRNCWebViewDownloadBlobBridge(this), DOWNLOAD_INTERFACE);
+    } else {
+      removeJavascriptInterface(DOWNLOAD_INTERFACE);
+    }
+  }
+
+
+  public void setDownloadingMessage(String message) {
+      downloadingMessage = message;
+  }
 
     protected void evaluateJavascriptWithFallback(String script) {
         evaluateJavascript(script, null);
@@ -275,18 +322,27 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         }
     }
 
+    public void injectBlobDownloaderJS(){
+      // get blobDownloaderJS from assets and inject it
+      String blobDownloaderJS = null;
+      try {
+        InputStream inputStream = this.getContext().getAssets().open("blobDownloader.js");
+        int size = inputStream.available();
+        byte[] buffer = new byte[size];
+        inputStream.read(buffer);
+        inputStream.close();
+        blobDownloaderJS = new String(buffer, "UTF-8");
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      evaluateJavascriptWithFallback("(function() {\n" + blobDownloaderJS + ";\n})();" );
+    }
+
     public void callInjectedJavaScriptBeforeContentLoaded() {
         if (getSettings().getJavaScriptEnabled() &&
                 injectedJSBeforeContentLoaded != null &&
                 !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
-        }
-    }
-
-    public void setInjectedJavaScriptObject(String obj) {
-        if (getSettings().getJavaScriptEnabled()) {
-            RNCWebViewBridge b = createRNCWebViewBridge(this);
-            b.setInjectedObjectJson(obj);
         }
     }
 
@@ -305,10 +361,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, webView.getUrl());
                     data.putString("data", message);
 
-                    if (mMessagingJSModule != null) {
-                        dispatchDirectMessage(data);
+                    if (mCatalystInstance != null) {
+                        mWebView.sendDirectMessage("onMessage", data);
                     } else {
-                        dispatchEvent(webView, new TopMessageEvent(RNCWebViewWrapper.getReactTagFromWebView(webView), data));
+                        dispatchEvent(webView, new TopMessageEvent(webView.getId(), data));
                     }
                 }
             });
@@ -316,29 +372,22 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             WritableMap eventData = Arguments.createMap();
             eventData.putString("data", message);
 
-            if (mMessagingJSModule != null) {
-                dispatchDirectMessage(eventData);
+            if (mCatalystInstance != null) {
+                this.sendDirectMessage("onMessage", eventData);
             } else {
-                dispatchEvent(this, new TopMessageEvent(RNCWebViewWrapper.getReactTagFromWebView(this), eventData));
+                dispatchEvent(this, new TopMessageEvent(this.getId(), eventData));
             }
         }
     }
 
-    protected void dispatchDirectMessage(WritableMap data) {
+    protected void sendDirectMessage(final String method, WritableMap data) {
         WritableNativeMap event = new WritableNativeMap();
         event.putMap("nativeEvent", data);
-        event.putString("messagingModuleName", messagingModuleName);
 
-        mMessagingJSModule.onMessage(event);
-    }
+        WritableNativeArray params = new WritableNativeArray();
+        params.pushMap(event);
 
-    protected boolean dispatchDirectShouldStartLoadWithRequest(WritableMap data) {
-        WritableNativeMap event = new WritableNativeMap();
-        event.putMap("nativeEvent", data);
-        event.putString("messagingModuleName", messagingModuleName);
-
-        mMessagingJSModule.onShouldStartLoadWithRequest(event);
-        return true;
+        mCatalystInstance.callFunction(messagingModuleName, method, params);
     }
 
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
@@ -354,7 +403,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
         if (mOnScrollDispatchHelper.onScrollChanged(x, y)) {
             ScrollEvent event = ScrollEvent.obtain(
-                    RNCWebViewWrapper.getReactTagFromWebView(this),
+                    this.getId(),
                     ScrollEventType.SCROLL,
                     x,
                     y,
@@ -371,7 +420,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     protected void dispatchEvent(WebView webView, Event event) {
         ThemedReactContext reactContext = getThemedReactContext();
-        int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
+        int reactTag = webView.getId();
         UIManagerHelper.getEventDispatcherForReactTag(reactContext, reactTag).dispatchEvent(event);
     }
 
@@ -392,21 +441,11 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     return (ThemedReactContext) this.getContext();
   }
 
-  public ReactApplicationContext getReactApplicationContext() {
-      return this.getThemedReactContext().getReactApplicationContext();
-  }
-
   protected class RNCWebViewBridge {
-        private String TAG = "RNCWebViewBridge";
         RNCWebView mWebView;
-        String injectedObjectJson;
 
         RNCWebViewBridge(RNCWebView c) {
           mWebView = c;
-        }
-
-        public void setInjectedObjectJson(String s) {
-            injectedObjectJson = s;
         }
 
         /**
@@ -415,16 +454,72 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
          */
         @JavascriptInterface
         public void postMessage(String message) {
-            if (mWebView.getMessagingEnabled()) {
-                mWebView.onMessage(message);
-            } else {
-                FLog.w(TAG, "ReactNativeWebView.postMessage method was called but messaging is disabled. Pass an onMessage handler to the WebView.");
-            }
+          mWebView.onMessage(message);
         }
 
-        @JavascriptInterface
-        public String injectedObjectJson() { return injectedObjectJson; }
+
+
     }
+
+  protected class RNCWebViewDownloadBridge {
+    RNCWebView mWebView;
+
+    RNCWebViewDownloadBridge(RNCWebView c) {
+      mWebView = c;
+    }
+
+    /**
+     * This method is called whenever JavaScript running within the web view calls:
+     * - window[JAVASCRIPT_INTERFACE].postMessage
+     */
+
+    @JavascriptInterface
+    public void downloadFile(String json) {
+      //parse json
+      try {
+        JSONObject jsonObject = null;
+        jsonObject = new JSONObject(json);
+        String url = jsonObject.getString("data");
+        String fileName = jsonObject.getString("fileName");
+        //decode base64 string and save to file
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        File file = new File(path, fileName);
+
+          if(!path.exists())
+            path.mkdirs();
+
+
+          // if file exists, change name to avoid overwrite
+          int i = 1;
+          while(file.exists()) {
+            file = new File(path, fileName.substring(0, fileName.lastIndexOf(".")) + "(" + i + ")" + fileName.substring(fileName.lastIndexOf(".")));
+            i++;
+          }
+
+          if(!file.exists())
+            file.createNewFile();
+
+          String base64EncodedString = url.substring(url.indexOf(",") + 1);
+          byte[] decodedBytes = Base64.decode(base64EncodedString, Base64.DEFAULT);
+          OutputStream os = new FileOutputStream(file);
+          os.write(decodedBytes);
+          os.close();
+
+          Toast.makeText(mWebView.getContext(), downloadingMessage, Toast.LENGTH_LONG).show();
+
+
+
+      } catch (JSONException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        Log.i("ReactNative", "IOException: " + e.getMessage());
+        e.printStackTrace();
+      }
+
+
+    }
+  }
 
 
     protected static class ProgressChangedFilter {
