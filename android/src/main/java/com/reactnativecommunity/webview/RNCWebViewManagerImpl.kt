@@ -28,8 +28,10 @@ import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.Locale
+import kotlin.math.min
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
+val splitExtensionRegex = "\\.(?=[^\\.]+$)".toRegex()
 
 class RNCWebViewManagerImpl {
     companion object {
@@ -49,6 +51,7 @@ class RNCWebViewManagerImpl {
     private val HTML_ENCODING = "UTF-8"
     private val HTML_MIME_TYPE = "text/html"
     private val HTTP_METHOD_POST = "POST"
+    private val MAX_FILE_PATH_SIZE = 255
 
     // Use `webView.loadUrl("about:blank")` to reliably reset the view
     // state and release page resources (including any running JavaScript).
@@ -103,6 +106,24 @@ class RNCWebViewManagerImpl {
 
             // Sanitize filename by replacing invalid characters with "_"
             fileName = fileName.replace(invalidCharRegex, "_")
+
+            // Trimming filename to avoid File name too long error
+            val downloadDirPathSize = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M)
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)?.absolutePath?.length ?: 0 else
+                context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath?.length ?: 0
+            val maxFileNameSize = MAX_FILE_PATH_SIZE - downloadDirPathSize
+
+            val fileNameParts = fileName.split(splitExtensionRegex)
+            fileName = if (fileNameParts.count() == 2) {
+              val fileNameLength = min(fileNameParts[0].length, maxFileNameSize)
+              val extensionLength = min(fileNameParts[1].length, maxFileNameSize)
+              val trimSize = if (fileNameLength + extensionLength > maxFileNameSize)
+                  fileNameLength + extensionLength - maxFileNameSize else
+                  0
+              "${fileNameParts[0].substring(0, fileNameLength - trimSize)}.${fileNameParts[1]}"
+            } else {
+                fileName.substring(0, min(fileName.length, maxFileNameSize))
+            }
 
             val downloadMessage = "Downloading $fileName"
 
