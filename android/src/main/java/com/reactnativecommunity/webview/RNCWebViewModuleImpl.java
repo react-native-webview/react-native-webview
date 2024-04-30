@@ -25,6 +25,7 @@ import android.webkit.WebChromeClient;
 import android.widget.Toast;
 
 import com.facebook.common.activitylistener.ActivityListenerManager;
+import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -163,6 +164,35 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
     protected static final ShouldOverrideUrlLoadingLock shouldOverrideUrlLoadingLock = new ShouldOverrideUrlLoadingLock();
 
+    protected static class ShouldInterceptRequestLock {
+      protected enum ShouldInterceptRequestState {
+        UNDECIDED,
+        SHOULD_INTERCEPT,
+        DO_NOT_INTERCEPT,
+      }
+
+      private double nextLockIdentifier = 1;
+      private final HashMap<Double, AtomicReference<String>> shouldInterceptLocks = new HashMap<>();
+
+      public synchronized Pair<Double, AtomicReference<String>> getNewLock() {
+        final double lockIdentifier = nextLockIdentifier++;
+
+        final AtomicReference<String> shouldIntercept = new AtomicReference<>(null);
+        shouldInterceptLocks.put(lockIdentifier, shouldIntercept);
+        return new Pair<>(lockIdentifier, shouldIntercept);
+      }
+
+      @Nullable
+      public synchronized AtomicReference<String> getLock(Double lockIdentifier) {
+        return shouldInterceptLocks.get(lockIdentifier);
+      }
+
+      public synchronized void removeLock(Double lockIdentifier) {
+        shouldInterceptLocks.remove(lockIdentifier);
+      }
+    }
+
+    protected static final ShouldInterceptRequestLock shouldInterceptRequestLoadingLock = new ShouldInterceptRequestLock();
     private enum MimeType {
         DEFAULT("*/*"),
         IMAGE("image"),
@@ -210,6 +240,18 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
             }
         }
     }
+
+  public void shouldInterceptRequestLockIdentifier(boolean shouldIntercept, double lockIdentifier, String input) {
+    final AtomicReference<String> lockObject = shouldInterceptRequestLoadingLock.getLock(lockIdentifier);
+    FLog.w("TAG", "Should Intercept Received from React Native: " + input + shouldIntercept);
+
+    if (lockObject != null) {
+      synchronized (lockObject) {
+        lockObject.set(shouldIntercept ? input : "");
+        lockObject.notify();
+      }
+    }
+  }
 
     public Uri[] getSelectedFiles(Intent data, int resultCode) {
         if (data == null) {

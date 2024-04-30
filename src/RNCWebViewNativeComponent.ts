@@ -101,6 +101,23 @@ export type ShouldStartLoadRequestEvent = Readonly<{
   isTopFrame: boolean;
 }>;
 
+export type ShouldInterceptRequestEvent = Readonly<{
+  url: string;
+  loading: boolean;
+  title: string;
+  canGoBack: boolean;
+  canGoForward: boolean;
+  lockIdentifier: Double;
+  navigationType:
+    | 'click'
+    | 'formsubmit'
+    | 'backforward'
+    | 'reload'
+    | 'formresubmit'
+    | 'other';
+  mainDocumentURL?: string;
+}>;
+
 type ScrollEvent = Readonly<{
   contentInset: {
     bottom: Double;
@@ -274,6 +291,7 @@ export interface NativeProps extends ViewProps {
   hasOnOpenWindowEvent?: boolean;
   onScroll?: DirectEventHandler<ScrollEvent>;
   onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
+  onShouldInterceptRequest: DirectEventHandler<ShouldInterceptRequestEvent>;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
   newSource: Readonly<{

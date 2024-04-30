@@ -6,4 +6,5 @@ import com.facebook.react.bridge.WritableMap
 internal interface RNCWebViewMessagingModule : JavaScriptModule {
   fun onShouldStartLoadWithRequest(event: WritableMap)
   fun onMessage(event: WritableMap)
+  fun onShouldInterceptRequest(event: WritableMap)
 }

@@ -11,6 +11,11 @@ export interface Spec extends TurboModule {
     shouldStart: boolean,
     lockIdentifier: Double
   ): void;
+  shouldInterceptRequestLockIdentifier(
+    shouldIntercept: boolean,
+    lockIdentifier: Double,
+    input?: string,
+  ): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('RNCWebView');

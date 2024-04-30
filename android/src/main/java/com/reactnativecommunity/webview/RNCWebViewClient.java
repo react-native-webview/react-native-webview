@@ -30,14 +30,17 @@ import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
+import com.reactnativecommunity.webview.events.TopShouldInterceptRequestEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RNCWebViewClient extends WebViewClient {
     private static String TAG = "RNCWebViewClient";
     protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
-
+    protected static final int SHOULD_INTERCEPT_REQUEST_LOADING_TIMEOUT = 1000;
     protected boolean mLastLoadFailed = false;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
@@ -84,7 +87,72 @@ public class RNCWebViewClient extends WebViewClient {
       reactWebView.callInjectedJavaScriptBeforeContentLoaded();
     }
 
-    @Override
+  @Override
+  public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+    final RNCWebView rncWebView = (RNCWebView) view;
+    final boolean isJsDebugging = rncWebView.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
+    final String url = request.getUrl().toString();
+    FLog.w(TAG, "Request Webview Class: " + request.getUrl() + request.getRequestHeaders() + request.getClass() + request.isForMainFrame() + request.isRedirect() + request.getMethod());
+    if (!isJsDebugging && rncWebView.mMessagingJSModule != null) {
+      final Pair<Double, AtomicReference<String>> lock = RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.getNewLock();
+      final double lockIdentifier = lock.first;
+      final AtomicReference<String> lockObject = lock.second;
+
+      final WritableMap event = createWebViewEventTest(view, url);
+      event.putDouble("lockIdentifier", lockIdentifier);
+      rncWebView.dispatchDirectShouldInterceptRequest(event);
+
+      try {
+        assert lockObject != null;
+        synchronized (lockObject) {
+          final long startTime = SystemClock.elapsedRealtime();
+          while (lockObject.get() == null) {
+            if (SystemClock.elapsedRealtime() - startTime > SHOULD_INTERCEPT_REQUEST_LOADING_TIMEOUT) {
+              FLog.w(TAG, "Did not receive response to shouldInterceptRequest in time, defaulting to allow loading.");
+              RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.removeLock(lockIdentifier);
+              return super.shouldInterceptRequest(view, request);
+            }
+            lockObject.wait(SHOULD_INTERCEPT_REQUEST_LOADING_TIMEOUT);
+          }
+        }
+      } catch (InterruptedException e) {
+        FLog.e(TAG, "shouldInterceptRequest was interrupted while waiting for result.", e);
+
+        RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.removeLock(lockIdentifier);
+        return super.shouldInterceptRequest(view, request);
+      }
+
+      final String input = lockObject.get();
+      final boolean shouldIntercept = !input.isEmpty();
+
+      RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.removeLock(lockIdentifier);
+
+      if (shouldIntercept) {
+        byte[] byteArrayInput = input.getBytes(StandardCharsets.UTF_8);
+        return new WebResourceResponse(
+          "text/html",
+          "utf-8",
+          200,
+          "OK",
+          request.getRequestHeaders(),
+          new ByteArrayInputStream(byteArrayInput)
+        );
+      } else {
+        return super.shouldInterceptRequest(view, request);
+      }
+    } else {
+      FLog.w(TAG, "Couldn't use blocking synchronous call for shouldInterceptRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
+      progressChangedFilter.setWaitingForCommandLoadUrl(true);
+
+      int reactTag = RNCWebViewWrapper.getReactTagFromWebView(view);
+      UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag).dispatchEvent(new TopShouldInterceptRequestEvent(
+        reactTag,
+        createWebViewEvent(view, url)));
+      return super.shouldInterceptRequest(view, request);
+    }
+  }
+
+  @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         final RNCWebView rncWebView = (RNCWebView) view;
         final boolean isJsDebugging = rncWebView.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
@@ -311,6 +379,19 @@ public class RNCWebViewClient extends WebViewClient {
         event.putBoolean("canGoForward", webView.canGoForward());
         return event;
     }
+
+  protected WritableMap createWebViewEventTest(WebView webView, String url) {
+    WritableMap event = Arguments.createMap();
+    event.putDouble("target", RNCWebViewWrapper.getReactTagFromWebView(webView));
+    // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
+    // like onPageFinished
+    event.putString("url", url);
+    event.putBoolean("loading", false);
+    event.putString("title", "title");
+    event.putBoolean("canGoBack", true);
+    event.putBoolean("canGoForward", true);
+    return event;
+  }
 
     public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
         progressChangedFilter = filter;

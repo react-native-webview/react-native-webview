@@ -27,6 +27,7 @@ import {
   WebViewSourceUri,
   type WebViewMessageEvent,
   type ShouldStartLoadRequestEvent,
+  type ShouldInterceptRequestEvent
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -52,6 +53,11 @@ registerCallableModule('RNCWebViewMessagingModule', {
     event: WebViewMessageEvent & { messagingModuleName?: string }
   ) => {
     directEventEmitter.emit('onMessage', event);
+  },
+  onShouldInterceptRequest: (
+    event: ShouldInterceptRequestEvent & { messagingModuleName?: string }
+  ) => {
+    directEventEmitter.emit('onShouldInterceptRequest', event);
   },
 });
 
@@ -95,6 +101,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       source,
       nativeConfig,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+      onShouldInterceptRequest: onShouldInterceptRequestProp,
       injectedJavaScriptObject,
       ...otherProps
     },
@@ -121,10 +128,26 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       []
     );
 
+    const onShouldInterceptRequestCallback = useCallback(
+      (shouldIntercept: boolean, url: string, lockIdentifier?: number, input?: string) => {
+        if (lockIdentifier) {
+          RNCWebViewModule.shouldInterceptRequestLockIdentifier(
+            shouldIntercept,
+            lockIdentifier,
+            input,
+          );
+        } else if (!shouldIntercept && webViewRef.current) {
+          Commands.loadUrl(webViewRef.current, url);
+        }
+      },
+      []
+    );
+
     const {
       onLoadingStart,
       onShouldStartLoadWithRequest,
       onMessage,
+      onShouldInterceptRequest,
       viewState,
       setViewState,
       lastErrorEvent,
@@ -149,6 +172,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       originWhitelist,
       onShouldStartLoadWithRequestProp,
       onShouldStartLoadWithRequestCallback,
+      onShouldInterceptRequestProp,
+      onShouldInterceptRequestCallback,
     });
 
     useImperativeHandle(
@@ -211,11 +236,28 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         }
       );
 
+      const onShouldInterceptRequestSubscription =
+        directEventEmitter.addListener(
+          'onShouldInterceptRequest',
+          (
+            event: ShouldInterceptRequestEvent & {
+              messagingModuleName?: string;
+            }
+          ) => {
+            if (event.messagingModuleName === messagingModuleName) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { messagingModuleName: _, ...rest } = event;
+              onShouldInterceptRequest(rest);
+            }
+          }
+        );
+
       return () => {
         onShouldStartLoadWithRequestSubscription.remove();
         onMessageSubscription.remove();
+        onShouldInterceptRequestSubscription.remove()
       };
-    }, [messagingModuleName, onMessage, onShouldStartLoadWithRequest]);
+    }, [messagingModuleName, onMessage, onShouldStartLoadWithRequest, onShouldInterceptRequest]);
 
     let otherView: ReactElement | undefined;
     if (viewState === 'LOADING') {
@@ -290,6 +332,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         onHttpError={onHttpError}
         onRenderProcessGone={onRenderProcessGone}
         onMessage={onMessage}
+        onShouldInterceptRequest={onShouldInterceptRequest}
         onOpenWindow={onOpenWindow}
         hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}

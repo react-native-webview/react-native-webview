@@ -102,6 +102,8 @@ export interface ShouldStartLoadRequest extends WebViewNavigation {
   isTopFrame: boolean;
 }
 
+export interface ShouldInterceptRequest extends WebViewNavigation {}
+
 export interface FileDownload {
   downloadUrl: string;
 }
@@ -143,6 +145,8 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 
 export type ShouldStartLoadRequestEvent =
   NativeSyntheticEvent<ShouldStartLoadRequest>;
+
+export type ShouldInterceptRequestEvent = NativeSyntheticEvent<ShouldInterceptRequest>;
 
 export type FileDownloadEvent = NativeSyntheticEvent<FileDownload>;
 
@@ -272,6 +276,10 @@ export interface WebViewNativeConfig {
 export type OnShouldStartLoadWithRequest = (
   event: ShouldStartLoadRequest
 ) => boolean;
+
+export type OnShouldInterceptRequest = (
+  event: ShouldInterceptRequest
+) => string | undefined;
 
 export interface BasicAuthCredential {
   /**
@@ -1274,6 +1282,13 @@ export interface WebViewSharedProps extends ViewProps {
    * to stop loading. The `navigationType` is always `other` on android.
    */
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest;
+
+  /**
+   * Function that allows intercepting any android web view requests. Return
+   * a string to modify the WebResourceResponse and `null` to load
+   * normally. The `navigationType` is always `other` on android.
+   */
+  onShouldInterceptRequest?: OnShouldInterceptRequest;
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
