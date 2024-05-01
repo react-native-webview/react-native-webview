@@ -940,12 +940,14 @@ RCTAutoInsetsProtocol>
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
 {
+  _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
+
   if (_webView == nil) {
-    _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
     return;
   }
 
   if (_savedHideKeyboardAccessoryView == false) {
+    [self __addInputAccessoryView];
     return;
   }
 
@@ -975,6 +977,21 @@ RCTAutoInsetsProtocol>
   object_setClass(subview, newClass);
 }
 #endif // TARGET_OS_IOS
+
+- (void)__addInputAccessoryView {
+  UIView* subview;
+
+  for (UIView* view in _webView.scrollView.subviews) {
+    if([[view.class description] hasSuffix:@"_SwizzleHelperWK"])
+      subview = view;
+  }
+
+  if(subview == nil) return;
+
+  Class newClass = subview.superclass;
+
+  object_setClass(subview, newClass);
+}
 
 // UIScrollViewDelegate method
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
