@@ -3,6 +3,8 @@
 
 #pragma once
 
+#ifndef USE_WINUI3
+
 #include "winrt/Microsoft.ReactNative.h"
 #include "NativeModules.h"
 #include "ReactWebView.g.h"
@@ -50,3 +52,5 @@ namespace winrt::ReactNativeWebView::implementation {
 namespace winrt::ReactNativeWebView::factory_implementation {
     struct ReactWebView : ReactWebViewT<ReactWebView, implementation::ReactWebView> {};
 } // namespace winrt::ReactNativeWebView::factory_implementation
+
+#endif // USE_WINUI3

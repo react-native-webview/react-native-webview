@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#ifndef USE_WINUI3
+
 #include "pch.h"
 #include "JSValueXaml.h"
 #include "ReactWebView.h"
@@ -41,7 +43,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 if (auto self = ref.get()) {
                     self->OnNavigationStarting(sender, args);
                 }
-                
+
             });
 
         m_navigationCompletedRevoker = m_webView.NavigationCompleted(
@@ -60,7 +62,7 @@ namespace winrt::ReactNativeWebView::implementation {
 
         m_domContentLoadedRevoker = m_webView.DOMContentLoaded(
             winrt::auto_revoke, [ref = get_weak()](auto const& sender, auto const& args) {
-                if (auto self = ref.get()) 
+                if (auto self = ref.get())
                 {
                     self->OnDOMContentLoaded(sender, args);
                 }
@@ -167,7 +169,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 }
             }
           }
-      
+
           m_reactContext.DispatchEvent(
                 *this,
                 L"topMessage",
@@ -235,3 +237,5 @@ namespace winrt::ReactNativeWebView::implementation {
         return m_messagingEnabled;
     }
 } // namespace winrt::ReactNativeWebView::implementation
+
+#endif // USE_WINUI3
