@@ -25,7 +25,7 @@ jobs:
         working-directory: example/ios
       - name: Build iOS test app
         run: |
-          device_name='iPhone 13'
+          device_name='iPhone 15'
           device=$(xcrun simctl list devices "${device_name}" available | grep "${device_name} (")
           re='\(([-0-9A-Fa-f]+)\)'
           [[ $device =~ $re ]] || exit 1
