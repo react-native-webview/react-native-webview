@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
+import android.webkit.JsPromptResult;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -58,6 +59,9 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     protected View mVideoView;
     protected WebChromeClient.CustomViewCallback mCustomViewCallback;
+
+    // This boolean block JS prompts and alerts from displaying during loading
+    protected boolean blockJsDuringLoading = true;
 
     /*
      * - Permissions -
@@ -381,6 +385,16 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
 
         return this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple, fileChooserParams.isCaptureEnabled());
+    }
+
+    @Override
+    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+        if (blockJsDuringLoading) {
+            result.cancel();
+            return true;
+        } else {
+            return super.onJsPrompt(view, url, message, defaultValue, result);
+        }
     }
 
     @Override
