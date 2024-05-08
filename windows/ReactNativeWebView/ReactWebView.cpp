@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#include "pch.h"
+
 #ifndef USE_WINUI3
 
-#include "pch.h"
 #include "JSValueXaml.h"
 #include "ReactWebView.h"
 #include "ReactWebView.g.cpp"
