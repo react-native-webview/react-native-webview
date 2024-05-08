@@ -852,7 +852,7 @@ PODS:
   - React-Mapbuffer (0.73.5):
     - glog
     - React-debug
-  - react-native-webview (13.9.1):
+  - react-native-webview (13.10.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1019,13 +1019,13 @@ PODS:
     - React-jsi (= 0.73.5)
     - React-logger (= 0.73.5)
     - React-perflogger (= 0.73.5)
-  - ReactNativeHost (0.4.8):
+  - ReactNativeHost (0.4.9):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - React-cxxreact
     - ReactCommon/turbomodule/core
-  - ReactTestApp-DevSupport (3.5.9):
+  - ReactTestApp-DevSupport (3.7.2):
     - React-Core
     - React-jsi
   - ReactTestApp-Resources (1.0.0-dev)
@@ -1224,7 +1224,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 32db5e364bcae8fca8cdf8891830636275add0c5
   React-logger: 0331362115f0f5b392bd7ed14636d1a3ea612479
   React-Mapbuffer: 7c35cd53a22d0be04d3f26f7881c7fb7dd230216
-  react-native-webview: 5ec98c388f32e4d1851b0fc371d4ac05306577b2
+  react-native-webview: 39288780069589ffd4d6912e327a52b11ff31513
   React-nativeconfig: 1166714a4f7ea57a0df5c2cb44fbc70f98d580f9
   React-NativeModulesApple: 461b7a216dffdcfcae46afeba2e0859a78eef71e
   React-perflogger: 0dd9f1725d55f8264b81efadd373fe1d9cca7dc2
@@ -1245,8 +1245,8 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 7b558337d22a47a270b5c99d8016b5ab743b3035
   React-utils: 987a4526a2fc0acdfaf87888adfe0bf9d0452066
   ReactCommon: dcc87812d79ce368cc41b7cf49fb624cf3c22b6b
-  ReactNativeHost: 6cd1ed318d4137d8e067702461d466c0d0e67422
-  ReactTestApp-DevSupport: 7ff82886ed4f6572e1dcfbd8267498f2f58c0fd5
+  ReactNativeHost: 8d42a784a88c420acba96197e779d0f8ac467e04
+  ReactTestApp-DevSupport: f845db38b4b4ce8d341f8acdba934ee85ed3d7b2
   ReactTestApp-Resources: 857244f3a23f2b3157b364fa06cf3e8866deff9c
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: a716eea57d0d3430219c0a5a233e1e93ee931eb7

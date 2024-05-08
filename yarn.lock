@@ -2888,10 +2888,10 @@
     "@rnx-kit/tools-react-native" "^1.3.4"
     "@rnx-kit/tools-workspaces" "^0.1.3"
 
-"@rnx-kit/react-native-host@^0.4.6":
-  version "0.4.8"
-  resolved "https://registry.yarnpkg.com/@rnx-kit/react-native-host/-/react-native-host-0.4.8.tgz#2c8702782f58c02c1bb7cbc518e8f2a7339b94e9"
-  integrity sha512-hxa2KDQWKWolVuKweLKdaARLxqMS/i973Mbuh4Hd/b/gGmnbA0a88GpVf5lmKGDnH6rK+jL8zrNC7I9vGHQBBA==
+"@rnx-kit/react-native-host@^0.4.9":
+  version "0.4.9"
+  resolved "https://registry.yarnpkg.com/@rnx-kit/react-native-host/-/react-native-host-0.4.9.tgz#1443649f9b96dc53e1f7ea10387c4abd260122b3"
+  integrity sha512-S8cp6sOLDsrW5bYk6LEoxU90UEms/eC2J2inF4UJ2p/AT2ibzU9ftO+oSAfoRQIizpAqAf823fuAsSXdfdQA5w==
 
 "@rnx-kit/tools-node@^2.0.0", "@rnx-kit/tools-node@^2.0.1":
   version "2.1.1"
@@ -11942,19 +11942,18 @@ react-native-macos@0.73.17:
     ws "^6.2.2"
     yargs "^17.6.2"
 
-react-native-test-app@3.5.9:
-  version "3.5.9"
-  resolved "https://registry.yarnpkg.com/react-native-test-app/-/react-native-test-app-3.5.9.tgz#005703cba8a95645ca4fa4ffac79d649ca0e3500"
-  integrity sha512-btSMHXraUEi3BT7cLUn6X8hxj66vVwBhKGWke3P3IH+/uwaz7hg+p73W2Ij7O0pihyywNcMRdy1Lc3H9FdvHyA==
+react-native-test-app@3.7.2:
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/react-native-test-app/-/react-native-test-app-3.7.2.tgz#c0d452cdada028bf9871fd6f571d19c2c3746143"
+  integrity sha512-h6maTpyIlUQtsXk2uC92aDAeAvTmgclB52ygik+MhZ2NYG695yN6kj2lK7doLLLqnLRBVc4B0nDJ9GTycu1svw==
   dependencies:
-    "@rnx-kit/react-native-host" "^0.4.6"
+    "@rnx-kit/react-native-host" "^0.4.9"
     ajv "^8.0.0"
     cliui "^8.0.0"
     fast-xml-parser "^4.0.0"
     prompts "^2.4.0"
     semver "^7.3.5"
     uuid "^9.0.0"
-    yoctocolors "^2.0.0"
 
 react-native-windows@0.73.8:
   version "0.73.8"
@@ -14737,11 +14736,6 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
-
-yoctocolors@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/yoctocolors/-/yoctocolors-2.0.0.tgz#f6cd83f1fd0b211594810a6de413202d6d177075"
-  integrity sha512-esbDnt0Z1zI1KgvOZU90hJbL6BkoUbrP9yy7ArNZ6TmxBxydMJTYMf9FZjmwwcA8ZgEQzriQ3hwZ0NYXhlFo8Q==
 
 zip-stream@^2.1.2:
   version "2.1.3"

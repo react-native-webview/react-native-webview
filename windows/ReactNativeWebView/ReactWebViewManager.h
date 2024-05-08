@@ -54,3 +54,5 @@ namespace winrt::ReactNativeWebView::implementation {
 
     };
 } // namespace winrt::ReactWebView::implementation
+
+#endif  // USE_WINUI3

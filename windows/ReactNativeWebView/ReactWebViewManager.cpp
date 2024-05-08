@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#include "pch.h"
+
 #ifndef USE_WINUI3
 
-#include "pch.h"
 #include "ReactWebViewManager.h"
 #include "NativeModules.h"
 #include "ReactWebView.h"
