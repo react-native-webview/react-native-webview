@@ -8,7 +8,7 @@
 #import <react/renderer/components/RNCWebViewSpec/Props.h>
 #import <react/renderer/components/RNCWebViewSpec/RCTComponentViewHelpers.h>
 
-#import "RCTFabricComponentsPlugins.h"
+#import <React/RCTFabricComponentsPlugins.h>
 
 using namespace facebook::react;
 
