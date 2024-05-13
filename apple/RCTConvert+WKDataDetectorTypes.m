@@ -2,6 +2,8 @@
 
 #import <React/RCTConvert.h>
 
+#if TARGET_OS_IPHONE
+
 @implementation RCTConvert (WKDataDetectorTypes)
 
 RCT_MULTI_ENUM_CONVERTER(
@@ -21,3 +23,5 @@ RCT_MULTI_ENUM_CONVERTER(
      unsignedLongLongValue)
 
 @end
+
+#endif // TARGET_OS_IPHONE
