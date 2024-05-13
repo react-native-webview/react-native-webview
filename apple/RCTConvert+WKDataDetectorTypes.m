@@ -1,6 +1,6 @@
 #import <WebKit/WebKit.h>
 
-#import "RCTConvert.h"
+#import <React/RCTConvert.h>
 
 RCT_MULTI_ENUM_CONVERTER(
      WKDataDetectorTypes,

@@ -1,6 +1,6 @@
- #import <WebKit/WebKit.h>
+#import <WebKit/WebKit.h>
 
- #import <React/RCTConvert.h>
+#import <React/RCTConvert.h>
 
 @interface RCTConvert (WKDataDetectorTypes)
 
