@@ -2,6 +2,8 @@
 
 #import <React/RCTConvert.h>
 
+@implementation RCTConvert (WKDataDetectorTypes)
+
 RCT_MULTI_ENUM_CONVERTER(
      WKDataDetectorTypes,
      (@{
@@ -17,3 +19,5 @@ RCT_MULTI_ENUM_CONVERTER(
      }),
      WKDataDetectorTypeNone,
      unsignedLongLongValue)
+
+@end
