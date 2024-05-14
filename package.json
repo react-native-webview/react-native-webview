@@ -22,7 +22,7 @@
     "ci:publish": "yarn semantic-release",
     "lint": "yarn tsc --noEmit && yarn eslint ./src --ext .ts,.tsx",
     "build": "yarn tsc",
-    "prepare": "yarn build",
+    "prepare_RW_RENAMED_SO_IT_DOESNT_RUN_ON_NPM_INSTALL": "yarn build",
     "appium": "appium",
     "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.js",
     "add:macos": "yarn add react-native-macos@0.71.33"
