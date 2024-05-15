@@ -92,7 +92,7 @@ class RNCWebViewManagerImpl {
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
-            val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
+            val module = webView.reactApplicationContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {
                 DownloadManager.Request(Uri.parse(url))
             } catch (e: IllegalArgumentException) {
@@ -642,9 +642,12 @@ class RNCWebViewManagerImpl {
       }
     }
 
-    fun setMenuCustomItems(viewWrapper: RNCWebViewWrapper, value: ReadableArray) {
+    fun setMenuCustomItems(viewWrapper: RNCWebViewWrapper, value: ReadableArray?) {
         val view = viewWrapper.webView
-        view.setMenuCustomItems(value.toArrayList() as List<Map<String, String>>)
+        when (value) {
+            null -> view.setMenuCustomItems(null)
+            else -> view.setMenuCustomItems(value.toArrayList() as List<Map<String, String>>)
+        }
     }
 
     fun setNestedScrollEnabled(viewWrapper: RNCWebViewWrapper, value: Boolean) {

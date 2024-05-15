@@ -1,4 +1,10 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 #include "pch.h"
+
+#ifndef USE_WINUI3
+
 #include "ReactWebViewManager.h"
 #include "NativeModules.h"
 #include "ReactWebView.h"
@@ -144,7 +150,7 @@ namespace winrt::ReactNativeWebView::implementation {
               auto reactWebView = view.as<ReactNativeWebView::ReactWebView>();
               reactWebView.MessagingEnabled(messagingEnabled);
             }
-        }        
+        }
     }
 
     // IViewManagerWithExportedEventTypeConstants
@@ -214,3 +220,5 @@ namespace winrt::ReactNativeWebView::implementation {
     }
 
 } // namespace winrt::ReactWebView::implementation
+
+#endif // USE_WINUI3
