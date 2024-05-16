@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, Text, Alert, TextInput, Button} from 'react-native';
-import WebView from 'react-native-webview';
+import WebView from '@metamask/react-native-webview';
 const localHtmlFile = require('../assets/test.html');
 
 export default class LocalPageLoad extends Component<Props, State> {
