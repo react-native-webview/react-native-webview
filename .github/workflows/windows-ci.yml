@@ -1,5 +1,5 @@
 name: Windows CI
-on: [pull_request]
+on:
 
 jobs:
   run-windows-tests:
