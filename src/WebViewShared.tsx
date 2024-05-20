@@ -2,9 +2,7 @@ import escapeStringRegexp from 'escape-string-regexp';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Linking, View, ActivityIndicator, Text, Platform } from 'react-native';
 import {
-  OnShouldInterceptRequest,
   OnShouldStartLoadWithRequest,
-  ShouldInterceptRequestEvent,
   ShouldStartLoadRequestEvent,
   WebViewError,
   WebViewErrorEvent,
@@ -73,30 +71,6 @@ const createOnShouldStartLoadWithRequest = (
   };
 };
 
-const createOnShouldInterceptRequest = (
-  interceptRequest: (
-    shouldStart: boolean,
-    url: string,
-    lockIdentifier: number,
-    input?: string,
-  ) => void,
-  onShouldInterceptRequest?: OnShouldInterceptRequest
-) => {
-  return ({ nativeEvent }: ShouldInterceptRequestEvent) => {
-    let shouldIntercept = true;
-    let input = undefined;
-    const { url, lockIdentifier } = nativeEvent;
-
-   if (onShouldInterceptRequest) {
-      input = onShouldInterceptRequest(nativeEvent);
-    }
-
-    shouldIntercept = !!input 
-
-    interceptRequest(shouldIntercept, url, lockIdentifier, input);
-  };
-};
-
 const defaultRenderLoading = () => (
   <View style={styles.loadingOrErrorView}>
     <ActivityIndicator />
@@ -138,8 +112,6 @@ export const useWebViewLogic = ({
   originWhitelist,
   onShouldStartLoadWithRequestProp,
   onShouldStartLoadWithRequestCallback,
-  onShouldInterceptRequestProp,
-  onShouldInterceptRequestCallback
 }: {
   startInLoadingState?: boolean;
   onNavigationStateChange?: (event: WebViewNavigation) => void;
@@ -160,13 +132,6 @@ export const useWebViewLogic = ({
     url: string,
     lockIdentifier?: number | undefined
   ) => void;
-  onShouldInterceptRequestProp?: OnShouldInterceptRequest
-  onShouldInterceptRequestCallback: (
-    shouldIntercept: boolean,
-    url: string,
-    lockIdentifier?: number | undefined,
-    input?: string | undefined
-  ) => void
 }) => {
   const [viewState, setViewState] = useState<'IDLE' | 'LOADING' | 'ERROR'>(
     startInLoadingState ? 'LOADING' : 'IDLE'
@@ -293,18 +258,6 @@ export const useWebViewLogic = ({
     ]
   );
 
-  const onShouldInterceptRequest = useMemo(
-    () =>
-      createOnShouldInterceptRequest(
-        onShouldInterceptRequestCallback,
-        onShouldInterceptRequestProp
-      ),
-    [
-      onShouldInterceptRequestProp,
-      onShouldInterceptRequestCallback,
-    ]
-  );
-
   const onOpenWindow = useCallback(
     (event: WebViewOpenWindowEvent) => {
       onOpenWindowProp?.(event);
@@ -326,6 +279,5 @@ export const useWebViewLogic = ({
     viewState,
     setViewState,
     lastErrorEvent,
-    onShouldInterceptRequest,
   };
 };

@@ -135,7 +135,13 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
     }
 
-    protected static class ShouldOverrideUrlLoadingLock {
+    protected interface LockManager<T> {
+      Pair<Double, AtomicReference<T>> getNewLock();
+      AtomicReference<T> getLock(Double lockIdentifier);
+      void removeLock(Double lockIdentifier);
+    }
+
+    protected static class ShouldOverrideUrlLoadingLock implements LockManager<ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> {
         protected enum ShouldOverrideCallbackState {
             UNDECIDED,
             SHOULD_OVERRIDE,
@@ -164,13 +170,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
     protected static final ShouldOverrideUrlLoadingLock shouldOverrideUrlLoadingLock = new ShouldOverrideUrlLoadingLock();
 
-    protected static class ShouldInterceptRequestLock {
-      protected enum ShouldInterceptRequestState {
-        UNDECIDED,
-        SHOULD_INTERCEPT,
-        DO_NOT_INTERCEPT,
-      }
-
+    protected static class ShouldInterceptRequestLock implements LockManager<String> {
       private double nextLockIdentifier = 1;
       private final HashMap<Double, AtomicReference<String>> shouldInterceptLocks = new HashMap<>();
 
@@ -241,13 +241,12 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         }
     }
 
-  public void shouldInterceptRequestLockIdentifier(boolean shouldIntercept, double lockIdentifier, String input) {
+  public void shouldInterceptRequestLockIdentifier(boolean shouldIntercept, double lockIdentifier, String response) {
     final AtomicReference<String> lockObject = shouldInterceptRequestLoadingLock.getLock(lockIdentifier);
-    FLog.w("TAG", "Should Intercept Received from React Native: " + input + shouldIntercept);
 
     if (lockObject != null) {
       synchronized (lockObject) {
-        lockObject.set(shouldIntercept ? input : "");
+        lockObject.set(shouldIntercept ? response : "");
         lockObject.notify();
       }
     }

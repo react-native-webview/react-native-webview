@@ -21,10 +21,9 @@ import androidx.core.util.Pair;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerHelper;
+import com.facebook.react.uimanager.events.Event;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
@@ -46,6 +45,11 @@ public class RNCWebViewClient extends WebViewClient {
     protected @Nullable String ignoreErrFailedForThisURL = null;
     protected @Nullable RNCBasicAuthCredential basicAuthCredential = null;
 
+    protected enum LockResponse {
+      TIMEOUT,
+      SUCCESS,
+      INTERUPTED,
+    }
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
         ignoreErrFailedForThisURL = url;
     }
@@ -90,116 +94,138 @@ public class RNCWebViewClient extends WebViewClient {
   @Override
   public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
     final RNCWebView rncWebView = (RNCWebView) view;
-    final boolean isJsDebugging = rncWebView.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
     final String url = request.getUrl().toString();
-    FLog.w(TAG, "Request Webview Class: " + request.getUrl() + request.getRequestHeaders() + request.getClass() + request.isForMainFrame() + request.isRedirect() + request.getMethod());
-    if (!isJsDebugging && rncWebView.mMessagingJSModule != null) {
-      final Pair<Double, AtomicReference<String>> lock = RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.getNewLock();
-      final double lockIdentifier = lock.first;
-      final AtomicReference<String> lockObject = lock.second;
 
-      final WritableMap event = createWebViewEventTest(view, url);
-      event.putDouble("lockIdentifier", lockIdentifier);
-      rncWebView.dispatchDirectShouldInterceptRequest(event);
-
-      try {
-        assert lockObject != null;
-        synchronized (lockObject) {
-          final long startTime = SystemClock.elapsedRealtime();
-          while (lockObject.get() == null) {
-            if (SystemClock.elapsedRealtime() - startTime > SHOULD_INTERCEPT_REQUEST_LOADING_TIMEOUT) {
-              FLog.w(TAG, "Did not receive response to shouldInterceptRequest in time, defaulting to allow loading.");
-              RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.removeLock(lockIdentifier);
-              return super.shouldInterceptRequest(view, request);
-            }
-            lockObject.wait(SHOULD_INTERCEPT_REQUEST_LOADING_TIMEOUT);
-          }
-        }
-      } catch (InterruptedException e) {
-        FLog.e(TAG, "shouldInterceptRequest was interrupted while waiting for result.", e);
-
-        RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.removeLock(lockIdentifier);
-        return super.shouldInterceptRequest(view, request);
-      }
-
-      final String input = lockObject.get();
-      final boolean shouldIntercept = !input.isEmpty();
-
-      RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.removeLock(lockIdentifier);
-
-      if (shouldIntercept) {
-        byte[] byteArrayInput = input.getBytes(StandardCharsets.UTF_8);
-        return new WebResourceResponse(
-          "text/html",
-          "utf-8",
-          200,
-          "OK",
-          request.getRequestHeaders(),
-          new ByteArrayInputStream(byteArrayInput)
-        );
-      } else {
-        return super.shouldInterceptRequest(view, request);
-      }
-    } else {
+    if (!canUseBlockingSyncCall(rncWebView)) {
       FLog.w(TAG, "Couldn't use blocking synchronous call for shouldInterceptRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
-      progressChangedFilter.setWaitingForCommandLoadUrl(true);
+      handleEventAndLoad(view, new TopShouldInterceptRequestEvent(
+        RNCWebViewWrapper.getReactTagFromWebView(view),
+        createBackgroundWebviewEvent(view, url))
+      );
 
-      int reactTag = RNCWebViewWrapper.getReactTagFromWebView(view);
-      UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag).dispatchEvent(new TopShouldInterceptRequestEvent(
-        reactTag,
-        createWebViewEvent(view, url)));
+      return super.shouldInterceptRequest(view, request);
+    }
+
+    final Pair<Double, AtomicReference<String>> lock = RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.getNewLock();
+    final double lockIdentifier = lock.first;
+    final AtomicReference<String> lockObject = lock.second;
+
+    final WritableMap event = createBackgroundWebviewEvent(view, url);
+    event.putDouble("lockIdentifier", lockIdentifier);
+    rncWebView.dispatchDirectShouldInterceptRequest(event);
+
+    final String defaultLockValue = null;
+    final LockResponse lockResponse = awaitResponseFromLock(
+      lock,
+      RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock,
+      SHOULD_INTERCEPT_REQUEST_LOADING_TIMEOUT,
+      defaultLockValue
+    );
+
+    if (lockResponse == LockResponse.TIMEOUT) {
+      FLog.w(TAG, "Did not receive response to shouldInterceptRequest in time, defaulting to the default request.");
+    }
+    if (lockResponse != LockResponse.SUCCESS) {
+      return super.shouldInterceptRequest(view, request);
+    }
+
+    final String response = lockObject.get();
+    final boolean shouldIntercept = !response.isEmpty();
+
+    RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.removeLock(lockIdentifier);
+
+    if (shouldIntercept) {
+      byte[] byteArrayInput = response.getBytes(StandardCharsets.UTF_8);
+      return new WebResourceResponse(
+        "text/html",
+        "utf-8",
+        200,
+        "OK",
+        request.getRequestHeaders(),
+        new ByteArrayInputStream(byteArrayInput)
+      );
+    } else {
       return super.shouldInterceptRequest(view, request);
     }
   }
 
-  @Override
+    @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         final RNCWebView rncWebView = (RNCWebView) view;
-        final boolean isJsDebugging = rncWebView.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
 
-        if (!isJsDebugging && rncWebView.mMessagingJSModule != null) {
-            final Pair<Double, AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState>> lock = RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.getNewLock();
-            final double lockIdentifier = lock.first;
-            final AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = lock.second;
-
-            final WritableMap event = createWebViewEvent(view, url);
-            event.putDouble("lockIdentifier", lockIdentifier);
-            rncWebView.dispatchDirectShouldStartLoadWithRequest(event);
-
-            try {
-                assert lockObject != null;
-                synchronized (lockObject) {
-                    final long startTime = SystemClock.elapsedRealtime();
-                    while (lockObject.get() == RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.UNDECIDED) {
-                        if (SystemClock.elapsedRealtime() - startTime > SHOULD_OVERRIDE_URL_LOADING_TIMEOUT) {
-                            FLog.w(TAG, "Did not receive response to shouldOverrideUrlLoading in time, defaulting to allow loading.");
-                            RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-                            return false;
-                        }
-                        lockObject.wait(SHOULD_OVERRIDE_URL_LOADING_TIMEOUT);
-                    }
-                }
-            } catch (InterruptedException e) {
-                FLog.e(TAG, "shouldOverrideUrlLoading was interrupted while waiting for result.", e);
-                RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-                return false;
-            }
-
-            final boolean shouldOverride = lockObject.get() == RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.SHOULD_OVERRIDE;
-            RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-
-            return shouldOverride;
-        } else {
-            FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
-            progressChangedFilter.setWaitingForCommandLoadUrl(true);
-
-            int reactTag = RNCWebViewWrapper.getReactTagFromWebView(view);
-            UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag).dispatchEvent(new TopShouldStartLoadWithRequestEvent(
-                    reactTag,
-                    createWebViewEvent(view, url)));
-            return true;
+        if (!canUseBlockingSyncCall(rncWebView)) {
+          FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
+          handleEventAndLoad(view, new TopShouldStartLoadWithRequestEvent(
+            RNCWebViewWrapper.getReactTagFromWebView(view),
+            createWebViewEvent(view, url)));
+          return true;
         }
+
+        final Pair<Double, AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState>> lock = RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.getNewLock();
+        final double lockIdentifier = lock.first;
+        final AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = lock.second;
+
+        final WritableMap event = createWebViewEvent(view, url);
+        event.putDouble("lockIdentifier", lockIdentifier);
+        rncWebView.dispatchDirectShouldStartLoadWithRequest(event);
+        final LockResponse lockResponse = awaitResponseFromLock(
+          lock,
+          RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock,
+          SHOULD_OVERRIDE_URL_LOADING_TIMEOUT,
+          RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.UNDECIDED
+        );
+
+        if (lockResponse == LockResponse.TIMEOUT) {
+          FLog.w(TAG, "Did not receive response to shouldOverrideUrlLoading in time, defaulting to allow loading.");
+        }
+        if (lockResponse != LockResponse.SUCCESS) {
+          return false;
+        }
+
+        final boolean shouldOverride = lockObject.get() == RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.SHOULD_OVERRIDE;
+        RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
+
+        return shouldOverride;
     }
+
+    private <T> LockResponse awaitResponseFromLock(
+      Pair<Double, AtomicReference<T>> lock,
+      RNCWebViewModuleImpl.LockManager<T> lockManager,
+      int timeout,
+      T defaultValue
+    ) {
+      final Double lockIdentifier = lock.first;
+      final AtomicReference<T> lockObject = lock.second;
+      try {
+        assert lockObject != null;
+        synchronized (lockObject) {
+          final long startTime = SystemClock.elapsedRealtime();
+          while (lockObject.get() == defaultValue) {
+            if (SystemClock.elapsedRealtime() - startTime > timeout) {
+              lockManager.removeLock(lockIdentifier);
+              return LockResponse.TIMEOUT;
+            }
+            lockObject.wait(timeout);
+          }
+        }
+      } catch (InterruptedException e) {
+        FLog.e(TAG, "lock was interrupted while waiting for result.", e);
+        lockManager.removeLock(lockIdentifier);
+        return LockResponse.INTERUPTED;
+      }
+
+      return LockResponse.SUCCESS;
+    }
+
+  private boolean canUseBlockingSyncCall(RNCWebView view) {
+    final boolean isJsDebugging = view.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
+    return !isJsDebugging && view.mMessagingJSModule != null;
+  }
+  private void handleEventAndLoad(WebView view, Event event) {
+    progressChangedFilter.setWaitingForCommandLoadUrl(true);
+    int reactTag = RNCWebViewWrapper.getReactTagFromWebView(view);
+    UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag).dispatchEvent(event);
+  }
 
     @TargetApi(Build.VERSION_CODES.N)
     @Override
@@ -380,16 +406,11 @@ public class RNCWebViewClient extends WebViewClient {
         return event;
     }
 
-  protected WritableMap createWebViewEventTest(WebView webView, String url) {
+  protected WritableMap createBackgroundWebviewEvent(WebView webView, String url) {
     WritableMap event = Arguments.createMap();
     event.putDouble("target", RNCWebViewWrapper.getReactTagFromWebView(webView));
-    // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
-    // like onPageFinished
+    // Don't use webView.getUrl() here, webview methods can only be used in main thread
     event.putString("url", url);
-    event.putBoolean("loading", false);
-    event.putString("title", "title");
-    event.putBoolean("canGoBack", true);
-    event.putBoolean("canGoForward", true);
     return event;
   }
 

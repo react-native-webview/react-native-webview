@@ -14,7 +14,7 @@ export interface Spec extends TurboModule {
   shouldInterceptRequestLockIdentifier(
     shouldIntercept: boolean,
     lockIdentifier: Double,
-    input?: string,
+    response?: string
   ): void;
 }
 

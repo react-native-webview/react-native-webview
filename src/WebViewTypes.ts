@@ -74,6 +74,11 @@ export interface ContentInsetProp {
   right?: number;
 }
 
+export interface BackgroundWebViewNativeEvent {
+  url: string;
+  lockIdentifier: number;
+}
+
 export interface WebViewNativeEvent {
   url: string;
   loading: boolean;
@@ -102,7 +107,7 @@ export interface ShouldStartLoadRequest extends WebViewNavigation {
   isTopFrame: boolean;
 }
 
-export interface ShouldInterceptRequest extends WebViewNavigation {}
+export interface ShouldInterceptRequest extends BackgroundWebViewNativeEvent {}
 
 export interface FileDownload {
   downloadUrl: string;
@@ -146,7 +151,8 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 export type ShouldStartLoadRequestEvent =
   NativeSyntheticEvent<ShouldStartLoadRequest>;
 
-export type ShouldInterceptRequestEvent = NativeSyntheticEvent<ShouldInterceptRequest>;
+export type ShouldInterceptRequestEvent =
+  NativeSyntheticEvent<ShouldInterceptRequest>;
 
 export type FileDownloadEvent = NativeSyntheticEvent<FileDownload>;
 
@@ -279,7 +285,7 @@ export type OnShouldStartLoadWithRequest = (
 
 export type OnShouldInterceptRequest = (
   event: ShouldInterceptRequest
-) => string | undefined;
+) => Promise<string | undefined>;
 
 export interface BasicAuthCredential {
   /**
