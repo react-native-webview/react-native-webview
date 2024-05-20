@@ -21,6 +21,7 @@ import androidx.core.util.Pair;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.UIManagerHelper;
 import com.facebook.react.uimanager.events.Event;
@@ -106,15 +107,15 @@ public class RNCWebViewClient extends WebViewClient {
       return super.shouldInterceptRequest(view, request);
     }
 
-    final Pair<Double, AtomicReference<String>> lock = RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.getNewLock();
+    final Pair<Double, AtomicReference<ReadableMap>> lock = RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.getNewLock();
     final double lockIdentifier = lock.first;
-    final AtomicReference<String> lockObject = lock.second;
+    final AtomicReference<ReadableMap> lockObject = lock.second;
 
     final WritableMap event = createBackgroundWebviewEvent(view, url);
     event.putDouble("lockIdentifier", lockIdentifier);
     rncWebView.dispatchDirectShouldInterceptRequest(event);
 
-    final String defaultLockValue = null;
+    final ReadableMap defaultLockValue = null;
     final LockResponse lockResponse = awaitResponseFromLock(
       lock,
       RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock,
@@ -129,18 +130,18 @@ public class RNCWebViewClient extends WebViewClient {
       return super.shouldInterceptRequest(view, request);
     }
 
-    final String response = lockObject.get();
-    final boolean shouldIntercept = !response.isEmpty();
+    final ReadableMap webResourceResponse = lockObject.get();
+    final boolean shouldIntercept = webResourceResponse != null && webResourceResponse.hasKey("response");
 
     RNCWebViewModuleImpl.shouldInterceptRequestLoadingLock.removeLock(lockIdentifier);
 
     if (shouldIntercept) {
-      byte[] byteArrayInput = response.getBytes(StandardCharsets.UTF_8);
+      byte[] byteArrayInput = webResourceResponse.getString("response").getBytes(StandardCharsets.UTF_8);
       return new WebResourceResponse(
-        "text/html",
-        "utf-8",
-        200,
-        "OK",
+        webResourceResponse.getString("mimeType"),
+        webResourceResponse.getString("encoding"),
+        webResourceResponse.getInt("statusCode"),
+        webResourceResponse.getString("reasonPhrase"),
         request.getRequestHeaders(),
         new ByteArrayInputStream(byteArrayInput)
       );

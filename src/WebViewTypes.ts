@@ -283,9 +283,17 @@ export type OnShouldStartLoadWithRequest = (
   event: ShouldStartLoadRequest
 ) => boolean;
 
+export type WebResourceResponse = {
+  mimeType: string;
+  encoding: string;
+  statusCode: number;
+  reasonPhrase: string;
+  response: string;
+};
+
 export type OnShouldInterceptRequest = (
   event: ShouldInterceptRequest
-) => Promise<string | undefined>;
+) => Promise<WebResourceResponse>;
 
 export interface BasicAuthCredential {
   /**

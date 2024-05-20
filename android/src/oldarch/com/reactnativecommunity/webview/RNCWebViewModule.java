@@ -11,6 +11,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 
 @ReactModule(name = RNCWebViewModuleImpl.NAME)
@@ -33,7 +34,7 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void shouldInterceptRequestLockIdentifier(boolean shouldIntercept, double lockIdentifier, String response) {
+    public void shouldInterceptRequestLockIdentifier(boolean shouldIntercept, double lockIdentifier, ReadableMap response) {
       mRNCWebViewModuleImpl.shouldInterceptRequestLockIdentifier(shouldIntercept, lockIdentifier, response);
     }
 

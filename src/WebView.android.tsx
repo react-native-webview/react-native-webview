@@ -30,6 +30,7 @@ import {
   type ShouldStartLoadRequestEvent,
   type ShouldInterceptRequestEvent,
   OnShouldInterceptRequest,
+  WebResourceResponse,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -67,13 +68,13 @@ const createOnShouldInterceptRequest = (
   interceptRequest: (
     shouldStart: boolean,
     lockIdentifier: number,
-    response?: string
+    response?: WebResourceResponse
   ) => void,
   onShouldInterceptRequest?: OnShouldInterceptRequest
 ) => {
   return async ({ nativeEvent }: ShouldInterceptRequestEvent) => {
     let shouldIntercept = true;
-    let response: string | undefined;
+    let response: WebResourceResponse | undefined;
     const { lockIdentifier } = nativeEvent;
 
     if (onShouldInterceptRequest) {
@@ -157,7 +158,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       (
         shouldIntercept: boolean,
         lockIdentifier?: number,
-        response?: string
+        response?: WebResourceResponse
       ) => {
         if (lockIdentifier) {
           RNCWebViewModule.shouldInterceptRequestLockIdentifier(

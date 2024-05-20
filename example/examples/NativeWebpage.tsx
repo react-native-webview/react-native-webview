@@ -19,14 +19,14 @@ export default class NativeWebpage extends Component<Props, State> {
             return true;
           }}
           onShouldInterceptRequest={async (event) => {
-            console.log("onShouldInterceptRequest", event);
+            // console.log("onShouldInterceptRequest", event);
             if (event.url === 'https://infinite.red/') {
 
               const response = await fetch('https://infinite.red/');
               const html = await response.text();
               const modifiedHtml = html.replace('<body>', '<body><p>Request succesfully intercepted!</p>');
 
-              return modifiedHtml
+              return { mimeType: 'text/html', encoding: 'utf-8', statusCode: 200, reasonPhrase: 'OK', response: modifiedHtml}
             }
           }}
           onLoadStart={(event) => {

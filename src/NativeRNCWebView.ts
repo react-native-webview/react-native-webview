@@ -1,6 +1,7 @@
 import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 import { Double } from 'react-native/Libraries/Types/CodegenTypes';
+import { WebResourceResponse } from './WebViewTypes';
 
 export interface Spec extends TurboModule {
   readonly getConstants: () => {};
@@ -14,7 +15,7 @@ export interface Spec extends TurboModule {
   shouldInterceptRequestLockIdentifier(
     shouldIntercept: boolean,
     lockIdentifier: Double,
-    response?: string
+    response?: WebResourceResponse
   ): void;
 }
 
