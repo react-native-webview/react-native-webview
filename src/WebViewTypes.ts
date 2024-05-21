@@ -1299,8 +1299,8 @@ export interface WebViewSharedProps extends ViewProps {
 
   /**
    * Function that allows intercepting any android web view requests. Return
-   * a string to modify the WebResourceResponse and `null` to load
-   * normally. The `navigationType` is always `other` on android.
+   * `null` to load the request normally, or a customer response object to
+   * intercept the request. The `navigationType` is always `other`.
    */
   onShouldInterceptRequest?: OnShouldInterceptRequest;
 

@@ -832,6 +832,41 @@ The `hasTargetFrame` prop is a boolean that is `false` when the navigation targe
 
 ---
 
+### `onShouldInterceptRequest`[⬆](#props-index)
+
+Function that allows intercepting any android web view requests. Return `null` to load the request normally, or a custom response object to intercept the request. The `navigationType` is always `other`.
+
+| Type     | Required | Platform            |
+| -------- | -------- | ------------------- |
+| function | No       | Android             |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onShouldInterceptRequest={async (event) => {
+    if (event.url === 'https://reactnative.dev/') {
+
+      const response = await fetch('https://infinite.red/');
+      const html = await response.text();
+      const modifiedHtml = html.replace('<body>', '<body><p>Request succesfully intercepted!</p>');
+
+      return { mimeType: 'text/html', encoding: 'utf-8', statusCode: 200, reasonPhrase: 'OK', response: modifiedHtml}
+    }
+  }}
+/>
+```
+
+The `request` object includes these properties:
+
+```
+url
+target
+lockIdentifier
+```
+---
+
 ### `startInLoadingState`[⬆](#props-index)
 
 Boolean value that forces the `WebView` to show the loading view on the first load. This prop must be set to `true` in order for the `renderLoading` prop to work.

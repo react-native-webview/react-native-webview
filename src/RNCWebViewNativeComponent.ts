@@ -103,10 +103,7 @@ export type ShouldStartLoadRequestEvent = Readonly<{
 
 export type ShouldInterceptRequestEvent = Readonly<{
   url: string;
-  loading: boolean;
   title: string;
-  canGoBack: boolean;
-  canGoForward: boolean;
   lockIdentifier: Double;
   navigationType:
     | 'click'
@@ -115,7 +112,6 @@ export type ShouldInterceptRequestEvent = Readonly<{
     | 'reload'
     | 'formresubmit'
     | 'other';
-  mainDocumentURL?: string;
 }>;
 
 type ScrollEvent = Readonly<{

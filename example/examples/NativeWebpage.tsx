@@ -7,8 +7,9 @@ interface Props {}
 interface State {}
 
 export default class NativeWebpage extends Component<Props, State> {
-  render() {
+  state = {};
 
+  render() {
     return (
       <View style={{ height: 400 }}>
         <WebView
