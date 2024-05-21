@@ -848,7 +848,7 @@ Example:
   onShouldInterceptRequest={async (event) => {
     if (event.url === 'https://reactnative.dev/') {
 
-      const response = await fetch('https://infinite.red/');
+      const response = await fetch('https://reactnative.dev/');
       const html = await response.text();
       const modifiedHtml = html.replace('<body>', '<body><p>Request succesfully intercepted!</p>');
 
