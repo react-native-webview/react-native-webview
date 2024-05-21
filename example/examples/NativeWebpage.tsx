@@ -19,7 +19,7 @@ export default class NativeWebpage extends Component<Props, State> {
             return true;
           }}
           onShouldInterceptRequest={async (event) => {
-            // console.log("onShouldInterceptRequest", event);
+            console.log("onShouldInterceptRequest", event);
             if (event.url === 'https://infinite.red/') {
 
               const response = await fetch('https://infinite.red/');

@@ -34,8 +34,8 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void shouldInterceptRequestLockIdentifier(boolean shouldIntercept, double lockIdentifier, ReadableMap response) {
-      mRNCWebViewModuleImpl.shouldInterceptRequestLockIdentifier(shouldIntercept, lockIdentifier, response);
+    public void shouldInterceptRequestLockIdentifier(double lockIdentifier, ReadableMap response) {
+      mRNCWebViewModuleImpl.shouldInterceptRequestLockIdentifier(lockIdentifier, response);
     }
 
     public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {

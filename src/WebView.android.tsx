@@ -66,14 +66,12 @@ registerCallableModule('RNCWebViewMessagingModule', {
 
 const createOnShouldInterceptRequest = (
   interceptRequest: (
-    shouldStart: boolean,
     lockIdentifier: number,
     response?: WebResourceResponse
   ) => void,
   onShouldInterceptRequest?: OnShouldInterceptRequest
 ) => {
   return async ({ nativeEvent }: ShouldInterceptRequestEvent) => {
-    let shouldIntercept = true;
     let response: WebResourceResponse | undefined;
     const { lockIdentifier } = nativeEvent;
 
@@ -81,9 +79,7 @@ const createOnShouldInterceptRequest = (
       response = await onShouldInterceptRequest(nativeEvent);
     }
 
-    shouldIntercept = !!response;
-
-    interceptRequest(shouldIntercept, lockIdentifier, response);
+    interceptRequest(lockIdentifier, response);
   };
 };
 
@@ -155,14 +151,9 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
     );
 
     const onShouldInterceptRequestCallback = useCallback(
-      (
-        shouldIntercept: boolean,
-        lockIdentifier?: number,
-        response?: WebResourceResponse
-      ) => {
+      (lockIdentifier?: number, response?: WebResourceResponse) => {
         if (lockIdentifier) {
           RNCWebViewModule.shouldInterceptRequestLockIdentifier(
-            shouldIntercept,
             lockIdentifier,
             response
           );

@@ -250,13 +250,13 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         }
     }
 
-  public void shouldInterceptRequestLockIdentifier(boolean shouldIntercept, double lockIdentifier, ReadableMap response) {
+  public void shouldInterceptRequestLockIdentifier(double lockIdentifier, ReadableMap response) {
     final AtomicReference<ReadableMap> lockObject = shouldInterceptRequestLoadingLock.getLock(lockIdentifier);
     final ReadableMap defaultMap = Arguments.createMap();
 
     if (lockObject != null) {
       synchronized (lockObject) {
-        lockObject.set(shouldIntercept ? response : defaultMap);
+        lockObject.set((response != null) ? response : defaultMap);
         lockObject.notify();
       }
     }
