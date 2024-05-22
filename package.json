@@ -87,7 +87,7 @@
     "src",
     "index.js",
     "index.d.ts",
-    "react-native-webview.podspec",
+    "react-native-webview-mm.podspec",
     "react-native.config.js"
   ],
   "resolutions": {
