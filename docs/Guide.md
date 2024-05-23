@@ -562,7 +562,7 @@ const CustomHeaderWebView = (props) => {
 
 #### Managing Cookies
 
-You can set cookies on the React Native side using the [@react-native-community/cookies](https://github.com/react-native-community/cookies) package.
+You can set cookies on the React Native side using the [@react-native-cookies/cookies](https://github.com/react-native-cookies/cookies) package.
 
 When you do, you'll likely want to enable the [sharedCookiesEnabled](Reference.md#sharedCookiesEnabled) prop as well.
 
