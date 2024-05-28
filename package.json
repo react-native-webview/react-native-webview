@@ -49,7 +49,7 @@
     "@types/selenium-webdriver": "4.0.9",
     "@typescript-eslint/eslint-plugin": "2.1.0",
     "@typescript-eslint/parser": "2.1.0",
-    "appium": "^1.22.3",
+    "appium": "^2.5.4",
     "eslint": "6.3.0",
     "eslint-config-airbnb": "18.0.1",
     "eslint-config-prettier": "6.2.0",
