@@ -15,7 +15,7 @@ import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 import invariant from 'invariant';
 
 import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
-import RNCWebViewModule from './NativeRNCWebView';
+import RNCWebViewModule from './NativeRNCWebViewModule';
 import {
   defaultOriginWhitelist,
   defaultRenderError,
