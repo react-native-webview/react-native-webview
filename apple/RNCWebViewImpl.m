@@ -117,6 +117,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @interface RNCWebViewImpl () <WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, WKHTTPCookieStoreObserver,
 #if !TARGET_OS_OSX
 UIScrollViewDelegate,
+UIGestureRecognizerDelegate,
 #endif // !TARGET_OS_OSX
 RCTAutoInsetsProtocol>
 
