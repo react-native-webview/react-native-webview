@@ -2,10 +2,6 @@
 
 #import "RNCWebViewManager.h"
 #import "RNCWebViewImpl.h"
-#import "RNCWebViewDecisionManager.h"
-#ifdef RCT_NEW_ARCH_ENABLED
-#import "RNCWebViewSpec/RNCWebViewSpec.h"
-#endif
 
 #if TARGET_OS_OSX
 #define RNCView NSView
@@ -34,7 +30,6 @@ RCT_ENUM_CONVERTER(RNCWebViewPermissionGrantType, (@{
 }), RNCWebViewPermissionGrantType_Prompt, integerValue)
 #endif
 @end
-
 
 @implementation RNCWebViewManager
 

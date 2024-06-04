@@ -2,6 +2,10 @@
 
 #import "RNCWebViewDecisionManager.h"
 
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <React/RCTFabricComponentsPlugins.h>
+#endif /* RCT_NEW_ARCH_ENABLED */
+
 @implementation RNCWebViewModule
 
 RCT_EXPORT_MODULE(RNCWebViewModule)
@@ -23,8 +27,8 @@ RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart lockIdenti
 }
 #endif /* RCT_NEW_ARCH_ENABLED */
 
-@end
-
 Class RNCWebViewModuleCls(void) {
   return RNCWebViewModule.class;
 }
+
+@end
