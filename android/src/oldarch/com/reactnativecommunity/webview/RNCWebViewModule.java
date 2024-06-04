@@ -12,7 +12,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 
-@ReactModule(name = RNCWebViewModuleImpl.NAME)
+@ReactModule(name = RNCWebViewModuleImpl.MODULE_NAME)
 public class RNCWebViewModule extends ReactContextBaseJavaModule {
     final private RNCWebViewModuleImpl mRNCWebViewModuleImpl;
 
@@ -54,6 +54,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
     @NonNull
     @Override
     public String getName() {
-        return RNCWebViewModuleImpl.NAME;
+        return RNCWebViewModuleImpl.MODULE_NAME;
     }
 }
