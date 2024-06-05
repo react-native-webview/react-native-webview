@@ -1,0 +1,5 @@
+require_relative '../../node_modules/react-native-test-app/visionos/test_app'
+
+workspace 'WebviewExample.xcworkspace'
+
+use_test_app!

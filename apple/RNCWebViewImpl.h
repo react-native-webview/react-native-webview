@@ -44,7 +44,15 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 @end
 
+#if !TARGET_OS_OSX
+@interface RNCWebViewImpl : RCTView <UIEditMenuInteractionDelegate>
+
+@property (nonatomic, nullable) UIEditMenuInteraction *editMenuInteraction API_AVAILABLE(ios(16.0));
+#else
 @interface RNCWebViewImpl : RCTView
+#endif // !TARGET_OS_OSX
+
+
 @property (nonatomic, copy) RCTDirectEventBlock onFileDownload;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;

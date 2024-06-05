@@ -25,7 +25,7 @@ static NSDictionary* customCertificatesForHost;
 
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
 @interface _SwizzleHelperWK : UIView
@@ -46,7 +46,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   return nil;
 }
 @end
-#endif // !TARGET_OS_OSX
+#endif // TARGET_OS_IOS
 
 @interface RNCWKWebView : WKWebView
 #if !TARGET_OS_OSX
@@ -170,10 +170,10 @@ RCTAutoInsetsProtocol>
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
-#endif // !TARGET_OS_OSX
+#endif // TARGET_OS_IOS
     _injectedJavaScript = nil;
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
@@ -189,9 +189,15 @@ RCTAutoInsetsProtocol>
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
 #endif
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 /* iOS 15 */
+    if (@available(iOS 16.0, *)) {
+      _editMenuInteraction = [[UIEditMenuInteraction alloc] initWithDelegate:self];
+      [self addInteraction:_editMenuInteraction];
+    }
+#endif
   }
 
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
   [[NSNotificationCenter defaultCenter]addObserver:self
                                           selector:@selector(appDidBecomeActive)
                                               name:UIApplicationDidBecomeActiveNotification
@@ -226,7 +232,7 @@ RCTAutoInsetsProtocol>
                                                object:nil];
 
   }
-#endif // !TARGET_OS_OSX
+#endif // TARGET_OS_IOS
   return self;
 }
 
@@ -246,29 +252,51 @@ RCTAutoInsetsProtocol>
     if (pressSender.state != UIGestureRecognizerStateEnded || !self.menuItems) {
         return;
     }
-    // When a long press ends, bring up our custom UIMenu if defined
-    if (self.menuItems.count == 0) {
+    if (@available(iOS 16.0, *)) {
+      CGPoint location = [pressSender locationInView:self];
+      UIEditMenuConfiguration *config = [UIEditMenuConfiguration configurationWithIdentifier:nil sourcePoint:location];
+      [_editMenuInteraction presentEditMenuWithConfiguration:config];
+    } else {
+      // When a long press ends, bring up our custom UIMenu if defined
+      if (self.menuItems.count == 0) {
         UIMenuController *menuController = [UIMenuController sharedMenuController];
         menuController.menuItems = nil;
-        [menuController setMenuVisible:NO animated:YES];
+        [menuController showMenuFromView:self rect:self.bounds];
         return;
-    }
-    UIMenuController *menuController = [UIMenuController sharedMenuController];
-    NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
+      }
 
-    for(NSDictionary *menuItem in self.menuItems) {
-      NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
-      NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
-      NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
-      UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
-                                                    action: NSSelectorFromString(sel)];
-      [menuControllerItems addObject: item];
+      UIMenuController *menuController = [UIMenuController sharedMenuController];
+      NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
+      
+      for(NSDictionary *menuItem in self.menuItems) {
+        NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
+        NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
+        NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
+        UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
+                                                      action: NSSelectorFromString(sel)];
+        [menuControllerItems addObject: item];
+      }
+      menuController.menuItems = menuControllerItems;
+      [menuController showMenuFromView:self rect:self.bounds];
     }
-
-    menuController.menuItems = menuControllerItems;
-    [menuController setMenuVisible:YES animated:YES];
 }
 
+- (UIMenu *)editMenuInteraction:(UIEditMenuInteraction *)interaction menuForConfiguration:(UIEditMenuConfiguration *)configuration suggestedActions:(NSArray<UIMenuElement *> *)suggestedActions API_AVAILABLE(ios(16.0))
+{
+  NSMutableArray<UICommand *> *menuItems = [NSMutableArray new];
+  for(NSDictionary *menuItem in self.menuItems) {
+    NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
+    NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
+    NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
+    UICommand *command = [UICommand commandWithTitle:menuItemLabel
+                                               image:nil
+                                              action:NSSelectorFromString(sel)
+                                        propertyList:nil];
+    [menuItems addObject:command];
+  }
+  UIMenu *menu = [UIMenu menuWithChildren:menuItems];
+  return menu;
+}
 #endif // !TARGET_OS_OSX
 
 - (void)dealloc
@@ -529,6 +557,7 @@ RCTAutoInsetsProtocol>
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];
     [self visitSource];
   }
+
 #if !TARGET_OS_OSX
   // Allow this object to recognize gestures
   if (self.menuItems != nil) {
@@ -594,7 +623,7 @@ RCTAutoInsetsProtocol>
 #endif
 }
 
-#if !TARGET_OS_OSX
+#if TARGET_OS_IOS
 -(void)showFullScreenVideoStatusBars
 {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -650,7 +679,7 @@ RCTAutoInsetsProtocol>
     }];
   }
 }
-#endif // !TARGET_OS_OSX
+#endif // TARGET_OS_IOS
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
   if ([keyPath isEqual:@"estimatedProgress"] && object == self.webView) {
@@ -840,6 +869,7 @@ RCTAutoInsetsProtocol>
     _webView.suppressMenuItems = suppressMenuItems;
 }
 
+#if TARGET_OS_IOS
 -(void)setKeyboardDisplayRequiresUserAction:(BOOL)keyboardDisplayRequiresUserAction
 {
   if (_webView == nil) {
@@ -910,12 +940,14 @@ RCTAutoInsetsProtocol>
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
 {
+  _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
+
   if (_webView == nil) {
-    _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
     return;
   }
 
   if (_savedHideKeyboardAccessoryView == false) {
+    [self __addInputAccessoryView];
     return;
   }
 
@@ -941,6 +973,22 @@ RCTAutoInsetsProtocol>
 
     objc_registerClassPair(newClass);
   }
+
+  object_setClass(subview, newClass);
+}
+#endif // TARGET_OS_IOS
+
+- (void)__addInputAccessoryView {
+  UIView* subview;
+
+  for (UIView* view in _webView.scrollView.subviews) {
+    if([[view.class description] hasSuffix:@"_SwizzleHelperWK"])
+      subview = view;
+  }
+
+  if(subview == nil) return;
+
+  Class newClass = subview.superclass;
 
   object_setClass(subview, newClass);
 }
@@ -1635,10 +1683,10 @@ didFinishNavigation:(WKNavigation *)navigation
     initWithSource: [
       NSString
       stringWithFormat:
-       @"window.%@ ??= {};"
+       @"window.%@ = window.%@ || {};"
       "window.%@.injectedObjectJson = function () {"
       "  return `%@`;"
-      "};", MessageHandlerName, MessageHandlerName, source
+      "};", MessageHandlerName, MessageHandlerName, MessageHandlerName, source
     ]
     injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     /* TODO: For a separate (minor) PR: use logic like this (as react-native-wkwebview does) so that messaging can be used in all frames if desired.
@@ -1686,10 +1734,10 @@ didFinishNavigation:(WKNavigation *)navigation
     initWithSource: [
       NSString
       stringWithFormat:
-       @"window.%@ ??= {};"
+       @"window.%@ = window.%@ || {};"
       "window.%@.postMessage = function (data) {"
       "  window.webkit.messageHandlers.%@.postMessage(String(data));"
-      "};", MessageHandlerName, MessageHandlerName, MessageHandlerName
+      "};", MessageHandlerName, MessageHandlerName, MessageHandlerName, MessageHandlerName
     ]
     injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     /* TODO: For a separate (minor) PR: use logic like this (as react-native-wkwebview does) so that messaging can be used in all frames if desired.

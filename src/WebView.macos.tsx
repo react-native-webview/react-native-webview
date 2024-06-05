@@ -4,11 +4,9 @@ import React, {
   useImperativeHandle,
   useRef,
 } from 'react';
-import { Image, View, ImageSourcePropType } from 'react-native';
+import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
-
-import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import RNCWebView from './WebViewNativeComponent.macos';
+import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
 import RNCWebViewModule from './NativeRNCWebView';
 import {
   defaultOriginWhitelist,
@@ -16,22 +14,9 @@ import {
   defaultRenderLoading,
   useWebViewLogic,
 } from './WebViewShared';
-import { MacOSWebViewProps, NativeWebViewMacOS } from './WebViewTypes';
+import { MacOSWebViewProps, WebViewSourceUri } from './WebViewTypes';
 
 import styles from './WebView.styles';
-
-const Commands = codegenNativeCommands({
-  supportedCommands: [
-    'goBack',
-    'goForward',
-    'reload',
-    'stopLoading',
-    'injectJavaScript',
-    'requestFocus',
-    'postMessage',
-    'loadUrl',
-  ],
-});
 
 const { resolveAssetSource } = Image;
 
@@ -78,7 +63,9 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
     },
     ref
   ) => {
-    const webViewRef = useRef<NativeWebViewMacOS | null>(null);
+    const webViewRef = useRef<React.ComponentRef<
+      HostComponent<NativeProps>
+    > | null>(null);
 
     const onShouldStartLoadWithRequestCallback = useCallback(
       (shouldStart: boolean, _url: string, lockIdentifier = 0) => {
@@ -120,18 +107,24 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
     useImperativeHandle(
       ref,
       () => ({
-        goForward: () => Commands.goForward(webViewRef.current),
-        goBack: () => Commands.goBack(webViewRef.current),
+        goForward: () =>
+          webViewRef.current && Commands.goForward(webViewRef.current),
+        goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
         reload: () => {
           setViewState('LOADING');
-          Commands.reload(webViewRef.current);
+          if (webViewRef.current) {
+            Commands.reload(webViewRef.current);
+          }
         },
-        stopLoading: () => Commands.stopLoading(webViewRef.current),
+        stopLoading: () =>
+          webViewRef.current && Commands.stopLoading(webViewRef.current),
         postMessage: (data: string) =>
-          Commands.postMessage(webViewRef.current, data),
+          webViewRef.current && Commands.postMessage(webViewRef.current, data),
         injectJavaScript: (data: string) =>
+          webViewRef.current &&
           Commands.injectJavaScript(webViewRef.current, data),
-        requestFocus: () => Commands.requestFocus(webViewRef.current),
+        requestFocus: () =>
+          webViewRef.current && Commands.requestFocus(webViewRef.current),
       }),
       [setViewState, webViewRef]
     );
@@ -156,9 +149,9 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
         'lastErrorEvent expected to be non-null'
       );
       otherView = (renderError || defaultRenderError)(
-        lastErrorEvent.domain,
-        lastErrorEvent.code,
-        lastErrorEvent.description
+        lastErrorEvent?.domain,
+        lastErrorEvent?.code || 0,
+        lastErrorEvent?.description ?? ''
       );
     } else if (viewState !== 'IDLE') {
       console.error(`RNCWebView invalid state encountered: ${viewState}`);
@@ -168,8 +161,31 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
     const webViewContainerStyle = [styles.container, containerStyle];
 
     const NativeWebView =
-      (nativeConfig?.component as typeof NativeWebViewMacOS | undefined) ||
-      RNCWebView;
+      (nativeConfig?.component as typeof RNCWebView | undefined) || RNCWebView;
+
+    const sourceResolved = resolveAssetSource(source as ImageSourcePropType);
+    const newSource =
+      typeof sourceResolved === 'object'
+        ? Object.entries(sourceResolved as WebViewSourceUri).reduce(
+            (prev, [currKey, currValue]) => {
+              return {
+                ...prev,
+                [currKey]:
+                  currKey === 'headers' &&
+                  currValue &&
+                  typeof currValue === 'object'
+                    ? Object.entries(currValue).map(([key, value]) => {
+                        return {
+                          name: key,
+                          value,
+                        };
+                      })
+                    : currValue,
+              };
+            },
+            {}
+          )
+        : sourceResolved;
 
     const webView = (
       <NativeWebView
@@ -179,6 +195,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
         cacheEnabled={cacheEnabled}
         useSharedProcessPool={useSharedProcessPool}
         messagingEnabled={typeof onMessageProp === 'function'}
+        newSource={newSource}
         onLoadingError={onLoadingError}
         onLoadingFinish={onLoadingFinish}
         onLoadingProgress={onLoadingProgress}
@@ -196,8 +213,8 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
         incognito={incognito}
         mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
         ref={webViewRef}
-        // TODO: find a better way to type this.
-        source={resolveAssetSource(source as ImageSourcePropType)}
+        // @ts-expect-error old arch only
+        source={sourceResolved}
         style={webViewStyles}
         {...nativeConfig?.props}
       />
