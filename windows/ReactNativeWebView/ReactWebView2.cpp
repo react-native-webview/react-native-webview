@@ -9,29 +9,32 @@
 #include "JSValueXaml.h"
 #include "ReactWebView2.g.cpp"
 #include <winrt/Windows.Foundation.Metadata.h>
+#include <winrt/Windows.System.h>
 #include <optional>
+
+namespace mux {
+    using namespace winrt::Microsoft::UI::Xaml::Controls;
+}
 
 namespace winrt {
     using namespace Microsoft::ReactNative;
     using namespace Windows::Foundation;
-    using namespace Windows::UI;
-    using namespace Windows::UI::Xaml;
-    using namespace Windows::UI::Xaml::Controls;
-    using namespace Microsoft::UI::Xaml::Controls;
     using namespace Microsoft::Web::WebView2::Core;
     using namespace Windows::Data::Json;
     using namespace Windows::UI::Popups;
-    using namespace Windows::UI::Xaml::Input;
-    using namespace Windows::UI::Xaml::Media;
     using namespace Windows::Web::Http;
     using namespace Windows::Storage::Streams;
     using namespace Windows::Security::Cryptography;
+    using namespace xaml;
+    using namespace xaml::Controls;
+    using namespace xaml::Input;
+    using namespace xaml::Media;
 } // namespace winrt
 
 namespace winrt::ReactNativeWebView::implementation {
 
     ReactWebView2::ReactWebView2(winrt::IReactContext const& reactContext) : m_reactContext(reactContext) {
-        m_webView = winrt::WebView2();
+        m_webView = mux::WebView2();
         this->Content(m_webView);
         RegisterEvents();
     }
@@ -44,7 +47,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 if (auto self = ref.get()) {
                     self->OnNavigationStarting(sender, args);
                 }
-                    
+
             });
 
         m_navigationCompletedRevoker = m_webView.NavigationCompleted(
@@ -60,7 +63,7 @@ namespace winrt::ReactNativeWebView::implementation {
                 self->OnCoreWebView2Initialized(sender, args);
             }
         });
-    }  
+    }
 
     void ReactWebView2::RegisterCoreWebView2Events()
     {
@@ -136,7 +139,7 @@ namespace winrt::ReactNativeWebView::implementation {
         return hasUniversalAPIContract_v7.value();
     }
 
-    void ReactWebView2::WriteWebViewNavigationEventArg(winrt::WebView2 const& sender, winrt::IJSValueWriter const& eventDataWriter) {
+    void ReactWebView2::WriteWebViewNavigationEventArg(mux::WebView2 const& sender, winrt::IJSValueWriter const& eventDataWriter) {
         auto tag = this->GetValue(winrt::FrameworkElement::TagProperty()).as<winrt::IPropertyValue>().GetInt64();
         WriteProperty(eventDataWriter, L"canGoBack", sender.CanGoBack());
         WriteProperty(eventDataWriter, L"canGoForward", sender.CanGoForward());
@@ -149,7 +152,7 @@ namespace winrt::ReactNativeWebView::implementation {
         }
     }
 
-    void ReactWebView2::OnNavigationStarting(winrt::WebView2 const& webView, winrt::CoreWebView2NavigationStartingEventArgs const& /* args */) {
+    void ReactWebView2::OnNavigationStarting(mux::WebView2 const& webView, winrt::CoreWebView2NavigationStartingEventArgs const& /* args */) {
         m_reactContext.DispatchEvent(
             *this,
             L"topLoadingStart",
@@ -184,7 +187,7 @@ namespace winrt::ReactNativeWebView::implementation {
         HandleMessageFromJS(message);
     }
 
-    void ReactWebView2::OnNavigationCompleted(winrt::WebView2 const& webView, winrt::CoreWebView2NavigationCompletedEventArgs const& /* args */) {
+    void ReactWebView2::OnNavigationCompleted(mux::WebView2 const& webView, winrt::CoreWebView2NavigationCompletedEventArgs const& /* args */) {
         m_reactContext.DispatchEvent(
             *this,
             L"topLoadingFinish",
@@ -195,7 +198,7 @@ namespace winrt::ReactNativeWebView::implementation {
             });
 
         if (m_messagingEnabled) {
-            winrt::hstring message = LR"(window.alert = function (msg) {window.chrome.webview.postMessage(`{"type":"__alert","message":"${msg}"}`)}; 
+            winrt::hstring message = LR"(window.alert = function (msg) {window.chrome.webview.postMessage(`{"type":"__alert","message":"${msg}"}`)};
                 window.ReactNativeWebView = {postMessage: function (data) {window.chrome.webview.postMessage(String(data))}};
                 const originalPostMessage = globalThis.postMessage;
                 globalThis.postMessage = function (data) { originalPostMessage(data); globalThis.ReactNativeWebView.postMessage(typeof data == 'string' ? data : JSON.stringify(data));};)";
@@ -203,7 +206,7 @@ namespace winrt::ReactNativeWebView::implementation {
         }
     }
 
-    void ReactWebView2::OnCoreWebView2Initialized(winrt::WebView2 const& sender, winrt::CoreWebView2InitializedEventArgs const& /* args */) {
+    void ReactWebView2::OnCoreWebView2Initialized(mux::WebView2 const& sender, mux::CoreWebView2InitializedEventArgs const& /* args */) {
         assert(sender.CoreWebView2());
 
         RegisterCoreWebView2Events();
@@ -407,7 +410,7 @@ namespace winrt::ReactNativeWebView::implementation {
             auto method = (m_request.find("method") != m_request.end()) ? m_request.at("method").AsString() : "GET";
             auto webResourceRequest = m_webView.CoreWebView2().Environment().CreateWebResourceRequest(
                 uri.ToString(), winrt::to_hstring(method), nullptr, L"");
-                
+
             SetupRequest(m_request.Copy(), webResourceRequest);
 
             m_webView.CoreWebView2().NavigateWithWebResourceRequest(webResourceRequest);

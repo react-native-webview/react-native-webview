@@ -1696,10 +1696,10 @@ didFinishNavigation:(WKNavigation *)navigation
     initWithSource: [
       NSString
       stringWithFormat:
-       @"window.%@ ??= {};"
+       @"window.%@ = window.%@ || {};"
       "window.%@.injectedObjectJson = function () {"
       "  return `%@`;"
-      "};", MessageHandlerName, MessageHandlerName, source
+      "};", MessageHandlerName, MessageHandlerName, MessageHandlerName, source
     ]
     injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     /* TODO: For a separate (minor) PR: use logic like this (as react-native-wkwebview does) so that messaging can be used in all frames if desired.
@@ -1747,10 +1747,10 @@ didFinishNavigation:(WKNavigation *)navigation
     initWithSource: [
       NSString
       stringWithFormat:
-       @"window.%@ ??= {};"
+       @"window.%@ = window.%@ || {};"
       "window.%@.postMessage = function (data) {"
       "  window.webkit.messageHandlers.%@.postMessage(String(data));"
-      "};", MessageHandlerName, MessageHandlerName, MessageHandlerName
+      "};", MessageHandlerName, MessageHandlerName, MessageHandlerName, MessageHandlerName
     ]
     injectionTime:WKUserScriptInjectionTimeAtDocumentStart
     /* TODO: For a separate (minor) PR: use logic like this (as react-native-wkwebview does) so that messaging can be used in all frames if desired.
