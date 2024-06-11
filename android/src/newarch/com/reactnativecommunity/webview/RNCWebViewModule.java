@@ -10,7 +10,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.module.annotations.ReactModule;
 
-@ReactModule(name = RNCWebViewModuleImpl.MODULE_NAME)
+@ReactModule(name = RNCWebViewModuleImpl.NAME)
 public class RNCWebViewModule extends NativeRNCWebViewSpec {
     final private RNCWebViewModuleImpl mRNCWebViewModuleImpl;
 
