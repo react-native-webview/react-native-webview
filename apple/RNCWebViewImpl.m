@@ -836,6 +836,9 @@ RCTAutoInsetsProtocol>
   NSString *allowingReadAccessToURL = _allowingReadAccessToURL;
 
   [self syncCookiesToWebView:^{
+    // Add observer to sync cookies from webview to sharedHTTPCookieStorage
+    [wkWebViewConfig.websiteDataStore.httpCookieStore addObserver:self];
+    
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
     // the same url. We'll expose a call to 'reload' to allow a user to load
@@ -1829,9 +1832,7 @@ didFinishNavigation:(WKNavigation *)navigation
       if(!_incognito && !_cacheEnabled) {
         wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
       }
-      [self syncCookiesToWebView:^{
-        [wkWebViewConfig.websiteDataStore.httpCookieStore addObserver:self];
-      }];
+      [self syncCookiesToWebView:^{}];
     } else {
       NSMutableString *script = [NSMutableString string];
 
