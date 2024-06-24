@@ -3,9 +3,6 @@ import { TurboModuleRegistry } from 'react-native';
 import { Double } from 'react-native/Libraries/Types/CodegenTypes';
 
 export interface Spec extends TurboModule {
-  readonly getConstants: () => {};
-
-  // your module methods go here, for example:
   isFileUploadSupported(): Promise<boolean>;
   shouldStartLoadWithLockIdentifier(
     shouldStart: boolean,
@@ -13,4 +10,4 @@ export interface Spec extends TurboModule {
   ): void;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>('RNCWebView');
+export default TurboModuleRegistry.getEnforcing<Spec>('RNCWebViewModule');
