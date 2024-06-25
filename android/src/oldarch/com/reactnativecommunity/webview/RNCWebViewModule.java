@@ -6,10 +6,12 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import android.webkit.ValueCallback;
 
+import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 
 @ReactModule(name = RNCWebViewModuleImpl.NAME)
@@ -29,6 +31,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         mRNCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
+    }
+
+    @ReactMethod
+    public void shouldInterceptRequestLockIdentifier(double lockIdentifier, ReadableMap response) {
+      mRNCWebViewModuleImpl.shouldInterceptRequestLockIdentifier(lockIdentifier, response);
     }
 
     public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {

@@ -341,6 +341,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return true;
     }
 
+  protected boolean dispatchDirectShouldInterceptRequest(WritableMap data) {
+    WritableNativeMap event = new WritableNativeMap();
+    event.putMap("nativeEvent", data);
+    event.putString("messagingModuleName", messagingModuleName);
+    mMessagingJSModule.onShouldInterceptRequest(event);
+    return true;
+  }
+
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
         super.onScrollChanged(x, y, oldX, oldY);
 

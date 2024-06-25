@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
 } from 'react';
 
@@ -27,6 +28,9 @@ import {
   WebViewSourceUri,
   type WebViewMessageEvent,
   type ShouldStartLoadRequestEvent,
+  type ShouldInterceptRequestEvent,
+  OnShouldInterceptRequest,
+  WebResourceResponse,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
@@ -53,7 +57,31 @@ registerCallableModule('RNCWebViewMessagingModule', {
   ) => {
     directEventEmitter.emit('onMessage', event);
   },
+  onShouldInterceptRequest: (
+    event: ShouldInterceptRequestEvent & { messagingModuleName?: string }
+  ) => {
+    directEventEmitter.emit('onShouldInterceptRequest', event);
+  },
 });
+
+const createOnShouldInterceptRequest = (
+  interceptRequest: (
+    lockIdentifier: number,
+    response?: WebResourceResponse
+  ) => void,
+  onShouldInterceptRequest?: OnShouldInterceptRequest
+) => {
+  return async ({ nativeEvent }: ShouldInterceptRequestEvent) => {
+    let response: WebResourceResponse | undefined;
+    const { lockIdentifier } = nativeEvent;
+
+    if (onShouldInterceptRequest) {
+      response = await onShouldInterceptRequest(nativeEvent);
+    }
+
+    interceptRequest(lockIdentifier, response);
+  };
+};
 
 /**
  * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
@@ -95,6 +123,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       source,
       nativeConfig,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+      onShouldInterceptRequest: onShouldInterceptRequestProp,
       injectedJavaScriptObject,
       ...otherProps
     },
@@ -116,6 +145,18 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
           );
         } else if (shouldStart && webViewRef.current) {
           Commands.loadUrl(webViewRef.current, url);
+        }
+      },
+      []
+    );
+
+    const onShouldInterceptRequestCallback = useCallback(
+      (lockIdentifier?: number, response?: WebResourceResponse) => {
+        if (lockIdentifier) {
+          RNCWebViewModule.shouldInterceptRequestLockIdentifier(
+            lockIdentifier,
+            response
+          );
         }
       },
       []
@@ -150,6 +191,15 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       onShouldStartLoadWithRequestProp,
       onShouldStartLoadWithRequestCallback,
     });
+
+    const onShouldInterceptRequest = useMemo(
+      () =>
+        createOnShouldInterceptRequest(
+          onShouldInterceptRequestCallback,
+          onShouldInterceptRequestProp
+        ),
+      [onShouldInterceptRequestProp, onShouldInterceptRequestCallback]
+    );
 
     useImperativeHandle(
       ref,
@@ -211,11 +261,33 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         }
       );
 
+      const onShouldInterceptRequestSubscription =
+        directEventEmitter.addListener(
+          'onShouldInterceptRequest',
+          (
+            event: ShouldInterceptRequestEvent & {
+              messagingModuleName?: string;
+            }
+          ) => {
+            if (event.messagingModuleName === messagingModuleName) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { messagingModuleName: _, ...rest } = event;
+              onShouldInterceptRequest(rest);
+            }
+          }
+        );
+
       return () => {
         onShouldStartLoadWithRequestSubscription.remove();
         onMessageSubscription.remove();
+        onShouldInterceptRequestSubscription.remove();
       };
-    }, [messagingModuleName, onMessage, onShouldStartLoadWithRequest]);
+    }, [
+      messagingModuleName,
+      onMessage,
+      onShouldStartLoadWithRequest,
+      onShouldInterceptRequest,
+    ]);
 
     let otherView: ReactElement | undefined;
     if (viewState === 'LOADING') {
@@ -290,6 +362,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         onHttpError={onHttpError}
         onRenderProcessGone={onRenderProcessGone}
         onMessage={onMessage}
+        onShouldInterceptRequest={onShouldInterceptRequest}
         onOpenWindow={onOpenWindow}
         hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}

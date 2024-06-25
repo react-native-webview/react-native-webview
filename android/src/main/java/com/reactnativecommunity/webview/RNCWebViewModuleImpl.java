@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -25,11 +26,18 @@ import android.webkit.WebChromeClient;
 import android.widget.Toast;
 
 import com.facebook.common.activitylistener.ActivityListenerManager;
+import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
@@ -40,6 +48,8 @@ import java.lang.SecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static android.app.Activity.RESULT_OK;
@@ -134,7 +144,13 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
     }
 
-    protected static class ShouldOverrideUrlLoadingLock {
+    protected interface LockManager<T> {
+      Pair<Double, AtomicReference<T>> getNewLock();
+      AtomicReference<T> getLock(Double lockIdentifier);
+      void removeLock(Double lockIdentifier);
+    }
+
+    protected static class ShouldOverrideUrlLoadingLock implements LockManager<ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> {
         protected enum ShouldOverrideCallbackState {
             UNDECIDED,
             SHOULD_OVERRIDE,
@@ -163,6 +179,29 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
     protected static final ShouldOverrideUrlLoadingLock shouldOverrideUrlLoadingLock = new ShouldOverrideUrlLoadingLock();
 
+    protected static class ShouldInterceptRequestLock implements LockManager<ReadableMap> {
+      private double nextLockIdentifier = 1;
+      private final HashMap<Double, AtomicReference<ReadableMap>> shouldInterceptLocks = new HashMap<>();
+
+      public synchronized Pair<Double, AtomicReference<ReadableMap>> getNewLock() {
+        final double lockIdentifier = nextLockIdentifier++;
+
+        final AtomicReference<ReadableMap> shouldIntercept = new AtomicReference<>(null);
+        shouldInterceptLocks.put(lockIdentifier, shouldIntercept);
+        return new Pair<>(lockIdentifier, shouldIntercept);
+      }
+
+      @Nullable
+      public synchronized AtomicReference<ReadableMap> getLock(Double lockIdentifier) {
+        return shouldInterceptLocks.get(lockIdentifier);
+      }
+
+      public synchronized void removeLock(Double lockIdentifier) {
+        shouldInterceptLocks.remove(lockIdentifier);
+      }
+    }
+
+    protected static final ShouldInterceptRequestLock shouldInterceptRequestLoadingLock = new ShouldInterceptRequestLock();
     private enum MimeType {
         DEFAULT("*/*"),
         IMAGE("image"),
@@ -210,6 +249,18 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
             }
         }
     }
+
+  public void shouldInterceptRequestLockIdentifier(double lockIdentifier, ReadableMap response) {
+    final AtomicReference<ReadableMap> lockObject = shouldInterceptRequestLoadingLock.getLock(lockIdentifier);
+    final ReadableMap defaultMap = Arguments.createMap();
+
+    if (lockObject != null) {
+      synchronized (lockObject) {
+        lockObject.set((response != null) ? response : defaultMap);
+        lockObject.notify();
+      }
+    }
+  }
 
     public Uri[] getSelectedFiles(Intent data, int resultCode) {
         if (data == null) {

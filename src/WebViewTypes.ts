@@ -74,6 +74,11 @@ export interface ContentInsetProp {
   right?: number;
 }
 
+export interface BackgroundWebViewNativeEvent {
+  url: string;
+  lockIdentifier: number;
+}
+
 export interface WebViewNativeEvent {
   url: string;
   loading: boolean;
@@ -101,6 +106,8 @@ export interface WebViewNavigation extends WebViewNativeEvent {
 export interface ShouldStartLoadRequest extends WebViewNavigation {
   isTopFrame: boolean;
 }
+
+export interface ShouldInterceptRequest extends BackgroundWebViewNativeEvent {}
 
 export interface FileDownload {
   downloadUrl: string;
@@ -143,6 +150,9 @@ export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 
 export type ShouldStartLoadRequestEvent =
   NativeSyntheticEvent<ShouldStartLoadRequest>;
+
+export type ShouldInterceptRequestEvent =
+  NativeSyntheticEvent<ShouldInterceptRequest>;
 
 export type FileDownloadEvent = NativeSyntheticEvent<FileDownload>;
 
@@ -272,6 +282,18 @@ export interface WebViewNativeConfig {
 export type OnShouldStartLoadWithRequest = (
   event: ShouldStartLoadRequest
 ) => boolean;
+
+export type WebResourceResponse = {
+  mimeType: string;
+  encoding: string;
+  statusCode: number;
+  reasonPhrase: string;
+  response: string;
+};
+
+export type OnShouldInterceptRequest = (
+  event: ShouldInterceptRequest
+) => Promise<WebResourceResponse>;
 
 export interface BasicAuthCredential {
   /**
@@ -1274,6 +1296,13 @@ export interface WebViewSharedProps extends ViewProps {
    * to stop loading. The `navigationType` is always `other` on android.
    */
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest;
+
+  /**
+   * Function that allows intercepting any android web view requests. Return
+   * `null` to load the request normally, or a customer response object to
+   * intercept the request. The `navigationType` is always `other`.
+   */
+  onShouldInterceptRequest?: OnShouldInterceptRequest;
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
