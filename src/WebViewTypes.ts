@@ -652,6 +652,15 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   pullToRefreshEnabled?: boolean;
 
   /**
+   * Boolean value that determines whether a pull to refresh gesture is
+   * available in the `WebView`. The default value is `false`.
+   * If `true`, sets `bounces` automatically to `true`
+   * @platform ios
+   *
+   */
+  refreshControlLightMode?: boolean;
+
+  /**
    * Function that is invoked when the client needs to download a file.
    *
    * iOS 13+ only: If the webview navigates to a URL that results in an HTTP
