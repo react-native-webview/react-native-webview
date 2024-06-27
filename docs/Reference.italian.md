@@ -72,7 +72,7 @@ Questo documento elenca le attuali proprietà e metodi pubblici di React Native 
 - [`sharedCookiesEnabled`](Reference.italian.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.italian.md#textZoom)
 - [`pullToRefreshEnabled`](Reference.italian.md#pullToRefreshEnabled)
-- [`pullToRefreshEnabled`](Reference.italian.md#pullToRefreshEnabled)
+- [`refreshControlLightMode`](Reference.italian.md#refreshControlLightMode)
 - [`ignoreSilentHardwareSwitch`](Reference.italian.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.italian.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.italian.md#limitsNavigationsToAppBoundDomains)
@@ -110,13 +110,11 @@ Questo documento elenca le attuali proprietà e metodi pubblici di React Native 
 ## Props
 
 ### `source`[⬆](#props-index)
-
 Carica HTML statico o un URI (con eventuali header) nella WebView. Si noti che l'HTML statico richiederà l'impostazione di [`originWhitelist`](Reference.italian.md#originWhiteList) a `["*"]`.
 
 L'oggetto passato a `source` può avere una delle seguenti forme:
 
 **Caricamento di un URI**
-
 - `uri` (string) - L'URI da caricare nel `WebView`. Può essere un file locale o remoto e può essere modificato con lo stato o le props di React per navigare verso una nuova pagina.
 - `method` (string) - Il metodo HTTP da utilizzare. Se non specificato, il valore predefinito è GET. Su Android e Windows, i metodi supportati sono solo GET e POST.
 - `headers` (object) - Intestazioni HTTP aggiuntive da inviare con la richiesta. Su Android, queste possono essere utilizzate solo con richieste GET. Consulta la [Guida](Guida.italian.md#impostazione-degli-header-personalizzati) per ulteriori informazioni sull'impostazione di header personalizzati.
@@ -125,7 +123,7 @@ L'oggetto passato a `source` può avere una delle seguenti forme:
 **HTML Statico**
 _Note that using static HTML requires the WebView property [originWhiteList](Reference.italian.md#originWhiteList) to `['*']`. For some content, such as video embeds (e.g. Twitter or Facebook posts with video), the baseUrl needs to be set for the video playback to work_
 
-- `html` (string) - Una pagina HTML statica da visualizzare nel WebView.
+- `html` (string) -  Una pagina HTML statica da visualizzare nel WebView.
 - `baseUrl` (string) - L'URL di base da utilizzare per i link relativi nell'HTML. Questo viene utilizzato anche per l'header dell'origine con le richieste CORS effettuate dal WebView. Consulta la documentazione di [Android WebView](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL) per ulteriori informazioni.
 
 | Tipo   | Obbligatorio |
@@ -135,27 +133,24 @@ _Note that using static HTML requires the WebView property [originWhiteList](Ref
 ---
 
 ### `automaticallyAdjustContentInsets`[⬆](#props-index)
-
 Controlla se regolare l'inset del contenuto per le web view posizionate dietro una barra di navigazione, una barra delle schede o una barra degli strumenti. Il valore predefinito è `true`.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | iOS         |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | iOS          |
 
 ---
 
 ### `automaticallyAdjustsScrollIndicatorInsets`[⬆](#props-index)
-
 Controlla se regolare l'inset dell'indicatore di scroll per le web view posizionate dietro una barra di navigazione, una barra delle schede o una barra degli strumenti. Il valore predefinito è `false`. (iOS 13+)
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | iOS(13+)    |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | iOS(13+)     |
 
 ---
 
 ### `injectedJavaScript`[⬆](#props-index)
-
 Imposta questo per fornire del codice JavaScript che verrà iniettato nella pagina web dopo il completamento del caricamento del documento, ma prima del completamento del caricamento di altre risorse secondarie.
 
 Assicurati che la stringa abbia un tipo valido (`true` funziona) e non generi eccezioni.
@@ -172,7 +167,7 @@ N.B.: Windows non ha [supporto nativo per gli alert](https://github.com/Microsof
 
 Esempio:
 
-Invia un messaggio contenente `window.location` sottoforma di un oggetto JSON da gestire tramite [`onMessage`](Reference.italian.md#onmessage):
+Invia un messaggio contenente `window.location` sottoforma di un oggetto JSON  da gestire tramite [`onMessage`](Reference.italian.md#onmessage):
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
@@ -189,7 +184,6 @@ const INJECTED_JAVASCRIPT = `(function() {
 ---
 
 ### `injectedJavaScriptBeforeContentLoaded`[⬆](#props-index)
-
 Imposta questo per passare del codice JavaScript che verrà iniettato nella pagina web dopo la creazione dell'elemento del documento, ma prima del completamento del caricamento di altre risorse secondarie.
 
 Assicurati che la stringa abbia un tipo valido (`true` funziona) e non generi eccezioni.
@@ -207,7 +201,7 @@ Per saperne di più leggi la guida [Comunicazione tra JS e Native](Guide.italian
 
 Esempio:
 
-Invia un messaggio contenente `window.location` sottoforma di un oggetto JSON da gestire tramite [`onMessage`](Reference.italian.md#onmessage). `window.ReactNativeWebView.postMessage` questa volta _sarà_ disponibile.
+Invia un messaggio contenente `window.location` sottoforma di un oggetto JSON  da gestire tramite [`onMessage`](Reference.italian.md#onmessage). `window.ReactNativeWebView.postMessage` questa volta _sarà_ disponibile.
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
@@ -224,31 +218,28 @@ const INJECTED_JAVASCRIPT = `(function() {
 ---
 
 ### `injectedJavaScriptForMainFrameOnly`[⬆](#props-index)
-
 If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
 
 If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
 
-| Tipo | Obbligatorio | Piattaforma                                            |
-| ---- | ------------ | ------------------------------------------------------ |
+| Tipo | Obbligatorio | Piattaforma                                              |
+| ---- | ------------ | -------------------------------------------------------- |
 | bool | No           | iOS e macOS (Android ha supporto solo quando è `true`) |
 
 ---
 
 ### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`[⬆](#props-index)
-
 If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
 
 If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
 
-| Tipo | Obbligatorio | Piattaforma                                            |
-| ---- | ------------ | ------------------------------------------------------ |
+| Tipo | Obbligatorio | Piattaforma                                              |
+| ---- | ------------ | -------------------------------------------------------- |
 | bool | No           | iOS e macOS (Android ha supporto solo quando è `true`) |
 
 ---
 
 ### `mediaPlaybackRequiresUserAction`[⬆](#props-index)
-
 Boolean che determina se è necessario che l'audio e il video HTML5 richiedano all'utente di interagire prima di avviare la riproduzione. Il valore predefinito è `true`. (Versione minima dell'API Android 17).
 
 NOTA: il valore predefinito `true` potrebbe causare il blocco del caricamento di alcuni video su iOS. Impostarlo su `false` potrebbe risolvere questo problema.
@@ -260,7 +251,6 @@ NOTA: il valore predefinito `true` potrebbe causare il blocco del caricamento di
 ---
 
 ### `nativeConfig`[⬆](#props-index)
-
 Sovrascrive il componente nativo utilizzato per il render della WebView. Consente di utilizzare una WebView nativa personalizzata che usa lo stesso JavaScript della WebView originale.
 
 La prop `nativeConfig` si aspetta un oggetto con le seguenti chiavi:
@@ -276,7 +266,6 @@ La prop `nativeConfig` si aspetta un oggetto con le seguenti chiavi:
 ---
 
 ### `onError`[⬆](#props-index)
-
 Funzione che viene invocata quando il caricamento della `WebView` non riesce.
 
 | Tipo     | Obbligatorio |
@@ -318,7 +307,6 @@ Il `syntheticEvent` può essere interrotto nell'esecuzione dell'azione predefini
 ---
 
 ### `onLoad`[⬆](#props-index)
-
 Funzione che viene invocata quando il caricamento della `WebView` è completato.
 
 | Tipo     | Obbligatorio |
@@ -351,7 +339,6 @@ url
 ---
 
 ### `onLoadEnd`[⬆](#props-index)
-
 Funzione che viene invocata quando il caricamento della `WebView` va a buon fine o fallisce.
 
 | Tipo     | Obbligatorio |
@@ -385,7 +372,6 @@ url
 ---
 
 ### `onLoadStart`[⬆](#props-index)
-
 Funzione che viene invocata quando il caricamento della `WebView` inizia.
 
 | Tipo     | Obbligatorio |
@@ -419,10 +405,9 @@ url
 ---
 
 ### `onLoadProgress`[⬆](#props-index)
-
 Funzione che viene invocata quando la `WebView` sta caricando.
 
-| Tipo     | Obbligatorio | Piattaforma         |
+| Tipo     | Obbligatorio | Piattaforma             |
 | -------- | ------------ | ------------------- |
 | function | No           | iOS, Android, macOS |
 
@@ -452,7 +437,6 @@ url
 ---
 
 ### `onHttpError`[⬆](#props-index)
-
 Funzione che viene invocata quando la `WebView` riceve un errore HTTP.
 
 > **_Nota_**
@@ -471,7 +455,7 @@ Esempio:
     const { nativeEvent } = syntheticEvent;
     console.warn(
       'WebView received error status code: ',
-      nativeEvent.statusCode
+      nativeEvent.statusCode,
     );
   }}
 />
@@ -496,7 +480,6 @@ url
 ---
 
 ### `onRenderProcessGone`[⬆](#props-index)
-
 Funzione che viene invocata quando il processo della `WebView` si arresta in modo anomalo o viene interrotto dal sistema operativo su Android.
 
 > **_Nota_**
@@ -511,9 +494,12 @@ Esempio:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onRenderProcessGone={(syntheticEvent) => {
+  onRenderProcessGone={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
-    console.warn('La WebView ha crashato: ', nativeEvent.didCrash);
+    console.warn(
+      'La WebView ha crashato: ',
+      nativeEvent.didCrash,
+    );
   }}
 />
 ```
@@ -523,11 +509,9 @@ La funzione passata a `onRenderProcessGone` viene chiamata con un evento sinteti
 ```
 didCrash
 ```
-
 ---
 
 ### `onMessage`[⬆](#props-index)
-
 Funzione che viene invocata quando la WebView chiama `window.ReactNativeWebView.postMessage`. Impostando questa proprietà, verrà iniettato questo oggetto globale nella WebView.
 
 `window.ReactNativeWebView.postMessage` accetta un argomento, `data`, che sarà disponibile sull'oggetto evento come `event.nativeEvent.data`. `data` deve essere una stringa.
@@ -541,7 +525,6 @@ Per saperne di più leggi la guida [Comunicazione tra JS e Native](Guide.italian
 ---
 
 ### `onNavigationStateChange`[⬆](#props-index)
-
 Funzione che viene invocata quando il caricamento del `WebView` inizia o termina.
 
 | Tipo     | Obbligatorio |
@@ -575,12 +558,11 @@ url
 ---
 
 ### `onContentProcessDidTerminate`[⬆](#props-index)
-
 Funzione che viene invocata quando l'elaborazione del contenuto della `WebView` viene terminato.
 
-| Tipo     | Obbligatorio | Piattaforma           |
-| -------- | ------------ | --------------------- |
-| function | No           | iOS e macOS WKWebView |
+| Tipo     | Obbligatorio | Piattaforma                 |
+| -------- | ------------ | --------------------------- |
+| function | No           | iOS e macOS WKWebView       |
 
 Le web view di iOS utilizzano un processo separato per il rendering e la gestione dei contenuti web. WebKit chiama questo metodo quando il processo per la web view specificata termina per qualsiasi motivo.
 Il motivo non è necessariamente un crash. Ad esempio, poiché le web view di iOS non sono incluse nella RAM totale dell'app, possono essere terminate indipendentemente dall'app per liberare memoria per nuove app che l'utente sta aprendo. Non è insolito che le Web view vengano terminate dopo un po' di tempo in background.
@@ -592,10 +574,7 @@ Esempio:
   source={{ uri: 'https://reactnative.dev' }}
   onContentProcessDidTerminate={(syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
-    console.warn(
-      'Elaborazione del contenuto terminato, ricaricamento in corso.',
-      nativeEvent
-    );
+    console.warn('Elaborazione del contenuto terminato, ricaricamento in corso.', nativeEvent);
     this.refs.webview.reload();
   }}
 />
@@ -615,7 +594,6 @@ url
 ---
 
 ### `onScroll`[⬆](#props-index)
-
 Funzione che viene invocata quando viene generato l'evento di scorrimento (`scroll`) nella `WebView`.
 
 | Tipo     | Obbligatorio | Piattaforma                  |
@@ -627,9 +605,9 @@ Esempio:
 ```jsx
 <Webview
   source={{ uri: 'https://reactnative.dev' }}
-  onScroll={(syntheticEvent) => {
-    const { contentOffset } = syntheticEvent.nativeEvent;
-    console.table(contentOffset);
+  onScroll={syntheticEvent => {
+    const { contentOffset } = syntheticEvent.nativeEvent
+    console.table(contentOffset)
   }}
 />
 ```
@@ -648,8 +626,7 @@ zoomScale
 ---
 
 ### `originWhitelist`[⬆](#props-index)
-
-Elenco di stringhe di origine consentite per la navigazione. Le stringhe consentono caratteri jolly (_) e vengono confrontate solo con l'origine (non l'URL completo). Se l'utente schiaccia per navigare verso una nuova pagina ma la nuova pagina non è in questa lista di controllo, l'URL verrà gestito dal sistema operativo. Le origini predefinite in lista bianca (whitelist o allowlist) sono "http://_" e "https://\*".
+Elenco di stringhe di origine consentite per la navigazione. Le stringhe consentono caratteri jolly (*) e vengono confrontate solo con l'origine (non l'URL completo). Se l'utente schiaccia per navigare verso una nuova pagina ma la nuova pagina non è in questa lista di controllo, l'URL verrà gestito dal sistema operativo. Le origini predefinite in lista bianca (whitelist o allowlist) sono "http://*" e "https://*".
 
 | Tipo             | Obbligatorio | Piattaforma         |
 | ---------------- | ------------ | ------------------- |
@@ -668,7 +645,6 @@ Esempio:
 ---
 
 ### `renderError`[⬆](#props-index)
-
 Funzione che restituisce una View da mostrare in caso di errore.
 
 | Tipo     | Obbligatorio | Piattaforma         |
@@ -689,7 +665,6 @@ La funzione passata a `renderError` verrà chiamata con il nome dell'errore.
 ---
 
 ### `renderLoading`[⬆](#props-index)
-
 Funzione che restituisce un indicatore di caricamento. La prop `startInLoadingState` deve essere impostata su `true` per utilizzare questa prop.
 
 | Tipo     | Obbligatorio | Piattaforma         |
@@ -709,17 +684,15 @@ Esempio:
 ---
 
 ### `scalesPageToFit`[⬆](#props-index)
-
 Boolean che controlla se il contenuto web viene ridimensionato per adattarsi alla vista e consente all'utente di modificare la scala. Il valore predefinito è `true`.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | Android     |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | Android      |
 
 ---
 
 ### `onShouldStartLoadWithRequest`[⬆](#props-index)
-
 Funzione che consente la gestione personalizzata di qualsiasi richiesta della web view. Restituisci `true` dalla funzione per continuare a caricare la richiesta e `false` per interrompere il caricamento.
 
 Su Android, non viene chiamata durante il primo caricamento.
@@ -758,7 +731,6 @@ isTopFrame (solo iOS)
 ---
 
 ### `startInLoadingState`[⬆](#props-index)
-
 Boolean che forza la `WebView` a mostrare una View di caricamento durante il primo caricamento. Questa prop dev'essere impostata su `true` affinché la prop `renderLoading` funzioni.
 
 | Tipo | Obbligatorio | Piattaforma         |
@@ -768,7 +740,6 @@ Boolean che forza la `WebView` a mostrare una View di caricamento durante il pri
 ---
 
 ### `style`[⬆](#props-index)
-
 [Style](https://reactnative.dev/docs/view-style-props) ti permette di personalizzare lo stile della `WebView`. Nota che ci sono stili predefiniti (ad esempio: è necessario aggiungere `flex: 0` allo stile se si desidera utilizzare la proprietà `height`).
 
 | Tipo  | Obbligatorio |
@@ -787,7 +758,6 @@ Esempio:
 ---
 
 ### `containerStyle`[⬆](#props-index)
-
 [Style](https://reactnative.dev/docs/view-style-props) che consente di personalizzare lo stile del contenitore della `WebView`. Nota che ci sono stili predefiniti (ad esempio: è necessario aggiungere `flex: 0` allo stile se si desidera utilizzare la proprietà `height`).
 
 | Tipo  | Obbligatorio |
@@ -806,30 +776,26 @@ Esempio:
 ---
 
 ### `decelerationRate`[⬆](#props-index)
-
 Un numero in virgola mobile che determina quanto rapidamente lo scroll nella view decelera dopo che l'utente ha sollevato il dito. È possibile utilizzare anche i valori di stringa `"normal"` e `"fast"` che corrispondono alle impostazioni sottostanti di iOS per `UIScrollViewDecelerationRateNormal` e `UIScrollViewDecelerationRateFast` rispettivamente:
-
 - `normal`: 0,998
 - `fast`: 0,99 (impostazione predefinita per la web view di iOS)
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| number | No           | iOS         |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| number | No           | iOS          |
 
 ---
 
 ### `domStorageEnabled`[⬆](#props-index)
-
 Valore booleano per controllare se il DOM Storage è abilitato. Usato solo in Android.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | Android     |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | Android      |
 
 ---
 
 ### `javaScriptEnabled`[⬆](#props-index)
-
 Valore booleano per abilitare JavaScript nella `WebView`. Il valore predefinito è `true`.
 
 | Tipo | Obbligatorio |
@@ -839,7 +805,6 @@ Valore booleano per abilitare JavaScript nella `WebView`. Il valore predefinito 
 ---
 
 ### `javaScriptCanOpenWindowsAutomatically`[⬆](#props-index)
-
 Una boolean che indica se JavaScript può aprire finestre senza chel'utente interagisca. Il valore predefinito è `false`.
 
 | Tipo | Obbligatorio |
@@ -849,7 +814,6 @@ Una boolean che indica se JavaScript può aprire finestre senza chel'utente inte
 ---
 
 ### `androidLayerType`[⬆](#props-index)
-
 Specifica il tipo di layer.
 
 I possibili valori per `androidLayerType` sono:
@@ -858,14 +822,14 @@ I possibili valori per `androidLayerType` sono:
 - `software`: la view ha un layer software. Un layer software è supportato da un bitmap e fa sì che la view venga renderizzata utilizzando la pipeline di rendering software di Android, anche se l'accelerazione hardware è abilitata.
 - `hardware`: la view ha un layer hardware. Un layer hardware è supportato da una texture specifica dell'hardware e fa sì che la view venga renderizzata utilizzando la pipeline di rendering hardware di Android, ma solo se l'accelerazione hardware è abilitata per la gerarchia delle view.
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | Android     |
+
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| string | No           | Android      |
 
 ---
 
 ### `mixedContentMode`[⬆](#props-index)
-
 Specifica la modalità di contenuto misto. Ad esempio, la WebView consentirà a un'origine sicura di caricare contenuti da qualsiasi altra origine.
 
 I possibili valori per `mixedContentMode` sono:
@@ -874,39 +838,36 @@ I possibili valori per `mixedContentMode` sono:
 - `always`: la WebView consentirà a un'origine sicura di caricare contenuti da qualsiasi altra origine, anche se questa origine non è sicura.
 - `compatibility`: la WebView cercherà di essere compatibile con l'approccio di un web browser moderno per quanto riguarda i contenuti misti.
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | Android     |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| string | No           | Android      |
 
 ---
 
 ### `thirdPartyCookiesEnabled`[⬆](#props-index)
-
 Boolean che abilita i cookie di terze parti nella WebView. Utilizzato solo su Android Lollipop e versioni successive, poiché i cookie di terze parti sono abilitati per impostazione predefinita su Android Kitkat e versioni precedenti e su iOS. Il valore predefinito è `true`. Per ulteriori informazioni sui cookie, leggi la [guida per come gestire i cookie](Guide.italian.md#gestione-dei-cookie).
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | Android     |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | Android      |
 
 ---
 
 ### `userAgent`[⬆](#props-index)
-
 Imposta l'user-agent per la WebView.
 
-| Tipo   | Obbligatorio | Piattaforma         |
-| ------ | ------------ | ------------------- |
-| string | No           | iOS, Android, macOS |
+| Tipo   | Obbligatorio | Piattaforma             |
+| ------ | ------------ | ----------------------- |
+| string | No           | iOS, Android, macOS     |
 
 ---
 
 ### `applicationNameForUserAgent`[⬆](#props-index)
-
 Aggiungi all'user-agent esistente. Impostare `userAgent` sovrascriverà questa opzione.
 
-| Tipo   | Obbligatorio | Piattaforma         |
-| ------ | ------------ | ------------------- |
-| string | No           | iOS, Android, macOS |
+| Tipo   | Obbligatorio | Piattaforma             |
+| ------ | ------------ | ----------------------- |
+| string | No           | iOS, Android, macOS     |
 
 ```jsx
 <WebView
@@ -919,51 +880,45 @@ Aggiungi all'user-agent esistente. Impostare `userAgent` sovrascriverà questa o
 ```
 
 ### `allowsFullscreenVideo`[⬆](#props-index)
-
 Boolean che determina se è consentito riprodurre i video a schermo intero. Il valore predefinito è `false`.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | Android     |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | Android      |
 
 ---
 
 ### `allowsInlineMediaPlayback`[⬆](#props-index)
-
 Boolean che determina se i video HTML5 vengono riprodotti all'interno del contenuto o utilizzano il controller a schermo intero nativo. Il valore predefinito è `false`.
 
 > **NOTA**
 >
 > Per consentire la riproduzione inline dei video, non basta solo che questa proprietà sia impostata su `true`, ma l'elemento video nel documento HTML deve anche includere l'attributo `webkit-playsinline`.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | iOS         |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | iOS          |
 
 ---
-
 ### `allowsAirPlayForMediaPlayback`[⬆](#props-index)
-
 Un valore booleano che indica se è consentito l'uso di AirPlay. Il valore predefinito è `false`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS e macOS |
+| Tipo    | Obbligatorio | Piattaforma       |
+| ------- | ------------ | ----------------- |
+| boolean | No           | iOS e macOS       |
 
 ---
 
 ### `bounces`[⬆](#props-index)
-
 Valore booleano che determina se la web view effettua l'effetto di "rimbalzo" (bounce) quando raggiunge il bordo del contenuto. Il valore predefinito è `true`.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | iOS         |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | iOS          |
 
 ---
 
 ### `overScrollMode`[⬆](#props-index)
-
 Specifica la modalità di overscroll.
 
 I possibili valori per `overScrollMode` sono:
@@ -972,9 +927,9 @@ I possibili valori per `overScrollMode` sono:
 - `content`: consente all'utente di eseguire l'overscroll su questa view solo se il contenuto è sufficientemente grande da poter usare lo scrolling in modo significativo, a condizione che sia una view che ha lo scrolling.
 - `never`: Non consente mai all'utente di eseguire l'overscroll su questa view.
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | Android     |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| string | No           | Android      |
 
 ---
 
@@ -982,49 +937,44 @@ I possibili valori per `overScrollMode` sono:
 
 La quantità di spazio tra il contenuto della WebView e i bordi della ScrollView. Impostato di default su {top: 0, left: 0, bottom: 0, right: 0}.
 
-| Tipo                                                               | Obbligatorio | Piattaforma |
-| ------------------------------------------------------------------ | ------------ | ----------- |
-| object: {top: number, left: number, bottom: number, right: number} | No           | iOS         |
+| Tipo                                                               | Obbligatorio | Piattaforma  |
+| ------------------------------------------------------------------ | ------------ | ------------ |
+| object: {top: number, left: number, bottom: number, right: number} | No           | iOS          |
 
 ---
 
 ### `contentInsetAdjustmentBehavior`[⬆](#props-index)
-
 Questa proprietà specifica come gli inset della safe area vengono utilizzati per modificare l'area del contenuto della scroll view. Il valore predefinito di questa proprietà è "never" (mai). Disponibile su iOS 11 e versioni successive. Il valore Predefinito è `never`.
 
 Valori possibili:
-
 - `automatic` (automatico)
 - `scrollableAxes` (assi scorrevoli)
 - `never` (mai)
 - `always` (sempre)
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | iOS         |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| string | No           | iOS          |
 
 ---
 
 ### `contentMode`[⬆](#props-index)
-
 Controlla il tipo di contenuto da caricare. Disponibile su iOS 13 e versioni successive. Predefinito a `recommended` (consigliato), che carica contenuti per dispositivi mobili su iPhone e iPad Mini, ma contenuti per desktop su iPad più grandi.
 
 Per ulteriori informazioni consulta [Introducing Desktop-class Browsing on iPad](https://developer.apple.com/videos/play/wwdc2019/203/).
 
 Valori possibili:
-
 - `recommended` (consigliato)
 - `mobile`
 - `desktop`
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | iOS         |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| string | No           | iOS          |
 
 ---
 
 ### `dataDetectorTypes`[⬆](#props-index)
-
 I tipi di dati riconosciuti per la rilevazione dei link nel contenuto della web view. Di seguito sono riportati i possibili valori per `dataDetectorTypes`:
 
 - `phoneNumber`
@@ -1037,196 +987,177 @@ I tipi di dati riconosciuti per la rilevazione dei link nel contenuto della web 
 - `flightNumber`
 - `lookupSuggestion`
 
-| Tipo           | Obbligatorio | Piattaforma |
-| -------------- | ------------ | ----------- |
-| string o array | No           | iOS         |
+| Tipo             | Obbligatorio | Piattaforma  |
+| ---------------- | ------------ | ------------ |
+| string o array   | No           | iOS          |
 
 ---
 
 ### `scrollEnabled`[⬆](#props-index)
-
 Boolean che determina se la funzionalità di scroll è abilitata nella `WebView`. Il valore predefinito è `true`. Impostando questo valore su `false`, la webview non sposterà il body del documento quando la tastiera appare sopra un campo di input.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | iOS e macOS |
+| Tipo | Obbligatorio | Piattaforma       |
+| ---- | ------------ | ----------------- |
+| bool | No           | iOS e macOS       |
 
 ---
 
 ### `nestedScrollEnabled`[⬆](#props-index)
-
 Boolean che determina se è possibile effettuare lo scroll nella `WebView` quando viene utilizzato all'interno di un `ScrollView` su Android. Il valore predefinito è `false`.
 
 Impostando questo valore su `true`, verrà impedito alla `ScrollView` di effettuare lo scrolling quando si scorre all'interno della `WebView`.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | Android     |
+| Tipo | Obbligatorio | Piattaforma       |
+| ---- | ------------ | ----------------- |
+| bool | No           | Android           |
 
 ---
 
 ### `setBuiltInZoomControls`[⬆](#props-index)
-
 Imposta se la WebView usa meccanismi di zoom integrati. Il valore predefinito è `true`. Impostando questo valore su `false`, verrà impedito l'uso del gesto di pinch (pizzico) per il controllo dello zoom.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | Android     |
+| Tipo | Obbligatorio | Piattaforma       |
+| ---- | ------------ | ----------------- |
+| bool | No           | Android           |
 
 ---
 
 ### `setDisplayZoomControls`[⬆](#props-index)
-
 Imposta se la WebView deve mostrare i controlli di zoom sullo schermo quando si utilizzano i meccanismi di zoom integrati (vedi `setBuiltInZoomControls`). Il valore predefinito è `false`.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | Android     |
+| Tipo | Obbligatorio | Piattaforma       |
+| ---- | ------------ | ----------------- |
+| bool | No           | Android           |
 
 ---
 
 ### `directionalLockEnabled`[⬆](#props-index)
-
 Un valore booleano che determina se lo scrolling è disabilitato per una direzione specifica. Il valore predefinito è `true`.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | iOS         |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | iOS          |
 
 ---
 
 ### `showsHorizontalScrollIndicator`[⬆](#props-index)
-
 Boolean che determina se l'indicatore di scrolling orizzontale viene mostrato nella `WebView`. Il valore predefinito è `true`.
 
-| Tipo | Obbligatorio | Piattaforma         |
-| ---- | ------------ | ------------------- |
-| bool | No           | iOS, Android, macOS |
+| Tipo | Obbligatorio | Piattaforma             |
+| ---- | ------------ | ----------------------- |
+| bool | No           | iOS, Android, macOS     |
 
 ---
 
 ### `showsVerticalScrollIndicator`[⬆](#props-index)
-
 Boolean che determina se l'indicatore di scrolling verticale viene mostrato nella `WebView`. Il valore predefinito è `true`.
 
-| Tipo | Obbligatorio | Piattaforma         |
-| ---- | ------------ | ------------------- |
-| bool | No           | iOS, Android, macOS |
+| Tipo | Obbligatorio | Piattaforma             |
+| ---- | ------------ | ----------------------- |
+| bool | No           | iOS, Android, macOS     |
 
 ---
 
 ### `geolocationEnabled`[⬆](#props-index)
-
 Imposta se la geolocalizzazione è abilitata nella `WebView`. Il valore predefinito è `false`. Supportato solo su Android.
 
-| Tipo | Obbligatorio | Piattaforma |
-| ---- | ------------ | ----------- |
-| bool | No           | Android     |
+| Tipo | Obbligatorio | Piattaforma  |
+| ---- | ------------ | ------------ |
+| bool | No           | Android      |
 
 ---
 
 ### `allowFileAccessFromFileURLs`[⬆](#props-index)
-
 Il valore booleano determina se è consentito a JavaScript, in esecuzione all'interno di un URL con schema file, di accedere ai contenuti di altri URL con schema file. Il valore predefinito è `false`.
 
-| Tipo | Obbligatorio | Piattaforma         |
-| ---- | ------------ | ------------------- |
-| bool | No           | iOS, Android, macOS |
+| Tipo | Obbligatorio | Piattaforma             |
+| ---- | ------------ | ----------------------- |
+| bool | No           | iOS, Android, macOS     |
 
 ---
 
 ### `allowUniversalAccessFromFileURLs`[⬆](#props-index)
-
 Il valore booleano determina se è consentito a JavaScript, in esecuzione all'interno di un URL con schema file, di accedere ai contenuti di qualsiasi origine, compresi i contenuti di altri URL con schema file. Il valore predefinito è `false`.
 
-| Tipo | Obbligatorio | Piattaforma         |
-| ---- | ------------ | ------------------- |
-| bool | No           | iOS, Android, macOS |
+| Tipo | Obbligatorio | Piattaforma              |
+| ---- | ------------ | ------------------------ |
+| bool | No           | iOS, Android, macOS      |
 
 ---
 
 ### `allowingReadAccessToURL`[⬆](#props-index)
-
 Il valore di tipo stringa indica a quali URL il file della WebView può fare riferimento negli script, nelle richieste AJAX e negli import di CSS. Questo viene utilizzato solo per le WebView che vengono caricate con un `source.uri` impostato su un URL `'file://'`. Se non viene fornito, il valore predefinito è consentire solo l'accesso in lettura all'URL fornito in `source.uri` stesso.
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | iOS e macOS |
+| Tipo   | Obbligatorio | Piattaforma       |
+| ------ | ------------ | ----------------- |
+| string | No           | iOS e macOS       |
 
 ---
 
 ### `keyboardDisplayRequiresUserAction`[⬆](#props-index)
-
 Se impostato su `false`, il contenuto web non mostra la tastiera mediante codice (programmatically). Il valore predefinito è `true`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | iOS          |
 
 ---
 
 ### `hideKeyboardAccessoryView`[⬆](#props-index)
-
 Se impostato su `true`, nasconde la view accessorio della tastiera(< > e Fatto).
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | iOS          |
 
 ---
 
 ### `allowsBackForwardNavigationGestures`[⬆](#props-index)
-
 Se impostato su `true`, sarà possibile utilizzare i gesti di scrolling orizzontale. Il valore predefinito è `false`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS e macOS |
+| Tipo    | Obbligatorio | Piattaforma       |
+| ------- | ------------ | ----------------- |
+| boolean | No           | iOS e macOS       |
 
 ---
 
 ### `incognito`[⬆](#props-index)
-
 Non memorizza alcun dato durante il ciclo di vita della WebView.
 
-| Tipo    | Obbligatorio | Piattaforma         |
-| ------- | ------------ | ------------------- |
-| boolean | No           | iOS, Android, macOS |
+| Tipo    | Obbligatorio | Piattaforma             |
+| ------- | ------------ | ----------------------- |
+| boolean | No           | iOS, Android, macOS     |
 
 ---
 
 ### `allowFileAccess`[⬆](#props-index)
-
 Se impostato su `true`, consentirà l'accesso ai file di sistema tramite URI `file://`. Il valore predefinito è `false`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | Android     |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | Android      |
 
 ---
 
 ### `saveFormDataDisabled`[⬆](#props-index)
-
 Imposta se la WebView deve disabilitare il salvataggio dei dati dei form. Il valore predefinito è `false`. Questa funzione non ha alcun effetto dall'API level 26 di Android in poi, in quanto è presente una funzionalità di compilazione automatica che memorizza i dati dei form.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | Android     |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | Android      |
 
 ---
 
 ### `cacheEnabled`[⬆](#props-index)
-
 Imposta se la WebView deve utilizzare la cache del browser.
 
-| Tipo    | Obbligatorio | Default | Piattaforma         |
-| ------- | ------------ | ------- | ------------------- |
-| boolean | No           | true    | iOS, Android, macOS |
+| Tipo    | Obbligatorio | Default | Piattaforma             |
+| ------- | ------------ | ------- | ----------------------- |
+| boolean | No           | true    | iOS, Android, macOS     |
 
 ---
 
 ### `cacheMode`[⬆](#props-index)
-
 Sovrascrive il modo in cui viene usata la cache. Il modo in cui viene utilizzata la cache dipende dal tipo di navigazione. Per un normale caricamento della pagina, la cache viene controllata e il contenuto viene rivalidato se necessario. Quando si torna indietro, il contenuto non viene rivalidato, ma viene semplicemente recuperato dalla cache. Questa proprietà consente al client di sovrascrivere questo comportamento.
 
 I valori possibili sono:
@@ -1236,51 +1167,47 @@ I valori possibili sono:
 - `LOAD_NO_CACHE`: non utilizza la cache, carica dalla rete.
 - `LOAD_CACHE_ONLY`: non utilizza la rete, carica dalla cache.
 
-| Tipo   | Obbligatorio | Default      | Piattaforma |
-| ------ | ------------ | ------------ | ----------- |
-| string | No           | LOAD_DEFAULT | Android     |
+| Tipo   | Obbligatorio | Default      | Piattaforma  |
+| ------ | ------------ | ------------ | ------------ |
+| string | No           | LOAD_DEFAULT | Android      |
 
 ---
 
 ### `pagingEnabled`[⬆](#props-index)
-
 Quando il valore di questa proprietà è impostato su `true`, la view di scrolling si fermerà sugli intervalli corrispondenti ai limiti della vista stessa quando l'utente effettua uno scroll. Il valore predefinito è `false`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | iOS          |
 
 ---
 
 ### `allowsLinkPreview`[⬆](#props-index)
-
 Boolean che determina se la pressione su un link visualizza un'anteprima della destinazione del link. In iOS, questa proprietà è disponibile sui dispositivi che supportano il 3D Touch. In iOS 10 e versioni successive, il valore predefinito è `true`. Prima di iOS 10, il valore predefinito è `false`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS e macOS |
+| Tipo    | Obbligatorio | Piattaforma       |
+| ------- | ------------ | ----------------- |
+| boolean | No           | iOS e macOS       |
 
 ---
 
 ### `sharedCookiesEnabled`[⬆](#props-index)
-
 Imposta `true` se i cookie condivisi da `[NSHTTPCookieStorage sharedHTTPCookieStorage]` devono essere usati per ogni richiesta di caricamento nella WebView. Il valore predefinito è `false`. Per ulteriori informazioni sui cookie, leggi la [guida di gestione dei cookie](Guide.italian.md#gestione-dei-cookie)
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS e macOS |
+| Tipo    | Obbligatorio | Piattaforma       |
+| ------- | ------------ | ----------------- |
+| boolean | No           | iOS e macOS       |
 
 ---
 
 ### `textZoom`[⬆](#props-index)
-
 Se l'utente ha impostato una dimensione del carattere personalizzata nel sistema Android, si verifica una scala indesiderata dell'interfaccia del sito nella WebView.
 
 Impostando la prop `textZoom` standard (100), questa conseguenza indesiderata scompare.
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| number | No           | Android     |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| number | No           | Android      |
 
 Esempio:
 
@@ -1291,12 +1218,11 @@ Esempio:
 ---
 
 ### `pullToRefreshEnabled`[⬆](#props-index)
-
 Boolean che determina se è abilitato il gesto di trascinamento per aggiornare nella WebView. Il valore predefinito è `false`, il che significa che il gesto di trascinamento per aggiornare non è disponibile. Se impostato su `true`, abiliterà automaticamente la proprietà `bounces` a `true`, consentendo al contenuto di rimbalzare quando viene trascinato oltre i limiti.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | iOS          |
 
 ### `refreshControlLightMode`[⬆](#props-index)
 
@@ -1310,17 +1236,15 @@ L'impostazione predefinita è "false", il che significa che il colore del contro
 | boolean | No           | iOS         |
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)
-
 (solo iOS)
 
 Quando impostato su `true`, viene ignorato il pulsante del silenzioso dell'hardware fisico. Predefinito: `false`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | iOS          |
 
 ### `onFileDownload`[⬆](#props-index)
-
 (solo iOS)
 
 È una funzione che viene invocata quando il client ha bisogno di scaricare un file.
@@ -1344,22 +1268,21 @@ Esempio:
 />
 ```
 
-| Tipo     | Obbligatorio | Piattaforma |
-| -------- | ------------ | ----------- |
-| function | No           | iOS         |
+| Tipo     | Obbligatorio | Piattaforma  |
+| -------- | ------------ | ------------ |
+| function | No           | iOS          |
 
 ---
 
 ### `limitsNavigationsToAppBoundDomains`[⬆](#props-index)
-
 Se impostato su `true`, indica a WebKit che un WKWebView può navigare solo su domini legati all'applicazione. Applicabile solo su iOS 14 o versioni successive.
 
 Una volta impostato, qualsiasi tentativo di navigare su una pagina che non ha un dominio legato all'applicazione fallirà con l'errore "App-bound domain failure" (mancato dominio legato all'applicazione).
 Le applicazioni possono specificare fino a 10 domini "app-bound" utilizzando una nuova chiave `WKAppBoundDomains` nel file `Info.plist`. Per ulteriori informazioni, consulta [App-Bound Domains](https://webkit.org/blog/10882/app-bound-domains/).
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | iOS          |
 
 Esempio:
 
@@ -1370,14 +1293,13 @@ Esempio:
 ---
 
 ### `textInteractionEnabled`[⬆](#props-index)
-
 Se impostato su `false`, indica a WebKit che un WKWebView non interagirà con il testo e non mostrerà quindi un'area di selezione del testo. Applicabile solo su iOS 14.5 o versioni successive.
 
 Il valore predefinito è `true`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | iOS          |
 
 Esempio:
 
@@ -1388,7 +1310,6 @@ Esempio:
 ---
 
 ### `mediaCapturePermissionGrantType`[⬆](#props-index)
-
 Questa prop specifica come gestire le richieste di autorizzazione per la cattura degli strumenti di comunicazione. Il valore predefinito è `prompt`, il che comporta che all'utente venga richiesta l'autorizzazione ripetutamente. Disponibile su iOS 15 e versioni successive.
 
 I possibili valori sono:
@@ -1401,9 +1322,9 @@ I possibili valori sono:
 
 Nota che anche una concessione può comportare una richiesta all'utente, ad esempio se l'autorizzazione non è mai stata richiesta all'utente in precedenza.
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | iOS         |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| string | No           | iOS          |
 
 Esempio:
 
@@ -1414,12 +1335,11 @@ Esempio:
 ---
 
 ### `autoManageStatusBarEnabled`[⬆](#props-index)
-
 Se impostato su `true`, la barra di stato verrà automaticamente nascosta/mostrata dalla WebView, in particolare quando si guarda un video a schermo intero. Se impostato su `false`, WebView non gestirà affatto la barra di stato. Il valore predefinito è `true`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | iOS          |
 
 Esempio:
 
@@ -1428,13 +1348,12 @@ Esempio:
 ```
 
 ### `setSupportMultipleWindows`[⬆](#props-index)
-
-Imposta se la WebView supporta più finestre. Consulta la [documentazione di Android](<'https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)'>) per ulteriori informazioni.
+Imposta se la WebView supporta più finestre. Consulta la [documentazione di Android]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') per ulteriori informazioni.
 Impostando questo valore su `false`, si potrebbe esporre l'applicazione a questa [vulnerabilità](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/), consentendo a un iframe maligno di sfuggire al DOM del livello superiore.
 
-| Tipo    | Obbligatorio | Default | Piattaforma |
-| ------- | ------------ | ------- | ----------- |
-| boolean | No           | true    | Android     |
+| Tipo    | Obbligatorio | Default | Piattaforma  |
+| ------- | ------------ | ------- | ------------ |
+| boolean | No           | true    | Android      |
 
 Esempio:
 
@@ -1443,19 +1362,18 @@ Esempio:
 ```
 
 ### `enableApplePay`[⬆](#props-index)
-
 Una boolean che, quando impostata su `true`, renderizzerà la WebView con il supporto di Apple Pay. Una volta impostato, i siti web saranno in grado di invocare Apple Pay da React Native Webview.
 Tuttavia, ciò comporta alcune limitazioni, ad esempio le funzionalità come [`injectJavaScript`](Reference.italian.md#injectjavascriptstr), la cronologia di HTML5, [`sharedCookiesEnabled`](Reference.italian.md#sharedCookiesEnabled), [`injectedJavaScript`](Reference.italian.md#injectedjavascript) e [`injectedJavaScriptBeforeContentLoaded`](Reference.italian.md#injectedjavascriptbeforecontentloaded) non funzioneranno. Consulta la [nota di rilascio di Apple Pay](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API) per ulteriori informazioni.
 
 Se devi inviare messaggi all'app, la pagina web dovrà chiamare esplicitamente l'handler dei messaggi di WebKit e riceverli tramite l'handler `onMessage` nel lato di React Native.
 
 ```javascript
-window.webkit.messageHandlers.ReactNativeWebView.postMessage('ciao apple pay');
+window.webkit.messageHandlers.ReactNativeWebView.postMessage("ciao apple pay")
 ```
 
-| Tipo    | Obbligatorio | Default | Piattaforma |
-| ------- | ------------ | ------- | ----------- |
-| boolean | No           | false   | iOS         |
+| Tipo    | Obbligatorio | Default | Piattaforma  |
+| ------- | ------------ | ------- | ------------ |
+| boolean | No           | false   | iOS          |
 
 Esempio:
 
@@ -1464,16 +1382,15 @@ Esempio:
 ```
 
 ### `forceDarkOn`[⬆](#props-index)
-
 Configurazione del tema scuro (Dark Mode).
 
-_NOTA_: L'impostazione della Dark Mode non è persistente. È necessario chiamare il metodo statico ogni volta che il processo dell'app viene avviato.
+*NOTA*: L'impostazione della Dark Mode non è persistente. È necessario chiamare il metodo statico ogni volta che il processo dell'app viene avviato.
 
-_NOTA_: Il passaggio da modalità giorno a modalità notte è una modifica di configurazione, quindi per l'impostazione predefinita l'attività verrà riavviata e registrerà i nuovi valori per attivare il tema. Presta attenzione quando sovrascrivi questo comportamento predefinito e assicurati che questo metodo venga comunque chiamato quando vengono apportate modifiche.
+*NOTA*: Il passaggio da modalità giorno a modalità notte è una modifica di configurazione, quindi per l'impostazione predefinita l'attività verrà riavviata e registrerà i nuovi valori per attivare il tema. Presta attenzione quando sovrascrivi questo comportamento predefinito e assicurati che questo metodo venga comunque chiamato quando vengono apportate modifiche.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | Android     |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | Android      |
 
 Esempio:
 
@@ -1482,38 +1399,32 @@ Esempio:
 ```
 
 ### `menuItems`[⬆](#props-index)
-
 Un array di oggetti di elementi di menu personalizzati che verranno aggiunti all'UIMenu che appare quando si seleziona del testo (appariranno dopo 'Copia' e 'Condividi...'). Utilizzato insieme a `onCustomMenuSelection`.
 
-| Tipo                                           | Obbligatorio | Piattaforma |
-| ---------------------------------------------- | ------------ | ----------- |
-| array of objects: {label: string, key: string} | No           | iOS         |
+| Tipo                                                               | Obbligatorio | Piattaforma  |
+| ------------------------------------------------------------------ | ------------ | ------------ |
+| array of objects: {label: string, key: string}                     | No           | iOS          |
 
 Esempio:
 
 ```jsx
-<WebView
-  menuItems={[
-    { label: 'Tweet', key: 'tweet' },
-    { label: 'Save for later', key: 'saveForLater' },
+<WebView menuItems={[
+  { label: 'Tweet', key: 'tweet' },
+  { label: 'Save for later', key: 'saveForLater' }
   ]}
 />
 ```
 
 ### `onCustomMenuSelection`[⬆](#props-index)
-
 La funzione chiamata quando viene selezionato un elemento di menu personalizzato. Riceve un evento Native che include tre chiavi personalizzate: `label`, `key` e `selectedText`.
 
-| Tipo     | Obbligatorio | Piattaforma |
-| -------- | ------------ | ----------- |
-| function | No           | iOS         |
+| Tipo                                                               | Obbligatorio | Piattaforma  |
+| ------------------------------------------------------------------ | ------------ | ------------ |
+| function                                                           | No           | iOS          |
 
 ```javascript
 <WebView
-  menuItems={[
-    { label: 'Tweet', key: 'tweet' },
-    { label: 'Save for later', key: 'saveForLater' },
-  ]}
+  menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]}
   onCustomMenuSelection={(webViewEvent) => {
     const { label } = webViewEvent.nativeEvent; // Il nome dell'elemento di menu, i.e. 'Tweet'
     const { key } = webViewEvent.nativeEvent; // La chiave dell'elemento di menu, i.e. 'tweet'
@@ -1523,9 +1434,7 @@ La funzione chiamata quando viene selezionato un elemento di menu personalizzato
 ```
 
 ### `basicAuthCredential`[⬆](#props-index)
-
 Un oggetto che specifica le credenziali di un utente da usare per l'autenticazione di base.
-
 - `username` (string): un nome utente usato per l'autenticazione di base.
 - `password` (string): una password usata per l'autenticazione di base.
 
@@ -1534,12 +1443,11 @@ Un oggetto che specifica le credenziali di un utente da usare per l'autenticazio
 | object | No           |
 
 ### `useWebView2`[⬆](#props-index)
-
 Usa il controllo WebView2 di WinUI al posto del controllo WebView come visualizzatore web nativo. Il controllo WebView2 è un controllo WinUI che renderizza il contenuto web utilizzando il motore di esecuzione Microsoft Edge (Chromium). L'opzione può essere attivata o disattivata durante l'esecuzione e supporta Fast Refresh. Per saperne di più leggi la sezione riguardante WebView2 nella [guida getting-started](Getting-Started.italian.md#3-supporto-per-webview2).
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | Windows     |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | Windows      |
 
 Esempio:
 
@@ -1548,12 +1456,11 @@ Esempio:
 ```
 
 ### `minimumFontSize`[⬆](#props-index)
-
 Android impone una dimensione minima del carattere basata su questo valore. Un numero intero non negativo compreso tra `1` e `72`. Qualsiasi numero al di fuori di questo intervallo verrà limitato ai valori consentiti. Il valore predefinito è `8`. Se si utilizzano dimensioni del carattere più piccole e si riscontrano problemi nel visualizzare l'intera finestra su un unico schermo, si consiglia di impostare un valore più piccolo.
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| number | No           | Android     |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| number | No           | Android      |
 
 Esempio:
 
@@ -1562,48 +1469,42 @@ Esempio:
 ```
 
 ### `downloadingMessage`[⬆](#props-index)
-
 Questo è il messaggio visualizzato nel Toast (finestra di dialogo o notifica) durante il download di un file tramite la WebView. Il messaggio predefinito è "Downloading".
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | Android     |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | -------- | ------------ |
+| string | No           | Android  |
 
 ### `lackPermissionToDownloadMessage`[⬆](#props-index)
-
 Questo è il messaggio visualizzato nel Toast (finestra di dialogo o notifica) quando la WebView non è in grado di scaricare un file. Il messaggio predefinito è "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files." (_Impossibile scaricare i file in quanto è stato negato l'accesso. Fornisci il permesso di scrittura sulla memoria per poter scaricare i file._).
 
-| Tipo   | Obbligatorio | Piattaforma |
-| ------ | ------------ | ----------- |
-| string | No           | Android     |
+| Tipo   | Obbligatorio | Piattaforma  |
+| ------ | ------------ | ------------ |
+| string | No           | Android      |
 
 ### `allowsProtectedMedia`[⬆](#props-index)
-
 Se impostato su `true`, la WebView può riprodurre contenuti multimediali protetti da DRM (Digital Rights Management). Il valore predefinito è `false`.
 ⚠️ L'impostazione di questa opzione su `false` non revoca automaticamente il permesso già concesso alla pagina web corrente. Per farlo, è necessario ricaricare la pagina. ⚠️
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | Android     |
+| Tipo    | Obbligatorio | Piattaforma  |
+| ------- | ------------ | ------------ |
+| boolean | No           | Android      |
 
 ### `fraudulentWebsiteWarningEnabled`[⬆](#props-index)
-
 Boolean che indica se la WebView mostra avvisi per contenuti sospetti di frode, come malware o tentativi di phishing. Il valore predefinito è `true`. (iOS 13+)
 
-| Tipo    | Obbligatorio | Default | Piattaforma |
-| ------- | ------------ | ------- | ----------- |
-| boolean | No           | true    | iOS         |
+| Tipo    | Obbligatorio | Default | Piattaforma  |
+| ------- | ------------ | ------- | ------------ |
+| boolean | No           | true    | iOS          |
 
 ### `webviewDebuggingEnabled`[⬆](#props-index)
-
 Valore che determina se la WebView può essere debuggata in remoto utilizzando Safari/Chrome. Il valore predefinito è `false`. Supportato su iOS a partire dalla versione 16.4, nelle versioni precedenti il debug è sempre abilitato di default.
 
-| Tipo    | Obbligatorio | Piattaforma   |
-| ------- | ------------ | ------------- |
-| boolean | No           | iOS e Android |
+| Tipo    | Obbligatorio | Piattaforma    |
+| ------- | ------------ | -------------- |
+| boolean | No           | iOS e Android  |
 
 ## Methods
-
 ### `goForward()`[⬆](#methods-index)
 
 ```javascript
@@ -1677,7 +1578,7 @@ Se presente, toglie la popup di autocompletamento dal campo di form attualmente 
 (solo android)
 
 ```javascript
-clearCache(true);
+clearCache(true)
 ```
 
 Cancella la cache delle risorse. Nota che la cache è specifica dell'applicazione, quindi questa operazione cancellerà la cache per tutte le WebView in uso. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
@@ -1693,12 +1594,10 @@ clearHistory();
 Indica a questa WebView di cancellare la sua cronologia interna di pagine precedenti/successive.[developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearHistory()>)
 
 ## Altri Documenti
-
 Fai anche riferimento alla nostra [Guida per Iniziare](Getting-Started.italian.md) e alla [Guida Approfondita](Guide.italian.md).
 
+
 ### Traduzioni
-
 Questo file è disponibile nelle seguenti lingue:
-
 - [Inglese](Reference.md)
 - [Portoghese brasiliano](Reference.portuguese.md)

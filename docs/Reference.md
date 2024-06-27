@@ -256,21 +256,21 @@ If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. if
 
 Inject any JavaScript object into the webview so it is available to the JS running on the page.
 
-| Type | Required | Platform     |
-| ---- | -------- | ------------ |
-| obj  | No       | iOS, Android |
+| Type | Required | Platform                                          |
+| ---- | -------- | ------------------------------------------------- |
+| obj | No       | iOS, Android |
 
 Example:
 
 Set a value to be used in JavaScript.
 
-Note: Any value in the object will be accessible to _all_ frames of the webpage. If sensitive values are present please ensure that you have a strict Content Security Policy set up to avoid data leaking.
+Note: Any value in the object will be accessible to *all* frames of the webpage. If sensitive values are present please ensure that you have a strict Content Security Policy set up to avoid data leaking.
 
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
   injectedJavaScriptObject={{ customValue: 'myCustomValue' }}
-/>
+/>;
 ```
 
 ```html
@@ -514,7 +514,7 @@ Example:
     const { nativeEvent } = syntheticEvent;
     console.warn(
       'WebView received error status code: ',
-      nativeEvent.statusCode
+      nativeEvent.statusCode,
     );
   }}
 />
@@ -554,9 +554,12 @@ Example:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onRenderProcessGone={(syntheticEvent) => {
+  onRenderProcessGone={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
-    console.warn('WebView Crashed: ', nativeEvent.didCrash);
+    console.warn(
+      'WebView Crashed: ',
+      nativeEvent.didCrash,
+    );
   }}
 />
 ```
@@ -566,7 +569,6 @@ Function passed to `onRenderProcessGone` is called with a SyntheticEvent wrappin
 ```
 didCrash
 ```
-
 ---
 
 ### `onMessage`[⬆](#props-index)
@@ -634,8 +636,8 @@ Example:
   source={{ uri: 'https://reactnative.dev' }}
   onOpenWindow={(syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
-    const { targetUrl } = nativeEvent;
-    console.log('Intercepted OpenWindow for', targetUrl);
+    const { targetUrl } = nativeEvent
+    console.log('Intercepted OpenWindow for', targetUrl)
   }}
 />
 ```
@@ -698,9 +700,9 @@ Example:
 ```jsx
 <Webview
   source={{ uri: 'https://reactnative.dev' }}
-  onScroll={(syntheticEvent) => {
-    const { contentOffset } = syntheticEvent.nativeEvent;
-    console.table(contentOffset);
+  onScroll={syntheticEvent => {
+    const { contentOffset } = syntheticEvent.nativeEvent
+    console.table(contentOffset)
   }}
 />
 ```
@@ -720,7 +722,7 @@ zoomScale
 
 ### `originWhitelist`[⬆](#props-index)
 
-List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are "http://_" and "https://_".
+List of origin strings to allow being navigated to. The strings allow wildcards and get matched against _just_ the origin (not the full URL). If the user taps to navigate to a new page but the new page is not in this whitelist, the URL will be handled by the OS. The default whitelisted origins are "http://*" and "https://*".
 
 | Type             | Required | Platform            |
 | ---------------- | -------- | ------------------- |
@@ -932,6 +934,7 @@ Possible values for `androidLayerType` are:
 - `software` - The view has a software layer. A software layer is backed by a bitmap and causes the view to be rendered using Android's software rendering pipeline, even if hardware acceleration is enabled.
 - `hardware` - The view has a hardware layer. A hardware layer is backed by a hardware specific texture and causes the view to be rendered using Android's hardware rendering pipeline, but only if hardware acceleration is turned on for the view hierarchy.
 
+
 | Type   | Required | Platform |
 | ------ | -------- | -------- |
 | string | No       | Android  |
@@ -1015,7 +1018,6 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 | bool | No       | iOS      |
 
 ---
-
 ### `allowsAirPlayForMediaPlayback`[⬆](#props-index)
 
 A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
@@ -1137,9 +1139,9 @@ Boolean value that determines whether scrolling is possible in the `WebView` whe
 
 Setting this to `true` will prevent the `ScrollView` to scroll when scrolling from inside the `WebView`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | Android  |
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
 
 ---
 
@@ -1147,9 +1149,9 @@ Setting this to `true` will prevent the `ScrollView` to scroll when scrolling fr
 
 Sets whether the WebView should use its built-in zoom mechanisms. The default value is `true`. Setting this to `false` will prevent the use of a pinch gesture to control zooming.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | Android  |
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
 
 ---
 
@@ -1157,9 +1159,9 @@ Sets whether the WebView should use its built-in zoom mechanisms. The default va
 
 Sets whether the WebView should display on-screen zoom controls when using the built-in zoom mechanisms (see `setBuiltInZoomControls`). The default value is `false`.
 
-| Type | Required | Platform |
-| ---- | -------- | -------- |
-| bool | No       | Android  |
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
 
 ---
 
@@ -1218,9 +1220,9 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 
 Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin. Including accessing content from other file scheme URLs. The default value is `false`.
 
-| Type | Required | Platform            |
-| ---- | -------- | ------------------- |
-| bool | No       | iOS, Android, macOS |
+| Type | Required | Platform             |
+| ---- | -------- | -------------------- |
+| bool | No       | iOS, Android, macOS  |
 
 ---
 
@@ -1398,7 +1400,6 @@ When set to `true` the hardware silent switch is ignored. Default: `false`
 | boolean | No       | iOS      |
 
 ### `onFileDownload`[⬆](#props-index)
-
 This property is iOS-only.
 
 Function that is invoked when the client needs to download a file.
@@ -1490,9 +1491,9 @@ Possible values are:
 - `underline`
 - `share`
 
-| Type             | Required | Default | Platform |
-| ---------------- | -------- | ------- | -------- |
-| array of strings | No       | []      | iOS      |
+| Type             | Required | Default      | Platform |
+| ---------------- | -------- | ------------ | -------- |
+| array of strings | No       | []           | iOS      |
 
 ### `mediaCapturePermissionGrantType`[⬆](#props-index)
 
@@ -1536,7 +1537,7 @@ Example:
 
 ### `setSupportMultipleWindows`[⬆](#props-index)
 
-Sets whether the WebView supports multiple windows. See [Android documentation](<'https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)'>) for more information.
+Sets whether the WebView supports multiple windows. See [Android documentation]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') for more information.
 Setting this to `false` can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
 
 | Type    | Required | Default | Platform |
@@ -1552,12 +1553,11 @@ Example:
 ### `enableApplePay`[⬆](#props-index)
 
 A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support. Once set, websites will be able to invoke Apple Pay from React Native Webview.
-This comes with a cost features like [`injectJavaScript`](Reference.md#injectjavascriptstr), html5 History, [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled), [`injectedJavaScript`](Reference.md#injectedjavascript), [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded) will not work See [Apple Pay Release Note](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API).
+This comes with a cost features like [`injectJavaScript`](Reference.md#injectjavascriptstr), html5 History, [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled), [`injectedJavaScript`](Reference.md#injectedjavascript), [`injectedJavaScriptBeforeContentLoaded`](Reference.md#injectedjavascriptbeforecontentloaded) will not work  See [Apple Pay Release Note](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API).
 
 If you are required to send message to App , webpage has to explicitly call webkit message handler and receive it on `onMessage` handler on react native side
-
 ```javascript
-window.webkit.messageHandlers.ReactNativeWebView.postMessage('hello apple pay');
+window.webkit.messageHandlers.ReactNativeWebView.postMessage("hello apple pay")
 ```
 
 | Type    | Required | Default | Platform |
@@ -1574,9 +1574,9 @@ Example:
 
 Configuring Dark Theme
 
-_NOTE_ : The force dark setting is not persistent. You must call the static method every time your app process is started.
+*NOTE* : The force dark setting is not persistent. You must call the static method every time your app process is started.
 
-_NOTE_ : The change from day<->night mode is a configuration change so by default the activity will be restarted and pickup the new values to apply the theme. Take care when overriding this default behavior to ensure this method is still called when changes are made.
+*NOTE* : The change from day<->night mode is a configuration change so by default the activity will be restarted and pickup the new values to apply the theme. Take care when overriding this default behavior to ensure this method is still called when changes are made.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1590,37 +1590,29 @@ Example:
 
 ### `menuItems`[⬆](#props-index)
 
-An array of custom menu item objects that will be shown when selecting text. An empty array will suppress the menu. Used in tandem with `onCustomMenuSelection`
+An array of custom menu item objects that will be shown when selecting text. An empty array will suppress the menu.  Used in tandem with `onCustomMenuSelection`
 
-| Type                                           | Required | Platform     |
-| ---------------------------------------------- | -------- | ------------ |
-| array of objects: {label: string, key: string} | No       | iOS, Android |
+| Type                                                               | Required | Platform |
+| ------------------------------------------------------------------ | -------- | -------- |
+| array of objects: {label: string, key: string}                     | No       | iOS, Android      |
 
 Example:
 
 ```jsx
-<WebView
-  menuItems={[
-    { label: 'Tweet', key: 'tweet' },
-    { label: 'Save for later', key: 'saveForLater' },
-  ]}
-/>
+<WebView menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]} />
 ```
 
 ### `onCustomMenuSelection`[⬆](#props-index)
 
-Function called when a custom menu item is selected. It receives a Native event, which includes three custom keys: `label`, `key` and `selectedText`.
+Function called when a custom menu item is selected.  It receives a Native event, which includes three custom keys: `label`, `key` and `selectedText`.
 
-| Type     | Required | Platform     |
-| -------- | -------- | ------------ |
-| function | No       | iOS, Android |
+| Type                                                               | Required | Platform |
+| ------------------------------------------------------------------ | -------- | -------- |
+| function                                                           | No       | iOS, Android      |
 
 ```jsx
 <WebView
-  menuItems={[
-    { label: 'Tweet', key: 'tweet' },
-    { label: 'Save for later', key: 'saveForLater' },
-  ]}
+  menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]}
   onCustomMenuSelection={(webViewEvent) => {
     const { label } = webViewEvent.nativeEvent; // The name of the menu item, i.e. 'Tweet'
     const { key } = webViewEvent.nativeEvent; // The key of the menu item, i.e. 'tweet'
@@ -1706,9 +1698,9 @@ A Boolean value that indicates whether the web view shows warnings for suspected
 Whether or not the webview can be debugged remotely using Safari / Chrome.
 Default is `false`. Supported on iOS as of 16.4, previous versions always allow debugging by default.
 
-| Type    | Required | Platform      |
-| ------- | -------- | ------------- |
-| boolean | No       | iOS & Android |
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS & Android  |
 
 ## Methods
 

@@ -125,7 +125,7 @@ _Observe que usar HTML estático requer a propriedade WebView [originWhiteList](
 - `baseUrl` (string) - A URL base a ser usada para quaisquer links relativos no HTML. Isso também é usado para o cabeçalho de origem com solicitações CORS feitas a partir da WebView. Ver [Documentação do Android WebView](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL)
 
 | Tipo   | Requerido |
-| ------ | --------- |
+| ------ | --------  |
 | object | Falso     |
 
 ---
@@ -135,7 +135,7 @@ _Observe que usar HTML estático requer a propriedade WebView [originWhiteList](
 Controla se a inserção de conteúdo deve ser ajustada para exibições da Web que são colocadas atrás de uma barra de navegação, barra de guias ou barra de ferramentas. O valor padrão é `true`.
 
 | Tipo | Requerido | Plataforma |
-| ---- | --------- | ---------- |
+| ---- | --------  | ---------- |
 | bool | Falso     | iOS        |
 
 ---
@@ -145,7 +145,7 @@ Controla se a inserção de conteúdo deve ser ajustada para exibições da Web 
 Controla se a inserção do indicador de rolagem deve ser ajustada para exibições da Web que são colocadas atrás de uma barra de navegação, barra de guias ou barra de ferramentas. O valor padrão `falso`. (iOS 13+)
 
 | Tipo | Requerido | Plataforma |
-| ---- | --------- | ---------- |
+| ---- | --------  | ---------- |
 | bool | Falso     | iOS(13+)   |
 
 ---
@@ -235,8 +235,8 @@ Se `true` (padrão; obrigatório para Android), carrega o `injectedJavaScriptBef
 
 Se `false`, (suportado apenas em iOS e macOS), carrega-o em todos os quadros (por exemplo, iframes).
 
-| Tipo | Requerido | Plataforma                                          |
-| ---- | --------- | --------------------------------------------------- |
+| Tipo | Requerido | Plataforma                                        |
+| ---- | --------- | ------------------------------------------------- |
 | bool | Não       | iOS e macOS (`true` somente suportado para Android) |
 
 ---
@@ -465,7 +465,7 @@ Exemplo:
     const { nativeEvent } = syntheticEvent;
     console.warn(
       'Código de status de erro recebido da WebView: ',
-      nativeEvent.statusCode
+      nativeEvent.statusCode,
     );
   }}
 />
@@ -505,9 +505,12 @@ Exemplo:
 ```jsx
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  onRenderProcessGone={(syntheticEvent) => {
+  onRenderProcessGone={syntheticEvent => {
     const { nativeEvent } = syntheticEvent;
-    console.warn('WebView falhou: ', nativeEvent.didCrash);
+    console.warn(
+      'WebView falhou: ',
+      nativeEvent.didCrash,
+    );
   }}
 />
 ```
@@ -517,7 +520,6 @@ A função passada para `onRenderProcessGone` é chamada com um SyntheticEvent e
 ```
 didCrash
 ```
-
 ---
 
 ### `onMessage`[⬆](#props-index)<!-- Link gerado com jump2header -->
@@ -572,9 +574,9 @@ url
 
 Função que é invocada quando o processo de conteúdo da `WebView` é encerrado.
 
-| Tipo     | Requerido | Plataforma            |
-| -------- | --------- | --------------------- |
-| function | Não       | iOS e macOS WKWebView |
+| Tipo     | Requerido | Plataforma              |
+| -------- | --------- | ----------------------- |
+| function | Não       | iOS e macOS WKWebView   |
 
 Exemplo:
 
@@ -615,9 +617,9 @@ Exemplo:
 ```jsx
 <Webview
   source={{ uri: 'https://reactnative.dev' }}
-  onScroll={(syntheticEvent) => {
-    const { contentOffset } = syntheticEvent.nativeEvent;
-    console.table(contentOffset);
+  onScroll={syntheticEvent => {
+    const { contentOffset } = syntheticEvent.nativeEvent
+    console.table(contentOffset)
   }}
 />
 ```
@@ -637,7 +639,7 @@ zoomScale
 
 ### `originWhitelist`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
-Lista de strings de origem para permitir a navegação. As strings permitem curingas e são correspondidas com \_\_somente a origem (não o URL completo). Se o usuário tocar para navegar para uma nova página, mas a nova página não estiver nesta lista de permissões, a URL será tratada pelo sistema operacional. As origens padrão da lista de permissões são "http://_" e "https://_".
+Lista de strings de origem para permitir a navegação. As strings permitem curingas e são correspondidas com __somente a origem (não o URL completo). Se o usuário tocar para navegar para uma nova página, mas a nova página não estiver nesta lista de permissões, a URL será tratada pelo sistema operacional. As origens padrão da lista de permissões são "http://*" e "https://*".
 
 | Tipo             | Requerido | Plataforma          |
 | ---------------- | --------- | ------------------- |
@@ -930,17 +932,15 @@ Booleano que determina se os vídeos HTML5 são reproduzidos inline ou usam o co
 | bool | Não       | iOS        |
 
 ---
-
 ### `allowsAirPlayForMediaPlayback`[⬆](#props-index)<!-- Link generated with jump2header -->
 
 Um valor booleano que indica se o AirPlay é permitido. O valor padrão é `falso`.
 
-| Tipo | Requerido | Plataforma  |
-| ---- | --------- | ----------- |
-| bool | Não       | iOS e macOS |
+| Tipo | Requerido | Plataforma      |
+| ---- | --------- | --------------- |
+| bool | Não       | iOS e macOS     |
 
 ---
-
 ### `bounces`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
 Valor booleano que determina se a visualização da Web é rejeitada quando atinge a borda do conteúdo. O valor padrão é `true`.
@@ -972,7 +972,7 @@ Os valores possíveis para `overScrollMode` são:
 A quantidade pela qual o conteúdo da visualização da web é inserido a partir das bordas da visualização de rolagem. Padrão {top: 0, left: 0, bottom: 0, right: 0}.
 
 | Tipo                                                               | Requerido | Plataforma |
-| ------------------------------------------------------------------ | --------- | ---------- |
+|  ----------------------------------------------------------------- | --------- | ---------- |
 | object: {top: number, left: number, bottom: number, right: number} | Não       | iOS        |
 
 ---
@@ -1040,9 +1040,9 @@ Os valores possíveis para `dataDetectorTypes` são:
 
 Valor booleano que determina se a rolagem está habilitada na `WebView`. O valor padrão é `true`. Definir isso como `false` impedirá que a visualização da Web mova o corpo do documento quando o teclado aparecer sobre uma entrada.
 
-| Tipo | Requerido | Plataforma  |
-| ---- | --------- | ----------- |
-| bool | Não       | iOS e macOS |
+| Tipo | Requerido | Plataforma      |
+| ---- | --------- | --------------- |
+| bool | Não       | iOS e macOS     |
 
 ---
 
@@ -1052,9 +1052,9 @@ Valor booleano que determina se a rolagem é possível na `WebView` quando usado
 
 Definir isso como `true` impedirá que o `ScrollView` role ao rolar de dentro do `WebView`.
 
-| Tipo | Requerido | Plataforma |
-| ---- | --------- | ---------- |
-| bool | Não       | Android    |
+| Tipo | Requerido | Plataforma    |
+| ---- | --------- | ------------- |
+| bool | Não       | Android       |
 
 ---
 
@@ -1062,9 +1062,9 @@ Definir isso como `true` impedirá que o `ScrollView` role ao rolar de dentro do
 
 Define se o WebView deve usar seus mecanismos de zoom integrados. O valor padrão é `true`. Definir isso como "falso" impedirá o uso de um gesto de pinça para controlar o zoom.
 
-| Tipo | Requerido | Plataforma |
-| ---- | --------- | ---------- |
-| bool | Não       | Android    |
+| Tipo | Requerido | Plataforma    |
+| ---- | --------- | ------------- |
+| bool | Não       | Android       |
 
 ---
 
@@ -1072,9 +1072,9 @@ Define se o WebView deve usar seus mecanismos de zoom integrados. O valor padrã
 
 Define se o WebView deve exibir controles de zoom na tela ao usar os mecanismos de zoom integrados (consulte `setBuiltInZoomControls`). O valor padrão é `falso`.
 
-| Tipo | Requerido | Plataforma |
-| ---- | --------- | ---------- |
-| bool | Não       | Android    |
+| Tipo | Requerido | Plataforma    |
+| ---- | --------- | ------------- |
+| bool | Não       | Android       |
 
 ---
 
@@ -1133,9 +1133,9 @@ Booleano que define se o JavaScript executado no contexto de uma URL de esquema 
 
 Booleano que define se o JavaScript executado no contexto de uma URL de esquema de arquivo deve ter permissão para acessar conteúdo de qualquer origem. Incluindo o acesso ao conteúdo de outros URLs de esquema de arquivos. O valor padrão é `falso`.
 
-| Tipo | Requerido | Plataforma          |
-| ---- | --------- | ------------------- |
-| bool | Não       | iOS, Android, macOS |
+| Tipo | Requerido | Plataforma           |
+| ---- | --------- | -------------------- |
+| bool | Não       | iOS, Android, macOS  |
 
 ---
 
@@ -1143,9 +1143,9 @@ Booleano que define se o JavaScript executado no contexto de uma URL de esquema 
 
 Um valor String que indica quais URLs o arquivo da WebView pode referenciar em scripts, solicitações AJAX e importações CSS. Isso é usado apenas para WebViews que são carregados com um source.uri definido como um URL `'file://'`. Se não for fornecido, o padrão é permitir apenas acesso de leitura à URL fornecida no próprio source.uri.
 
-| Tipo   | Requerido | Plataforma  |
-| ------ | --------- | ----------- |
-| string | Não       | iOS e macOS |
+| Tipo   | Requerido | Plataforma    |
+| ------ | --------- | ------------- |
+| string | Não       | iOS e macOS   |
 
 ---
 
@@ -1173,9 +1173,9 @@ Se true, isso ocultará a visualização do acessório de teclado (< > e Feito).
 
 Se for verdade, isso será capaz de gestos de furto horizontal. O valor padrão é `falso`.
 
-| Tipo    | Requerido | Plataforma  |
-| ------- | --------- | ----------- |
-| boolean | Não       | iOS e macOS |
+| Tipo    | Requerido | Plataforma    |
+| ------- | --------- | ------------- |
+| boolean | Não       | iOS e macOS   |
 
 ---
 
@@ -1213,9 +1213,9 @@ Define se a WebView deve desabilitar o salvamento de dados de formulário. O val
 
 Define se a WebView deve usar o cache do navegador.
 
-| Tipo    | Requerido | Padrão | Plataforma          |
-| ------- | --------- | ------ | ------------------- |
-| boolean | Não       | true   | iOS, Android, macOS |
+| Tipo    | Requerido | Padrão | Plataforma           |
+| ------- | --------- | ------- | ------------------- |
+| boolean | Não       | true    | iOS, Android, macOS |
 
 ---
 
@@ -1241,8 +1241,8 @@ Os valores possíveis são:
 Se o valor desta propriedade for true, a visualização de rolagem para em múltiplos dos limites da visualização de rolagem quando o usuário rola. O valor padrão é falso.
 
 | Tipo    | Requerido | Plataforma |
-| ------- | --------- | ---------- |
-| boolean | Não       | iOS        |
+| ------- | --------- | -------- |
+| boolean | Não       | iOS      |
 
 ---
 
@@ -1250,9 +1250,9 @@ Se o valor desta propriedade for true, a visualização de rolagem para em múlt
 
 Um valor booleano que determina se pressionar um link exibe uma visualização do destino do link. No iOS esta propriedade está disponível em dispositivos que suportam 3D Touch. No iOS 10 e posterior, o valor padrão é true; antes disso, o valor padrão é false.
 
-| Tipo    | Requerido | Plataforma  |
-| ------- | --------- | ----------- |
-| boolean | Não       | iOS e macOS |
+| Tipo    | Requerido | Plataforma    |
+| ------- | --------- | ------------- |
+| boolean | Não       | iOS e macOS   |
 
 ---
 
@@ -1260,9 +1260,9 @@ Um valor booleano que determina se pressionar um link exibe uma visualização d
 
 Defina `true` se os cookies compartilhados de `[NSHTTPCookieStorage sharedHTTPCookieStorage]` devem ser usados ​​para cada solicitação de carregamento no WebView. O valor padrão é `falso`. Para saber mais sobre cookies, leia o [Guia](Guide.portuguese.md#Managing-Cookies)
 
-| Tipo    | Requerido | Plataforma  |
-| ------- | --------- | ----------- |
-| boolean | Não       | iOS e macOS |
+| Tipo    | Requerido | Plataforma    |
+| ------- | --------- | ------------- |
+| boolean | Não       | iOS e macOS   |
 
 ---
 
@@ -1312,7 +1312,6 @@ Quando definido como true, o switch silencioso do hardware é ignorado. Padrão:
 | boolean | Não       | iOS        |
 
 ### `onFileDownload`[⬆](#props-index)<!-- Link gerado com jump2header -->
-
 Esta propriedade é somente para iOS.
 
 Função que é chamada quando o cliente precisa baixar um arquivo.
@@ -1426,12 +1425,12 @@ Exemplo:
 
 ### `setSupportMultipleWindows`
 
-Define se a WebView oferece suporte a várias janelas. Consulte [documentação do Android](<'https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)'>) para obter mais informações.
+Define se a WebView oferece suporte a várias janelas. Consulte [documentação do Android]('https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)') para obter mais informações.
 Definir isso como false pode expor o aplicativo a essa [vulnerabilidade](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/), permitindo que um iframe malicioso escape para o DOM da camada superior.
 
-| Tipo    | Requerido | Padrão | Plataforma |
-| ------- | --------- | ------ | ---------- |
-| boolean | Não       | true   | Android    |
+| Tipo    | Requerido | Padrão  | Plataforma |
+| ------- | --------- | ------- | ---------- |
+| boolean | Não       | true    | Android    |
 
 Exemplo:
 
@@ -1447,12 +1446,12 @@ Isso vem com recursos como [`injectJavaScript`](Reference.portuguese.md#injectja
 Se você for solicitado a enviar uma mensagem para App , a página da Web deve chamar explicitamente o manipulador de mensagens do webkit e recebê-lo no manipulador `onMessage` no lado nativo.
 
 ```javascript
-window.webkit.messageHandlers.ReactNativeWebView.postMessage('hello apple pay');
+window.webkit.messageHandlers.ReactNativeWebView.postMessage("hello apple pay")
 ```
 
-| Tipo    | Requerido | Padrão | Plataforma |
-| ------- | --------- | ------ | ---------- |
-| boolean | Não       | false  | iOS        |
+| Tipo    | Requerido | Padrão  | Plataforma |
+| ------- | --------- | ------- | --------- |
+| boolean | Não       | false   | iOS       |
 
 Exemplo:
 
@@ -1463,9 +1462,9 @@ Exemplo:
 ### `forceDarkOn`
 
 Configurando o tema escuro
-_NOTA_ : A configuração de forçar o tema escuro não é persistente. Você deve chamar o método estático sempre que o processo do aplicativo for iniciado.
+*NOTA* : A configuração de forçar o tema escuro não é persistente. Você deve chamar o método estático sempre que o processo do aplicativo for iniciado.
 
-_NOTA_ : A mudança do modo dia<->noite é uma alteração de configuração, portanto, por padrão, a atividade será reiniciada e serão coletados os novos valores para aplicar o tema. Tome cuidado ao substituir esse comportamento padrão para garantir que esse método ainda seja chamado quando as alterações forem feitas.
+*NOTA* : A mudança do modo dia<->noite é uma alteração de configuração, portanto, por padrão, a atividade será reiniciada e serão coletados os novos valores para aplicar o tema. Tome cuidado ao substituir esse comportamento padrão para garantir que esse método ainda seja chamado quando as alterações forem feitas.
 
 | Tipo    | Requerido | Plataforma |
 | ------- | --------- | ---------- |
@@ -1476,40 +1475,31 @@ Exemplo:
 ```javascript
 <WebView forceDarkOn={false} />
 ```
-
 ### `menuItems`
 
 Uma matriz de objetos de itens de menu personalizados que serão exibidos ao selecionar o texto. Uma matriz vazia suprimirá o menu. Usado em conjunto com `onCustomMenuSelection`
 
-| Tipo                                           | Requerido | Plataforma   |
-| ---------------------------------------------- | --------- | ------------ |
-| array of objects: {label: string, key: string} | Não       | iOS, Android |
+| Tipo                                                               | Requerido | Plataforma |
+| ------------------------------------------------------------------ | --------  | --------   |
+| array of objects: {label: string, key: string}                     | Não       | iOS, Android        |
 
 Exemplo:
 
 ```javascript
-<WebView
-  menuItems={[
-    { label: 'Tweet', key: 'tweet' },
-    { label: 'Guardar para depois', key: 'saveForLater' },
-  ]}
-/>
+<WebView menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Guardar para depois', key: 'saveForLater' }]} />
 ```
 
 ### `onCustomMenuSelection`
 
 Função chamada quando um item de menu personalizado é selecionado. Ele recebe um evento Nativo, que inclui três chaves personalizadas: `label`, `key` e `selectedText`.
 
-| Tipo     | Requerido | Plataforma   |
-| -------- | --------- | ------------ |
-| function | Não       | iOS, Android |
+| Tipo                                                               | Requerido | Plataforma |
+| ------------------------------------------------------------------ | --------  | --------   |
+| function                                                           | Não       | iOS, Android        |
 
 ```javascript
 <WebView
-  menuItems={[
-    { label: 'Tweet', key: 'tweet' },
-    { label: 'Guardar para depois', key: 'saveForLater' },
-  ]}
+  menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Guardar para depois', key: 'saveForLater' }]}
   onCustomMenuSelection={(webViewEvent) => {
     const { label } = webViewEvent.nativeEvent; // O nome do item de menu, ou seja, 'Tweet'
     const { key } = webViewEvent.nativeEvent; // A chave do item de menu, ou seja, 'tweet'
@@ -1618,7 +1608,7 @@ Remove o pop-up de preenchimento automático do campo de formulário em foco no 
 (somente Android)
 
 ```javascript
-clearCache(true);
+clearCache(true)
 ```
 
 Limpa o cache de recursos. Observe que o cache é por aplicativo, portanto, isso limpará o cache de todos os WebViews usados. [referência do desenvolvedor.android.com](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
@@ -1643,3 +1633,4 @@ Esse arquivo está disponível em:
 
 - [Inglês](Reference.md)
 - [Italiano](Reference.italian.md)
+
