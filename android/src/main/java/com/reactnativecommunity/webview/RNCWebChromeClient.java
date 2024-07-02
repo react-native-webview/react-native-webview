@@ -182,7 +182,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             Uri originUri = request.getOrigin();
             String host = originUri.getHost();
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
-            String alertMessage = String.format("Allow this " + host  + " to use your " + requestPermissionIdentifier + "?");
+            String alertMessage = String.format("Allow " + host  + " to use your " + requestPermissionIdentifier + "?");
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
