@@ -14,6 +14,7 @@ import Alerts from './examples/Alerts';
 import Scrolling from './examples/Scrolling';
 import Background from './examples/Background';
 import Downloads from './examples/Downloads';
+import SSLVerification from './examples/SSLVerification';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
@@ -147,6 +148,14 @@ const TESTS = {
       return <SuppressMenuItems />;
     },
   },
+  SSLVerification: {
+    title: 'SSLVerification',
+    testId: 'SSLVerification',
+    description: 'SSL Verification',
+    render() {
+      return <SSLVerification />;
+    },
+  },
 };
 
 interface Props {}
@@ -264,6 +273,11 @@ export default class App extends Component<Props, State> {
             testID="testType_suppressMenuItems"
             title="SuppressMenuItems"
             onPress={() => this._changeTest('SuppressMenuItems')}
+          />
+          <Button
+            testID="testType_sslVerification"
+            title="SSLVerification"
+            onPress={() => this._changeTest('SSLVerification')}
           />
           <Button
             testID="testType_clearData"
