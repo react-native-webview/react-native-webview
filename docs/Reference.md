@@ -67,6 +67,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
+- [`allowInsecureHttps`](Reference.md#allowInsecureHttps)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`cacheEnabled`](Reference.md#cacheEnabled)
 - [`cacheMode`](Reference.md#cacheMode)
@@ -1229,6 +1230,19 @@ Boolean that sets whether JavaScript running in the context of a file scheme URL
 | Type | Required | Platform            |
 | ---- | -------- | ------------------- |
 | bool | No       | iOS, Android, macOS |
+
+---
+
+### `allowInsecureHttps`[⬆](#props-index)
+
+Boolean that sets whether SSL verification should be disabled for any URLs loaded in the WebView. The default value is `false`.
+
+> [!WARNING]
+> Setting this to `true` can expose your app to security vulnerabilities, and may result in your app being rejected from the Play Store.
+
+| Type | Required | Platform |
+| ---- | -------- |----------|
+| bool | No       | Android  |
 
 ---
 

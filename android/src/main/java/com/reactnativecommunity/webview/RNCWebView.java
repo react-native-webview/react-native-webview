@@ -86,6 +86,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         mRNCWebViewClient.setIgnoreErrFailedForThisURL(url);
     }
 
+    public void setAllowInsecureHttps(Boolean value) {
+        mRNCWebViewClient.setAllowInsecureHttps(value);
+    }
+
     public void setBasicAuthCredential(RNCBasicAuthCredential credential) {
         mRNCWebViewClient.setBasicAuthCredential(credential);
     }
