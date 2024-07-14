@@ -624,6 +624,9 @@ Function that is invoked when the `WebView` should open a new window.
 
 This happens when the JS calls `window.open('http://someurl', '_blank')` or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
 
+> **_Note_**
+> This will not be invoked on Android if [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows) is `false`.
+
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
