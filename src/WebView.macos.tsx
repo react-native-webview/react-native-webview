@@ -131,7 +131,10 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
     );
 
     useWarnIfChanges(allowsInlineMediaPlayback, 'allowsInlineMediaPlayback');
-    useWarnIfChanges(allowsPictureInPictureMediaPlayback, 'allowsPictureInPictureMediaPlayback');
+    useWarnIfChanges(
+      allowsPictureInPictureMediaPlayback,
+      'allowsPictureInPictureMediaPlayback'
+    );
     useWarnIfChanges(
       allowsAirPlayForMediaPlayback,
       'allowsAirPlayForMediaPlayback'
@@ -212,7 +215,9 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
         }
         allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
         allowsInlineMediaPlayback={allowsInlineMediaPlayback}
-        allowsPictureInPictureMediaPlayback={allowsPictureInPictureMediaPlayback}
+        allowsPictureInPictureMediaPlayback={
+          allowsPictureInPictureMediaPlayback
+        }
         incognito={incognito}
         mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
         ref={webViewRef}
