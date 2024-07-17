@@ -1588,6 +1588,9 @@ didFinishNavigation:(WKNavigation *)navigation
 {
   UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
   _refreshControl = refreshControl;
+  if(_refreshControlLightMode) {
+    [refreshControl setTintColor:[UIColor whiteColor]];
+  }
   [_webView.scrollView addSubview: refreshControl];
   [refreshControl addTarget:self action:@selector(pullToRefresh:) forControlEvents: UIControlEventValueChanged];
 }

@@ -74,6 +74,7 @@ This document lays out the current public properties and methods for the React N
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
 - [`pullToRefreshEnabled`](Reference.md#pullToRefreshEnabled)
+- [`refreshControlLightMode`](Reference.md#refreshControlLightMode)
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
@@ -1373,6 +1374,16 @@ Example:
 ### `pullToRefreshEnabled`[⬆](#props-index)
 
 Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+### `refreshControlLightMode`[⬆](#props-index)
+
+(ios only)
+Boolean value that determines whether the refresh control color is white or not.
+Default is `false`, meaning the refresh control color will be the default.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
