@@ -80,6 +80,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL pagingEnabled;
 @property (nonatomic, assign) CGFloat decelerationRate;
 @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
+@property (nonatomic, assign) BOOL allowsPictureInPictureMediaPlayback;
 @property (nonatomic, assign) BOOL webviewDebuggingEnabled;
 @property (nonatomic, assign) BOOL allowsAirPlayForMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
