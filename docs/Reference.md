@@ -887,9 +887,11 @@ A floating-point number that determines how quickly the scroll view decelerates 
 - normal: 0.998
 - fast: 0.99 (the default for iOS web view)
 
-| Type   | Required | Platform |
-| ------ | -------- | -------- |
-| number | No       | iOS      |
+On Android you need to use only numeric values.
+
+| Type   | Required |
+| ------ | -------- |
+| number | No       |
 
 ---
 

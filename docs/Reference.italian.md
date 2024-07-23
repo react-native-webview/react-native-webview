@@ -779,9 +779,11 @@ Un numero in virgola mobile che determina quanto rapidamente lo scroll nella vie
 - `normal`: 0,998
 - `fast`: 0,99 (impostazione predefinita per la web view di iOS)
 
-| Tipo   | Obbligatorio | Piattaforma  |
-| ------ | ------------ | ------------ |
-| number | No           | iOS          |
+Su android, ad ogni modo, bisogna ustilizzare solo valori numerici.
+
+| Tipo   | Obbligatorio |
+| ------ | ------------ |
+| number | No           |
 
 ---
 
