@@ -802,9 +802,11 @@ Um número de ponto flutuante que determina a rapidez com que a visualização d
 - normal: 0,998
 - rápido: 0,99 (o padrão para visualização na web do iOS)
 
-| Tipo   | Requerido | Plataforma |
-| ------ | --------- | ---------- |
-| number | Não       | iOS        |
+No Android você deve usar apenas valores numéricos.
+
+| Tipo   | Requerido |
+| ------ | --------- |
+| number | Não       |
 
 ---
 
