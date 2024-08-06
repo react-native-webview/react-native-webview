@@ -838,7 +838,7 @@ RCTAutoInsetsProtocol>
 
   [self syncCookiesToWebView:^{
     // Add observer to sync cookies from webview to sharedHTTPCookieStorage
-    [wkWebViewConfig.websiteDataStore.httpCookieStore addObserver:self];
+    [webView.configuration.websiteDataStore.httpCookieStore addObserver:self];
     
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
