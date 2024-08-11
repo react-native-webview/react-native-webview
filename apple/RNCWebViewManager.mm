@@ -2,10 +2,6 @@
 
 #import "RNCWebViewManager.h"
 #import "RNCWebViewImpl.h"
-#import "RNCWebViewDecisionManager.h"
-#ifdef RCT_NEW_ARCH_ENABLED
-#import "RNCWebViewSpec/RNCWebViewSpec.h"
-#endif
 
 #if TARGET_OS_OSX
 #define RNCView NSView
@@ -35,11 +31,7 @@ RCT_ENUM_CONVERTER(RNCWebViewPermissionGrantType, (@{
 #endif
 @end
 
-
-@implementation RNCWebViewManager {
-    NSConditionLock *_shouldStartLoadLock;
-    BOOL _shouldStartLoad;
-}
+@implementation RNCWebViewManager
 
 RCT_EXPORT_MODULE(RNCWebView)
 
@@ -215,20 +207,5 @@ QUICK_RCT_EXPORT_COMMAND_METHOD(requestFocus)
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(postMessage, message:(NSString *)message, message)
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(injectJavaScript, script:(NSString *)script, script)
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(clearCache, includeDiskFiles:(BOOL)includeDiskFiles, includeDiskFiles)
-
-RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart
-                                        lockIdentifier:(double)lockIdentifier)
-{
-    [[RNCWebViewDecisionManager getInstance] setResult:shouldStart forLockIdentifier:(int)lockIdentifier];
-}
-
-// Thanks to this guard, we won't compile this code when we build for the old architecture.
-#ifdef RCT_NEW_ARCH_ENABLED
-- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
-    (const facebook::react::ObjCTurboModule::InitParams &)params
-{
-    return std::make_shared<facebook::react::NativeRNCWebViewSpecJSI>(params);
-}
-#endif
 
 @end
