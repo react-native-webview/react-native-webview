@@ -338,6 +338,7 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowUniversalAccessFromFileURLs?: boolean;
   allowsBackForwardNavigationGestures?: boolean;
   allowsInlineMediaPlayback?: boolean;
+  allowsPictureInPictureMediaPlayback?: boolean;
   allowsAirPlayForMediaPlayback?: boolean;
   allowsLinkPreview?: boolean;
   automaticallyAdjustContentInsets?: boolean;
@@ -505,6 +506,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   allowsInlineMediaPlayback?: boolean;
+  /**
+   * Boolean value that indicates whether HTML5 videos can play Picture in Picture.
+   * The default value is `true`.
+   *
+   * @platform macos
+   */
+  allowsPictureInPictureMediaPlayback?: boolean;
   /**
    * A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
    * @platform ios
@@ -816,6 +824,13 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
    * @platform macos
    */
   allowsInlineMediaPlayback?: boolean;
+  /**
+   * Boolean value that indicates whether HTML5 videos can play Picture in Picture.
+   * The default value is `true`.
+   *
+   * @platform ios
+   */
+  allowsPictureInPictureMediaPlayback?: boolean;
   /**
    * A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
    * @platform macos

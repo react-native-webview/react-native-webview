@@ -45,6 +45,7 @@ This document lays out the current public properties and methods for the React N
 - [`applicationNameForUserAgent`](Reference.md#applicationNameForUserAgent)
 - [`allowsFullscreenVideo`](Reference.md#allowsfullscreenvideo)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
+- [`allowsPictureInPictureMediaPlayback`](Reference.md#allowsPictureInPictureMediaPlayback)
 - [`allowsAirPlayForMediaPlayback`](Reference.md#allowsAirPlayForMediaPlayback)
 - [`bounces`](Reference.md#bounces)
 - [`overScrollMode`](Reference.md#overscrollmode)
@@ -1018,6 +1019,21 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 | bool | No       | iOS      |
 
 ---
+
+### `allowsPictureInPictureMediaPlayback`[⬆](#props-index)
+
+Boolean value that indicates whether HTML5 videos can play Picture in Picture. The default value is `false`.
+
+> **NOTE**
+>
+> In order to restrict playing video in picture in picture mode this props need to be set to `false`
+.
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS      |
+
+---
+
 ### `allowsAirPlayForMediaPlayback`[⬆](#props-index)
 
 A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
