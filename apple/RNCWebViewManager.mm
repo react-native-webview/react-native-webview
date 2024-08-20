@@ -124,6 +124,9 @@ RCT_EXPORT_VIEW_PROPERTY(onCustomMenuSelection, RCTDirectEventBlock)
 RCT_CUSTOM_VIEW_PROPERTY(pullToRefreshEnabled, BOOL, RNCWebViewImpl) {
   view.pullToRefreshEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
+RCT_CUSTOM_VIEW_PROPERTY(refreshControlLightMode, BOOL, RNCWebViewImpl) {
+    view.refreshControlLightMode = json == nil ? false : [RCTConvert BOOL: json];
+}
 
 RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, RNCWebViewImpl) {
   view.bounces = json == nil ? true : [RCTConvert BOOL: json];

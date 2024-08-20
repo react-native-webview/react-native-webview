@@ -293,6 +293,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     #endif // !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(enableApplePay)
     REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
+    REMAP_WEBVIEW_PROP(refreshControlLightMode)
     REMAP_WEBVIEW_PROP(bounces)
     REMAP_WEBVIEW_PROP(useSharedProcessPool)
     REMAP_WEBVIEW_STRING_PROP(userAgent)

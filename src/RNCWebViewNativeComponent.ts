@@ -231,6 +231,7 @@ export interface NativeProps extends ViewProps {
   >;
   pagingEnabled?: boolean;
   pullToRefreshEnabled?: boolean;
+  refreshControlLightMode?: boolean;
   scrollEnabled?: boolean;
   sharedCookiesEnabled?: boolean;
   textInteractionEnabled?: boolean;
