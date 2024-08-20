@@ -616,7 +616,9 @@ For Android, you need to use `BackHandler.addEventListener` and hook that up to 
 With functional React components, you can use `useRef` and `useEffect` (you'll need to import them from React if you aren't already) to allow users to navigate to the previous page when they press the back button like so:
 ```jsx
 import React, {
+    useCallback,
     useEffect,
+    useState,
     useRef,
 } from 'react';
 import {
@@ -626,14 +628,15 @@ import {
 ```
 
 ```jsx
+const [canGoBack, setCanGoBack] = useState(false);
 const webViewRef = useRef(null);
-const onAndroidBackPress = () => {
-  if (webViewRef.current) {
-    webViewRef.current.goBack();
+const onAndroidBackPress = useCallback(() => {
+  if (canGoBack) {
+    webViewRef.current?.goBack();
     return true; // prevent default behavior (exit app)
   }
   return false;
-};
+}, [canGoBack]);
 
 useEffect(() => {
   if (Platform.OS === 'android') {
@@ -645,10 +648,13 @@ useEffect(() => {
 }, []);
 ```
 
-And add this prop to your `WebView` component:
+And add these prop to your `WebView` component:
 ```jsx
 <WebView
   ref={webViewRef}
+  onLoadProgress={event => {
+    setCanGoBack(event.nativeEvent.canGoBack);
+  }}
 />
 ```
 
