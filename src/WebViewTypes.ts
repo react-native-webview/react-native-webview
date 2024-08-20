@@ -948,7 +948,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   cacheMode?: CacheMode;
 
   /**
-   * https://developer.android.com/reference/android/view/View#OVER_SCROLL_NEVER
+   * https://developer.android.com/reference/android/view/View#setOverScrollMode(int)
    * Sets the overScrollMode. Possible values are:
    *
    * - `'always'` (default)
