@@ -37,7 +37,7 @@
     "react-native": "*"
   },
   "dependencies": {
-    "escape-string-regexp": "2.0.0",
+    "escape-string-regexp": "^4.0.0",
     "invariant": "2.2.4"
   },
   "devDependencies": {
