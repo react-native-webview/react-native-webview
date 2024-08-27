@@ -72,6 +72,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`sharedCookiesEnabled`](Reference.portuguese.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.portuguese.md#textZoom)
 - [`pullToRefreshEnabled`](Reference.portuguese.md#pullToRefreshEnabled)
+- [`refreshControlLightMode`](Reference.portuguese.md#refreshControlLightMode)
 - [`ignoreSilentHardwareSwitch`](Reference.portuguese.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.portuguese.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.portuguese.md#limitsNavigationsToAppBoundDomains)
@@ -1284,6 +1285,17 @@ Exemplo:
 ### `pullToRefreshEnabled`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
 Valor booleano que determina se um gesto de puxar para atualizar está disponível na `WebView`. O valor padrão é `falso`. Se `true`, define `bounces` automaticamente para `true`.
+
+| Tipo    | Requerido | Plataforma |
+| ------- | --------- | ---------- |
+| boolean | Não       | iOS        |
+
+### `refreshControlLightMode`[⬆](#props-index)<!-- Link gerado com jump2header -->
+
+(somente ios)
+
+Valor booleano que determina se a cor do controle de atualização é branca ou não.
+O padrão é `false`, o que significa que a cor do controle de atualização será o padrão.
 
 | Tipo    | Requerido | Plataforma |
 | ------- | --------- | ---------- |

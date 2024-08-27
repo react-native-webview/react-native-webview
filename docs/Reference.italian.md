@@ -72,6 +72,7 @@ Questo documento elenca le attuali proprietà e metodi pubblici di React Native 
 - [`sharedCookiesEnabled`](Reference.italian.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.italian.md#textZoom)
 - [`pullToRefreshEnabled`](Reference.italian.md#pullToRefreshEnabled)
+- [`refreshControlLightMode`](Reference.italian.md#refreshControlLightMode)
 - [`ignoreSilentHardwareSwitch`](Reference.italian.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.italian.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.italian.md#limitsNavigationsToAppBoundDomains)
@@ -1222,6 +1223,17 @@ Boolean che determina se è abilitato il gesto di trascinamento per aggiornare n
 | Tipo    | Obbligatorio | Piattaforma  |
 | ------- | ------------ | ------------ |
 | boolean | No           | iOS          |
+
+### `refreshControlLightMode`[⬆](#props-index)
+
+(solo iOS)
+
+Valore booleano che determina se il colore del controllo di aggiornamento è bianco o meno.
+L'impostazione predefinita è "false", il che significa che il colore del controllo di aggiornamento sarà quello predefinito.
+
+| Tipo    | Obbligatorio | Piattaforma |
+| ------- | ------------ | ----------- |
+| boolean | No           | iOS         |
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)
 (solo iOS)
