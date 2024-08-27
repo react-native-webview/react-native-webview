@@ -21,7 +21,7 @@
     "ci": "CI=true && npm run lint",
     "ci:publish": "npx semantic-release",
     "lint": "npx tsc --noEmit && npm run eslint ./src --ext .ts,.tsx",
-    "build": "babel --extensions \".ts,.tsx\" --out-dir lib src",
+    "build": "npx tsc",
     "prepare:types": "tsc --noEmit false --emitDeclarationOnly --declaration --rootDir src --outDir lib",
     "prepare": "npm run build",
     "appium": "appium",
