@@ -60,6 +60,12 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
 }
 #endif // !TARGET_OS_OSX
 
+// Needed because of this: https://github.com/facebook/react-native/pull/37274
++ (void)load
+{
+  [super load];
+}
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
@@ -274,6 +280,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(allowFileAccessFromFileURLs)
     REMAP_WEBVIEW_PROP(allowUniversalAccessFromFileURLs)
     REMAP_WEBVIEW_PROP(allowsInlineMediaPlayback)
+    REMAP_WEBVIEW_PROP(allowsPictureInPictureMediaPlayback)
     REMAP_WEBVIEW_PROP(webviewDebuggingEnabled)
     REMAP_WEBVIEW_PROP(allowsAirPlayForMediaPlayback)
     REMAP_WEBVIEW_PROP(mediaPlaybackRequiresUserAction)
@@ -293,6 +300,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     #endif // !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(enableApplePay)
     REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
+    REMAP_WEBVIEW_PROP(refreshControlLightMode)
     REMAP_WEBVIEW_PROP(bounces)
     REMAP_WEBVIEW_PROP(useSharedProcessPool)
     REMAP_WEBVIEW_STRING_PROP(userAgent)
