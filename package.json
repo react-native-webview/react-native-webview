@@ -96,6 +96,5 @@
     "android": {
       "javaPackageName": "com.reactnativecommunity.webview"
     }
-  },
-  "packageManager": "yarn@1.22.19"
+  }
 }
