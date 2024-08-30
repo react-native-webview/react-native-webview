@@ -82,6 +82,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
 @property (nonatomic, assign) BOOL allowsPictureInPictureMediaPlayback;
 @property (nonatomic, assign) BOOL webviewDebuggingEnabled;
+@property (nonatomic, assign) BOOL sharedInstance;
 @property (nonatomic, assign) BOOL allowsAirPlayForMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;

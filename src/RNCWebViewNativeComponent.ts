@@ -289,6 +289,7 @@ export interface NativeProps extends ViewProps {
   }>;
   userAgent?: string;
   injectedJavaScriptObject?: string;
+  cachedInstance?: boolean;
 }
 
 export interface NativeCommands {

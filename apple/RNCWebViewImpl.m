@@ -509,13 +509,14 @@ RCTAutoInsetsProtocol>
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
-    if (self.window != nil && _webView == nil) {
-    if (sharedWebView != nil) {
+    if (sharedWebView != nil && _cacheEnabled) {
       _webView = sharedWebView;
     } else {
       WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
       _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-      sharedWebView = _webView;
+      if (sharedWebView == nil && _cacheEnabled) {
+        sharedWebView = _webView;
+      }
     }
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
