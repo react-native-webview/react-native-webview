@@ -1419,11 +1419,10 @@ RCTAutoInsetsProtocol>
                     decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
 {
   WKNavigationResponsePolicy policy = WKNavigationResponsePolicyAllow;
-  if (_onHttpError && navigationResponse.forMainFrame) {
-    if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
-      NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
-      NSInteger statusCode = response.statusCode;
-
+  if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
+    NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
+    NSInteger statusCode = response.statusCode;
+    if (_onHttpError && navigationResponse.forMainFrame) {
       if (statusCode >= 400) {
         NSMutableDictionary<NSString *, id> *httpErrorEvent = [self baseEvent];
         [httpErrorEvent addEntriesFromDictionary: @{
@@ -1433,22 +1432,21 @@ RCTAutoInsetsProtocol>
 
         _onHttpError(httpErrorEvent);
       }
+    }
+    NSString *disposition = nil;
+    if (@available(iOS 13, macOS 10.15, *)) {
+      disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
+    }
+    BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
+    if (isAttachment || !navigationResponse.canShowMIMEType) {
+      if (_onFileDownload) {
+        policy = WKNavigationResponsePolicyCancel;
 
-      NSString *disposition = nil;
-      if (@available(iOS 13, macOS 10.15, *)) {
-        disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
-      }
-      BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
-      if (isAttachment || !navigationResponse.canShowMIMEType) {
-        if (_onFileDownload) {
-          policy = WKNavigationResponsePolicyCancel;
-
-          NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
-          [downloadEvent addEntriesFromDictionary: @{
-            @"downloadUrl": (response.URL).absoluteString,
-          }];
-          _onFileDownload(downloadEvent);
-        }
+        NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
+        [downloadEvent addEntriesFromDictionary: @{
+          @"downloadUrl": (response.URL).absoluteString,
+        }];
+        _onFileDownload(downloadEvent);
       }
     }
   }
