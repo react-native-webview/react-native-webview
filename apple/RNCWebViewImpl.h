@@ -44,7 +44,15 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 @end
 
+#if !TARGET_OS_OSX
+@interface RNCWebViewImpl : RCTView <UIEditMenuInteractionDelegate>
+
+@property (nonatomic, nullable) UIEditMenuInteraction *editMenuInteraction API_AVAILABLE(ios(16.0));
+#else
 @interface RNCWebViewImpl : RCTView
+#endif // !TARGET_OS_OSX
+
+
 @property (nonatomic, copy) RCTDirectEventBlock onFileDownload;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
@@ -72,6 +80,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL pagingEnabled;
 @property (nonatomic, assign) CGFloat decelerationRate;
 @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
+@property (nonatomic, assign) BOOL allowsPictureInPictureMediaPlayback;
 @property (nonatomic, assign) BOOL webviewDebuggingEnabled;
 @property (nonatomic, assign) BOOL allowsAirPlayForMediaPlayback;
 @property (nonatomic, assign) BOOL bounces;
@@ -98,6 +107,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) NSString * _Nullable allowingReadAccessToURL;
 @property (nonatomic, copy) NSDictionary * _Nullable basicAuthCredential;
 @property (nonatomic, assign) BOOL pullToRefreshEnabled;
+@property (nonatomic, assign) BOOL refreshControlLightMode;
 @property (nonatomic, assign) BOOL enableApplePay;
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
 @property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;

@@ -6,13 +6,15 @@ jobs:
     name: 'Running tests'
     runs-on: 'macOS-latest'
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 20
       - name: Setup - Install NPM Dependencies
         run: npm ci
       - name: Setup - Install CocoaPods CLI
-        run: sudo gem install cocoapods -v 1.8.4
+        run: sudo gem install cocoapods -v 1.14.3
       - name: Run tests
         run: npm run ci

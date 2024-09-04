@@ -33,6 +33,8 @@ import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -70,6 +72,14 @@ public class RNCWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView webView, String url) {
         super.onPageFinished(webView, url);
+        String cookies = CookieManager.getInstance().getCookie(url);
+        if (cookies != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                CookieManager.getInstance().flush();
+            }else {
+                CookieSyncManager.getInstance().sync();
+            }
+        }
 
         if (!mLastLoadFailed) {
             RNCWebView reactWebView = (RNCWebView) webView;
@@ -103,16 +113,16 @@ public class RNCWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         final RNCWebView rncWebView = (RNCWebView) view;
-        final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
+        final boolean isJsDebugging = rncWebView.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
 
-        if (!isJsDebugging && rncWebView.mCatalystInstance != null) {
+        if (!isJsDebugging && rncWebView.mMessagingJSModule != null) {
             final Pair<Double, AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState>> lock = RNCWebViewModuleImpl.shouldOverrideUrlLoadingLock.getNewLock();
             final double lockIdentifier = lock.first;
             final AtomicReference<RNCWebViewModuleImpl.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = lock.second;
 
             final WritableMap event = createWebViewEvent(view, url);
             event.putDouble("lockIdentifier", lockIdentifier);
-            rncWebView.sendDirectMessage("onShouldStartLoadWithRequest", event);
+            rncWebView.dispatchDirectShouldStartLoadWithRequest(event);
 
             try {
                 assert lockObject != null;

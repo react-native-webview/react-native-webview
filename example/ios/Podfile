@@ -2,7 +2,4 @@ require_relative '../../node_modules/react-native-test-app/test_app'
 
 workspace 'WebviewExample.xcworkspace'
 
-# Comment out the line below to enable Flipper
-use_flipper! false
-
-use_test_app! :hermes_enabled => false
+use_test_app!
