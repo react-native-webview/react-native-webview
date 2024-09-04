@@ -268,6 +268,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
         ArrayList<Parcelable> extraIntents = new ArrayList<>();
         Intent photoIntent = null;
+        Intent videoIntent = null;
         if (!needsCameraPermission()) {
             if (acceptsImages(acceptTypes)) {
                 photoIntent = getPhotoIntent();
@@ -276,7 +277,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
                 }
             }
             if (acceptsVideo(acceptTypes)) {
-                Intent videoIntent = getVideoIntent();
+                videoIntent = getVideoIntent();
                 if (videoIntent != null) {
                     extraIntents.add(videoIntent);
                 }
@@ -285,7 +286,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
         Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
         if (isCaptureEnabled) {
-            chooserIntent = photoIntent;
+            chooserIntent = photoIntent != null ? photoIntent : videoIntent;
         } else {
             Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
 
