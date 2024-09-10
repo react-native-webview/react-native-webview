@@ -1356,12 +1356,12 @@ RCTAutoInsetsProtocol>
                     decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
 {
   WKNavigationResponsePolicy policy = WKNavigationResponsePolicyAllow;
-  if (_onHttpError && navigationResponse.forMainFrame) {
+  if (_onHttpError) {
     if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
       NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
       NSInteger statusCode = response.statusCode;
 
-      if (statusCode >= 400) {
+      if (statusCode >= 400 && navigationResponse.forMainFrame) {
         NSMutableDictionary<NSString *, id> *httpErrorEvent = [self baseEvent];
         [httpErrorEvent addEntriesFromDictionary: @{
           @"url": response.URL.absoluteString,
