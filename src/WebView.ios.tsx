@@ -70,6 +70,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       onLoadProgress,
       onContentProcessDidTerminate: onContentProcessDidTerminateProp,
       onFileDownload,
+      onRefresh: onRefreshProp,
       onHttpError: onHttpErrorProp,
       onMessage: onMessageProp,
       onOpenWindow: onOpenWindowProp,
@@ -118,6 +119,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       onLoadingProgress,
       onOpenWindow,
       onContentProcessDidTerminate,
+      onRefresh,
     } = useWebViewLogic({
       onNavigationStateChange,
       onLoad,
@@ -133,6 +135,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       onShouldStartLoadWithRequestProp,
       onShouldStartLoadWithRequestCallback,
       onContentProcessDidTerminateProp,
+      onRefreshProp,
     });
 
     useImperativeHandle(
@@ -251,6 +254,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
         hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentProcessDidTerminate={onContentProcessDidTerminate}
+        onRefresh={onRefresh}
         injectedJavaScript={injectedJavaScript}
         injectedJavaScriptBeforeContentLoaded={
           injectedJavaScriptBeforeContentLoaded

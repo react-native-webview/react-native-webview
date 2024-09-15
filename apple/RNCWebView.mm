@@ -244,6 +244,20 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                 webViewEventEmitter->onHttpError(data);
             }
         };
+        _view.onRefresh = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnRefresh data = {
+                    .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue])
+                };
+                webViewEventEmitter->onRefresh(data);
+            }
+        }
         self.contentView = _view;
     }
     return self;

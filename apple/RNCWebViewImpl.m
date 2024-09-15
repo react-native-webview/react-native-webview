@@ -518,13 +518,13 @@ RCTAutoInsetsProtocol>
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
 #if !TARGET_OS_OSX
-    if (_pullToRefreshEnabled) {
+    if (_pullToRefreshEnabled || _onRefresh) {
       [self addPullToRefreshControl];
     }
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
     //For UIRefreshControl to work correctly, the bounces should always be true
-    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
+    _webView.scrollView.bounces = _pullToRefreshEnabled || _onRefresh || _bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
@@ -1599,7 +1599,12 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (void)pullToRefresh:(UIRefreshControl *)refreshControl
 {
-  [self reload];
+  if (_onRefresh) {
+    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    _onRefresh(event);
+  } else {
+    [self reload];
+  }
   [refreshControl endRefreshing];
 }
 
@@ -1608,7 +1613,7 @@ didFinishNavigation:(WKNavigation *)navigation
 {
   _pullToRefreshEnabled = pullToRefreshEnabled;
 
-  if (pullToRefreshEnabled) {
+  if (pullToRefreshEnabled || _onRefresh) {
     [self addPullToRefreshControl];
   } else {
     [_refreshControl removeFromSuperview];
@@ -1666,7 +1671,7 @@ didFinishNavigation:(WKNavigation *)navigation
 {
   _bounces = bounces;
   //For UIRefreshControl to work correctly, the bounces should always be true
-  _webView.scrollView.bounces = _pullToRefreshEnabled || bounces;
+  _webView.scrollView.bounces = _pullToRefreshEnabled || _onRefresh || bounces;
 }
 #endif // !TARGET_OS_OSX
 
