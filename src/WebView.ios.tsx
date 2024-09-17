@@ -254,7 +254,8 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
         hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentProcessDidTerminate={onContentProcessDidTerminate}
-        onRefresh={onRefresh}
+        onRefresh={onRefreshProp && onRefresh}
+        hasOnRefresh={onRefreshProp !== undefined}
         injectedJavaScript={injectedJavaScript}
         injectedJavaScriptBeforeContentLoaded={
           injectedJavaScriptBeforeContentLoaded
