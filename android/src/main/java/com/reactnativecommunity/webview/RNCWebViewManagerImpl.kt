@@ -94,6 +94,10 @@ class RNCWebViewManagerImpl {
         if (ReactBuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
+        // Remove google autofill for Android > 8
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            webView.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
+        }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
             val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
