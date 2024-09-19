@@ -338,6 +338,7 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowUniversalAccessFromFileURLs?: boolean;
   allowsBackForwardNavigationGestures?: boolean;
   allowsInlineMediaPlayback?: boolean;
+  allowsPictureInPictureMediaPlayback?: boolean;
   allowsAirPlayForMediaPlayback?: boolean;
   allowsLinkPreview?: boolean;
   automaticallyAdjustContentInsets?: boolean;
@@ -506,6 +507,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    */
   allowsInlineMediaPlayback?: boolean;
   /**
+   * Boolean value that indicates whether HTML5 videos can play Picture in Picture.
+   * The default value is `true`.
+   *
+   * @platform macos
+   */
+  allowsPictureInPictureMediaPlayback?: boolean;
+  /**
    * A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
    * @platform ios
    */
@@ -650,6 +658,15 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    *
    */
   pullToRefreshEnabled?: boolean;
+
+  /**
+   * Boolean value that determines whether a pull to refresh gesture is
+   * available in the `WebView`. The default value is `false`.
+   * If `true`, sets `bounces` automatically to `true`
+   * @platform ios
+   *
+   */
+  refreshControlLightMode?: boolean;
 
   /**
    * Function that is invoked when the client needs to download a file.
@@ -808,6 +825,13 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
    */
   allowsInlineMediaPlayback?: boolean;
   /**
+   * Boolean value that indicates whether HTML5 videos can play Picture in Picture.
+   * The default value is `true`.
+   *
+   * @platform ios
+   */
+  allowsPictureInPictureMediaPlayback?: boolean;
+  /**
    * A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
    * @platform macos
    */
@@ -939,7 +963,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   cacheMode?: CacheMode;
 
   /**
-   * https://developer.android.com/reference/android/view/View#OVER_SCROLL_NEVER
+   * https://developer.android.com/reference/android/view/View#setOverScrollMode(int)
    * Sets the overScrollMode. Possible values are:
    *
    * - `'always'` (default)
