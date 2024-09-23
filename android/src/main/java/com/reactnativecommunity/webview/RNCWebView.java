@@ -341,6 +341,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return true;
     }
 
+    @Override
+    public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
+      var hit = this.getHitTestResult();
+      if (hit.getType() == HitTestResult.EDIT_TEXT_TYPE) {
+        return super.requestFocus(direction, previouslyFocusedRect);
+      } else return false;
+    }
+
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
         super.onScrollChanged(x, y, oldX, oldY);
 
