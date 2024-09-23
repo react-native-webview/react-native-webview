@@ -288,8 +288,8 @@ export interface NativeProps extends ViewProps {
     baseUrl?: string;
   }>;
   userAgent?: string;
+  webviewInstanceKey?: string;
   injectedJavaScriptObject?: string;
-  cachedInstance?: boolean;
 }
 
 export interface NativeCommands {

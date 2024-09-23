@@ -542,6 +542,8 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    */
   userAgent?: string;
 
+  webviewInstanceKey?: string;
+
   /**
    * A Boolean value that determines whether pressing on a link
    * displays a preview of the destination for the link.

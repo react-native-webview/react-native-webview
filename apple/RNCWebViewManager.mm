@@ -64,7 +64,6 @@ RCT_EXPORT_VIEW_PROPERTY(allowUniversalAccessFromFileURLs, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsPictureInPictureMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(webviewDebuggingEnabled, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(cachedInstance, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsAirPlayForMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaPlaybackRequiresUserAction, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(dataDetectorTypes, WKDataDetectorTypes)
@@ -140,6 +139,10 @@ RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, RNCWebViewImpl) {
 
 RCT_CUSTOM_VIEW_PROPERTY(userAgent, NSString, RNCWebViewImpl) {
   view.userAgent = [RCTConvert NSString: json];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(webviewInstanceKey, NSString, RNCWebViewImpl) {
+  view.webviewInstanceKey = [RCTConvert NSString: json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, RNCWebViewImpl) {

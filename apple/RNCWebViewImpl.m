@@ -23,9 +23,10 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
-NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
+// Static dictionary to hold web view instances
+static NSMutableDictionary *webViewInstances;
 
-static WKWebView *sharedWebView = nil;
+NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 #if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
@@ -508,15 +509,35 @@ RCTAutoInsetsProtocol>
 
 - (void)didMoveToWindow
 {
+  NSLog(@"_webviewInstanceKey - jayesh: %@", _webviewInstanceKey);
   if (self.window != nil && _webView == nil) {
-    if (sharedWebView != nil && _cacheEnabled) {
-      _webView = sharedWebView;
+
+    if (webViewInstances == nil && _webviewInstanceKey != nil) {
+        webViewInstances = [[NSMutableDictionary alloc] init];
+    }
+
+    if (_webviewInstanceKey != nil) {
+      NSLog(@"webViewInstances - jayesh: %@", webViewInstances);
+      // Check if the webview instance already exists
+      if ([webViewInstances objectForKey:_webviewInstanceKey] != nil) {
+        // Use the existing webview instance
+        NSLog(@"Using existing webview instance - jayesh: %@", _webviewInstanceKey);
+        _webView = [webViewInstances objectForKey:_webviewInstanceKey];
+        NSLog(@"_webView - jayesh: %@", _webView);
+
+      } else {
+        // Create a new webview instance
+        NSLog(@"Creating new webview instance - jayesh: %@", _webviewInstanceKey);
+        WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
+        _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+        NSLog(@"_webView - jayesh: %@", _webView);
+        [webViewInstances setObject:_webView forKey:_webviewInstanceKey];
+        NSLog(@"webViewInstances added - jayesh: %@", webViewInstances);
+      }
     } else {
       WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
       _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-      if (sharedWebView == nil && _cacheEnabled) {
-        sharedWebView = _webView;
-      }
+      [self addSubview:_webView];
     }
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
@@ -790,6 +811,13 @@ RCTAutoInsetsProtocol>
     if (_webView != nil) {
       [self visitSource];
     }
+
+    WKWebView* sharedWebview = [webViewInstances objectForKey:_webviewInstanceKey];
+
+    if (sharedWebview != nil){
+      [self visitSource];
+      NSLog(@"Shared webview setSource");
+    }
   }
 }
 
@@ -800,6 +828,13 @@ RCTAutoInsetsProtocol>
 
     if (_webView != nil) {
       [self visitSource];
+    }
+
+    WKWebView* sharedWebview = [webViewInstances objectForKey:_webviewInstanceKey];
+
+    if (sharedWebview != nil){
+      [self visitSource];
+      NSLog(@"Shared webview setAllowingReadAccessToURL");
     }
   }
 }
@@ -1415,11 +1450,10 @@ RCTAutoInsetsProtocol>
                     decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
 {
   WKNavigationResponsePolicy policy = WKNavigationResponsePolicyAllow;
-  if (_onHttpError && navigationResponse.forMainFrame) {
-    if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
-      NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
-      NSInteger statusCode = response.statusCode;
-
+  if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
+    NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
+    NSInteger statusCode = response.statusCode;
+    if (_onHttpError && navigationResponse.forMainFrame) {
       if (statusCode >= 400) {
         NSMutableDictionary<NSString *, id> *httpErrorEvent = [self baseEvent];
         [httpErrorEvent addEntriesFromDictionary: @{
@@ -1429,22 +1463,21 @@ RCTAutoInsetsProtocol>
 
         _onHttpError(httpErrorEvent);
       }
+    }
+    NSString *disposition = nil;
+    if (@available(iOS 13, macOS 10.15, *)) {
+      disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
+    }
+    BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
+    if (isAttachment || !navigationResponse.canShowMIMEType) {
+      if (_onFileDownload) {
+        policy = WKNavigationResponsePolicyCancel;
 
-      NSString *disposition = nil;
-      if (@available(iOS 13, macOS 10.15, *)) {
-        disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
-      }
-      BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
-      if (isAttachment || !navigationResponse.canShowMIMEType) {
-        if (_onFileDownload) {
-          policy = WKNavigationResponsePolicyCancel;
-
-          NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
-          [downloadEvent addEntriesFromDictionary: @{
-            @"downloadUrl": (response.URL).absoluteString,
-          }];
-          _onFileDownload(downloadEvent);
-        }
+        NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
+        [downloadEvent addEntriesFromDictionary: @{
+          @"downloadUrl": (response.URL).absoluteString,
+        }];
+        _onFileDownload(downloadEvent);
       }
     }
   }
@@ -1691,6 +1724,14 @@ didFinishNavigation:(WKNavigation *)navigation
   if(_webView != nil){
     [self resetupScripts:_webView.configuration];
   }
+
+  WKWebView* sharedWebview = [webViewInstances objectForKey:_webviewInstanceKey];
+
+  if (sharedWebview != nil){
+    [self resetupScripts: sharedWebview.configuration];
+    NSLog(@"Shared webview injected javascript");
+  }
+  
 }
 
 - (void)setInjectedJavaScriptObject:(NSString *)source
@@ -1730,6 +1771,13 @@ didFinishNavigation:(WKNavigation *)navigation
   if(_webView != nil){
     [self resetupScripts:_webView.configuration];
   }
+
+  WKWebView* sharedWebview = [webViewInstances objectForKey:_webviewInstanceKey];
+
+  if (sharedWebview != nil){
+    [self resetupScripts: sharedWebview.configuration];
+    NSLog(@"Shared webview setInjectedJavaScriptBeforeContentLoaded");
+  }
 }
 
 - (void)setInjectedJavaScriptForMainFrameOnly:(BOOL)mainFrameOnly {
@@ -1766,6 +1814,13 @@ didFinishNavigation:(WKNavigation *)navigation
 
   if(_webView != nil){
     [self resetupScripts:_webView.configuration];
+  }
+
+  WKWebView* sharedWebview = [webViewInstances objectForKey:_webviewInstanceKey];
+
+  if (sharedWebview != nil){
+    [self resetupScripts: sharedWebview.configuration];
+    NSLog(@"Shared webview injected javascript");
   }
 }
 
