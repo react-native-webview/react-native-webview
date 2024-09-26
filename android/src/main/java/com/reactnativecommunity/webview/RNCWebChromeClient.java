@@ -232,7 +232,6 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-
         if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -245,23 +244,33 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
 
         } else {
-            String alertMessage = String.format("Allow this app to use your location?");
-            AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
-            builder.setMessage(alertMessage);
-            builder.setCancelable(false);
-            builder.setPositiveButton("Allow", (dialog, which) -> {
-                callback.invoke(origin, true, false);
-            });
-            builder.setNegativeButton("Don't allow", (dialog, which) -> {
-                callback.invoke(origin, false, false);
-            });
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-            //Delay making `allow` clickable for 500ms to avoid unwanted presses.
-            Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            posButton.setEnabled(false);
-            this.runDelayed(() -> posButton.setEnabled(true), 500);
-
+            String uri = "";
+            try {
+                // get current URL for webview
+                uri = mWebView.getUrl();
+                // get parsed URL
+                URI parsedUri = new URI(uri);
+                // create URL string of origin and path
+                String formattedUrl =  parsedUri.getHost() + parsedUri.getPath();
+                String alertMessage = String.format("Allow %s to use your location?", formattedUrl);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+                builder.setMessage(alertMessage);
+                builder.setCancelable(false);
+                builder.setPositiveButton("Allow", (dialog, which) -> {
+                    callback.invoke(origin, true, false);
+                });
+                builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                    callback.invoke(origin, false, false);
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+                Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                posButton.setEnabled(false);
+                this.runDelayed(() -> posButton.setEnabled(true), 500);
+            } catch (Exception e) {
+                System.out.println("URI " + uri + " is a malformed URL");
+            }
         }
     }
 
