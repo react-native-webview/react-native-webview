@@ -2,6 +2,8 @@ package com.reactnativecommunity.webview;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -69,6 +71,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+
+    private long lastFocusResetTimestamp = 0;
 
     /**
      * WebView must be created with an context of the current activity
@@ -343,10 +347,56 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     @Override
     public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
+      // Only accept the focus if a focusable element inside the WebView's content has been touched.
+      // As of now, I believe a touch of any focusable element will result in the EDIT_TEXT_TYPE
+      // result of the hit test, but it may be non-exhaustive. Also getHitTestResult() may return
+      // a stale result, but that's not a problem as a touch will repeat the requestFocus() call,
+      // and it will get an up-to-date hit result in that next call.
       var hit = this.getHitTestResult();
       if (hit.getType() == HitTestResult.EDIT_TEXT_TYPE) {
         return super.requestFocus(direction, previouslyFocusedRect);
       } else return false;
+    }
+
+    @Override
+    protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
+      super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+      if (!gainFocus) {
+        // If the last hit test in WebView matched an input field, we must reset it on blurring
+        // to avoid that stale hit test result to be reused by requestFocus() when the component
+        // is clicked again. There is a slim
+        var hit = this.getHitTestResult();
+        if (hit.getType() == HitTestResult.EDIT_TEXT_TYPE) {
+          var now = SystemClock.uptimeMillis();
+
+          // There is a slim chance that our reset does not work, if our emulated off-viewport
+          // click below hits some focusable off-viewport element, to counter that we have this
+          // 100ms debounce period.
+          if (now - lastFocusResetTimestamp < 100) {
+            lastFocusResetTimestamp = 0;
+            return;
+          }
+
+          // This emulates a rapid click outside the visible WebView viewport, which causes
+          // the WebView to re-evaluate the hit test (and we hope there is no interactive element
+          // at that point outside WebView viewport.
+          lastFocusResetTimestamp = 0;
+          dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, -12345, -12345, 0));
+          dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, -12345, -12345, 0));
+
+          // As a side-effect of the click above, the view regains the focus, thus we have to clear
+          // it, and we should do it asynchronously, so that requestFocus(), which is triggered by
+          // this clearing of the focus, is re-evaluated after the hit test result update.
+          new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+              clearFocus();
+            }
+          }, 0);
+        } else {
+          lastFocusResetTimestamp = 0;
+        }
+      }
     }
 
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
