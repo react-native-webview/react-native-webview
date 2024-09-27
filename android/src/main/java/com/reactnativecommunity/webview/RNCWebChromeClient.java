@@ -416,3 +416,4 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     public void setHasOnOpenWindowEvent(boolean hasEvent) {
       mHasOnOpenWindowEvent = hasEvent;
     }
+}
