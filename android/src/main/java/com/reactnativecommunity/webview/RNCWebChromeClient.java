@@ -182,11 +182,8 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                     AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
                     builder.setMessage(alertMessage);
                     builder.setCancelable(false);
-                    String finalAndroidPermission = androidPermission;
                     builder.setPositiveButton("Allow", (dialog, which) -> {
-                        permissionRequest = request;
-                        grantedPermissions.add(finalAndroidPermission);
-                        requestPermissions(grantedPermissions);
+                        grantedPermissions.add(requestedResource);
                     });
                     builder.setNegativeButton("Don't allow", (dialog, which) -> {
                         request.deny();
@@ -205,10 +202,8 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
         // If all the permissions are already granted, send the response to the WebView synchronously
         if (requestedAndroidPermissions.isEmpty()) {
-            if (!grantedPermissions.isEmpty()) {
-                request.grant(grantedPermissions.toArray(new String[0]));
-                grantedPermissions = null;
-            }
+            request.grant(grantedPermissions.toArray(new String[0]));
+            grantedPermissions = null;
             return;
         }
 
