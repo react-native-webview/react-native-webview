@@ -149,9 +149,9 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     @Override
     public void onPermissionRequest(final PermissionRequest request) {
 
-        grantedPermissions = new ArrayList<>();
-
+        ArrayList<String> grantedPermissions = new ArrayList<>();
         ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
+        
         for (String requestedResource : request.getResources()) {
             String androidPermission = null;
             String requestPermissionIdentifier = null;
@@ -176,14 +176,16 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                   androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
                 }            }
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
-            String alertMessage = String.format("Allow this app to use your " + requestPermissionIdentifier + "?");
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
+                    String alertMessage = String.format("Allow this app to use your " + requestPermissionIdentifier + "?");
                     AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
                     builder.setMessage(alertMessage);
                     builder.setCancelable(false);
                     builder.setPositiveButton("Allow", (dialog, which) -> {
                         grantedPermissions.add(requestedResource);
+                        request.grant(grantedPermissions.toArray(new String[0]));
+                        grantedPermissions = null;
                     });
                     builder.setNegativeButton("Don't allow", (dialog, which) -> {
                         request.deny();
@@ -202,8 +204,6 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
         // If all the permissions are already granted, send the response to the WebView synchronously
         if (requestedAndroidPermissions.isEmpty()) {
-            request.grant(grantedPermissions.toArray(new String[0]));
-            grantedPermissions = null;
             return;
         }
 
