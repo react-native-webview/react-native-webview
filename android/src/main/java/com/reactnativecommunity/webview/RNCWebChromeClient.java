@@ -40,6 +40,7 @@ import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.net.URI;
 
 public class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
     protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
