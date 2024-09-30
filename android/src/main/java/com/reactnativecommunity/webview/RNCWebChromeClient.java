@@ -246,33 +246,32 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
         } else {
             String uri = "";
-            URI parsedUri;
             try {
                 // get current URL for webview
                 uri = mWebView.getUrl();
                 // get parsed URL
-                parsedUri = new URI(uri);
+                URI parsedUri = new URI(uri);
+                // create URL string of origin and path
+                String formattedUrl =  parsedUri.getHost() + parsedUri.getPath();
+                String alertMessage = String.format("Allow this %s to use your location?", formattedUrl);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+                builder.setMessage(alertMessage);
+                builder.setCancelable(false);
+                builder.setPositiveButton("Allow", (dialog, which) -> {
+                    callback.invoke(origin, true, false);
+                });
+                builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                    callback.invoke(origin, false, false);
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+                Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                posButton.setEnabled(false);
+                this.runDelayed(() -> posButton.setEnabled(true), 500);
             } catch (Exception e) {
                 System.out.println("URI " + uri + " is a malformed URL");
             }
-            // create URL string of origin and path
-            String formattedUrl =  parsedUri.getHost() + parsedUri.getPath();
-            String alertMessage = String.format("Allow %s to use your location?", formattedUrl);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
-            builder.setMessage(alertMessage);
-            builder.setCancelable(false);
-            builder.setPositiveButton("Allow", (dialog, which) -> {
-                callback.invoke(origin, true, false);
-            });
-            builder.setNegativeButton("Don't allow", (dialog, which) -> {
-                callback.invoke(origin, false, false);
-            });
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-            //Delay making `allow` clickable for 500ms to avoid unwanted presses.
-            Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            posButton.setEnabled(false);
-            this.runDelayed(() -> posButton.setEnabled(true), 500);
         }
     }
 
