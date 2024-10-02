@@ -1,6 +1,8 @@
 package com.reactnativecommunity.webview
 
+import android.app.AlertDialog
 import android.app.DownloadManager
+import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -106,34 +108,42 @@ class RNCWebViewManagerImpl {
 
             val downloadMessage = "Downloading $fileName"
 
-            //Attempt to add cookie, if it exists
-            var urlObj: URL? = null
-            try {
-                urlObj = URL(url)
-                val baseUrl = urlObj.protocol + "://" + urlObj.host
-                val cookie = CookieManager.getInstance().getCookie(baseUrl)
-                request.addRequestHeader("Cookie", cookie)
-            } catch (e: MalformedURLException) {
-                Log.w(TAG, "Error getting cookie for DownloadManager", e)
-            }
+            val builder = AlertDialog.Builder(webView.context)
+            builder.setMessage("Do you want to download \n$fileName?")
+            builder.setCancelable(false)
+            builder.setPositiveButton("Download") { _, _ ->
+                //Attempt to add cookie, if it exists
+                var urlObj: URL? = null
+                try {
+                    urlObj = URL(url)
+                    val baseUrl = urlObj.protocol + "://" + urlObj.host
+                    val cookie = CookieManager.getInstance().getCookie(baseUrl)
+                    request.addRequestHeader("Cookie", cookie)
+                } catch (e: MalformedURLException) {
+                    Log.w(TAG, "Error getting cookie for DownloadManager", e)
+                }
 
-            //Finish setting up request
-            request.addRequestHeader("User-Agent", userAgent)
-            request.setTitle(fileName)
-            request.setDescription(downloadMessage)
-            request.allowScanningByMediaScanner()
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-            module.setDownloadRequest(request)
-            if (module.grantFileDownloaderPermissions(
-                    getDownloadingMessageOrDefault(),
-                    getLackPermissionToDownloadMessageOrDefault()
-                )
-            ) {
-                module.downloadFile(
-                    getDownloadingMessageOrDefault()
-                )
+                //Finish setting up request
+                request.addRequestHeader("User-Agent", userAgent)
+                request.setTitle(fileName)
+                request.setDescription(downloadMessage)
+                request.allowScanningByMediaScanner()
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+                module.setDownloadRequest(request)
+                if (module.grantFileDownloaderPermissions(
+                                getDownloadingMessageOrDefault(),
+                                getLackPermissionToDownloadMessageOrDefault()
+                        )
+                ) {
+                    module.downloadFile(
+                            getDownloadingMessageOrDefault()
+                    )
+                }
             }
+            builder.setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> }
+            val alertDialog = builder.create()
+            alertDialog.show()
         })
         return RNCWebViewWrapper(context, webView)
     }

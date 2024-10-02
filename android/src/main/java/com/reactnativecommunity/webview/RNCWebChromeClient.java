@@ -3,9 +3,12 @@ package com.reactnativecommunity.webview;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.View;
@@ -17,6 +20,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.annotation.RequiresApi;
@@ -146,15 +150,18 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     public void onPermissionRequest(final PermissionRequest request) {
 
         grantedPermissions = new ArrayList<>();
-
         ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
+        ArrayList<String> requestPermissionIdentifiers = new ArrayList<>();
+
         for (String requestedResource : request.getResources()) {
             String androidPermission = null;
 
             if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
                 androidPermission = Manifest.permission.RECORD_AUDIO;
+                requestPermissionIdentifiers.add("microphone");
             } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
                 androidPermission = Manifest.permission.CAMERA;
+                requestPermissionIdentifiers.add("camera");
             } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
                 if (mAllowsProtectedMedia) {
                   grantedPermissions.add(requestedResource);
@@ -167,10 +174,12 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                    * Find more details here: https://github.com/react-native-webview/react-native-webview/pull/2732
                    */
                   androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
-                }            }
+                }            
+            }
+
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
             if (androidPermission != null) {
-                if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this.mWebView.getContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
                     grantedPermissions.add(requestedResource);
                 } else {
                     requestedAndroidPermissions.add(androidPermission);
@@ -178,38 +187,73 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             }
         }
 
-        // If all the permissions are already granted, send the response to the WebView synchronously
-        if (requestedAndroidPermissions.isEmpty()) {
-            request.grant(grantedPermissions.toArray(new String[0]));
-            grantedPermissions = null;
+        if (requestedAndroidPermissions.isEmpty() && grantedPermissions.isEmpty()) {
             return;
         }
 
-        // Otherwise, ask to Android System for native permissions asynchronously
-
-        this.permissionRequest = request;
-
-        requestPermissions(requestedAndroidPermissions);
+        String identifierStr = String.join(", ", requestPermissionIdentifiers);
+        String alertMessage = String.format("Allow this app to use your " + identifierStr + "?");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+        builder.setMessage(alertMessage);
+        builder.setCancelable(false);
+        builder.setPositiveButton("Allow", (dialog, which) -> {
+            if (!requestedAndroidPermissions.isEmpty()) {
+                // ask to Android System for native permissions asynchronously
+                this.permissionRequest = request;
+                requestPermissions(requestedAndroidPermissions);
+                return;
+            }
+            if (!grantedPermissions.isEmpty()) {
+                // If all the permissions are already granted, send the response to the WebView synchronously
+                final String[] grantedPermissionsArray = grantedPermissions.toArray(new String[0]);
+                request.grant(grantedPermissionsArray);
+                grantedPermissions = null;
+            }
+        });
+        builder.setNegativeButton("Don't allow", (dialog, which) -> {
+            request.deny();
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+        Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        posButton.setEnabled(false);
+        this.runDelayed(() -> posButton.setEnabled(true), 500);
     }
 
+    private void runDelayed(Runnable function, long delayMillis) {
+        Handler handler = new Handler();
+        handler.postDelayed(function, delayMillis);
+    }
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-
-        if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+        String alertMessage = String.format("Allow this app to use your location?");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+        builder.setMessage(alertMessage);
+        builder.setCancelable(false);
+        builder.setPositiveButton("Allow", (dialog, which) -> {
+            if (ContextCompat.checkSelfPermission(this.mWebView.getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-
-            /*
-             * Keep the trace of callback and origin for the async permission request
-             */
-            geolocationPermissionCallback = callback;
-            geolocationPermissionOrigin = origin;
-
-            requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
-
-        } else {
-            callback.invoke(origin, true, false);
-        }
+                /*
+                * Keep the trace of callback and origin for the async permission request
+                */
+                geolocationPermissionCallback = callback;
+                geolocationPermissionOrigin = origin;
+                requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
+            } else {
+                callback.invoke(origin, true, false);
+            }
+        });
+        builder.setNegativeButton("Don't allow", (dialog, which) -> {
+            callback.invoke(origin, false, false);
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+        Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        posButton.setEnabled(false);
+        this.runDelayed(() -> posButton.setEnabled(true), 500);
     }
 
     private PermissionAwareActivity getPermissionAwareActivity() {
