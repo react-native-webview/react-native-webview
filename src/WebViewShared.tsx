@@ -112,6 +112,7 @@ export const useWebViewLogic = ({
   originWhitelist,
   onShouldStartLoadWithRequestProp,
   onShouldStartLoadWithRequestCallback,
+  onRefreshProp,
 }: {
   startInLoadingState?: boolean;
   onNavigationStateChange?: (event: WebViewNavigation) => void;
@@ -132,6 +133,7 @@ export const useWebViewLogic = ({
     url: string,
     lockIdentifier?: number | undefined
   ) => void;
+  onRefreshProp?: (event: WebViewTerminatedEvent) => void;
 }) => {
   const [viewState, setViewState] = useState<'IDLE' | 'LOADING' | 'ERROR'>(
     startInLoadingState ? 'LOADING' : 'IDLE'
@@ -265,6 +267,15 @@ export const useWebViewLogic = ({
     [onOpenWindowProp]
   );
 
+  // iOS Only
+  const onRefresh = useCallback(
+    (event: WebViewTerminatedEvent) => {
+      onRefreshProp?.(event);
+    },
+    [onRefreshProp]
+  );
+  // !iOS Only
+
   return {
     onShouldStartLoadWithRequest,
     onLoadingStart,
@@ -276,6 +287,7 @@ export const useWebViewLogic = ({
     onContentProcessDidTerminate,
     onMessage,
     onOpenWindow,
+    onRefresh,
     viewState,
     setViewState,
     lastErrorEvent,

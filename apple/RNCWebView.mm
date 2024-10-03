@@ -431,6 +431,30 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             _view.onOpenWindow = nil;
         }
     }
+
+#if !TARGET_OS_OSX
+    if (oldViewProps.hasOnRefresh != newViewProps.hasOnRefresh) {
+        if (newViewProps.hasOnRefresh) {
+            _view.onRefresh = [self](NSDictionary* dictionary) {
+                if (_eventEmitter) {
+                    auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                    facebook::react::RNCWebViewEventEmitter::OnRefresh data = {
+                        .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
+                        .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                        .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
+                        .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                        .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoForward"] boolValue]),
+                        .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue])
+                    };
+                    webViewEventEmitter->onRefresh(data);
+                }
+            };
+        } else {
+            _view.onRefresh = nil;
+        }
+    }
+#endif // !TARGET_OS_OSX
+
 //
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
     if (oldViewProps.contentMode != newViewProps.contentMode) {

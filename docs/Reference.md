@@ -26,6 +26,7 @@ This document lays out the current public properties and methods for the React N
 - [`onOpenWindow`](Reference.md#onopenwindow)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`onScroll`](Reference.md#onscroll)
+- [`onRefresh`](Reference.md#onrefresh)
 - [`originWhitelist`](Reference.md#originwhitelist)
 - [`renderError`](Reference.md#rendererror)
 - [`renderLoading`](Reference.md#renderloading)
@@ -717,6 +718,40 @@ contentSize
 layoutMeasurement
 velocity
 zoomScale
+```
+
+---
+
+### `onRefresh`[⬆](#props-index)
+
+Function that is invoked when the `WebView` pull to refresh gesture is triggered. If provided, sets `pullToRefreshEnabled` automatically to `true`.
+
+| Type     | Required | Platform |
+| -------- | -------- | -------- |
+| function | No       | iOS      |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onRefresh={(syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    console.log(`Pull to refresh (url: ${nativeEvent.url})`);
+    this.refs.webview.reload();
+  }}
+/>
+```
+
+Function passed to `onRefresh` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+loading
+target
+title
+url
 ```
 
 ---

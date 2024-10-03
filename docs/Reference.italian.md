@@ -24,6 +24,7 @@ Questo documento elenca le attuali proprietà e metodi pubblici di React Native 
 - [`onNavigationStateChange`](Reference.italian.md#onnavigationstatechange)
 - [`onContentProcessDidTerminate`](Reference.italian.md#oncontentprocessdidterminate)
 - [`onScroll`](Reference.italian.md#onscroll)
+- [`onRefresh`](Reference.italian.md#onrefresh)
 - [`originWhitelist`](Reference.italian.md#originwhitelist)
 - [`renderError`](Reference.italian.md#rendererror)
 - [`renderLoading`](Reference.italian.md#renderloading)
@@ -621,6 +622,40 @@ contentSize
 layoutMeasurement
 velocity
 zoomScale
+```
+
+---
+
+### `onRefresh`[⬆](#props-index)
+
+Funzione che viene invocata quando viene attivato il gesto di pull to refresh del `WebView`. Se fornita, imposta automaticamente `pullToRefreshEnabled` su `true`.
+
+| Tipo     | Obbligatorio | Piattaforma |
+| -------- | ------------ | ----------- |
+| function | No           | iOS         |
+
+Esempio:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onRefresh={(syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    console.log(`Pull to refresh (url: ${nativeEvent.url})`);
+    this.refs.webview.reload();
+  }}
+/>
+```
+
+La funzione passata a `onRefresh` viene chiamata con un evento sintetico (`SyntheticEvent`) che racchiude un evento nativo con le seguenti proprietà:
+
+```
+canGoBack
+canGoForward
+loading
+target
+title
+url
 ```
 
 ---
