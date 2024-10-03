@@ -288,6 +288,9 @@ class RNCWebViewManagerImpl {
     val COMMAND_CLEAR_FORM_DATA = 1000
     val COMMAND_CLEAR_CACHE = 1001
     val COMMAND_CLEAR_HISTORY = 1002
+    val COMMAND_LOAD_WEBVIEW = 1003
+    val COMMAND_ENABLE_ANDROID_REFRESH = 1004
+    val COMMAND_DISABLE_ANDROID_REFRESH = 1005
 
     fun getCommandsMap(): Map<String, Int>? {
       return MapBuilder.builder<String, Int>()
@@ -302,11 +305,15 @@ class RNCWebViewManagerImpl {
         .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
         .put("clearCache", COMMAND_CLEAR_CACHE)
         .put("clearHistory", COMMAND_CLEAR_HISTORY)
+        .put("loadWebview", COMMAND_LOAD_WEBVIEW)
+        .put("enableAndroidRefresh", COMMAND_ENABLE_ANDROID_REFRESH)
+        .put("disableAndroidRefresh", COMMAND_DISABLE_ANDROID_REFRESH)
         .build()
     }
 
     fun receiveCommand(viewWrapper: RNCWebViewWrapper, commandId: String, args: ReadableArray) {
       val webView = viewWrapper.webView
+      val swipeRefreshView = viewWrapper.getSwipeRefreshLayout()
       when (commandId) {
         "goBack" -> webView.goBack()
         "goForward" -> webView.goForward()
@@ -346,6 +353,9 @@ class RNCWebViewManagerImpl {
           webView.clearCache(includeDiskFiles)
         }
         "clearHistory" -> webView.clearHistory()
+        "loadWebview" -> webView.loadUrl(args.getString(0));
+        "enableAndroidRefresh" -> swipeRefreshView?.setEnabled(true);
+        "disableAndroidRefresh" -> swipeRefreshView?.setEnabled(false);
       }
     }
 
