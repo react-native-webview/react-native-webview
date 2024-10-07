@@ -253,7 +253,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                 URI parsedUri = new URI(uri);
                 // create URL string of origin and path
                 String formattedUrl =  parsedUri.getHost() + parsedUri.getPath();
-                String alertMessage = String.format("Allow this %s to use your location?", formattedUrl);
+                String alertMessage = String.format("Allow %s to use your location?", formattedUrl);
                 AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
                 builder.setMessage(alertMessage);
                 builder.setCancelable(false);
