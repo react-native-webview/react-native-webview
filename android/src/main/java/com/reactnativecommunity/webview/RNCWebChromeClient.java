@@ -245,7 +245,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
 
         } else {
-            String alertMessage = String.format("Allow this app to use your location?");
+            String alertMessage = String.format("Allow %s to use your location?", origin);
             AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
             builder.setMessage(alertMessage);
             builder.setCancelable(false);
