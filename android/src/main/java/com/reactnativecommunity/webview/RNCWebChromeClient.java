@@ -245,15 +245,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
 
         } else {
-            String uri = "";
-            try {
-                // get current URL for webview
-                uri = mWebView.getUrl();
-                // get parsed URL
-                URI parsedUri = new URI(uri);
-                // create URL string of origin and path
-                String formattedUrl =  parsedUri.getHost() + parsedUri.getPath();
-                String alertMessage = String.format("Allow %s to use your location?", formattedUrl);
+                String alertMessage = String.format("Allow %s to use your location?", origin);
                 AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
                 builder.setMessage(alertMessage);
                 builder.setCancelable(false);
@@ -269,9 +261,6 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                 Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
                 posButton.setEnabled(false);
                 this.runDelayed(() -> posButton.setEnabled(true), 500);
-            } catch (Exception e) {
-                System.out.println("URI " + uri + " is a malformed URL");
-            }
         }
     }
 
