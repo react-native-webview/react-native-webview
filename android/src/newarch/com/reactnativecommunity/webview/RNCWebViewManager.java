@@ -72,7 +72,11 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     @ReactProp(name = "allowFileAccessFromFileURLs")
     public void setAllowFileAccessFromFileURLs(RNCWebViewWrapper view, boolean value) {
         mRNCWebViewManagerImpl.setAllowFileAccessFromFileURLs(view, value);
+    }
 
+    @ReactProp(name = "allowInsecureHttps")
+    public void setAllowInsecureHttps(RNCWebViewWrapper view, boolean value) {
+        mRNCWebViewManagerImpl.setAllowInsecureHttps(view, value);
     }
 
     @Override

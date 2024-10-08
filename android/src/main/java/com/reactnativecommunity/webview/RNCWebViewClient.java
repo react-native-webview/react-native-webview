@@ -40,6 +40,7 @@ public class RNCWebViewClient extends WebViewClient {
     private static String TAG = "RNCWebViewClient";
     protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
 
+    protected boolean mAllowInsecureHttps = false;
     protected boolean mLastLoadFailed = false;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable String ignoreErrFailedForThisURL = null;
@@ -47,6 +48,10 @@ public class RNCWebViewClient extends WebViewClient {
 
     public void setIgnoreErrFailedForThisURL(@Nullable String url) {
         ignoreErrFailedForThisURL = url;
+    }
+
+    public void setAllowInsecureHttps(Boolean value) {
+        mAllowInsecureHttps = value;
     }
 
     public void setBasicAuthCredential(@Nullable RNCBasicAuthCredential credential) {
@@ -168,10 +173,17 @@ public class RNCWebViewClient extends WebViewClient {
         String topWindowUrl = webView.getUrl();
         String failingUrl = error.getUrl();
 
-        // Cancel request after obtaining top-level URL.
-        // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
-        // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
-        handler.cancel();
+        // If SSL verification is disabled, allow request to proceed.
+        if (mAllowInsecureHttps) {
+            handler.proceed();
+            // Clear SSL preferences in case `mAllowInsecureHttps` is changed.
+            webView.clearSslPreferences();
+        } else {
+            // Cancel request after obtaining top-level URL.
+            // If request is cancelled before obtaining top-level URL, undesired behavior may occur.
+            // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
+            handler.cancel();
+        }
 
         if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
             // If error is not due to top-level navigation, then do not call onReceivedError()
