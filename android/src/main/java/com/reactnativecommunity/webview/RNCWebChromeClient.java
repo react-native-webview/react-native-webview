@@ -40,7 +40,6 @@ import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.net.URI;
 
 public class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
     protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
@@ -233,6 +232,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+
         if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
