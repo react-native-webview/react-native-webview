@@ -23,10 +23,11 @@ static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
+NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
+
 // Static dictionary to hold web view instances
 static NSMutableDictionary *webViewInstances;
-
-NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
+static NSMutableDictionary *webViewLoadedInstances;
 
 #if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
@@ -493,7 +494,6 @@ RCTAutoInsetsProtocol>
 
 #if !TARGET_OS_OSX
   wkWebViewConfig.allowsInlineMediaPlayback = _allowsInlineMediaPlayback;
-  wkWebViewConfig.allowsPictureInPictureMediaPlayback = _allowsPictureInPictureMediaPlayback;
   wkWebViewConfig.mediaTypesRequiringUserActionForPlayback = _mediaPlaybackRequiresUserAction
   ? WKAudiovisualMediaTypeAll
   : WKAudiovisualMediaTypeNone;
@@ -509,36 +509,50 @@ RCTAutoInsetsProtocol>
 
 - (void)didMoveToWindow
 {
-  NSLog(@"_webviewInstanceKey - jayesh: %@", _webviewInstanceKey);
+  NSLog(@"_webviewInstanceKey - newWVImpl: %@", _webviewInstanceKey);
   if (self.window != nil && _webView == nil) {
 
     if (webViewInstances == nil && _webviewInstanceKey != nil) {
         webViewInstances = [[NSMutableDictionary alloc] init];
     }
 
+    if (webViewLoadedInstances == nil && _webviewInstanceKey != nil) {
+        webViewLoadedInstances = [[NSMutableDictionary alloc] init];
+    }
+
     if (_webviewInstanceKey != nil) {
-      NSLog(@"webViewInstances - jayesh: %@", webViewInstances);
+      NSLog(@"webViewInstances - newWVImpl: %@", webViewInstances);
       // Check if the webview instance already exists
       if ([webViewInstances objectForKey:_webviewInstanceKey] != nil) {
         // Use the existing webview instance
-        NSLog(@"Using existing webview instance - jayesh: %@", _webviewInstanceKey);
+
+        if (_onLoadingStart) {
+          _onLoadingStart([self baseEvent]);
+        }
+
+        NSLog(@"Using existing webview instance - newWVImpl: %@", _webviewInstanceKey);
         _webView = [webViewInstances objectForKey:_webviewInstanceKey];
-        NSLog(@"_webView - jayesh: %@", _webView);
+        NSLog(@"_webView - newWVImpl: %@", _webView);
+
+        if (_onLoadingFinish && [webViewLoadedInstances objectForKey:_webviewInstanceKey] != nil) {
+          _onLoadingFinish([self baseEvent]);
+        }
 
       } else {
         // Create a new webview instance
-        NSLog(@"Creating new webview instance - jayesh: %@", _webviewInstanceKey);
+        NSLog(@"Creating new webview instance - newWVImpl: %@", _webviewInstanceKey);
         WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
         _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
-        NSLog(@"_webView - jayesh: %@", _webView);
+        NSLog(@"_webView - newWVImpl: %@", _webView);
         [webViewInstances setObject:_webView forKey:_webviewInstanceKey];
-        NSLog(@"webViewInstances added - jayesh: %@", webViewInstances);
+        NSLog(@"webViewInstances added - newWVImpl: %@", webViewInstances);
       }
     } else {
       WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
       _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
       [self addSubview:_webView];
     }
+    
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     _webView.menuItems = _menuItems;
@@ -882,9 +896,6 @@ RCTAutoInsetsProtocol>
   NSString *allowingReadAccessToURL = _allowingReadAccessToURL;
 
   [self syncCookiesToWebView:^{
-    // Add observer to sync cookies from webview to sharedHTTPCookieStorage
-    [webView.configuration.websiteDataStore.httpCookieStore addObserver:self];
-    
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
     // the same url. We'll expose a call to 'reload' to allow a user to load
@@ -1450,10 +1461,11 @@ RCTAutoInsetsProtocol>
                     decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
 {
   WKNavigationResponsePolicy policy = WKNavigationResponsePolicyAllow;
-  if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
-    NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
-    NSInteger statusCode = response.statusCode;
-    if (_onHttpError && navigationResponse.forMainFrame) {
+  if (_onHttpError && navigationResponse.forMainFrame) {
+    if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
+      NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
+      NSInteger statusCode = response.statusCode;
+
       if (statusCode >= 400) {
         NSMutableDictionary<NSString *, id> *httpErrorEvent = [self baseEvent];
         [httpErrorEvent addEntriesFromDictionary: @{
@@ -1463,21 +1475,22 @@ RCTAutoInsetsProtocol>
 
         _onHttpError(httpErrorEvent);
       }
-    }
-    NSString *disposition = nil;
-    if (@available(iOS 13, macOS 10.15, *)) {
-      disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
-    }
-    BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
-    if (isAttachment || !navigationResponse.canShowMIMEType) {
-      if (_onFileDownload) {
-        policy = WKNavigationResponsePolicyCancel;
 
-        NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
-        [downloadEvent addEntriesFromDictionary: @{
-          @"downloadUrl": (response.URL).absoluteString,
-        }];
-        _onFileDownload(downloadEvent);
+      NSString *disposition = nil;
+      if (@available(iOS 13, macOS 10.15, *)) {
+        disposition = [response valueForHTTPHeaderField:@"Content-Disposition"];
+      }
+      BOOL isAttachment = disposition != nil && [disposition hasPrefix:@"attachment"];
+      if (isAttachment || !navigationResponse.canShowMIMEType) {
+        if (_onFileDownload) {
+          policy = WKNavigationResponsePolicyCancel;
+
+          NSMutableDictionary<NSString *, id> *downloadEvent = [self baseEvent];
+          [downloadEvent addEntriesFromDictionary: @{
+            @"downloadUrl": (response.URL).absoluteString,
+          }];
+          _onFileDownload(downloadEvent);
+        }
       }
     }
   }
@@ -1582,6 +1595,10 @@ didFinishNavigation:(WKNavigation *)navigation
 
   if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
+
+    if (_webviewInstanceKey != nil) {
+      [webViewLoadedInstances setObject:webView forKey:_webviewInstanceKey];
+    }
   }
 }
 
@@ -1634,9 +1651,6 @@ didFinishNavigation:(WKNavigation *)navigation
 {
   UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
   _refreshControl = refreshControl;
-  if(_refreshControlLightMode) {
-    [refreshControl setTintColor:[UIColor whiteColor]];
-  }
   [_webView.scrollView addSubview: refreshControl];
   [refreshControl addTarget:self action:@selector(pullToRefresh:) forControlEvents: UIControlEventValueChanged];
 }
@@ -1731,7 +1745,6 @@ didFinishNavigation:(WKNavigation *)navigation
     [self resetupScripts: sharedWebview.configuration];
     NSLog(@"Shared webview injected javascript");
   }
-  
 }
 
 - (void)setInjectedJavaScriptObject:(NSString *)source
@@ -1901,7 +1914,9 @@ didFinishNavigation:(WKNavigation *)navigation
       if(!_incognito && !_cacheEnabled) {
         wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
       }
-      [self syncCookiesToWebView:^{}];
+      [self syncCookiesToWebView:^{
+        [wkWebViewConfig.websiteDataStore.httpCookieStore addObserver:self];
+      }];
     } else {
       NSMutableString *script = [NSMutableString string];
 
