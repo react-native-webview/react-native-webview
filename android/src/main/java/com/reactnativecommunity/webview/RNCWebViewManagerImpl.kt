@@ -13,8 +13,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.CookieManager
 import android.webkit.DownloadListener
+import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.annotation.RequiresApi
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
@@ -24,6 +26,8 @@ import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.uimanager.ThemedReactContext
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.BufferedInputStream
+import java.io.ByteArrayOutputStream
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
@@ -92,6 +96,11 @@ class RNCWebViewManagerImpl {
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
+            if(url.startsWith("blob:")){
+                Log.i("ReactNative", "Downloading " + url);
+                downloadBlob(url, webView)
+                return@DownloadListener
+            }
             val module = webView.reactApplicationContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {
                 DownloadManager.Request(Uri.parse(url))
@@ -136,6 +145,29 @@ class RNCWebViewManagerImpl {
             }
         })
         return RNCWebViewWrapper(context, webView)
+    }
+
+    class RNCWebViewBridge internal constructor() {
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @JavascriptInterface
+    fun downloadFile() {
+      Log.i("ReactNative", "invoked by js");
+    }
+
+
+  }
+
+    fun downloadBlob(url : String, webview: RNCWebView){
+       injectJs(webview, "window.reactNativeDownloadBlobUrl('" + url + "');");
+    }
+
+    fun injectJs(webview: RNCWebView, js: String){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+          webview.evaluateJavascript(js, null);
+        } else {
+          webview.loadUrl("javascript:$js");
+        }
     }
 
     private fun setupWebChromeClient(
@@ -506,6 +538,11 @@ class RNCWebViewManagerImpl {
     fun setJavaScriptCanOpenWindowsAutomatically(viewWrapper: RNCWebViewWrapper, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.javaScriptCanOpenWindowsAutomatically = value
+    }
+
+    fun setBlobDownloadingEnabled(view: RNCWebView, value: Boolean) {
+    view.setDownloadingBlobEnabled(value)
+    view.setDownloadedMessage(getDownloadedMessageOrDefault())
     }
 
     fun setShowsVerticalScrollIndicator(viewWrapper: RNCWebViewWrapper, value: Boolean) {
