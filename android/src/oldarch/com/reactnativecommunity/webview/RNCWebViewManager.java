@@ -183,6 +183,11 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
         mRNCWebViewManagerImpl.setMessagingEnabled(view, value);
     }
 
+    @ReactProp(name = "blobDownloadingEnabled")
+    public void setBlobDownloadingEnabled(RNCWebView view, boolean value) {
+        mRNCWebViewManagerImpl.setBlobDownloadingEnabled(view, value);
+    }
+
     @ReactProp(name = "menuItems")
     public void setMenuCustomItems(RNCWebViewWrapper view, @Nullable ReadableArray items) {
         mRNCWebViewManagerImpl.setMenuCustomItems(view, items);
