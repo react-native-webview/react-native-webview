@@ -1073,6 +1073,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    */
   mixedContentMode?: 'never' | 'always' | 'compatibility';
 
+  blobDownloadingEnabled?: boolean;
   /**
    * Sets ability to open fullscreen videos on Android devices.
    */
