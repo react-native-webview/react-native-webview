@@ -283,6 +283,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         {...otherProps}
         messagingEnabled={typeof onMessageProp === 'function'}
         messagingModuleName={messagingModuleName}
+        blobDownloadingEnabled={blobDownloadingEnabled}
         hasOnScroll={!!otherProps.onScroll}
         onLoadingError={onLoadingError}
         onLoadingFinish={onLoadingFinish}
