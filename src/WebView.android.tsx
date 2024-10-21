@@ -71,6 +71,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       allowFileAccess = false,
       saveFormDataDisabled = false,
       cacheEnabled = true,
+      blobDownloadingEnabled= true,
       androidLayerType = 'none',
       originWhitelist = defaultOriginWhitelist,
       setSupportMultipleWindows = true,
