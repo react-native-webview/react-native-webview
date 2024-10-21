@@ -2,7 +2,11 @@ package com.reactnativecommunity.webview;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
+import android.os.Environment;
 import android.text.TextUtils;
+
+import android.util.Base64;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +17,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -38,6 +43,12 @@ import com.reactnativecommunity.webview.events.TopMessageEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +69,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
 
     protected boolean messagingEnabled = false;
+    protected boolean downloadingBlobEnabled = true;
     protected @Nullable
     String messagingModuleName;
     protected @Nullable
@@ -425,6 +437,57 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         @JavascriptInterface
         public String injectedObjectJson() { return injectedObjectJson; }
     }
+
+    protected class RNCWebViewDownloadBridge {
+    RNCWebView mWebView;
+
+    RNCWebViewDownloadBridge(RNCWebView webView) {
+      mWebView = webView;
+    }
+
+    @JavascriptInterface
+    public void downloadFile(String json) {
+      // parse json
+      try {
+        JSONObject jsonObject = new JSONObject(json);
+        String url = jsonObject.getString("data");
+        String fileName = jsonObject.getString("fileName");
+        // decode base64 string and save to file
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        File file = new File(path, fileName);
+
+        if (!path.exists())
+          path.mkdirs();
+
+        // if file exists, change name to avoid overwrite
+        int i = 1;
+        while (file.exists()) {
+          file = new File(path, fileName.substring(0, fileName.lastIndexOf(".")) + "(" + i + ")"
+              + fileName.substring(fileName.lastIndexOf(".")));
+          i++;
+        }
+
+        if (!file.exists())
+          file.createNewFile();
+
+        String base64EncodedString = url.substring(url.indexOf(",") + 1);
+        byte[] decodedBytes = Base64.decode(base64EncodedString, Base64.DEFAULT);
+        OutputStream os = new FileOutputStream(file);
+        os.write(decodedBytes);
+        os.close();
+
+        Toast.makeText(mWebView.getContext(), downloadedMessage, Toast.LENGTH_LONG).show();
+
+      } catch (JSONException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        Log.i("ReactNative", "IOException: " + e.getMessage());
+        e.printStackTrace();
+      }
+
+    }
+  }
 
 
     protected static class ProgressChangedFilter {
