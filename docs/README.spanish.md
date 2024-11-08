@@ -41,7 +41,7 @@ Este proyecto es compatible con [expo](https://docs.expo.dev/versions/latest/sdk
 
 ### Empezando
 
-Debes leer nuestra guia [Getting Started Guide](docs/Getting-Started.md). Si algun paso no esta claro, por favor abre un pull request.
+Debes leer nuestra guia [Getting Started Guide](Getting-Started.md). Si algun paso no esta claro, por favor abre un pull request.
 
 ### Versionando
 
@@ -63,8 +63,8 @@ const MyWebComponent = () => {
 }
 ```
 
-Para mas informacion, lea [API Reference](docs/Reference.md) y [Guia](docs/Guide.md).
-Si esta interesado en contribuir al proyecto lea la [Guia de contribucion](docs/Contributing.md).
+Para mas informacion, lea [API Reference](Reference.md) y [Guia](Guide.md).
+Si esta interesado en contribuir al proyecto lea la [Guia de contribucion](Contributing.md).
 
 ### Problemas Comúnes
 
@@ -83,6 +83,6 @@ MIT
 ### Traducciones
 
 - [Ingles](../README.md)
-- [Brazilian portuguese](docs/README.portuguese.md)
+- [Brazilian portuguese](README.portuguese.md)
 - [Frances](README.french.md)
 - [Italiano](README.italian.md)
