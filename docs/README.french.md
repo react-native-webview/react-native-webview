@@ -76,3 +76,4 @@ This readme is available in:
 - [English](../README.md)
 - [Italian](README.italian.md)
 - [Brazilian portuguese](README.portuguese.md)
+- [Spanish](docs/README.spanish.md)
