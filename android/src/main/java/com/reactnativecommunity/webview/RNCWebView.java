@@ -2,6 +2,7 @@ package com.reactnativecommunity.webview;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -14,7 +15,12 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.WebMessageCompat;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
@@ -40,6 +46,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
@@ -300,11 +307,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         }
     }
 
+    protected String injectedJavaScriptObject = null;
+
     public void setInjectedJavaScriptObject(String obj) {
-        if (getSettings().getJavaScriptEnabled()) {
-            this.createRNCWebViewBridge(this);
-            b.setInjectedObjectJson(obj);
-        }
+        this.injectedJavaScriptObject = obj;
     }
 
     public void onMessage(String message, String sourceUrl) {
@@ -319,7 +325,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     if (mRNCWebViewClient == null) {
                         return;
                     }
-                    WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, sourceUrl)
+                    WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, sourceUrl);
                     data.putString("data", message);
 
                     if (mMessagingJSModule != null) {
