@@ -64,6 +64,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
 @property (nonatomic, copy) RCTDirectEventBlock onOpenWindow;
+@property (nonatomic, copy) RCTDirectEventBlock onRefresh;
 
 
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;

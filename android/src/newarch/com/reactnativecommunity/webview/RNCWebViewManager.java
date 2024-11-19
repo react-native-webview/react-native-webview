@@ -393,6 +393,9 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     public void setPullToRefreshEnabled(RNCWebViewWrapper view, boolean value) {}
 
     @Override
+    public void setHasOnRefresh(RNCWebViewWrapper view, boolean value) {}
+
+    @Override
     public void setRefreshControlLightMode(RNCWebViewWrapper view, boolean value) {}
 
     @Override
