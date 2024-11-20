@@ -107,3 +107,4 @@ Esse readme está disponível em:
 - [Francês](README.french.md)
 - [Inglês](../README.md)
 - [Italiano](README.italian.md)
+- [Spanish](docs/README.spanish.md)

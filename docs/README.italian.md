@@ -61,3 +61,4 @@ Questo readme è disponibile nelle seguenti lingue:
 - [Francese](README.french.md) 
 - [Inglese](../README.md)
 - [Portoghese brasiliano](README.portuguese.md)
+- [Spanish](docs/README.spanish.md)
