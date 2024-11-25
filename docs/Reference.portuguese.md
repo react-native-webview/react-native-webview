@@ -64,6 +64,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`allowsBackForwardNavigationGestures`](Reference.portuguese.md#allowsbackforwardnavigationgestures)
 - [`incognito`](Reference.portuguese.md#incognito)
 - [`allowFileAccess`](Reference.portuguese.md#allowFileAccess)
+- [`allowInsecureHttps`](Reference.portuguese.md#allowInsecureHttps)
 - [`saveFormDataDisabled`](Reference.portuguese.md#saveFormDataDisabled)
 - [`cacheEnabled`](Reference.portuguese.md#cacheEnabled)
 - [`cacheMode`](Reference.portuguese.md#cacheMode)
@@ -1196,6 +1197,22 @@ Se true, isso permitirá o acesso ao sistema de arquivos por meio de URIs `file:
 | Tipo    | Requerido | Plataforma |
 | ------- | --------- | ---------- |
 | boolean | Não       | Android    |
+
+---
+
+### `allowInsecureHttps`[⬆](#props-index)
+
+Booleano que define se a verificaçāo SSL deve ser disabilitada em quaisquer URLs carregadas na WebView. O valor padrão é `false`.
+
+> [!NOTE]
+> Disabling SSL verification persists for the lifetime of the WebView, and re-enabling verification requires re-creating the WebView. See similar issue here: NativeScript/NativeScript#8632
+
+> [!WARNING]
+> Se `true` pode expor seu app a vulnerabilidades de segurança, e pode resultar em seu app sendo rejeitado pela Play Store.
+
+| Tipo | Requerido | Plataforma |
+|------|-----------|------------|
+| bool | No        | Android    |
 
 ---
 

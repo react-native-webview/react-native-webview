@@ -1010,6 +1010,12 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   allowFileAccess?: boolean;
 
   /**
+   * A Boolean value indicating whether insecure HTTPS connections are allowed. The default value is `false`.
+   * @platform android
+   */
+  allowInsecureHttps?: boolean;
+
+  /**
    * Used on Android only, controls whether form autocomplete data should be saved
    * @platform android
    */

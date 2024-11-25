@@ -560,6 +560,11 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         view.settings.allowFileAccessFromFileURLs = value;
     }
 
+    fun setAllowInsecureHttps(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+        val view = viewWrapper.webView
+        view.setAllowInsecureHttps(value)
+    }
+
     fun setAllowsFullscreenVideo(viewWrapper: RNCWebViewWrapper, value: Boolean) {
         val view = viewWrapper.webView
         mAllowsFullscreenVideo = value
