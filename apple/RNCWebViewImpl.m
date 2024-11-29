@@ -507,7 +507,7 @@ RCTAutoInsetsProtocol>
 - (void)initializeWebView
 {
   @synchronized (self) {
-    if (_webView != nil) {
+    if (self.superview == nil || _webView != nil) {
       return;
     }
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
@@ -564,21 +564,9 @@ RCTAutoInsetsProtocol>
   }
 }
 
-// react-native-mac os does not support didMoveToSuperView
-#if !TARGET_OS_OSX
-- (void)didMoveToSuperview
-{
-  if (self.superview != nil && _webView == nil) {
-    [self initializeWebView];
-  }
-}
-#endif // !TARGET_OS_OSX
-
 - (void)didMoveToWindow
 {
-  if (self.window != nil && _webView == nil) {
-    [self initializeWebView];
-  }
+  [self initializeWebView];
 
 #if !TARGET_OS_OSX
   // Allow this object to recognize gestures
@@ -797,6 +785,8 @@ RCTAutoInsetsProtocol>
 {
   if (![_source isEqualToDictionary:source]) {
     _source = [source copy];
+
+    [self initializeWebView];
 
     if (_webView != nil) {
       [self visitSource];
