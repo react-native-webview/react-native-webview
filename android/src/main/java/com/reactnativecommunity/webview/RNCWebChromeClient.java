@@ -192,7 +192,8 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         }
 
         String identifierStr = String.join(", ", requestPermissionIdentifiers);
-        String alertMessage = String.format("Allow this app to use your " + identifierStr + "?");
+        String uriString = request.getOrigin().toString();
+        String alertMessage = String.format("Allow " + uriString + " to use your " + identifierStr + "?");
         AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
         builder.setMessage(alertMessage);
         builder.setCancelable(false);
