@@ -24,7 +24,7 @@ import {
 
 import styles from './WebView.styles';
 
-const RNCWebView = Animated.createAnimatedComponent(_RNCWebView)
+const RNCWebView = Animated.createAnimatedComponent(_RNCWebView);
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
   decelerationRate: DecelerationRateConstant | number | undefined
