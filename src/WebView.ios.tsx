@@ -4,10 +4,10 @@ import React, {
   useImperativeHandle,
   useRef,
 } from 'react';
-import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
+import { Image, View, ImageSourcePropType, HostComponent, Animated } from 'react-native';
 import invariant from 'invariant';
 
-import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
+import _RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
 import RNCWebViewModule from './NativeRNCWebViewModule';
 
 import {
@@ -24,6 +24,7 @@ import {
 
 import styles from './WebView.styles';
 
+const RNCWebView = Animated.createAnimatedComponent(_RNCWebView)
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
   decelerationRate: DecelerationRateConstant | number | undefined

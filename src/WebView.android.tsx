@@ -7,14 +7,14 @@ import React, {
   useRef,
 } from 'react';
 
-import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
+import { Image, View, ImageSourcePropType, HostComponent, Animated } from 'react-native';
 
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
 import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 
 import invariant from 'invariant';
 
-import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
+import _RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
 import RNCWebViewModule from './NativeRNCWebViewModule';
 import {
   defaultOriginWhitelist,
@@ -31,6 +31,7 @@ import {
 
 import styles from './WebView.styles';
 
+const RNCWebView = Animated.createAnimatedComponent(_RNCWebView)
 const { resolveAssetSource } = Image;
 
 const directEventEmitter = new EventEmitter();
