@@ -7,14 +7,23 @@ import React, {
   useRef,
 } from 'react';
 
-import { Image, View, ImageSourcePropType, HostComponent, Animated } from 'react-native';
+import {
+  Image,
+  View,
+  ImageSourcePropType,
+  HostComponent,
+  Animated,
+} from 'react-native';
 
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
 import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 
 import invariant from 'invariant';
 
-import _RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
+import _RNCWebView, {
+  Commands,
+  NativeProps,
+} from './RNCWebViewNativeComponent';
 import RNCWebViewModule from './NativeRNCWebViewModule';
 import {
   defaultOriginWhitelist,

@@ -4,10 +4,19 @@ import React, {
   useImperativeHandle,
   useRef,
 } from 'react';
-import { Image, View, ImageSourcePropType, HostComponent, Animated } from 'react-native';
+import {
+  Image,
+  View,
+  ImageSourcePropType,
+  HostComponent,
+  Animated,
+} from 'react-native';
 import invariant from 'invariant';
 
-import _RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
+import _RNCWebView, {
+  Commands,
+  NativeProps,
+} from './RNCWebViewNativeComponent';
 import RNCWebViewModule from './NativeRNCWebViewModule';
 
 import {
