@@ -54,6 +54,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String injectedJSBeforeContentLoaded;
     protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
+    protected @Nullable
+    RNCWebViewBridge fallbackBridge;
+    protected WebViewCompat.WebMessageListener bridgeListener = null;
 
     /**
      * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
@@ -247,30 +250,34 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return this.messagingEnabled;
     }
 
-    protected WebViewCompat.WebMessageListener bridgeListener = null;
-
     protected void createRNCWebViewBridge(RNCWebView webView) {
-        if (this.bridgeListener == null &&
-                WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+        if (getSettings().getJavaScriptEnabled() &&
+          injectedJavaScriptObject != null &&
+          !TextUtils.isEmpty(injectedJavaScriptObject)) {
+          evaluateJavascriptWithFallback("(function(){\n" +
+            "    window.ReactNativeWebView.injectedObjectJson = \"" + injectedJavaScriptObject + "\";\n" +
+            "})()");
+        }
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)){
+          if (this.bridgeListener == null) {
             this.bridgeListener = new WebViewCompat.WebMessageListener() {
-                @Override
-                public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy replyProxy) {
-                    RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString());
-                }
+              @Override
+              public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy replyProxy) {
+                RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString());
+              }
             };
             WebViewCompat.addWebMessageListener(
-                    webView,
-                    JAVASCRIPT_INTERFACE,
-                    Set.of("*"),
-                    this.bridgeListener
+              webView,
+              JAVASCRIPT_INTERFACE,
+              Set.of("*"),
+              this.bridgeListener
             );
-        }
-
-        if (this.injectedJavaScriptObject != null) {
-            this.createRNCWebViewBridge(this);
-            evaluateJavascriptWithFallback("(function(){\n" +
-                    "    window.ReactNativeWebView.injectedObjectJson = \"" + this.injectedJavaScriptObject + "\";\n" +
-                    "})()");
+          }
+        } else {
+          if (fallbackBridge == null) {
+            fallbackBridge = new RNCWebViewBridge(webView);
+            addJavascriptInterface(fallbackBridge, JAVASCRIPT_INTERFACE);
+          }
         }
     }
 
@@ -310,7 +317,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected String injectedJavaScriptObject = null;
 
     public void setInjectedJavaScriptObject(String obj) {
-        this.injectedJavaScriptObject = obj;
+        if (getSettings().getJavaScriptEnabled()) {
+            this.injectedJavaScriptObject = obj;
+            this.createRNCWebViewBridge(this);
+        }
     }
 
     public void onMessage(String message, String sourceUrl) {
@@ -418,6 +428,29 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
   public ReactApplicationContext getReactApplicationContext() {
       return this.getThemedReactContext().getReactApplicationContext();
   }
+
+  protected class RNCWebViewBridge {
+        private String TAG = "RNCWebViewBridge";
+        RNCWebView mWebView;
+
+        RNCWebViewBridge(RNCWebView c) {
+          mWebView = c;
+        }
+
+        /**
+         * This method is called whenever JavaScript running within the web view calls:
+         * - window[JAVASCRIPT_INTERFACE].postMessage
+         */
+        @JavascriptInterface
+        public void postMessage(String message) {
+            if (mWebView.getMessagingEnabled()) {
+                mWebView.onMessage(message, mWebView.getUrl());
+            } else {
+                FLog.w(TAG, "ReactNativeWebView.postMessage method was called but messaging is disabled. Pass an onMessage handler to the WebView.");
+            }
+        }
+    }
+
 
     protected static class ProgressChangedFilter {
         private boolean waitingForCommandLoadUrl = false;
