@@ -1080,6 +1080,16 @@ The amount by which the web view content is inset from the edges of the scroll v
 
 ---
 
+### `scrollIndicatorInsets`[⬆](#props-index)
+
+The amount by which the scroll view indicators are inset from the edges of the scroll view. This should normally be set to the same value as the contentInset. Defaults to {top: 0, left: 0, bottom: 0, right: 0}.
+
+| Type                                                               | Required | Platform |
+| ------------------------------------------------------------------ | -------- | -------- |
+| object: {top: number, left: number, bottom: number, right: number} | No       | iOS      |
+
+---
+
 ### `contentInsetAdjustmentBehavior`[⬆](#props-index)
 
 This property specifies how the safe area insets are used to modify the content area of the scroll view. The default value of this property is "never". Available on iOS 11 and later. Defaults to `never`.

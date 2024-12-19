@@ -170,6 +170,7 @@ RCTAutoInsetsProtocol>
     _automaticallyAdjustContentInsets = YES;
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
+    _scrollIndicatorInsets = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
 #if TARGET_OS_IOS
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
@@ -1090,6 +1091,7 @@ RCTAutoInsetsProtocol>
   _webView.frame = self.bounds;
 #if !TARGET_OS_OSX
   _webView.scrollView.contentInset = _contentInset;
+  _webView.scrollView.scrollIndicatorInsets = _scrollIndicatorInsets;
 #endif // !TARGET_OS_OSX
 }
 
