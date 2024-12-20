@@ -25,6 +25,7 @@ import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
+import PullToRefresh from './examples/PullToRefresh';
 
 const TESTS = {
   Messaging: {
@@ -147,6 +148,14 @@ const TESTS = {
       return <SuppressMenuItems />;
     },
   },
+  PullToRefresh: {
+    title: 'PullToRefresh',
+    testId: 'PullToRefresh',
+    description: 'Pull to refresh',
+    render() {
+      return <PullToRefresh />;
+    },
+  },
 };
 
 interface Props {}
@@ -163,7 +172,7 @@ export default class App extends Component<Props, State> {
 
   _simulateRestart = () => {
     this.setState({ restarting: true }, () =>
-      this.setState({ restarting: false }),
+      this.setState({ restarting: false })
     );
   };
 
@@ -269,6 +278,11 @@ export default class App extends Component<Props, State> {
             testID="testType_clearData"
             title="ClearData"
             onPress={() => this._changeTest('ClearData')}
+          />
+          <Button
+            testID="testType_pullToRefresh"
+            title="PullToRefresh"
+            onPress={() => this._changeTest('PullToRefresh')}
           />
         </View>
 

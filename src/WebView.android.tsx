@@ -7,7 +7,13 @@ import React, {
   useRef,
 } from 'react';
 
-import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
+import {
+  Image,
+  View,
+  ImageSourcePropType,
+  HostComponent,
+  StyleSheet,
+} from 'react-native';
 
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
 import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
@@ -96,6 +102,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       nativeConfig,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       injectedJavaScriptObject,
+      pullToRefreshEnabled,
+      refreshControl,
       ...otherProps
     },
     ref
@@ -317,6 +325,25 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       />
     );
 
+    if (pullToRefreshEnabled && refreshControl) {
+      // https://github.com/facebook/react-native/blob/main/packages/react-native/Libraries/Components/ScrollView/ScrollView.js#L1815
+      // Looking into RN ScrollView, we see that the RefreshControl is wrapped around the ScrollView
+      // Webview has scroll support and we cannot wrap it in a ScrollView (viewport issues etc)
+      // So we directly use the RefreshControl and wrap it around the WebView
+      return (
+        <View style={webViewContainerStyle}>
+          {React.cloneElement(
+            refreshControl,
+            {
+              style: androidStyles.refreshControl,
+            },
+            webView,
+            otherView
+          )}
+        </View>
+      );
+    }
+
     return (
       <View style={webViewContainerStyle}>
         {webView}
@@ -325,6 +352,13 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
     );
   }
 );
+
+const androidStyles = StyleSheet.create({
+  refreshControl: {
+    flexGrow: 1,
+    flexShrink: 1,
+  },
+});
 
 // native implementation should return "true" only for Android 5+
 const { isFileUploadSupported } = RNCWebViewModule;
