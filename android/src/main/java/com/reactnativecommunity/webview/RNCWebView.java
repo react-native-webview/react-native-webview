@@ -251,13 +251,6 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     protected void createRNCWebViewBridge(RNCWebView webView) {
-        if (getSettings().getJavaScriptEnabled() &&
-          injectedJavaScriptObject != null &&
-          !TextUtils.isEmpty(injectedJavaScriptObject)) {
-          evaluateJavascriptWithFallback("(function(){\n" +
-            "    window.ReactNativeWebView.injectedObjectJson = \"" + injectedJavaScriptObject + "\";\n" +
-            "})()");
-        }
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)){
           if (this.bridgeListener == null) {
             this.bridgeListener = new WebViewCompat.WebMessageListener() {
@@ -279,6 +272,19 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             addJavascriptInterface(fallbackBridge, JAVASCRIPT_INTERFACE);
           }
         }
+        injectJavascriptObject();
+    }
+
+    private void injectJavascriptObject() {
+      if (getSettings().getJavaScriptEnabled() &&
+        injectedJavaScriptObject != null &&
+          !TextUtils.isEmpty(injectedJavaScriptObject)) {
+        String js = "(function(){\n" +
+          "    window." + JAVASCRIPT_INTERFACE + " = window." + JAVASCRIPT_INTERFACE + " || {}; \n" +
+          "    window." + JAVASCRIPT_INTERFACE + ".injectedObjectJson = function () { return `" + injectedJavaScriptObject + "`; };\n" +
+          "})();";
+        evaluateJavascriptWithFallback(js);
+      }
     }
 
     @SuppressLint("AddJavascriptInterface")
@@ -303,6 +309,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                 injectedJS != null &&
                 !TextUtils.isEmpty(injectedJS)) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
+            injectJavascriptObject(); // re-inject the Javascript object in case it has been overwritten.
         }
     }
 
@@ -311,16 +318,15 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                 injectedJSBeforeContentLoaded != null &&
                 !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
+            injectJavascriptObject();  // re-inject the Javascript object in case it has been overwritten.
         }
     }
 
-    protected String injectedJavaScriptObject = null;
+    protected String injectedJavaScriptObject = "null";
 
     public void setInjectedJavaScriptObject(String obj) {
-        if (getSettings().getJavaScriptEnabled()) {
-            this.injectedJavaScriptObject = obj;
-            this.createRNCWebViewBridge(this);
-        }
+      this.injectedJavaScriptObject = obj;
+      injectJavascriptObject();
     }
 
     public void onMessage(String message, String sourceUrl) {
