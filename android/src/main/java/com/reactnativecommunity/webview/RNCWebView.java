@@ -276,12 +276,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     private void injectJavascriptObject() {
-      if (getSettings().getJavaScriptEnabled() &&
-        injectedJavaScriptObject != null &&
-          !TextUtils.isEmpty(injectedJavaScriptObject)) {
+      if (getSettings().getJavaScriptEnabled()) {
         String js = "(function(){\n" +
-          "    window." + JAVASCRIPT_INTERFACE + " = window." + JAVASCRIPT_INTERFACE + " || {}; \n" +
-          "    window." + JAVASCRIPT_INTERFACE + ".injectedObjectJson = function () { return `" + injectedJavaScriptObject + "`; };\n" +
+          "    window." + JAVASCRIPT_INTERFACE + " = window." + JAVASCRIPT_INTERFACE + " || {};\n" +
+          "    window." + JAVASCRIPT_INTERFACE + ".injectedObjectJson = function () { return " + (injectedJavaScriptObject == null ? null : ("`" + injectedJavaScriptObject + "`")) + "; };\n" +
           "})();";
         evaluateJavascriptWithFallback(js);
       }
@@ -322,7 +320,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         }
     }
 
-    protected String injectedJavaScriptObject = "null";
+    protected String injectedJavaScriptObject = null;
 
     public void setInjectedJavaScriptObject(String obj) {
       this.injectedJavaScriptObject = obj;
