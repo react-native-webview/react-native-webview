@@ -56,7 +56,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
     protected @Nullable
     RNCWebViewBridge fallbackBridge;
-    protected WebViewCompat.WebMessageListener bridgeListener = null;
+    protected @Nullable
+    WebViewCompat.WebMessageListener bridgeListener = null;
 
     /**
      * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
