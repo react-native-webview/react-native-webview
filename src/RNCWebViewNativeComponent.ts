@@ -335,6 +335,7 @@ export const Commands = codegenNativeCommands<NativeCommands>({
     'clearFormData',
     'clearCache',
     'clearHistory',
+    'saveWebArchive',
   ],
 });
 
