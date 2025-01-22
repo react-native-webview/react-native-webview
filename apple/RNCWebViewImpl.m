@@ -1451,7 +1451,7 @@ RCTAutoInsetsProtocol>
             }
         }];
     } else {
-        NSLog(@"Web archive data saved to %@, but need iOS 14.0 or above", filepath);
+        NSLog(@"Web archive data cannot be saved to %@ because it requires iOS 14.0 or above", filepath);
     }
 }
 
