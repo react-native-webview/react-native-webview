@@ -179,6 +179,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
           Commands.clearCache(webViewRef.current, includeDiskFiles),
         clearHistory: () =>
           webViewRef.current && Commands.clearHistory(webViewRef.current),
+        saveWebArchive: (filename: string) => webViewRef.current && Commands.saveWebArchive(webViewRef.current, filename),
       }),
       [setViewState, webViewRef]
     );

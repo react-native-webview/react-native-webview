@@ -301,6 +301,7 @@ export interface NativeCommands {
     javascript: string
   ) => void;
   requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  saveWebArchive: (viewRef: React.ElementRef<HostComponent<NativeProps>>, filename: string) => void;
   postMessage: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
     data: string

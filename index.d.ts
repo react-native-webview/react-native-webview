@@ -41,6 +41,11 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      * Posts a message to WebView.
      */
     postMessage: (message: string) => void;
+
+    /**
+     * Save webview content
+     */
+    saveWebArchive?: (filename: string) => void;
     
      /**
      * (Android only)
