@@ -16,6 +16,6 @@ jobs:
       - name: Setup - Install Yarn
         run: YARN_GPG=NO curl -o- -L https://yarnpkg.com/install.sh | bash
       - name: Setup - Install NPM Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
       - name: Run tests
         run: yarn ci
