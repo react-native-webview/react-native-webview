@@ -645,7 +645,7 @@ useEffect(() => {
       BackHandler.removeEventListener('hardwareBackPress', onAndroidBackPress);
     };
   }
-}, []);
+}, [onAndroidBackPress]);
 ```
 
 And add these prop to your `WebView` component:
