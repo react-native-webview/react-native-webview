@@ -1434,6 +1434,16 @@ RCTAutoInsetsProtocol>
         [downloadEvent addEntriesFromDictionary: @{
           @"downloadUrl": (response.URL).absoluteString,
         }];
+        NSRange fnRange = [disposition rangeOfString:@"filename="];
+        if (fnRange.location != NSNotFound) {
+          // case where header value is like `Content-Disposition: attachment; filename="my-file.pdf"`
+          fnRange.location = fnRange.location + 10;
+          fnRange.length = disposition.length - 1 - fnRange.location;
+          NSString *filename = [disposition substringWithRange: fnRange];
+          [downloadEvent addEntriesFromDictionary: @{
+            @"filename": filename,
+          }];
+        }
         _onFileDownload(downloadEvent);
       }
     }
