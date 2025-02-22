@@ -23,7 +23,7 @@ jobs:
         msbuild-architecture: x64
 
     - name: Install node modules
-      run: yarn --pure-lockfile
+      run: yarn --immutable
 
     - name: yarn build
       run: |
