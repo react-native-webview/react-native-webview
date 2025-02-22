@@ -45,7 +45,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @end
 
 #if !TARGET_OS_OSX
-@interface RNCWebViewImpl : RCTView <UIEditMenuInteractionDelegate>
+@interface RNCWebViewImpl : RCTView <UIEditMenuInteractionDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, nullable) UIEditMenuInteraction *editMenuInteraction API_AVAILABLE(ios(16.0));
 #else
