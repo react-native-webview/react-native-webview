@@ -194,6 +194,12 @@ export interface NativeProps extends ViewProps {
     bottom?: Double;
     right?: Double;
   }>;
+  scrollIndicatorInsets?: Readonly<{
+    top?: Double;
+    left?: Double;
+    bottom?: Double;
+    right?: Double;
+  }>;
   contentInsetAdjustmentBehavior?: WithDefault<
     'never' | 'automatic' | 'scrollableAxes' | 'always',
     'never'

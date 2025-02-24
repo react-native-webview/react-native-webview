@@ -86,6 +86,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL bounces;
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;
 @property (nonatomic, assign) UIEdgeInsets contentInset;
+@property (nonatomic, assign) UIEdgeInsets scrollIndicatorInsets;
 @property (nonatomic, assign) BOOL automaticallyAdjustContentInsets;
 @property (nonatomic, assign) BOOL keyboardDisplayRequiresUserAction;
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
