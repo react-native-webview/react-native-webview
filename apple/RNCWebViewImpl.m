@@ -9,6 +9,8 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#import <PopupBridge/PopupBridge-Swift.h>
+
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
@@ -30,6 +32,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
 @interface _SwizzleHelperWK : UIView
 @property (nonatomic, copy) WKWebView *webView;
+@property (nonatomic, strong) POPPopupBridge *popupBridge;
 @end
 @implementation _SwizzleHelperWK
 -(id)inputAccessoryView
@@ -509,6 +512,7 @@ RCTAutoInsetsProtocol>
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    self.popupBridge = [[POPPopupBridge alloc] initWithWebView:self.webView];
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     _webView.menuItems = _menuItems;
