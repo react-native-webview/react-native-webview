@@ -236,7 +236,7 @@ export interface NativeProps extends ViewProps {
   scrollEnabled?: WithDefault<boolean, true>;
   sharedCookiesEnabled?: boolean;
   textInteractionEnabled?: WithDefault<boolean, true>;
-  useSharedProcessPool?: boolean;
+  useSharedProcessPool?: WithDefault<boolean, true>;
   onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;
   onCustomMenuSelection?: DirectEventHandler<WebViewCustomMenuSelectionEvent>;
   onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
