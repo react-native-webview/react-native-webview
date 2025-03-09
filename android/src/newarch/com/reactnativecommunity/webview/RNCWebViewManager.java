@@ -44,6 +44,17 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
         mRNCWebViewManagerImpl = new RNCWebViewManagerImpl(true);
     }
 
+    /**
+     * Allows to override the RNCWebView instance used for creating the ViewInstance.
+     * @param context The React Context.
+     * @param webView The RNCWebView instance.
+     * @return The RNCWebViewWrapper.
+     */
+    @NonNull
+    protected RNCWebViewWrapper createViewInstance(@NonNull ThemedReactContext context, @NonNull RNCWebView webView) {
+        return mRNCWebViewManagerImpl.createViewInstance(context, webView);
+    }
+
     @Nullable
     @Override
     protected ViewManagerDelegate<RNCWebViewWrapper> getDelegate() {
