@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class RNCWebViewClient extends WebViewClient {
     private static String TAG = "RNCWebViewClient";
-    protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
+    protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 60000;
 
     protected boolean mLastLoadFailed = false;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
