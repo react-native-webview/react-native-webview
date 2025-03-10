@@ -291,6 +291,8 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
     val COMMAND_INJECT_JAVASCRIPT = 6
     val COMMAND_LOAD_URL = 7
     val COMMAND_FOCUS = 8
+    val COMMAND_SAVE_WEB_ARCHIVE = 9
+
 
     // android commands
     val COMMAND_CLEAR_FORM_DATA = 1000
@@ -310,6 +312,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         .put("clearFormData", COMMAND_CLEAR_FORM_DATA)
         .put("clearCache", COMMAND_CLEAR_CACHE)
         .put("clearHistory", COMMAND_CLEAR_HISTORY)
+        .put("saveWebArchive", COMMAND_SAVE_WEB_ARCHIVE)
         .build()
     }
 
@@ -352,6 +355,10 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
           webView.clearCache(includeDiskFiles)
         }
         "clearHistory" -> webView.clearHistory()
+        "saveWebArchive" -> {
+          val path = args.getString(0)
+          webView.saveWebArchive(path)
+        }
       }
     }
 
