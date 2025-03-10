@@ -32,6 +32,11 @@ static def findNodeModulePath(baseDir, packageName) {
     return null
 }
 
+def reactNativeArchitectures() {
+  def value = rootProject.getProperties().get("reactNativeArchitectures")
+  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
+}
+
 def isNewArchitectureEnabled() {
     return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
 }
@@ -54,6 +59,7 @@ if (isNewArchitectureEnabled()) {
     apply plugin: 'com.facebook.react'
 }
 apply plugin: 'kotlin-android'
+apply from: '../nitrogen/generated/android/NitroBridgeWebview+autolinking.gradle'
 
 android {
     if (supportsNamespace()) {
@@ -75,6 +81,23 @@ android {
         minSdkVersion getExtOrIntegerDefault('minSdkVersion')
         targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+
+        externalNativeBuild {
+        cmake {
+            cppFlags "-frtti -fexceptions -Wall -Wextra -fstack-protector-all"
+            arguments "-DANDROID_STL=c++_shared"
+            abiFilters (*reactNativeArchitectures())
+
+            buildTypes {
+            debug {
+                cppFlags "-O1 -g"
+            }
+            release {
+                cppFlags "-O2"
+            }
+            }
+        }
+        }
     }
 
     sourceSets {
@@ -86,7 +109,14 @@ android {
             }
         }
     }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
 }
+
 
 def reactNativePath = findNodeModulePath(projectDir, "react-native")
 def codegenPath = findNodeModulePath(projectDir, "@react-native/codegen")
