@@ -165,8 +165,15 @@ RCTAutoInsetsProtocol>
     _bounces = YES;
     _scrollEnabled = YES;
     _showsHorizontalScrollIndicator = YES;
+    _javaScriptEnabled = YES;
+    _allowsLinkPreview = YES;
+    _textInteractionEnabled = YES;
     _showsVerticalScrollIndicator = YES;
     _directionalLockEnabled = YES;
+    _useSharedProcessPool = YES;
+    _fraudulentWebsiteWarningEnabled = YES;
+    _cacheEnabled = YES;
+    _mediaPlaybackRequiresUserAction = YES;
     _automaticallyAdjustContentInsets = YES;
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
