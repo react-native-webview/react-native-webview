@@ -19,7 +19,7 @@ jobs:
           node-version: 20
           cache: 'yarn'
       - name: Install npm dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
       - name: Install Pods
         run: ${{matrix.extraEnv}} pod install
         working-directory: example/ios

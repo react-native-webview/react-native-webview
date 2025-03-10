@@ -60,3 +60,6 @@ lib/
 .settings/
 msbuild.binlog
 example/msbuild.binlog
+
+# Yarn
+.yarn/install-state.gz
