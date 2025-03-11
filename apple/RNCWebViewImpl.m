@@ -167,33 +167,34 @@ RCTAutoInsetsProtocol>
     _showsHorizontalScrollIndicator = YES;
     _javaScriptEnabled = YES;
     _allowsLinkPreview = YES;
-    _textInteractionEnabled = YES;
     _showsVerticalScrollIndicator = YES;
     _directionalLockEnabled = YES;
     _useSharedProcessPool = YES;
-    _fraudulentWebsiteWarningEnabled = YES;
     _cacheEnabled = YES;
     _mediaPlaybackRequiresUserAction = YES;
     _automaticallyAdjustContentInsets = YES;
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
-#if TARGET_OS_IOS
-    _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
-    _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
-#endif // TARGET_OS_IOS
     _injectedJavaScript = nil;
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
     _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
-
+    _enableApplePay = NO;
+#if TARGET_OS_IOS
+    _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
+    _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
+#endif // TARGET_OS_IOS
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     _savedAutomaticallyAdjustsScrollIndicatorInsets = NO;
+    _fraudulentWebsiteWarningEnabled = YES;
 #endif
-    _enableApplePay = NO;
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* __IPHONE_13_0 */
+    _textInteractionEnabled = YES;
+#endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
 #endif
