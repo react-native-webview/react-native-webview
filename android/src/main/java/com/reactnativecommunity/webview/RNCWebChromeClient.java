@@ -174,7 +174,24 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
-                    grantedPermissions.add(requestedResource);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+                    builder.setMessage(alertMessage);
+                    builder.setCancelable(false);
+                    String finalAndroidPermission = androidPermission;
+                    builder.setPositiveButton("Allow", (dialog, which) -> {
+                        permissionRequest = request;
+                        grantedPermissions.add(finalAndroidPermission);
+                        requestPermissions(grantedPermissions);
+                    });
+                    builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                        request.deny();
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                    //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+                    Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    posButton.setEnabled(false);
+                    this.runDelayed(() -> posButton.setEnabled(true), 500);
                 } else {
                     requestedAndroidPermissions.add(androidPermission);
                 }
