@@ -55,6 +55,9 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     protected View mVideoView;
     protected WebChromeClient.CustomViewCallback mCustomViewCallback;
 
+    // This boolean block JS prompts and alerts from displaying during loading
+    protected boolean blockJsDuringLoading = true;
+
     /*
      * - Permissions -
      * As native permissions are asynchronously handled by the PermissionListener, many fields have
@@ -334,6 +337,16 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
 
         return this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple, fileChooserParams.isCaptureEnabled());
+    }
+
+    @Override
+    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+        if (blockJsDuringLoading) {
+            result.cancel();
+            return true;
+        } else {
+            return super.onJsPrompt(view, url, message, defaultValue, result);
+        }
     }
 
     @Override
