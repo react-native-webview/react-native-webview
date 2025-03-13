@@ -55,6 +55,9 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     protected View mVideoView;
     protected WebChromeClient.CustomViewCallback mCustomViewCallback;
 
+    // This boolean block JS prompts and alerts from displaying during loading
+    protected boolean blockJsDuringLoading = true;
+
     /*
      * - Permissions -
      * As native permissions are asynchronously handled by the PermissionListener, many fields have
@@ -171,7 +174,24 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
-                    grantedPermissions.add(requestedResource);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+                    builder.setMessage(alertMessage);
+                    builder.setCancelable(false);
+                    String finalAndroidPermission = androidPermission;
+                    builder.setPositiveButton("Allow", (dialog, which) -> {
+                        permissionRequest = request;
+                        grantedPermissions.add(finalAndroidPermission);
+                        requestPermissions(grantedPermissions);
+                    });
+                    builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                        request.deny();
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                    //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+                    Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    posButton.setEnabled(false);
+                    this.runDelayed(() -> posButton.setEnabled(true), 500);
                 } else {
                     requestedAndroidPermissions.add(androidPermission);
                 }
@@ -208,7 +228,22 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
 
         } else {
-            callback.invoke(origin, true, false);
+            String alertMessage = String.format("Allow %s to use your location?", origin);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+            builder.setMessage(alertMessage);
+            builder.setCancelable(false);
+            builder.setPositiveButton("Allow", (dialog, which) -> {
+                callback.invoke(origin, true, false);
+            });
+            builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                callback.invoke(origin, false, false);
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+            //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+            Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            posButton.setEnabled(false);
+            this.runDelayed(() -> posButton.setEnabled(true), 500);
         }
     }
 
@@ -334,6 +369,16 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
 
         return this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple, fileChooserParams.isCaptureEnabled());
+    }
+
+    @Override
+    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+        if (blockJsDuringLoading) {
+            result.cancel();
+            return true;
+        } else {
+            return super.onJsPrompt(view, url, message, defaultValue, result);
+        }
     }
 
     @Override
