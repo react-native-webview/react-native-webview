@@ -212,8 +212,10 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
         // If all the permissions are already granted, send the response to the WebView synchronously
         if (requestedAndroidPermissions.isEmpty()) {
-            request.grant(grantedPermissions.toArray(new String[0]));
-            grantedPermissions = null;
+            if (!grantedPermissions.isEmpty()) {
+                request.grant(grantedPermissions.toArray(new String[0]));
+                grantedPermissions = null;
+            }
             return;
         }
 
