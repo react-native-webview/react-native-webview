@@ -159,6 +159,7 @@ export interface NativeProps extends ViewProps {
   downloadingMessage?: string;
   forceDarkOn?: boolean;
   geolocationEnabled?: boolean;
+  inheritAppPermissions?: WithDefault<boolean, true>;
   lackPermissionToDownloadMessage?: string;
   messagingModuleName: string;
   minimumFontSize?: Int32;

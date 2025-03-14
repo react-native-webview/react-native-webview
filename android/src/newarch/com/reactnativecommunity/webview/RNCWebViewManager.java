@@ -159,6 +159,11 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
         mRNCWebViewManagerImpl.setIncognito(view, value);
     }
 
+    @ReactProp(name = "inheritAppPermissions")
+    public void setInheritAppPermissions(RNCWebViewWrapper view, boolean value) {
+        mRNCWebViewManagerImpl.setInheritAppPermissions(view, value);
+    }
+
     @Override
     @ReactProp(name = "injectedJavaScript")
     public void setInjectedJavaScript(RNCWebViewWrapper view, @Nullable String value) {

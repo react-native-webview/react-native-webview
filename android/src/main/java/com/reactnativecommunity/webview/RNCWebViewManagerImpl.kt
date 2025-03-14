@@ -40,6 +40,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
     private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
     private var mAllowsFullscreenVideo = false
     private var mAllowsProtectedMedia = false
+    private var mInheritAppPermissions = true
     private var mDownloadingMessage: String? = null
     private var mLackPermissionToDownloadMessage: String? = null
     private var mHasOnOpenWindowEvent = false
@@ -208,6 +209,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
                     }
                 }
             webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
+            webChromeClient.setInheritAppPermissions(mInheritAppPermissions);
             webChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent);
             webView.webChromeClient = webChromeClient
         } else {
@@ -219,6 +221,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
                 }
             }
             webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
+            webChromeClient.setInheritAppPermissions(mInheritAppPermissions);
             webChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent);
             webView.webChromeClient = webChromeClient
         }
@@ -650,6 +653,11 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
           client.setAllowsProtectedMedia(enabled)
         }
       }
+    }
+
+    fun setInheritAppPermissions(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
+        val view = viewWrapper.webView
+        mInheritAppPermissions = enabled
     }
 
     fun setMenuCustomItems(viewWrapper: RNCWebViewWrapper, value: ReadableArray?) {
