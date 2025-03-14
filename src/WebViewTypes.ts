@@ -1145,6 +1145,13 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   allowsProtectedMedia?: boolean;
+
+  /**
+   * Boolean value to control whether webview inherits app permissions (camera and microphone).
+   * Default is true.
+   * @platform android
+   */
+  inheritAppPermissions?: boolean;
 }
 
 export interface WebViewSharedProps extends ViewProps {
