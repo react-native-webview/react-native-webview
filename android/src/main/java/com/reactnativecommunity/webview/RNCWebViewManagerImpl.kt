@@ -17,6 +17,7 @@ import android.webkit.CookieManager
 import android.webkit.DownloadListener
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.widget.Toast
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
@@ -29,6 +30,7 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
+import java.text.Bidi
 import java.util.Locale
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
@@ -83,6 +85,9 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         settings.allowContentAccess = false
         settings.allowFileAccessFromFileURLs = false
         settings.allowUniversalAccessFromFileURLs = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            settings.safeBrowsingEnabled = true
+        }
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
 
         // Fixes broken full-screen modals/galleries due to body height being 0.
@@ -92,6 +97,10 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         )
         if (ReactBuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
+        }
+        // Remove google autofill for Android > 8
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            webView.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
@@ -109,42 +118,47 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
 
             val downloadMessage = "Downloading $fileName"
 
-            val builder = AlertDialog.Builder(webView.context)
-            builder.setMessage("Do you want to download \n$fileName?")
-            builder.setCancelable(false)
-            builder.setPositiveButton("Download") { _, _ ->
-                //Attempt to add cookie, if it exists
-                var urlObj: URL? = null
-                try {
-                    urlObj = URL(url)
-                    val baseUrl = urlObj.protocol + "://" + urlObj.host
-                    val cookie = CookieManager.getInstance().getCookie(baseUrl)
-                    request.addRequestHeader("Cookie", cookie)
-                } catch (e: MalformedURLException) {
-                    Log.w(TAG, "Error getting cookie for DownloadManager", e)
-                }
-                
-                //Finish setting up request
-                request.addRequestHeader("User-Agent", userAgent)
-                request.setTitle(fileName)
-                request.setDescription(downloadMessage)
-                request.allowScanningByMediaScanner()
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-                module.setDownloadRequest(request)
-                if (module.grantFileDownloaderPermissions(
-                                getDownloadingMessageOrDefault(),
-                                getLackPermissionToDownloadMessageOrDefault()
+            //Filename validation checking for files that use RTL characters and do not allow those types
+            if (Bidi(fileName, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).isMixed) {
+                Toast.makeText(webView.context, "Invalid filename or type", Toast.LENGTH_LONG).show()
+            } else {
+                val builder = AlertDialog.Builder(webView.context)
+                builder.setMessage("Do you want to download \n$fileName?")
+                builder.setCancelable(false)
+                builder.setPositiveButton("Download") { _, _ ->
+                    //Attempt to add cookie, if it exists
+                    var urlObj: URL? = null
+                    try {
+                        urlObj = URL(url)
+                        val baseUrl = urlObj.protocol + "://" + urlObj.host
+                        val cookie = CookieManager.getInstance().getCookie(baseUrl)
+                        request.addRequestHeader("Cookie", cookie)
+                    } catch (e: MalformedURLException) {
+                        Log.w(TAG, "Error getting cookie for DownloadManager", e)
+                    }
+
+                    //Finish setting up request
+                    request.addRequestHeader("User-Agent", userAgent)
+                    request.setTitle(fileName)
+                    request.setDescription(downloadMessage)
+                    request.allowScanningByMediaScanner()
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+                    module.setDownloadRequest(request)
+                    if (module.grantFileDownloaderPermissions(
+                            getDownloadingMessageOrDefault(),
+                            getLackPermissionToDownloadMessageOrDefault()
                         )
-                ) {
-                    module.downloadFile(
+                    ) {
+                        module.downloadFile(
                             getDownloadingMessageOrDefault()
-                    )
+                        )
+                    }
                 }
+                builder.setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> }
+                val alertDialog = builder.create()
+                alertDialog.show()
             }
-            builder.setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> }
-            val alertDialog = builder.create()
-            alertDialog.show()
         })
         return RNCWebViewWrapper(context, webView)
     }
