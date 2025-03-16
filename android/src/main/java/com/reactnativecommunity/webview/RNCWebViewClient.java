@@ -9,6 +9,7 @@ import android.util.Log;
 import android.webkit.HttpAuthHandler;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SslErrorHandler;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -34,6 +35,7 @@ import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEven
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RNCWebViewClient extends WebViewClient {
@@ -68,6 +70,9 @@ public class RNCWebViewClient extends WebViewClient {
         if (!mLastLoadFailed) {
             RNCWebView reactWebView = (RNCWebView) webView;
 
+            RNCWebChromeClient webChromeClient = (RNCWebChromeClient) reactWebView.getWebChromeClient();
+            if(Objects.nonNull(webChromeClient)) webChromeClient.blockJsDuringLoading = false;
+            
             reactWebView.callInjectedJavaScript();
 
             emitFinishEvent(webView, url);
@@ -91,12 +96,20 @@ public class RNCWebViewClient extends WebViewClient {
       mLastLoadFailed = false;
 
       RNCWebView reactWebView = (RNCWebView) webView;
+
+      RNCWebChromeClient webChromeClient = (RNCWebChromeClient) reactWebView.getWebChromeClient();
+      if(Objects.nonNull(webChromeClient)) webChromeClient.blockJsDuringLoading = true;
+
       reactWebView.callInjectedJavaScriptBeforeContentLoaded();
     }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         final RNCWebView rncWebView = (RNCWebView) view;
+
+        RNCWebChromeClient webChromeClient = (RNCWebChromeClient) rncWebView.getWebChromeClient();
+        if(Objects.nonNull(webChromeClient)) webChromeClient.blockJsDuringLoading = true;
+
         final boolean isJsDebugging = rncWebView.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
 
         if (!isJsDebugging && rncWebView.mMessagingJSModule != null) {
