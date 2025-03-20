@@ -2,7 +2,6 @@ import type { HostComponent, ViewProps } from 'react-native';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import {DirectEventHandler,Double, Int32, WithDefault} from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import type { BlobDownload, FileDownload } from './WebViewTypes';
 
 export type WebViewNativeEvent = Readonly<{
   url: string;
@@ -129,8 +128,14 @@ type WebViewRenderProcessGoneEvent = Readonly<{
   didCrash: boolean;
 }>
 
-type WebViewBlobDownloadEvent = Readonly<BlobDownload>;
-type WebViewFileDownloadEvent = Readonly<FileDownload>;
+type WebViewBlobDownloadEvent = Readonly<{
+  base64String: string;
+}>;
+
+type WebViewFileDownloadEvent = Readonly<{
+  downloadUrl: string;
+  disposition?: string;
+}>;
 
 // type MenuItem = Readonly<{label: string, key: string}>;
 
