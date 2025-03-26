@@ -25,7 +25,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Install npm dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
         shell: bash
       - name: Build Android test app
         uses: gradle/gradle-build-action@v2
