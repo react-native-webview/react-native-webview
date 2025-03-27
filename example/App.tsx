@@ -25,6 +25,7 @@ import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
+import Insets from './examples/Insets';
 
 const TESTS = {
   Messaging: {
@@ -145,6 +146,14 @@ const TESTS = {
     description: 'SuppressMenuItems in editable content',
     render() {
       return <SuppressMenuItems />;
+    },
+  },
+  Insets: {
+    title: 'Insets',
+    testId: 'Insets',
+    description: 'iOS insets and scroll insets',
+    render() {
+      return <Insets />;
     },
   },
 };
@@ -269,6 +278,11 @@ export default class App extends Component<Props, State> {
             testID="testType_clearData"
             title="ClearData"
             onPress={() => this._changeTest('ClearData')}
+          />
+          <Button
+            testID="testType_insets"
+            title="Insets"
+            onPress={() => this._changeTest('Insets')}
           />
         </View>
 
