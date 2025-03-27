@@ -311,6 +311,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(directionalLockEnabled)
     REMAP_WEBVIEW_PROP(showsHorizontalScrollIndicator)
     REMAP_WEBVIEW_PROP(showsVerticalScrollIndicator)
+    REMAP_WEBVIEW_PROP(forceLightScrollIndicators)
     REMAP_WEBVIEW_PROP(keyboardDisplayRequiresUserAction)
     
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
