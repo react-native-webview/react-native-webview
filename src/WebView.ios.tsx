@@ -159,6 +159,9 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
         clearCache: (includeDiskFiles: boolean) =>
           webViewRef.current &&
           Commands.clearCache(webViewRef.current, includeDiskFiles),
+        saveWebArchive: (filename: string) =>
+          webViewRef.current &&
+          Commands.saveWebArchive(webViewRef.current, filename),
       }),
       [setViewState, webViewRef]
     );
