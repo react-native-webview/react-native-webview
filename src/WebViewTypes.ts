@@ -306,6 +306,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
+  forceLightScrollIndicators?: boolean;
   // TODO: find a better way to type this.
 
   source: any;
@@ -1276,6 +1277,13 @@ export interface WebViewSharedProps extends ViewProps {
    * shown in the `WebView`. The default value is `true`.
    */
   showsVerticalScrollIndicator?: boolean;
+
+  /**
+   * Boolean value that determines whether a light scrollbar is
+   * shown in the `WebView`. The default value is `false`.
+   * @platform ios
+   */
+  forceLightScrollIndicators?: boolean;
 
   /**
    * Boolean that determines whether HTML5 audio and video requires the user

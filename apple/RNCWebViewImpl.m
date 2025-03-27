@@ -168,6 +168,7 @@ RCTAutoInsetsProtocol>
     _javaScriptEnabled = YES;
     _allowsLinkPreview = YES;
     _showsVerticalScrollIndicator = YES;
+    _forceLightScrollIndicators = NO;
     _directionalLockEnabled = YES;
     _useSharedProcessPool = YES;
     _cacheEnabled = YES;
@@ -535,6 +536,14 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
+
+    if(_forceLightScrollIndicators){
+        _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
+    }
+    else{
+        _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
+    }
+
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
 #endif // !TARGET_OS_OSX
     _webView.allowsLinkPreview = _allowsLinkPreview;
@@ -1083,6 +1092,18 @@ RCTAutoInsetsProtocol>
 {
   _showsVerticalScrollIndicator = showsVerticalScrollIndicator;
   _webView.scrollView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+}
+
+- (void)setForceLightScrollIndicators:(BOOL)forceLightScrollIndicators
+{
+  _forceLightScrollIndicators = forceLightScrollIndicators;
+
+  if(_forceLightScrollIndicators){
+      _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
+  }
+  else{
+      _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
+  }
 }
 #endif // !TARGET_OS_OSX
 
