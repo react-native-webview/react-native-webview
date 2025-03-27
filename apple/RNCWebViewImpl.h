@@ -114,7 +114,6 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) RCTDirectEventBlock onCustomMenuSelection;
 #if !TARGET_OS_OSX
 @property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
-@property (nonatomic, weak) UIRefreshControl * _Nullable refreshControl;
 #endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */

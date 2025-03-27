@@ -1603,11 +1603,10 @@ didFinishNavigation:(WKNavigation *)navigation
 - (void)addPullToRefreshControl
 {
   UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-  _refreshControl = refreshControl;
   if(_refreshControlLightMode) {
     [refreshControl setTintColor:[UIColor whiteColor]];
   }
-  [_webView.scrollView addSubview: refreshControl];
+  _webView.scrollView.refreshControl = refreshControl;
   [refreshControl addTarget:self action:@selector(pullToRefresh:) forControlEvents: UIControlEventValueChanged];
 }
 
@@ -1625,7 +1624,7 @@ didFinishNavigation:(WKNavigation *)navigation
   if (pullToRefreshEnabled) {
     [self addPullToRefreshControl];
   } else {
-    [_refreshControl removeFromSuperview];
+    _webView.scrollView.refreshControl = nil;
   }
 
   [self setBounces:_bounces];
