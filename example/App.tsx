@@ -25,6 +25,7 @@ import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
+import Permissions from './examples/Permissions';
 
 const TESTS = {
   Messaging: {
@@ -145,6 +146,14 @@ const TESTS = {
     description: 'SuppressMenuItems in editable content',
     render() {
       return <SuppressMenuItems />;
+    },
+  },
+  Permissions: {
+    title: 'Permissions',
+    testId: 'Permissions',
+    description: 'Camera permission test',
+    render() {
+      return <Permissions />;
     },
   },
 };
@@ -269,6 +278,11 @@ export default class App extends Component<Props, State> {
             testID="testType_clearData"
             title="ClearData"
             onPress={() => this._changeTest('ClearData')}
+          />
+          <Button
+            testID="testType_permissions"
+            title="Permissions"
+            onPress={() => this._changeTest('Permissions')}
           />
         </View>
 
