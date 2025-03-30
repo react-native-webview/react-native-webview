@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.classtinginc.image_picker.models.Media;
 import com.classtinginc.image_picker.consts.Extra;
-import com.classtinginc.image_picker.folders.ImagePickerActivity;
+import com.classtinginc.image_picker.ImagePickerActivity;
 import com.google.gson.Gson;
 
 import static android.app.Activity.RESULT_OK;
