@@ -1713,7 +1713,7 @@ didFinishNavigation:(WKNavigation *)navigation
     /* TODO: For a separate (minor) PR: use logic like this (as react-native-wkwebview does) so that messaging can be used in all frames if desired.
      *       I am keeping it as YES for consistency with previous behaviour. */
     // forMainFrameOnly:_messagingEnabledForMainFrameOnly
-    forMainFrameOnly:YES
+    forMainFrameOnly:NO
   ];
 }
 
@@ -1764,7 +1764,7 @@ didFinishNavigation:(WKNavigation *)navigation
     /* TODO: For a separate (minor) PR: use logic like this (as react-native-wkwebview does) so that messaging can be used in all frames if desired.
      *       I am keeping it as YES for consistency with previous behaviour. */
     // forMainFrameOnly:_messagingEnabledForMainFrameOnly
-    forMainFrameOnly:YES
+    forMainFrameOnly:NO
   ] :
   nil;
 
@@ -1837,7 +1837,7 @@ didFinishNavigation:(WKNavigation *)navigation
                                          "  })\n"
                                          "})(window.history)\n", HistoryShimName
   ];
-  WKUserScript *userScript = [[WKUserScript alloc] initWithSource:html5HistoryAPIShimSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+  WKUserScript *userScript = [[WKUserScript alloc] initWithSource:html5HistoryAPIShimSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
   [wkWebViewConfig.userContentController addUserScript:userScript];
 
   if(_sharedCookiesEnabled) {
@@ -1895,7 +1895,7 @@ didFinishNavigation:(WKNavigation *)navigation
 
       WKUserScript* cookieInScript = [[WKUserScript alloc] initWithSource:script
                                                             injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-                                                         forMainFrameOnly:YES];
+                                                         forMainFrameOnly:NO];
       [wkWebViewConfig.userContentController addUserScript:cookieInScript];
     }
   }
