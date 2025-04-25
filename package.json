@@ -1,6 +1,6 @@
 {
   "name": "@phantom/react-native-webview",
-  "description": "Phantom's fork ofReact Native WebView component for iOS, Android, macOS, and Windows",
+  "description": "Phantom's fork of react-native-webview, based off of react-native-webview@13.13.5",
   "main": "index.js",
   "main-internal": "src/index.ts",
   "react-native": "src/index.ts",
@@ -12,7 +12,7 @@
     "Napas Udomsak <napas@phantom.com>"
   ],
   "license": "MIT",
-  "version": "13.13.5-phantom.1",
+  "version": "0.0.1",
   "homepage": "https://github.com/phantom/react-native-webview#readme",
   "scripts": {
     "android": "react-native run-android",
@@ -47,6 +47,7 @@
     "@babel/core": "^7.20.0",
     "@babel/runtime": "^7.20.0",
     "@callstack/react-native-visionos": "0.73.8",
+    "@changesets/cli": "^2.29.2",
     "@react-native/babel-preset": "0.73.21",
     "@react-native/eslint-config": "0.73.2",
     "@react-native/metro-config": "0.73.5",
