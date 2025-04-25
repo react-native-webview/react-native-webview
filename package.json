@@ -1,17 +1,19 @@
 {
-  "name": "react-native-webview",
-  "description": "React Native WebView component for iOS, Android, macOS, and Windows",
+  "name": "@phantom/react-native-webview",
+  "description": "Phantom's fork ofReact Native WebView component for iOS, Android, macOS, and Windows",
   "main": "index.js",
   "main-internal": "src/index.ts",
   "react-native": "src/index.ts",
   "typings": "index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "contributors": [
-    "Thibault Malbranche <malbranche.thibault@gmail.com>"
+    "Thibault Malbranche <malbranche.thibault@gmail.com>",
+    "Jakub Adamczyk <jakub.adamczyk@phantom.com>",
+    "Napas Udomsak <napas@phantom.com>"
   ],
   "license": "MIT",
-  "version": "13.13.5",
-  "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
+  "version": "13.13.5-phantom.1",
+  "homepage": "https://github.com/phantom/react-native-webview#readme",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
