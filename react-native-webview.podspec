@@ -6,7 +6,7 @@ ios_platform = new_arch_enabled ? '11.0' : '9.0'
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
-  s.name         = package['name']
+  s.name         = 'react-native-webview'
   s.version      = package['version']
   s.summary      = package['description']
   s.license      = package['license']
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.homepage     = package['homepage']
   s.platforms    = { :ios => ios_platform, :osx => "10.13", :visionos => "1.0" }
 
-  s.source       = { :git => "https://github.com/react-native-webview/react-native-webview.git", :tag => "v#{s.version}" }
+  s.source       = { :git => "https://github.com/phantom/react-native-webview.git", :tag => "v#{s.version}" }
 
   s.source_files    = "apple/**/*.{h,m,mm,swift}"
 
