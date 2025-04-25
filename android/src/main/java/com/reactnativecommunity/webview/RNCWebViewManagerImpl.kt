@@ -93,48 +93,8 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
-            val module = webView.reactApplicationContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
-            val request: DownloadManager.Request = try {
-                DownloadManager.Request(Uri.parse(url))
-            } catch (e: IllegalArgumentException) {
-                Log.w(TAG, "Unsupported URI, aborting download", e)
-                return@DownloadListener
-            }
-            var fileName = URLUtil.guessFileName(url, contentDisposition, mimetype)
-
-            // Sanitize filename by replacing invalid characters with "_"
-            fileName = fileName.replace(invalidCharRegex, "_")
-
-            val downloadMessage = "Downloading $fileName"
-
-            //Attempt to add cookie, if it exists
-            var urlObj: URL? = null
-            try {
-                urlObj = URL(url)
-                val baseUrl = urlObj.protocol + "://" + urlObj.host
-                val cookie = CookieManager.getInstance().getCookie(baseUrl)
-                request.addRequestHeader("Cookie", cookie)
-            } catch (e: MalformedURLException) {
-                Log.w(TAG, "Error getting cookie for DownloadManager", e)
-            }
-
-            //Finish setting up request
-            request.addRequestHeader("User-Agent", userAgent)
-            request.setTitle(fileName)
-            request.setDescription(downloadMessage)
-            request.allowScanningByMediaScanner()
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-            module.setDownloadRequest(request)
-            if (module.grantFileDownloaderPermissions(
-                    getDownloadingMessageOrDefault(),
-                    getLackPermissionToDownloadMessageOrDefault()
-                )
-            ) {
-                module.downloadFile(
-                    getDownloadingMessageOrDefault()
-                )
-            }
+            android.widget.Toast.makeText(context, "File downloads are not supported", android.widget.Toast.LENGTH_SHORT).show();
+            return@DownloadListener;
         })
         return RNCWebViewWrapper(context, webView)
     }
