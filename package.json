@@ -15,6 +15,7 @@
   "version": "0.0.1",
   "homepage": "https://github.com/phantom/react-native-webview#readme",
   "scripts": {
+    "release": "yarn changeset publish",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "macos": "react-native run-macos --scheme WebviewExample --project-path example/macos",
