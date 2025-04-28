@@ -1,18 +1,21 @@
 {
-  "name": "react-native-webview",
-  "description": "React Native WebView component for iOS, Android, macOS, and Windows",
+  "name": "@phantom/react-native-webview",
+  "description": "Phantom's fork of react-native-webview, based off of react-native-webview@13.13.5",
   "main": "index.js",
   "main-internal": "src/index.ts",
   "react-native": "src/index.ts",
   "typings": "index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "contributors": [
-    "Thibault Malbranche <malbranche.thibault@gmail.com>"
+    "Thibault Malbranche <malbranche.thibault@gmail.com>",
+    "Jakub Adamczyk <jakub.adamczyk@phantom.com>",
+    "Napas Udomsak <napas@phantom.com>"
   ],
   "license": "MIT",
-  "version": "13.13.5",
-  "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
+  "version": "0.0.1",
+  "homepage": "https://github.com/phantom/react-native-webview#readme",
   "scripts": {
+    "release": "yarn changeset publish",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "macos": "react-native run-macos --scheme WebviewExample --project-path example/macos",
@@ -45,6 +48,7 @@
     "@babel/core": "^7.20.0",
     "@babel/runtime": "^7.20.0",
     "@callstack/react-native-visionos": "0.73.8",
+    "@changesets/cli": "^2.29.2",
     "@react-native/babel-preset": "0.73.21",
     "@react-native/eslint-config": "0.73.2",
     "@react-native/metro-config": "0.73.5",

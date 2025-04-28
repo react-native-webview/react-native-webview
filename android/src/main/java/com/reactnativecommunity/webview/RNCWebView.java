@@ -274,6 +274,16 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
           }
         }
         injectJavascriptObject();
+
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) 
+            && injectedJSBeforeContentLoaded != null 
+            && !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
+            WebViewCompat.addDocumentStartJavaScript(
+                webView,
+                "(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();",
+                Set.of("*")
+            );
+        }
     }
 
     private void injectJavascriptObject() {
