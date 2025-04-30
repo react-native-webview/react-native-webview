@@ -773,10 +773,12 @@ RCTAutoInsetsProtocol>
       _onLoadingFinish(event);
     }
   } else if ([message.name isEqualToString:MessageHandlerName]) {
+    BOOL isMainFrame = message.frameInfo.isMainFrame;
     if (_onMessage) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       [event addEntriesFromDictionary: @{@"data": message.body}];
       [event addEntriesFromDictionary: @{@"url": message.frameInfo.request.URL.absoluteString}];
+      [event addEntriesFromDictionary: @{@"isMainFrame": @(isMainFrame)}];
       _onMessage(event);
     }
   }
