@@ -257,7 +257,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             this.bridgeListener = new WebViewCompat.WebMessageListener() {
               @Override
               public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy replyProxy) {
-                RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString());
+                RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString(), isMainFrame);
               }
             };
             WebViewCompat.addWebMessageListener(
@@ -339,6 +339,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     public void onMessage(String message, String sourceUrl) {
+        onMessage(message, sourceUrl, null);
+    }
+
+    public void onMessage(String message, String sourceUrl, @Nullable Boolean isMainFrame) {
         ThemedReactContext reactContext = getThemedReactContext();
         RNCWebView mWebView = this;
 
@@ -352,6 +356,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     }
                     WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, sourceUrl);
                     data.putString("data", message);
+                    if (isMainFrame != null) {
+                        data.putBoolean("isMainFrame", isMainFrame);
+                    }
 
                     if (mMessagingJSModule != null) {
                         dispatchDirectMessage(data);
@@ -363,6 +370,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         } else {
             WritableMap eventData = Arguments.createMap();
             eventData.putString("data", message);
+            if (isMainFrame != null) {
+                eventData.putBoolean("isMainFrame", isMainFrame);
+            }
 
             if (mMessagingJSModule != null) {
                 dispatchDirectMessage(eventData);

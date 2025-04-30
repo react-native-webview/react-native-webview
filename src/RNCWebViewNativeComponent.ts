@@ -29,6 +29,7 @@ export type WebViewMessageEvent = Readonly<{
   canGoForward: boolean;
   lockIdentifier: Double;
   data: string;
+  isMainFrame?: boolean;
 }>;
 export type WebViewOpenWindowEvent = Readonly<{
   targetUrl: string;
