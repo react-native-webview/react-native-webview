@@ -281,6 +281,7 @@ export interface NativeProps extends ViewProps {
   onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
   showsHorizontalScrollIndicator?: WithDefault<boolean, true>;
   showsVerticalScrollIndicator?: WithDefault<boolean, true>;
+  paymentRequestEnabled?: boolean;
   newSource: Readonly<{
     uri?: string;
     method?: string;

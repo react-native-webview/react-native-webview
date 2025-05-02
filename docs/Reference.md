@@ -93,6 +93,7 @@ This document lays out the current public properties and methods for the React N
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
 - [`webviewDebuggingEnabled`](Reference.md#webviewDebuggingEnabled)
+- [`paymentRequestEnabled`](Reference.md#paymentRequestEnabled)
 
 ## Methods Index
 
@@ -1026,8 +1027,8 @@ Boolean value that indicates whether HTML5 videos can play Picture in Picture. T
 
 > **NOTE**
 >
-> In order to restrict playing video in picture in picture mode this props need to be set to `false`
-.
+> In order to restrict playing video in picture in picture mode this props need to be set to `false`.
+
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | iOS      |
@@ -1717,6 +1718,15 @@ Default is `false`. Supported on iOS as of 16.4, previous versions always allow 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS & Android  |
+
+### `paymentRequestEnabled`[⬆](#props-index)
+
+Whether or not the webview has the Payment Request API enabled. Default is `true`.
+This is needed for Google Pay to work within the WebView.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
 
 ## Methods
 
