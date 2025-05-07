@@ -23,6 +23,7 @@
  *   CONTENT_DISPOSITION_PATTERN and parseContentDisposition
  * - Improve CONTENT_DISPOSITION_PATTERN and parseContentDisposition to add
  *   support for the "filename*" parameter in content disposition
+ * - Imporve parseContentDisposition to support multiple disposition parameter parsing
  */
 
 package com.reactnativecommunity.webview;
@@ -133,46 +134,59 @@ public final class URLUtil {
         return filename + extension;
     }
 
-    /** Regex used to parse content-disposition headers */
-    private static final Pattern CONTENT_DISPOSITION_PATTERN =
-            Pattern.compile("attachment(?:;\\s*filename\\s*=\\s*(\"?)([^\"]*)\\1)?(?:;\\s*filename\\s*\\*\\s*=\\s*([^']*)'[^']*'([^']*))?\\s*$",
+    /**
+     * Regex used to parse content-disposition header ext-value parameter
+     * <a href="https://www.rfc-editor.org/rfc/rfc5987#section-3.2.1">RFC 5987</a>
+     */
+    private static final Pattern CONTENT_DISPOSITION_EXT_VALUE_PATTERN = Pattern.compile("([^']*)'[^']*'([^']*)",
             Pattern.CASE_INSENSITIVE);
 
     /**
      * Parse the Content-Disposition HTTP Header. The format of the header
-     * is defined here: <a href="https://www.rfc-editor.org/rfc/rfc6266">RFC 6266</a>
+     * is defined here: <a href="https://www.rfc-editor.org/rfc/rfc6266">RFC
+     * 6266</a>
      * This header provides a filename for content that is going to be
      * downloaded to the file system. We only support the attachment type.
      */
     static String parseContentDisposition(String contentDisposition) {
         try {
-            // The regex attempts to match the following pattern:
-            //     attachment; filename="(Group 2)"; filename*=(Group 3)'(lang)'(Group 4)
-            // Group 4 refers to the percent-encoded filename, and the charset
-            // is specified in Group 3.
-            // Group 2 is the fallback filename.
-            // Group 1 refers to the quotation marks around Group 2.
-            //
             // Test cases can be found at http://test.greenbytes.de/tech/tc2231/
             // Examples can be found at https://www.rfc-editor.org/rfc/rfc6266#section-5
-            // There are a few known limitations:
-            // - any Content Disposition value that does not have parameters
-            //   arranged in the order of "attachment...filename...filename*"
-            //   or contains extra parameters shall fail to be parsed
-            // - any filename that contains " shall fail to be parsed
-            Matcher m = CONTENT_DISPOSITION_PATTERN.matcher(contentDisposition);
-            if (m.find()) {
-                if (m.group(3) != null && m.group(4) != null) {
+            // Current limitations:
+            // - http://test.greenbytes.de/tech/tc2231/#encoding-2231-cont
+
+            String[] parsed = contentDisposition.split(";");
+            if (parsed.length < 2 || !parsed[0].trim().equalsIgnoreCase("attachment"))
+                return null;
+
+            String filename = null;
+
+            for (int i = 1; i < parsed.length; i++) {
+                String[] dispositionParm = parsed[i].trim().split("=");
+                if (dispositionParm.length != 2)
+                    continue;
+                String key = dispositionParm[0].trim();
+                String value = dispositionParm[1].trim();
+
+                if (key.equalsIgnoreCase("filename")) {
+                    filename = value.replaceAll("^\"|\"$", "");
+                } else if (key.equalsIgnoreCase("filename*")) {
+                    Matcher m = CONTENT_DISPOSITION_EXT_VALUE_PATTERN.matcher(value);
+                    if (!m.find() || m.group(1) == null || m.group(2) == null)
+                        continue;
+
                     try {
-                        return URLDecoder.decode(m.group(4), m.group(3).isEmpty() ? "UTF-8" : m.group(3));
+                        filename = URLDecoder.decode(m.group(2), m.group(1));
+                        break;
                     } catch (UnsupportedEncodingException e) {
                         // Skip the ext-parameter as the encoding is unsupported
                     }
                 }
-                return m.group(2);
             }
+
+            return filename;
         } catch (IllegalStateException ex) {
-             // This function is defined as returning null when it can't parse the header
+            // This function is defined as returning null when it can't parse the header
         }
         return null;
     }

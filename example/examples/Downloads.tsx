@@ -23,6 +23,10 @@ const HTML = `
     <a href="https://www.7-zip.org/a/7za920.zip">Example zip file download</a>
     <br>
     <a href="http://test.greenbytes.de/tech/tc2231/attwithisofn2231iso.asis">Download file with non-ascii filename: "foo-ä.html"</a>
+    <br>
+    <a href="http://test.greenbytes.de/tech/tc2231/attfnboth2.asis">Download file with non-ascii filename: "foo-ä.html" with multiple disposition parameters</a>
+    <br>
+    <a href="http://test.greenbytes.de/tech/tc2231/attnewandfn.asis">Download file with non-ascii filename: "foo-ä.html" with ambiguous disposition parameter</a>
   </body>
 </html>
 `;
