@@ -92,7 +92,7 @@ public final class URLUtil {
 
         // Split filename between base and extension
         // Add an extension if filename does not have one
-        int dotIndex = filename.indexOf('.');
+        int dotIndex = filename.lastIndexOf('.');
         if (dotIndex < 0) {
             if (mimeType != null) {
                 extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
