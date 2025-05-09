@@ -3,9 +3,13 @@ package com.reactnativecommunity.webview;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.View;
@@ -17,6 +21,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.annotation.RequiresApi;
@@ -65,6 +70,10 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     protected PermissionRequest permissionRequest;
     // Webview camera & audio permission already granted
     protected List<String> grantedPermissions;
+    // Webview requested permissions from the OS
+    protected List<String> requestedAndroidPermissions;
+    // Webview granted permissions requested separately through isDialog
+    protected List<String> alertPermissions;
 
     // Webview geolocation permission callback
     protected GeolocationPermissions.Callback geolocationPermissionCallback;
@@ -144,54 +153,133 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     @Override
     public void onPermissionRequest(final PermissionRequest request) {
-
+        permissionRequest = request;
         grantedPermissions = new ArrayList<>();
+        alertPermissions = new ArrayList<>();
+        // Permissions that we need to ask permission for from the OS
+        requestedAndroidPermissions = new ArrayList<>();
 
-        ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
         for (String requestedResource : request.getResources()) {
             String androidPermission = null;
+            String requestPermissionIdentifier = null;
 
             if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
                 androidPermission = Manifest.permission.RECORD_AUDIO;
+                requestPermissionIdentifier = "microphone";
             } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
                 androidPermission = Manifest.permission.CAMERA;
+                requestPermissionIdentifier = "camera";
             } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
                 if (mAllowsProtectedMedia) {
-                  grantedPermissions.add(requestedResource);
+                    grantedPermissions.add(requestedResource);
                 } else {
-                  /**
-                   * Legacy handling (Kept in case it was working under some conditions (given Android version or something))
-                   *
-                   * Try to ask user to grant permission using Activity.requestPermissions
-                   *
-                   * Find more details here: https://github.com/react-native-webview/react-native-webview/pull/2732
-                   */
-                  androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
-                }            }
+                    // TODO: Make sure this is properly taken care of too
+                    /**
+                    * Legacy handling (Kept in case it was working under some conditions (given Android version or something))
+                    *
+                    * Try to ask user to grant permission using Activity.requestPermissions
+                    *
+                    * Find more details here: https://github.com/react-native-webview/react-native-webview/pull/2732
+                    */
+                    androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
+                }
+            }
+
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
-                    grantedPermissions.add(requestedResource);
+                    Activity activity = this.mWebView.getThemedReactContext().getCurrentActivity();
+                    if (activity == null) {
+                        // We just skip this one, but it should never happen
+                        Log.w(TAG, "Current activity is null, cannot show AlertDialog. Denying permission request.");
+                        continue;
+                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                    builder.setMessage(this.makeAlertMessage(request, requestPermissionIdentifier));
+                    builder.setCancelable(false);
+                    String finalAndroidPermission = androidPermission;
+                    builder.setPositiveButton("Allow", (dialog, which) -> {
+                        this.grantedPermissions.add(requestedResource);
+                        this.alertPermissions.remove(finalAndroidPermission);
+                        if (!this.alertPermissions.isEmpty()) {
+                            // There will be more alerts to show, so we just return
+                            return;
+                        }
+                        this.alertPermissions = null;
+                        if (this.requestedAndroidPermissions.isEmpty()) {
+                            // Wrapping up the permission request
+                            this.permissionRequest.grant(this.grantedPermissions.toArray(new String[0]));
+                            this.permissionRequest = null;
+                            this.grantedPermissions = null;
+                        } else {
+                            // Need to request permissions from the OS, will grant or deny later
+                            this.requestPermissions(this.requestedAndroidPermissions);
+                        }
+                    });
+                    builder.setNegativeButton("Deny", (dialog, which) -> {
+                        this.alertPermissions.remove(finalAndroidPermission);
+                        if (!this.alertPermissions.isEmpty()) {
+                            // There will be more alerts to show, so we just return
+                            return;
+                        }
+                        this.alertPermissions = null;
+                        if (!this.requestedAndroidPermissions.isEmpty()) {
+                            // Need to request permissions from the OS, will grant or deny later and return now
+                            this.requestPermissions(this.requestedAndroidPermissions);
+                            return;
+                        }
+                        // Wrapping up the permission request, this time with grant or deny
+                        if (!this.grantedPermissions.isEmpty()) {
+                            this.permissionRequest.grant(this.grantedPermissions.toArray(new String[0]));
+                        } else {
+                            this.permissionRequest.deny();
+                        }
+                        this.permissionRequest = null;
+                        this.grantedPermissions = null;
+                    });                  
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                    this.alertPermissions.add(finalAndroidPermission);
+                    //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+                    Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    posButton.setEnabled(false);
+                    this.runDelayed(() -> posButton.setEnabled(true), 500);
                 } else {
                     requestedAndroidPermissions.add(androidPermission);
                 }
             }
         }
 
+        // if we have alerts in progress we will handle below with the last alert
+        if (!this.alertPermissions.isEmpty()) {
+            return;
+        }
+
         // If all the permissions are already granted, send the response to the WebView synchronously
         if (requestedAndroidPermissions.isEmpty()) {
-            request.grant(grantedPermissions.toArray(new String[0]));
-            grantedPermissions = null;
+            if (!grantedPermissions.isEmpty()) {
+                request.grant(grantedPermissions.toArray(new String[0]));
+                grantedPermissions = null;
+            } else {
+                request.deny();
+            }
             return;
         }
 
         // Otherwise, ask to Android System for native permissions asynchronously
-
-        this.permissionRequest = request;
-
         requestPermissions(requestedAndroidPermissions);
     }
 
+    private String makeAlertMessage(PermissionRequest request, String requestIdentifier) {
+      Uri originUri = request.getOrigin();
+      String host = originUri.getHost();
+      return String.format("Allow " + host  + " to use your " + requestIdentifier + "?");
+    }
+
+    private void runDelayed(Runnable function, long delayMillis) {
+        Handler handler = new Handler();
+        handler.postDelayed(function, delayMillis);
+    }
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -208,7 +296,29 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
 
         } else {
-            callback.invoke(origin, true, false);
+            String alertMessage = String.format("Allow %s to use your location?", origin);
+            Activity activity = this.mWebView.getThemedReactContext().getCurrentActivity();
+            if (activity == null) {
+                Log.w(TAG, "Current activity is null, cannot show AlertDialog. Calling negative callback.");
+                callback.invoke(origin, false, false);
+                return;
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setMessage(alertMessage);
+            builder.setCancelable(false);
+            builder.setPositiveButton("Allow", (dialog, which) -> {
+                callback.invoke(origin, true, false);
+            });
+            builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                callback.invoke(origin, false, false);
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+            //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+            Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            posButton.setEnabled(false);
+            this.runDelayed(() -> posButton.setEnabled(true), 500);
+
         }
     }
 
@@ -223,7 +333,6 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     }
 
     private synchronized void requestPermissions(List<String> permissions) {
-
         /*
          * If permissions request dialog is displayed on the screen and another request is sent to the
          * activity, the last permission asked is skipped. As a work-around, we use pendingPermissions
@@ -257,7 +366,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
          * As a "pending requests" approach is used, requestCode cannot help to define if the request
          * came from geolocation or camera/audio. This is why shouldAnswerToPermissionRequest is used
          */
-        boolean shouldAnswerToPermissionRequest = false;
+        boolean shouldAnswerToPermissionRequest = grantedPermissions != null && !grantedPermissions.isEmpty() && permissionRequest != null;
 
         for (int i = 0; i < permissions.length; i++) {
 
