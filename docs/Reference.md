@@ -1721,7 +1721,7 @@ Default is `false`. Supported on iOS as of 16.4, previous versions always allow 
 
 ### `paymentRequestEnabled`[⬆](#props-index)
 
-Whether or not the webview has the Payment Request API enabled. Default is `true`.
+Whether or not the webview has the Payment Request API enabled. Default is `false`.
 This is needed for Google Pay to work within the WebView.
 
 | Type    | Required | Platform |
