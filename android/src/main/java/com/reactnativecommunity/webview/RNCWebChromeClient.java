@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
+    private static final String TAG = RNCWebChromeClient.class.getSimpleName();
     protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
 
