@@ -251,6 +251,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return this.messagingEnabled;
     }
 
+    @SuppressLint("RestrictedApi")
     protected void createRNCWebViewBridge(RNCWebView webView) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)){
           if (this.bridgeListener == null) {
