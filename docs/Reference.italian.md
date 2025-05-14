@@ -88,6 +88,7 @@ Questo documento elenca le attuali proprietà e metodi pubblici di React Native 
 - [`downloadingMessage`](Reference.italian.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.italian.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.italian.md#allowsProtectedMedia)
+- [`inheritAppPermissions`](Reference.md#inheritAppPermissions)
 - [`webviewDebuggingEnabled`](Reference.italian.md#webviewDebuggingEnabled)
 
 ## Methods Index
@@ -1489,6 +1490,15 @@ Se impostato su `true`, la WebView può riprodurre contenuti multimediali protet
 | Tipo    | Obbligatorio | Piattaforma  |
 | ------- | ------------ | ------------ |
 | boolean | No           | Android      |
+
+### `inheritAppPermissions`[⬆](#props-index)
+
+Se il WebView eredita o meno le autorizzazioni dell'app. Il valore predefinito è `true`.
+Impostarlo su `false` allineerà il comportamento con iOS, dove il WebView richiede sempre le autorizzazioni all'utente.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
 
 ### `fraudulentWebsiteWarningEnabled`[⬆](#props-index)
 Boolean che indica se la WebView mostra avvisi per contenuti sospetti di frode, come malware o tentativi di phishing. Il valore predefinito è `true`. (iOS 13+)
