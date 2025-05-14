@@ -93,6 +93,7 @@ This document lays out the current public properties and methods for the React N
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
+- [`inheritAppPermissions`](Reference.md#inheritAppPermissions)
 - [`webviewDebuggingEnabled`](Reference.md#webviewDebuggingEnabled)
 
 ## Methods Index
@@ -1707,6 +1708,15 @@ This is the message that is shown in the Toast when the webview is unable to dow
 
 Whether or not the Webview can play media protected by DRM. Default is `false`.
 ⚠️ Setting this to `false` won't revoke the permission already granted to the current webpage. In order to do so, you'd have to reload the page as well. ⚠️
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+### `inheritAppPermissions`[⬆](#props-index)
+
+Whether or not the Webview inherits the app's permissions. Default is `true`.
+Setting this to `false` will align with iOS behavior, where the webview always asks user for permissions.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
