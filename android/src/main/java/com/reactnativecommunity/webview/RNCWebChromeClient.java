@@ -3,20 +3,25 @@ package com.reactnativecommunity.webview;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
+import android.webkit.JsPromptResult;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.annotation.RequiresApi;
@@ -54,6 +59,9 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     protected View mVideoView;
     protected WebChromeClient.CustomViewCallback mCustomViewCallback;
+
+    // This boolean block JS prompts and alerts from displaying during loading
+    protected boolean blockJsDuringLoading = true;
 
     /*
      * - Permissions -
@@ -150,11 +158,14 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
         for (String requestedResource : request.getResources()) {
             String androidPermission = null;
+            String requestPermissionIdentifier = null;
 
             if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
                 androidPermission = Manifest.permission.RECORD_AUDIO;
+                requestPermissionIdentifier = "microphone";
             } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
                 androidPermission = Manifest.permission.CAMERA;
+                requestPermissionIdentifier = "camera";
             } else if(requestedResource.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
                 if (mAllowsProtectedMedia) {
                   grantedPermissions.add(requestedResource);
@@ -168,10 +179,30 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                    */
                   androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
                 }            }
+            Uri originUri = request.getOrigin();
+            String host = originUri.getHost();
             // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
+            String alertMessage = String.format("Allow " + host  + " to use your " + requestPermissionIdentifier + "?");
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
-                    grantedPermissions.add(requestedResource);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+                    builder.setMessage(alertMessage);
+                    builder.setCancelable(false);
+                    String finalAndroidPermission = androidPermission;
+                    builder.setPositiveButton("Allow", (dialog, which) -> {
+                        permissionRequest = request;
+                        grantedPermissions.add(finalAndroidPermission);
+                        requestPermissions(grantedPermissions);
+                    });
+                    builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                        request.deny();
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                    //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+                    Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    posButton.setEnabled(false);
+                    this.runDelayed(() -> posButton.setEnabled(true), 500);
                 } else {
                     requestedAndroidPermissions.add(androidPermission);
                 }
@@ -180,8 +211,10 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
         // If all the permissions are already granted, send the response to the WebView synchronously
         if (requestedAndroidPermissions.isEmpty()) {
-            request.grant(grantedPermissions.toArray(new String[0]));
-            grantedPermissions = null;
+            if (!grantedPermissions.isEmpty()) {
+                request.grant(grantedPermissions.toArray(new String[0]));
+                grantedPermissions = null;
+            }
             return;
         }
 
@@ -192,6 +225,10 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         requestPermissions(requestedAndroidPermissions);
     }
 
+    private void runDelayed(Runnable function, long delayMillis) {
+        Handler handler = new Handler();
+        handler.postDelayed(function, delayMillis);
+    }
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -208,7 +245,23 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
 
         } else {
-            callback.invoke(origin, true, false);
+            String alertMessage = String.format("Allow %s to use your location?", origin);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+            builder.setMessage(alertMessage);
+            builder.setCancelable(false);
+            builder.setPositiveButton("Allow", (dialog, which) -> {
+                callback.invoke(origin, true, false);
+            });
+            builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                callback.invoke(origin, false, false);
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+            //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+            Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            posButton.setEnabled(false);
+            this.runDelayed(() -> posButton.setEnabled(true), 500);
+
         }
     }
 
@@ -334,6 +387,16 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
 
         return this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple, fileChooserParams.isCaptureEnabled());
+    }
+
+    @Override
+    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+        if (blockJsDuringLoading) {
+            result.cancel();
+            return true;
+        } else {
+            return super.onJsPrompt(view, url, message, defaultValue, result);
+        }
     }
 
     @Override
