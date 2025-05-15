@@ -1269,28 +1269,6 @@ RCTAutoInsetsProtocol>
     [alert addAction:cancelAction];
     alert.preferredAction = okAction;
     [[self topViewController] presentViewController:alert animated:YES completion:NULL];
-#else
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText:prompt];
-
-    const NSRect RCTSingleTextFieldFrame = NSMakeRect(0.0, 0.0, 275.0, 22.0);
-    NSTextField *textField = [[NSTextField alloc] initWithFrame:RCTSingleTextFieldFrame];
-    textField.cell.scrollable = YES;
-    if (@available(macOS 10.11, *)) {
-      textField.maximumNumberOfLines = 1;
-    }
-    textField.stringValue = defaultText;
-    [alert setAccessoryView:textField];
-
-    [alert addButtonWithTitle:NSLocalizedString(@"OK", @"OK button")];
-    [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button")];
-    [alert beginSheetModalForWindow:[NSApp keyWindow] completionHandler:^(NSModalResponse response) {
-      if (response == NSAlertFirstButtonReturn) {
-        completionHandler([textField stringValue]);
-      } else {
-        completionHandler(nil);
-      }
-    }];
 #endif // !TARGET_OS_OSX
   } else {
     completionHandler(nil);
