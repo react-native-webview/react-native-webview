@@ -62,8 +62,6 @@ public class RNCWebViewClient extends WebViewClient {
         if (cookies != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 CookieManager.getInstance().flush();
-            } else {
-                CookieSyncManager.getInstance().sync();
             }
         }
 
