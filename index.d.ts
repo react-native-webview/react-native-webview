@@ -33,7 +33,7 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
     injectJavaScript: (script: string) => void;
 
     /**
-     * Focuses on WebView redered page.
+     * Focuses on WebView rendered page.
      */
     requestFocus: () => void;
     
