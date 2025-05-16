@@ -1265,14 +1265,9 @@ RCTAutoInsetsProtocol>
       completionHandler([textField stringValue]);
     } else {
       completionHandler(nil);
-    }];
-    [alert addAction:cancelAction];
-    alert.preferredAction = okAction;
-    [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+    }
+  }];
 #endif // !TARGET_OS_OSX
-  } else {
-    completionHandler(nil);
-  }
 }
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
