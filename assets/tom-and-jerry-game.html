@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tom and Jerry Game</title>
+  <style>
+    canvas {
+      background: url('https://i.imgur.com/dYcYQ7E.jpg') no-repeat center center;
+      background-size: cover;
+      display: block;
+      margin: auto;
+      border: 5px solid #333;
+    }
+  </style>
+</head>
+<body>
+<canvas id="game" width="800" height="500"></canvas>
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const jerry = {
+  x: 100,
+  y: 100,
+  size: 50,
+  dx: 0,
+  dy: 0,
+  speed: 4,
+  img: new Image()
+};
+jerry.img.src = "https://i.imgur.com/FEXb4ln.png"; // Jerry image
+
+const tom = {
+  x: 700,
+  y: 400,
+  size: 60,
+  img: new Image()
+};
+tom.img.src = "https://i.imgur.com/IZjN76e.png"; // Tom image
+
+function drawCharacter(char) {
+  ctx.drawImage(char.img, char.x, char.y, char.size, char.size);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawCharacter(jerry);
+  drawCharacter(tom);
+}
+
+function update() {
+  jerry.x += jerry.dx;
+  jerry.y += jerry.dy;
+
+  // Keep Jerry in bounds
+  jerry.x = Math.max(0, Math.min(canvas.width - jerry.size, jerry.x));
+  jerry.y = Math.max(0, Math.min(canvas.height - jerry.size, jerry.y));
+
+  // Move Tom toward Jerry
+  if (tom.x < jerry.x) tom.x += 1;
+  if (tom.x > jerry.x) tom.x -= 1;
+  if (tom.y < jerry.y) tom.y += 1;
+  if (tom.y > jerry.y) tom.y -= 1;
+
+  // Collision check
+  if (
+    Math.abs(jerry.x - tom.x) < 40 &&
+    Math.abs(jerry.y - tom.y) < 40
+  ) {
+    alert("Oh no! Tom caught Jerry!");
+    window.location.reload();
+  }
+}
+
+function loop() {
+  draw();
+  update();
+  requestAnimationFrame(loop);
+}
+
+function keyDown(e) {
+  if (e.key === "ArrowRight") jerry.dx = jerry.speed;
+  if (e.key === "ArrowLeft") jerry.dx = -jerry.speed;
+  if (e.key === "ArrowUp") jerry.dy = -jerry.speed;
+  if (e.key === "ArrowDown") jerry.dy = jerry.speed;
+}
+
+function keyUp(e) {
+  if (
+    e.key === "ArrowRight" || e.key === "ArrowLeft"
+  ) jerry.dx = 0;
+  if (
+    e.key === "ArrowUp" || e.key === "ArrowDown"
+  ) jerry.dy = 0;
+}
+
+document.addEventListener("keydown", keyDown);
+document.addEventListener("keyup", keyUp);
+
+loop();
+</script>
+</body>
+</html>
