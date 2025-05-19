@@ -198,6 +198,15 @@ Add permission in AndroidManifest.xml:
 
 If the file input indicates that images or video is desired with [`accept`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept), then the WebView will attempt to provide options to the user to use their camera to take a picture or video.
 
+Additionally, if the user- or environment-facing camera is specified with the [`capture`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#capture) attribute, the following must be added to the AndroidManifest.xml file for the camera to function consistently on some Android versions and devices:
+```xml
+<queries>
+    <intent>
+        <action android:name="android.media.action.IMAGE_CAPTURE" />
+    </intent>
+</queries>
+```
+
 Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app _can_ request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, it is up to the developer to request camera permission before a file upload directly using the camera is necessary.
 
 ##### Check for File Upload support, with `static isFileUploadSupported()`
@@ -375,7 +384,7 @@ By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the J
 > Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
 
 
-#### The `injectedJavaScriptObject` prop (Android Only)
+#### The `injectedJavaScriptObject` prop
 
 Due to the Android race condition mentioned above, this more reliable prop was added. While you cannot execute arbitrary JavaScript, you can make an arbitrary JS object available to the JS run in the webview prior to the page load completing.
 
@@ -562,7 +571,7 @@ const CustomHeaderWebView = (props) => {
 
 #### Managing Cookies
 
-You can set cookies on the React Native side using the [@react-native-community/cookies](https://github.com/react-native-community/cookies) package.
+You can set cookies on the React Native side using the [@react-native-cookies/cookies](https://github.com/react-native-cookies/cookies) package.
 
 When you do, you'll likely want to enable the [sharedCookiesEnabled](Reference.md#sharedCookiesEnabled) prop as well.
 
@@ -607,7 +616,9 @@ For Android, you need to use `BackHandler.addEventListener` and hook that up to 
 With functional React components, you can use `useRef` and `useEffect` (you'll need to import them from React if you aren't already) to allow users to navigate to the previous page when they press the back button like so:
 ```jsx
 import React, {
+    useCallback,
     useEffect,
+    useState,
     useRef,
 } from 'react';
 import {
@@ -617,14 +628,15 @@ import {
 ```
 
 ```jsx
+const [canGoBack, setCanGoBack] = useState(false);
 const webViewRef = useRef(null);
-const onAndroidBackPress = () => {
-  if (webViewRef.current) {
-    webViewRef.current.goBack();
+const onAndroidBackPress = useCallback(() => {
+  if (canGoBack) {
+    webViewRef.current?.goBack();
     return true; // prevent default behavior (exit app)
   }
   return false;
-};
+}, [canGoBack]);
 
 useEffect(() => {
   if (Platform.OS === 'android') {
@@ -633,13 +645,16 @@ useEffect(() => {
       BackHandler.removeEventListener('hardwareBackPress', onAndroidBackPress);
     };
   }
-}, []);
+}, [onAndroidBackPress]);
 ```
 
-And add this prop to your `WebView` component:
+And add these prop to your `WebView` component:
 ```jsx
 <WebView
   ref={webViewRef}
+  onLoadProgress={event => {
+    setCanGoBack(event.nativeEvent.canGoBack);
+  }}
 />
 ```
 

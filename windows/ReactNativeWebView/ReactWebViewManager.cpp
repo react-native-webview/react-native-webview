@@ -1,4 +1,10 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 #include "pch.h"
+
+#ifndef USE_WINUI3
+
 #include "ReactWebViewManager.h"
 #include "NativeModules.h"
 #include "ReactWebView.h"
@@ -144,7 +150,7 @@ namespace winrt::ReactNativeWebView::implementation {
               auto reactWebView = view.as<ReactNativeWebView::ReactWebView>();
               reactWebView.MessagingEnabled(messagingEnabled);
             }
-        }        
+        }
     }
 
     // IViewManagerWithExportedEventTypeConstants
@@ -158,6 +164,8 @@ namespace winrt::ReactNativeWebView::implementation {
             WriteCustomDirectEventTypeConstant(constantWriter, "LoadingFinish");
             WriteCustomDirectEventTypeConstant(constantWriter, "LoadingError");
             WriteCustomDirectEventTypeConstant(constantWriter, "Message");
+            WriteCustomDirectEventTypeConstant(constantWriter, "DOMContentLoaded");
+            WriteCustomDirectEventTypeConstant(constantWriter, "Message");
         };
     }
 
@@ -169,6 +177,8 @@ namespace winrt::ReactNativeWebView::implementation {
         commands.Append(L"reload");
         commands.Append(L"stopLoading");
         commands.Append(L"injectJavaScript");
+        commands.Append(L"postMessage");
+        commands.Append(L"loadUrl");
         return commands.GetView();
     }
 
@@ -199,7 +209,16 @@ namespace winrt::ReactNativeWebView::implementation {
         }
         else if (commandId == L"injectJavaScript") {
             webView.InvokeScriptAsync(L"eval", { winrt::to_hstring(commandArgs[0].AsString()) });
-        } 
+        }
+        else if (commandId == L"postMessage") {
+            auto reactWebView = view.as<ReactNativeWebView::ReactWebView>();
+            reactWebView.PostMessage(to_hstring(commandArgs[0].AsString()));
+        }
+        else if (commandId == L"loadUrl") {
+            webView.Navigate(winrt::Uri(to_hstring(commandArgs[0].AsString())));
+        }
     }
 
 } // namespace winrt::ReactWebView::implementation
+
+#endif // USE_WINUI3

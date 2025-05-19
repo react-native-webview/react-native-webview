@@ -45,6 +45,7 @@ This document lays out the current public properties and methods for the React N
 - [`applicationNameForUserAgent`](Reference.md#applicationNameForUserAgent)
 - [`allowsFullscreenVideo`](Reference.md#allowsfullscreenvideo)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
+- [`allowsPictureInPictureMediaPlayback`](Reference.md#allowsPictureInPictureMediaPlayback)
 - [`allowsAirPlayForMediaPlayback`](Reference.md#allowsAirPlayForMediaPlayback)
 - [`bounces`](Reference.md#bounces)
 - [`overScrollMode`](Reference.md#overscrollmode)
@@ -74,6 +75,7 @@ This document lays out the current public properties and methods for the React N
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
 - [`pullToRefreshEnabled`](Reference.md#pullToRefreshEnabled)
+- [`refreshControlLightMode`](Reference.md#refreshControlLightMode)
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
@@ -257,7 +259,7 @@ Inject any JavaScript object into the webview so it is available to the JS runni
 
 | Type | Required | Platform                                          |
 | ---- | -------- | ------------------------------------------------- |
-| obj | No       | Android only |
+| obj | No       | iOS, Android |
 
 Example:
 
@@ -1017,6 +1019,21 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 | bool | No       | iOS      |
 
 ---
+
+### `allowsPictureInPictureMediaPlayback`[⬆](#props-index)
+
+Boolean value that indicates whether HTML5 videos can play Picture in Picture. The default value is `false`.
+
+> **NOTE**
+>
+> In order to restrict playing video in picture in picture mode this props need to be set to `false`
+.
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS      |
+
+---
+
 ### `allowsAirPlayForMediaPlayback`[⬆](#props-index)
 
 A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
@@ -1373,6 +1390,16 @@ Example:
 ### `pullToRefreshEnabled`[⬆](#props-index)
 
 Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true`.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+### `refreshControlLightMode`[⬆](#props-index)
+
+(ios only)
+Boolean value that determines whether the refresh control color is white or not.
+Default is `false`, meaning the refresh control color will be the default.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
@@ -1770,6 +1797,8 @@ clearCache(true);
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
 
 In iOS, includeDiskFiles will also remove data from the web storages and databases.[developer.apple.com reference](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata)
+
+In Windows, this has been set to clear cookies, since there is no way to clear the cache in WebView2 because it is shared with Edge. The best we can do is clear the cookies, because we cannot access history or local storage.
 
 ### `clearHistory()`[⬆](#methods-index)
 

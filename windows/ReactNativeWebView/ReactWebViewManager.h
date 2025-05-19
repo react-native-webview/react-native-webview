@@ -2,12 +2,15 @@
 // Licensed under the MIT License.
 
 #pragma once
+
+#ifndef USE_WINUI3
+
 #include "winrt/Microsoft.ReactNative.h"
 #include "NativeModules.h"
 #include "ReactWebView.h"
 
 namespace winrt::ReactNativeWebView::implementation {
-    
+
     class ReactWebViewManager : public winrt::implements<
         ReactWebViewManager,
         winrt::Microsoft::ReactNative::IViewManager,
@@ -51,3 +54,5 @@ namespace winrt::ReactNativeWebView::implementation {
 
     };
 } // namespace winrt::ReactWebView::implementation
+
+#endif  // USE_WINUI3

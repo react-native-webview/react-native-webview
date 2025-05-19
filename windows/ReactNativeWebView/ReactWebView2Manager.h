@@ -10,7 +10,7 @@
 #include "NativeModules.h"
 
 namespace winrt::ReactNativeWebView::implementation {
-    
+
     class ReactWebView2Manager : public winrt::implements<
         ReactWebView2Manager,
         winrt::Microsoft::ReactNative::IViewManager,
@@ -22,7 +22,7 @@ namespace winrt::ReactNativeWebView::implementation {
         ReactWebView2Manager();
         // IViewManager
         winrt::hstring Name() noexcept;
-        winrt::Windows::UI::Xaml::FrameworkElement CreateView() noexcept;
+        xaml::FrameworkElement CreateView() noexcept;
 
         // IViewManagerWithReactContext
         winrt::Microsoft::ReactNative::IReactContext ReactContext() noexcept;
@@ -34,7 +34,7 @@ namespace winrt::ReactNativeWebView::implementation {
             NativeProps() noexcept;
 
         void UpdateProperties(
-            winrt::Windows::UI::Xaml::FrameworkElement const& view,
+            xaml::FrameworkElement const& view,
             winrt::Microsoft::ReactNative::IJSValueReader const& propertyMapReader) noexcept;
 
         // IViewManagerWithExportedEventTypeConstants
@@ -45,7 +45,7 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::Windows::Foundation::Collections::IVectorView<winrt::hstring> Commands() noexcept;
 
         void DispatchCommand(
-            winrt::Windows::UI::Xaml::FrameworkElement const& view,
+            xaml::FrameworkElement const& view,
             winrt::hstring const& commandId,
             winrt::Microsoft::ReactNative::IJSValueReader const& commandArgsReader) noexcept;
 
