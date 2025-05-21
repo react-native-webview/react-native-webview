@@ -33,6 +33,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
+import com.reactnativecommunity.webview.extension.file.Base64FileDownloader;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +55,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
     final private ReactApplicationContext mContext;
 
     private DownloadManager.Request mDownloadRequest;
+    private String base64DownloadRequest;
 
     private ValueCallback<Uri> mFilePathCallbackLegacy;
     private ValueCallback<Uri[]> mFilePathCallback;
@@ -185,6 +187,8 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
                         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                             if (mDownloadRequest != null) {
                                 downloadFile(downloadingMessage);
+                            } else if (base64DownloadRequest != null) {
+                                Base64FileDownloader.INSTANCE.downloadBase64FileWithoutPermissionCheckAndDialog(mContext, base64DownloadRequest, downloadingMessage);
                             }
                         } else {
                             Toast.makeText(mContext, lackPermissionToDownloadMessage, Toast.LENGTH_LONG).show();
@@ -308,6 +312,10 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
     public void setDownloadRequest(DownloadManager.Request request) {
         mDownloadRequest = request;
+    }
+
+    public void setBase64DownloadRequest(String base64) {
+        base64DownloadRequest = base64;
     }
 
     public void downloadFile(String downloadingMessage) {
