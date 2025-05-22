@@ -1,7 +1,7 @@
 package com.reactnativecommunity.webview.extension.file
 
+import android.app.AlertDialog
 import android.content.Context
-import android.support.v7.app.AlertDialog
 
 /**
  * For the first 500ms disabled Positive button to prevent accidental taps
