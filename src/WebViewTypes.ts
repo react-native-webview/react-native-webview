@@ -306,6 +306,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
+  paymentRequestEnabled?: boolean;
   // TODO: find a better way to type this.
 
   source: any;
@@ -1329,4 +1330,9 @@ export interface WebViewSharedProps extends ViewProps {
    * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
    */
   webviewDebuggingEnabled?: boolean;
+
+  /**
+   * Enables support for the Payment Request API for the WebView
+   */
+  paymentRequestEnabled?: boolean;
 }
