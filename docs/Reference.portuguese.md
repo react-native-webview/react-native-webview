@@ -84,6 +84,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`enableApplePay`](Reference.portuguese.md#enableApplePay)
 - [`forceDarkOn`](Reference.portuguese.md#forceDarkOn)
 - [`minimumFontSize`](Reference.portuguese.md#minimumFontSize)
+- [`inheritAppPermissions`](Reference.md#inheritAppPermissions)
 
 ## Methods Index
 
@@ -1532,6 +1533,15 @@ Exemplo:
 ```javascript
 <WebView minimumFontSize={1} />
 ```
+
+### `inheritAppPermissions`[⬆](#props-index)
+
+Se a WebView herda ou não as permissões do aplicativo. O valor padrão é `true`.
+Definir como `false` alinhará o comportamento com o iOS, onde a WebView sempre solicita permissões ao usuário.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
 
 ## Métodos
 
