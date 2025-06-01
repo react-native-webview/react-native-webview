@@ -53,6 +53,7 @@ This document lays out the current public properties and methods for the React N
 - [`contentInsetAdjustmentBehavior`](Reference.md#contentInsetAdjustmentBehavior)
 - [`contentMode`](Reference.md#contentMode)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
+- [`indicatorStyle`](Reference.md#indicatorStyle)
 - [`scrollEnabled`](Reference.md#scrollenabled)
 - [`nestedScrollEnabled`](Reference.md#nestedscrollenabled)
 - [`setBuiltInZoomControls`](Reference.md#setBuiltInZoomControls)
@@ -1146,6 +1147,16 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 | Type | Required | Platform      |
 | ---- | -------- | ------------- |
 | bool | No       | iOS and macOS |
+
+---
+
+### `indicatorStyle`[⬆](#props-index)
+
+The colorstyle of the scroll indicator. The default value is `default`.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
 
 ---
 

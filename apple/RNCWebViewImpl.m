@@ -74,7 +74,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
       @"toggleUnderline:":   @"underline",
       @"_share:":            @"share",
   };
-    
+
   return map[sel] ?: sel;
 }
 
@@ -86,7 +86,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
           return NO;
       }
   }
-  
+
   if (!self.menuItems) {
       return [super canPerformAction:action withSender:sender];
   }
@@ -168,7 +168,6 @@ RCTAutoInsetsProtocol>
     _javaScriptEnabled = YES;
     _allowsLinkPreview = YES;
     _showsVerticalScrollIndicator = YES;
-    _forceLightScrollIndicators = NO;
     _directionalLockEnabled = YES;
     _useSharedProcessPool = YES;
     _cacheEnabled = YES;
@@ -277,7 +276,7 @@ RCTAutoInsetsProtocol>
 
       UIMenuController *menuController = [UIMenuController sharedMenuController];
       NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
-      
+
       for(NSDictionary *menuItem in self.menuItems) {
         NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
         NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
@@ -537,10 +536,11 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
 
-    if(_forceLightScrollIndicators){
+    if ([_indicatorStyle isEqualToString:@"black"]) {
+        _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
+    } else if ([_indicatorStyle isEqualToString:@"white"]) {
         _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
-    }
-    else{
+    } else {
         _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
     }
 
@@ -861,7 +861,7 @@ RCTAutoInsetsProtocol>
   [self syncCookiesToWebView:^{
     // Add observer to sync cookies from webview to sharedHTTPCookieStorage
     [webView.configuration.websiteDataStore.httpCookieStore addObserver:self];
-    
+
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
     // the same url. We'll expose a call to 'reload' to allow a user to load
@@ -1094,15 +1094,16 @@ RCTAutoInsetsProtocol>
   _webView.scrollView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
 }
 
-- (void)setForceLightScrollIndicators:(BOOL)forceLightScrollIndicators
+- (void)setIndicatorStyle:(NSString *)indicatorStyle
 {
-  _forceLightScrollIndicators = forceLightScrollIndicators;
+  _indicatorStyle = indicatorStyle;
 
-  if(_forceLightScrollIndicators){
-      _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
-  }
-  else{
-      _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
+  if ([indicatorStyle isEqualToString:@"black"]) {
+    _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
+  } else if ([indicatorStyle isEqualToString:@"white"]) {
+    _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
+  } else {
+    _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
   }
 }
 #endif // !TARGET_OS_OSX
@@ -1420,7 +1421,7 @@ RCTAutoInsetsProtocol>
 }
 
 /**
- * Called when the web view’s content process is terminated.
+ * Called when the web view's content process is terminated.
  * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi?language=objc
  */
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
