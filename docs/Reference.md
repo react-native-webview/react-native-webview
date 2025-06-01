@@ -898,7 +898,7 @@ A floating-point number that determines how quickly the scroll view decelerates 
 
 ### `domStorageEnabled`[⬆](#props-index)
 
-Boolean value to control whether DOM Storage is enabled. Used only in Android.
+Boolean value to control whether DOM Storage is enabled. Used only in Android. The default value is `true`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |

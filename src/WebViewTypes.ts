@@ -1058,7 +1058,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
 
   /**
    * Boolean value to control whether DOM Storage is enabled. Used only in
-   * Android.
+   * Android. The default value is `true`.
    * @platform android
    */
   domStorageEnabled?: boolean;
