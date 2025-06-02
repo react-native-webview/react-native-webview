@@ -28,24 +28,21 @@ internal class BlobFileDownloader(
 	companion object {
 		const val JS_INTERFACE_TAG: String = "BlobFileDownloader"
 
-		fun getBase64StringFromBlobUrl(blobUrl: String): String {
-			return """
-                javascript: var xhr = new XMLHttpRequest();
-                xhr.open('GET', '$blobUrl', true);
-                xhr.responseType = 'blob';
-                xhr.onload = function(e) {
-                    if (this.status == 200) {
-                        var blobFile = this.response;
-                        var reader = new FileReader();
-                        reader.readAsDataURL(blobFile);
-                        reader.onloadend = function() {
-                            var base64 = reader.result;
-                            ${JS_INTERFACE_TAG}.getBase64FromBlobData(base64);
-                        }
-                    }
-                };
-                xhr.send();
-            """.trimIndent()
-		}
+    fun getBlobFileInterceptor(): String =
+      """
+        (function() {
+          const originalCreateObjectURL = URL.createObjectURL;
+          URL.createObjectURL = function(blob) {
+            const url = originalCreateObjectURL.call(URL, blob);
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = function() {
+              const base64 = reader.result;
+              ${JS_INTERFACE_TAG}.getBase64FromBlobData(base64);
+            };
+            return url;
+          };
+        })();
+    """.trimIndent()
 	}
 }

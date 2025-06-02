@@ -80,7 +80,7 @@ internal object Base64FileDownloader {
 
 
 	private fun getMimeTypeAndFileExtension(header: String): Pair<String, String> {
-		val mimeType = Regex("data:(.*?);base64").find(header)?.groupValues?.get(1) ?: "application/octet-stream"
+		val mimeType = Regex("data:([^;]+)").find(header)?.groupValues?.get(1) ?: "application/octet-stream"
 		val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
 		return mimeType to extension
 	}
