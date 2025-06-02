@@ -95,6 +95,14 @@
     "jsSrcsDir": "./src",
     "android": {
       "javaPackageName": "com.reactnativecommunity.webview"
+    },
+    "ios": {
+      "componentProvider": {
+        "RNCWebView": "RNCWebView"
+      },
+      "modulesProvider": {
+        "RNCWebViewModule": "RNCWebViewModule"
+      }
     }
   },
   "packageManager": "yarn@1.22.19"
