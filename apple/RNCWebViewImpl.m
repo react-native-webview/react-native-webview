@@ -972,28 +972,29 @@ RCTAutoInsetsProtocol>
 
     NSData *fileData = [[NSData alloc] initWithBase64EncodedString:base64ContentPart options:NSDataBase64DecodingIgnoreUnknownCharacters];
     NSString *fileExtension = [self fileExtensionFromBase64String:base64String];
+    [self showDownloadAlert:fileExtension invokeDownload:^{
+    	NSString *tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"File.%@", fileExtension]];
+        [fileData writeToFile:tempFilePath atomically:YES];
 
-    NSString *tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"File.%@", fileExtension]];
-    [fileData writeToFile:tempFilePath atomically:YES];
+        NSURL *tempFileURL = [NSURL fileURLWithPath:tempFilePath];
 
-    NSURL *tempFileURL = [NSURL fileURLWithPath:tempFilePath];
+        UIDocumentPickerViewController *documentPicker = nil;
+        if (@available(iOS 14.0, *)) {
+            documentPicker = [[UIDocumentPickerViewController alloc] initForExportingURLs:@[tempFileURL] asCopy:YES];
+        } else {
+            // Usage of initWithURL:inMode: might lose file's extension and user has to type it manually
+            // Problem was solved for iOS 14 and higher with initForExportingURLs
+            documentPicker = [[UIDocumentPickerViewController alloc] initWithURL:tempFileURL inMode:UIDocumentPickerModeExportToService];
+        }
+        documentPicker.delegate = self;
+        documentPicker.modalPresentationStyle = UIModalPresentationFullScreen;
 
-    UIDocumentPickerViewController *documentPicker = nil;
-    if (@available(iOS 14.0, *)) {
-        documentPicker = [[UIDocumentPickerViewController alloc] initForExportingURLs:@[tempFileURL] asCopy:YES];
-    } else {
-        // Usage of initWithURL:inMode: might lose file's extension and user has to type it manually
-        // Problem was solved for iOS 14 and higher with initForExportingURLs
-        documentPicker = [[UIDocumentPickerViewController alloc] initWithURL:tempFileURL inMode:UIDocumentPickerModeExportToService];
-    }
-    documentPicker.delegate = self;
-    documentPicker.modalPresentationStyle = UIModalPresentationFullScreen;
-
-    UIViewController *rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while (rootViewController.presentedViewController) {
-        rootViewController = rootViewController.presentedViewController;
-    }
+        UIViewController *rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+        while (rootViewController.presentedViewController) {
+            rootViewController = rootViewController.presentedViewController;
+        }
     [rootViewController presentViewController:documentPicker animated:YES completion:nil];
+    }];
 }
 
 - (NSString *)fileExtensionFromBase64String:(NSString *)base64String {
@@ -2102,6 +2103,56 @@ didFinishNavigation:(WKNavigation *)navigation
         }
     }];
 }
+
+- (void)showDownloadAlert:(NSString *)fileExtension
+           invokeDownload:(void (^)(void))invokeDownload {
+    NSString *title =
+        [NSString stringWithFormat:@"Do you want to download File.%@?",
+                                   fileExtension ?: @""];
+
+    UIAlertController *alert = [UIAlertController
+        alertControllerWithTitle:title
+                         message:nil
+                  preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction *cancelAction =
+        [UIAlertAction actionWithTitle:@"Cancel"
+                                 style:UIAlertActionStyleCancel
+                               handler:nil];
+
+    UIAlertAction *downloadAction =
+        [UIAlertAction actionWithTitle:@"Download"
+                                 style:UIAlertActionStyleDefault
+                               handler:^(UIAlertAction *_Nonnull action) {
+                                 if (invokeDownload) {
+                                     invokeDownload();
+                                 }
+                               }];
+
+    [alert addAction:cancelAction];
+    [alert addAction:downloadAction];
+
+    UIViewController *rootViewController =
+        [UIApplication sharedApplication].keyWindow.rootViewController;
+    if (rootViewController) {
+        [rootViewController presentViewController:alert
+                                         animated:YES
+                                       completion:nil];
+    } else {
+        NSLog(@"Error: No root view controller to present alert");
+    }
+
+    // Disable download button initially to prevent Tap jacking
+    downloadAction.enabled = NO;
+
+    // Enable button after 500ms
+    dispatch_after(
+        dispatch_time(DISPATCH_TIME_NOW, (int64_t)(500 * NSEC_PER_MSEC)),
+        dispatch_get_main_queue(), ^{
+          downloadAction.enabled = YES;
+        });
+}
+
 
 @end
 
