@@ -1401,6 +1401,12 @@ RCTAutoInsetsProtocol>
             decisionHandler(WKNavigationActionPolicyCancel);
             return;
         }
+    } else if ([self isDownloadableFileURL:navigationAction.request.URL]) {
+      	if (_onFileDownload) {
+        	[self handleRegularFileDownload:urlString];
+        	decisionHandler(WKNavigationActionPolicyCancel);
+        	return;
+        }
     }
 
     dispatch_once(&onceToken, ^{
@@ -2051,6 +2057,50 @@ didFinishNavigation:(WKNavigation *)navigation
       "};"
       "xhr.send();", urlString];
   [self.webView evaluateJavaScript:jsCode completionHandler:^(id result, NSError *error) {}];
+}
+
+- (BOOL)isDownloadableFileURL:(NSURL *)url {
+    if (!url || !url.pathExtension) {
+        return NO;
+    }
+    
+    NSString *extension = [url.pathExtension lowercaseString];
+    NSSet *downloadableExtensions = [NSSet setWithObjects:
+        @"jpg", @"jpeg", @"png", @"gif", @"bmp", @"webp", @"svg",  // Images
+        @"pdf", @"doc", @"docx", @"xls", @"xlsx", @"ppt", @"pptx", // Documents
+        @"txt", @"rtf", @"csv", @"json", @"xml",                   // Text files
+        @"zip", @"rar", @"7z", @"tar", @"gz",                      // Archives
+        @"mp3", @"wav", @"m4a", @"aac", @"flac",                   // Audio
+        @"mp4", @"avi", @"mov", @"wmv", @"mkv", @"webm",           // Video
+        nil
+    ];
+    
+    return [downloadableExtensions containsObject:extension];
+}
+
+- (void)handleRegularFileDownload:(NSString *)urlString {
+    NSString *jsCode = [NSString stringWithFormat:
+        @"fetch('%@')"
+        ".then(response => {"
+        "    if (!response.ok) throw new Error('Network response was not ok');"
+        "    return response.blob();"
+        "})"
+        ".then(blob => {"
+        "    const reader = new FileReader();"
+        "    reader.onloadend = function() {"
+        "        window.webkit.messageHandlers.base64Handler.postMessage(reader.result);"
+        "    };"
+        "    reader.readAsDataURL(blob);"
+        "})"
+        ".catch(error => {"
+        "    console.error('Download failed:', error);"
+        "});", urlString];
+    
+    [self.webView evaluateJavaScript:jsCode completionHandler:^(id result, NSError *error) {
+        if (error) {
+            NSLog(@"Error downloading file: %@", error.localizedDescription);
+        }
+    }];
 }
 
 @end
