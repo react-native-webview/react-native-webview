@@ -66,6 +66,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean injectedJavaScriptForMainFrameOnly = true;
     protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
 
+    protected boolean inheritAppPermissions = true;
     protected boolean messagingEnabled = false;
     protected @Nullable
     String messagingModuleName;
