@@ -28,6 +28,12 @@ import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.Locale
+import android.content.Intent
+import android.util.Base64
+import android.webkit.MimeTypeMap
+import android.widget.Toast
+import java.io.File
+import java.io.IOException
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
@@ -92,6 +98,37 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+            // Check if the URL is a Base64 data URL
+            if (url.startsWith("data:")) {
+                // Extract Base64 data and MIME MimeTypeMap
+                
+                val base64Prefix = url.substringAfter("data:").substringBefore(";")
+                val base64Data = url.substringAfter("base64,")
+                val fileExtension = MimeTypeMap.getSingleton().getExtensionFromMimeType(base64Prefix) ?: "bin"
+                val guessedMimeType = mimetype ?: url.substringAfter("data:", "").substringBefore(";")
+                val fileName_ = "downloaded_file.$fileExtension"
+                val timestamp = System.currentTimeMillis().toString()
+                val fileName: String = fileName_.replace(".", "_$timestamp.")
+                // Decode and save Base64 data
+                val decodedBytes = Base64.decode(base64Data, Base64.DEFAULT)
+                val directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val file = File(directory, fileName)
+                try {
+                    directory.mkdirs() // Ensure the directory exists
+                    file.writeBytes(decodedBytes) // Write file
+                    Log.i(TAG, "Base64 file saved: ${file.absolutePath}")
+                    // Notify the user about the successful download
+                    Toast.makeText(webView.context, "File downloaded: ${fileName}", Toast.LENGTH_LONG).show()
+                    val file = File(file.absolutePath)
+                    val uri = Uri.fromFile(file)
+                    context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri))
+                } catch (e: IOException) {
+                    Log.e(TAG, "Error saving Base64 file", e)
+                    Toast.makeText(webView.context, "Failed to download file", Toast.LENGTH_LONG).show()
+                }
+                return@DownloadListener // Skip HTTP download logic
+            }
+            // Else it will work use default behaviour
             webView.setIgnoreErrFailedForThisURL(url)
             val module = webView.reactApplicationContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {
