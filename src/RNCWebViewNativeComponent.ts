@@ -292,6 +292,7 @@ export interface NativeProps extends ViewProps {
   }>;
   userAgent?: string;
   injectedJavaScriptObject?: string;
+  paymentRequestEnabled?: boolean;
 }
 
 export interface NativeCommands {
