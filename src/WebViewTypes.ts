@@ -660,14 +660,6 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    *
    */
-  pullToRefreshEnabled?: boolean;
-
-  /**
-   * Boolean value that determines whether the refresh control color is white or not.
-   * The default value is `false`, meaning the refresh control color will be the default.
-   * @platform ios
-   *
-   */
   refreshControlLightMode?: boolean;
 
   /**
@@ -945,6 +937,7 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
+  refreshControl?: ReactElement;
   onNavigationStateChange?: (event: WebViewNavigation) => void;
   onContentSizeChange?: (event: WebViewEvent) => void;
 
@@ -1344,6 +1337,13 @@ export interface WebViewSharedProps extends ViewProps {
    * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
    */
   webviewDebuggingEnabled?: boolean;
+
+  /**
+   * Boolean value that determines whether a pull to refresh gesture is
+   * available in the `WebView`. The default value is `false`.
+   * If `true`, sets `bounces` automatically to `true` in iOS
+   */
+  pullToRefreshEnabled?: boolean;
 
   /**
    * Enables support for the Payment Request API for the WebView
