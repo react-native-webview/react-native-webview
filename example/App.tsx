@@ -21,6 +21,7 @@ import Messaging from './examples/Messaging';
 import MultiMessaging from './examples/MultiMessaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
+import GooglePay from './examples/GooglePay';
 import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
@@ -122,6 +123,14 @@ const TESTS = {
     description: 'Test to open a apple pay supported page',
     render() {
       return <ApplePay />;
+    },
+  },
+  GooglePay: {
+    title: 'Google Pay ',
+    testId: 'GooglePay',
+    description: 'Test to open a Google Pay supported page',
+    render() {
+      return <GooglePay />;
     },
   },
   CustomMenu: {
@@ -257,6 +266,13 @@ export default class App extends Component<Props, State> {
               testID="testType_applePay"
               title="ApplePay"
               onPress={() => this._changeTest('ApplePay')}
+            />
+          )}
+          {Platform.OS === 'android' && (
+            <Button
+              testID="testType_googlePay"
+              title="GooglePay"
+              onPress={() => this._changeTest('GooglePay')}
             />
           )}
           <Button

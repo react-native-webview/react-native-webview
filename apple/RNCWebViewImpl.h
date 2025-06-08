@@ -45,7 +45,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @end
 
 #if !TARGET_OS_OSX
-@interface RNCWebViewImpl : RCTView <UIEditMenuInteractionDelegate>
+@interface RNCWebViewImpl : RCTView <UIEditMenuInteractionDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, nullable) UIEditMenuInteraction *editMenuInteraction API_AVAILABLE(ios(16.0));
 #else
@@ -102,6 +102,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL allowsLinkPreview;
 @property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
 @property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
+@property (nonatomic, copy) NSString * _Nullable indicatorStyle;
 @property (nonatomic, assign) BOOL directionalLockEnabled;
 @property (nonatomic, assign) BOOL ignoreSilentHardwareSwitch;
 @property (nonatomic, copy) NSString * _Nullable allowingReadAccessToURL;

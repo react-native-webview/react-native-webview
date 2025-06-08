@@ -74,7 +74,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
       @"toggleUnderline:":   @"underline",
       @"_share:":            @"share",
   };
-    
+
   return map[sel] ?: sel;
 }
 
@@ -86,7 +86,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
           return NO;
       }
   }
-  
+
   if (!self.menuItems) {
       return [super canPerformAction:action withSender:sender];
   }
@@ -165,28 +165,36 @@ RCTAutoInsetsProtocol>
     _bounces = YES;
     _scrollEnabled = YES;
     _showsHorizontalScrollIndicator = YES;
+    _javaScriptEnabled = YES;
+    _allowsLinkPreview = YES;
     _showsVerticalScrollIndicator = YES;
     _directionalLockEnabled = YES;
+    _useSharedProcessPool = YES;
+    _cacheEnabled = YES;
+    _mediaPlaybackRequiresUserAction = YES;
     _automaticallyAdjustContentInsets = YES;
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
-#if TARGET_OS_IOS
-    _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
-    _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
-#endif // TARGET_OS_IOS
     _injectedJavaScript = nil;
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
     _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
-
+    _enableApplePay = NO;
+#if TARGET_OS_IOS
+    _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
+    _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
+#endif // TARGET_OS_IOS
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     _savedContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     _savedAutomaticallyAdjustsScrollIndicatorInsets = NO;
+    _fraudulentWebsiteWarningEnabled = YES;
 #endif
-    _enableApplePay = NO;
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* __IPHONE_13_0 */
+    _textInteractionEnabled = YES;
+#endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
 #endif
@@ -268,7 +276,7 @@ RCTAutoInsetsProtocol>
 
       UIMenuController *menuController = [UIMenuController sharedMenuController];
       NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
-      
+
       for(NSDictionary *menuItem in self.menuItems) {
         NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
         NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
@@ -527,6 +535,15 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
+
+    if ([_indicatorStyle isEqualToString:@"black"]) {
+        _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
+    } else if ([_indicatorStyle isEqualToString:@"white"]) {
+        _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
+    } else {
+        _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
+    }
+
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
 #endif // !TARGET_OS_OSX
     _webView.allowsLinkPreview = _allowsLinkPreview;
@@ -768,6 +785,7 @@ RCTAutoInsetsProtocol>
     if (_onMessage) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       [event addEntriesFromDictionary: @{@"data": message.body}];
+      [event addEntriesFromDictionary: @{@"url": message.frameInfo.request.URL.absoluteString}];
       _onMessage(event);
     }
   }
@@ -795,22 +813,25 @@ RCTAutoInsetsProtocol>
   }
 }
 
-#if !TARGET_OS_OSX
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {
+#if !TARGET_OS_OSX
   _contentInset = contentInset;
   [RCTView autoAdjustInsetsForView:self
                     withScrollView:_webView.scrollView
                       updateOffset:NO];
+#endif // !TARGET_OS_OSX
 }
 
 - (void)refreshContentInset
 {
+#if !TARGET_OS_OSX
   [RCTView autoAdjustInsetsForView:self
                     withScrollView:_webView.scrollView
                       updateOffset:YES];
-}
 #endif // !TARGET_OS_OSX
+}
+
 
 - (void)visitSource
 {
@@ -840,7 +861,7 @@ RCTAutoInsetsProtocol>
   [self syncCookiesToWebView:^{
     // Add observer to sync cookies from webview to sharedHTTPCookieStorage
     [webView.configuration.websiteDataStore.httpCookieStore addObserver:self];
-    
+
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
     // the same url. We'll expose a call to 'reload' to allow a user to load
@@ -877,6 +898,7 @@ RCTAutoInsetsProtocol>
 #if TARGET_OS_IOS
 -(void)setKeyboardDisplayRequiresUserAction:(BOOL)keyboardDisplayRequiresUserAction
 {
+  _keyboardDisplayRequiresUserAction = keyboardDisplayRequiresUserAction;
   if (_webView == nil) {
     _savedKeyboardDisplayRequiresUserAction = keyboardDisplayRequiresUserAction;
     return;
@@ -909,7 +931,7 @@ RCTAutoInsetsProtocol>
     SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:activityStateChanges:userObject:");
     method = class_getInstanceMethod(class, selector);
     IMP original = method_getImplementation(method);
-    override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
+    override = imp_implementationWithBlock(^void(id me, void* arg0, __unused BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
     });
   }
@@ -918,7 +940,7 @@ RCTAutoInsetsProtocol>
     SEL selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:changingActivityState:userObject:");
     method = class_getInstanceMethod(class, selector);
     IMP original = method_getImplementation(method);
-    override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
+    override = imp_implementationWithBlock(^void(id me, void* arg0, __unused BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
     });
   }
@@ -927,7 +949,7 @@ RCTAutoInsetsProtocol>
     SEL selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:changingActivityState:userObject:");
     method = class_getInstanceMethod(class, selector);
     IMP original = method_getImplementation(method);
-    override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
+    override = imp_implementationWithBlock(^void(id me, void* arg0, __unused BOOL arg1, BOOL arg2, BOOL arg3, id arg4) {
       ((void (*)(id, SEL, void*, BOOL, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3, arg4);
     });
   } else {
@@ -935,7 +957,7 @@ RCTAutoInsetsProtocol>
     SEL selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:userObject:");
     method = class_getInstanceMethod(class, selector);
     IMP original = method_getImplementation(method);
-    override = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, id arg3) {
+    override = imp_implementationWithBlock(^void(id me, void* arg0, __unused BOOL arg1, BOOL arg2, id arg3) {
       ((void (*)(id, SEL, void*, BOOL, BOOL, id))original)(me, selector, arg0, TRUE, arg2, arg3);
     });
   }
@@ -945,6 +967,7 @@ RCTAutoInsetsProtocol>
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
 {
+  _hideKeyboardAccessoryView = hideKeyboardAccessoryView;
   _savedHideKeyboardAccessoryView = hideKeyboardAccessoryView;
 
   if (_webView == nil) {
@@ -1070,6 +1093,19 @@ RCTAutoInsetsProtocol>
   _showsVerticalScrollIndicator = showsVerticalScrollIndicator;
   _webView.scrollView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
 }
+
+- (void)setIndicatorStyle:(NSString *)indicatorStyle
+{
+  _indicatorStyle = indicatorStyle;
+
+  if ([indicatorStyle isEqualToString:@"black"]) {
+    _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
+  } else if ([indicatorStyle isEqualToString:@"white"]) {
+    _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
+  } else {
+    _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
+  }
+}
 #endif // !TARGET_OS_OSX
 
 - (void)postMessage:(NSString *)message
@@ -1167,7 +1203,7 @@ RCTAutoInsetsProtocol>
 {
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
-  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
     completionHandler();
   }]];
   [[self topViewController] presentViewController:alert animated:YES completion:NULL];
@@ -1186,10 +1222,10 @@ RCTAutoInsetsProtocol>
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
-  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
     completionHandler(YES);
   }]];
-  [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+  [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action) {
     completionHandler(NO);
   }]];
   [[self topViewController] presentViewController:alert animated:YES completion:NULL];
@@ -1214,11 +1250,11 @@ RCTAutoInsetsProtocol>
   [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
     textField.text = defaultText;
   }];
-  UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+  UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
     completionHandler([[alert.textFields lastObject] text]);
   }];
   [alert addAction:okAction];
-  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action) {
     completionHandler(nil);
   }];
   [alert addAction:cancelAction];
@@ -1327,7 +1363,6 @@ RCTAutoInsetsProtocol>
     }
 
     if (_onShouldStartLoadWithRequest) {
-        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
         int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (!shouldStart) {
@@ -1351,6 +1386,7 @@ RCTAutoInsetsProtocol>
             });
 
         }];
+        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
         if (request.mainDocumentURL) {
           [event addEntriesFromDictionary: @{
             @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
@@ -1385,7 +1421,7 @@ RCTAutoInsetsProtocol>
 }
 
 /**
- * Called when the web view’s content process is terminated.
+ * Called when the web view's content process is terminated.
  * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi?language=objc
  */
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
@@ -1684,6 +1720,7 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (void)setInjectedJavaScriptObject:(NSString *)source
 {
+  _injectedJavaScriptObject = source;
   self.injectedObjectJsonScript = [
     [WKUserScript alloc]
     initWithSource: [
@@ -1822,8 +1859,8 @@ didFinishNavigation:(WKNavigation *)navigation
                                          "  })\n"
                                          "})(window.history)\n", HistoryShimName
   ];
-  WKUserScript *script = [[WKUserScript alloc] initWithSource:html5HistoryAPIShimSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
-  [wkWebViewConfig.userContentController addUserScript:script];
+  WKUserScript *userScript = [[WKUserScript alloc] initWithSource:html5HistoryAPIShimSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
+  [wkWebViewConfig.userContentController addUserScript:userScript];
 
   if(_sharedCookiesEnabled) {
     // More info to sending cookies with WKWebView
