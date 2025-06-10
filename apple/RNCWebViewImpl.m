@@ -2082,7 +2082,7 @@ didFinishNavigation:(WKNavigation *)navigation
     NSString *jsCode = [NSString stringWithFormat:
         @"fetch('%@')"
         ".then(response => {"
-        "    if (!response.ok) throw new Error('Network response was not ok');"
+        "    if (!response.ok) throw new Error('Unable to download file');"
         "    return response.blob();"
         "})"
         ".then(blob => {"
