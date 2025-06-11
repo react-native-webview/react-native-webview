@@ -53,6 +53,7 @@ This document lays out the current public properties and methods for the React N
 - [`contentInsetAdjustmentBehavior`](Reference.md#contentInsetAdjustmentBehavior)
 - [`contentMode`](Reference.md#contentMode)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
+- [`indicatorStyle`](Reference.md#indicatorStyle)
 - [`scrollEnabled`](Reference.md#scrollenabled)
 - [`nestedScrollEnabled`](Reference.md#nestedscrollenabled)
 - [`setBuiltInZoomControls`](Reference.md#setBuiltInZoomControls)
@@ -93,6 +94,7 @@ This document lays out the current public properties and methods for the React N
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
 - [`webviewDebuggingEnabled`](Reference.md#webviewDebuggingEnabled)
+- [`paymentRequestEnabled`](Reference.md#paymentRequestEnabled)
 
 ## Methods Index
 
@@ -897,7 +899,7 @@ A floating-point number that determines how quickly the scroll view decelerates 
 
 ### `domStorageEnabled`[⬆](#props-index)
 
-Boolean value to control whether DOM Storage is enabled. Used only in Android.
+Boolean value to control whether DOM Storage is enabled. Used only in Android. The default value is `true`.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -1026,8 +1028,8 @@ Boolean value that indicates whether HTML5 videos can play Picture in Picture. T
 
 > **NOTE**
 >
-> In order to restrict playing video in picture in picture mode this props need to be set to `false`
-.
+> In order to restrict playing video in picture in picture mode this props need to be set to `false`.
+
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | iOS      |
@@ -1146,6 +1148,16 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 | Type | Required | Platform      |
 | ---- | -------- | ------------- |
 | bool | No       | iOS and macOS |
+
+---
+
+### `indicatorStyle`[⬆](#props-index)
+
+The colorstyle of the scroll indicator. The default value is `default`.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
 
 ---
 
@@ -1717,6 +1729,15 @@ Default is `false`. Supported on iOS as of 16.4, previous versions always allow 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | iOS & Android  |
+
+### `paymentRequestEnabled`[⬆](#props-index)
+
+Whether or not the webview has the Payment Request API enabled. Default is `false`.
+This is needed for Google Pay to work within the WebView.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
 
 ## Methods
 
