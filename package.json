@@ -1,5 +1,5 @@
 {
-  "name": "react-native-webview",
+  "name": "@coolwallet-app/react-native-webview",
   "description": "React Native WebView component for iOS, Android, macOS, and Windows",
   "main": "index.js",
   "main-internal": "src/index.ts",
@@ -10,7 +10,11 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "13.13.4",
+  "version": "13.13.4-cbx.3",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
   "scripts": {
     "android": "react-native run-android",
@@ -26,6 +30,7 @@
     "prepare": "yarn prepare:types && yarn build",
     "appium": "appium",
     "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.js",
+    "publish:npm": "yarn publish",
     "add:macos": "yarn add react-native-macos@0.73.17"
   },
   "rn-docs": {
