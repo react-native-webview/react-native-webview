@@ -472,6 +472,7 @@ RCTAutoInsetsProtocol>
     wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
   }
   wkWebViewConfig.userContentController = [WKUserContentController new];
+  [wkWebViewConfig.userContentController addScriptMessageHandler:self name:@"base64Handler"];
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
   if (@available(iOS 13.0, *)) {
@@ -771,7 +772,10 @@ RCTAutoInsetsProtocol>
 - (void)userContentController:(WKUserContentController *)userContentController
       didReceiveScriptMessage:(WKScriptMessage *)message
 {
-  if ([message.name isEqualToString:HistoryShimName]) {
+  if ([message.name isEqualToString:@"base64Handler"]) {
+      NSString *base64String = message.body;
+      [self downloadBase64File:base64String];
+  } else if ([message.name isEqualToString:HistoryShimName]) {
     if (_onLoadingFinish) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       [event addEntriesFromDictionary: @{@"navigationType": message.body}];
@@ -960,6 +964,68 @@ RCTAutoInsetsProtocol>
   }
 
   method_setImplementation(method, override);
+}
+
+- (void)downloadBase64File:(NSString *)base64String {
+    NSArray *components = [base64String componentsSeparatedByString:@","];
+    NSString *base64ContentPart = components.lastObject;
+
+    NSData *fileData = [[NSData alloc] initWithBase64EncodedString:base64ContentPart options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    NSString *fileExtension = [self fileExtensionFromBase64String:base64String];
+
+    NSString *tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"File.%@", fileExtension]];
+    [fileData writeToFile:tempFilePath atomically:YES];
+
+    NSURL *tempFileURL = [NSURL fileURLWithPath:tempFilePath];
+
+    UIDocumentPickerViewController *documentPicker = nil;
+    if (@available(iOS 14.0, *)) {
+        documentPicker = [[UIDocumentPickerViewController alloc] initForExportingURLs:@[tempFileURL] asCopy:YES];
+    } else {
+        // Usage of initWithURL:inMode: might lose file's extension and user has to type it manually
+        // Problem was solved for iOS 14 and higher with initForExportingURLs
+        documentPicker = [[UIDocumentPickerViewController alloc] initWithURL:tempFileURL inMode:UIDocumentPickerModeExportToService];
+    }
+    documentPicker.delegate = self;
+    documentPicker.modalPresentationStyle = UIModalPresentationFullScreen;
+
+    UIViewController *rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    while (rootViewController.presentedViewController) {
+        rootViewController = rootViewController.presentedViewController;
+    }
+    [rootViewController presentViewController:documentPicker animated:YES completion:nil];
+}
+
+- (NSString *)fileExtensionFromBase64String:(NSString *)base64String {
+    NSRange mimeTypeRange = [base64String rangeOfString:@"data:"];
+    NSRange base64Range = [base64String rangeOfString:@";base64"];
+
+    if (mimeTypeRange.location != NSNotFound && base64Range.location != NSNotFound) {
+        NSUInteger start = NSMaxRange(mimeTypeRange);
+        NSUInteger length = base64Range.location - start;
+        NSString *mimeType = [base64String substringWithRange:NSMakeRange(start, length)];
+
+        NSDictionary *mimeTypeToExtension = @{
+            @"image/png": @"png",
+            @"image/jpeg": @"jpg",
+            @"image/gif": @"gif",
+            @"application/pdf": @"pdf",
+            @"text/plain": @"txt",
+            @"application/json": @"json",
+            @"application/octet-stream": @"bin"
+        };
+
+        NSString *fileExtension = mimeTypeToExtension[mimeType];
+        return fileExtension ?: @"bin";
+    }
+
+    return @"bin";
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+   if (urls.count > 0) {
+       NSURL *destinationURL = urls.firstObject;
+   }
 }
 
 -(void)setHideKeyboardAccessoryView:(BOOL)hideKeyboardAccessoryView
@@ -1321,6 +1387,21 @@ RCTAutoInsetsProtocol>
 {
     static NSDictionary<NSNumber *, NSString *> *navigationTypes;
     static dispatch_once_t onceToken;
+
+    NSString *urlString = navigationAction.request.URL.absoluteString;
+    if ([urlString hasPrefix:@"blob:"]) {
+        if (_onFileDownload) {
+            [self handleBlobDownloadUrl:urlString];
+            decisionHandler(WKNavigationActionPolicyCancel);
+            return;
+        }
+    } else if ([urlString hasPrefix:@"data:"]) {
+        if (_onFileDownload) {
+            [self downloadBase64File:urlString];
+            decisionHandler(WKNavigationActionPolicyCancel);
+            return;
+        }
+    }
 
     dispatch_once(&onceToken, ^{
         navigationTypes = @{
@@ -1950,6 +2031,26 @@ didFinishNavigation:(WKNavigation *)navigation
     }
   }
   return request;
+}
+
+- (void)handleBlobDownloadUrl:(NSString *)urlString {
+  NSString *jsCode = [NSString stringWithFormat:
+     @"var xhr = new XMLHttpRequest();"
+     "xhr.open('GET', '%@', true);"
+     "xhr.responseType = 'blob';"
+     "xhr.onload = function(e) {"
+     "    if (this.status == 200) {"
+      "        var blobFile = this.response;"
+      "        var reader = new FileReader();"
+      "        reader.readAsDataURL(blobFile);"
+      "        reader.onloadend = function() {"
+      "            var base64 = reader.result;"
+      "            window.webkit.messageHandlers.base64Handler.postMessage(base64);"
+      "        };"
+      "    }"
+      "};"
+      "xhr.send();", urlString];
+  [self.webView evaluateJavaScript:jsCode completionHandler:^(id result, NSError *error) {}];
 }
 
 @end
