@@ -25,6 +25,9 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.uimanager.ThemedReactContext
+import com.reactnativecommunity.webview.extension.file.Base64FileDownloader
+import com.reactnativecommunity.webview.extension.file.BlobFileDownloader
+import com.reactnativecommunity.webview.extension.file.addBlobFileDownloaderJavascriptInterface
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -99,7 +102,31 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             webView.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
         }
-        webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+		    val base64DownloaderRequestFilePermission = { base64: String ->
+			    	webView.reactApplicationContext.getNativeModule(RNCWebViewModule::class.java)?.let { module ->
+				    		module.setBase64DownloadRequest(base64)
+				    		module.grantFileDownloaderPermissions(getDownloadingMessageOrDefault(), getLackPermissionToDownloadMessageOrDefault())
+			    	}
+						Unit
+		    }
+		    webView.addBlobFileDownloaderJavascriptInterface(
+			      downloadingMessage = getDownloadingMessageOrDefault(),
+			      requestFilePermission = base64DownloaderRequestFilePermission,
+		    )
+		    webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+			      if (url.startsWith("data:")) {
+			      	  Base64FileDownloader.downloadBase64File(
+			      	  	context = context,
+			      	  	base64 = url,
+			      	  	downloadingMessage = getDownloadingMessageOrDefault(),
+			      	  	requestFilePermission = base64DownloaderRequestFilePermission,
+			      	  )
+			      	  return@DownloadListener
+			      }
+			      if (url.startsWith("blob:")) {
+                      // Handled in RNCWebView.injectBlobFileDownloaderScript()
+			      	  return@DownloadListener
+			      }
             webView.setIgnoreErrFailedForThisURL(url)
             val module = webView.reactApplicationContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {
@@ -391,7 +418,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         viewWrapper.webView.settings.allowUniversalAccessFromFileURLs = allow
     }
 
-    private fun getDownloadingMessageOrDefault(): String? {
+    private fun getDownloadingMessageOrDefault(): String {
         return mDownloadingMessage ?: DEFAULT_DOWNLOADING_MESSAGE
     }
 

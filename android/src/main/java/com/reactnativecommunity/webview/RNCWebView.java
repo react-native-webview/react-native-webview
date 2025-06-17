@@ -46,6 +46,7 @@ import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
+import com.reactnativecommunity.webview.extension.file.BlobFileDownloader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -336,6 +337,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
             injectJavascriptObject(); // re-inject the Javascript object in case it has been overwritten.
         }
+    }
+
+    public void injectBlobFileDownloaderScript() {
+        evaluateJavascriptWithFallback(BlobFileDownloader.Companion.getBlobFileInterceptor());
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
