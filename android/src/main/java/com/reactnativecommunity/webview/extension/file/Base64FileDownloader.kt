@@ -1,10 +1,8 @@
 package com.reactnativecommunity.webview.extension.file
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -59,23 +57,13 @@ internal object Base64FileDownloader {
 	}
 
 	private fun showAlertDialog(context: Context, extension: String, onPositiveButtonClick: () -> Unit) {
-		AlertDialog.Builder(context)
-			.apply {
-				setMessage("Do you want to download \nFile.${extension}?")
-				setCancelable(false)
-				setPositiveButton("Download", object : DialogInterface.OnClickListener {
-					override fun onClick(p0: DialogInterface?, p1: Int) {
-						onPositiveButtonClick()
-					}
-				})
-				setNegativeButton("Cancel", object : DialogInterface.OnClickListener {
-					override fun onClick(p0: DialogInterface?, p1: Int) {
-						// Do nothing
-					}
-				})
-			}
-			.create()
-			.show()
+    TapjackingPreventionAlertDialog(
+      context = context,
+      message = "Do you want to download \nFile.${extension}?",
+      positiveButtonText = "Download",
+      negativeButtonText = "Cancel",
+      onPositiveButtonClick = onPositiveButtonClick,
+    ).show()
 	}
 
 

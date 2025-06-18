@@ -1,8 +1,6 @@
 package com.reactnativecommunity.webview
 
-import android.app.AlertDialog
 import android.app.DownloadManager
-import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -27,6 +25,7 @@ import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.uimanager.ThemedReactContext
 import com.reactnativecommunity.webview.extension.file.Base64FileDownloader
 import com.reactnativecommunity.webview.extension.file.BlobFileDownloader
+import com.reactnativecommunity.webview.extension.file.TapjackingPreventionAlertDialog
 import com.reactnativecommunity.webview.extension.file.addBlobFileDownloaderJavascriptInterface
 import org.json.JSONException
 import org.json.JSONObject
@@ -146,10 +145,12 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
             if (Bidi(fileName, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).isMixed) {
                 Toast.makeText(webView.context, "Invalid filename or type", Toast.LENGTH_LONG).show()
             } else {
-                val builder = AlertDialog.Builder(webView.context)
-                builder.setMessage("Do you want to download \n$fileName?")
-                builder.setCancelable(false)
-                builder.setPositiveButton("Download") { _, _ ->
+                TapjackingPreventionAlertDialog(
+                  context = webView.context,
+                  message = "Do you want to download \n$fileName?",
+                  positiveButtonText = "Download",
+                  negativeButtonText = "Cancel",
+                  onPositiveButtonClick = {
                     //Attempt to add cookie, if it exists
                     var urlObj: URL? = null
                     try {
@@ -178,10 +179,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
                                 getDownloadingMessageOrDefault()
                         )
                     }
-                }
-                builder.setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> }
-                val alertDialog = builder.create()
-                alertDialog.show()
+                }).show()
             }
         })
         return RNCWebViewWrapper(context, webView)
