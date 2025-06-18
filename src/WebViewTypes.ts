@@ -497,7 +497,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    *
    * @platform ios
    */
-  readonly dataDetectorTypes?: DataDetectorTypes | DataDetectorTypes[];
+  readonly dataDetectorTypes?: DataDetectorTypes[];
 
   /**
    * Boolean that determines whether HTML5 videos play inline or use the
