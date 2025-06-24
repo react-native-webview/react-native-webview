@@ -28,21 +28,55 @@ internal class BlobFileDownloader(
 	companion object {
 		const val JS_INTERFACE_TAG: String = "BlobFileDownloader"
 
-    fun getBlobFileInterceptor(): String =
-      """
-        (function() {
-          const originalCreateObjectURL = URL.createObjectURL;
-          URL.createObjectURL = function(blob) {
-            const url = originalCreateObjectURL.call(URL, blob);
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = function() {
-              const base64 = reader.result;
-              ${JS_INTERFACE_TAG}.getBase64FromBlobData(base64);
-            };
-            return url;
-          };
+    /**
+     * Invokes JS method downloadBlob from [getBlobFileInterceptor]
+     */
+    fun getDownloadBlobInterceptor(url: String): String = "downloadBlob('$url');"
+
+    /**
+     * This script handles Blob downloading in two ways:
+     * 1) It intercepts clicks on elements with a Blob: href.
+     * 2) It defines a method, downloadBlob, which is manually invoked from Android [com.reactnativecommunity.webview.RNCWebViewManagerImpl] in cases where the href is undefined.
+     */
+    fun getBlobFileInterceptor(): String = """
+       (function() {
+            if (window.blobDownloadInjected) return;
+            window.blobDownloadInjected = true;
+            
+            function blobToBase64(blob, callback) {
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    const base64 = reader.result;
+                    callback(base64);
+                };
+                reader.readAsDataURL(blob);
+            }
+            
+            function downloadBlobUrl(url) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'blob';
+                xhr.onload = function() {
+                    if (this.status === 200) {
+                        const blob = this.response;
+                        blobToBase64(blob, function(base64) {
+                            ${JS_INTERFACE_TAG}.getBase64FromBlobData(base64);
+                        });
+                    }
+                };
+                xhr.send();
+            }
+            
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target.tagName === 'A' && target.href && target.href.startsWith('blob:')) {
+                    e.preventDefault();
+                    downloadBlobUrl(target.href);
+                }
+            }, true);
+            
+            window.downloadBlob = downloadBlobUrl;
         })();
-    """.trimIndent()
+      """.trimIndent()
 	}
 }

@@ -123,7 +123,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
 			      	  return@DownloadListener
 			      }
 			      if (url.startsWith("blob:")) {
-                      // Handled in RNCWebView.injectBlobFileDownloaderScript()
+                webView.evaluateJavascriptWithFallback(BlobFileDownloader.getDownloadBlobInterceptor(url))
 			      	  return@DownloadListener
 			      }
             webView.setIgnoreErrFailedForThisURL(url)
