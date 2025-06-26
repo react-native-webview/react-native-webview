@@ -47,6 +47,7 @@ import com.facebook.react.views.scroll.ScrollEventType;
 import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.extension.file.BlobFileDownloader;
+import com.reactnativecommunity.webview.extension.file.IFrameDetectorKt;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -341,6 +342,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     public void injectBlobFileDownloaderScript() {
         evaluateJavascriptWithFallback(BlobFileDownloader.Companion.getBlobFileInterceptor());
+    }
+
+    public void injectIFrameDetectorScript() {
+        evaluateJavascriptWithFallback(IFrameDetectorKt.getIFrameDetectorScript());
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
