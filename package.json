@@ -10,7 +10,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "14.2.1",
+  "version": "14.2.2",
   "homepage": "https://github.com/MetaMask/react-native-webview-mm#readme",
   "scripts": {
     "android": "react-native run-android",
