@@ -1390,7 +1390,8 @@ RCTAutoInsetsProtocol>
     static dispatch_once_t onceToken;
 
     NSString *urlString = navigationAction.request.URL.absoluteString;
-    if ([urlString hasPrefix:@"blob:"]) {
+    // Some Dapps on opening send to mobile blob: urls. We ignore them and handle only urls which were received on clicks on Link (based on navigationType)
+    if ([urlString hasPrefix:@"blob:"] && navigationAction.navigationType == WKNavigationTypeLinkActivated) {
         if (_onFileDownload) {
             [self handleBlobDownloadUrl:urlString];
             decisionHandler(WKNavigationActionPolicyCancel);
