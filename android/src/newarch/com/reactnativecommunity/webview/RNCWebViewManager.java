@@ -62,6 +62,10 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
         return mRNCWebViewManagerImpl.createViewInstance(context);
     }
 
+    protected RNCWebViewWrapper createViewInstance(@NonNull ThemedReactContext context, @NonNull RNCWebView view) {
+        return mRNCWebViewManagerImpl.createViewInstance(context, view);
+    }
+
     @Override
     @ReactProp(name = "allowFileAccess")
     public void setAllowFileAccess(RNCWebViewWrapper view, boolean value) {
