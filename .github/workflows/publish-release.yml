@@ -1,0 +1,50 @@
+name: Publish Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout and setup environment
+        uses: MetaMask/action-checkout-and-setup@v1
+        with:
+          is-high-risk-environment: true
+      - uses: MetaMask/action-publish-release@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: yarn build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-release-artifacts-${{ github.sha }}
+          include-hidden-files: true
+          retention-days: 4
+          path: |
+            ./packages/**/dist
+            ./node_modules/.yarn-state.yml
+
+  publish-npm-dry-run:
+    name: Dry run publish to NPM
+    runs-on: ubuntu-latest
+    needs: publish-release
+
+    steps:
+      - name: Checkout and setup environment
+        uses: MetaMask/action-checkout-and-setup@v1
+        with:
+          is-high-risk-environment: true
+          ref: ${{ github.sha }}
+
+      - name: Restore build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-release-artifacts-${{ github.sha }}
+
+      - name: Dry run publish to NPM
+        uses: MetaMask/action-npm-publish@v5
