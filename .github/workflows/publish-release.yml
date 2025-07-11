@@ -1,8 +1,6 @@
 name: Publish Release
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
 
 jobs:
@@ -27,24 +25,24 @@ jobs:
           retention-days: 4
           path: |
             ./packages/**/dist
-            ./node_modules/.yarn-state.yml
+            ./node_modules/.yarn-integrity
 
-  publish-npm-dry-run:
-    name: Dry run publish to NPM
+  publish-npm:
+    name: Publish to NPM
+    environment: npm-publish
     runs-on: ubuntu-latest
     needs: publish-release
-
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
         with:
           is-high-risk-environment: true
           ref: ${{ github.sha }}
-
       - name: Restore build artifacts
         uses: actions/download-artifact@v4
         with:
           name: publish-release-artifacts-${{ github.sha }}
-
-      - name: Dry run publish to NPM
+      - name: Publish to NPM
         uses: MetaMask/action-npm-publish@v5
+        with:
+          npm-token: ${{ secrets.NPM_TOKEN }}
