@@ -5,6 +5,7 @@ Questo documento ti guida attraverso i casi d'uso più comuni per React Native W
 _Attenzione: questa guida è attualmente in fase di sviluppo._
 
 ## Indice della guida
+
 - [HTML inline di base](Guide.italian.md#html-inline-di-base)
 - [URL di base con Source](Guide.italian.md#url-di-base-con-source)
 - [Caricamento dei file HTML locali](Guide.italian.md#caricamento-dei-file-html-locali)
@@ -17,6 +18,7 @@ _Attenzione: questa guida è attualmente in fase di sviluppo._
 - [Supporto per la navigazione gestuale e a pulsanti](Guide.italian.md#supporto-per-la-navigazione-gestuale-e-a-pulsanti)
 
 ### HTML inline di base
+
 Il modo più semplice per usare la WebView è passare l'HTML che si desidera renderizzare. Tieni conto che impostare una source `html` richiede che la prop [originWhiteList](Reference.italian.md#originWhiteList) sia settata su `['*']`.
 
 ```js
@@ -37,8 +39,8 @@ class MyInlineWeb extends Component {
 
 Passare una nuova source HTML statica causerà il rendering del WebView.
 
-
 ### URL di base con Source
+
 Questo è l'uso più comune per una WebView.
 
 ```js
@@ -53,6 +55,7 @@ class MyWeb extends Component {
 ```
 
 ### Caricamento dei file HTML locali
+
 N.B.: Attualmente, questo non funziona come discusso in [#428](https://github.com/react-native-webview/react-native-webview/issues/428) e [#518](https://github.com/react-native-webview/react-native-webview/issues/518). Possibili soluzioni alternative includono l'incorporazione di tutti gli asset con webpack o bundler simili, oppure con l'esecuzione di un [web server locale](https://github.com/futurepress/react-native-static-server).
 
 <details><summary>Mostra metodo non funzionante</summary>
@@ -86,9 +89,11 @@ class MyWeb extends Component {
   }
 }
 ```
+
 </details>
 
 ### Controllo dei cambiamenti di state della navigazione
+
 A volte si desidera intercettare quando l'utente preme un link nella WebView e fare qualcosa di diverso anziché navigare direttamente a quella pagina nella WebView. Ecco un esempio di codice su come potresti farlo usando la funzione `onNavigationStateChange`.
 
 ```js
@@ -148,28 +153,34 @@ class MyWeb extends Component {
 ```
 
 ### Aggiunta del supporto per il caricamento dei file
+
 ##### iOS
+
 Per iOS, l'unica cosa che devi fare è specificare i permessi nel file `ios/[progetto]/Info.plist`:
 
 Scattare una foto:
+
 ```
 <key>NSCameraUsageDescription</key>
 <string>Fai foto per determinate attività</string>
 ```
 
 Selezionare dalla galleria:
+
 ```
 <key>NSPhotoLibraryUsageDescription</key>
 <string>Seleziona immagini per determinate attività</string>
 ```
 
 Registra video:
+
 ```
 <key>NSMicrophoneUsageDescription</key>
 <string>È necessario l'accesso al microfono per registrare i video</string>
 ```
 
 ##### Android
+
 Aggiungi i permessi nel file AndroidManifest.xml:
 
 ```xml
@@ -184,18 +195,19 @@ Aggiungi i permessi nel file AndroidManifest.xml:
 ```
 
 ###### L'opzione della fotocamera per l'upload è disponibile su Android.
+
 Se l'input del file indica che si desiderano immagini o video tramite l'attributo [`accept`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept), la WebView cercherà di dare all'utente opzioni per usare la fotocamera per scattare una foto o registrare un video.
 
 Normalmente, le app che non hanno il permesso di accesso alla fotocamera possono richiedere all'utente di utilizzare un'app esterna in modo che l'app richiedente non abbia bisogno del permesso. Su Android, c'è un'eccezione speciale per l'accesso alla fotocamera al fine di evitare confusione agli utenti. Se un'app ha dichiarato il permesso di utilizzare la fotocamera, ma l'utente non ha ancora concesso tale permesso, l'app potrebbe non avviare un'azione che richiede l'uso della fotocamera, come la cattura di immagini (`MediaStore.ACTION_IMAGE_CAPTURE`) o la registrazione di video (`MediaStore.ACTION_VIDEO_CAPTURE`). In questo caso, è responsabilità dello sviluppatore richiedere esplicitamente il permesso di accesso alla fotocamera prima di effettuare un caricamento diretto di file utilizzando la fotocamera.
 
-#####  Verifica la compatibilità del caricamento dei file utilizzando il metodo `static isFileUploadSupported()`. 
+##### Verifica la compatibilità del caricamento dei file utilizzando il metodo `static isFileUploadSupported()`.
 
 Il caricamento dei file tramite l'elemento `<input type="file" />` non è supportato su Android 4.4 KitKat (vedi [dettagli](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
 
 ```jsx
-import { WebView } from "react-native-webview";
+import { WebView } from 'react-native-webview';
 
-WebView.isFileUploadSupported().then(res => {
+WebView.isFileUploadSupported().then((res) => {
   if (res === true) {
     // Il caricamento del file è supportato
   } else {
@@ -205,6 +217,7 @@ WebView.isFileUploadSupported().then(res => {
 ```
 
 ##### MacOS
+
 Aggiungi l'accesso in lettura per il `User Selected File` nella scheda `Signing & Capabilities` sotto `App Sandbox`:
 
 <img width="856" alt="Screenshot della sezione Signing & Capabilities in XCode" src="https://user-images.githubusercontent.com/36531255/200541359-dde130d0-169e-4b58-8b2f-205442d76fdd.png">
@@ -212,6 +225,7 @@ Aggiungi l'accesso in lettura per il `User Selected File` nella scheda `Signing 
 Nota: Tentare di aprire un elemento di input file senza questo permesso farà crashare la webview.
 
 ### Caricamento di più file
+
 Puoi controllare la selezione di singoli o molteplici file specificando l'attributo [`multiple`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#multiple) sul tuo elemento `input`:
 
 ```jsx
@@ -223,12 +237,15 @@ Puoi controllare la selezione di singoli o molteplici file specificando l'attrib
 ```
 
 ### Aggiunta del supporto per il download dei file
+
 ##### iOS
+
 Su iOS, dovrai fornire il tuo codice per il download dei file. Puoi passare una callback `onFileDownload` al componente WebView come prop. Se RNCWebView determina che è necessario effettuare un download del file, l'URL da cui è possibile scaricare il file verrà passato a `onFileDownload`. Puoi quindi usare questa callback per scaricare il file nel modo desiderato.
 
 NOTA: È necessario iOS 13 o versione successiva per aver la miglior esperienza di download. Con iOS 13, Apple ha aggiunto un'API per accedere agli header di risposta HTTP, che viene utilizzata per determinare se una risposta HTTP dev'essere scaricata. Su iOS 12 o versioni precedenti, solo i tipi MIME che non possono essere visualizzati nel WebView triggeranno chiamate a `onFileDownload`.
 
 Esempio:
+
 ```javascript
 onFileDownload = ({ nativeEvent }) => {
   const { downloadUrl } = nativeEvent;
@@ -237,12 +254,14 @@ onFileDownload = ({ nativeEvent }) => {
 ```
 
 Per poter salvare le immagini nella galleria, è necessario specificare questo permesso nel file `ios/[progetto]/Info.plist`:
+
 ```
 <key>NSPhotoLibraryAddUsageDescription</key>
 <string>Ci serve il permesso per salvare le immagini per determinate attività.</string>
 ```
 
 ##### Android
+
 Sul sistema Android, l'integrazione con il DownloadManager è integrata di default.
 Aggiungi questa autorizzazione nel file AndroidManifest.xml (necessaria solo se la tua app supporta versioni di Android precedenti alla 10):
 
@@ -258,14 +277,17 @@ Aggiungi questa autorizzazione nel file AndroidManifest.xml (necessaria solo se 
 ```
 
 ### Comunicazione tra JS e Native
+
 Spesso ti troverai nella situazione di voler fare del passaggio dati inviando messaggi alle pagine web caricate tramite le tue webview e ricevendo messaggi da esse.
 
 Per realizzare ciò, React Native WebView offre tre diverse opzioni:
+
 1. React Native -> Web: La prop `injectedJavaScript`
 2. React Native -> Web: Il metodo `injectJavaScript`
 3. Web -> React Native: Il metodo `postMessage` e la prop `onMessage`
 
 #### La prop `injectedJavaScript`
+
 Questo è uno script che viene eseguito immediatamente dopo il caricamento iniziale della pagina web. Viene eseguito una sola volta, anche se la pagina viene ricaricata o abbandonata.
 
 ```jsx
@@ -301,15 +323,16 @@ Questo esegue il codice JavaScript nella stringa `runFirst` una volta che la pag
 
 Impostando `injectedJavaScriptForMainFrameOnly: false`, l'iniezione del JavaScript avverrà su tutti i frame (non solo il frame principale) se supportato dalla piattaforma specifica. Ad esempio, se una pagina contiene un iframe, il JavaScript verrà iniettato anche nell'iframe se questa opzione è impostata su `false`. (Nota: ciò non è supportato su Android.) È disponibile anche `injectedJavaScriptBeforeContentLoadedForMainFrameOnly` per l'iniezione prima del caricamento del contenuto. Per ulteriori informazioni, leggi nella [Referenza delle API](./Reference.italian.md#injectedjavascriptformainframeonly).
 
-
 <img alt="Screenshot del repo su Github" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
 
 _Roba da smanettoni_
+
 > Su iOS, ~~`injectedJavaScript` esegue un metodo su WebView chiamato `evaluateJavaScript:completionHandler:`~~ - questa affermazione non è più valida a partire dalla versione `8.2.0`. Invece, utilizziamo un `WKUserScript` con un tempo di iniezione `WKUserScriptInjectionTimeAtDocumentEnd`. Di conseguenza, `injectedJavaScript` non restituisce più un valore di valutazione né genera un avviso nella console. Nel caso improbabile in cui la tua app dipenda da questo comportamento, consulta i passaggi di migrazione [qui](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-574919464) per mantenere un comportamento equivalente.
 > Su Android, `injectedJavaScript` esegue un metodo sulla WebView di Android chiamato `evaluateJavascriptWithFallback`.
 > Su Windows, `injectedJavaScript` esegue un metodo sulla WebView WinRT/C++ chiamato `InvokeScriptAsync`.
 
 #### La prop `injectedJavaScriptBeforeContentLoaded`
+
 Questo è uno script che viene eseguito **prima** del caricamento della pagina web per la prima volta. Viene eseguito solo una volta, anche se la pagina viene ricaricata o navigata altrove. Questo è utile se desideri iniettare qualcosa nella finestra, nel localStorage o nel documento prima dell'esecuzione del codice web.
 
 ```jsx
@@ -349,6 +372,7 @@ Impostando `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, l'ini
 > Nota sulla compatibilità di Android: per le applicazioni che mirano a `Build.VERSION_CODES.N` o versioni successive, lo state JavaScript da una WebView vuota non viene più mantenuto tra le navigazioni come `loadUrl(java.lang.String)`. Ad esempio, le variabili globali e le funzioni definite prima di chiamare `loadUrl(java.lang.String)` non esisteranno nella pagina caricata. Le applicazioni devono utilizzare l'API nativa di Android `addJavascriptInterface(Object, String)` per mantenere gli oggetti JavaScript tra le navigazioni.
 
 #### Il metodo `injectJavaScript`
+
 Sebbene comodo, il lato negativo della prop `injectedJavaScript` precedentemente menzionata è che viene eseguita solo una volta. Ecco perché mettiamo a disposizione anche un metodo sull'oggetto di riferimento della WebView chiamato `injectJavaScript` (nota il nome leggermente diverso!).
 
 ```jsx
@@ -386,10 +410,12 @@ Dopo 3 secondi, questo codice cambia il colore di sfondo in blu:
 <img alt="Screenshot dell'app che mostra il codice JavaScript iniettato" width="200" src="https://user-images.githubusercontent.com/1479215/53670433-93a98280-3c2f-11e9-85a5-0e4650993817.png" />
 
 _Roba da smanettoni_
+
 > Su iOS, `injectJavaScript` chiama il metodo `evaluateJS:andThen:` della WebView
 > Su Android, `injectJavaScript` chiama il metodo `evaluateJavascriptWithFallback` della WebView di Android
 
 #### Il metodo `window.ReactNativeWebView.postMessage` e la prop `onMessage`
+
 Poter inviare JavaScript alla pagina web è fantastico, ma cosa succede quando la pagina web vuole comunicare con il tuo codice React Native? È qui che entrano in gioco `window.ReactNativeWebView.postMessage` e la prop `onMessage`.
 
 È **necessario** impostare `onMessage`, altrimenti il metodo `window.ReactNativeWebView.postMessage` non verrà iniettato nella pagina web.
@@ -433,9 +459,10 @@ export default class App extends Component {
 Questo codice genererà un avviso come dimostrato:
 <img alt="Avviso che mostra la comunicazione dalla pagina web a React Native" width="200" src="https://user-images.githubusercontent.com/1479215/53671269-7e822300-3c32-11e9-9937-7ddc34ba8af3.png" />
 
-
 ### Lavorare con header personalizzate, sessioni e cookie
+
 #### Impostazione degli header personalizzati
+
 In React Native WebView, è possibile impostare un header personalizzato nel seguente modo:
 
 ```jsx
@@ -485,6 +512,7 @@ const CustomHeaderWebView = (props) => {
 ```
 
 #### Gestione dei cookie
+
 Puoi impostare i cookie dal lato React Native utilizzando il pacchetto [@react-native-cookies/cookies](https://github.com/react-native-cookies/cookies).
 
 Quando lo fai, dovrai abilitare anche la prop [sharedCookiesEnabled](Reference.italian.md#sharedCookiesEnabled).
@@ -509,7 +537,8 @@ const App = () => {
       source={{
         uri: 'http://example.com',
         headers: {
-          Cookie: 'cookie1=contenuto-del-cookie1; cookie2=contenuto-del-cookie2',
+          Cookie:
+            'cookie1=contenuto-del-cookie1; cookie2=contenuto-del-cookie2',
         },
       }}
       sharedCookiesEnabled={true}
@@ -521,6 +550,7 @@ const App = () => {
 Tieni presente che questi cookie verranno inviati solo nella prima richiesta a meno che tu non utilizzi la tecnica descritta sopra per impostare gli [header personalizzati](#impostazione-degli-header-personalizzati) ad ogni caricamento della pagina.
 
 ### Supporto per la navigazione gestuale e a pulsanti
+
 Possiamo fornire supporto per la navigazione convenzionale delle pagine mobili: gesti di scorrimento avanti/indietro su iOS e il pulsante indietro/gesto hardware su Android.
 
 Per iOS, è sufficiente utilizzare la proprietà [`allowsBackForwardNavigationGestures`](Reference.italian.md#allowsbackforwardnavigationgestures).
@@ -530,8 +560,8 @@ Per Android, è necessario utilizzare [`BackHandler.addEventListener`](https://r
 Con i componenti funzionali di React, è possibile utilizzare `useRef` e `useEffect` (dovrai importarli da React se non lo hai già fatto) per consentire agli utenti di navigare alla pagina precedente quando il pulsante "indietro" viene premuto, come segue:
 
 ```jsx
-import React, { useEffect, useRef, } from 'react';
-import { BackHandler, Platform, } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { BackHandler, Platform } from 'react-native';
 ```
 
 ```jsx
@@ -566,8 +596,9 @@ Su iOS, l'audio verrà disattivato quando il silenzioso è nella posizione attiv
 
 Sempre su iOS, invece, il video ignorerà sempre il tasto del silenzioso.
 
-
 ### Traduzioni
+
 Questo file è disponibile nelle seguenti lingue:
+
 - [Inglese](Guide.md)
 - [Portoghese brasiliano](Guide.portuguese.md)

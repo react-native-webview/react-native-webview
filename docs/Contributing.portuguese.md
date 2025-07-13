@@ -9,8 +9,9 @@ Em segundo lugar, gostaríamos que a experiência de contribuição fosse a melh
 Após fazer um fork do repositório, cloná-lo em sua máquina e fazer suas alterações, você deverar testá-las em uma aplicação.
 
 Existem dois métodos de teste:
-1) Rodando os testes do react-native-webview
-2) Testando em um projeto `react-native init`
+
+1. Rodando os testes do react-native-webview
+2. Testando em um projeto `react-native init`
 
 ### Rodando os testes dentro do react-native-webview
 

@@ -172,7 +172,7 @@ export default class App extends Component<Props, State> {
 
   _simulateRestart = () => {
     this.setState({ restarting: true }, () =>
-      this.setState({ restarting: false }),
+      this.setState({ restarting: false })
     );
   };
 
