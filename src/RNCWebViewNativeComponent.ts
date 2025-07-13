@@ -325,8 +325,12 @@ export interface NativeCommands {
   clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   // !Android Only
   loadWebview: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
-  enableAndroidRefresh: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
-  disableAndroidRefresh: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  enableAndroidRefresh: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>
+  ) => void;
+  disableAndroidRefresh: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>
+  ) => void;
 }
 
 export const Commands = codegenNativeCommands<NativeCommands>({

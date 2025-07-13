@@ -182,9 +182,11 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         loadWebview: () =>
           webViewRef.current && Commands.loadWebview(webViewRef.current),
         enableAndroidRefresh: () =>
-          webViewRef.current && Commands.enableAndroidRefresh(webViewRef.current),
+          webViewRef.current &&
+          Commands.enableAndroidRefresh(webViewRef.current),
         disableAndroidRefresh: () =>
-          webViewRef.current && Commands.disableAndroidRefresh(webViewRef.current),
+          webViewRef.current &&
+          Commands.disableAndroidRefresh(webViewRef.current),
       }),
       [setViewState, webViewRef]
     );

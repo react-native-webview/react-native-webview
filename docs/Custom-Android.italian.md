@@ -1,8 +1,9 @@
 Nonostante la web view integrata disponga di molte funzionalità, non è possibile gestire tutti i casi d'uso in React Native. Tuttavia, è possibile estendere la web view con codice nativo senza dover forkare React Native o duplicare l'intero codice esistente della web view.
 
-Prima di procedere, è consigliabile avere un'idea di base  dei concetti legati ai [native UI components](https://reactnative.dev/docs/native-components-android) (componenti dell'interfaccia utente nativi). Inoltre, è opportuno familiarizzarsi con il [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) (codice nativo per le web view), poiché sarà necessario farvi riferimento durante l'implementazione delle nuove funzionalità, anche se non è richiesta una conoscenza approfondita.
+Prima di procedere, è consigliabile avere un'idea di base dei concetti legati ai [native UI components](https://reactnative.dev/docs/native-components-android) (componenti dell'interfaccia utente nativi). Inoltre, è opportuno familiarizzarsi con il [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) (codice nativo per le web view), poiché sarà necessario farvi riferimento durante l'implementazione delle nuove funzionalità, anche se non è richiesta una conoscenza approfondita.
 
 ## Codice nativo
+
 Per iniziare, dovrai creare una sottoclasse di `RNCWebViewManager`, `RNCWebView` e `RNCWebViewClient`. Poi, nel gestore della view, sovrascrivi i seguenti metodi:
 
 - `createViewInstance`
@@ -43,6 +44,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
 Poi dovrai seguire i soliti passaggi per [register the module](https://reactnative.dev/docs/native-modules-android#register-the-module-android-specific) (registrare il modulo Android).
 
 ### Aggiungere nuove proprietà
+
 Per aggiungere una nuova proprietà, è necessario includerla in `CustomWebView` e successivamente esporla tramite `CustomWebViewManager`.
 
 ```java
@@ -75,6 +77,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
 ```
 
 ### Aggiungere nuovi eventi
+
 Per gli eventi, dovrai prima creare una sottoclasse degli eventi.
 
 ```java
@@ -185,7 +188,7 @@ const RCTCustomWebView = requireNativeComponent('RCTCustomWebView');
 
 Se desideri aggiungere props personalizzate al tuo componente nativo, puoi utilizzare `nativeConfig.props` sulla web view.
 
-Per gli eventi, l'handler deve essere sempre una funzione. Ciò significa che non è sicuro chiamare  l'handler direttamente da `this.props`, poiché l'utente potrebbe non averne fornito uno. L'approccio di base consiste nel creare un handler delle'evento nella tua classe, per poi invocarlo solamente se l'handler fornito da `this.props` esiste.
+Per gli eventi, l'handler deve essere sempre una funzione. Ciò significa che non è sicuro chiamare l'handler direttamente da `this.props`, poiché l'utente potrebbe non averne fornito uno. L'approccio di base consiste nel creare un handler delle'evento nella tua classe, per poi invocarlo solamente se l'handler fornito da `this.props` esiste.
 
 Se non sei sicuro su come qualcosa debba essere implementato nel lato JS, dai un'occhiata al file [WebView.android.tsx](https://github.com/react-native-webview/react-native-webview/blob/master/src/WebView.android.tsx) nel codice sorgente di React Native WebView.
 
@@ -214,6 +217,8 @@ export default class CustomWebView extends Component {
 ```
 
 ### Traduzioni
+
 Questo file è disponibile nelle seguenti lingue:
+
 - [Inglese](Custom-Android.md)
 - [Portoghese brasiliano](Custom-Android.portuguese.md)

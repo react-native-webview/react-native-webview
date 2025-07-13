@@ -13,10 +13,10 @@
 Également beaucoup de temps personnel est investi pour maintenir ce projet, n'hésitez pas à nous sponsoriser, **ça aide vraiment.**
 
 - [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) de [Brigad](https://www.brigad.co/fr-fr/about-us)  
-[*Me Sponsor* ❤️ !](https://github.com/sponsors/Titozzz)
-
+  [_Me Sponsor_ ❤️ !](https://github.com/sponsors/Titozzz)
 
 Windows et macOS sont maintenues par Microsoft, notamment:
+
 - [Alexander Sklar](https://github.com/asklar) ([Twitter @alexsklar](https://twitter.com/alexsklar)) de [React Native for Windows](https://microsoft.github.io/react-native-windows/)
 - [Chiara Mooney](https://github.com/chiaramooney) de [React Native for Windows @ Microsoft](https://microsoft.github.io/react-native-windows/)
 
@@ -27,21 +27,21 @@ Grand merci à [Jamon Holmgren](https://github.com/jamonholmgren) de [Infinite R
 Maintenir la WebView est très compliqué, à cause de ses nombreux usages (rendering svgs, pdfs, login flows, et autres). On supporte également de nombreuses plateformes et les deux architectures de React Native.
 
 Depuis que la WebView a été retirée du core, près de 500 PR ont été mergées.  
-En considérant que nous possédons un temps limité, les issues github serviront principalement comme lieu d'échange pour la communauté, tandis que **nous prioriserons les reviews et les merges de pull requests** 
+En considérant que nous possédons un temps limité, les issues github serviront principalement comme lieu d'échange pour la communauté, tandis que **nous prioriserons les reviews et les merges de pull requests**
 
 ### Platform compatibles
 
-Ce projet est compatible avec **iOS**,  **Android**, **Windows** et **macOS**.  
+Ce projet est compatible avec **iOS**, **Android**, **Windows** et **macOS**.  
 Ce projet supporte à la fois **l'ancienne** (paper) **et la nouvelle architecture** (fabric).  
 Ce projet est compatible avec [expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
-## Débuter 
+## Débuter
 
 Lisez attentivement notre guide (exclusivement en anglais) [Getting Started Guide](docs/Getting-Started.md). Si la moindre étape ne semble pas claire, merci de créer une **issue** détaillée.
 
 ## Versionnage
 
-Ce projet suit la [gestion sémantique de version](https://semver.org/).  Nous n'hésitons pas à publier des modifications "breaking-change", mais elles seront intégrées dans une version majeure.
+Ce projet suit la [gestion sémantique de version](https://semver.org/). Nous n'hésitons pas à publier des modifications "breaking-change", mais elles seront intégrées dans une version majeure.
 
 ## Utilisation
 
@@ -54,8 +54,10 @@ import { WebView } from 'react-native-webview';
 
 // ...
 const MyWebComponent = () => {
-  return <WebView source={{ uri: 'https://reactnative.dev/' }} style={{ flex: 1 }} />;
-}
+  return (
+    <WebView source={{ uri: 'https://reactnative.dev/' }} style={{ flex: 1 }} />
+  );
+};
 ```
 
 Pour plus de détails, lisez la [Référence API](./docs/Reference.md) et le [Guide](./docs/Guide.md). Si vous êtes intéressé à contribuer, lisez le [Guide de contribution](./docs/Contributing.md).
