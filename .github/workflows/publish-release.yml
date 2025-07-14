@@ -1,0 +1,70 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout and setup environment
+        uses: MetaMask/action-checkout-and-setup@v1
+        with:
+          is-high-risk-environment: true
+      - uses: MetaMask/action-publish-release@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: yarn build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-release-artifacts-${{ github.sha }}
+          include-hidden-files: true
+          retention-days: 4
+          path: |
+            ./packages/**/dist
+            ./node_modules/.yarn-integrity
+
+  publish-npm-dry-run:
+    needs: publish-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout and setup environment
+        uses: MetaMask/action-checkout-and-setup@v1
+        with:
+          is-high-risk-environment: true
+          ref: ${{ github.sha }}
+      - name: Restore build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-release-artifacts-${{ github.sha }}
+      - name: Dry Run Publish
+        # omit npm-token token to perform dry run publish
+        uses: MetaMask/action-npm-publish@v5
+        with:
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          subteam: S04EF225J1M # @metamask-mobile-platform
+        env:
+          SKIP_PREPACK: true
+
+  publish-npm:
+    name: Publish to NPM
+    environment: npm-publish
+    runs-on: ubuntu-latest
+    needs: publish-npm-dry-run
+    steps:
+      - name: Checkout and setup environment
+        uses: MetaMask/action-checkout-and-setup@v1
+        with:
+          is-high-risk-environment: true
+          ref: ${{ github.sha }}
+      - name: Restore build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-release-artifacts-${{ github.sha }}
+      - name: Publish to NPM
+        uses: MetaMask/action-npm-publish@v5
+        with:
+          npm-token: ${{ secrets.NPM_TOKEN }}
