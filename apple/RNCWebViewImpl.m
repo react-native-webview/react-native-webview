@@ -9,6 +9,7 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#import "IFrameDetector.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
@@ -126,6 +127,7 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *injectedObjectJsonScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
+@property (nonatomic, strong) WKUserScript *iframeDetectorScript;
 @end
 
 @implementation RNCWebViewImpl
@@ -185,6 +187,10 @@ RCTAutoInsetsProtocol>
     _disablePromptDuringLoading = YES;
 
     _enableApplePay = NO;
+
+    self.iframeDetectorScript = [[WKUserScript alloc] initWithSource:getIFrameDetectorScript()
+                                                       injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
+                                                    forMainFrameOnly:NO];
 #if TARGET_OS_IOS
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
@@ -2011,6 +2017,9 @@ didFinishNavigation:(WKNavigation *)navigation
     if (self.atEndScript) {
       [wkWebViewConfig.userContentController addUserScript:self.atEndScript];
     }
+    if (self.iframeDetectorScript) {
+      [wkWebViewConfig.userContentController addUserScript:self.iframeDetectorScript];
+  	}
   }
   // Whether or not messaging is enabled, add the startup script if it exists.
   if (self.atStartScript) {
