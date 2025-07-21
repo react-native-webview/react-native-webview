@@ -45,7 +45,7 @@ jobs:
         uses: MetaMask/action-npm-publish@v5
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          subteam: S04EF225J1M # @metamask-mobile-platform
+          subteam: S042S7RE4AE # @metamask-npm-publishers
         env:
           SKIP_PREPACK: true
 
