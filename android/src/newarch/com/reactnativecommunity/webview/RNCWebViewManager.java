@@ -525,6 +525,8 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
         export.put(TopLoadingFinishEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingFinish"));
         export.put(TopLoadingErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingError"));
         export.put(TopMessageEvent.EVENT_NAME, MapBuilder.of("registrationName", "onMessage"));
+        // In getExportedCustomDirectEventTypeConstants (Java) or getExportedCustomDirectEventTypeConstants (Kotlin)
+        export.put("topOverScrolled", MapBuilder.of("registrationName", "onOverScrolled"));
         // !Default events but adding them here explicitly for clarity
 
         export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));

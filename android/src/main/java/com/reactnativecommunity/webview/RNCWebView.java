@@ -127,6 +127,18 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     @Override
+    public void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+
+        WritableMap event= Arguments.createMap();
+        event.putInt("scrollX", scrollX);
+        event.putInt("scrollY", scrollY);
+        event.putBoolean("clampedX", clampedX);
+        event.putBoolean("clampedY", clampedY);
+        dispatchEvent(this, new TopOverScrolledEvent(RNCWebViewWrapper.getReactTagFromWebView(this), event));
+    }
+    
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (this.nestedScrollEnabled) {
             requestDisallowInterceptTouchEvent(true);
