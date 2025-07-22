@@ -222,6 +222,13 @@ export interface WebViewSourceHtml {
   baseUrl?: string;
 }
 
+export interface WebViewOverScrolledEvent {
+  scrollX: number;
+  scrollY: number;
+  clampedX: boolean;
+  clampedY: boolean;
+}
+
 export interface WebViewCustomMenuItems {
   /**
    * The unique key that will be added as a selector on the webview
@@ -299,6 +306,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   webviewDebuggingEnabled?: boolean;
   messagingEnabled: boolean;
   onScroll?: (event: WebViewScrollEvent) => void;
+  onOverScrolled?: (event: WebViewOverScrolledEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
   onLoadingFinish: (event: WebViewNavigationEvent) => void;
   onLoadingProgress: (event: WebViewProgressEvent) => void;
