@@ -304,6 +304,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
         export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
         export.put(TopCustomMenuSelectionEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomMenuSelection"));
         export.put(TopOpenWindowEvent.EVENT_NAME, MapBuilder.of("registrationName", "onOpenWindow"));
+        export.put("topOverScrolled", MapBuilder.of("registrationName", "onOverScrolled"));
         return export;
     }
 
