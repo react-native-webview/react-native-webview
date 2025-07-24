@@ -1,0 +1,25 @@
+{
+  "name": "base-examples",
+  "version": "1.0.0",
+  "main": "index",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~53.0.20",
+    "expo-status-bar": "~2.2.3",
+    "react": "19.0.0",
+    "react-native": "0.79.5",
+    "react-native-webview": "workspace:*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@types/react": "~19.0.10",
+    "tsx": "4.20.3",
+    "typescript": "~5.8.3"
+  },
+  "private": true
+}
