@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import React, { Component } from 'react';
+import { View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -23,7 +23,7 @@ const HTML = `
     <button onclick="showAlert()">Show alert</button>
     <button onclick="showConfirm()">Show confirm</button>
     <button onclick="showPrompt()">Show prompt</button>
-    <p id="demo"></p>    
+    <p id="demo"></p>
     <script>
       function showAlert() {
         alert("Hello! I am an alert box!");
@@ -53,17 +53,14 @@ const HTML = `
 </html>
 `;
 
-type Props = {};
-type State = {};
-
-export default class Alerts extends Component<Props, State> {
+export default class Alerts extends Component {
   state = {};
 
   render() {
     return (
       <View style={{ height: 120 }}>
         <WebView
-          source={{html: HTML}}
+          source={{ html: HTML }}
           automaticallyAdjustContentInsets={false}
           useWebView2
         />

@@ -1,35 +1,39 @@
-import React, {
+import invariant from 'invariant';
+import type React from 'react';
+import {
   forwardRef,
-  ReactElement,
+  type ReactElement,
   useCallback,
   useEffect,
   useImperativeHandle,
   useRef,
 } from 'react';
-
-import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
-
+import {
+  type HostComponent,
+  Image,
+  type ImageSourcePropType,
+  View,
+} from 'react-native';
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
 import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
-
-import invariant from 'invariant';
-
-import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
 import RNCWebViewModule from './NativeRNCWebViewModule';
+import RNCWebView, {
+  Commands,
+  type NativeProps,
+} from './RNCWebViewNativeComponent';
+import styles from './WebView.styles';
 import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
   useWebViewLogic,
 } from './WebViewShared';
-import {
+import type {
   AndroidWebViewProps,
+  ShouldStartLoadRequestEvent,
+  WebViewMessageEvent,
   WebViewSourceUri,
-  type WebViewMessageEvent,
-  type ShouldStartLoadRequestEvent,
 } from './WebViewTypes';
-
-import styles from './WebView.styles';
 
 const { resolveAssetSource } = Image;
 
@@ -44,12 +48,12 @@ const registerCallableModule: (name: string, module: Object) => void =
 
 registerCallableModule('RNCWebViewMessagingModule', {
   onShouldStartLoadWithRequest: (
-    event: ShouldStartLoadRequestEvent & { messagingModuleName?: string }
+    event: ShouldStartLoadRequestEvent & { messagingModuleName?: string },
   ) => {
     directEventEmitter.emit('onShouldStartLoadWithRequest', event);
   },
   onMessage: (
-    event: WebViewMessageEvent & { messagingModuleName?: string }
+    event: WebViewMessageEvent & { messagingModuleName?: string },
   ) => {
     directEventEmitter.emit('onMessage', event);
   },
@@ -98,10 +102,10 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       injectedJavaScriptObject,
       ...otherProps
     },
-    ref
+    ref,
   ) => {
     const messagingModuleName = useRef<string>(
-      `WebViewMessageHandler${(uniqueRef += 1)}`
+      `WebViewMessageHandler${(uniqueRef += 1)}`,
     ).current;
     const webViewRef = useRef<React.ComponentRef<
       HostComponent<NativeProps>
@@ -112,13 +116,13 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         if (lockIdentifier) {
           RNCWebViewModule.shouldStartLoadWithLockIdentifier(
             shouldStart,
-            lockIdentifier
+            lockIdentifier,
           );
         } else if (shouldStart && webViewRef.current) {
           Commands.loadUrl(webViewRef.current, url);
         }
       },
-      []
+      [],
     );
 
     const {
@@ -180,7 +184,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         clearHistory: () =>
           webViewRef.current && Commands.clearHistory(webViewRef.current),
       }),
-      [setViewState, webViewRef]
+      [setViewState, webViewRef],
     );
 
     useEffect(() => {
@@ -190,14 +194,14 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
           (
             event: ShouldStartLoadRequestEvent & {
               messagingModuleName?: string;
-            }
+            },
           ) => {
             if (event.messagingModuleName === messagingModuleName) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { messagingModuleName: _, ...rest } = event;
               onShouldStartLoadWithRequest(rest);
             }
-          }
+          },
         );
 
       const onMessageSubscription = directEventEmitter.addListener(
@@ -208,7 +212,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
             const { messagingModuleName: _, ...rest } = event;
             onMessage(rest);
           }
-        }
+        },
       );
 
       return () => {
@@ -223,13 +227,13 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
     } else if (viewState === 'ERROR') {
       invariant(
         lastErrorEvent != null,
-        'lastErrorEvent expected to be non-null'
+        'lastErrorEvent expected to be non-null',
       );
       if (lastErrorEvent) {
         otherView = (renderError || defaultRenderError)(
           lastErrorEvent.domain,
           lastErrorEvent.code,
-          lastErrorEvent.description
+          lastErrorEvent.description,
         );
       }
     } else if (viewState !== 'IDLE') {
@@ -242,7 +246,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
     if (typeof source !== 'number' && source && 'method' in source) {
       if (source.method === 'POST' && source.headers) {
         console.warn(
-          'WebView: `source.headers` is not supported when using POST.'
+          'WebView: `source.headers` is not supported when using POST.',
         );
       } else if (source.method === 'GET' && source.body) {
         console.warn('WebView: `source.body` is not supported when using GET.');
@@ -272,7 +276,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
                     : currValue,
               };
             },
-            {}
+            {},
           )
         : sourceResolved;
 
@@ -323,7 +327,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         {otherView}
       </View>
     );
-  }
+  },
 );
 
 // native implementation should return "true" only for Android 5+

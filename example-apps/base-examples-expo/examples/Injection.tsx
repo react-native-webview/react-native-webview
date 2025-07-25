@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {Text, View, ScrollView} from 'react-native';
+import React, { Component } from 'react';
+import { ScrollView, Text, View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -21,20 +21,11 @@ const HTML = `
 </html>
 `;
 
-type Props = {};
-type State = {
-  backgroundColor: string,
-};
-
-export default class Injection extends Component<Props, State> {
-  state = {
-    backgroundColor: '#FF00FF00'
-  };
-
+export default class Injection extends Component {
   render() {
     return (
       <ScrollView>
-        <View style={{ }}>
+        <View style={{}}>
           <View style={{ height: 400 }}>
             <WebView
               /**
@@ -43,18 +34,18 @@ export default class Injection extends Component<Props, State> {
                * The cause of this is unresolved.
                */
               // source={{ html: HTML }}
-              source={{ uri: "https://birchlabs.co.uk/linguabrowse/infopages/obsol/rnw_iframe_test.html" }}
+              source={{
+                uri: 'https://birchlabs.co.uk/linguabrowse/infopages/obsol/rnw_iframe_test.html',
+              }}
               automaticallyAdjustContentInsets={false}
-              style={{backgroundColor:'#00000000'}}
-              
+              style={{ backgroundColor: '#00000000' }}
               /* Must be populated in order for `messagingEnabled` to be `true` to activate the
                * JS injection user scripts, consistent with current behaviour. This is undesirable,
                * so needs addressing in a follow-up PR. */
               onMessage={() => {}}
               injectedJavaScriptBeforeContentLoadedForMainFrameOnly={false}
               injectedJavaScriptForMainFrameOnly={false}
-              injectedJavaScriptObject={{ hello: "world" }}
-
+              injectedJavaScriptObject={{ hello: 'world' }}
               /* We set this property in each frame */
               injectedJavaScriptBeforeContentLoaded={`
               console.log("executing injectedJavaScriptBeforeContentLoaded... " + (new Date()).toString());
@@ -88,7 +79,6 @@ export default class Injection extends Component<Props, State> {
                 console.log("wasn't window.top. Still going...");
               }
               `}
-
               /* We read the colourToUse property in each frame to recolour each frame */
               injectedJavaScript={`
               console.log("executing injectedJavaScript... " + (new Date()).toString());
@@ -104,7 +94,7 @@ export default class Injection extends Component<Props, State> {
 
               // Example usage of injectedJavaScriptObject({hello: 'world'}), see above
               const injectedObjectJson = window.ReactNativeWebView.injectedObjectJson();
-              
+
               if (injectedObjectJson) {
                 const injectedObject = JSON.parse(injectedObjectJson);
                 console.log("injectedJavaScriptObject: ", injectedObject); // injectedJavaScriptObject: { hello: 'world' }
@@ -153,22 +143,64 @@ export default class Injection extends Component<Props, State> {
             />
           </View>
         </View>
-        <Text>This test presents three iframes: iframe_0 (yellow); iframe_1 (pink); and iframe_2 (transparent, because its 'X-Frame-Options' is set to 'SAMEORIGIN').</Text>
-        <Text>Before injection, the main frame's background is the browser's default value (transparent or white) and each frame has its natural colour.</Text>
+        <Text>
+          This test presents three iframes: iframe_0 (yellow); iframe_1 (pink);
+          and iframe_2 (transparent, because its 'X-Frame-Options' is set to
+          'SAMEORIGIN').
+        </Text>
+        <Text>
+          Before injection, the main frame's background is the browser's default
+          value (transparent or white) and each frame has its natural colour.
+        </Text>
         {/*<Text>1a) At injection time "beforeContentLoaded", a variable will be set in each frame to set 'orange' as the "colour to be used".</Text>*/}
         {/*<Text>1b) Also upon "beforeContentLoaded", a style element to change the text "beforeContentLoaded failed" -> "beforeContentLoaded succeeded" will be applied as soon as the head has loaded.</Text>*/}
         {/*<Text>2a) At injection time "afterContentLoaded", that variable will be read – if present, the colour orange will be injected into all frames. Otherwise, cyan.</Text>*/}
         {/*<Text>2b) Also upon "afterContentLoaded", a style element to change the text "afterContentLoaded failed" -> "afterContentLoaded succeeded" will be applied as soon as the head has loaded.</Text>*/}
-        <Text>✅ If the main frame becomes orange, then top-frame injection both beforeContentLoaded and afterContentLoaded is supported.</Text>
-        <Text>✅ If iframe_0, and iframe_1 become orange, then multi-frame injection beforeContentLoaded and afterContentLoaded is supported.</Text>
-        <Text>✅ If the two texts say "beforeContentLoaded on the top frame succeeded!" and "afterContentLoaded on the top frame succeeded!", then both injection times are supported at least on the main frame.</Text>
-        <Text>❌ If either of the two iframes become coloured cyan, then for that given frame, JS injection succeeded after the content loaded, but didn't occur before the content loaded.</Text>
-        <Text>❌ If "Names of iframes that called beforeContentLoaded: " is [], then see above.</Text>
-        <Text>❌ If "Names of iframes that called afterContentLoaded: " is [], then afterContentLoaded is not supported in iframes.</Text>
-        <Text>❌ If the main frame becomes coloured cyan, then JS injection succeeded after the content loaded, but didn't occur before the content loaded.</Text>
-        <Text>❌ If the text "beforeContentLoaded on the top frame failed" remains unchanged, then JS injection has failed on the main frame before the content loaded.</Text>
-        <Text>❌ If the text "afterContentLoaded on the top frame failed" remains unchanged, then JS injection has failed on the main frame after the content loaded.</Text>
-        <Text>❌ If the iframes remain their original colours (yellow and pink), then multi-frame injection is not supported at all.</Text>
+        <Text>
+          ✅ If the main frame becomes orange, then top-frame injection both
+          beforeContentLoaded and afterContentLoaded is supported.
+        </Text>
+        <Text>
+          ✅ If iframe_0, and iframe_1 become orange, then multi-frame injection
+          beforeContentLoaded and afterContentLoaded is supported.
+        </Text>
+        <Text>
+          ✅ If the two texts say "beforeContentLoaded on the top frame
+          succeeded!" and "afterContentLoaded on the top frame succeeded!", then
+          both injection times are supported at least on the main frame.
+        </Text>
+        <Text>
+          ❌ If either of the two iframes become coloured cyan, then for that
+          given frame, JS injection succeeded after the content loaded, but
+          didn't occur before the content loaded.
+        </Text>
+        <Text>
+          ❌ If "Names of iframes that called beforeContentLoaded: " is [], then
+          see above.
+        </Text>
+        <Text>
+          ❌ If "Names of iframes that called afterContentLoaded: " is [], then
+          afterContentLoaded is not supported in iframes.
+        </Text>
+        <Text>
+          ❌ If the main frame becomes coloured cyan, then JS injection
+          succeeded after the content loaded, but didn't occur before the
+          content loaded.
+        </Text>
+        <Text>
+          ❌ If the text "beforeContentLoaded on the top frame failed" remains
+          unchanged, then JS injection has failed on the main frame before the
+          content loaded.
+        </Text>
+        <Text>
+          ❌ If the text "afterContentLoaded on the top frame failed" remains
+          unchanged, then JS injection has failed on the main frame after the
+          content loaded.
+        </Text>
+        <Text>
+          ❌ If the iframes remain their original colours (yellow and pink),
+          then multi-frame injection is not supported at all.
+        </Text>
       </ScrollView>
     );
   }

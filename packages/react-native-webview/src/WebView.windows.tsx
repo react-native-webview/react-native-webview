@@ -10,25 +10,29 @@
  * Licensed under the MIT License.
  */
 
+import invariant from 'invariant';
 import React, {
   forwardRef,
   useCallback,
   useImperativeHandle,
   useRef,
 } from 'react';
-import { View, Image, ImageSourcePropType, NativeModules } from 'react-native';
+import {
+  Image,
+  type ImageSourcePropType,
+  NativeModules,
+  View,
+} from 'react-native';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import invariant from 'invariant';
+import styles from './WebView.styles';
 import { RCTWebView, RCTWebView2 } from './WebViewNativeComponent.windows';
 import {
-  useWebViewLogic,
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
+  useWebViewLogic,
 } from './WebViewShared';
-import { NativeWebViewWindows, WindowsWebViewProps } from './WebViewTypes';
-
-import styles from './WebView.styles';
+import type { NativeWebViewWindows, WindowsWebViewProps } from './WebViewTypes';
 
 const Commands = codegenNativeCommands({
   supportedCommands: [
@@ -71,7 +75,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
       useWebView2,
       ...otherProps
     },
-    ref
+    ref,
   ) => {
     const webViewRef = useRef<NativeWebViewWindows | null>(null);
 
@@ -83,19 +87,19 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
           if (RCTWebViewString === 'RCTWebView') {
             NativeModules.RCTWebView.onShouldStartLoadWithRequestCallback(
               shouldStart,
-              lockIdentifier
+              lockIdentifier,
             );
           } else {
             NativeModules.RCTWebView2.onShouldStartLoadWithRequestCallback(
               shouldStart,
-              lockIdentifier
+              lockIdentifier,
             );
           }
         } else if (shouldStart) {
           Commands.loadUrl(webViewRef, url);
         }
       },
-      [RCTWebViewString]
+      [RCTWebViewString],
     );
 
     const {
@@ -144,7 +148,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
         clearCache: () => Commands.clearCache(webViewRef.current),
         loadUrl: (url: string) => Commands.loadUrl(webViewRef.current, url),
       }),
-      [setViewState, webViewRef]
+      [setViewState, webViewRef],
     );
 
     let otherView = null;
@@ -153,12 +157,12 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
     } else if (viewState === 'ERROR') {
       invariant(
         lastErrorEvent != null,
-        'lastErrorEvent expected to be non-null'
+        'lastErrorEvent expected to be non-null',
       );
       otherView = (renderError || defaultRenderError)(
         lastErrorEvent.domain,
         lastErrorEvent.code,
-        lastErrorEvent.description
+        lastErrorEvent.description,
       );
     } else if (viewState !== 'IDLE') {
       console.error(`RNCWebView invalid state encountered: ${viewState}`);
@@ -199,7 +203,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
         {otherView}
       </View>
     );
-  }
+  },
 );
 
 // native implementation should return "true" only for Android 5+

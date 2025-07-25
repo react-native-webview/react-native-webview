@@ -1,31 +1,31 @@
 import React, { Component } from 'react';
 import {
-  StyleSheet,
+  Button,
+  Keyboard,
+  Platform,
   SafeAreaView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Keyboard,
-  Button,
-  Platform,
 } from 'react-native';
 
 import Alerts from './examples/Alerts';
-import Scrolling from './examples/Scrolling';
+import ApplePay from './examples/ApplePay';
 import Background from './examples/Background';
+import ClearData from './examples/ClearData';
+import CustomMenu from './examples/CustomMenu';
 import Downloads from './examples/Downloads';
-import Uploads from './examples/Uploads';
+import GooglePay from './examples/GooglePay';
 import Injection from './examples/Injection';
 import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
 import MultiMessaging from './examples/MultiMessaging';
 import NativeWebpage from './examples/NativeWebpage';
-import ApplePay from './examples/ApplePay';
-import GooglePay from './examples/GooglePay';
-import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
+import Scrolling from './examples/Scrolling';
 import SuppressMenuItems from './examples/Suppress';
-import ClearData from './examples/ClearData';
+import Uploads from './examples/Uploads';
 
 const TESTS = {
   Messaging: {
@@ -158,7 +158,7 @@ const TESTS = {
   },
 };
 
-interface Props {}
+type Props = {};
 interface State {
   restarting: boolean;
   currentTest: Object;
@@ -172,7 +172,7 @@ export default class App extends Component<Props, State> {
 
   _simulateRestart = () => {
     this.setState({ restarting: true }, () =>
-      this.setState({ restarting: false })
+      this.setState({ restarting: false }),
     );
   };
 

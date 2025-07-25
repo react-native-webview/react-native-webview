@@ -22,7 +22,7 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     return context.resolveRequest(
       { ...context, disableHierarchicalLookup: true },
       moduleName,
-      platform
+      platform,
     );
   }
 

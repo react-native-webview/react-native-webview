@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {Button, Linking, Text, View} from 'react-native';
+import React from 'react';
+import { Text, View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -21,16 +21,16 @@ const HTML = `
     <script>
       //script to clear selection/highlight
       const messageEventListenerFn = (e) =>{
-        try{  
+        try{
           if(e.origin === '' && typeof window.ReactNativeWebView === 'object'){
-            const parsedData = JSON.parse(e.data)  
+            const parsedData = JSON.parse(e.data)
             if(parsedData?.what === 'clearSelection'){
               window.getSelection()?.removeAllRanges()
             }
           }
         }catch(e){
           console.log('External: ', 'exception in eventListener: ', e.message)
-        } 
+        }
       }
       window.addEventListener('message', (e) => messageEventListenerFn(e))
       document.addEventListener('message', (e) => messageEventListenerFn(e))
@@ -42,7 +42,7 @@ const HTML = `
     </p>
     <p>
       The custom context menu will show the custom menus defined in the menuItems prop and call the onCustomMenuSelection
-      on clicking on the menu Item. Testing symbols ' " < & > + - = ^ % $ # @ ! ~ ; :  ? 
+      on clicking on the menu Item. Testing symbols ' " < & > + - = ^ % $ # @ ! ~ ; :  ?
     </p>
     <p>
       "Third Para with quotes"
@@ -51,38 +51,43 @@ const HTML = `
 </html>
 `;
 
-interface Props {}
-interface State {}
+type Props = {};
+type State = {};
 
-// export default class CustomMenu extends Component<Props, State> {
-export default CustomMenu = () => {
-  const [selectionInfo, setSelectionInfo] = React.useState(null)
-  const webviewRef = React.useRef()
+const CustomMenu = () => {
+  const [selectionInfo, setSelectionInfo] = React.useState(null);
+  const webviewRef = React.useRef<WebView>(null);
 
-    return (
-      <View>
-        <View style={{ height: 120 }}>
-          <WebView
-            ref={webviewRef}
-            source={{html: HTML}}
-            automaticallyAdjustContentInsets={false}
-            menuItems={[{ label: 'Highlight', key: 'highlight' }, { label: 'Strikethrough', key: 'strikethrough' }]}
-            onCustomMenuSelection={(webViewEvent) => {
-              const { label, key, selectedText } = webViewEvent.nativeEvent;
-              setSelectionInfo(webViewEvent.nativeEvent)
-              // clearing the selection by sending a message. This would need a script on the source page to listen to the message.
-              webviewRef.current?.postMessage(JSON.stringify({what: 'clearSelection'}))
-            }}
-          />
-        </View>
-        {selectionInfo 
-          && <Text> 
-              onCustomMenuSelection called: {"\n"}
-              - label: {selectionInfo?.label}{"\n"}
-              - key: {selectionInfo?.key}{"\n"}
-              - selectedText: {selectionInfo?.selectedText}
-          </Text>
-        }
+  return (
+    <View>
+      <View style={{ height: 120 }}>
+        <WebView
+          ref={webviewRef}
+          source={{ html: HTML }}
+          automaticallyAdjustContentInsets={false}
+          menuItems={[
+            { label: 'Highlight', key: 'highlight' },
+            { label: 'Strikethrough', key: 'strikethrough' },
+          ]}
+          onCustomMenuSelection={(webViewEvent) => {
+            const { label, key, selectedText } = webViewEvent.nativeEvent;
+            setSelectionInfo(webViewEvent.nativeEvent);
+            // clearing the selection by sending a message. This would need a script on the source page to listen to the message.
+            webviewRef.current?.postMessage(
+              JSON.stringify({ what: 'clearSelection' }),
+            );
+          }}
+        />
       </View>
-    );
-}
+      {selectionInfo && (
+        <Text>
+          onCustomMenuSelection called: {'\n'}- label: {selectionInfo?.label}
+          {'\n'}- key: {selectionInfo?.key}
+          {'\n'}- selectedText: {selectionInfo?.selectedText}
+        </Text>
+      )}
+    </View>
+  );
+};
+
+export default CustomMenu;

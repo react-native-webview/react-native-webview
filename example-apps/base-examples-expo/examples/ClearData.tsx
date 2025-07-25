@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
-import { View, Button } from 'react-native';
+import { Button, View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
-type Props = {};
-type State = {};
-
-export default class ClearData extends Component<Props, State> {
-  state = {};
-
+export default class ClearData extends Component {
   constructor(props) {
     super(props);
     this.webView = React.createRef();

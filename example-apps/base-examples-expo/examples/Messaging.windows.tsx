@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {View, Alert, TextInput} from 'react-native';
+import React, { Component } from 'react';
+import { Alert, TextInput, View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -20,7 +20,7 @@ const HTML = `<!DOCTYPE html>\n
   </head>
   <body>
     <button onclick="sendPostMessage()">Send post message from JS to WebView</button>
-    <p id="demo"></p>    
+    <p id="demo"></p>
     <p id="test">Nothing received yet</p>
 
     <script>
@@ -41,10 +41,7 @@ const HTML = `<!DOCTYPE html>\n
   </body>
 </html>`;
 
-type Props = {};
-type State = {};
-
-export default class Messaging extends Component<Props, State> {
+export default class Messaging extends Component {
   state = {};
 
   constructor(props) {
@@ -54,16 +51,20 @@ export default class Messaging extends Component<Props, State> {
 
   render() {
     return (
-      <View style={{height: 120}}>
-        <TextInput onSubmitEditing={(e) => {
-          this.webView.current.postMessage(e.nativeEvent.text);
-        }}/>
+      <View style={{ height: 120 }}>
+        <TextInput
+          onSubmitEditing={(e) => {
+            this.webView.current.postMessage(e.nativeEvent.text);
+          }}
+        />
         <WebView
           ref={this.webView}
-          source={{html: HTML}}
-          onLoadEnd={()=>{this.webView.current.postMessage('Hello from RN');}}
+          source={{ html: HTML }}
+          onLoadEnd={() => {
+            this.webView.current.postMessage('Hello from RN');
+          }}
           automaticallyAdjustContentInsets={false}
-          onMessage={(e: {nativeEvent: {data?: string}}) => {
+          onMessage={(e: { nativeEvent: { data?: string } }) => {
             Alert.alert('Message received from JS: ', e.nativeEvent.data);
           }}
           useWebView2

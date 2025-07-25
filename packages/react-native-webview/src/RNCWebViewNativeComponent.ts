@@ -1,12 +1,12 @@
 import type { HostComponent, ViewProps } from 'react-native';
-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import {
+import type {
   DirectEventHandler,
   Double,
   Int32,
   WithDefault,
 } from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 
 export type WebViewNativeEvent = Readonly<{
   url: string;
@@ -303,24 +303,24 @@ export interface NativeCommands {
   stopLoading: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   injectJavaScript: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    javascript: string
+    javascript: string,
   ) => void;
   requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   postMessage: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    data: string
+    data: string,
   ) => void;
   // Android Only
   loadUrl: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    url: string
+    url: string,
   ) => void;
   clearFormData: (
-    viewRef: React.ElementRef<HostComponent<NativeProps>>
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
   ) => void;
   clearCache: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    includeDiskFiles: boolean
+    includeDiskFiles: boolean,
   ) => void;
   clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   // !Android Only
@@ -343,5 +343,5 @@ export const Commands = codegenNativeCommands<NativeCommands>({
 });
 
 export default codegenNativeComponent<NativeProps>(
-  'RNCWebView'
+  'RNCWebView',
 ) as HostComponent<NativeProps>;

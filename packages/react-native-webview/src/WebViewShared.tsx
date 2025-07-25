@@ -1,7 +1,8 @@
 import escapeStringRegexp from 'escape-string-regexp';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Linking, View, ActivityIndicator, Text, Platform } from 'react-native';
-import {
+import { ActivityIndicator, Linking, Platform, Text, View } from 'react-native';
+import styles from './WebView.styles';
+import type {
   OnShouldStartLoadWithRequest,
   ShouldStartLoadRequestEvent,
   WebViewError,
@@ -15,7 +16,6 @@ import {
   WebViewRenderProcessGoneEvent,
   WebViewTerminatedEvent,
 } from './WebViewTypes';
-import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['http://*', 'https://*'] as const;
 
@@ -33,7 +33,7 @@ const passesWhitelist = (compiledWhitelist: readonly string[], url: string) => {
 };
 
 const compileWhitelist = (
-  originWhitelist: readonly string[]
+  originWhitelist: readonly string[],
 ): readonly string[] =>
   ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
 
@@ -41,10 +41,10 @@ const createOnShouldStartLoadWithRequest = (
   loadRequest: (
     shouldStart: boolean,
     url: string,
-    lockIdentifier: number
+    lockIdentifier: number,
   ) => void,
   originWhitelist: readonly string[],
-  onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest
+  onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
   return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
     let shouldStart = true;
@@ -79,7 +79,7 @@ const defaultRenderLoading = () => (
 const defaultRenderError = (
   errorDomain: string | undefined,
   errorCode: number,
-  errorDesc: string
+  errorDesc: string,
 ) => (
   <View style={styles.loadingOrErrorView}>
     <Text style={styles.errorTextTitle}>Error loading page</Text>
@@ -130,14 +130,14 @@ export const useWebViewLogic = ({
   onShouldStartLoadWithRequestCallback: (
     shouldStart: boolean,
     url: string,
-    lockIdentifier?: number | undefined
+    lockIdentifier?: number | undefined,
   ) => void;
 }) => {
   const [viewState, setViewState] = useState<'IDLE' | 'LOADING' | 'ERROR'>(
-    startInLoadingState ? 'LOADING' : 'IDLE'
+    startInLoadingState ? 'LOADING' : 'IDLE',
   );
   const [lastErrorEvent, setLastErrorEvent] = useState<WebViewError | null>(
-    null
+    null,
   );
   const startUrl = useRef<string | null>(null);
 
@@ -145,7 +145,7 @@ export const useWebViewLogic = ({
     (event: WebViewNavigationEvent) => {
       onNavigationStateChange?.(event.nativeEvent);
     },
-    [onNavigationStateChange]
+    [onNavigationStateChange],
   );
 
   const onLoadingStart = useCallback(
@@ -157,7 +157,7 @@ export const useWebViewLogic = ({
       onLoadStart?.(event);
       updateNavigationState(event);
     },
-    [onLoadStart, updateNavigationState]
+    [onLoadStart, updateNavigationState],
   );
 
   const onLoadingError = useCallback(
@@ -175,14 +175,14 @@ export const useWebViewLogic = ({
       setViewState('ERROR');
       setLastErrorEvent(event.nativeEvent);
     },
-    [onError, onLoadEnd]
+    [onError, onLoadEnd],
   );
 
   const onHttpError = useCallback(
     (event: WebViewHttpErrorEvent) => {
       onHttpErrorProp?.(event);
     },
-    [onHttpErrorProp]
+    [onHttpErrorProp],
   );
 
   // Android Only
@@ -190,7 +190,7 @@ export const useWebViewLogic = ({
     (event: WebViewRenderProcessGoneEvent) => {
       onRenderProcessGoneProp?.(event);
     },
-    [onRenderProcessGoneProp]
+    [onRenderProcessGoneProp],
   );
   // !Android Only
 
@@ -199,7 +199,7 @@ export const useWebViewLogic = ({
     (event: WebViewTerminatedEvent) => {
       onContentProcessDidTerminateProp?.(event);
     },
-    [onContentProcessDidTerminateProp]
+    [onContentProcessDidTerminateProp],
   );
   // !iOS Only
 
@@ -217,14 +217,14 @@ export const useWebViewLogic = ({
       // !on Android, only if url === startUrl
       updateNavigationState(event);
     },
-    [onLoad, onLoadEnd, updateNavigationState]
+    [onLoad, onLoadEnd, updateNavigationState],
   );
 
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
       onMessageProp?.(event);
     },
-    [onMessageProp]
+    [onMessageProp],
   );
 
   const onLoadingProgress = useCallback(
@@ -235,13 +235,13 @@ export const useWebViewLogic = ({
       // patch for Android only
       if (Platform.OS === 'android' && progress === 1) {
         setViewState((prevViewState) =>
-          prevViewState === 'LOADING' ? 'IDLE' : prevViewState
+          prevViewState === 'LOADING' ? 'IDLE' : prevViewState,
         );
       }
       // !patch for Android only
       onLoadProgress?.(event);
     },
-    [onLoadProgress]
+    [onLoadProgress],
   );
 
   const onShouldStartLoadWithRequest = useMemo(
@@ -249,20 +249,20 @@ export const useWebViewLogic = ({
       createOnShouldStartLoadWithRequest(
         onShouldStartLoadWithRequestCallback,
         originWhitelist,
-        onShouldStartLoadWithRequestProp
+        onShouldStartLoadWithRequestProp,
       ),
     [
       originWhitelist,
       onShouldStartLoadWithRequestProp,
       onShouldStartLoadWithRequestCallback,
-    ]
+    ],
   );
 
   const onOpenWindow = useCallback(
     (event: WebViewOpenWindowEvent) => {
       onOpenWindowProp?.(event);
     },
-    [onOpenWindowProp]
+    [onOpenWindowProp],
   );
 
   return {
