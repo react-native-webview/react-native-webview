@@ -789,7 +789,7 @@ RCTAutoInsetsProtocol>
       _disablePromptDuringLoading = NO;
     }
   } else if ([message.name isEqualToString:MessageHandlerName]) {
-    if (_onMessage) {
+    if (_onMessage && message.frameInfo.mainFrame) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       [event addEntriesFromDictionary: @{@"data": message.body}];
       [event addEntriesFromDictionary: @{@"url": message.frameInfo.request.URL.absoluteString}];

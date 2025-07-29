@@ -285,7 +285,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     @Override
                     public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message,
                             @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy replyProxy) {
-                        RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString());
+                        if (isMainFrame) {
+                          RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString());
+                        }
                     }
                 };
                 WebViewCompat.addWebMessageListener(
