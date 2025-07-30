@@ -27,11 +27,23 @@ import {
   WebViewSourceUri,
   type WebViewMessageEvent,
   type ShouldStartLoadRequestEvent,
+  DecelerationRateConstant,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
 const { resolveAssetSource } = Image;
+const processDecelerationRate = (
+  decelerationRate: DecelerationRateConstant | number | undefined
+) => {
+  let newDecelerationRate = decelerationRate;
+  if (newDecelerationRate === 'normal') {
+    newDecelerationRate = 0.985;
+  } else if (newDecelerationRate === 'fast') {
+    newDecelerationRate = 0.9;
+  }
+  return newDecelerationRate;
+};
 
 const directEventEmitter = new EventEmitter();
 
@@ -94,6 +106,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       containerStyle,
       source,
       nativeConfig,
+      decelerationRate: decelerationRateProp,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       injectedJavaScriptObject,
       ...otherProps
@@ -239,6 +252,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
     const webViewStyles = [styles.container, styles.webView, style];
     const webViewContainerStyle = [styles.container, containerStyle];
 
+    const decelerationRate = processDecelerationRate(decelerationRateProp);
+
     if (typeof source !== 'number' && source && 'method' in source) {
       if (source.method === 'POST' && source.headers) {
         console.warn(
@@ -280,6 +295,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       <NativeWebView
         key="webViewKey"
         {...otherProps}
+        decelerationRate={decelerationRate}
         messagingEnabled={typeof onMessageProp === 'function'}
         messagingModuleName={messagingModuleName}
         hasOnScroll={!!otherProps.onScroll}
