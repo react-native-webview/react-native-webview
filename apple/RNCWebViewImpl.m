@@ -1463,6 +1463,16 @@ RCTAutoInsetsProtocol>
                             @"navigationType": navigationTypes[@(navigationType)]
                         }];
                         self->_onLoadingStart(event);
+                    } else {
+                        // In aditional to IFrameDetector report all navigated iFrames to the app
+                        NSString *reportIframeUrlsScript = [NSString stringWithFormat:
+                            @"if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {\n"
+                            @"    window.ReactNativeWebView.postMessage(JSON.stringify({\n"
+                            @"    type: 'IFRAME_DETECTED',\n"
+                            @"    iframeUrls: ['%@']\n"
+                            @"}));\n"
+                            @"}", urlString];
+                        [self.webView evaluateJavaScript:reportIframeUrlsScript completionHandler:^(id result, NSError *error) {}];
                     }
                 }
 
