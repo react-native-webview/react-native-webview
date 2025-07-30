@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [14.4.0]
+
+### Added
+
+- On iOS add additional detection of embedded iFrames (https://github.com/MetaMask/react-native-webview-mm/pull/67)
+- Handle messages only coming from the main frame to prevent spoofing from child iframes (https://github.com/MetaMask/react-native-webview-mm/pull/55)
+
 ## [14.3.0]
 
 ### Added
@@ -44,7 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - bump ws from 6.2.2 to 6.2.3 in the npm_and_yarn group across 1 directory (https://github.com/MetaMask/react-native-webview-mm/pull/35)
 - sync with upstream v13.13.5 (https://github.com/MetaMask/react-native-webview-mm/pull/47)
 
-[Unreleased]: https://github.com/MetaMask/react-native-webview-mm/compare/bfdef1a...main
+[Unreleased]: https://github.com/MetaMask/react-native-webview-mm/compare/d93893d...main
+[14.4.0]: https://github.com/MetaMask/react-native-webview-mm/compare/bfdef1a...d93893d
 [14.3.0]: https://github.com/MetaMask/react-native-webview-mm/compare/6925354...bfdef1a
 [14.2.2]: https://github.com/MetaMask/react-native-webview-mm/compare/3be76c0...6925354
 [14.2.1]: https://github.com/MetaMask/react-native-webview-mm/compare/release/14.2.0...MetaMask:react-native-webview-mm:release/14.2.1
