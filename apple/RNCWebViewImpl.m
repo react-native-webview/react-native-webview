@@ -1958,6 +1958,45 @@ didFinishNavigation:(WKNavigation *)navigation
   WKUserScript *userScript = [[WKUserScript alloc] initWithSource:html5HistoryAPIShimSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
   [wkWebViewConfig.userContentController addUserScript:userScript];
 
+  NSString *serviceWorkerPreventCrashesSource = @"(function() {\n"
+    "    if (!('serviceWorker' in navigator)) {\n"
+    "        Object.defineProperty(navigator, 'serviceWorker', {\n"
+    "            value: {\n"
+    "                register: function(scriptURL, options) {\n"
+    "                    return Promise.resolve({\n"
+    "                        installing: null,\n"
+    "                        waiting: null,\n"
+    "                        active: {\n"
+    "                            scriptURL: scriptURL,\n"
+    "                            state: 'activated'\n"
+    "                        },\n"
+    "                        scope: options?.scope || '/',\n"
+    "                        update: () => Promise.resolve(),\n"
+    "                        unregister: () => Promise.resolve(true)\n"
+    "                    });\n"
+    "                },\n"
+    "                getRegistration: () => Promise.resolve(null),\n"
+    "                getRegistrations: () => Promise.resolve([]),\n"
+    "                ready: Promise.resolve({\n"
+    "                    installing: null,\n"
+    "                    waiting: null,\n"
+    "                    active: null,\n"
+    "                    scope: '/'\n"
+    "                }),\n"
+    "                controller: null,\n"
+    "                addEventListener() {},\n"
+    "                removeEventListener() {}\n"
+    "            },\n"
+    "            configurable: true\n"
+    "        });\n"
+    "    }\n"
+    "})();";
+  WKUserScript *serviceWorkerPreventCrashesScript = [[WKUserScript alloc]
+    initWithSource:serviceWorkerPreventCrashesSource
+    injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+    forMainFrameOnly:NO];
+  [wkWebViewConfig.userContentController addUserScript:serviceWorkerPreventCrashesScript];
+
   if(_sharedCookiesEnabled) {
     // More info to sending cookies with WKWebView
     // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
