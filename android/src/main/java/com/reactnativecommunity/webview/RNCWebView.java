@@ -1,6 +1,8 @@
 package com.reactnativecommunity.webview;
 
 import android.annotation.SuppressLint;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.text.TextUtils;
@@ -127,14 +129,6 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (this.nestedScrollEnabled) {
-            requestDisallowInterceptTouchEvent(true);
-        }
-        return super.onTouchEvent(event);
-    }
-
-    @Override
     protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
     super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
 
@@ -150,6 +144,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             .getJSModule(RCTDeviceEventEmitter.class)
             .emit("onClampedYEvent", event);
     }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (this.nestedScrollEnabled) {
+            requestDisallowInterceptTouchEvent(true);
+        }
+        return super.onTouchEvent(event);
     }
 
     @Override
