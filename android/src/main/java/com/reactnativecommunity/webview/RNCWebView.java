@@ -135,6 +135,24 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     @Override
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+    super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+
+    if (clampedY) {
+        WritableMap event = Arguments.createMap();
+        event.putInt("scrollX", scrollX);
+        event.putInt("scrollY", scrollY);
+        event.putBoolean("clampedX", clampedX);
+        event.putBoolean("clampedY", clampedY);
+        ReactContext reactContext = (ReactContext) getContext();
+
+        reactContext
+            .getJSModule(RCTDeviceEventEmitter.class)
+            .emit("onClampedYEvent", event);
+    }
+    }
+
+    @Override
     protected void onSizeChanged(int w, int h, int ow, int oh) {
         super.onSizeChanged(w, h, ow, oh);
 
