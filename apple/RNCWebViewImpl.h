@@ -12,7 +12,6 @@
 
 #pragma mark - Classting Custom
 #import <React/RCTBridgeModule.h>
-#import "AdPopcornSSPWKScriptMessageHandler.h"
 // classting custom end
 
 #if !TARGET_OS_OSX
@@ -53,7 +52,6 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 #pragma mark - Classting Custom
 @property (nonatomic, copy) RCTDirectEventBlock onBlobDownload;
-@property (nonatomic, copy) AdPopcornSSPWKScriptMessageHandler *adPopcornScriptMessageHandler;
 // classting custom end
 
 @property (nonatomic, copy) RCTDirectEventBlock onFileDownload;

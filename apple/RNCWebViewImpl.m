@@ -20,7 +20,6 @@
 #pragma mark Classting Custom
 #import <React/RCTBridgeModule.h>
 #import <Photos/Photos.h> // import for save gifs
-#import "AdPopcornSSPWKScriptMessageHandler.h"
 // classting custom end
 
 static NSTimer *keyboardTimer;
@@ -33,7 +32,6 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 #pragma mark - Classting Custom
 static NSString *const IOSFunc = @"IOSFunc";
-static NSString *const AdpopcornSSP = @"apssp";
 static inline BOOL isEmpty(id value)
 {
   return value == nil
@@ -435,9 +433,6 @@ RCTAutoInsetsProtocol>
   #pragma mark - Classting Custom
   [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                             name:IOSFunc];
-    
-  _adPopcornScriptMessageHandler = [[AdPopcornSSPWKScriptMessageHandler alloc] initWithDelegate:nil];
-  [wkWebViewConfig.userContentController addScriptMessageHandler:_adPopcornScriptMessageHandler name:AdpopcornSSP];
   // classting custom end
 
   [self resetupScripts:wkWebViewConfig];
@@ -517,7 +512,6 @@ RCTAutoInsetsProtocol>
       _webView.inspectable = _webviewDebuggingEnabled;
 #endif
 
-    _adPopcornScriptMessageHandler.webView = _webView;
     [self addSubview:_webView];
     [self setHideKeyboardAccessoryView: _savedHideKeyboardAccessoryView];
     [self setKeyboardDisplayRequiresUserAction: _savedKeyboardDisplayRequiresUserAction];

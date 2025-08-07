@@ -26,7 +26,6 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.uimanager.ThemedReactContext
-import com.igaworks.ssp.part.hybrid.AdPopcornSSPJsBridge
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
@@ -100,11 +99,6 @@ class RNCWebViewManagerImpl {
         if (ReactBuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
-
-        webView.addJavascriptInterface(
-          AdPopcornSSPJsBridge(webView.context, webView),
-          AdPopcornSSPJsBridge.INTERFACE_NAME
-        )
 
         webView.addJavascriptInterface(
           BlobDownloadInterface(context),
