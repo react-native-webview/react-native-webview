@@ -177,6 +177,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     ev.putDouble("deltaY",deltaY);
                     requestDisallowInterceptTouchEvent(!allowRefresh);
                     break;
+                case MotionEvent.ACTION_DOWN:
+                    float releasedY=event.getY();
+                    ev.putDouble("releasedY",releasedY);
+                    break;
                 default:
                     // For other events, allow normal behavior
                     requestDisallowInterceptTouchEvent(false);
