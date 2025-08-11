@@ -171,7 +171,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     // Allow refresh if the user is scrolled enough
                     allowRefresh= getScrollY() == 0 && allowRefresh && deltaY > MIN_PULL_DISTANCE;
                     ev.putBoolean("allowRefresh",allowRefresh);
-                    ev.putDouble("deltaY",deltaY);
+                    if(allowRefresh){
+                        ev.putDouble("deltaY",deltaY);
+                    }
                     requestDisallowInterceptTouchEvent(!allowRefresh);
                     break;
                 case MotionEvent.ACTION_UP:
