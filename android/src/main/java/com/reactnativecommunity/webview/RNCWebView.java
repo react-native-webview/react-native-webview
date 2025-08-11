@@ -127,72 +127,75 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     public void onHostDestroy() {
         cleanupCallbacksAndDestroy();
     }
-     private boolean allowRefresh = false;
-    private float startY=0;
-    private final float MIN_PULL_DISTANCE = 150;
+private boolean allowRefresh = false;
+private float startY = 0;
+private boolean dragStartedFromTop = false; // New flag
+private final float MIN_PULL_DISTANCE = 150;
 
-    @Override
-    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+@Override
+protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
     super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
-        WritableMap event = Arguments.createMap();
-        event.putInt("scrollX", scrollX);
-        event.putInt("scrollY", scrollY);
-        event.putBoolean("clampedX", clampedX);
-        event.putBoolean("clampedY", clampedY);
-        allowRefresh=clampedY;
-        ReactContext reactContext = (ReactContext) getContext();
+    WritableMap event = Arguments.createMap();
+    event.putInt("scrollX", scrollX);
+    event.putInt("scrollY", scrollY);
+    event.putBoolean("clampedX", clampedX);
+    event.putBoolean("clampedY", clampedY);
+    
+    ReactContext reactContext = (ReactContext) getContext();
+    reactContext
+        .getJSModule(RCTDeviceEventEmitter.class)
+        .emit("onClampedYEvent", event);
+}
 
-        reactContext
-            .getJSModule(RCTDeviceEventEmitter.class)
-            .emit("onClampedYEvent", event);
-    }
-
-
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (this.nestedScrollEnabled) {
-            requestDisallowInterceptTouchEvent(true);
-        }   
-        if (event != null) {
-            WritableMap ev= Arguments.createMap();
-            ev.putDouble("scrollY", event.getY());
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    // Initially disallow parent interception
-                    startY = event.getY();
-                    allowRefresh = false;
-                    requestDisallowInterceptTouchEvent(true);
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    // Allow parent interception only when overscrolled
-                    float currentY=event.getY();
-                    float deltaY=currentY-startY;
-                    // Allow refresh if the user is scrolled enough
-                    allowRefresh= getScrollY() == 0 && allowRefresh && deltaY > MIN_PULL_DISTANCE;
-                    ev.putBoolean("allowRefresh",allowRefresh);
-                    if(allowRefresh){
-                        ev.putDouble("deltaY",deltaY);
-                    }
-                    requestDisallowInterceptTouchEvent(!allowRefresh);
-                    break;
-                case MotionEvent.ACTION_UP:
-                    float releasedY=event.getY();
-                    ev.putDouble("releasedY",releasedY);
-                    break;
-                default:
-                    // For other events, allow normal behavior
-                    requestDisallowInterceptTouchEvent(false);
-                    break;
-            }
+@Override
+public boolean onTouchEvent(MotionEvent event) {
+    if (this.nestedScrollEnabled) {
+        requestDisallowInterceptTouchEvent(true);
+    }   
+    
+    if (event != null) {
+        WritableMap ev = Arguments.createMap();
+        
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                startY = event.getY();
+                dragStartedFromTop = (getScrollY() == 0); // Check if drag starts from top
+                allowRefresh = false;
+                requestDisallowInterceptTouchEvent(true);
+                break;
+                
+            case MotionEvent.ACTION_MOVE:
+                float currentY = event.getY();
+                float deltaY = currentY - startY;
+                
+                // Only allow refresh if drag started from top AND currently at top AND pulled enough
+                boolean isAtTop = getScrollY() == 0;
+                allowRefresh = dragStartedFromTop && isAtTop && deltaY > MIN_PULL_DISTANCE;
+                
+                ev.putBoolean("allowRefresh", allowRefresh);
+                if (allowRefresh) {
+                    ev.putDouble("deltaY", deltaY);
+                }
+                requestDisallowInterceptTouchEvent(!allowRefresh);
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                ev.putBoolean("releasedY", true);
+                allowRefresh = false;
+                dragStartedFromTop = false; // Reset for next gesture
+                break;
+            default:
+                requestDisallowInterceptTouchEvent(false);
+                break;
+        }
         ReactContext reactContext = (ReactContext) getContext();
 
         reactContext
             .getJSModule(RCTDeviceEventEmitter.class)
             .emit("yOnTouchEvent", ev);
-        }
-        return super.onTouchEvent(event);
     }
+    return super.onTouchEvent(event);
+}
 
     @Override
     protected void onSizeChanged(int w, int h, int ow, int oh) {
