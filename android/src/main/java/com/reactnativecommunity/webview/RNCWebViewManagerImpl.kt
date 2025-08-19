@@ -98,10 +98,9 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
            if (url.startsWith("data:")) {
                 try {
+                    val reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView)
                     val eventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(webView.reactApplicationContext, reactTag)
                     if (eventDispatcher != null) {
-
-                        val reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView)
                         val eventData = Arguments.createMap()
                         eventData.putDouble("target", reactTag.toDouble())
                         eventData.putString("url", url)
