@@ -28,6 +28,10 @@ import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.Locale
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.WritableMap
+import com.facebook.react.uimanager.UIManagerHelper
+import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
@@ -92,6 +96,34 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+           if (url.startsWith("data:")) {
+                try {
+                    val eventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(webView.reactApplicationContext, reactTag)
+                    if (eventDispatcher != null) {
+
+                        val reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView)
+                        val eventData = Arguments.createMap()
+                        eventData.putDouble("target", reactTag.toDouble())
+                        eventData.putString("url", url)
+                        eventData.putBoolean("loading", webView.progress != 100)
+                        eventData.putString("title", webView.title)
+                        eventData.putBoolean("canGoBack", webView.canGoBack())
+                        eventData.putBoolean("canGoForward", webView.canGoForward())
+                        eventData.putBoolean("isTopFrame", true)
+                        eventData.putString("navigationType", "click")
+                        eventData.putString("contentDisposition", contentDisposition)
+                        eventData.putString("mimetype", mimetype)
+                        eventData.putDouble("contentLength", contentLength.toDouble())
+
+                        eventDispatcher.dispatchEvent(TopShouldStartLoadWithRequestEvent(reactTag, eventData))
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to dispatch TopShouldStartLoadWithRequestEvent", e)
+                }
+
+                return@DownloadListener
+            }
+            
             webView.setIgnoreErrFailedForThisURL(url)
             val module = webView.reactApplicationContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {
