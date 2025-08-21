@@ -1016,6 +1016,7 @@ RCTAutoInsetsProtocol>
             @"image/png": @"png",
             @"image/jpeg": @"jpg",
             @"image/gif": @"gif",
+            @"image/svg+xml": @"svg",
             @"application/pdf": @"pdf",
             @"text/plain": @"txt",
             @"application/json": @"json",
@@ -2126,7 +2127,6 @@ didFinishNavigation:(WKNavigation *)navigation
     
     NSString *extension = [url.pathExtension lowercaseString];
     NSSet *downloadableExtensions = [NSSet setWithObjects:
-        @"jpg", @"jpeg", @"png", @"gif", @"bmp", @"webp", @"svg",  // Images
         @"pdf", @"doc", @"docx", @"xls", @"xlsx", @"ppt", @"pptx", // Documents
         @"txt", @"rtf", @"csv", @"json", @"xml",                   // Text files
         @"zip", @"rar", @"7z", @"tar", @"gz",                      // Archives
