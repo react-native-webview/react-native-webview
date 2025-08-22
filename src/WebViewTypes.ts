@@ -1167,7 +1167,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @param event
    * @platform android
    */
-  onLoadSubResourceError: (event: WebViewErrorEvent) => void;
+  onLoadSubResourceError?: (event: WebViewErrorEvent) => void;
 }
 
 export interface WebViewSharedProps extends ViewProps {
