@@ -42,12 +42,7 @@ public class RNCWebViewClient extends WebViewClient {
 
     protected boolean mLastLoadFailed = false;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
-    protected @Nullable String ignoreErrFailedForThisURL = null;
     protected @Nullable RNCBasicAuthCredential basicAuthCredential = null;
-
-    public void setIgnoreErrFailedForThisURL(@Nullable String url) {
-        ignoreErrFailedForThisURL = url;
-    }
 
     public void setBasicAuthCredential(@Nullable RNCBasicAuthCredential credential) {
         basicAuthCredential = credential;
@@ -224,20 +219,6 @@ public class RNCWebViewClient extends WebViewClient {
             int errorCode,
             String description,
             String failingUrl) {
-
-        if (ignoreErrFailedForThisURL != null
-                && failingUrl.equals(ignoreErrFailedForThisURL)
-                && errorCode == -1
-                && description.equals("net::ERR_FAILED")) {
-
-            // This is a workaround for a bug in the WebView.
-            // See these chromium issues for more context:
-            // https://bugs.chromium.org/p/chromium/issues/detail?id=1023678
-            // https://bugs.chromium.org/p/chromium/issues/detail?id=1050635
-            // This entire commit should be reverted once this bug is resolved in chromium.
-            setIgnoreErrFailedForThisURL(null);
-            return;
-        }
 
         super.onReceivedError(webView, errorCode, description, failingUrl);
         mLastLoadFailed = true;
