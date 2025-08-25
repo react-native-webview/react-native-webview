@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [14.5.0]
+
+- Enable support for Google Pay (Android)
+- Prevent WebView from downloading images, in lieu of just displaying
+- Handle missing service worker bug on iOS
+
 ## [14.4.0]
 
 ### Added
