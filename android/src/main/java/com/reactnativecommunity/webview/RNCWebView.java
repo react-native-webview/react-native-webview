@@ -40,6 +40,7 @@ import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
+import com.reactnativecommunity.webview.events.TopOverScrolledEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -122,6 +123,16 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         cleanupCallbacksAndDestroy();
     }
 
+    @Override
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+    
+        if (clampedY && scrollY == 0) {
+            Log.d("WebView", "Overscrolled at top!");
+            requestDisallowInterceptTouchEvent(true);
+        }
+    }
+    
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (this.nestedScrollEnabled) {
