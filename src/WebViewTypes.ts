@@ -978,6 +978,15 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   cacheMode?: CacheMode;
 
   /**
+   * A floating-point number that determines how quickly the scroll view
+   * decelerates after the user lifts their finger.
+   *   - normal: 0.985 (the default for Android web view)
+   *   - fast: 0.9
+   * @platform android
+   */
+  decelerationRate?: DecelerationRateConstant | number;
+
+  /**
    * https://developer.android.com/reference/android/view/View#setOverScrollMode(int)
    * Sets the overScrollMode. Possible values are:
    *
