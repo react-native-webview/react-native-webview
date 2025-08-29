@@ -34,9 +34,10 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "^0.81.1"
   },
   "dependencies": {
+    "@react-native-windows/cli": "file:C:/Users/anuverma/Desktop/GitHub/react-native-windows/packages/@react-native-windows/cli",
     "escape-string-regexp": "^4.0.0",
     "invariant": "2.2.4"
   },
@@ -60,10 +61,10 @@
     "jest": "^29.6.3",
     "prettier": "2.8.8",
     "react": "18.2.0",
-    "react-native": "0.73.5",
+    "react-native": "0.80.0",
     "react-native-macos": "0.73.17",
     "react-native-test-app": "3.7.2",
-    "react-native-windows": "0.73.8",
+    "react-native-windows": "file:C:/Users/anuverma/Desktop/GitHub/react-native-windows/vnext",
     "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",
     "semantic-release": "15.13.24",
@@ -103,7 +104,19 @@
       "modulesProvider": {
         "RNCWebViewModule": "RNCWebViewModule"
       }
+    },
+    "windows": {
+      "namespace": "ReactNativeWebviewCodegen",
+      "outputDirectory": "windows/ReactNativeWebview/codegen",
+      "separateDataTypes": true
     }
   },
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "yarn@1.22.19",
+  "react-native-windows": {
+    "init-windows": {
+      "name": "ReactNativeWebview",
+      "namespace": "ReactNativeWebview",
+      "template": "cpp-lib"
+    }
+  }
 }
