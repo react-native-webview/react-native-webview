@@ -1,26 +1,20 @@
 #include "pch.h"
+
 #include "ReactPackageProvider.h"
 #if __has_include("ReactPackageProvider.g.cpp")
 #include "ReactPackageProvider.g.cpp"
 #endif
 
-#include "ReactWebView2Manager.h"
-#ifndef USE_WINUI3
-#include "ReactWebViewManager.h"
-#endif
+#include "ReactNativeWebview.h"
 
 using namespace winrt::Microsoft::ReactNative;
 
-namespace winrt::ReactNativeWebView::implementation {
+namespace winrt::ReactNativeWebview::implementation
+{
 
-void ReactPackageProvider::CreatePackage(IReactPackageBuilder const &packageBuilder) noexcept {
-#ifndef USE_WINUI3
-  packageBuilder.AddViewManager(L"ReactWebViewManager", []() { return winrt::make<ReactWebViewManager>(); });
-#endif
-
-#if HAS_WEBVIEW2
-  packageBuilder.AddViewManager(L"ReactWebView2Manager", []() { return winrt::make<ReactWebView2Manager>(); });
-#endif
+void ReactPackageProvider::CreatePackage(IReactPackageBuilder const &packageBuilder) noexcept
+{
+  AddAttributedModules(packageBuilder, true);
 }
 
-} // namespace winrt::ReactNativeWebView::implementation
+} // namespace winrt::ReactNativeWebview::implementation
