@@ -37,7 +37,6 @@
     "react-native": "^0.81.1"
   },
   "dependencies": {
-    "@react-native-windows/cli": "file:C:/Users/anuverma/Desktop/GitHub/react-native-windows/packages/@react-native-windows/cli",
     "escape-string-regexp": "^4.0.0",
     "invariant": "2.2.4"
   },
@@ -64,7 +63,7 @@
     "react-native": "0.80.0",
     "react-native-macos": "0.73.17",
     "react-native-test-app": "3.7.2",
-    "react-native-windows": "file:C:/Users/anuverma/Desktop/GitHub/react-native-windows/vnext",
+    "react-native-windows": "0.80.0-preview.5",
     "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",
     "semantic-release": "15.13.24",

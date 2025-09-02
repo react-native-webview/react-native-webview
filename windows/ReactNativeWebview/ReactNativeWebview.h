@@ -6,7 +6,7 @@
 #if __has_include("codegen/NativeReactNativeWebviewDataTypes.g.h")
   #include "codegen/NativeReactNativeWebviewDataTypes.g.h"
 #endif
-#include "codegen/NativeReactNativeWebviewSpec.g.h"
+#include "codegen/NativeRNCWebViewModuleSpec.g.h"
 
 #include "NativeModules.h"
 
