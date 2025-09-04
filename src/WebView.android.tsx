@@ -95,6 +95,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       onError,
       onLoad,
       onLoadEnd,
+      onLoadSubResourceError,
       onLoadProgress,
       onHttpError: onHttpErrorProp,
       onRenderProcessGone: onRenderProcessGoneProp,
@@ -143,6 +144,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       lastErrorEvent,
       onHttpError,
       onLoadingError,
+      onLoadingSubResourceError,
       onLoadingFinish,
       onLoadingProgress,
       onOpenWindow,
@@ -152,6 +154,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       onLoad,
       onError,
       onHttpErrorProp,
+      onLoadSubResourceError,
       onLoadEnd,
       onLoadProgress,
       onLoadStart,
@@ -300,6 +303,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         messagingModuleName={messagingModuleName}
         hasOnScroll={!!otherProps.onScroll}
         onLoadingError={onLoadingError}
+        onLoadingSubResourceError={onLoadingSubResourceError}
         onLoadingFinish={onLoadingFinish}
         onLoadingProgress={onLoadingProgress}
         onLoadingStart={onLoadingStart}
