@@ -173,6 +173,10 @@ public class RNCWebViewClient extends WebViewClient {
         String description = "";
         String descriptionPrefix = "SSL error: ";
 
+        if (failingUrl == null) {
+            failingUrl = "";
+        }
+
         // https://developer.android.com/reference/android/net/http/SslError.html
         switch (code) {
             case SslError.SSL_DATE_INVALID:
@@ -199,18 +203,17 @@ public class RNCWebViewClient extends WebViewClient {
         }
 
         description = descriptionPrefix + description;
-
-      if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
-        // If error is not due to top-level navigation, then do not call onReceivedError()
-        Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
-        this.onReceivedSubResourceSslError(
-          webView,
-          code,
-          description,
-          failingUrl
-        );
-        return;
-      }
+        if (topWindowUrl == null || !topWindowUrl.equalsIgnoreCase(failingUrl)) {
+            // If error is not due to top-level navigation, then do not call onReceivedError()
+            Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
+            this.onReceivedSubResourceSslError(
+                    webView,
+                    code,
+                    description,
+                    failingUrl
+            );
+            return;
+        }
 
         this.onReceivedError(
                 webView,
