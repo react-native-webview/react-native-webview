@@ -15,6 +15,7 @@ import com.facebook.react.viewmanagers.RNCWebViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNCWebViewManagerInterface;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
+import com.reactnativecommunity.webview.events.SubResourceErrorEvent;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
@@ -226,7 +227,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     }
 
     @Override
-    @ReactProp(name = "suppressMenuItems ")
+    @ReactProp(name = "suppressMenuItems")
     public void setSuppressMenuItems(RNCWebViewWrapper view, @Nullable ReadableArray items) {}
 
     @Override
@@ -331,6 +332,12 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
         mRNCWebViewManagerImpl.setWebviewDebuggingEnabled(view, value);
     }
 
+    @Override
+    @ReactProp(name = "paymentRequestEnabled")
+    public void setPaymentRequestEnabled(RNCWebViewWrapper view, boolean value) {
+        mRNCWebViewManagerImpl.setPaymentRequestEnabled(view, value);
+    }
+
     /* iOS PROPS - no implemented here */
     @Override
     public void setAllowingReadAccessToURL(RNCWebViewWrapper view, @Nullable String value) {}
@@ -394,6 +401,9 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
 
     @Override
     public void setRefreshControlLightMode(RNCWebViewWrapper view, boolean value) {}
+
+    @Override
+    public void setIndicatorStyle(RNCWebViewWrapper view, @Nullable String value) {}
 
     @Override
     public void setScrollEnabled(RNCWebViewWrapper view, boolean value) {}
@@ -515,6 +525,7 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
         export.put(TopLoadingStartEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingStart"));
         export.put(TopLoadingFinishEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingFinish"));
         export.put(TopLoadingErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingError"));
+        export.put(SubResourceErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingSubResourceError"));
         export.put(TopMessageEvent.EVENT_NAME, MapBuilder.of("registrationName", "onMessage"));
         // !Default events but adding them here explicitly for clarity
 
