@@ -271,6 +271,7 @@ export interface NativeProps extends ViewProps {
   mediaPlaybackRequiresUserAction?: WithDefault<boolean, true>;
   messagingEnabled: boolean;
   onLoadingError: DirectEventHandler<WebViewErrorEvent>;
+  onLoadingSubResourceError: DirectEventHandler<WebViewErrorEvent>;
   onLoadingFinish: DirectEventHandler<WebViewNavigationEvent>;
   onLoadingProgress: DirectEventHandler<WebViewNativeProgressEvent>;
   onLoadingStart: DirectEventHandler<WebViewNavigationEvent>;
@@ -282,6 +283,7 @@ export interface NativeProps extends ViewProps {
   onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
   showsHorizontalScrollIndicator?: WithDefault<boolean, true>;
   showsVerticalScrollIndicator?: WithDefault<boolean, true>;
+  indicatorStyle?: WithDefault<'default' | 'black' | 'white', 'default'>;
   newSource: Readonly<{
     uri?: string;
     method?: string;
@@ -293,6 +295,7 @@ export interface NativeProps extends ViewProps {
   }>;
   userAgent?: string;
   injectedJavaScriptObject?: string;
+  paymentRequestEnabled?: boolean;
 }
 
 export interface NativeCommands {
