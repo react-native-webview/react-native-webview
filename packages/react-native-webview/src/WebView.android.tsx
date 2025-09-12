@@ -187,7 +187,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         clearHistory: () =>
           webViewRef.current && Commands.clearHistory(webViewRef.current),
       }),
-      [setViewState, webViewRef],
+      [setViewState],
     );
 
     useEffect(() => {
