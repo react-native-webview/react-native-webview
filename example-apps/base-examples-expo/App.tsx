@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Button,
   Keyboard,
@@ -167,160 +167,150 @@ const TESTS = {
   },
 };
 
-type Props = {};
-interface State {
-  restarting: boolean;
-  currentTest: Object;
-}
+export default () => {
+  const [restarting, setRestarting] = useState(false);
+  const [currentTest, setCurrentTest] = useState(TESTS.Alerts);
 
-export default class App extends Component<Props, State> {
-  state = {
-    restarting: false,
-    currentTest: TESTS.Alerts,
-  };
+  const simulateRestart = useCallback(() => {
+    setRestarting(true);
+    setTimeout(() => {
+      setRestarting(false);
+    }, 1000);
+  }, []);
 
-  _simulateRestart = () => {
-    this.setState({ restarting: true }, () =>
-      this.setState({ restarting: false }),
-    );
-  };
+  const changeTest = (
+    (testName: keyof typeof TESTS) => () => setCurrentTest(TESTS[testName])
+  );
 
-  _changeTest = (testName) => {
-    this.setState({ currentTest: TESTS[testName] });
-  };
+  return (
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity
+        style={styles.closeKeyboardView}
+        onPress={() => Keyboard.dismiss()}
+        testID="closeKeyboard"
+      />
 
-  render() {
-    const { restarting, currentTest } = this.state;
-    return (
-      <SafeAreaView style={styles.container}>
-        <TouchableOpacity
-          style={styles.closeKeyboardView}
-          onPress={() => Keyboard.dismiss()}
-          testID="closeKeyboard"
+      <TouchableOpacity
+        testID="restart_button"
+        onPress={simulateRestart}
+        style={styles.restartButton}
+        activeOpacity={0.6}
+      >
+        <Text>Simulate Restart</Text>
+      </TouchableOpacity>
+
+      <View style={styles.testPickerContainer}>
+        <Button
+          testID="testType_alerts"
+          title="Alerts"
+          onPress={changeTest('Alerts')}
         />
-
-        <TouchableOpacity
-          testID="restart_button"
-          onPress={this._simulateRestart}
-          style={styles.restartButton}
-          activeOpacity={0.6}
-        >
-          <Text>Simulate Restart</Text>
-        </TouchableOpacity>
-
-        <View style={styles.testPickerContainer}>
+        <Button
+          testID="testType_scrolling"
+          title="Scrolling"
+          onPress={changeTest('Scrolling')}
+        />
+        <Button
+          testID="testType_background"
+          title="Background"
+          onPress={changeTest('Background')}
+        />
+        <Button
+          testID="testType_injection"
+          title="Injection"
+          onPress={changeTest('Injection')}
+        />
+        <Button
+          testID="testType_pageLoad"
+          title="LocalPageLoad"
+          onPress={changeTest('PageLoad')}
+        />
+        <Button
+          testID="testType_downloads"
+          title="Downloads"
+          onPress={changeTest('Downloads')}
+        />
+        {(Platform.OS === 'android' || Platform.OS === 'macos') && (
           <Button
-            testID="testType_alerts"
-            title="Alerts"
-            onPress={() => this._changeTest('Alerts')}
+            testID="testType_uploads"
+            title="Uploads"
+            onPress={changeTest('Uploads')}
           />
-          <Button
-            testID="testType_scrolling"
-            title="Scrolling"
-            onPress={() => this._changeTest('Scrolling')}
-          />
-          <Button
-            testID="testType_background"
-            title="Background"
-            onPress={() => this._changeTest('Background')}
-          />
-          <Button
-            testID="testType_injection"
-            title="Injection"
-            onPress={() => this._changeTest('Injection')}
-          />
-          <Button
-            testID="testType_pageLoad"
-            title="LocalPageLoad"
-            onPress={() => this._changeTest('PageLoad')}
-          />
-          <Button
-            testID="testType_downloads"
-            title="Downloads"
-            onPress={() => this._changeTest('Downloads')}
-          />
-          {(Platform.OS === 'android' || Platform.OS === 'macos') && (
-            <Button
-              testID="testType_uploads"
-              title="Uploads"
-              onPress={() => this._changeTest('Uploads')}
-            />
-          )}
-          <Button
-            testID="testType_messaging"
-            title="Messaging"
-            onPress={() => this._changeTest('Messaging')}
-          />
-          <Button
-            testID="testType_multimessaging"
-            title="MultiMessaging"
-            onPress={() => this._changeTest('MultiMessaging')}
-          />
-          <Button
-            testID="testType_nativeWebpage"
-            title="NativeWebpage"
-            onPress={() => this._changeTest('NativeWebpage')}
-          />
-          {Platform.OS === 'ios' && (
-            <Button
-              testID="testType_applePay"
-              title="ApplePay"
-              onPress={() => this._changeTest('ApplePay')}
-            />
-          )}
-          {Platform.OS === 'android' && (
-            <Button
-              testID="testType_googlePay"
-              title="GooglePay"
-              onPress={() => this._changeTest('GooglePay')}
-            />
-          )}
-          <Button
-            testID="testType_customMenu"
-            title="CustomMenu"
-            onPress={() => this._changeTest('CustomMenu')}
-          />
-          <Button
-            testID="testType_openwindow"
-            title="OpenWindow"
-            onPress={() => this._changeTest('OpenWindow')}
-          />
-          <Button
-            testID="testType_suppressMenuItems"
-            title="SuppressMenuItems"
-            onPress={() => this._changeTest('SuppressMenuItems')}
-          />
-          <Button
-            testID="testType_clearData"
-            title="ClearData"
-            onPress={() => this._changeTest('ClearData')}
-          />
-          <Button
-            testID="testType_sslError"
-            title="SslError"
-            onPress={() => this._changeTest('SslError')}
-          />
-        </View>
-
-        {restarting ? null : (
-          <View
-            testID={`example-${currentTest.testId}`}
-            key={currentTest.title}
-            style={styles.exampleContainer}
-          >
-            <Text style={styles.exampleTitle}>{currentTest.title}</Text>
-            <Text style={styles.exampleDescription}>
-              {currentTest.description}
-            </Text>
-            <View style={styles.exampleInnerContainer}>
-              {currentTest.render()}
-            </View>
-          </View>
         )}
-      </SafeAreaView>
-    );
-  }
-}
+        <Button
+          testID="testType_messaging"
+          title="Messaging"
+          onPress={changeTest('Messaging')}
+        />
+        <Button
+          testID="testType_multimessaging"
+          title="MultiMessaging"
+          onPress={changeTest('MultiMessaging')}
+        />
+        <Button
+          testID="testType_nativeWebpage"
+          title="NativeWebpage"
+          onPress={changeTest('NativeWebpage')}
+        />
+        {Platform.OS === 'ios' && (
+          <Button
+            testID="testType_applePay"
+            title="ApplePay"
+            onPress={changeTest('ApplePay')}
+          />
+        )}
+        {Platform.OS === 'android' && (
+          <Button
+            testID="testType_googlePay"
+            title="GooglePay"
+            onPress={changeTest('GooglePay')}
+          />
+        )}
+        <Button
+          testID="testType_customMenu"
+          title="CustomMenu"
+          onPress={changeTest('CustomMenu')}
+        />
+        <Button
+          testID="testType_openwindow"
+          title="OpenWindow"
+          onPress={changeTest('OpenWindow')}
+        />
+        <Button
+          testID="testType_suppressMenuItems"
+          title="SuppressMenuItems"
+          onPress={changeTest('SuppressMenuItems')}
+        />
+        <Button
+          testID="testType_clearData"
+          title="ClearData"
+          onPress={changeTest('ClearData')}
+        />
+        <Button
+          testID="testType_sslError"
+          title="SslError"
+          onPress={changeTest('SslError')}
+        />
+      </View>
+
+      {restarting ? null : (
+        <View
+          testID={`example-${currentTest.testId}`}
+          key={currentTest.title}
+          style={styles.exampleContainer}
+        >
+          <Text style={styles.exampleTitle}>{currentTest.title}</Text>
+          <Text style={styles.exampleDescription}>
+            {currentTest.description}
+          </Text>
+          <View style={styles.exampleInnerContainer}>
+            {currentTest.render()}
+          </View>
+        </View>
+      )}
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
