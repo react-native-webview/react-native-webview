@@ -26,6 +26,7 @@ import OpenWindow from './examples/OpenWindow';
 import Scrolling from './examples/Scrolling';
 import SuppressMenuItems from './examples/Suppress';
 import Uploads from './examples/Uploads';
+import SslError from './examples/SslError';
 
 const TESTS = {
   Messaging: {
@@ -154,6 +155,14 @@ const TESTS = {
     description: 'SuppressMenuItems in editable content',
     render() {
       return <SuppressMenuItems />;
+    },
+  },
+  SslError: {
+    title: 'SslError',
+    testId: 'SslError',
+    description: 'SSL error test',
+    render() {
+      return <SslError />;
     },
   },
 };
@@ -285,6 +294,11 @@ export default class App extends Component<Props, State> {
             testID="testType_clearData"
             title="ClearData"
             onPress={() => this._changeTest('ClearData')}
+          />
+          <Button
+            testID="testType_sslError"
+            title="SslError"
+            onPress={() => this._changeTest('SslError')}
           />
         </View>
 
