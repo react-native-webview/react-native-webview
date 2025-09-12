@@ -22,11 +22,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void isFileUploadSupported(final Promise promise) {
-        promise.resolve(mRNCWebViewModuleImpl.isFileUploadSupported());
-    }
-
-    @ReactMethod
     public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         mRNCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     }

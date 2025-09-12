@@ -292,7 +292,6 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
   },
 );
 
-// no native implementation for iOS, depends only on permissions
 const isFileUploadSupported: () => Promise<boolean> = async () => true;
 
 const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });

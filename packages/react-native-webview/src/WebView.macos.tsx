@@ -240,7 +240,6 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
   },
 );
 
-// no native implementation for macOS, depends only on permissions
 const isFileUploadSupported: () => Promise<boolean> = async () => true;
 
 const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });

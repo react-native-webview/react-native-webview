@@ -20,11 +20,6 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec {
     }
 
     @Override
-    public void isFileUploadSupported(final Promise promise) {
-        promise.resolve(mRNCWebViewModuleImpl.isFileUploadSupported());
-    }
-
-    @Override
     public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         mRNCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     }

@@ -197,10 +197,6 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         };
     }
 
-    public boolean isFileUploadSupported() {
-        return true;
-    }
-
     public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         final AtomicReference<ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = shouldOverrideUrlLoadingLock.getLock(lockIdentifier);
         if (lockObject != null) {
