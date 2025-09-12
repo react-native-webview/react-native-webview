@@ -206,13 +206,7 @@ O upload de arquivo usando `<input type="file" />` não é compatível com o And
 ```javascript
 import { WebView } from "react-native-webview";
 
-WebView.isFileUploadSupported().then(res => {
-  if (res === true) {
-    // o upload de arquivos é suportado
-  } else {
-    // o upload de arquivos não é suportado
-  }
-});
+const res = WebView.isFileUploadSupported();
 ```
 
 ### Upload de vários arquivos
@@ -275,7 +269,7 @@ Muitas vezes você vai querer enviar mensagens para as páginas da web carregada
 
 Para fazer isso, o React Native WebView expõe três opções diferentes:
 
-1. Reagir Nativo -> Web: A prop `injectedJavaScript` 
+1. Reagir Nativo -> Web: A prop `injectedJavaScript`
 2. Reagir Nativo -> Web: O método `injectJavaScript`
 3. Web -> React Native: O método `postMessage` e a prop `onMessage`
 

@@ -206,8 +206,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
   },
 );
 
-// native implementation should return "true" only for Android 5+
-const isFileUploadSupported: () => Promise<boolean> = async () => false;
+const isFileUploadSupported: () => boolean = () => false;
 
 const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });
 

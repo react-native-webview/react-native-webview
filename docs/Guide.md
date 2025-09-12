@@ -211,19 +211,10 @@ Normally, apps that do not have permission to use the camera can prompt the user
 
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
-File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
-
 ```jsx
 import { WebView } from "react-native-webview";
 
-WebView.isFileUploadSupported().then(res => {
-  if (res === true) {
-    // file upload is supported
-  } else {
-    // not file upload support
-  }
-});
-
+const res = WebView.isFileUploadSupported();
 ```
 
 ##### MacOS

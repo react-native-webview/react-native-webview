@@ -188,20 +188,14 @@ Se l'input del file indica che si desiderano immagini o video tramite l'attribut
 
 Normalmente, le app che non hanno il permesso di accesso alla fotocamera possono richiedere all'utente di utilizzare un'app esterna in modo che l'app richiedente non abbia bisogno del permesso. Su Android, c'è un'eccezione speciale per l'accesso alla fotocamera al fine di evitare confusione agli utenti. Se un'app ha dichiarato il permesso di utilizzare la fotocamera, ma l'utente non ha ancora concesso tale permesso, l'app potrebbe non avviare un'azione che richiede l'uso della fotocamera, come la cattura di immagini (`MediaStore.ACTION_IMAGE_CAPTURE`) o la registrazione di video (`MediaStore.ACTION_VIDEO_CAPTURE`). In questo caso, è responsabilità dello sviluppatore richiedere esplicitamente il permesso di accesso alla fotocamera prima di effettuare un caricamento diretto di file utilizzando la fotocamera.
 
-#####  Verifica la compatibilità del caricamento dei file utilizzando il metodo `static isFileUploadSupported()`. 
+#####  Verifica la compatibilità del caricamento dei file utilizzando il metodo `static isFileUploadSupported()`.
 
 Il caricamento dei file tramite l'elemento `<input type="file" />` non è supportato su Android 4.4 KitKat (vedi [dettagli](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
 
 ```jsx
 import { WebView } from "react-native-webview";
 
-WebView.isFileUploadSupported().then(res => {
-  if (res === true) {
-    // Il caricamento del file è supportato
-  } else {
-    // Il caricamento del file non è supportato
-  }
-});
+const res = WebView.isFileUploadSupported();
 ```
 
 ##### MacOS
