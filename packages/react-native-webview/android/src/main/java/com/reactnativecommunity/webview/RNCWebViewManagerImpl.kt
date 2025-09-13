@@ -593,30 +593,6 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         mDownloadingMessage = value
     }
 
-    fun setForceDarkOn(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
-        val view = viewWrapper.webView
-        // Only Android 10+ support dark mode
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-                val forceDarkMode =
-                    if (enabled) WebSettingsCompat.FORCE_DARK_ON else WebSettingsCompat.FORCE_DARK_OFF
-                WebSettingsCompat.setForceDark(view.settings, forceDarkMode)
-            }
-
-            // Set how WebView content should be darkened.
-            // PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING:  checks for the "color-scheme" <meta> tag.
-            // If present, it uses media queries. If absent, it applies user-agent (automatic)
-            // More information about Force Dark Strategy can be found here:
-            // https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setForceDarkStrategy(android.webkit.WebSettings)
-            if (enabled && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
-                WebSettingsCompat.setForceDarkStrategy(
-                    view.settings,
-                    WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING
-                )
-            }
-        }
-    }
-
     fun setGeolocationEnabled(viewWrapper: RNCWebViewWrapper, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.setGeolocationEnabled(value)

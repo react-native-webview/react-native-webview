@@ -82,7 +82,6 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`setSupportMultipleWindows`](Reference.portuguese.md#setSupportMultipleWindows)
 - [`basicAuthCredential`](Reference.portuguese.md#basicAuthCredential)
 - [`enableApplePay`](Reference.portuguese.md#enableApplePay)
-- [`forceDarkOn`](Reference.portuguese.md#forceDarkOn)
 - [`minimumFontSize`](Reference.portuguese.md#minimumFontSize)
 
 ## Methods Index
@@ -1459,22 +1458,6 @@ Exemplo:
 <WebView enableApplePay={true} />
 ```
 
-### `forceDarkOn`
-
-Configurando o tema escuro
-*NOTA* : A configuração de forçar o tema escuro não é persistente. Você deve chamar o método estático sempre que o processo do aplicativo for iniciado.
-
-*NOTA* : A mudança do modo dia<->noite é uma alteração de configuração, portanto, por padrão, a atividade será reiniciada e serão coletados os novos valores para aplicar o tema. Tome cuidado ao substituir esse comportamento padrão para garantir que esse método ainda seja chamado quando as alterações forem feitas.
-
-| Tipo    | Requerido | Plataforma |
-| ------- | --------- | ---------- |
-| boolean | Não       | Android    |
-
-Exemplo:
-
-```javascript
-<WebView forceDarkOn={false} />
-```
 ### `menuItems`
 
 Uma matriz de objetos de itens de menu personalizados que serão exibidos ao selecionar o texto. Uma matriz vazia suprimirá o menu. Usado em conjunto com `onCustomMenuSelection`

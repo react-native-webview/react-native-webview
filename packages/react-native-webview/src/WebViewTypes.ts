@@ -1094,19 +1094,6 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   allowsFullscreenVideo?: boolean;
 
   /**
-   * Configuring Dark Theme
-   *
-   * *NOTE* : The force dark setting is not persistent. You must call the static method every time your app process is started.
-   *
-   * *NOTE* : The change from day<->night mode is a configuration change so by default the activity will be restarted
-   * and pickup the new values to apply the theme.
-   * Take care when overriding this default behavior to ensure this method is still called when changes are made.
-   *
-   * @platform android
-   */
-  forceDarkOn?: boolean;
-
-  /**
    * Boolean value to control whether pinch zoom is enabled. Used only in Android.
    * Default to true
    *

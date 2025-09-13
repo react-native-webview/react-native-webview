@@ -107,11 +107,6 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
         mRNCWebViewManagerImpl.setDownloadingMessage(value);
     }
 
-    @ReactProp(name = "forceDarkOn")
-    public void setForceDarkOn(RNCWebViewWrapper view, boolean value) {
-        mRNCWebViewManagerImpl.setForceDarkOn(view, value);
-    }
-
     @ReactProp(name = "geolocationEnabled")
     public void setGeolocationEnabled(RNCWebViewWrapper view, boolean value) {
         mRNCWebViewManagerImpl.setGeolocationEnabled(view, value);

@@ -82,7 +82,6 @@ Questo documento elenca le attuali proprietà e metodi pubblici di React Native 
 - [`setSupportMultipleWindows`](Reference.italian.md#setSupportMultipleWindows)
 - [`basicAuthCredential`](Reference.italian.md#basicAuthCredential)
 - [`enableApplePay`](Reference.italian.md#enableApplePay)
-- [`forceDarkOn`](Reference.italian.md#forceDarkOn)
 - [`useWebView2`](Reference.italian.md#useWebView2)
 - [`minimumFontSize`](Reference.italian.md#minimumFontSize)
 - [`downloadingMessage`](Reference.italian.md#downloadingMessage)
@@ -1379,23 +1378,6 @@ Esempio:
 
 ```jsx
 <WebView enableApplePay={true} />
-```
-
-### `forceDarkOn`[⬆](#props-index)
-Configurazione del tema scuro (Dark Mode).
-
-*NOTA*: L'impostazione della Dark Mode non è persistente. È necessario chiamare il metodo statico ogni volta che il processo dell'app viene avviato.
-
-*NOTA*: Il passaggio da modalità giorno a modalità notte è una modifica di configurazione, quindi per l'impostazione predefinita l'attività verrà riavviata e registrerà i nuovi valori per attivare il tema. Presta attenzione quando sovrascrivi questo comportamento predefinito e assicurati che questo metodo venga comunque chiamato quando vengono apportate modifiche.
-
-| Tipo    | Obbligatorio | Piattaforma  |
-| ------- | ------------ | ------------ |
-| boolean | No           | Android      |
-
-Esempio:
-
-```javascript
-<WebView forceDarkOn={false} />
 ```
 
 ### `menuItems`[⬆](#props-index)

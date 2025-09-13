@@ -157,7 +157,6 @@ export interface NativeProps extends ViewProps {
   >;
   domStorageEnabled?: boolean;
   downloadingMessage?: string;
-  forceDarkOn?: boolean;
   geolocationEnabled?: boolean;
   lackPermissionToDownloadMessage?: string;
   messagingModuleName: string;

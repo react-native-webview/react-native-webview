@@ -137,12 +137,6 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     }
 
     @Override
-    @ReactProp(name = "forceDarkOn")
-    public void setForceDarkOn(RNCWebViewWrapper view, boolean value) {
-        mRNCWebViewManagerImpl.setForceDarkOn(view, value);
-    }
-
-    @Override
     @ReactProp(name = "geolocationEnabled")
     public void setGeolocationEnabled(RNCWebViewWrapper view, boolean value) {
         mRNCWebViewManagerImpl.setGeolocationEnabled(view, value);
