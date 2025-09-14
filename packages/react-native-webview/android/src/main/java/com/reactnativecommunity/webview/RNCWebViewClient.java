@@ -15,15 +15,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.util.Pair;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerHelper;
 import com.reactnativecommunity.webview.events.SubResourceErrorEvent;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
@@ -251,7 +248,6 @@ public class RNCWebViewClient extends WebViewClient {
         UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingErrorEvent(reactTag, eventData));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceivedHttpError(
             WebView webView,

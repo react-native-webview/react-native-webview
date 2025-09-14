@@ -13,7 +13,6 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
@@ -24,13 +23,8 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.widget.Toast;
 
-import com.facebook.common.activitylistener.ActivityListenerManager;
 import com.facebook.react.bridge.ActivityEventListener;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 
@@ -223,7 +217,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         }
 
         // we have one file selected
-        if (data.getData() != null && resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (data.getData() != null && resultCode == RESULT_OK) {
             return WebChromeClient.FileChooserParams.parseResult(resultCode, data);
         }
 
@@ -327,7 +321,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         }
 
         boolean result = ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-        if (!result && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (!result) {
             PermissionAwareActivity PAactivity = getPermissionAwareActivity();
             PAactivity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, FILE_DOWNLOAD_PERMISSION_REQUEST, getWebviewFileDownloaderPermissionListener(downloadingMessage, lackPermissionToDownloadMessage));
         }
@@ -422,10 +416,6 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
     }
 
     private Boolean acceptsVideo(String types) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return false;
-        }
-
         String mimeType = types;
         if (types.matches("\\.\\w+")) {
             mimeType = getMimeTypeFromExtension(types.replace(".", ""));
@@ -434,10 +424,6 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
     }
 
     private Boolean acceptsVideo(String[] types) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return false;
-        }
-
         String[] mimeTypes = getAcceptedMimeType(types);
         return arrayContainsString(mimeTypes, MimeType.DEFAULT.value) || arrayContainsString(mimeTypes, MimeType.VIDEO.value);
     }
@@ -482,12 +468,6 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
     }
 
     public Uri getOutputUri(File capturedFile) {
-        // for versions below 6.0 (23) we use the old File creation & permissions model
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return Uri.fromFile(capturedFile);
-        }
-
-        // for versions 6.0+ (23) we use the FileProvider to avoid runtime permissions
         String packageName = mContext.getPackageName();
         return FileProvider.getUriForFile(mContext, packageName + ".fileprovider", capturedFile);
     }
@@ -514,18 +494,8 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         }
 
         String filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
-        File outputFile = null;
-
-        // for versions below 6.0 (23) we use the old File creation & permissions model
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            // only this Directory works on all tested Android versions
-            // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
-            File storageDir = Environment.getExternalStoragePublicDirectory(dir);
-            outputFile = new File(storageDir, filename);
-        } else {
-            File storageDir = mContext.getExternalFilesDir(null);
-            outputFile = File.createTempFile(prefix, suffix, storageDir);
-        }
+        File storageDir = mContext.getExternalFilesDir(null);
+        File outputFile = File.createTempFile(prefix, suffix, storageDir);
 
         return outputFile;
     }
