@@ -316,18 +316,6 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         return true;
     };
 
-    protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptType);
-    }
-
-    protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, "");
-    }
-
-    protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptType);
-    }
-
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
         String[] acceptTypes = fileChooserParams.getAcceptTypes();
