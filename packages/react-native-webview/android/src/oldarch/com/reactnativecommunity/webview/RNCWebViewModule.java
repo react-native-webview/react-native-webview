@@ -26,10 +26,6 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
         mRNCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     }
 
-    public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {
-        mRNCWebViewModuleImpl.startPhotoPickerIntent(acceptType, filePathCallback);
-    }
-
     public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final String[] acceptTypes, final boolean allowMultiple, final boolean isCaptureEnabled) {
         return mRNCWebViewModuleImpl.startPhotoPickerIntent(acceptTypes, allowMultiple, callback, isCaptureEnabled);
     }
