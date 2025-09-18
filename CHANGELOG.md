@@ -1,5 +1,11 @@
 # @phantom/react-native-webview
 
+## 1.1.1
+
+### Patch Changes
+
+- 1388353: Add isMainFrame to new arch serialization layer
+
 ## 1.1.0
 
 ### Minor Changes
