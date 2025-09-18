@@ -134,7 +134,8 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
                     .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoForward"] boolValue]),
                     .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
-                    .data = std::string([[dictionary valueForKey:@"data"] UTF8String])
+                    .data = std::string([[dictionary valueForKey:@"data"] UTF8String]),
+                    .isMainFrame = static_cast<bool>([[dictionary valueForKey:@"isMainFrame"] boolValue])
                 };
                 webViewEventEmitter->onMessage(data);
             }
