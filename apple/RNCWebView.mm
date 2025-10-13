@@ -270,6 +270,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     }
 
     REMAP_WEBVIEW_PROP(scrollEnabled)
+    REMAP_WEBVIEW_PROP(disableTextHighlightMenu)
     REMAP_WEBVIEW_STRING_PROP(injectedJavaScript)
     REMAP_WEBVIEW_STRING_PROP(injectedJavaScriptBeforeContentLoaded)
     REMAP_WEBVIEW_PROP(injectedJavaScriptForMainFrameOnly)
@@ -392,6 +393,11 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }
         [_view setMenuItems:newMenuItems];
     }
+    
+    if(oldViewProps.disableTextHighlightMenu != newViewProps.disableTextHighlightMenu) {
+        [_view setDisableTextHighlightMenu:newViewProps.disableTextHighlightMenu];
+    }
+
     if(oldViewProps.suppressMenuItems != newViewProps.suppressMenuItems) {
         NSMutableArray *suppressMenuItems = [NSMutableArray array];
 

@@ -394,6 +394,11 @@ export interface WindowsWebViewProps extends WebViewSharedProps {
 
 export interface IOSWebViewProps extends WebViewSharedProps {
   /**
+   * Disables the context menu that appears when text is long-pressed
+   */
+  disableTextHighlightMenu?: boolean;
+
+  /**
    * Does not store any data within the lifetime of the WebView.
    */
   incognito?: boolean;

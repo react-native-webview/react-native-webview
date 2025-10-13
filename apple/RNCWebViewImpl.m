@@ -52,6 +52,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
 @property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;
+@property (nonatomic, assign) BOOL disableTextHighlightMenu; 
 #endif // !TARGET_OS_OSX
 @end
 @implementation RNCWKWebView
@@ -80,6 +81,10 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 - (BOOL)canPerformAction:(SEL)action
               withSender:(id)sender{
+
+  if (self.disableTextHighlightMenu) {
+      return NO;
+  }
   if(self.suppressMenuItems) {
       NSString * sel = [self stringFromAction:action];
       if ([self.suppressMenuItems containsObject: sel]) {
@@ -94,6 +99,10 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   return NO;
 }
 - (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AVAILABLE(ios(13.0))  {
+    if (self.disableTextHighlightMenu) {
+        return;
+    }
+    
     if (@available(iOS 16.0, *)) {
       if(self.menuItems){
         [builder removeMenuForIdentifier:UIMenuLookup];
@@ -522,6 +531,7 @@ RCTAutoInsetsProtocol>
     _webView.menuItems = _menuItems;
     _webView.suppressMenuItems = _suppressMenuItems;
     _webView.scrollView.delegate = self;
+    _webView.disableTextHighlightMenu = _disableTextHighlightMenu;
 #endif // !TARGET_OS_OSX
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
@@ -1041,6 +1051,13 @@ RCTAutoInsetsProtocol>
   _webView.scrollView.scrollEnabled = scrollEnabled;
 #endif // !TARGET_OS_OSX
 }
+
+-(void)setDisableMenuItems:(BOOL)disableMenuItems {
++    NSLog(@"disableMenuItems: %@", self.disableMenuItems ? @"true" : @"false");
++
++    _disableMenuItems = disableMenuItems;
++    _webView.disableMenuItems = disableMenuItems;
++}
 
 #if !TARGET_OS_OSX
 // UIScrollViewDelegate method
