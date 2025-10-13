@@ -179,7 +179,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
     );
     useWarnIfChanges(dataDetectorTypes, 'dataDetectorTypes');
 
-    let otherView = null;
+    let otherView: React.ReactNode = null;
     if (viewState === 'LOADING') {
       otherView = (renderLoading || defaultRenderLoading)();
     } else if (viewState === 'ERROR') {
