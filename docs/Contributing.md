@@ -103,3 +103,4 @@ This file is available in:
 
 - [Brazilian portuguese](Contributing.portuguese.md)
 - [Italian](Contributing.italian.md)
+- [Chinese](Contributing.chinese.md)

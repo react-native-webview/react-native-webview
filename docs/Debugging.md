@@ -89,3 +89,4 @@ This file is available in:
 
 - [Brazilian portuguese](Debugging.portuguese.md)
 - [Italian](Debugging.italian.md)
+- [Chinese](Debugging.chinese.md)
