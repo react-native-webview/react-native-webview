@@ -701,7 +701,7 @@ url
 示例：
 
 ```jsx
-<Webview
+<WebView
   source={{ uri: 'https://reactnative.dev' }}
   onScroll={syntheticEvent => {
     const { contentOffset } = syntheticEvent.nativeEvent

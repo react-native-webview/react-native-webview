@@ -1,6 +1,6 @@
 尽管内置的 webview 功能强大，但在 React Native 中不可能覆盖所有用例。然而，你可以通过原生代码扩展 webview，而无需 fork React Native 或复制现有的 webview 代码。
 
-在开始之前，你应该熟悉 [原生 UI 组件](https://reactnative.dev/docs/native-components-android) 的概念。你还应该参考 webview 的原生代码（例如：android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java），因为你在实现新功能时需要以此为参考——不过不需要非常深入的理解。
+在开始之前，你应该熟悉 [原生 UI 组件](https://reactnative.dev/docs/native-components-android) 的概念。你还应该参考[原生 webview 代码](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java)，因为你在实现新功能时需要以此为参考——不过不需要非常深入的理解。
 
 ## 原生代码
 

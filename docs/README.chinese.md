@@ -75,6 +75,7 @@ MIT
 
 本 README 提供以下翻译版本：
 
-- [Brazilian portuguese](docs/README.portuguese.md)
-- [French](docs/README.french.md)
-- [Italian](docs/README.italian.md)
+- [English](../README.md)
+- [Brazilian portuguese](README.portuguese.md)
+- [French](README.french.md)
+- [Italian](README.italian.md)

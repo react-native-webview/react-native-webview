@@ -19,7 +19,7 @@ _该指南仍在持续完善中。_
 
 ### 基本内联 HTML
 
-最简单的使用方式是直接传入要展示的 HTML。注意：设置 `html` 源需要将 [originWhiteList](Reference.md#originWhiteList) 属性设置为 `['*']`。
+最简单的使用方式是直接传入要展示的 HTML。注意：设置 `html` 源需要将 [originWhitelist](Reference.chinese.md#originwhitelist) 属性设置为 `['*']`。
 
 ```js
 import React, { Component } from 'react';
