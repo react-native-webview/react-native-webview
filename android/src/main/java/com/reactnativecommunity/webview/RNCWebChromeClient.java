@@ -153,9 +153,14 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     @Override
     public void onPermissionRequest(final PermissionRequest request) {
 
+        // Reset state to handle new request
         grantedPermissions = new ArrayList<>();
+        permissionRequest = null;
 
         ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
+        ArrayList<String> permissionsNeedingDialog = new ArrayList<>();
+        ArrayList<String> permissionLabels = new ArrayList<>();
+        
         for (String requestedResource : request.getResources()) {
             String androidPermission = null;
             String requestPermissionIdentifier = null;
@@ -179,37 +184,83 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                    */
                   androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
                 }            }
-            Uri originUri = request.getOrigin();
-            String host = originUri.getHost();
-            // TODO: RESOURCE_MIDI_SYSEX, RESOURCE_PROTECTED_MEDIA_ID.
-            String alertMessage = String.format("Allow " + host  + " to use your " + requestPermissionIdentifier + "?");
+            
             if (androidPermission != null) {
                 if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), androidPermission) == PackageManager.PERMISSION_GRANTED) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
-                    builder.setMessage(alertMessage);
-                    builder.setCancelable(false);
-                    String finalAndroidPermission = androidPermission;
-                    builder.setPositiveButton("Allow", (dialog, which) -> {
-                        permissionRequest = request;
-                        grantedPermissions.add(finalAndroidPermission);
-                        requestPermissions(grantedPermissions);
-                    });
-                    builder.setNegativeButton("Don't allow", (dialog, which) -> {
-                        request.deny();
-                    });
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                    //Delay making `allow` clickable for 500ms to avoid unwanted presses.
-                    Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                    posButton.setEnabled(false);
-                    this.runDelayed(() -> posButton.setEnabled(true), 500);
+                    // Permission already granted at OS level, but still need user confirmation
+                    permissionsNeedingDialog.add(androidPermission);
+                    permissionLabels.add(requestPermissionIdentifier);
                 } else {
+                    // Permission not granted at OS level, need to request it
                     requestedAndroidPermissions.add(androidPermission);
                 }
             }
         }
 
-        // If all the permissions are already granted, send the response to the WebView synchronously
+        // Show a SINGLE dialog for all permissions that are already granted at OS level
+        if (!permissionsNeedingDialog.isEmpty()) {
+            Uri originUri = request.getOrigin();
+            String host = originUri.getHost();
+            
+            // Build message for all requested permissions
+            String permissionList = String.join(" and ", permissionLabels);
+            String alertMessage = String.format("Allow %s to use your %s?", host, permissionList);
+            
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.mWebView.getContext());
+            builder.setMessage(alertMessage);
+            builder.setCancelable(false);
+            
+            builder.setPositiveButton("Allow", (dialog, which) -> {
+                // Add all permissions to granted list
+                for (String permission : permissionsNeedingDialog) {
+                    if (permission.equals(Manifest.permission.CAMERA)) {
+                        grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+                    } else if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
+                        grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
+                    } else if (permission.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+                        grantedPermissions.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
+                    }
+                }
+                
+                // If no additional system permissions needed, grant immediately
+                if (requestedAndroidPermissions.isEmpty()) {
+                    if (!grantedPermissions.isEmpty()) {
+                        try {
+                            request.grant(grantedPermissions.toArray(new String[0]));
+                        } catch (IllegalStateException e) {
+                            // Request was already granted or denied, ignore
+                        } finally {
+                            grantedPermissions = null;
+                            permissionRequest = null;
+                        }
+                    }
+                    // DO NOT set permissionRequest since we're handling it entirely here
+                } else {
+                    // Still need to request system permissions - set permissionRequest for listener callback
+                    permissionRequest = request;
+                    requestPermissions(requestedAndroidPermissions);
+                }
+            });
+            
+            builder.setNegativeButton("Don't allow", (dialog, which) -> {
+                request.deny();
+                // Clean up state
+                grantedPermissions = null;
+                permissionRequest = null;
+            });
+            
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+            
+            //Delay making `allow` clickable for 500ms to avoid unwanted presses.
+            Button posButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            posButton.setEnabled(false);
+            this.runDelayed(() -> posButton.setEnabled(true), 500);
+            
+            return;
+        }
+
+        // If all the permissions are already granted (no dialog needed), send the response to the WebView synchronously
         if (requestedAndroidPermissions.isEmpty()) {
             if (!grantedPermissions.isEmpty()) {
                 request.grant(grantedPermissions.toArray(new String[0]));
@@ -219,9 +270,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         }
 
         // Otherwise, ask to Android System for native permissions asynchronously
-
         this.permissionRequest = request;
-
         requestPermissions(requestedAndroidPermissions);
     }
 
@@ -356,9 +405,14 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         if (shouldAnswerToPermissionRequest
                 && permissionRequest != null
                 && grantedPermissions != null) {
-            permissionRequest.grant(grantedPermissions.toArray(new String[0]));
-            permissionRequest = null;
-            grantedPermissions = null;
+            try {
+                permissionRequest.grant(grantedPermissions.toArray(new String[0]));
+            } catch (IllegalStateException e) {
+                // Request was already granted or denied, ignore
+            } finally {
+                permissionRequest = null;
+                grantedPermissions = null;
+            }
         }
 
         if (!pendingPermissions.isEmpty()) {
