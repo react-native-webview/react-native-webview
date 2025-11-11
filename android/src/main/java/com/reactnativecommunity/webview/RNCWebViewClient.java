@@ -21,9 +21,7 @@ import androidx.core.util.Pair;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerHelper;
 import com.reactnativecommunity.webview.events.SubResourceErrorEvent;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
@@ -77,8 +75,11 @@ public class RNCWebViewClient extends WebViewClient {
       ((RNCWebView) webView).dispatchEvent(
         webView,
         new TopLoadingStartEvent(
+          UIManagerHelper.getSurfaceId(webView.getContext()),
           RNCWebViewWrapper.getReactTagFromWebView(webView),
-          createWebViewEvent(webView, url)));
+          createWebViewEvent(webView, url)
+        )
+      );
     }
 
     @Override
@@ -131,10 +132,16 @@ public class RNCWebViewClient extends WebViewClient {
             FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
             progressChangedFilter.setWaitingForCommandLoadUrl(true);
 
+            int surfaceId = UIManagerHelper.getSurfaceId(view.getContext());
             int reactTag = RNCWebViewWrapper.getReactTagFromWebView(view);
-            UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag).dispatchEvent(new TopShouldStartLoadWithRequestEvent(
-                    reactTag,
-                    createWebViewEvent(view, url)));
+            UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag)
+              .dispatchEvent(
+                new TopShouldStartLoadWithRequestEvent(
+                  surfaceId,
+                  reactTag,
+                  createWebViewEvent(view, url)
+                )
+              );
             return true;
         }
     }
@@ -224,14 +231,18 @@ public class RNCWebViewClient extends WebViewClient {
       WebView webView,
       int errorCode,
       String description,
-      String failingUrl) {
+      String failingUrl
+    ) {
 
       WritableMap eventData = createWebViewEvent(webView, failingUrl);
       eventData.putDouble("code", errorCode);
       eventData.putString("description", description);
 
       int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
-      UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new SubResourceErrorEvent(reactTag, eventData));
+      ReactContext reactContext = (ReactContext) webView.getContext();
+      int surfaceId = UIManagerHelper.getSurfaceId(reactContext);
+      UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag)
+        .dispatchEvent(new SubResourceErrorEvent(surfaceId, reactTag, eventData));
     }
 
     @Override
@@ -252,8 +263,9 @@ public class RNCWebViewClient extends WebViewClient {
         eventData.putDouble("code", errorCode);
         eventData.putString("description", description);
 
+        int surfaceId = UIManagerHelper.getSurfaceId(webView.getContext());
         int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
-        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingErrorEvent(reactTag, eventData));
+        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingErrorEvent(surfaceId, reactTag, eventData));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -270,7 +282,8 @@ public class RNCWebViewClient extends WebViewClient {
             eventData.putString("description", errorResponse.getReasonPhrase());
 
             int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
-            UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopHttpErrorEvent(reactTag, eventData));
+            int surfaceId = UIManagerHelper.getSurfaceId(webView.getContext());
+            UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopHttpErrorEvent(surfaceId, reactTag, eventData));
         }
     }
 
@@ -299,16 +312,19 @@ public class RNCWebViewClient extends WebViewClient {
 
         WritableMap event = createWebViewEvent(webView, webView.getUrl());
         event.putBoolean("didCrash", detail.didCrash());
+        int surfaceId = UIManagerHelper.getSurfaceId(webView.getContext());
         int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
-        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopRenderProcessGoneEvent(reactTag, event));
+        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag)
+          .dispatchEvent(new TopRenderProcessGoneEvent(surfaceId, reactTag, event));
 
         // returning false would crash the app.
         return true;
     }
 
     protected void emitFinishEvent(WebView webView, String url) {
+        int surfaceId = UIManagerHelper.getSurfaceId(webView.getContext());
         int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
-        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingFinishEvent(reactTag, createWebViewEvent(webView, url)));
+        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingFinishEvent(surfaceId, reactTag, createWebViewEvent(webView, url)));
     }
 
     protected WritableMap createWebViewEvent(WebView webView, String url) {

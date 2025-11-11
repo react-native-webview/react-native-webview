@@ -2,13 +2,13 @@ package com.reactnativecommunity.webview.events
 
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.events.Event
-import com.facebook.react.uimanager.events.RCTEventEmitter
 
 /**
  * Event emitted when there is a loading progress event.
  */
-class TopCustomMenuSelectionEvent(viewId: Int, private val mEventData: WritableMap) :
-  Event<TopCustomMenuSelectionEvent>(viewId) {
+class TopCustomMenuSelectionEvent(
+  surfaceId: Int, viewId: Int, private val mEventData: WritableMap
+) : Event<TopCustomMenuSelectionEvent>(surfaceId, viewId) {
   companion object {
     const val EVENT_NAME = "topCustomMenuSelection"
   }
@@ -19,6 +19,5 @@ class TopCustomMenuSelectionEvent(viewId: Int, private val mEventData: WritableM
 
   override fun getCoalescingKey(): Short = 0
 
-  override fun dispatch(rctEventEmitter: RCTEventEmitter) =
-    rctEventEmitter.receiveEvent(viewTag, eventName, mEventData)
+  override fun getEventData() = mEventData
 }

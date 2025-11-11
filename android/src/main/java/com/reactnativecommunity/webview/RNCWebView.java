@@ -28,6 +28,7 @@ import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -181,6 +182,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             new ValueCallback<String>() {
               @Override
               public void onReceiveValue(String selectionJson) {
+                int surfaceId = UIManagerHelper.getSurfaceId(RNCWebView.this.getContext());
                 Map<String, String> menuItemMap = menuCustomItems.get(item.getItemId());
                 wMap.putString("label", menuItemMap.get("label"));
                 wMap.putString("key", menuItemMap.get("key"));
@@ -189,7 +191,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                   selectionText = new JSONObject(selectionJson).getString("selection");
                 } catch (JSONException ignored) {}
                 wMap.putString("selectedText", selectionText);
-                dispatchEvent(RNCWebView.this, new TopCustomMenuSelectionEvent(RNCWebViewWrapper.getReactTagFromWebView(RNCWebView.this), wMap));
+                dispatchEvent(RNCWebView.this, new TopCustomMenuSelectionEvent(surfaceId, RNCWebViewWrapper.getReactTagFromWebView(RNCWebView.this), wMap));
                 mode.finish();
               }
             }
@@ -342,7 +344,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     if (mMessagingJSModule != null) {
                         dispatchDirectMessage(data);
                     } else {
-                        dispatchEvent(webView, new TopMessageEvent(RNCWebViewWrapper.getReactTagFromWebView(webView), data));
+                        dispatchEvent(
+                          webView,
+                          new TopMessageEvent(
+                            UIManagerHelper.getSurfaceId(webView.getContext()),
+                            RNCWebViewWrapper.getReactTagFromWebView(webView),
+                            data
+                          )
+                        );
                     }
                 }
             });
@@ -353,7 +362,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             if (mMessagingJSModule != null) {
                 dispatchDirectMessage(eventData);
             } else {
-                dispatchEvent(this, new TopMessageEvent(RNCWebViewWrapper.getReactTagFromWebView(this), eventData));
+                dispatchEvent(
+                  this,
+                  new TopMessageEvent(
+                    UIManagerHelper.getSurfaceId(getContext()),
+                    RNCWebViewWrapper.getReactTagFromWebView(this),
+                    eventData
+                  )
+                );
             }
         }
     }
