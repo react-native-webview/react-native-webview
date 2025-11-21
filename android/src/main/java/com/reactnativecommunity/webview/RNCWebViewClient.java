@@ -90,8 +90,7 @@ public class RNCWebViewClient extends WebViewClient {
       reactWebView.callInjectedJavaScriptBeforeContentLoaded();
     }
 
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+    private boolean mShouldOverrideUrlLoading(WebView view, String url, @Nullable WebResourceRequest request) {
         final RNCWebView rncWebView = (RNCWebView) view;
         final boolean isJsDebugging = rncWebView.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
 
@@ -102,6 +101,11 @@ public class RNCWebViewClient extends WebViewClient {
 
             final WritableMap event = createWebViewEvent(view, url);
             event.putDouble("lockIdentifier", lockIdentifier);
+
+            if (request != null) {
+                event.putBoolean("hasGesture", request.hasGesture());
+            }
+
             rncWebView.dispatchDirectShouldStartLoadWithRequest(event);
 
             try {
@@ -139,11 +143,16 @@ public class RNCWebViewClient extends WebViewClient {
         }
     }
 
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        return this.mShouldOverrideUrlLoading(view, url, null);
+    }
+
     @TargetApi(Build.VERSION_CODES.N)
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         final String url = request.getUrl().toString();
-        return this.shouldOverrideUrlLoading(view, url);
+        return this.mShouldOverrideUrlLoading(view, url, request);
     }
 
     @Override

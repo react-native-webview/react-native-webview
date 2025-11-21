@@ -830,9 +830,12 @@ mainDocumentURL (iOS only)
 navigationType (iOS only)
 isTopFrame (iOS only)
 hasTargetFrame (iOS only)
+hasGesture (Android only)
 ```
 
 The `hasTargetFrame` prop is a boolean that is `false` when the navigation targets a new window or tab, otherwise it should be `true` ([more info](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe)). Note that this prop should always be `true` when `onOpenWindow` event is registered on the WebView because the `false` case is intercepted by this event.
+
+The `hasGesture` prop is a boolean that is an equivalent of `navigationType: 'click'`. See the [Android documentation](https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture()).
 
 ---
 

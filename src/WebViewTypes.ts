@@ -100,6 +100,12 @@ export interface WebViewNavigation extends WebViewNativeEvent {
 
 export interface ShouldStartLoadRequest extends WebViewNavigation {
   isTopFrame: boolean;
+  /**
+   * Equivalent to `navigationType: 'click'`
+   *
+   * @platform android
+   */
+  hasGesture?: boolean;
 }
 
 export interface FileDownload {
