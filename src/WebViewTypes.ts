@@ -656,8 +656,9 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   /**
    * Boolean value that determines whether a pull to refresh gesture is
    * available in the `WebView`. The default value is `false`.
-   * If `true`, sets `bounces` automatically to `true`
+   * If `true`, sets `bounces` automatically to `true` on iOS.
    * @platform ios
+   * @platform android
    *
    */
   pullToRefreshEnabled?: boolean;

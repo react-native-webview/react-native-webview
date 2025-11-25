@@ -1401,11 +1401,11 @@ Example:
 
 ### `pullToRefreshEnabled`[⬆](#props-index)
 
-Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true`.
+Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true` on iOS.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+| Type    | Required | Platform     |
+| ------- | -------- | ------------ |
+| boolean | No       | iOS, Android |
 
 ### `refreshControlLightMode`[⬆](#props-index)
 
