@@ -104,6 +104,7 @@ export interface ShouldStartLoadRequest extends WebViewNavigation {
 
 export interface FileDownload {
   downloadUrl: string;
+  filename?: string;
 }
 
 export type DecelerationRateConstant = 'normal' | 'fast';
