@@ -101,39 +101,23 @@ export type ShouldStartLoadRequestEvent = Readonly<{
   isTopFrame: boolean;
 }>;
 
+// Simplified scroll event - flatten the structure to avoid codegen ordering issues
 type ScrollEvent = Readonly<{
-  contentInset: {
-    bottom: Double;
-    left: Double;
-    right: Double;
-    top: Double;
-  };
-  contentOffset: {
-    y: Double;
-    x: Double;
-  };
-  contentSize: {
-    height: Double;
-    width: Double;
-  };
-  layoutMeasurement: {
-    height: Double;
-    width: Double;
-  };
-  targetContentOffset?: {
-    y: Double;
-    x: Double;
-  };
-  velocity?: {
-    y: Double;
-    x: Double;
-  };
+  contentInsetTop: Double;
+  contentInsetBottom: Double;
+  contentInsetLeft: Double;
+  contentInsetRight: Double;
+  contentOffsetX: Double;
+  contentOffsetY: Double;
+  contentSizeWidth: Double;
+  contentSizeHeight: Double;
+  layoutMeasurementWidth: Double;
+  layoutMeasurementHeight: Double;
   zoomScale?: Double;
-  responderIgnoreScroll?: boolean;
 }>;
 
 // Windows-specific native props
-export interface WindowsNativeProps extends ViewProps {
+export interface NativeProps extends ViewProps {
   // Windows-specific props
   testID?: string;
   /**
@@ -192,10 +176,12 @@ export interface WindowsNativeProps extends ViewProps {
     uri?: string;
     method?: string;
     body?: string;
-    headers?: ReadonlyArray<Readonly<{ name: string; value: string }>>;
     html?: string;
     baseUrl?: string;
   }>;
+
+  // Headers as JSON string (workaround for codegen nested array limitation)
+  sourceHeaders?: string;
 
   // Authentication
   basicAuthCredential?: Readonly<{
@@ -208,32 +194,35 @@ export interface WindowsNativeProps extends ViewProps {
   applicationNameForUserAgent?: string;
 }
 
+// Alias for backwards compatibility
+export type WindowsNativeProps = NativeProps;
+
 // Windows-specific commands
-export interface WindowsNativeCommands {
-  goBack: (viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>) => void;
-  goForward: (viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>) => void;
-  reload: (viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>) => void;
-  stopLoading: (viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>) => void;
+export interface NativeCommands {
+  goBack: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  goForward: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  reload: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+  stopLoading: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   injectJavaScript: (
-    viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>,
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
     javascript: string
   ) => void;
-  requestFocus: (viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>) => void;
+  requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   postMessage: (
-    viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>,
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
     data: string
   ) => void;
   loadUrl: (
-    viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>,
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
     url: string
   ) => void;
   clearCache: (
-    viewRef: React.ElementRef<HostComponent<WindowsNativeProps>>,
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
     includeDiskFiles: boolean
   ) => void;
 }
 
-export const WindowsCommands = codegenNativeCommands<WindowsNativeCommands>({
+export const Commands = codegenNativeCommands<NativeCommands>({
   supportedCommands: [
     'goBack',
     'goForward',
@@ -247,9 +236,14 @@ export const WindowsCommands = codegenNativeCommands<WindowsNativeCommands>({
   ],
 });
 
-// RCTWebView2 - Chromium-based Edge WebView2
-export const RCTWebView2 = codegenNativeComponent<WindowsNativeProps>(
-  'RCTWebView2'
-) as HostComponent<WindowsNativeProps>;
+// Alias for backwards compatibility
+export const WindowsCommands = Commands;
 
-export default RCTWebView2;
+// RCTWebView2 - Chromium-based Edge WebView2
+export default codegenNativeComponent<NativeProps>(
+  'RCTWebView2'
+) as HostComponent<NativeProps>;
+
+export const RCTWebView2 = codegenNativeComponent<NativeProps>(
+  'RCTWebView2'
+) as HostComponent<NativeProps>;

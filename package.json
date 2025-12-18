@@ -106,8 +106,8 @@
       }
     },
     "windows": {
-      "namespace": "RNCWebViewCodegen",
-      "outputDirectory": "windows/ReactNativeWebView/codegen",
+      "namespace": "ReactNativeWebviewCodegen",
+      "outputDirectory": "windows/ReactNativeWebview/codegen",
       "separateDataTypes": true,
       "modulesWindows": true,
       "componentsWindows": true
@@ -116,8 +116,8 @@
   "packageManager": "yarn@4.1.1",
   "react-native-windows": {
     "init-windows": {
-      "name": "ReactNativeWebView",
-      "namespace": "ReactNativeWebView",
+      "name": "ReactNativeWebview",
+      "namespace": "ReactNativeWebview",
       "template": "cpp-lib"
     }
   }
