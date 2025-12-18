@@ -3,18 +3,24 @@ import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
   /**
+   * Check if file upload is supported.
+   * @returns Promise that resolves to true if file upload is supported
+   */
+  isFileUploadSupported(): Promise<boolean>;
+
+  /**
    * Callback for onShouldStartLoadWithRequest.
    * Called to determine whether loading should continue.
    * @param shouldStart - Whether to allow the load request
    * @param lockIdentifier - Unique identifier for the request
    */
-  onShouldStartLoadWithRequestCallback(
+  shouldStartLoadWithLockIdentifier(
     shouldStart: boolean,
     lockIdentifier: number
   ): void;
 }
 
-// RCTWebView2 module for Chromium-based Edge WebView2
-export const RCTWebView2Module = TurboModuleRegistry.get<Spec>('RCTWebView2');
+// RNCWebView module for Windows
+export const RNCWebViewModule = TurboModuleRegistry.get<Spec>('RNCWebViewModule');
 
-export default RCTWebView2Module;
+export default RNCWebViewModule;
