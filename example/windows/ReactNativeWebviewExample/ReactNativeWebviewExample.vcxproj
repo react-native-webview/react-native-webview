@@ -5,7 +5,7 @@
   <PropertyGroup Label="Globals">
     <CppWinRTOptimized>true</CppWinRTOptimized>
     <MinimalCoreWin>true</MinimalCoreWin>
-    <ProjectGuid>{5E29EC3F-E925-437F-A665-BECD8A29BD38}</ProjectGuid>
+    <ProjectGuid>{D5844806-499F-4C09-9D1D-E6937E9762A3}</ProjectGuid>
     <ProjectName>ReactNativeWebviewExample</ProjectName>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ReactNativeWebviewExample</RootNamespace>

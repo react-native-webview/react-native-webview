@@ -113,12 +113,5 @@
       "componentsWindows": true
     }
   },
-  "packageManager": "yarn@4.1.1",
-  "react-native-windows": {
-    "init-windows": {
-      "name": "ReactNativeWebview",
-      "namespace": "ReactNativeWebview",
-      "template": "cpp-lib"
-    }
-  }
+  "packageManager": "yarn@4.1.1"
 }
