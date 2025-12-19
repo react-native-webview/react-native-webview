@@ -4,7 +4,7 @@
 
 using namespace winrt::Microsoft::ReactNative;
 
-namespace winrt::ReactNativeWebview::implementation
+namespace winrt::ReactNativeWebView::implementation
 {
 
 struct ReactPackageProvider : ReactPackageProviderT<ReactPackageProvider>
@@ -14,11 +14,11 @@ struct ReactPackageProvider : ReactPackageProviderT<ReactPackageProvider>
   void CreatePackage(IReactPackageBuilder const &packageBuilder) noexcept;
 };
 
-} // namespace winrt::ReactNativeWebview::implementation
+} // namespace winrt::ReactNativeWebView::implementation
 
-namespace winrt::ReactNativeWebview::factory_implementation
+namespace winrt::ReactNativeWebView::factory_implementation
 {
 
 struct ReactPackageProvider : ReactPackageProviderT<ReactPackageProvider, implementation::ReactPackageProvider> {};
 
-} // namespace winrt::ReactNativeWebview::factory_implementation
+} // namespace winrt::ReactNativeWebView::factory_implementation
