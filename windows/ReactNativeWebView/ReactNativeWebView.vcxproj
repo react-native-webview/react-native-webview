@@ -6,9 +6,9 @@
     <CppWinRTOptimized>true</CppWinRTOptimized>
     <MinimalCoreWin>true</MinimalCoreWin>
     <ProjectGuid>{30CADFC7-80EF-4296-A405-47E4B97C0C71}</ProjectGuid>
-    <ProjectName>ReactNativeWebview</ProjectName>
+    <ProjectName>ReactNativeWebView</ProjectName>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>ReactNativeWebview</RootNamespace>
+    <RootNamespace>ReactNativeWebView</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>17.0</MinimumVisualStudioVersion>
@@ -81,6 +81,7 @@
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalIncludeDirectories>
         $(MSBuildThisFileDirectory);
+        $(MSBuildThisFileDirectory)codegen_manual;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -112,9 +113,9 @@
     <ClInclude Include="targetver.h" />
     <!-- Fabric Component View -->
     <ClInclude Include="RCTWebView2ComponentView.h" />
-    <!-- Codegen -->
-    <ClInclude Include="codegen\NativeWebviewModuleSpec.g.h" />
-    <ClInclude Include="codegen\react\components\RNCWebViewSpec\RCTWebView2.g.h" />
+    <!-- Codegen (manually generated to avoid codegen ordering issues) -->
+    <ClInclude Include="codegen_manual\NativeWebviewModuleSpec.g.h" />
+    <ClInclude Include="codegen_manual\react\components\RNCWebViewSpec\RCTWebView2.g.h" />
     <!-- Helpers -->
     <ClInclude Include="ReactWebViewHelpers.h" />
   </ItemGroup>

@@ -1,4 +1,4 @@
-namespace ReactNativeWebview
+namespace ReactNativeWebView
 {
   [webhosthidden]
   [default_interface]

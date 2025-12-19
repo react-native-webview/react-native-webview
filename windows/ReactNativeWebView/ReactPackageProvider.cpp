@@ -13,7 +13,7 @@
 
 using namespace winrt::Microsoft::ReactNative;
 
-namespace winrt::ReactNativeWebview::implementation
+namespace winrt::ReactNativeWebView::implementation
 {
 
 void ReactPackageProvider::CreatePackage(IReactPackageBuilder const &packageBuilder) noexcept
@@ -22,8 +22,8 @@ void ReactPackageProvider::CreatePackage(IReactPackageBuilder const &packageBuil
 
 #ifdef RNW_NEW_ARCH
   // Register Fabric component with XamlIsland support
-  winrt::ReactNativeWebView::implementation::RegisterRCTWebView2ComponentView(packageBuilder);
+  RegisterRCTWebView2ComponentView(packageBuilder);
 #endif
 }
 
-} // namespace winrt::ReactNativeWebview::implementation
+} // namespace winrt::ReactNativeWebView::implementation
