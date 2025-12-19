@@ -178,9 +178,8 @@ export default () => {
     }, 1000);
   }, []);
 
-  const changeTest = (
-    (testName: keyof typeof TESTS) => () => setCurrentTest(TESTS[testName])
-  );
+  const changeTest = (testName: keyof typeof TESTS) => () =>
+    setCurrentTest(TESTS[testName]);
 
   return (
     <SafeAreaView style={styles.container}>

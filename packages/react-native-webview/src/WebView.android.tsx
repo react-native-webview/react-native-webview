@@ -43,8 +43,8 @@ const registerCallableModule: (name: string, module: Object) => void =
   // `registerCallableModule()` is available in React Native 0.74 and above.
   // Fallback to use `BatchedBridge.registerCallableModule()` for older versions.
 
-  require('react-native').registerCallableModule ??
-  BatchedBridge.registerCallableModule.bind(BatchedBridge);
+  require('react-native').registerCallableModule
+  ?? BatchedBridge.registerCallableModule.bind(BatchedBridge);
 
 registerCallableModule('RNCWebViewMessagingModule', {
   onShouldStartLoadWithRequest: (
@@ -175,15 +175,15 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         postMessage: (data: string) =>
           webViewRef.current && Commands.postMessage(webViewRef.current, data),
         injectJavaScript: (data: string) =>
-          webViewRef.current &&
-          Commands.injectJavaScript(webViewRef.current, data),
+          webViewRef.current
+          && Commands.injectJavaScript(webViewRef.current, data),
         requestFocus: () =>
           webViewRef.current && Commands.requestFocus(webViewRef.current),
         clearFormData: () =>
           webViewRef.current && Commands.clearFormData(webViewRef.current),
         clearCache: (includeDiskFiles: boolean) =>
-          webViewRef.current &&
-          Commands.clearCache(webViewRef.current, includeDiskFiles),
+          webViewRef.current
+          && Commands.clearCache(webViewRef.current, includeDiskFiles),
         clearHistory: () =>
           webViewRef.current && Commands.clearHistory(webViewRef.current),
       }),
@@ -267,9 +267,9 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
               return {
                 ...prev,
                 [currKey]:
-                  currKey === 'headers' &&
-                  currValue &&
-                  typeof currValue === 'object'
+                  currKey === 'headers'
+                  && currValue
+                  && typeof currValue === 'object'
                     ? Object.entries(currValue).map(([key, value]) => {
                         return {
                           name: key,

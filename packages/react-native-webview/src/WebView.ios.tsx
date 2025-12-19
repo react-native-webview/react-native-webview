@@ -153,13 +153,13 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
         postMessage: (data: string) =>
           webViewRef.current && Commands.postMessage(webViewRef.current, data),
         injectJavaScript: (data: string) =>
-          webViewRef.current &&
-          Commands.injectJavaScript(webViewRef.current, data),
+          webViewRef.current
+          && Commands.injectJavaScript(webViewRef.current, data),
         requestFocus: () =>
           webViewRef.current && Commands.requestFocus(webViewRef.current),
         clearCache: (includeDiskFiles: boolean) =>
-          webViewRef.current &&
-          Commands.clearCache(webViewRef.current, includeDiskFiles),
+          webViewRef.current
+          && Commands.clearCache(webViewRef.current, includeDiskFiles),
       }),
       [setViewState, webViewRef],
     );
@@ -213,9 +213,9 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
               return {
                 ...prev,
                 [currKey]:
-                  currKey === 'headers' &&
-                  currValue &&
-                  typeof currValue === 'object'
+                  currKey === 'headers'
+                  && currValue
+                  && typeof currValue === 'object'
                     ? Object.entries(currValue).map(([key, value]) => {
                         return {
                           name: key,

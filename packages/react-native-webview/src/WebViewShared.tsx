@@ -184,7 +184,7 @@ export const useWebViewLogic = ({
     (event: WebViewErrorEvent) => {
       onLoadSubResourceError?.(event);
     },
-    [onLoadSubResourceError]
+    [onLoadSubResourceError],
   );
 
   const onHttpError = useCallback(

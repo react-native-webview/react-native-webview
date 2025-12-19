@@ -11,6 +11,6 @@
     "example-apps/*"
   ],
   "devDependencies": {
-    "@biomejs/biome": "2.1.2"
+    "@biomejs/biome": "2.3.5"
   }
 }

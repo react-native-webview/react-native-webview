@@ -125,8 +125,8 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
         postMessage: (data: string) =>
           webViewRef.current && Commands.postMessage(webViewRef.current, data),
         injectJavaScript: (data: string) =>
-          webViewRef.current &&
-          Commands.injectJavaScript(webViewRef.current, data),
+          webViewRef.current
+          && Commands.injectJavaScript(webViewRef.current, data),
         requestFocus: () =>
           webViewRef.current && Commands.requestFocus(webViewRef.current),
       }),
@@ -179,9 +179,9 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
               return {
                 ...prev,
                 [currKey]:
-                  currKey === 'headers' &&
-                  currValue &&
-                  typeof currValue === 'object'
+                  currKey === 'headers'
+                  && currValue
+                  && typeof currValue === 'object'
                     ? Object.entries(currValue).map(([key, value]) => {
                         return {
                           name: key,
