@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "react": "19.1.0",
-    "react-native": "0.82.0-nightly-20250806-5936f29d6",
+    "react-native": "0.82.0",
     "react-native-webview": "file:..",
     "react-native-windows": "0.0.0-canary.1020"
   },
@@ -30,10 +30,10 @@
     "@react-native-community/cli": "20.0.0",
     "@react-native-community/cli-platform-android": "20.0.0",
     "@react-native-community/cli-platform-ios": "20.0.0",
-    "@react-native/babel-preset": "0.82.0-nightly-20250806-5936f29d6",
-    "@react-native/eslint-config": "0.82.0-nightly-20250806-5936f29d6",
-    "@react-native/metro-config": "0.82.0-nightly-20250806-5936f29d6",
-    "@react-native/typescript-config": "0.82.0-nightly-20250806-5936f29d6",
+    "@react-native/babel-preset": "0.82.0",
+    "@react-native/eslint-config": "0.82.0",
+    "@react-native/metro-config": "0.82.0",
+    "@react-native/typescript-config": "0.82.0",
     "@rnx-kit/jest-preset": "^0.1.17",
     "@rnx-kit/metro-config": "^2.0.0",
     "@types/react": "^19.1.0",
