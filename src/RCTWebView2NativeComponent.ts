@@ -240,10 +240,8 @@ export const Commands = codegenNativeCommands<NativeCommands>({
 export const WindowsCommands = Commands;
 
 // RCTWebView2 - Chromium-based Edge WebView2
-export default codegenNativeComponent<NativeProps>(
-  'RCTWebView2'
-) as HostComponent<NativeProps>;
-
 export const RCTWebView2 = codegenNativeComponent<NativeProps>(
   'RCTWebView2'
 ) as HostComponent<NativeProps>;
+
+export default RCTWebView2;
