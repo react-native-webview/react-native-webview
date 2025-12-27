@@ -1,4 +1,3 @@
-#ifdef RCT_NEW_ARCH_ENABLED
 #import "RNCHeadlessWebView.h"
 #import "RNCHeadlessWebViewManager.h"
 
@@ -47,7 +46,11 @@ using namespace facebook::react;
 - (void)detachWebView
 {
     if (_attachedWebView) {
-        [_attachedWebView removeFromSuperview];
+        // Only remove from superview if the webview is still our child
+        // It might have already been moved to another component
+        if (_attachedWebView.superview == self) {
+            [_attachedWebView removeFromSuperview];
+        }
         _attachedWebView = nil;
         _currentWebViewId = -1;
     }
@@ -55,19 +58,21 @@ using namespace facebook::react;
 
 - (void)attachWebView:(NSInteger)webviewId
 {
-    if (_currentWebViewId == webviewId && _attachedWebView != nil) {
+    // Check if already properly attached (same id AND actually our subview)
+    // The webview might have been "stolen" by another component
+    if (_currentWebViewId == webviewId && _attachedWebView != nil && _attachedWebView.superview == self) {
         // Already attached
         return;
     }
-    
+
     // Detach previous if any
     [self detachWebView];
-    
+
     WKWebView *webview = [[RNCHeadlessWebViewManager sharedInstance] getWebView:webviewId];
     if (webview) {
         _attachedWebView = webview;
         _currentWebViewId = webviewId;
-        
+
         webview.frame = self.bounds;
         webview.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self addSubview:webview];
@@ -77,7 +82,8 @@ using namespace facebook::react;
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    if (_attachedWebView) {
+    // Only set frame if webview is still our subview (might have been stolen)
+    if (_attachedWebView && _attachedWebView.superview == self) {
         _attachedWebView.frame = self.bounds;
     }
 }
@@ -86,11 +92,19 @@ using namespace facebook::react;
 {
     const auto &oldViewProps = *std::static_pointer_cast<RNCHeadlessWebViewProps const>(_props);
     const auto &newViewProps = *std::static_pointer_cast<RNCHeadlessWebViewProps const>(props);
-    
-    if (oldViewProps.webviewId != newViewProps.webviewId) {
+
+    // Reattach if:
+    // 1. webviewId changed, OR
+    // 2. No webview attached (after prepareForRecycle), OR
+    // 3. Webview was "stolen" by another component
+    BOOL needsAttach = oldViewProps.webviewId != newViewProps.webviewId ||
+                       _attachedWebView == nil ||
+                       _attachedWebView.superview != self;
+
+    if (needsAttach) {
         [self attachWebView:(NSInteger)newViewProps.webviewId];
     }
-    
+
     [super updateProps:props oldProps:oldProps];
 }
 
@@ -100,5 +114,4 @@ Class<RCTComponentViewProtocol> RNCHeadlessWebViewCls(void)
 }
 
 @end
-#endif
 

@@ -1,10 +1,11 @@
-#import <React/RCTBridgeModule.h>
-
-#ifdef RCT_NEW_ARCH_ENABLED
+#import <Foundation/Foundation.h>
 #import <RNCWebViewSpec/RNCWebViewSpec.h>
-#endif
 
-@interface RNCHeadlessWebViewModule : NSObject <RCTBridgeModule>
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RNCHeadlessWebViewModule : NSObject <NativeHeadlessWebViewModuleSpec>
 
 @end
+
+NS_ASSUME_NONNULL_END
 

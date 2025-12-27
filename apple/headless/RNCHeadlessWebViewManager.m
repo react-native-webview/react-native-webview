@@ -27,18 +27,28 @@
 }
 
 - (NSInteger)createWebView {
-    WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
-    
-    // Default configuration
-    config.allowsInlineMediaPlayback = YES;
-    
-    WKWebView *webview = [[WKWebView alloc] initWithFrame:CGRectZero configuration:config];
-    
-    NSInteger webviewId = self.nextId;
-    self.nextId++;
-    
-    self.webviews[@(webviewId)] = webview;
-    
+    __block NSInteger webviewId;
+
+    void (^createBlock)(void) = ^{
+        WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
+
+        // Default configuration
+        config.allowsInlineMediaPlayback = YES;
+
+        WKWebView *webview = [[WKWebView alloc] initWithFrame:CGRectZero configuration:config];
+
+        webviewId = self.nextId;
+        self.nextId++;
+
+        self.webviews[@(webviewId)] = webview;
+    };
+
+    if ([NSThread isMainThread]) {
+        createBlock();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), createBlock);
+    }
+
     return webviewId;
 }
 
