@@ -1,3 +1,4 @@
+#ifdef __cplusplus
 #import <Foundation/Foundation.h>
 #import <RNCWebViewSpec/RNCWebViewSpec.h>
 
@@ -9,3 +10,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
+#endif

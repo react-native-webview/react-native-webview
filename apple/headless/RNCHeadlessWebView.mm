@@ -1,5 +1,15 @@
+// Import Swift header BEFORE any C++ code
+// The generated Swift header is pure Objective-C and must be imported
+// before C++ context is established
+#if __has_include("react_native_webview-Swift.h")
+#import "react_native_webview-Swift.h"
+#elif __has_include("react-native-webview-Swift.h")
+#import "react-native-webview-Swift.h"
+#elif __has_include(<react_native_webview/react_native_webview-Swift.h>)
+#import <react_native_webview/react_native_webview-Swift.h>
+#endif
+
 #import "RNCHeadlessWebView.h"
-#import "RNCHeadlessWebViewManager.h"
 
 #import <react/renderer/components/RNCWebViewSpec/ComponentDescriptors.h>
 #import <react/renderer/components/RNCWebViewSpec/EventEmitters.h>
@@ -68,7 +78,7 @@ using namespace facebook::react;
     // Detach previous if any
     [self detachWebView];
 
-    WKWebView *webview = [[RNCHeadlessWebViewManager sharedInstance] getWebView:webviewId];
+    WKWebView *webview = [[RNCHeadlessWebViewManager shared] getWebView:webviewId];
     if (webview) {
         _attachedWebView = webview;
         _currentWebViewId = webviewId;
