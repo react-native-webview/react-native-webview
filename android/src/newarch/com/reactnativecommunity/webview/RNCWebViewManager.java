@@ -40,6 +40,11 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     private final ViewManagerDelegate<RNCWebViewWrapper> mDelegate;
     private final RNCWebViewManagerImpl mRNCWebViewManagerImpl;
 
+    // WV PATCHES 13.16.0
+    public static void setCertificateAlias(String alias) {
+        RNCWebViewModule.setCertificateAlias(alias);
+    }
+
     public RNCWebViewManager() {
         mDelegate = new RNCWebViewManagerDelegate<>(this);
         mRNCWebViewManagerImpl = new RNCWebViewManagerImpl(true);
