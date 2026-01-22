@@ -78,6 +78,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+    protected boolean mActive = true;
 
     /**
      * WebView must be created with an context of the current activity
@@ -105,6 +106,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     public void setNestedScrollEnabled(boolean nestedScrollEnabled) {
         this.nestedScrollEnabled = nestedScrollEnabled;
+    }
+
+    public void setActive(boolean active) {
+        this.mActive = active;
+    }
+
+    public boolean isActive() {
+        return this.mActive;
     }
 
     @Override

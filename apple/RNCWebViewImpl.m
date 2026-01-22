@@ -176,6 +176,7 @@ RCTAutoInsetsProtocol>
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
+    _active = YES;
     _injectedJavaScript = nil;
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
@@ -1203,6 +1204,11 @@ RCTAutoInsetsProtocol>
  */
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
+  // Security: Suppress dialogs from non-active tabs to prevent cross-tab spoofing
+  if (!_active) {
+    completionHandler();
+    return;
+  }
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
   [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
@@ -1222,6 +1228,11 @@ RCTAutoInsetsProtocol>
  * confirm
  */
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
+  // Security: Suppress dialogs from non-active tabs to prevent cross-tab spoofing
+  if (!_active) {
+    completionHandler(NO);
+    return;
+  }
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
   [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
@@ -1247,6 +1258,11 @@ RCTAutoInsetsProtocol>
  * prompt
  */
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
+  // Security: Suppress dialogs from non-active tabs to prevent cross-tab spoofing
+  if (!_active) {
+    completionHandler(nil);
+    return;
+  }
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
   [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {

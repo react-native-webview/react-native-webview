@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -478,5 +480,35 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     public void setHasOnOpenWindowEvent(boolean hasEvent) {
       mHasOnOpenWindowEvent = hasEvent;
+    }
+
+    /**
+     * Security: Prevent dialogs from being presented when webview is inactive.
+     */
+    @Override
+    public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+        if (!mWebView.isActive()) {
+            result.cancel();
+            return true;  // Consumed - don't show default dialog
+        }
+        return false;  // Show default system dialog
+    }
+
+    @Override
+    public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
+        if (!mWebView.isActive()) {
+            result.cancel();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+        if (!mWebView.isActive()) {
+            result.cancel();
+            return true;
+        }
+        return false;
     }
 }

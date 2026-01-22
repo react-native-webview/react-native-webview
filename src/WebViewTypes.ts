@@ -1358,4 +1358,13 @@ export interface WebViewSharedProps extends ViewProps {
    * Enables support for the Payment Request API for the WebView
    */
   paymentRequestEnabled?: boolean;
+
+  /**
+   * Allows marking the WebView as active or inactive.
+   * When a WebView is marked inactive, JS dialogs and alerts will be blocked and won't be shown to the user
+   * @platform android
+   * @platform ios
+   * @default true
+   */
+  active?: boolean;
 }

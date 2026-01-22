@@ -113,6 +113,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
 @property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;
 @property (nonatomic, copy) RCTDirectEventBlock onCustomMenuSelection;
+@property (nonatomic, assign) BOOL active;
 #if !TARGET_OS_OSX
 @property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
 @property (nonatomic, weak) UIRefreshControl * _Nullable refreshControl;
