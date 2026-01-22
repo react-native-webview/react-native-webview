@@ -1,5 +1,11 @@
 # @phantom/react-native-webview
 
+## 1.2.0
+
+### Minor Changes
+
+- 176afdb: Added a new prop that allows marking webviews as active or inactive.
+
 ## 1.1.1
 
 ### Patch Changes
