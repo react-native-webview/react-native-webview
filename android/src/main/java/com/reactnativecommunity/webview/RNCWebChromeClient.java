@@ -483,7 +483,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     }
 
     /**
-     * Security: Prevent dialogs from being presented when webiew is inactive.
+     * Security: Prevent dialogs from being presented when webview is inactive.
      */
     @Override
     public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
