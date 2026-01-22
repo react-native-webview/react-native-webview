@@ -681,4 +681,8 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
             WebSettingsCompat.setPaymentRequestEnabled(view.settings, enabled)
         }
     }
+
+    fun setActive(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+        viewWrapper.webView.setActive(value)
+    }
 }

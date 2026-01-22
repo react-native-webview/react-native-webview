@@ -431,6 +431,12 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     /* !iOS PROPS - no implemented here */
 
     @Override
+    @ReactProp(name = "active")
+    public void setActive(RNCWebViewWrapper view, boolean value) {
+        mRNCWebViewManagerImpl.setActive(view, value);
+    }
+
+    @Override
     @ReactProp(name = "userAgent")
     public void setUserAgent(RNCWebViewWrapper view, @Nullable String value) {
         mRNCWebViewManagerImpl.setUserAgent(view, value);

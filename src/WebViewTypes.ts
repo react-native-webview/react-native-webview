@@ -1358,4 +1358,15 @@ export interface WebViewSharedProps extends ViewProps {
    * Enables support for the Payment Request API for the WebView
    */
   paymentRequestEnabled?: boolean;
+
+  /**
+   * When used in a multi-tab browser context, indicates whether this WebView
+   * is the currently active/visible tab. When false, JavaScript dialogs
+   * (alert, prompt, confirm) will be automatically dismissed to prevent
+   * cross-tab spoofing attacks.
+   * @platform android
+   * @platform ios
+   * @default true
+   */
+  active?: boolean;
 }
