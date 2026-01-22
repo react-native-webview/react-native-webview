@@ -483,7 +483,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     }
 
     /**
-     * Security: Suppress dialogs from non-active tabs to prevent cross-tab spoofing
+     * Security: Prevent dialogs from being presented when webiew is inactive.
      */
     @Override
     public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
