@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: 20.x
           registry-url: "https://registry.npmjs.org"
+          token: ""
 
       - name: Ensure npm 11.5.1+ for trusted publishing
         run: npm install -g npm@^11.5.1
@@ -48,3 +49,6 @@ jobs:
           publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # we use trusted publishing and setup-node will set these incorrectly. Unset if we ever use RO_TOKEN
+          NODE_AUTH_TOKEN: ""
+          NPM_TOKEN: ""
