@@ -312,6 +312,8 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(showsHorizontalScrollIndicator)
     REMAP_WEBVIEW_PROP(showsVerticalScrollIndicator)
     REMAP_WEBVIEW_PROP(keyboardDisplayRequiresUserAction)
+    REMAP_WEBVIEW_PROP(scrollsToTop)
+    REMAP_WEBVIEW_PROP(dragInteractionEnabled)
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
@@ -549,6 +551,14 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
 
 - (void)clearHistory {
     // android only
+}
+
+- (void)setTintColor:(double)red green:(double)green blue:(double)blue alpha:(double)alpha {
+    UIColor *color = [UIColor colorWithRed:red / 255.0
+                                     green:green / 255.0
+                                      blue:blue / 255.0
+                                     alpha:alpha];
+    [_view setTintColor:color];
 }
 
 @end

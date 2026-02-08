@@ -234,7 +234,9 @@ export interface NativeProps extends ViewProps {
   pullToRefreshEnabled?: boolean;
   refreshControlLightMode?: boolean;
   scrollEnabled?: WithDefault<boolean, true>;
+  scrollsToTop?: WithDefault<boolean, true>;
   sharedCookiesEnabled?: boolean;
+  dragInteractionEnabled?: WithDefault<boolean, true>;
   textInteractionEnabled?: WithDefault<boolean, true>;
   useSharedProcessPool?: WithDefault<boolean, true>;
   onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;
@@ -325,6 +327,15 @@ export interface NativeCommands {
   ) => void;
   clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   // !Android Only
+
+  // iOS Only (Readwise custom)
+  setTintColor: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
+    red: Double,
+    green: Double,
+    blue: Double,
+    alpha: Double
+  ) => void;
 }
 
 export const Commands = codegenNativeCommands<NativeCommands>({
@@ -340,6 +351,7 @@ export const Commands = codegenNativeCommands<NativeCommands>({
     'clearFormData',
     'clearCache',
     'clearHistory',
+    'setTintColor',
   ],
 });
 

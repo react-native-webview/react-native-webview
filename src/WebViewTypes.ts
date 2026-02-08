@@ -24,6 +24,8 @@ type WebViewCommands =
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearFormData';
 
+type IOSWebViewCommands = 'setTintColor';
+
 interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (name: string) => {
     Commands: { [key in Commands]: number };
@@ -33,7 +35,7 @@ interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
 export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<
   WebViewCommands | AndroidWebViewCommands
 >;
-export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>;
+export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands | IOSWebViewCommands>;
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>;
 export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>;
 
@@ -777,6 +779,21 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   fraudulentWebsiteWarningEnabled?: boolean;
+
+  /**
+   * A Boolean value that controls whether the web view scrolls to the top of
+   * the content when the user taps the status bar.
+   * The default value is `true`.
+   * @platform ios
+   */
+  scrollsToTop?: boolean;
+
+  /**
+   * A Boolean value that determines whether drag interactions are enabled
+   * on the web view. The default value is `true`.
+   * @platform ios
+   */
+  dragInteractionEnabled?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {

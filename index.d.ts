@@ -58,6 +58,12 @@ declare class WebView<P = {}> extends Component<WebViewProps & P> {
      * Tells this WebView to clear its internal back/forward list.
      */
     clearHistory?: () => void;
+
+    /**
+     * (iOS only)
+     * Sets the tint color (selection color) of the WebView.
+     */
+    setTintColor: (red: number, green: number, blue: number, alpha: number) => void;
 }
 
 export {WebView};

@@ -175,6 +175,14 @@ RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebViewImpl
   view.keyboardDisplayRequiresUserAction = json == nil ? true : [RCTConvert BOOL: json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(scrollsToTop, BOOL, RNCWebViewImpl) {
+  view.scrollsToTop = json == nil ? true : [RCTConvert BOOL: json];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(dragInteractionEnabled, BOOL, RNCWebViewImpl) {
+  view.dragInteractionEnabled = json == nil ? true : [RCTConvert BOOL: json];
+}
+
 #if !TARGET_OS_OSX
     #define BASE_VIEW_PER_OS() UIView
 #else
@@ -215,5 +223,21 @@ QUICK_RCT_EXPORT_COMMAND_METHOD(requestFocus)
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(postMessage, message:(NSString *)message, message)
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(injectJavaScript, script:(NSString *)script, script)
 QUICK_RCT_EXPORT_COMMAND_METHOD_PARAMS(clearCache, includeDiskFiles:(BOOL)includeDiskFiles, includeDiskFiles)
+
+RCT_EXPORT_METHOD(setTintColor:(nonnull NSNumber *)reactTag red:(double)red green:(double)green blue:(double)blue alpha:(double)alpha)
+{
+[self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, BASE_VIEW_PER_OS() *> *viewRegistry) {
+    RNCWebViewImpl *view = (RNCWebViewImpl *)viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNCWebViewImpl class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RNCWebView, got: %@", view);
+    } else {
+      UIColor *color = [UIColor colorWithRed:red / 255.0
+                                       green:green / 255.0
+                                        blue:blue / 255.0
+                                       alpha:alpha];
+      [view setTintColor:color];
+    }
+  }];
+}
 
 @end
