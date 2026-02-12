@@ -240,8 +240,12 @@ export const Commands = codegenNativeCommands<NativeCommands>({
 export const WindowsCommands = Commands;
 
 // RCTWebView2 - Chromium-based Edge WebView2
-export const RCTWebView2 = codegenNativeComponent<NativeProps>(
-  'RCTWebView2'
+// IMPORTANT: The `export default` MUST directly contain the codegenNativeComponent()
+// call expression. @react-native/babel-plugin-codegen inspects the AST of the
+// ExportDefaultDeclaration node — if it sees an Identifier instead of a
+// CallExpression / TSAsExpression, it won't generate the static view config,
+// which causes "View config not found for component 'RCTWebView2'" in
+// Bridgeless / Fabric mode (where requireNativeComponent is unavailable).
+export default codegenNativeComponent<NativeProps>(
+  'RCTWebView2',
 ) as HostComponent<NativeProps>;
-
-export default RCTWebView2;

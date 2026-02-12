@@ -18,8 +18,7 @@ import React, {
 } from 'react';
 import { View, Image, ImageSourcePropType, NativeModules, HostComponent } from 'react-native';
 import invariant from 'invariant';
-import {
-  RCTWebView2,
+import RCTWebView2, {
   Commands,
   NativeProps,
 } from './RCTWebView2NativeComponent';

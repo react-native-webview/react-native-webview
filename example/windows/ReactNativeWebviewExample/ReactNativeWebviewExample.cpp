@@ -51,7 +51,7 @@ _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR 
 #else
   // Load the JS bundle from Metro
   settings.JavaScriptBundleFile(L"index");
-  // Enable hot reload
+  // Enable hot reload so the bundle is fetched from Metro dev server
   settings.UseFastRefresh(true);
 #endif
 #if _DEBUG
@@ -78,5 +78,26 @@ _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR 
   viewOptions.ComponentName(L"WebviewExample");
 
   // Start the app
-  reactNativeWin32App.Start();
+  try {
+    reactNativeWin32App.Start();
+  } catch (winrt::hresult_error const& ex) {
+    auto msg = ex.message();
+    OutputDebugStringW(L"[RNW CRASH] hresult_error: ");
+    OutputDebugStringW(msg.c_str());
+    OutputDebugStringW(L"\n");
+    wchar_t buf[512];
+    swprintf_s(buf, L"hresult_error 0x%08X: %s", static_cast<uint32_t>(ex.code()), msg.c_str());
+    MessageBoxW(nullptr, buf, L"ReactNative Crash", MB_OK | MB_ICONERROR);
+    return 1;
+  } catch (std::exception const& ex) {
+    OutputDebugStringA("[RNW CRASH] std::exception: ");
+    OutputDebugStringA(ex.what());
+    OutputDebugStringA("\n");
+    MessageBoxA(nullptr, ex.what(), "ReactNative Crash", MB_OK | MB_ICONERROR);
+    return 1;
+  } catch (...) {
+    OutputDebugStringW(L"[RNW CRASH] Unknown exception\n");
+    MessageBoxW(nullptr, L"Unknown exception in Start()", L"ReactNative Crash", MB_OK | MB_ICONERROR);
+    return 1;
+  }
 }

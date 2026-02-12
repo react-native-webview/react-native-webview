@@ -21,7 +21,7 @@
     "react": "19.1.0",
     "react-native": "0.82.0",
     "react-native-webview": "file:..",
-    "react-native-windows": "0.0.0-canary.1020"
+    "react-native-windows": "0.82.0-preview.8"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
