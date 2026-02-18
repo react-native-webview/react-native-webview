@@ -234,7 +234,9 @@ export interface NativeProps extends ViewProps {
   pullToRefreshEnabled?: boolean;
   refreshControlLightMode?: boolean;
   scrollEnabled?: WithDefault<boolean, true>;
+  scrollsToTop?: WithDefault<boolean, true>;
   sharedCookiesEnabled?: boolean;
+  dragInteractionEnabled?: WithDefault<boolean, true>;
   textInteractionEnabled?: WithDefault<boolean, true>;
   useSharedProcessPool?: WithDefault<boolean, true>;
   onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;

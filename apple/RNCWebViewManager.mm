@@ -175,6 +175,14 @@ RCT_CUSTOM_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, BOOL, RNCWebViewImpl
   view.keyboardDisplayRequiresUserAction = json == nil ? true : [RCTConvert BOOL: json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(scrollsToTop, BOOL, RNCWebViewImpl) {
+  view.scrollsToTop = json == nil ? true : [RCTConvert BOOL: json];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(dragInteractionEnabled, BOOL, RNCWebViewImpl) {
+  view.dragInteractionEnabled = json == nil ? true : [RCTConvert BOOL: json];
+}
+
 #if !TARGET_OS_OSX
     #define BASE_VIEW_PER_OS() UIView
 #else

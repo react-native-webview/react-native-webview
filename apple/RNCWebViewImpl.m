@@ -169,6 +169,8 @@ RCTAutoInsetsProtocol>
     _allowsLinkPreview = YES;
     _showsVerticalScrollIndicator = YES;
     _directionalLockEnabled = YES;
+    _scrollsToTop = YES;
+    _dragInteractionEnabled = YES;
     _useSharedProcessPool = YES;
     _cacheEnabled = YES;
     _mediaPlaybackRequiresUserAction = YES;
@@ -545,6 +547,7 @@ RCTAutoInsetsProtocol>
     }
 
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
+    _webView.scrollView.scrollsToTop = _scrollsToTop;
 #endif // !TARGET_OS_OSX
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
@@ -1104,6 +1107,22 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
   } else {
     _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
+  }
+}
+
+- (void)setScrollsToTop:(BOOL)scrollsToTop
+{
+  _scrollsToTop = scrollsToTop;
+  _webView.scrollView.scrollsToTop = scrollsToTop;
+}
+
+- (void)setDragInteractionEnabled:(BOOL)dragInteractionEnabled
+{
+  _dragInteractionEnabled = dragInteractionEnabled;
+  for (id<UIInteraction> interaction in _webView.scrollView.interactions) {
+    if ([interaction isKindOfClass:[UIDragInteraction class]]) {
+      ((UIDragInteraction *)interaction).enabled = dragInteractionEnabled;
+    }
   }
 }
 #endif // !TARGET_OS_OSX
