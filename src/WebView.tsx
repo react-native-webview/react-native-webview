@@ -7,7 +7,6 @@ import {
 } from './WebViewTypes';
 import styles from './WebView.styles';
 
-
 export type WebViewProps = IOSWebViewProps &
   AndroidWebViewProps &
   WindowsWebViewProps;
