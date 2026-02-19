@@ -784,7 +784,6 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   scrollsToTop?: boolean;
-
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {
