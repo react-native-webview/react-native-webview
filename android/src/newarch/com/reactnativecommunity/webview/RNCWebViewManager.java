@@ -429,9 +429,6 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     @Override
     public void setFraudulentWebsiteWarningEnabled(RNCWebViewWrapper view, boolean value) {}
 
-    @Override
-    public void setDragInteractionEnabled(RNCWebViewWrapper view, boolean value) {}
-
 	@Override
     public void setScrollsToTop(RNCWebViewWrapper view, boolean value) {}
 
