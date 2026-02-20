@@ -294,11 +294,12 @@ Add this permission in AndroidManifest.xml (only required if your app supports A
 
 You will often find yourself wanting to send messages to the web pages loaded by your webviews and also receiving messages back from those web pages.
 
-To accomplish this, React Native WebView exposes three different options:
+To accomplish this, React Native WebView exposes four different options:
 
 1. React Native -> Web: The `injectedJavaScript` prop
 2. React Native -> Web: The `injectJavaScript` method
-3. Web -> React Native: The `postMessage` method and `onMessage` prop
+3. React Native -> Web: The `postMessage` method on the WebView ref
+4. Web -> React Native: The `postMessage` method and `onMessage` prop
 
 #### The `injectedJavaScript` prop
 
@@ -470,6 +471,59 @@ _Under the hood_
 
 > On iOS, `injectJavaScript` calls WebView's `evaluateJS:andThen:`
 > On Android, `injectJavaScript` calls Android WebView's `evaluateJavascriptWithFallback` method
+
+#### The `postMessage` method on the WebView ref
+
+When calling `webViewRef.current.postMessage(message)` from React Native, the
+message can be received inside the WebView through a `'message'` event listener.
+
+> Under the hood, React Native WebView delivers messages to the page by dispatching
+> a DOM `'message'` event. Depending on the platform, this event may be dispatched on either `window` (iOS) or `document` (Android, for backward compatibility).
+>
+> To cover all cases, register the listener on both.
+
+```html
+<script>
+  function handleMessage(event) {
+    console.log('Message received from React Native:', event.data);
+    // do something with the event data...
+  }
+
+  // Recommended: listen on both for cross-platform compatibility
+  window.addEventListener('message', handleMessage);
+  document.addEventListener('message', handleMessage);
+</script>
+```
+
+And on the React Native side:
+
+```jsx
+import React, { useRef } from "react";
+import { View, Button } from "react-native";
+import { WebView } from "react-native-webview";
+
+const App = () => {
+  const webViewRef = useRef(null);
+
+  const sendMessageToWeb = () => {
+    webViewRef.current?.postMessage(
+      JSON.stringify({ type: "PING", payload: "Hello from React Native" })
+    );
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <WebView
+        ref={webViewRef}
+        source={{
+          uri: 'https://github.com/react-native-webview/react-native-webview',
+        }}
+      />
+      <Button title="Send message" onPress={sendMessageToWeb} />
+    </View>
+  );
+};
+```
 
 #### The `window.ReactNativeWebView.postMessage` method and `onMessage` prop
 
