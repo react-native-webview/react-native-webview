@@ -22,6 +22,7 @@ import RCTWebView2, {
   Commands,
   NativeProps,
 } from './RCTWebView2NativeComponent';
+import RNCWebViewModule from './NativeWebviewModule';
 import {
   useWebViewLogic,
   defaultOriginWhitelist,
@@ -91,7 +92,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
     const onShouldStartLoadWithRequestCallback = useCallback(
       (shouldStart: boolean, url: string, lockIdentifier?: number) => {
         if (lockIdentifier) {
-          NativeModules.RCTWebView2.onShouldStartLoadWithRequestCallback(
+          RNCWebViewModule?.shouldStartLoadWithLockIdentifier(
             shouldStart,
             lockIdentifier
           );

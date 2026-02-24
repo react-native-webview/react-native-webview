@@ -51,13 +51,16 @@ _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR 
 #else
   // Load the JS bundle from Metro
   settings.JavaScriptBundleFile(L"index");
-  // Enable hot reload so the bundle is fetched from Metro dev server
+  // Enable Fast Refresh so the bridgeless runtime loads the bundle from Metro
+  // (UseFastRefresh(false) forces JsBigStringFromPath which requires a local .bundle file)
   settings.UseFastRefresh(true);
 #endif
 #if _DEBUG
   // For Debug builds
-  // Enable Direct Debugging of JS
-  settings.UseDirectDebugger(true);
+  // Disable Direct Debugging (causes 60s timeout + blank screen in bridgeless mode)
+  settings.UseDirectDebugger(false);
+  // Enable Fast Refresh — required in bridgeless mode to load bundles from Metro
+  settings.UseFastRefresh(true);
   // Enable the Developer Menu
   settings.UseDeveloperSupport(true);
 #else

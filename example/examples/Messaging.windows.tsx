@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Alert, TextInput} from 'react-native';
+import {View, Text, TextInput} from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -42,12 +42,16 @@ const HTML = `<!DOCTYPE html>\n
 </html>`;
 
 type Props = {};
-type State = {};
+type State = {
+  lastMessage: string;
+};
 
 export default class Messaging extends Component<Props, State> {
-  state = {};
+  state = {
+    lastMessage: '',
+  };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.webView = React.createRef();
   }
@@ -55,18 +59,28 @@ export default class Messaging extends Component<Props, State> {
   render() {
     return (
       <View style={{height: 120}}>
-        <TextInput onSubmitEditing={(e) => {
-          this.webView.current.postMessage(e.nativeEvent.text);
-        }}/>
+        {this.state.lastMessage ? (
+          <Text style={{padding: 4, backgroundColor: '#eee'}}>
+            Message from JS: {this.state.lastMessage}
+          </Text>
+        ) : null}
+        <TextInput
+          placeholder="Type a message and press Enter"
+          onSubmitEditing={(e) => {
+            this.webView.current?.postMessage(e.nativeEvent.text);
+          }}
+        />
         <WebView
           ref={this.webView}
           source={{html: HTML}}
-          onLoadEnd={()=>{this.webView.current.postMessage('Hello from RN');}}
+          onLoadEnd={() => {
+            this.webView.current?.postMessage('Hello from RN');
+          }}
           automaticallyAdjustContentInsets={false}
           onMessage={(e: {nativeEvent: {data?: string}}) => {
-            Alert.alert('Message received from JS: ', e.nativeEvent.data);
+            console.log('Message received from JS: ', e.nativeEvent.data);
+            this.setState({lastMessage: e.nativeEvent.data || ''});
           }}
-          useWebView2
         />
       </View>
     );

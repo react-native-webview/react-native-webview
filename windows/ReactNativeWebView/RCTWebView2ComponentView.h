@@ -38,6 +38,11 @@ struct RCTWebView2ComponentView : winrt::implements<RCTWebView2ComponentView, wi
         const winrt::Microsoft::ReactNative::ComponentView &view,
         const winrt::Microsoft::ReactNative::IComponentState &newState) noexcept override;
 
+    void UpdateLayoutMetrics(
+        const winrt::Microsoft::ReactNative::ComponentView &view,
+        const winrt::Microsoft::ReactNative::LayoutMetrics &newLayoutMetrics,
+        const winrt::Microsoft::ReactNative::LayoutMetrics &oldLayoutMetrics) noexcept override;
+
     // Command handlers (required by BaseRCTWebView2)
     void HandleGoBackCommand() noexcept override;
     void HandleGoForwardCommand() noexcept override;
@@ -96,6 +101,7 @@ private:
     winrt::hstring m_injectedJavascript{L""};
     winrt::hstring m_userAgent{L""};
     bool m_updating{false};
+    std::string m_pendingHtml{};
 };
 
 void RegisterRCTWebView2ComponentView(

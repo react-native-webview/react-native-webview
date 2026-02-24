@@ -8,7 +8,10 @@
 #include "ReactNativeWebview.h"
 
 #ifdef RNW_NEW_ARCH
+#pragma message(">>> RNW_NEW_ARCH IS DEFINED - Fabric component registration will be compiled")
 #include "RCTWebView2ComponentView.h"
+#else
+#pragma message(">>> RNW_NEW_ARCH IS NOT DEFINED - Fabric component registration SKIPPED")
 #endif
 
 using namespace winrt::Microsoft::ReactNative;
@@ -21,8 +24,12 @@ void ReactPackageProvider::CreatePackage(IReactPackageBuilder const &packageBuil
   AddAttributedModules(packageBuilder, true);
 
 #ifdef RNW_NEW_ARCH
-  // Register Fabric component with XamlIsland support
-  RegisterRCTWebView2ComponentView(packageBuilder);
+  try {
+    RegisterRCTWebView2ComponentView(packageBuilder);
+  } catch (winrt::hresult_error const&) {
+  } catch (std::exception const&) {
+  } catch (...) {
+  }
 #endif
 }
 

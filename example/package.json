@@ -18,10 +18,10 @@
     "test:windows": "jest --config jest.config.windows.js"
   },
   "dependencies": {
-    "react": "19.1.0",
+    "react": "^19.1.1",
     "react-native": "0.82.0",
     "react-native-webview": "file:..",
-    "react-native-windows": "0.82.0-preview.8"
+    "react-native-windows": "^0.82.0-preview.11"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

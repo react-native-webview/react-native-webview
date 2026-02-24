@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, Alert, TextInput } from 'react-native';
+import { View, TextInput, Text } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -68,7 +68,7 @@ export default function MultiMessaging() {
           }}
           automaticallyAdjustContentInsets={false}
           onMessage={(e: { nativeEvent: { data?: string } }) => {
-            Alert.alert('Message received from JS: ', e.nativeEvent.data);
+            console.log('Message received from JS: ', e.nativeEvent.data);
           }}
           useWebView2
         />
@@ -96,7 +96,7 @@ export default function MultiMessaging() {
           }}
           automaticallyAdjustContentInsets={false}
           onMessage={(e: { nativeEvent: { data?: string } }) => {
-            Alert.alert('Message received from JS2: ', e.nativeEvent.data);
+            console.log('Message received from JS2: ', e.nativeEvent.data);
           }}
           useWebView2
         />
