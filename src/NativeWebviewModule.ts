@@ -21,6 +21,7 @@ export interface Spec extends TurboModule {
 }
 
 // RNCWebView module for Windows
-export const RNCWebViewModule = TurboModuleRegistry.get<Spec>('RNCWebViewModule');
+export const RNCWebViewModule =
+  TurboModuleRegistry.get<Spec>('RNCWebViewModule');
 
 export default RNCWebViewModule;

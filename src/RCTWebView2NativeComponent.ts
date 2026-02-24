@@ -1,6 +1,6 @@
 import React from 'react';
 import type { HostComponent, ViewProps } from 'react-native';
-import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import { codegenNativeCommands } from 'react-native';
 // Use NativeComponentRegistry directly for Fabric/Bridgeless mode on Windows.
 // The babel-plugin-codegen crashes with "Cannot read properties of null (reading 'loc')"
 // on complex component specs, and without the transform the runtime fallback calls
@@ -274,7 +274,9 @@ const RCTWebView2 = getNativeComponent<NativeProps>('RCTWebView2', () => ({
     topHttpError: { registrationName: 'onHttpError' },
     topMessage: { registrationName: 'onMessage' },
     topScroll: { registrationName: 'onScroll' },
-    topShouldStartLoadWithRequest: { registrationName: 'onShouldStartLoadWithRequest' },
+    topShouldStartLoadWithRequest: {
+      registrationName: 'onShouldStartLoadWithRequest',
+    },
   },
   validAttributes: {
     testID: true,

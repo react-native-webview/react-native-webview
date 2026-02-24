@@ -1,9 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import {
-  IOSWebViewProps,
-  AndroidWebViewProps,
-} from './WebViewTypes';
+import { IOSWebViewProps, AndroidWebViewProps } from './WebViewTypes';
 import styles from './WebView.styles';
 
 export type WebViewProps = IOSWebViewProps & AndroidWebViewProps;
