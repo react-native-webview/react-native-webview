@@ -1,44 +1,39 @@
-const project = (() => {
-  const path = require('path');
-  try {
-    const { configureProjects } = require('react-native-test-app');
-    return configureProjects({
-      android: {
-        sourceDir: path.join('example', 'android'),
-      },
-      ios: {
-        sourceDir: 'example/ios',
-      },
-      windows: {
-        sourceDir: path.join('example', 'windows'),
-        solutionFile: path.join('example', 'windows', 'WebviewExample.sln'),
-      },
-    });
-  } catch (e) {
-    return undefined;
-  }
-})();
+'use strict';
 
 module.exports = {
-  dependencies: {
-    // Help rn-cli find and autolink this library
-    'react-native-webview': {
-      root: __dirname,
+  project: {
+    android: {
+      sourceDir: './example/android',
+    },
+    windows: {
+      sourceDir: './example/windows',
+      solutionFile: 'ReactNativeWebviewExample.sln',
+      project: {
+        projectFile: 'ReactNativeWebviewExample/ReactNativeWebviewExample.vcxproj',
+      },
     },
   },
   dependency: {
     platforms: {
+      android: {
+        componentDescriptors: ['RNCWebViewComponentDescriptor'],
+        cmakeListsPath: '../android/src/main/jni/CMakeLists.txt',
+      },
       windows: {
         sourceDir: 'windows',
         solutionFile: 'ReactNativeWebView.sln',
         projects: [
           {
-            projectFile: 'ReactNativeWebView/ReactNativeWebView.vcxproj',
+            projectFile: 'ReactNativeWebView\\ReactNativeWebView.vcxproj',
+            projectName: 'ReactNativeWebView',
+            projectLang: 'cpp',
+            projectGuid: '{30CADFC7-80EF-4296-A405-47E4B97C0C71}',
             directDependency: true,
+            cppHeaders: ['winrt/ReactNativeWebView.h'],
+            cppPackageProviders: ['ReactNativeWebView::ReactPackageProvider'],
           },
         ],
       },
     },
   },
-  ...(project ? { project } : undefined),
 };
