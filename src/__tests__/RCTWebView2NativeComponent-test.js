@@ -24,13 +24,16 @@ jest.mock('react-native', () => {
 });
 
 // Mock NativeComponentRegistry
-jest.mock('react-native/Libraries/NativeComponent/NativeComponentRegistry', () => ({
-  get: jest.fn((name, viewConfigFactory) => {
-    const viewConfig = viewConfigFactory();
-    const MockComponent = 'RCTWebView2-Mock';
-    return MockComponent;
-  }),
-}));
+jest.mock(
+  'react-native/Libraries/NativeComponent/NativeComponentRegistry',
+  () => ({
+    get: jest.fn((name, viewConfigFactory) => {
+      viewConfigFactory();
+      const MockComponent = 'RCTWebView2-Mock';
+      return MockComponent;
+    }),
+  })
+);
 
 // Mock codegenNativeCommands
 jest.mock('react-native/Libraries/Utilities/codegenNativeCommands', () => {
@@ -49,19 +52,20 @@ describe('RCTWebView2NativeComponent', () => {
   });
 
   test('registers component with correct name', () => {
-    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const {
+      get,
+    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     // Re-require to trigger registration
     jest.isolateModules(() => {
       require('../RCTWebView2NativeComponent');
     });
-    expect(get).toHaveBeenCalledWith(
-      'RCTWebView2',
-      expect.any(Function)
-    );
+    expect(get).toHaveBeenCalledWith('RCTWebView2', expect.any(Function));
   });
 
   test('view config has correct uiViewClassName', () => {
-    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const {
+      get,
+    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     let capturedViewConfig;
     get.mockImplementation((name, factory) => {
       capturedViewConfig = factory();
@@ -76,7 +80,9 @@ describe('RCTWebView2NativeComponent', () => {
   });
 
   test('view config registers all required direct event types', () => {
-    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const {
+      get,
+    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     let capturedViewConfig;
     get.mockImplementation((name, factory) => {
       capturedViewConfig = factory();
@@ -88,22 +94,40 @@ describe('RCTWebView2NativeComponent', () => {
     });
 
     const directEvents = capturedViewConfig.directEventTypes;
-    
+
     // All required events must be registered
-    expect(directEvents.topOpenWindow).toEqual({ registrationName: 'onOpenWindow' });
-    expect(directEvents.topSourceChanged).toEqual({ registrationName: 'onSourceChanged' });
-    expect(directEvents.topLoadingError).toEqual({ registrationName: 'onLoadingError' });
-    expect(directEvents.topLoadingFinish).toEqual({ registrationName: 'onLoadingFinish' });
-    expect(directEvents.topLoadingProgress).toEqual({ registrationName: 'onLoadingProgress' });
-    expect(directEvents.topLoadingStart).toEqual({ registrationName: 'onLoadingStart' });
-    expect(directEvents.topHttpError).toEqual({ registrationName: 'onHttpError' });
+    expect(directEvents.topOpenWindow).toEqual({
+      registrationName: 'onOpenWindow',
+    });
+    expect(directEvents.topSourceChanged).toEqual({
+      registrationName: 'onSourceChanged',
+    });
+    expect(directEvents.topLoadingError).toEqual({
+      registrationName: 'onLoadingError',
+    });
+    expect(directEvents.topLoadingFinish).toEqual({
+      registrationName: 'onLoadingFinish',
+    });
+    expect(directEvents.topLoadingProgress).toEqual({
+      registrationName: 'onLoadingProgress',
+    });
+    expect(directEvents.topLoadingStart).toEqual({
+      registrationName: 'onLoadingStart',
+    });
+    expect(directEvents.topHttpError).toEqual({
+      registrationName: 'onHttpError',
+    });
     expect(directEvents.topMessage).toEqual({ registrationName: 'onMessage' });
     expect(directEvents.topScroll).toEqual({ registrationName: 'onScroll' });
-    expect(directEvents.topShouldStartLoadWithRequest).toEqual({ registrationName: 'onShouldStartLoadWithRequest' });
+    expect(directEvents.topShouldStartLoadWithRequest).toEqual({
+      registrationName: 'onShouldStartLoadWithRequest',
+    });
   });
 
   test('view config registers all valid attributes', () => {
-    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const {
+      get,
+    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     let capturedViewConfig;
     get.mockImplementation((name, factory) => {
       capturedViewConfig = factory();
@@ -115,34 +139,34 @@ describe('RCTWebView2NativeComponent', () => {
     });
 
     const attrs = capturedViewConfig.validAttributes;
-    
+
     // Core props
     expect(attrs.testID).toBe(true);
     expect(attrs.messagingEnabled).toBe(true);
     expect(attrs.javaScriptEnabled).toBe(true);
     expect(attrs.cacheEnabled).toBe(true);
     expect(attrs.incognito).toBe(true);
-    
+
     // Source-related
     expect(attrs.newSource).toBe(true);
     expect(attrs.sourceHeaders).toBe(true);
-    
+
     // Injection
     expect(attrs.injectedJavaScript).toBe(true);
     expect(attrs.injectedJavaScriptBeforeContentLoaded).toBe(true);
-    
+
     // UI
     expect(attrs.showsHorizontalScrollIndicator).toBe(true);
     expect(attrs.showsVerticalScrollIndicator).toBe(true);
     expect(attrs.userAgent).toBe(true);
-    
+
     // Debugging
     expect(attrs.webviewDebuggingEnabled).toBe(true);
   });
 
   test('Commands exports all supported commands', () => {
-    const codegenNativeCommands = require('react-native/Libraries/Utilities/codegenNativeCommands');
-    
+    const { codegenNativeCommands } = require('react-native');
+
     jest.isolateModules(() => {
       require('../RCTWebView2NativeComponent');
     });
@@ -163,7 +187,9 @@ describe('RCTWebView2NativeComponent', () => {
   });
 
   test('no bubblingEventTypes are registered', () => {
-    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const {
+      get,
+    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     let capturedViewConfig;
     get.mockImplementation((name, factory) => {
       capturedViewConfig = factory();

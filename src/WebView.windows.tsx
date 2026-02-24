@@ -16,7 +16,7 @@ import React, {
   useImperativeHandle,
   useRef,
 } from 'react';
-import { View, Image, ImageSourcePropType, NativeModules, HostComponent } from 'react-native';
+import { View, Image, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
 import RCTWebView2, {
   Commands,
@@ -36,7 +36,11 @@ import styles from './WebView.styles';
 export type { NativeProps as NativeWebViewWindows } from './RCTWebView2NativeComponent';
 
 // Windows-specific WebViewProps that extends shared props
-import { WebViewSharedProps, WebViewOpenWindowEvent, WebViewNavigationEvent } from './WebViewTypes';
+import {
+  WebViewSharedProps,
+  WebViewOpenWindowEvent,
+  WebViewNavigationEvent,
+} from './WebViewTypes';
 
 export interface WindowsWebViewProps extends WebViewSharedProps {
   /**
@@ -79,8 +83,8 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
       source,
       nativeConfig,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-      useWebView2,
-      onScroll, // Exclude from otherProps - not currently supported on Windows
+      useWebView2: _useWebView2,
+      onScroll: _onScroll, // Exclude from otherProps - not currently supported on Windows
       ...otherProps
     },
     ref
@@ -136,8 +140,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
       () => ({
         goForward: () =>
           webViewRef.current && Commands.goForward(webViewRef.current),
-        goBack: () =>
-          webViewRef.current && Commands.goBack(webViewRef.current),
+        goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
         reload: () => {
           setViewState('LOADING');
           if (webViewRef.current) {
@@ -149,11 +152,13 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
         postMessage: (data: string) =>
           webViewRef.current && Commands.postMessage(webViewRef.current, data),
         injectJavaScript: (data: string) =>
-          webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
+          webViewRef.current &&
+          Commands.injectJavaScript(webViewRef.current, data),
         requestFocus: () =>
           webViewRef.current && Commands.requestFocus(webViewRef.current),
         clearCache: (includeDiskFiles: boolean = true) =>
-          webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
+          webViewRef.current &&
+          Commands.clearCache(webViewRef.current, includeDiskFiles),
         loadUrl: (url: string) =>
           webViewRef.current && Commands.loadUrl(webViewRef.current, url),
       }),
@@ -192,7 +197,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
             baseUrl: (sourceResolved as any).baseUrl,
           }
         : {};
-    
+
     // Headers as JSON string (workaround for codegen nested array limitation)
     const sourceHeaders =
       typeof sourceResolved === 'object' && (sourceResolved as any).headers
