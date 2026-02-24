@@ -56,6 +56,7 @@ export type State = NormalState | ErrorState;
 
 type Constructor<T> = new (...args: any[]) => T;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}
 declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewMacOSComponent;
