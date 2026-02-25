@@ -269,6 +269,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
     }
 
     fun onAfterUpdateTransaction(viewWrapper: RNCWebViewWrapper) {
+        viewWrapper.webView.setupDocumentStartScript()
         mPendingSource?.let { source ->
             loadSource(viewWrapper, source)
         }

@@ -18,6 +18,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.ScriptHandler;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -59,6 +60,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     RNCWebViewBridge bridge;
     protected @Nullable
     WebViewCompat.WebMessageListener webMessageListener = null;
+    protected @Nullable
+    ScriptHandler documentStartScriptHandler = null;
+    private String lastDocumentStartScript = "";
+    protected boolean useDocumentStartScripts = false;
 
     /**
      * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
@@ -316,13 +321,59 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
-        if (!getSettings().getJavaScriptEnabled()) {
+        if (useDocumentStartScripts || !getSettings().getJavaScriptEnabled()) {
             return;
         }
         overridePostMessageWithMessageListener();
         if (injectedJSBeforeContentLoaded != null && !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
         }
+    }
+
+    public void setupDocumentStartScript() {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            useDocumentStartScripts = false;
+            return;
+        }
+
+        boolean hasInjectedJS = injectedJSBeforeContentLoaded != null && !TextUtils.isEmpty(injectedJSBeforeContentLoaded);
+
+        if (!getSettings().getJavaScriptEnabled() || !hasInjectedJS) {
+            if (documentStartScriptHandler != null) {
+                documentStartScriptHandler.remove();
+                documentStartScriptHandler = null;
+                lastDocumentStartScript = "";
+            }
+            useDocumentStartScripts = false;
+            return;
+        }
+
+        StringBuilder scriptBuilder = new StringBuilder();
+
+        if (webMessageListener != null) {
+            scriptBuilder.append(buildPostMessageOverrideScript()).append("\n");
+        }
+
+        // addDocumentStartJavaScript runs in all frames, so when mainFrameOnly is true,
+        // wrap the script with a top-frame guard.
+        String wrappedJS = injectedJavaScriptBeforeContentLoadedForMainFrameOnly
+            ? "if (window.self === window.top) {\n" + injectedJSBeforeContentLoaded + ";\n}"
+            : injectedJSBeforeContentLoaded + ";";
+        scriptBuilder.append("(function() {\n" + wrappedJS + "\n})();");
+
+        String script = scriptBuilder.toString();
+        if (script.equals(lastDocumentStartScript)) {
+            return;
+        }
+
+        if (documentStartScriptHandler != null) {
+            documentStartScriptHandler.remove();
+        }
+
+        documentStartScriptHandler = WebViewCompat.addDocumentStartJavaScript(
+            this, script, Set.of("*"));
+        lastDocumentStartScript = script;
+        useDocumentStartScripts = true;
     }
 
     protected String injectedJavaScriptObject = null;
