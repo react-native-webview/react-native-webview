@@ -9,9 +9,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: '24.14.0'
           cache: 'yarn'
       - name: Setup - Install Yarn
         run: YARN_GPG=NO curl -o- -L https://yarnpkg.com/install.sh | bash
