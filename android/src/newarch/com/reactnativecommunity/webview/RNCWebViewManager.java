@@ -397,7 +397,10 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     public void setPagingEnabled(RNCWebViewWrapper view, boolean value) {}
 
     @Override
-    public void setPullToRefreshEnabled(RNCWebViewWrapper view, boolean value) {}
+    @ReactProp(name = "pullToRefreshEnabled")
+    public void setPullToRefreshEnabled(RNCWebViewWrapper view, boolean value) {
+        mRNCWebViewManagerImpl.setPullToRefreshEnabled(view, value);
+    }
 
     @Override
     public void setRefreshControlLightMode(RNCWebViewWrapper view, boolean value) {}

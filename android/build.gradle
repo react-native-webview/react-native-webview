@@ -107,4 +107,5 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
     implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 }

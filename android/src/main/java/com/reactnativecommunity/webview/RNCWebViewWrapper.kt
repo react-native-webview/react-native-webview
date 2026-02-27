@@ -3,8 +3,10 @@ package com.reactnativecommunity.webview
 import android.content.Context
 import android.graphics.Color
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 /**
  * A [FrameLayout] container to hold the [RNCWebView].
@@ -13,14 +15,29 @@ import android.widget.FrameLayout
  * The WebView will then create an empty offscreen surface and NPE.
  */
 class RNCWebViewWrapper(context: Context, webView: RNCWebView) : FrameLayout(context) {
+  private val swipeRefreshLayout: SwipeRefreshLayout = SwipeRefreshLayout(context)
+
   init {
     // We make the WebView as transparent on top of the container,
     // and let React Native sets background color for the container.
     webView.setBackgroundColor(Color.TRANSPARENT)
-    addView(webView)
+
+    swipeRefreshLayout.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+    swipeRefreshLayout.addView(webView)
+    swipeRefreshLayout.setOnRefreshListener {
+      webView.reload()
+      swipeRefreshLayout.isRefreshing = false
+    }
+    swipeRefreshLayout.isEnabled = false
+
+    addView(swipeRefreshLayout)
   }
 
-  val webView: RNCWebView = getChildAt(0) as RNCWebView
+  val webView: RNCWebView = webView
+
+  fun setPullToRefreshEnabled(enabled: Boolean) {
+    swipeRefreshLayout.isEnabled = enabled
+  }
 
   companion object {
     /**
@@ -33,7 +50,11 @@ class RNCWebViewWrapper(context: Context, webView: RNCWebView) : FrameLayout(con
       // In exceptional cases, such as receiving WebView messaging after the view has been unmounted,
       // the WebView will not have a parent.
       // In this case, we simply return -1 to indicate that it was not found.
-      return (webView.parent as? View)?.id ?: -1
+      var parent = webView.parent
+      if (parent is SwipeRefreshLayout) {
+        parent = parent.parent
+      }
+      return (parent as? View)?.id ?: -1
     }
   }
 }
