@@ -18,6 +18,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.ScriptHandler;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -54,10 +55,15 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected @Nullable
     String injectedJSBeforeContentLoaded;
     protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
+    protected static final String MESSAGE_LISTENER_INTERFACE = "__RNCWebViewMessageListener";
     protected @Nullable
-    RNCWebViewBridge fallbackBridge;
+    RNCWebViewBridge bridge;
     protected @Nullable
-    WebViewCompat.WebMessageListener bridgeListener = null;
+    WebViewCompat.WebMessageListener webMessageListener = null;
+    protected @Nullable
+    ScriptHandler documentStartScriptHandler = null;
+    private String lastDocumentStartScript = "";
+    protected boolean useDocumentStartScripts = false;
 
     /**
      * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
@@ -248,38 +254,43 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     protected void createRNCWebViewBridge(RNCWebView webView) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)){
-          if (this.bridgeListener == null) {
-            this.bridgeListener = new WebViewCompat.WebMessageListener() {
-              @Override
-              public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy replyProxy) {
-                RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString());
-              }
-            };
-            WebViewCompat.addWebMessageListener(
-              webView,
-              JAVASCRIPT_INTERFACE,
-              Set.of("*"),
-              this.bridgeListener
-            );
-          }
-        } else {
-          if (fallbackBridge == null) {
-            fallbackBridge = new RNCWebViewBridge(webView);
-            addJavascriptInterface(fallbackBridge, JAVASCRIPT_INTERFACE);
-          }
+        if (bridge == null) {
+            bridge = new RNCWebViewBridge(webView);
+            addJavascriptInterface(bridge, JAVASCRIPT_INTERFACE);
         }
-        injectJavascriptObject();
+
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            if (webMessageListener == null) {
+                webMessageListener = new WebViewCompat.WebMessageListener() {
+                    @Override
+                    public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy replyProxy) {
+                        RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString());
+                    }
+                };
+                WebViewCompat.addWebMessageListener(
+                    webView, MESSAGE_LISTENER_INTERFACE, Set.of("*"), webMessageListener);
+            }
+        }
     }
 
-    private void injectJavascriptObject() {
-      if (getSettings().getJavaScriptEnabled()) {
-        String js = "(function(){\n" +
-          "    window." + JAVASCRIPT_INTERFACE + " = window." + JAVASCRIPT_INTERFACE + " || {};\n" +
-          "    window." + JAVASCRIPT_INTERFACE + ".injectedObjectJson = function () { return " + (injectedJavaScriptObject == null ? null : ("`" + injectedJavaScriptObject + "`")) + "; };\n" +
-          "})();";
-        evaluateJavascriptWithFallback(js);
-      }
+    private String buildPostMessageOverrideScript() {
+        return "(function() {\n" +
+            "  var nb = window." + JAVASCRIPT_INTERFACE + ";\n" +
+            "  var wml = window." + MESSAGE_LISTENER_INTERFACE + ";\n" +
+            "  if (nb && wml) {\n" +
+            "    window." + JAVASCRIPT_INTERFACE + " = Object.assign({}, nb, {\n" +
+            "      postMessage: function(msg) { wml.postMessage(msg); },\n" +
+            "      injectedObjectJson: function() { return nb.injectedObjectJson(); }\n" +
+            "    });\n" +
+            "  }\n" +
+            "})();";
+    }
+
+    private void overridePostMessageWithMessageListener() {
+        if (webMessageListener == null) {
+            return;
+        }
+        evaluateJavascriptWithFallback(buildPostMessageOverrideScript());
     }
 
     @SuppressLint("AddJavascriptInterface")
@@ -300,28 +311,75 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     public void callInjectedJavaScript() {
-        if (getSettings().getJavaScriptEnabled() &&
-                injectedJS != null &&
-                !TextUtils.isEmpty(injectedJS)) {
+        if (!getSettings().getJavaScriptEnabled()) {
+            return;
+        }
+        overridePostMessageWithMessageListener();
+        if (injectedJS != null && !TextUtils.isEmpty(injectedJS)) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
-            injectJavascriptObject(); // re-inject the Javascript object in case it has been overwritten.
         }
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
-        if (getSettings().getJavaScriptEnabled() &&
-                injectedJSBeforeContentLoaded != null &&
-                !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
-            evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
-            injectJavascriptObject();  // re-inject the Javascript object in case it has been overwritten.
+        if (useDocumentStartScripts || !getSettings().getJavaScriptEnabled()) {
+            return;
         }
+        overridePostMessageWithMessageListener();
+        if (injectedJSBeforeContentLoaded != null && !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
+            evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
+        }
+    }
+
+    public void setupDocumentStartScript() {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            useDocumentStartScripts = false;
+            return;
+        }
+
+        boolean hasInjectedJS = injectedJSBeforeContentLoaded != null && !TextUtils.isEmpty(injectedJSBeforeContentLoaded);
+
+        if (!getSettings().getJavaScriptEnabled() || !hasInjectedJS) {
+            if (documentStartScriptHandler != null) {
+                documentStartScriptHandler.remove();
+                documentStartScriptHandler = null;
+                lastDocumentStartScript = "";
+            }
+            useDocumentStartScripts = false;
+            return;
+        }
+
+        StringBuilder scriptBuilder = new StringBuilder();
+
+        if (webMessageListener != null) {
+            scriptBuilder.append(buildPostMessageOverrideScript()).append("\n");
+        }
+
+        // addDocumentStartJavaScript runs in all frames, so when mainFrameOnly is true,
+        // wrap the script with a top-frame guard.
+        String wrappedJS = injectedJavaScriptBeforeContentLoadedForMainFrameOnly
+            ? "if (window.self === window.top) {\n" + injectedJSBeforeContentLoaded + ";\n}"
+            : injectedJSBeforeContentLoaded + ";";
+        scriptBuilder.append("(function() {\n" + wrappedJS + "\n})();");
+
+        String script = scriptBuilder.toString();
+        if (script.equals(lastDocumentStartScript)) {
+            return;
+        }
+
+        if (documentStartScriptHandler != null) {
+            documentStartScriptHandler.remove();
+        }
+
+        documentStartScriptHandler = WebViewCompat.addDocumentStartJavaScript(
+            this, script, Set.of("*"));
+        lastDocumentStartScript = script;
+        useDocumentStartScripts = true;
     }
 
     protected String injectedJavaScriptObject = null;
 
     public void setInjectedJavaScriptObject(String obj) {
       this.injectedJavaScriptObject = obj;
-      injectJavascriptObject();
     }
 
     public void onMessage(String message, String sourceUrl) {
@@ -445,11 +503,15 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         @JavascriptInterface
         public void postMessage(String message) {
             if (mWebView.getMessagingEnabled()) {
-                // Post to main thread because `mWebView.getUrl()` requires to be executed on main.
                 mWebView.post(() -> mWebView.onMessage(message, mWebView.getUrl()));
             } else {
                 FLog.w(TAG, "ReactNativeWebView.postMessage method was called but messaging is disabled. Pass an onMessage handler to the WebView.");
             }
+        }
+
+        @JavascriptInterface
+        public String injectedObjectJson() {
+          return mWebView.injectedJavaScriptObject;
         }
     }
 
