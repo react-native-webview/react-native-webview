@@ -56,5 +56,5 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Publish release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BOT_PAT_GITHUB }}
         run: yarn ci:publish
