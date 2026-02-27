@@ -35,6 +35,7 @@ jobs:
     name: Publish to npm
     runs-on: ubuntu-latest
     needs: tests
+    environment: deployment
     permissions:
       contents: write
       issues: write
