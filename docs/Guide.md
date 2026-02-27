@@ -333,19 +333,11 @@ export default class App extends Component {
 
 This runs the JavaScript in the `runFirst` string once the page is loaded. In this case, you can see that both the body style was changed to red and the alert showed up after 2 seconds. An `onMessage` event is required as well to inject the JavaScript code into the WebView.
 
-By setting `injectedJavaScriptForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the main frame) if supported for the given platform. For example, if a page contains an iframe, the javascript will be injected into that iframe as well with this set to `false`. (Note this is not supported on Android.) There is also `injectedJavaScriptBeforeContentLoadedForMainFrameOnly` for injecting prior to content loading. Read more about this in the [Reference](./Reference.md#injectedjavascriptformainframeonly).
-
 <img alt="screenshot of Github repo" width="200" src="https://user-images.githubusercontent.com/1479215/53609254-e5dc9c00-3b7a-11e9-9118-bc4e520ce6ca.png" />
 
-_Under the hood_
+#### The `scripts` prop
 
-> On iOS, ~~`injectedJavaScript` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentEnd`. As a consequence, `injectedJavaScript` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
-> On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
-> On Windows, `injectedJavaScript` runs a method on the WinRT/C++ WebView called `InvokeScriptAsync`
-
-#### The `injectedJavaScriptBeforeContentLoaded` prop
-
-This is a script that runs **before** the web page loads for the first time. It only runs once, even if the page is reloaded or navigated away. This is useful if you want to inject anything into the window, localstorage, or document prior to the web code executing.
+The `scripts` prop provides a unified way to inject JavaScript into the WebView at different points in the page lifecycle. Each script specifies when it should be injected and whether it applies to all frames.
 
 ```jsx
 import React, { Component } from 'react';
@@ -354,17 +346,32 @@ import { WebView } from 'react-native-webview';
 
 export default class App extends Component {
   render() {
-    const runFirst = `
-      window.isNativeApp = true;
-      true; // note: this is required, or you'll sometimes get silent failures
-    `;
     return (
       <View style={{ flex: 1 }}>
         <WebView
           source={{
             uri: 'https://github.com/react-native-webview/react-native-webview',
           }}
-          injectedJavaScriptBeforeContentLoaded={runFirst}
+          scripts={[
+            {
+              code: `
+                window.isNativeApp = true;
+                true;
+              `,
+              injectionTime: 'atDocumentStart',
+            },
+            {
+              code: `
+                document.body.style.backgroundColor = 'red';
+                setTimeout(() => {
+                  alert('Hello');
+                }, 2000);
+                true;
+              `,
+              injectionTime: 'atDocumentEnd',
+              mainFrameOnly: false, // iOS/macOS only - inject into all frames
+            },
+          ]}
         />
       </View>
     );
@@ -372,61 +379,18 @@ export default class App extends Component {
 }
 ```
 
-This runs the JavaScript in the `runFirst` string before the page is loaded. In this case, the value of `window.isNativeApp` will be set to true before the web code executes.
+**Script Properties:**
+- `code` (string, required): The JavaScript code to inject
+- `injectionTime` ('atDocumentStart' | 'atDocumentEnd', required): When to inject the script
+  - `atDocumentStart`: Before the page content loads (equivalent to the old `injectedJavaScriptBeforeContentLoaded`)
+  - `atDocumentEnd`: After the page finishes loading (equivalent to the old `injectedJavaScript`)
+- `mainFrameOnly` (boolean, optional, iOS/macOS only): If `true` (default), injects only into the main frame. If `false`, injects into all frames including iframes. Note: This is not supported on Android.
 
-> **Warning**
-> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)). Consider using `injectedJavaScriptObject` instead.
+_Under the hood_
 
-By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the JavaScript injection will occur on all frames (not just the top frame) if supported for the given platform. However, although support for `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false` has been implemented for iOS and macOS, [it is not clear](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-600275750) that it is actually possible to inject JS into iframes at this point in the page lifecycle, and so relying on the expected behaviour of this prop when set to `false` is not recommended.
-
-> On iOS, ~~`injectedJavaScriptBeforeContentLoaded` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentStart`. As a consequence, `injectedJavaScriptBeforeContentLoaded` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
-> On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
-> Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
-
-
-#### The `injectedJavaScriptObject` prop
-
-Due to the Android race condition mentioned above, this more reliable prop was added. While you cannot execute arbitrary JavaScript, you can make an arbitrary JS object available to the JS run in the webview prior to the page load completing.
-
-```html
-<html>
-  <head>
-    <script>
-      window.onload = (event) => {
-        if (window.ReactNativeWebView.injectedObjectJson()) {
-          document.getElementById('output').innerHTML = JSON.parse(window.ReactNativeWebView.injectedObjectJson()).customValue;
-        }
-      }
-    </script>
-  </head>
-  <body>
-    <p id="output">undefined</p>
-  </body>
-</html>
-```
-
-Note: `ReactNativeWebView.injectedObjectJson()` returns the JSON encoded object passed in to `injectedJavaScriptObject`. It must be passed to `JSON.parse` before its properties can be accessed (but it may be `undefined`!).
-
-```jsx
-import React, { Component } from 'react';
-import { View } from 'react-native';
-import { WebView } from 'react-native-webview';
-
-export default class App extends Component {
-  render() {
-    return (
-      <View style={{ flex: 1 }}>
-        <WebView
-          source={{
-            html: HTML
-          }}
-          injectedJavaScriptObject={{ customValue: 'myCustomValue' }}
-        />
-      </View>
-    );
-  }
-}
-```
+> On iOS/macOS, scripts use `WKUserScript` with `WKUserScriptInjectionTimeAtDocumentStart` or `WKUserScriptInjectionTimeAtDocumentEnd` based on the `injectionTime` value.
+> On Android, `atDocumentStart` scripts use `WebViewCompat.addDocumentStartJavaScript()` (AndroidX WebKit 1.5.0+) when available, falling back to `evaluateJavascript` in `onPageStarted`. `atDocumentEnd` scripts use `evaluateJavascript` in `onPageFinished`.
+> On Windows, scripts are injected using `InvokeScriptAsync` in `OnDOMContentLoaded`, with `atDocumentStart` scripts applied before `atDocumentEnd` scripts.
 
 #### The `injectJavaScript` method
 

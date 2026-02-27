@@ -487,29 +487,9 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         view.settings.saveFormData = false;
     }
 
-    fun setInjectedJavaScript(viewWrapper: RNCWebViewWrapper, injectedJavaScript: String?) {
+    fun setScripts(viewWrapper: RNCWebViewWrapper, scripts: ReadableArray?) {
         val view = viewWrapper.webView
-        view.injectedJS = injectedJavaScript
-    }
-
-    fun setInjectedJavaScriptBeforeContentLoaded(viewWrapper: RNCWebViewWrapper, value: String?) {
-        val view = viewWrapper.webView
-        view.injectedJSBeforeContentLoaded = value
-    }
-
-    fun setInjectedJavaScriptForMainFrameOnly(viewWrapper: RNCWebViewWrapper, value: Boolean) {
-        val view = viewWrapper.webView
-        view.injectedJavaScriptForMainFrameOnly = value
-    }
-
-    fun setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(viewWrapper: RNCWebViewWrapper, value: Boolean) {
-        val view = viewWrapper.webView
-        view.injectedJavaScriptBeforeContentLoadedForMainFrameOnly = value
-    }
-
-    fun setInjectedJavaScriptObject(viewWrapper: RNCWebViewWrapper, value: String?) {
-        val view = viewWrapper.webView
-        view.setInjectedJavaScriptObject(value)
+        view.setScripts(scripts)
     }
 
     fun setJavaScriptCanOpenWindowsAutomatically(viewWrapper: RNCWebViewWrapper, value: Boolean) {

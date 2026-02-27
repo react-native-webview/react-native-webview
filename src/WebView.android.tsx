@@ -96,7 +96,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       source,
       nativeConfig,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-      injectedJavaScriptObject,
+      scripts,
       ...otherProps
     },
     ref
@@ -316,7 +316,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         setBuiltInZoomControls={setBuiltInZoomControls}
         setDisplayZoomControls={setDisplayZoomControls}
         nestedScrollEnabled={nestedScrollEnabled}
-        injectedJavaScriptObject={JSON.stringify(injectedJavaScriptObject)}
+        scripts={scripts}
         {...nativeConfig?.props}
       />
     );

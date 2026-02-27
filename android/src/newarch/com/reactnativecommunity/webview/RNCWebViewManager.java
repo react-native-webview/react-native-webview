@@ -161,34 +161,9 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     }
 
     @Override
-    @ReactProp(name = "injectedJavaScript")
-    public void setInjectedJavaScript(RNCWebViewWrapper view, @Nullable String value) {
-        mRNCWebViewManagerImpl.setInjectedJavaScript(view, value);
-    }
-
-    @Override
-    @ReactProp(name = "injectedJavaScriptBeforeContentLoaded")
-    public void setInjectedJavaScriptBeforeContentLoaded(RNCWebViewWrapper view, @Nullable String value) {
-        mRNCWebViewManagerImpl.setInjectedJavaScriptBeforeContentLoaded(view, value);
-    }
-
-    @Override
-    @ReactProp(name = "injectedJavaScriptForMainFrameOnly")
-    public void setInjectedJavaScriptForMainFrameOnly(RNCWebViewWrapper view, boolean value) {
-        mRNCWebViewManagerImpl.setInjectedJavaScriptForMainFrameOnly(view, value);
-
-    }
-
-    @Override
-    @ReactProp(name = "injectedJavaScriptBeforeContentLoadedForMainFrameOnly")
-    public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(RNCWebViewWrapper view, boolean value) {
-        mRNCWebViewManagerImpl.setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(view, value);
-
-    }
-
-    @ReactProp(name = "injectedJavaScriptObject")
-    public void setInjectedJavaScriptObject(RNCWebViewWrapper view, @Nullable String value) {
-        mRNCWebViewManagerImpl.setInjectedJavaScriptObject(view, value);
+    @ReactProp(name = "scripts")
+    public void setScripts(RNCWebViewWrapper view, @Nullable ReadableArray scripts) {
+        mRNCWebViewManagerImpl.setScripts(view, scripts);
     }
 
     @Override

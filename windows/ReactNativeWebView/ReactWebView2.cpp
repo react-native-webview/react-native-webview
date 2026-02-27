@@ -249,9 +249,31 @@ namespace winrt::ReactNativeWebView::implementation {
                 WriteWebViewNavigationEventArg(m_webView, eventDataWriter);
                 eventDataWriter.WriteObjectEnd();
             });
-        if (!m_injectedJavascript.empty())
+        // Apply scripts in order: atDocumentStart first, then atDocumentEnd
+        if (m_scripts != nullptr)
         {
-            sender.ExecuteScriptAsync(m_injectedJavascript);
+            for (auto const& scriptValue : m_scripts)
+            {
+                auto scriptMap = scriptValue.as<winrt::Windows::Foundation::Collections::IMap<winrt::hstring, winrt::Windows::Foundation::IInspectable>>();
+                auto code = scriptMap.Lookup(L"code").as<winrt::hstring>();
+                auto injectionTime = scriptMap.Lookup(L"injectionTime").as<winrt::hstring>();
+
+                if (injectionTime == L"atDocumentStart" && !code.empty())
+                {
+                    sender.ExecuteScriptAsync(code);
+                }
+            }
+            for (auto const& scriptValue : m_scripts)
+            {
+                auto scriptMap = scriptValue.as<winrt::Windows::Foundation::Collections::IMap<winrt::hstring, winrt::Windows::Foundation::IInspectable>>();
+                auto code = scriptMap.Lookup(L"code").as<winrt::hstring>();
+                auto injectionTime = scriptMap.Lookup(L"injectionTime").as<winrt::hstring>();
+
+                if (injectionTime == L"atDocumentEnd" && !code.empty())
+                {
+                    sender.ExecuteScriptAsync(code);
+                }
+            }
         }
     }
 
@@ -380,13 +402,9 @@ namespace winrt::ReactNativeWebView::implementation {
         return m_request.Copy();
     }
 
-    void ReactWebView2::InjectedJavascript(winrt::hstring const& injectedJavascript) noexcept {
-        m_injectedJavascript = injectedJavascript;
-    }
-
-    winrt::hstring ReactWebView2::InjectedJavascript() const noexcept
+    void ReactWebView2::SetScripts(winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Foundation::IInspectable> const& scripts)
     {
-        return m_injectedJavascript;
+        m_scripts = scripts;
     }
 
     void ReactWebView2::NavigateToHtml(winrt::hstring const& html) {

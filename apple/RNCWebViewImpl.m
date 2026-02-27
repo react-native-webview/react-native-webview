@@ -123,9 +123,7 @@ RCTAutoInsetsProtocol>
 
 @property (nonatomic, copy) RNCWKWebView *webView;
 @property (nonatomic, strong) WKUserScript *postMessageScript;
-@property (nonatomic, strong) WKUserScript *injectedObjectJsonScript;
-@property (nonatomic, strong) WKUserScript *atStartScript;
-@property (nonatomic, strong) WKUserScript *atEndScript;
+@property (nonatomic, strong) NSArray<WKUserScript *> *userScripts;
 @end
 
 @implementation RNCWebViewImpl
@@ -176,10 +174,7 @@ RCTAutoInsetsProtocol>
     _autoManageStatusBarEnabled = YES;
     _contentInset = UIEdgeInsetsZero;
     _savedKeyboardDisplayRequiresUserAction = YES;
-    _injectedJavaScript = nil;
-    _injectedJavaScriptForMainFrameOnly = YES;
-    _injectedJavaScriptBeforeContentLoaded = nil;
-    _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
+    _scripts = nil;
     _enableApplePay = NO;
 #if TARGET_OS_IOS
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
@@ -1706,37 +1701,41 @@ didFinishNavigation:(WKNavigation *)navigation
 }
 #endif // !TARGET_OS_OSX
 
-- (void)setInjectedJavaScript:(NSString *)source {
-  _injectedJavaScript = source;
+- (void)setScripts:(NSArray<NSDictionary *> *)scripts {
+  _scripts = scripts;
 
-  self.atEndScript = source == nil ? nil : [[WKUserScript alloc] initWithSource:source
-                                                                  injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
-                                                               forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
+  if (scripts == nil || scripts.count == 0) {
+    self.userScripts = nil;
+  } else {
+    NSMutableArray<WKUserScript *> *userScriptsArray = [NSMutableArray array];
+    for (NSDictionary *scriptDict in scripts) {
+      NSString *code = scriptDict[@"code"];
+      NSString *injectionTime = scriptDict[@"injectionTime"];
+      NSNumber *mainFrameOnly = scriptDict[@"mainFrameOnly"];
+
+      if (code && injectionTime) {
+        WKUserScriptInjectionTime wkInjectionTime;
+        if ([injectionTime isEqualToString:@"atDocumentStart"]) {
+          wkInjectionTime = WKUserScriptInjectionTimeAtDocumentStart;
+        } else if ([injectionTime isEqualToString:@"atDocumentEnd"]) {
+          wkInjectionTime = WKUserScriptInjectionTimeAtDocumentEnd;
+        } else {
+          continue; // Skip invalid injectionTime
+        }
+
+        BOOL forMainFrameOnly = mainFrameOnly != nil ? [mainFrameOnly boolValue] : YES;
+        WKUserScript *userScript = [[WKUserScript alloc] initWithSource:code
+                                                          injectionTime:wkInjectionTime
+                                                       forMainFrameOnly:forMainFrameOnly];
+        [userScriptsArray addObject:userScript];
+      }
+    }
+    self.userScripts = userScriptsArray;
+  }
 
   if(_webView != nil){
     [self resetupScripts:_webView.configuration];
   }
-}
-
-- (void)setInjectedJavaScriptObject:(NSString *)source
-{
-  _injectedJavaScriptObject = source;
-  self.injectedObjectJsonScript = [
-    [WKUserScript alloc]
-    initWithSource: [
-      NSString
-      stringWithFormat:
-       @"window.%@ = window.%@ || {};"
-      "window.%@.injectedObjectJson = function () {"
-      "  return `%@`;"
-      "};", MessageHandlerName, MessageHandlerName, MessageHandlerName, source
-    ]
-    injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-    /* TODO: For a separate (minor) PR: use logic like this (as react-native-wkwebview does) so that messaging can be used in all frames if desired.
-     *       I am keeping it as YES for consistency with previous behaviour. */
-    // forMainFrameOnly:_messagingEnabledForMainFrameOnly
-    forMainFrameOnly:YES
-  ];
 }
 
 - (void)setEnableApplePay:(BOOL)enableApplePay {
@@ -1744,28 +1743,6 @@ didFinishNavigation:(WKNavigation *)navigation
     if(_webView != nil){
       [self resetupScripts:_webView.configuration];
     }
-}
-
-- (void)setInjectedJavaScriptBeforeContentLoaded:(NSString *)source {
-  _injectedJavaScriptBeforeContentLoaded = source;
-
-  self.atStartScript = source == nil ? nil : [[WKUserScript alloc] initWithSource:source
-                                                                    injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-                                                                 forMainFrameOnly:_injectedJavaScriptBeforeContentLoadedForMainFrameOnly];
-
-  if(_webView != nil){
-    [self resetupScripts:_webView.configuration];
-  }
-}
-
-- (void)setInjectedJavaScriptForMainFrameOnly:(BOOL)mainFrameOnly {
-  _injectedJavaScriptForMainFrameOnly = mainFrameOnly;
-  [self setInjectedJavaScript:_injectedJavaScript];
-}
-
-- (void)setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly:(BOOL)mainFrameOnly {
-  _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = mainFrameOnly;
-  [self setInjectedJavaScriptBeforeContentLoaded:_injectedJavaScriptBeforeContentLoaded];
 }
 
 - (void)setMessagingEnabled:(BOOL)messagingEnabled {
@@ -1928,16 +1905,12 @@ didFinishNavigation:(WKNavigation *)navigation
                                                                 name:MessageHandlerName];
       [wkWebViewConfig.userContentController addUserScript:self.postMessageScript];
     }
-    if (self.atEndScript) {
-      [wkWebViewConfig.userContentController addUserScript:self.atEndScript];
+  }
+  // Add user scripts from the scripts prop
+  if (self.userScripts) {
+    for (WKUserScript *script in self.userScripts) {
+      [wkWebViewConfig.userContentController addUserScript:script];
     }
-  }
-  // Whether or not messaging is enabled, add the startup script if it exists.
-  if (self.atStartScript) {
-    [wkWebViewConfig.userContentController addUserScript:self.atStartScript];
-  }
-  if (self.injectedObjectJsonScript) {
-    [wkWebViewConfig.userContentController addUserScript:self.injectedObjectJsonScript];
   }
 }
 

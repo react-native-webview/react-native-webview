@@ -287,13 +287,31 @@ export interface BasicAuthCredential {
   password: string;
 }
 
+export interface InjectedScript {
+  /**
+   * JavaScript code to inject.
+   */
+  code: string;
+  /**
+   * When to inject the script: 'atDocumentStart' (before content loads) or 'atDocumentEnd' (after page loads).
+   */
+  injectionTime: 'atDocumentStart' | 'atDocumentEnd';
+  /**
+   * If `true` (default), loads the script only into the main frame.
+   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+   * @platform ios, macos
+   */
+  mainFrameOnly?: boolean;
+}
+
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
   incognito?: boolean;
-  injectedJavaScript?: string;
-  injectedJavaScriptBeforeContentLoaded?: string;
-  injectedJavaScriptForMainFrameOnly?: boolean;
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
+  /**
+   * Array of scripts to inject into the WebView.
+   * Each script specifies when it should be injected and whether it applies to all frames.
+   */
+  scripts?: InjectedScript[];
   javaScriptCanOpenWindowsAutomatically?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
   webviewDebuggingEnabled?: boolean;
@@ -640,20 +658,6 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
 
   /**
-   * If `true` (default), loads the `injectedJavaScript` only into the main frame.
-   * If `false`, loads it into all frames (e.g. iframes).
-   * @platform ios
-   */
-  injectedJavaScriptForMainFrameOnly?: boolean;
-
-  /**
-   * If `true` (default), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
-   * If `false`, loads it into all frames (e.g. iframes).
-   * @platform ios
-   */
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
-
-  /**
    * Boolean value that determines whether a pull to refresh gesture is
    * available in the `WebView`. The default value is `false`.
    * If `true`, sets `bounces` automatically to `true`
@@ -732,7 +736,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support.
    *  Once set, websites will be able to invoke apple pay from React Native Webview.
    *  This comes with a cost features like `injectJavaScript`, html5 History,`sharedCookiesEnabled`,
-   *  `injectedJavaScript`, `injectedJavaScriptBeforeContentLoaded` will not work
+   *  `scripts` will not work
    * {@link https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API ApplePay Doc}
    * if you require to send message to App , webpage has to explicitly call webkit message handler
    * and receive it on `onMessage` handler on react native side
@@ -1265,28 +1269,10 @@ export interface WebViewSharedProps extends ViewProps {
   startInLoadingState?: boolean;
 
   /**
-   * Set this to provide JavaScript that will be injected into the web page
-   * when the view loads.
+   * Array of scripts to inject into the WebView.
+   * Each script specifies when it should be injected and whether it applies to all frames.
    */
-  injectedJavaScript?: string;
-
-  /**
-   * Set this to provide JavaScript that will be injected into the web page
-   * once the webview is initialized but before the view loads any content.
-   */
-  injectedJavaScriptBeforeContentLoaded?: string;
-
-  /**
-   * If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
-   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
-   */
-  injectedJavaScriptForMainFrameOnly?: boolean;
-
-  /**
-   * If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
-   * If `false` (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
-   */
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
+  scripts?: InjectedScript[];
 
   /**
    * Boolean value that determines whether a horizontal scroll indicator is
@@ -1342,11 +1328,6 @@ export interface WebViewSharedProps extends ViewProps {
    * An object that specifies the credentials of a user to be used for basic authentication.
    */
   basicAuthCredential?: BasicAuthCredential;
-
-  /**
-   * Inject a JavaScript object to be accessed as a JSON string via JavaScript in the WebView.
-   */
-  injectedJavaScriptObject?: object;
 
   /**
    * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).

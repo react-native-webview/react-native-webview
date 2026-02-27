@@ -49,7 +49,7 @@ namespace winrt::ReactNativeWebView::implementation {
         auto nativeProps = winrt::single_threaded_map<hstring, ViewManagerPropertyType>();
         nativeProps.Insert(L"source", ViewManagerPropertyType::Map);
         nativeProps.Insert(L"messagingEnabled", ViewManagerPropertyType::Boolean);
-        nativeProps.Insert(L"injectedJavaScript", ViewManagerPropertyType::String);
+        nativeProps.Insert(L"scripts", ViewManagerPropertyType::Array);
         nativeProps.Insert(L"linkHandlingEnabled", ViewManagerPropertyType::String);
         return nativeProps.GetView();
     }
@@ -101,11 +101,11 @@ namespace winrt::ReactNativeWebView::implementation {
                 auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
                 reactWebView2.MessagingEnabled(messagingEnabled);
             }
-            else if (propertyName == "injectedJavaScript")
+            else if (propertyName == "scripts")
             {
-                auto injectedJavascript = propertyValue.AsString();
+                auto scriptsArray = propertyValue.AsArray();
                 auto reactWebView2 = view.as<ReactNativeWebView::ReactWebView2>();
-                reactWebView2.InjectedJavascript(to_hstring(injectedJavascript));
+                reactWebView2.SetScripts(scriptsArray);
             }
             else if (propertyName == "linkHandlingEnabled") {
                 auto linkHandlingEnabled = propertyValue.To<bool>();

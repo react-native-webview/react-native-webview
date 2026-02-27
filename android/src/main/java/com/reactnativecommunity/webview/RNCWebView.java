@@ -27,6 +27,8 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
@@ -44,15 +46,13 @@ import com.reactnativecommunity.webview.events.TopMessageEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class RNCWebView extends WebView implements LifecycleEventListener {
-    protected @Nullable
-    String injectedJS;
-    protected @Nullable
-    String injectedJSBeforeContentLoaded;
     protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
     protected @Nullable
     RNCWebViewBridge fallbackBridge;
@@ -60,11 +60,17 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     WebViewCompat.WebMessageListener bridgeListener = null;
 
     /**
-     * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
-     * than the main frame, so these two properties are mostly here just for parity with iOS & macOS.
+     * List of scripts to inject, with their injection timing.
      */
-    protected boolean injectedJavaScriptForMainFrameOnly = true;
-    protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
+    protected @Nullable
+    List<InjectedScript> scripts = null;
+
+    /**
+     * Track the URL for which atDocumentEnd scripts were last injected,
+     * to prevent duplicate injections when onPageFinished is called multiple times.
+     */
+    protected @Nullable
+    String lastInjectedScriptsUrl = null;
 
     protected boolean messagingEnabled = false;
     protected @Nullable
@@ -269,17 +275,6 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             addJavascriptInterface(fallbackBridge, JAVASCRIPT_INTERFACE);
           }
         }
-        injectJavascriptObject();
-    }
-
-    private void injectJavascriptObject() {
-      if (getSettings().getJavaScriptEnabled()) {
-        String js = "(function(){\n" +
-          "    window." + JAVASCRIPT_INTERFACE + " = window." + JAVASCRIPT_INTERFACE + " || {};\n" +
-          "    window." + JAVASCRIPT_INTERFACE + ".injectedObjectJson = function () { return " + (injectedJavaScriptObject == null ? null : ("`" + injectedJavaScriptObject + "`")) + "; };\n" +
-          "})();";
-        evaluateJavascriptWithFallback(js);
-      }
     }
 
     @SuppressLint("AddJavascriptInterface")
@@ -299,29 +294,95 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         evaluateJavascript(script, null);
     }
 
+    /**
+     * Call scripts that should be injected at document end (after page loads).
+     * Tracks the URL to prevent duplicate injections when onPageFinished is called multiple times.
+     */
     public void callInjectedJavaScript() {
-        if (getSettings().getJavaScriptEnabled() &&
-                injectedJS != null &&
-                !TextUtils.isEmpty(injectedJS)) {
-            evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
-            injectJavascriptObject(); // re-inject the Javascript object in case it has been overwritten.
+        String currentUrl = getUrl();
+        // Prevent duplicate injection for the same URL (onPageFinished can fire multiple times)
+        if (currentUrl != null && currentUrl.equals(lastInjectedScriptsUrl)) {
+            return;
+        }
+        lastInjectedScriptsUrl = currentUrl;
+
+        if (getSettings().getJavaScriptEnabled() && scripts != null) {
+            for (InjectedScript script : scripts) {
+                if ("atDocumentEnd".equals(script.injectionTime) && script.code != null && !TextUtils.isEmpty(script.code)) {
+                    evaluateJavascriptWithFallback("(function() {\n" + script.code + ";\n})();");
+                }
+            }
         }
     }
 
+    /**
+     * Call scripts that should be injected at document start (before content loads).
+     * This is only used as a fallback when WebViewCompat.addDocumentStartJavaScript is not available.
+     * Also resets the duplicate injection tracking for atDocumentEnd scripts.
+     */
     public void callInjectedJavaScriptBeforeContentLoaded() {
-        if (getSettings().getJavaScriptEnabled() &&
-                injectedJSBeforeContentLoaded != null &&
-                !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
-            evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
-            injectJavascriptObject();  // re-inject the Javascript object in case it has been overwritten.
+        // Reset the tracking for atDocumentEnd scripts when a new page starts loading
+        lastInjectedScriptsUrl = null;
+
+        // Only use this as fallback - if WebViewCompat is available, scripts are already registered
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) &&
+                getSettings().getJavaScriptEnabled() && scripts != null) {
+            for (InjectedScript script : scripts) {
+                if ("atDocumentStart".equals(script.injectionTime) && script.code != null && !TextUtils.isEmpty(script.code)) {
+                    // Fallback to evaluateJavascript (runs in onPageStarted)
+                    evaluateJavascriptWithFallback("(function() {\n" + script.code + ";\n})();");
+                }
+            }
         }
     }
 
-    protected String injectedJavaScriptObject = null;
+    /**
+     * Set the scripts array from React Native props.
+     */
+    public void setScripts(@Nullable ReadableArray scriptsArray) {
+        if (scriptsArray == null) {
+            this.scripts = null;
+            return;
+        }
 
-    public void setInjectedJavaScriptObject(String obj) {
-      this.injectedJavaScriptObject = obj;
-      injectJavascriptObject();
+        List<InjectedScript> scriptsList = new ArrayList<>();
+        for (int i = 0; i < scriptsArray.size(); i++) {
+            ReadableMap scriptMap = scriptsArray.getMap(i);
+            if (scriptMap != null) {
+                InjectedScript script = new InjectedScript();
+                script.code = scriptMap.getString("code");
+                script.injectionTime = scriptMap.getString("injectionTime");
+                // mainFrameOnly is iOS/macOS only, ignored on Android
+                scriptsList.add(script);
+            }
+        }
+        this.scripts = scriptsList;
+
+        // Register document start scripts with WebViewCompat if available
+        // Note: Scripts are added each time setScripts is called. If scripts change,
+        // new ones will be added. This may result in scripts being injected multiple times
+        // if the same script is set multiple times, but that's acceptable behavior.
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            // Use Collections.singleton("*") to allow script injection from all origins
+            // This matches the pattern used for WebMessageListener (which uses Set.of("*"))
+            // Using Collections.singleton for better API compatibility (available from API 1+)
+            Set<String> allowedOriginRules = Collections.singleton("*");
+            for (InjectedScript script : scriptsList) {
+                if ("atDocumentStart".equals(script.injectionTime) && script.code != null && !TextUtils.isEmpty(script.code)) {
+                    WebViewCompat.addDocumentStartJavaScript(this, script.code, allowedOriginRules);
+                }
+            }
+        }
+    }
+
+    /**
+     * Internal class to represent an injected script.
+     */
+    protected static class InjectedScript {
+        @Nullable
+        String code;
+        @Nullable
+        String injectionTime; // "atDocumentStart" or "atDocumentEnd"
     }
 
     public void onMessage(String message, String sourceUrl) {

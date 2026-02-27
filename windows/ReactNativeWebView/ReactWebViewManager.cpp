@@ -51,6 +51,7 @@ namespace winrt::ReactNativeWebView::implementation {
         nativeProps.Insert(L"source", ViewManagerPropertyType::Map);
         nativeProps.Insert(L"backgroundColor", ViewManagerPropertyType::Color);
         nativeProps.Insert(L"messagingEnabled", ViewManagerPropertyType::Boolean);
+        nativeProps.Insert(L"scripts", ViewManagerPropertyType::Array);
         return nativeProps.GetView();
     }
 
@@ -149,6 +150,11 @@ namespace winrt::ReactNativeWebView::implementation {
               auto messagingEnabled = propertyValue.To<bool>();
               auto reactWebView = view.as<ReactNativeWebView::ReactWebView>();
               reactWebView.MessagingEnabled(messagingEnabled);
+            }
+            else if (propertyName == "scripts") {
+              auto scriptsArray = propertyValue.AsArray();
+              auto reactWebView = view.as<ReactNativeWebView::ReactWebView>();
+              reactWebView.SetScripts(scriptsArray);
             }
         }
     }

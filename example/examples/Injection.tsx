@@ -46,17 +46,14 @@ export default class Injection extends Component<Props, State> {
               source={{ uri: "https://birchlabs.co.uk/linguabrowse/infopages/obsol/rnw_iframe_test.html" }}
               automaticallyAdjustContentInsets={false}
               style={{backgroundColor:'#00000000'}}
-              
+
               /* Must be populated in order for `messagingEnabled` to be `true` to activate the
                * JS injection user scripts, consistent with current behaviour. This is undesirable,
                * so needs addressing in a follow-up PR. */
               onMessage={() => {}}
-              injectedJavaScriptBeforeContentLoadedForMainFrameOnly={false}
-              injectedJavaScriptForMainFrameOnly={false}
-              injectedJavaScriptObject={{ hello: "world" }}
-
-              /* We set this property in each frame */
-              injectedJavaScriptBeforeContentLoaded={`
+              scripts={[
+                {
+                  code: `
               console.log("executing injectedJavaScriptBeforeContentLoaded... " + (new Date()).toString());
               if(typeof window.top.injectedIframesBeforeContentLoaded === "undefined"){
                 window.top.injectedIframesBeforeContentLoaded = [];
@@ -87,10 +84,12 @@ export default class Injection extends Component<Props, State> {
                 console.log("wasn't window.top.");
                 console.log("wasn't window.top. Still going...");
               }
-              `}
-
-              /* We read the colourToUse property in each frame to recolour each frame */
-              injectedJavaScript={`
+              `,
+                  injectionTime: 'atDocumentStart',
+                  mainFrameOnly: false,
+                },
+                {
+                  code: `
               console.log("executing injectedJavaScript... " + (new Date()).toString());
               if(typeof window.top.injectedIframesAfterContentLoaded === "undefined"){
                 window.top.injectedIframesAfterContentLoaded = [];
@@ -100,19 +99,6 @@ export default class Injection extends Component<Props, State> {
                 window.self.document.body.style.backgroundColor = window.self.colourToUse;
               } else {
                 window.self.document.body.style.backgroundColor = "cyan";
-              }
-
-              // Example usage of injectedJavaScriptObject({hello: 'world'}), see above
-              const injectedObjectJson = window.ReactNativeWebView.injectedObjectJson();
-              
-              if (injectedObjectJson) {
-                const injectedObject = JSON.parse(injectedObjectJson);
-                console.log("injectedJavaScriptObject: ", injectedObject); // injectedJavaScriptObject: { hello: 'world' }
-
-                var injectedJavaScriptObjectEle = document.createElement('p');
-                injectedJavaScriptObjectEle.textContent = "injectedJavaScriptObject: " + injectedObjectJson;
-                injectedJavaScriptObjectEle.id = "injectedJavaScriptObjectEle";
-                document.body.appendChild(injectedJavaScriptObjectEle);
               }
 
               if(window.self === window.top){
@@ -125,14 +111,6 @@ export default class Injection extends Component<Props, State> {
 
                 declareSuccessOfAfterContentLoaded(window.self.document.head || window.self.document.getElementsByTagName('head')[0]);
 
-                // var numberOfFramesAtBeforeContentLoadedEle = document.createElement('p');
-                // numberOfFramesAtBeforeContentLoadedEle.textContent = "Number of iframes upon the main frame's beforeContentLoaded: " +
-                // window.self.numberOfFramesAtBeforeContentLoaded;
-
-                // var numberOfFramesAtAfterContentLoadedEle = document.createElement('p');
-                // numberOfFramesAtAfterContentLoadedEle.textContent = "Number of iframes upon the main frame's afterContentLoaded: " + window.frames.length;
-                // numberOfFramesAtAfterContentLoadedEle.id = "numberOfFramesAtAfterContentLoadedEle";
-
                 var namedFramesAtBeforeContentLoadedEle = document.createElement('p');
                 namedFramesAtBeforeContentLoadedEle.textContent = "Names of iframes that called beforeContentLoaded: " + JSON.stringify(window.top.injectedIframesBeforeContentLoaded || []);
                 namedFramesAtBeforeContentLoadedEle.id = "namedFramesAtBeforeContentLoadedEle";
@@ -141,15 +119,17 @@ export default class Injection extends Component<Props, State> {
                 namedFramesAtAfterContentLoadedEle.textContent = "Names of iframes that called afterContentLoaded: " + JSON.stringify(window.top.injectedIframesAfterContentLoaded);
                 namedFramesAtAfterContentLoadedEle.id = "namedFramesAtAfterContentLoadedEle";
 
-                // document.body.appendChild(numberOfFramesAtBeforeContentLoadedEle);
-                // document.body.appendChild(numberOfFramesAtAfterContentLoadedEle);
                 document.body.appendChild(namedFramesAtBeforeContentLoadedEle);
                 document.body.appendChild(namedFramesAtAfterContentLoadedEle);
               } else {
                 window.top.injectedIframesAfterContentLoaded.push(window.self.name);
                 window.top.document.getElementById('namedFramesAtAfterContentLoadedEle').textContent = "Names of iframes that called afterContentLoaded: " + JSON.stringify(window.top.injectedIframesAfterContentLoaded);
               }
-              `}
+              `,
+                  injectionTime: 'atDocumentEnd',
+                  mainFrameOnly: false,
+                },
+              ]}
             />
           </View>
         </View>

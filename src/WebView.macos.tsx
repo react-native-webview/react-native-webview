@@ -37,8 +37,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
       cacheEnabled = true,
       originWhitelist = defaultOriginWhitelist,
       useSharedProcessPool = true,
-      injectedJavaScript,
-      injectedJavaScriptBeforeContentLoaded,
+      scripts,
       startInLoadingState,
       onNavigationStateChange,
       onLoadStart,
@@ -209,10 +208,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
         onMessage={onMessage}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentProcessDidTerminate={onContentProcessDidTerminate}
-        injectedJavaScript={injectedJavaScript}
-        injectedJavaScriptBeforeContentLoaded={
-          injectedJavaScriptBeforeContentLoaded
-        }
+        scripts={scripts}
         allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
         allowsInlineMediaPlayback={allowsInlineMediaPlayback}
         allowsPictureInPictureMediaPlayback={

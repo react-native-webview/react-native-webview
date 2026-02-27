@@ -270,11 +270,35 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     }
 
     REMAP_WEBVIEW_PROP(scrollEnabled)
-    REMAP_WEBVIEW_STRING_PROP(injectedJavaScript)
-    REMAP_WEBVIEW_STRING_PROP(injectedJavaScriptBeforeContentLoaded)
-    REMAP_WEBVIEW_PROP(injectedJavaScriptForMainFrameOnly)
-    REMAP_WEBVIEW_PROP(injectedJavaScriptBeforeContentLoadedForMainFrameOnly)
-    REMAP_WEBVIEW_STRING_PROP(injectedJavaScriptObject)
+    // Compare scripts manually since RNCWebViewScriptsStruct may not have operator==
+    bool scriptsChanged = false;
+    if (oldViewProps.scripts.size() != newViewProps.scripts.size()) {
+        scriptsChanged = true;
+    } else {
+        for (size_t i = 0; i < newViewProps.scripts.size(); i++) {
+            const auto &oldScript = oldViewProps.scripts[i];
+            const auto &newScript = newViewProps.scripts[i];
+            if (oldScript.code != newScript.code ||
+                oldScript.injectionTime != newScript.injectionTime ||
+                oldScript.mainFrameOnly != newScript.mainFrameOnly) {
+                scriptsChanged = true;
+                break;
+            }
+        }
+    }
+    if (scriptsChanged) {
+        NSMutableArray *scriptsArray = [NSMutableArray array];
+        for (const auto &script : newViewProps.scripts) {
+            NSMutableDictionary *scriptDict = [NSMutableDictionary dictionary];
+            scriptDict[@"code"] = RCTNSStringFromString(script.code);
+            // Handle injectionTime - it's a string, use default if empty
+            std::string injectionTimeStr = script.injectionTime.empty() ? "atDocumentEnd" : script.injectionTime;
+            scriptDict[@"injectionTime"] = RCTNSStringFromString(injectionTimeStr);
+            scriptDict[@"mainFrameOnly"] = @(script.mainFrameOnly);
+            [scriptsArray addObject:scriptDict];
+        }
+        [_view setScripts:scriptsArray];
+    }
     REMAP_WEBVIEW_PROP(javaScriptEnabled)
     REMAP_WEBVIEW_PROP(javaScriptCanOpenWindowsAutomatically)
     REMAP_WEBVIEW_PROP(allowFileAccessFromFileURLs)

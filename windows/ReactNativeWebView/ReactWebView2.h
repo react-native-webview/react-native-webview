@@ -23,8 +23,7 @@ namespace winrt::ReactNativeWebView::implementation {
         bool LinkHandlingEnabled() const noexcept;
         void WebResourceRequestSource(Microsoft::ReactNative::JSValueObject const& source) noexcept;
         Microsoft::ReactNative::JSValueObject WebResourceRequestSource() const noexcept;
-        void InjectedJavascript(winrt::hstring const& injectedJavascript) noexcept;
-        winrt::hstring InjectedJavascript() const noexcept;
+        void SetScripts(winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Foundation::IInspectable> const& scripts);
         void NavigateToHtml(winrt::hstring const& html);
         winrt::fire_and_forget NavigateWithWebResourceRequest(Microsoft::ReactNative::IJSValueReader const& source);
         ~ReactWebView2();
@@ -34,7 +33,7 @@ namespace winrt::ReactNativeWebView::implementation {
         winrt::Microsoft::ReactNative::JSValueObject m_request{};
         bool m_messagingEnabled{ true };
         bool m_linkHandlingEnabled{ true };
-        winrt::hstring m_injectedJavascript = L"";
+        winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Foundation::IInspectable> m_scripts{ nullptr };
 
 
         winrt::Microsoft::UI::Xaml::Controls::WebView2 m_webView{ nullptr };

@@ -161,18 +161,21 @@ Controls whether to adjust the scroll indicator inset for web views that are pla
 
 ---
 
-### `injectedJavaScript`[⬆](#props-index)
+### `scripts`[⬆](#props-index)
 
-Set this to provide JavaScript that will be injected into the web page after the document finishes loading, but before other subresources finish loading.
-
-Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
-
-On iOS, see [`WKUserScriptInjectionTimeAtDocumentEnd`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentend?language=objc). Be sure
-to set an [`onMessage`](Reference.md#onmessage) handler, even if it's a no-op, or the code will not be run.
+Array of scripts to inject into the WebView at different points in the page lifecycle. Each script specifies when it should be injected and whether it applies to all frames.
 
 | Type   | Required | Platform                     |
 | ------ | -------- | ---------------------------- |
-| string | No       | iOS, Android, macOS, Windows |
+| array  | No       | iOS, Android, macOS, Windows |
+
+Each script object has the following properties:
+
+- `code` (string, required): The JavaScript code to inject
+- `injectionTime` ('atDocumentStart' | 'atDocumentEnd', required): When to inject the script
+  - `atDocumentStart`: Before the page content loads (equivalent to the old `injectedJavaScriptBeforeContentLoaded`)
+  - `atDocumentEnd`: After the page finishes loading (equivalent to the old `injectedJavaScript`)
+- `mainFrameOnly` (boolean, optional, iOS/macOS only): If `true` (default), injects only into the main frame. If `false`, injects into all frames including iframes. Note: This is not supported on Android.
 
 To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
 
@@ -183,109 +186,36 @@ Example:
 Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage)
 
 ```jsx
-const INJECTED_JAVASCRIPT = `(function() {
-    window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
-})();`;
-
 <WebView
   source={{ uri: 'https://reactnative.dev' }}
-  injectedJavaScript={INJECTED_JAVASCRIPT}
+  scripts={[
+    {
+      code: `
+        window.isNativeApp = true;
+        true;
+      `,
+      injectionTime: 'atDocumentStart',
+    },
+    {
+      code: `
+        (function() {
+          window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
+        })();
+        true;
+      `,
+      injectionTime: 'atDocumentEnd',
+      mainFrameOnly: false, // iOS/macOS only
+    },
+  ]}
   onMessage={this.onMessage}
 />;
 ```
 
----
+_Under the hood_
 
-### `injectedJavaScriptBeforeContentLoaded`[⬆](#props-index)
-
-Set this to provide JavaScript that will be injected into the web page after the document element is created, but before other subresources finish loading.
-
-Make sure the string evaluates to a valid type (`true` works) and doesn't otherwise throw an exception.
-
-On iOS, see [`WKUserScriptInjectionTimeAtDocumentStart`](https://developer.apple.com/documentation/webkit/wkuserscriptinjectiontime/wkuserscriptinjectiontimeatdocumentstart?language=objc)
-
-> **Warning**
-> On Android, this may work, but it is not 100% reliable (see [#1609](https://github.com/react-native-webview/react-native-webview/issues/1609) and [#1099](https://github.com/react-native-webview/react-native-webview/pull/1099)). Consider `injectedJavaScriptObject` instead.
-
-| Type   | Required | Platform                           |
-| ------ | -------- | ---------------------------------- |
-| string | No       | iOS, macOS, Android (experimental) |
-
-To learn more, read the [Communicating between JS and Native](Guide.md#communicating-between-js-and-native) guide.
-
-Example:
-
-Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.ReactNativeWebView.postMessage` _will_ be available at this time.
-
-```jsx
-const INJECTED_JAVASCRIPT = `(function() {
-    window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
-})();`;
-
-<WebView
-  source={{ uri: 'https://reactnative.dev' }}
-  injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
-  onMessage={this.onMessage}
-/>;
-```
-
----
-
-### `injectedJavaScriptForMainFrameOnly`[⬆](#props-index)
-
-If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
-
-If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
-
-| Type | Required | Platform                                          |
-| ---- | -------- | ------------------------------------------------- |
-| bool | No       | iOS and macOS (only `true` supported for Android) |
-
----
-
-### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`[⬆](#props-index)
-
-If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
-
-If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
-
-| Type | Required | Platform                                          |
-| ---- | -------- | ------------------------------------------------- |
-| bool | No       | iOS and macOS (only `true` supported for Android) |
-
----
-
-### `injectedJavaScriptObject`[⬆](#props-index)
-
-Inject any JavaScript object into the webview so it is available to the JS running on the page.
-
-| Type | Required | Platform                                          |
-| ---- | -------- | ------------------------------------------------- |
-| obj | No       | iOS, Android |
-
-Example:
-
-Set a value to be used in JavaScript.
-
-Note: Any value in the object will be accessible to *all* frames of the webpage. If sensitive values are present please ensure that you have a strict Content Security Policy set up to avoid data leaking.
-
-```jsx
-<WebView
-  source={{ uri: 'https://reactnative.dev' }}
-  injectedJavaScriptObject={{ customValue: 'myCustomValue' }}
-/>;
-```
-
-```html
-<html>
-  <head>
-    <script>
-      window.onload = (event) => {
-        if (window.ReactNativeWebView.injectedObjectJson()) {
-            const customValue = JSON.parse(window.ReactNativeWebView.injectedObjectJson()).customValue;
-            ...
-        }
-      }
+> On iOS/macOS, scripts use `WKUserScript` with `WKUserScriptInjectionTimeAtDocumentStart` or `WKUserScriptInjectionTimeAtDocumentEnd` based on the `injectionTime` value.
+> On Android, `atDocumentStart` scripts use `WebViewCompat.addDocumentStartJavaScript()` (AndroidX WebKit 1.5.0+) when available, falling back to `evaluateJavascript` in `onPageStarted`. `atDocumentEnd` scripts use `evaluateJavascript` in `onPageFinished`.
+> On Windows, scripts are injected using `InvokeScriptAsync` in `OnDOMContentLoaded`, with `atDocumentStart` scripts applied before `atDocumentEnd` scripts.
     </script>
   </head>
 </html>

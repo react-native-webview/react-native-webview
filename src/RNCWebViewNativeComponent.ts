@@ -257,12 +257,12 @@ export interface NativeProps extends ViewProps {
   }>;
   cacheEnabled?: WithDefault<boolean, true>;
   incognito?: boolean;
-  injectedJavaScript?: string;
-  injectedJavaScriptBeforeContentLoaded?: string;
-  injectedJavaScriptForMainFrameOnly?: WithDefault<boolean, true>;
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: WithDefault<
-    boolean,
-    true
+  scripts?: ReadonlyArray<
+    Readonly<{
+      code: string;
+      injectionTime?: string;
+      mainFrameOnly?: WithDefault<boolean, true>;
+    }>
   >;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   javaScriptEnabled?: WithDefault<boolean, true>;
@@ -293,7 +293,6 @@ export interface NativeProps extends ViewProps {
     baseUrl?: string;
   }>;
   userAgent?: string;
-  injectedJavaScriptObject?: string;
   paymentRequestEnabled?: boolean;
 }
 

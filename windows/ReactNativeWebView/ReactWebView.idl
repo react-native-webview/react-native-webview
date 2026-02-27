@@ -6,7 +6,7 @@ namespace ReactNativeWebView{
     runtimeclass ReactWebView : Windows.UI.Xaml.Controls.ContentPresenter{
         ReactWebView(Microsoft.ReactNative.IReactContext context);
         Boolean MessagingEnabled;
-        void SetInjectedJavascript(String payload);
+        void SetScripts(Windows.Foundation.Collections.IVector<Windows.Foundation.IInspectable> scripts);
         void RequestFocus();
         void PostMessage(String message);
     };
@@ -23,7 +23,7 @@ namespace ReactNativeWebView{
         ReactWebView2(Microsoft.ReactNative.IReactContext context);
         void NavigateToHtml(String html);
         void NavigateWithWebResourceRequest(Microsoft.ReactNative.IJSValueReader request);
-        String InjectedJavascript;
+        void SetScripts(Windows.Foundation.Collections.IVector<Windows.Foundation.IInspectable> scripts);
         Boolean MessagingEnabled;
         Boolean LinkHandlingEnabled;
     };

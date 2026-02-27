@@ -20,7 +20,7 @@ namespace winrt::ReactNativeWebView::implementation {
         ReactWebView(Microsoft::ReactNative::IReactContext const& reactContext);
         void MessagingEnabled(bool enabled) noexcept;
         bool MessagingEnabled() const noexcept;
-        void SetInjectedJavascript(winrt::hstring const& payload);
+        void SetScripts(winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Foundation::IInspectable> const& scripts);
         void RequestFocus();
         void PostMessage(winrt::hstring const& message);
         ~ReactWebView();
@@ -31,7 +31,7 @@ namespace winrt::ReactNativeWebView::implementation {
         Microsoft::ReactNative::IReactContext m_reactContext{ nullptr };
         WebBridge m_webBridge{ nullptr };
         winrt::event_token m_messageToken;
-        winrt::hstring m_injectedJavascript;
+        winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Foundation::IInspectable> m_scripts{ nullptr };
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationStarting_revoker m_navigationStartingRevoker{};
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationCompleted_revoker m_navigationCompletedRevoker{};
         winrt::Windows::UI::Xaml::Controls::WebView::NavigationFailed_revoker m_navigationFailedRevoker{};

@@ -56,11 +56,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       originWhitelist = defaultOriginWhitelist,
       useSharedProcessPool = true,
       textInteractionEnabled = true,
-      injectedJavaScript,
-      injectedJavaScriptBeforeContentLoaded,
-      injectedJavaScriptForMainFrameOnly = true,
-      injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true,
-      injectedJavaScriptObject,
+      scripts,
       startInLoadingState,
       onNavigationStateChange,
       onLoadStart,
@@ -251,15 +247,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
         hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onContentProcessDidTerminate={onContentProcessDidTerminate}
-        injectedJavaScript={injectedJavaScript}
-        injectedJavaScriptBeforeContentLoaded={
-          injectedJavaScriptBeforeContentLoaded
-        }
-        injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
-        injectedJavaScriptBeforeContentLoadedForMainFrameOnly={
-          injectedJavaScriptBeforeContentLoadedForMainFrameOnly
-        }
-        injectedJavaScriptObject={JSON.stringify(injectedJavaScriptObject)}
+        scripts={scripts}
         dataDetectorTypes={
           !dataDetectorTypes || Array.isArray(dataDetectorTypes)
             ? dataDetectorTypes

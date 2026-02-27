@@ -69,11 +69,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
 @property (nonatomic, assign) BOOL messagingEnabled;
-@property (nonatomic, copy) NSString * _Nullable injectedJavaScript;
-@property (nonatomic, copy) NSString * _Nullable injectedJavaScriptBeforeContentLoaded;
-@property (nonatomic, assign) BOOL injectedJavaScriptForMainFrameOnly;
-@property (nonatomic, assign) BOOL injectedJavaScriptBeforeContentLoadedForMainFrameOnly;
-@property (nonatomic, copy) NSString * _Nullable injectedJavaScriptObject;
+@property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable scripts;
 @property (nonatomic, assign) BOOL scrollEnabled;
 @property (nonatomic, assign) BOOL sharedCookiesEnabled;
 @property (nonatomic, assign) BOOL autoManageStatusBarEnabled;

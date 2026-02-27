@@ -213,15 +213,37 @@ namespace winrt::ReactNativeWebView::implementation {
             {L"window.DOMRect = function (x = 0, y = 0, width = 0, height = 0) { return Object.assign({ x: x, y: y, "
              L"height: height, width: width, top: ((y > 0) ? y : (y + height)), right: ((x > 0) ? (x + width) : x), "
              L"bottom: ((y > 0) ? (y + height) : y), left: ((x > 0) ? x : (x + width)) }); }"});
-        if (!m_injectedJavascript.empty())
+        // Apply scripts in order: atDocumentStart first, then atDocumentEnd
+        if (m_scripts != nullptr)
         {
-            webView.InvokeScriptAsync(L"eval", {m_injectedJavascript});
+            for (auto const& scriptValue : m_scripts)
+            {
+                auto scriptMap = scriptValue.as<winrt::Windows::Foundation::Collections::IMap<winrt::hstring, winrt::Windows::Foundation::IInspectable>>();
+                auto code = scriptMap.Lookup(L"code").as<winrt::hstring>();
+                auto injectionTime = scriptMap.Lookup(L"injectionTime").as<winrt::hstring>();
+
+                if (injectionTime == L"atDocumentStart" && !code.empty())
+                {
+                    webView.InvokeScriptAsync(L"eval", {code});
+                }
+            }
+            for (auto const& scriptValue : m_scripts)
+            {
+                auto scriptMap = scriptValue.as<winrt::Windows::Foundation::Collections::IMap<winrt::hstring, winrt::Windows::Foundation::IInspectable>>();
+                auto code = scriptMap.Lookup(L"code").as<winrt::hstring>();
+                auto injectionTime = scriptMap.Lookup(L"injectionTime").as<winrt::hstring>();
+
+                if (injectionTime == L"atDocumentEnd" && !code.empty())
+                {
+                    webView.InvokeScriptAsync(L"eval", {code});
+                }
+            }
         }
     }
 
-    void ReactWebView::SetInjectedJavascript(winrt::hstring const& payload)
+    void ReactWebView::SetScripts(winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Foundation::IInspectable> const& scripts)
     {
-        m_injectedJavascript = payload;
+        m_scripts = scripts;
     }
 
     void ReactWebView::RequestFocus()
