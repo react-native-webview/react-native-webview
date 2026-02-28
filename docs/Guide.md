@@ -672,3 +672,4 @@ This file is available in:
 
 - [Brazilian portuguese](Guide.portuguese.md)
 - [Italian](Guide.italian.md)
+- [Chinese](Guide.chinese.md)

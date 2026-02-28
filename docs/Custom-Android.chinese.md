@@ -1,10 +1,10 @@
-While the built-in web view has a lot of features, it is not possible to handle every use-case in React Native. You can, however, extend the web view with native code without forking React Native or duplicating all the existing web view code.
+尽管内置的 webview 功能强大，但在 React Native 中不可能覆盖所有用例。然而，你可以通过原生代码扩展 webview，而无需 fork React Native 或复制现有的 webview 代码。
 
-Before you do this, you should be familiar with the concepts in [native UI components](https://reactnative.dev/docs/native-components-android). You should also familiarise yourself with the [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java), as you will have to use this as a reference when implementing new features—although a deep understanding is not required.
+在开始之前，你应该熟悉 [原生 UI 组件](https://reactnative.dev/docs/native-components-android) 的概念。你还应该参考[原生 webview 代码](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java)，因为你在实现新功能时需要以此为参考——不过不需要非常深入的理解。
 
-## Native Code
+## 原生代码
 
-To get started, you'll need to create a subclass of `RNCWebViewManager`, `RNCWebView`, and `RNCWebViewClient`. In your view manager, you'll then need to override:
+要开始，你需要创建 `RNCWebViewManager`、`RNCWebView` 和 `RNCWebViewClient` 的子类。在你的 view manager 中，你需要覆盖：
 
 - `createViewInstance`
 - `getName`
@@ -41,11 +41,11 @@ public class CustomWebViewManager extends RNCWebViewManager {
 }
 ```
 
-You'll need to follow the usual steps to [register the module](https://reactnative.dev/docs/native-modules-android#register-the-module-android-specific).
+你需要按照常规步骤来[注册模块](https://reactnative.dev/docs/native-modules-android#register-the-module-android-specific)。
 
-### Adding New Properties
+### 添加新属性
 
-To add a new property, you'll need to add it to `CustomWebView`, and then expose it in `CustomWebViewManager`.
+要添加新属性，需要在 `CustomWebView` 中新增字段，然后在 `CustomWebViewManager` 中对外暴露它。
 
 ```java
 public class CustomWebViewManager extends RNCWebViewManager {
@@ -76,9 +76,9 @@ public class CustomWebViewManager extends RNCWebViewManager {
 }
 ```
 
-### Adding New Events
+### 添加新事件
 
-For events, you'll first need to make create event subclass.
+对于事件，你首先需要创建事件的子类。
 
 ```java
 // NavigationCompletedEvent.java
@@ -103,9 +103,9 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 }
 ```
 
-You can trigger the event in your web view client. You can hook existing handlers if your events are based on them.
+你可以在你的 web view client 中触发这个事件。如果你的事件基于已有的 handler，你也可以挂钩这些 handler。
 
-You should refer to [RNCWebViewManager.java](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) in the react-native-webview codebase to see what handlers are available and how they are implemented. You can extend any methods here to provide extra functionality.
+应该参考 `RNCWebViewManager.java` 来查看有哪些可用的 handler 以及如何实现它们。你可以扩展其中任何方法以提供额外功能。
 
 ```java
 public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
@@ -145,7 +145,7 @@ protected static class CustomWebViewClient extends RNCWebViewClient {
 }
 ```
 
-Finally, you'll need to expose the events in `CustomWebViewManager` through `getExportedCustomDirectEventTypeConstants`. Note that currently, the default implementation returns `null`, but this may change in the future.
+最后，你需要在 `CustomWebViewManager` 中通过 `getExportedCustomDirectEventTypeConstants` 暴露事件。注意当前默认实现返回 `null`，未来可能会变更。
 
 ```java
 public class CustomWebViewManager extends RNCWebViewManager {
@@ -164,11 +164,11 @@ public class CustomWebViewManager extends RNCWebViewManager {
 }
 ```
 
-## JavaScript Interface
+## JavaScript 接口
 
-To use your custom web view, you may want to create a class for it. Your class must return a `WebView` component with the prop `nativeConfig.component` set to your native component (see below).
+要在 JS 侧使用自定义 webview，你可能想为其创建一个类。该类必须返回一个 `WebView` 组件，并将 prop `nativeConfig.component` 设置为你的原生组件（见下）。
 
-To get your native component, you must use `requireNativeComponent`: the same as for regular custom components.
+获取原生组件需使用 `requireNativeComponent`，与常规自定义组件相同。
 
 ```javascript
 import React, { Component } from 'react';
@@ -186,11 +186,11 @@ export default class CustomWebView extends Component {
 const RCTCustomWebView = requireNativeComponent('RCTCustomWebView');
 ```
 
-If you want to add custom props to your native component, you can use `nativeConfig.props` on the web view.
+如果你想为原生组件增加自定义属性，可以在 WebView 的 `nativeConfig.props` 中传入这些属性。
 
-For events, the event handler must always be set to a function. This means it isn't safe to use the event handler directly from `this.props`, as the user might not have provided one. The standard approach is to create a event handler in your class, and then invoking the event handler given in `this.props` if it exists.
+对于事件，事件处理函数必须始终是一个函数。这意味着直接从 `this.props` 读取事件处理器并不安全，因为用户可能没有提供该回调。标准做法是在类中创建一个事件处理器，然后在调用时判断 `this.props` 中是否提供了回调。
 
-If you are unsure how something should be implemented from the JS side, look at [WebView.android.tsx](https://github.com/react-native-webview/react-native-webview/blob/master/src/WebView.android.tsx) in the React Native WebView source.
+如果不确定如何从 JS 侧实现某些行为，请参考 `WebView.android.tsx`。
 
 ```javascript
 export default class CustomWebView extends Component {
@@ -215,9 +215,8 @@ export default class CustomWebView extends Component {
   }
 }
 ```
-## Translations
 
-This file is available in:
-- [Brazilian portuguese](Custom-Android.portuguese.md)
-- [Italian](Custom-Android.italian.md)
-- [Chinese](Custom-Android.chinese.md)
+## 翻译
+此文件提供以下翻译版本：
+- [巴西葡萄牙语](Custom-Android.portuguese.md)
+- [意大利语](Custom-Android.italian.md)

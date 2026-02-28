@@ -235,3 +235,4 @@ This file is available at:
 
 - [Brazilian portuguese](Custom-iOS.portuguese.md)
 - [Italian](Contributing.italian.md)
+- [Chinese](Custom-iOS.chinese.md)

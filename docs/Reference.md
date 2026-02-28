@@ -1841,3 +1841,4 @@ This file is available in:
 
 - [Brazilian portuguese](Reference.portuguese.md)
 - [Italian](Reference.italian.md)
+- [Chinese](Reference.chinese.md)

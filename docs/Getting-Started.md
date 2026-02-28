@@ -140,3 +140,4 @@ Next, check out the [API Reference](Reference.md) or [In-Depth Guide](Guide.md).
 This file is available in:
 - [Brazilian portuguese](Getting-Started.portuguese.md)
 - [Italian](Getting-Started.italian.md)
+- [Chinese](Getting-Started.chinese.md)
