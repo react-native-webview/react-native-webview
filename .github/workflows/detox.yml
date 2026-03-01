@@ -8,14 +8,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '24.14.0'
-          cache: 'yarn'
-      - name: Setup - Install Yarn
-        run: YARN_GPG=NO curl -o- -L https://yarnpkg.com/install.sh | bash
-      - name: Setup - Install NPM Dependencies
-        run: yarn --frozen-lockfile
+          bun-version: 1.3.10
+      - name: Setup - Install dependencies
+        run: bun install --frozen-lockfile
       - name: Run tests
-        run: yarn ci
+        run: bun run ci

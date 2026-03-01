@@ -73,13 +73,7 @@ export type WebViewNavigationEvent = Readonly<{
   canGoBack: boolean;
   canGoForward: boolean;
   lockIdentifier: Double;
-  navigationType:
-    | 'click'
-    | 'formsubmit'
-    | 'backforward'
-    | 'reload'
-    | 'formresubmit'
-    | 'other';
+  navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
 }>;
 
@@ -90,13 +84,7 @@ export type ShouldStartLoadRequestEvent = Readonly<{
   canGoBack: boolean;
   canGoForward: boolean;
   lockIdentifier: Double;
-  navigationType:
-    | 'click'
-    | 'formsubmit'
-    | 'backforward'
-    | 'reload'
-    | 'formresubmit'
-    | 'other';
+  navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
   isTopFrame: boolean;
 }>;
@@ -149,10 +137,7 @@ export interface NativeProps extends ViewProps {
   allowsFullscreenVideo?: boolean;
   androidLayerType?: WithDefault<'none' | 'software' | 'hardware', 'none'>;
   cacheMode?: WithDefault<
-    | 'LOAD_DEFAULT'
-    | 'LOAD_CACHE_ELSE_NETWORK'
-    | 'LOAD_NO_CACHE'
-    | 'LOAD_CACHE_ONLY',
+    'LOAD_DEFAULT' | 'LOAD_CACHE_ELSE_NETWORK' | 'LOAD_NO_CACHE' | 'LOAD_CACHE_ONLY',
     'LOAD_DEFAULT'
   >;
   domStorageEnabled?: boolean;
@@ -198,10 +183,7 @@ export interface NativeProps extends ViewProps {
     'never' | 'automatic' | 'scrollableAxes' | 'always',
     'never'
   >;
-  contentMode?: WithDefault<
-    'recommended' | 'mobile' | 'desktop',
-    'recommended'
-  >;
+  contentMode?: WithDefault<'recommended' | 'mobile' | 'desktop', 'recommended'>;
   dataDetectorTypes?: WithDefault<
     ReadonlyArray<
       | 'address'
@@ -223,11 +205,7 @@ export interface NativeProps extends ViewProps {
   keyboardDisplayRequiresUserAction?: WithDefault<boolean, true>;
   limitsNavigationsToAppBoundDomains?: boolean;
   mediaCapturePermissionGrantType?: WithDefault<
-    | 'prompt'
-    | 'grant'
-    | 'deny'
-    | 'grantIfSameHostElsePrompt'
-    | 'grantIfSameHostElseDeny',
+    'prompt' | 'grant' | 'deny' | 'grantIfSameHostElsePrompt' | 'grantIfSameHostElseDeny',
     'prompt'
   >;
   pagingEnabled?: boolean;
@@ -260,10 +238,7 @@ export interface NativeProps extends ViewProps {
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   injectedJavaScriptForMainFrameOnly?: WithDefault<boolean, true>;
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: WithDefault<
-    boolean,
-    true
-  >;
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: WithDefault<boolean, true>;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   javaScriptEnabled?: WithDefault<boolean, true>;
   webviewDebuggingEnabled?: boolean;
@@ -304,24 +279,16 @@ export interface NativeCommands {
   stopLoading: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   injectJavaScript: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    javascript: string
+    javascript: string,
   ) => void;
   requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
-  postMessage: (
-    viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    data: string
-  ) => void;
+  postMessage: (viewRef: React.ElementRef<HostComponent<NativeProps>>, data: string) => void;
   // Android Only
-  loadUrl: (
-    viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    url: string
-  ) => void;
-  clearFormData: (
-    viewRef: React.ElementRef<HostComponent<NativeProps>>
-  ) => void;
+  loadUrl: (viewRef: React.ElementRef<HostComponent<NativeProps>>, url: string) => void;
+  clearFormData: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   clearCache: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    includeDiskFiles: boolean
+    includeDiskFiles: boolean,
   ) => void;
   clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   // !Android Only
@@ -343,6 +310,4 @@ export const Commands = codegenNativeCommands<NativeCommands>({
   ],
 });
 
-export default codegenNativeComponent<NativeProps>(
-  'RNCWebView'
-) as HostComponent<NativeProps>;
+export default codegenNativeComponent<NativeProps>('RNCWebView') as HostComponent<NativeProps>;

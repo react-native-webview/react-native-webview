@@ -167,25 +167,22 @@ const TESTS = {
   },
 };
 
-interface Props {}
 interface State {
   restarting: boolean;
-  currentTest: Object;
+  currentTest: (typeof TESTS)[keyof typeof TESTS];
 }
 
-export default class App extends Component<Props, State> {
+export default class App extends Component<unknown, State> {
   state = {
     restarting: false,
     currentTest: TESTS.Alerts,
   };
 
   _simulateRestart = () => {
-    this.setState({ restarting: true }, () =>
-      this.setState({ restarting: false }),
-    );
+    this.setState({ restarting: true }, () => this.setState({ restarting: false }));
   };
 
-  _changeTest = (testName) => {
+  _changeTest = (testName: keyof typeof TESTS) => {
     this.setState({ currentTest: TESTS[testName] });
   };
 
@@ -309,12 +306,8 @@ export default class App extends Component<Props, State> {
             style={styles.exampleContainer}
           >
             <Text style={styles.exampleTitle}>{currentTest.title}</Text>
-            <Text style={styles.exampleDescription}>
-              {currentTest.description}
-            </Text>
-            <View style={styles.exampleInnerContainer}>
-              {currentTest.render()}
-            </View>
+            <Text style={styles.exampleDescription}>{currentTest.description}</Text>
+            <View style={styles.exampleInnerContainer}>{currentTest.render()}</View>
           </View>
         )}
       </SafeAreaView>
