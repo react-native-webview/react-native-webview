@@ -1,5 +1,5 @@
-module.exports = function(api) {
-  api && api.cache(false);
+module.exports = function (api) {
+  api?.cache(false);
   return {
     env: {
       test: {

@@ -9,8 +9,9 @@ In secondo luogo, desideriamo che l'esperienza di contribuzione sia il migliore 
 Dopo aver forkato il reposito, clonalo sulla tuo computer e apporta le modifiche. Successivamente, potrai testarle in un'applicazione.
 
 Ci sono due metodi per testare:
-1) testare all'interno di una copia di react-native-webview;
-2) testare in un nuovo progetto creato con `react-native init`.
+
+1. testare all'interno di una copia di react-native-webview;
+2. testare in un nuovo progetto creato con `react-native init`.
 
 ### Testare in react-native-webview
 
@@ -94,10 +95,13 @@ $ yarn add ../react-native-webview
 ```
 
 ## Note
+
 - Usiamo TypeScript.
-- Dopo aver scaricato quest repo e installato tutte le dipendenze, puoi eseguire i test usando il comando: `yarn ci`.
+- Dopo aver scaricato quest repo e installato tutte le dipendenze, puoi eseguire i test usando il comando: `bun run lint`.
 
 ### Traduzioni
+
 Questo file è disponibile nelle seguenti lingue:
+
 - [Inglese](Contributing.md)
 - [Portoghese brasiliano](Contributing.portuguese.md)

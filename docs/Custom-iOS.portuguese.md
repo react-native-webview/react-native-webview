@@ -32,8 +32,8 @@ Para a visualização, você precisará criar uma subclasse de `RCTWebView`.
 
 Para o gerenciador de visualização, você precisa criar uma subclasse `RCTWebViewManager`. Você ainda deve incluir:
 
-* `(UIView *)view` retorna sua visualização personalizada
-* A tag  `RCT_EXPORT_MODULE()`
+- `(UIView *)view` retorna sua visualização personalizada
+- A tag `RCT_EXPORT_MODULE()`
 
 ```objc
 // RCTCustomWebViewManager.h
@@ -146,21 +146,20 @@ Isso pode ser combinado com uma chamada do Javascript para passar um rótulo de 
 
 Se você precisa se conectar a um servidor que possui um certificado autoassinado, ou deseja realizar SSL Pinning nas solicitações de webview, você precisa passar um dicionário com o host como chave e o certificado como o valor de cada item:
 
-
 ```objc
 -(void)installCerts {
 
   // Get the bundle where the certificates in DER format are present.
   NSBundle *bundle = [NSBundle mainBundle];
-  
+
   NSMutableDictionary* certMap = [NSMutableDictionary new];
 
   NSData *rootCertData = [NSData dataWithContentsOfFile:[bundle pathForResource:@"example_ca" ofType:@"der"]];
 
   SecCertificateRef certificate = SecCertificateCreateWithData(NULL, (CFDataRef) rootCertData);
-   
+
   OSStatus err = SecItemAdd((CFDictionaryRef) [NSDictionary dictionaryWithObjectsAndKeys:(id) kSecClassCertificate, kSecClass, certificate, kSecValueRef, nil], NULL);
-  
+
   [certMap setObject:(__bridge id _Nonnull)(certificate) forKey:@"example.com"];
 
   [RNCWebView setCustomCertificatesForHost:certMap];
@@ -177,9 +176,9 @@ Para usar sua visualização da Web personalizada, você pode criar uma classe p
 Para obter seu componente nativo, você deve usar `requireNativeComponent`: o mesmo que para componentes personalizados regulares.
 
 ```javascript
-import React, {Component} from 'react';
-import {WebView, requireNativeComponent, NativeModules} from 'react-native';
-const {CustomWebViewManager} = NativeModules;
+import React, { Component } from 'react';
+import { WebView, requireNativeComponent, NativeModules } from 'react-native';
+const { CustomWebViewManager } = NativeModules;
 
 export default class CustomWebView extends Component {
   render() {
@@ -207,7 +206,7 @@ Se você não tiver certeza de como algo deve ser implementado do lado do JS, co
 ```javascript
 export default class CustomWebView extends Component {
   _onNavigationCompleted = (event) => {
-    const {onNavigationCompleted} = this.props;
+    const { onNavigationCompleted } = this.props;
     onNavigationCompleted && onNavigationCompleted(event);
   };
 
@@ -228,6 +227,7 @@ export default class CustomWebView extends Component {
   }
 }
 ```
+
 ## Traduções
 
 Esse arquivo está disponível em:

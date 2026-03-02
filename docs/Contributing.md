@@ -9,8 +9,9 @@ Secondly, we'd like the contribution experience to be as good as possible. While
 After you fork the repo, clone it to your machine, and make your changes, you'll want to test them in an app.
 
 There are two methods of testing:
-1) Testing within a clone of react-native-webview
-2) Testing in a new `react-native init` project
+
+1. Testing within a clone of react-native-webview
+2. Testing in a new `react-native init` project
 
 ### Testing within react-native-webview
 
@@ -96,9 +97,10 @@ $ yarn add ../react-native-webview
 ## Notes
 
 - We use TypeScript.
-- After pulling this repo and installing all dependencies, you can run tests using the command: `yarn ci`
+- After pulling this repo and installing all dependencies, you can run lint using the command: `bun run lint`
 
 ## Translations
+
 This file is available in:
 
 - [Brazilian portuguese](Contributing.portuguese.md)
