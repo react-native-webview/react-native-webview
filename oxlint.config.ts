@@ -26,7 +26,7 @@ export default defineConfig({
     'import/unambiguous': 'off',
     'import/no-relative-parent-imports': 'off',
   },
-  ignorePatterns: ['node_modules', 'lib', 'android', 'ios', 'macos', 'windows', '.yarn', 'example'],
+  ignorePatterns: ['node_modules', 'lib', 'android', 'ios', 'macos', 'windows', 'example'],
   categories: {
     correctness: 'error',
     perf: 'error',

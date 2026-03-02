@@ -97,7 +97,7 @@ $ yarn add ../react-native-webview
 ## Note
 
 - Usiamo TypeScript.
-- Dopo aver scaricato quest repo e installato tutte le dipendenze, puoi eseguire i test usando il comando: `yarn ci`.
+- Dopo aver scaricato quest repo e installato tutte le dipendenze, puoi eseguire i test usando il comando: `bun run lint`.
 
 ### Traduzioni
 

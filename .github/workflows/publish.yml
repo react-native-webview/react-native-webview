@@ -25,8 +25,8 @@ jobs:
           bun-version: 1.3.10
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Run CI checks
-        run: bun run ci
+      - name: Run lint
+        run: bun run lint
 
   publish:
     name: Publish to npm

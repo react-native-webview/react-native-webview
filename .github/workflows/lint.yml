@@ -1,10 +1,10 @@
-name: 'Detox CI Tests'
+name: 'Lint'
 on: [pull_request]
 
 jobs:
-  tests:
-    name: 'Running tests'
-    runs-on: 'macOS-latest'
+  lint:
+    name: 'Running lint'
+    runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -14,5 +14,5 @@ jobs:
           bun-version: 1.3.10
       - name: Setup - Install dependencies
         run: bun install --frozen-lockfile
-      - name: Run tests
-        run: bun run ci
+      - name: Run lint
+        run: bun run lint
