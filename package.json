@@ -45,7 +45,7 @@
     "prepare:types": "tsgo --noEmit false --emitDeclarationOnly --declaration --rootDir src --outDir lib",
     "prepare": "bun run --bun prepare:types && bun run --bun build",
     "appium": "bun run --bun appium",
-    "test:windows": "bun run --bun jest --setupFiles=./jest-setups/jest.setup.js",
+    "test:windows": "bun run jest --setupFiles=./jest-setups/jest.setup.js",
     "add:macos": "bun run --bun add react-native-macos@0.73.17"
   },
   "dependencies": {
