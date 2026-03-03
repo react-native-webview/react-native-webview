@@ -44,7 +44,7 @@ jobs:
 
       - name: Start Appium server
         shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run appium"
+        run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
 
       - name: Start React server
         shell: powershell
