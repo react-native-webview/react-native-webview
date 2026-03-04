@@ -4,5 +4,8 @@
     "source.fixAll.oxc": "always"
   },
   "oxc.typeAware": true,
-  "typescript.experimental.useTsgo": true
+  "typescript.experimental.useTsgo": true,
+  "oxc.fmt.configPath": ".oxfmtrc.jsonc",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true
 }
