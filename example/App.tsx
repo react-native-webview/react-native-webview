@@ -16,6 +16,7 @@ import Background from './examples/Background';
 import Downloads from './examples/Downloads';
 import Uploads from './examples/Uploads';
 import Injection from './examples/Injection';
+import InjectedObjectJson from './examples/InjectedObjectJson';
 import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
 import MultiMessaging from './examples/MultiMessaging';
@@ -99,6 +100,14 @@ const TESTS = {
     description: 'Injection test',
     render() {
       return <Injection />;
+    },
+  },
+  InjectedObjectJson: {
+    title: 'InjectedObjectJson',
+    testId: 'injectedObjectJson',
+    description: 'injectedJavaScriptObject availability test',
+    render() {
+      return <InjectedObjectJson />;
     },
   },
   PageLoad: {
@@ -225,6 +234,11 @@ export default class App extends Component<unknown, State> {
             testID="testType_injection"
             title="Injection"
             onPress={() => this._changeTest('Injection')}
+          />
+          <Button
+            testID="testType_injectedObjectJson"
+            title="InjectedObjectJson"
+            onPress={() => this._changeTest('InjectedObjectJson')}
           />
           <Button
             testID="testType_pageLoad"
