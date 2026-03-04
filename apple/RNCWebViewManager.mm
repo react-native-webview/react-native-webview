@@ -42,7 +42,19 @@ RCT_EXPORT_MODULE(RNCWebView)
 
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
 // New arch only
-RCT_CUSTOM_VIEW_PROPERTY(newSource, NSDictionary, RNCWebViewImpl) {}
+// Ensure the "newSource" prop coming from the JS (used by the new architecture)
+// is forwarded to the native view implementation for projects that still
+// use the view manager path or when the Fabric component isn't compiled.
+RCT_CUSTOM_VIEW_PROPERTY(newSource, NSDictionary, RNCWebViewImpl) {
+  if (json == nil) {
+    // Clear source
+    [view setSource:@{}];
+  } else {
+    // json is expected to be an NSDictionary matching the shape produced by
+    // the JS side. Forward it directly to the view implementation.
+    [view setSource:json];
+  }
+}
 RCT_EXPORT_VIEW_PROPERTY(onFileDownload, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingStart, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingFinish, RCTDirectEventBlock)
