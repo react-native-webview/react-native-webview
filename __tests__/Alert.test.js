@@ -3,15 +3,14 @@
  * Licensed under the MIT License.
  */
 
-import { driver, By2 } from 'selenium-appium'
+import { driver, By2 } from 'selenium-appium';
 
 const setup = require('../jest-setups/jest.setup');
 jest.setTimeout(150000);
 
-const WindowsApplicationDriverUrl = "http://127.0.0.1:4723/wd/hub";
+const WindowsApplicationDriverUrl = 'http://127.0.0.1:4723/wd/hub';
 
 describe('Alert Tests', () => {
-  
   test('Show Alert', async () => {
     await driver.startWithCapabilities(setup.capabilities, WindowsApplicationDriverUrl);
     const showAlertButton = By2.nativeName('Show alert');

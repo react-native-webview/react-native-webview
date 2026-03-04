@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
-import {Alert, Platform, View} from 'react-native';
+import React, { Component } from 'react';
+import { Alert, Platform, View } from 'react-native';
 
-import WebView, {FileDownload} from 'react-native-webview';
+import WebView, { FileDownload } from 'react-native-webview';
 
 const HTML = `
 <!DOCTYPE html>\n
@@ -33,8 +33,8 @@ interface State {}
 export default class Downloads extends Component<Props, State> {
   state = {};
 
-  onFileDownload = ({ nativeEvent }: { nativeEvent: FileDownload } ) => {
-    Alert.alert("File download detected", nativeEvent.downloadUrl);
+  onFileDownload = ({ nativeEvent }: { nativeEvent: FileDownload }) => {
+    Alert.alert('File download detected', nativeEvent.downloadUrl);
   };
 
   render() {
@@ -47,7 +47,7 @@ export default class Downloads extends Component<Props, State> {
     return (
       <View style={{ height: 120 }}>
         <WebView
-          source={{html: HTML}}
+          source={{ html: HTML }}
           automaticallyAdjustContentInsets={false}
           {...platformProps}
         />

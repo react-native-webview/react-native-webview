@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import React, { Component } from 'react';
+import { Text, View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -27,23 +27,23 @@ const HTML = `
 
 type Props = {};
 type State = {
-  backgroundColor: string,
+  backgroundColor: string;
 };
 
 export default class Background extends Component<Props, State> {
   state = {
-    backgroundColor: '#FF00FF00'
+    backgroundColor: '#FF00FF00',
   };
 
   render() {
     return (
       <View>
-        <View style={{backgroundColor:'red'}}>
+        <View style={{ backgroundColor: 'red' }}>
           <View style={{ height: 120 }}>
             <WebView
-              source={{html: HTML}}
+              source={{ html: HTML }}
               automaticallyAdjustContentInsets={false}
-              style={{backgroundColor:'#00000000'}}
+              style={{ backgroundColor: '#00000000' }}
             />
           </View>
         </View>

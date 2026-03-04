@@ -1,9 +1,12 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ]
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "always"
+  },
+  "oxc.typeAware": true,
+  "oxc.configPath": ".oxlintrc.json",
+  "typescript.experimental.useTsgo": true,
+  "oxc.fmt.configPath": ".oxfmtrc.jsonc",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true
 }
