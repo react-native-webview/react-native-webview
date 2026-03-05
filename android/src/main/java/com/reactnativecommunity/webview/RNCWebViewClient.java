@@ -1,5 +1,16 @@
 package com.reactnativecommunity.webview;
 
+/// START PATCHES WV 13.16.0
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+/// END PATCHES WV 13.16.0
+
+/// START PATCHES WV 13.16.0
+import android.security.KeyChain;
+import android.webkit.ClientCertRequest;
+import android.os.AsyncTask;
+/// END PATCHES WV 13.16.0
+
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
@@ -38,12 +49,51 @@ import android.webkit.CookieSyncManager;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RNCWebViewClient extends WebViewClient {
+    private static String certificateAlias = null; // WV PATCHES 13.16.0
+    private ReactContext reactContext; // WV PATCHES 13.16.0
     private static String TAG = "RNCWebViewClient";
     protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
 
     protected boolean mLastLoadFailed = false;
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected @Nullable RNCBasicAuthCredential basicAuthCredential = null;
+
+    public static void setCertificateAlias(String alias) {
+        certificateAlias = alias;
+    }
+
+    public void setReactContext(ReactContext reactContext) {
+        this.reactContext = reactContext;
+    }
+
+    
+    // WV PATCHES 13.16.0
+    @Override
+    public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
+        if (certificateAlias != null && reactContext != null) {
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        PrivateKey privateKey = KeyChain.getPrivateKey(reactContext, certificateAlias);
+                        X509Certificate[] certificateChain =
+                            KeyChain.getCertificateChain(reactContext, certificateAlias);
+
+                        if (privateKey != null && certificateChain != null) {
+                            request.proceed(privateKey, certificateChain);
+                        } else {
+                            request.cancel();
+                        }
+                    } catch (Exception e) {
+                        request.cancel();
+                    }
+                    return null;
+                }
+            }.execute();
+        } else {
+            super.onReceivedClientCertRequest(view, request);
+        }
+    }
 
     public void setBasicAuthCredential(@Nullable RNCBasicAuthCredential credential) {
         basicAuthCredential = credential;

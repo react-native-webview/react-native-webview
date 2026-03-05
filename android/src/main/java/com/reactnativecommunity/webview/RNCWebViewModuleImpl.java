@@ -60,6 +60,11 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
     private File mOutputImage;
     private File mOutputVideo;
 
+    // WV PATCHES 13.16.0
+    public static void setCertificateAlias(String alias) {
+        RNCWebViewClient.setCertificateAlias(alias);
+    }
+
     public RNCWebViewModuleImpl(ReactApplicationContext context) {
         mContext = context;
         context.addActivityEventListener(this);

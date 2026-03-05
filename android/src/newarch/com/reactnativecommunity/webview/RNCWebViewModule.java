@@ -14,6 +14,11 @@ import com.facebook.react.module.annotations.ReactModule;
 public class RNCWebViewModule extends NativeRNCWebViewModuleSpec {
     final private RNCWebViewModuleImpl mRNCWebViewModuleImpl;
 
+    // WV PATCHES 13.16.0
+    public static void setCertificateAlias(String alias) {
+        RNCWebViewModuleImpl.setCertificateAlias(alias);
+    }
+
     public RNCWebViewModule(ReactApplicationContext reactContext) {
         super(reactContext);
         mRNCWebViewModuleImpl = new RNCWebViewModuleImpl(reactContext);

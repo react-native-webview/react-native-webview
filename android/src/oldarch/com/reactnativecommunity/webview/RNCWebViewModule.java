@@ -20,6 +20,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
         super(reactContext);
         mRNCWebViewModuleImpl = new RNCWebViewModuleImpl(reactContext);
     }
+    
+    // WV PATCHES 13.16.0
+    public static void setCertificateAlias(String alias) {
+        RNCWebViewModuleImpl.setCertificateAlias(alias);
+    }
 
     @ReactMethod
     public void isFileUploadSupported(final Promise promise) {

@@ -219,6 +219,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     public void setWebViewClient(WebViewClient client) {
         super.setWebViewClient(client);
         if (client instanceof RNCWebViewClient) {
+            ((RNCWebViewClient) client).setReactContext(this.getReactApplicationContext()); // WV 13.16.0 PATCH
             mRNCWebViewClient = (RNCWebViewClient) client;
             mRNCWebViewClient.setProgressChangedFilter(progressChangedFilter);
         }
