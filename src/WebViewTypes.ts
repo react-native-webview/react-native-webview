@@ -766,6 +766,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   fraudulentWebsiteWarningEnabled?: boolean;
+
+  /**
+   * A Boolean value which determines whether the WebView scrolls to top if user taps on the status bar.
+   * The default value is `true`.
+   * @platform ios
+   */
+  scrollsToTop?: boolean;
 }
 
 export interface MacOSWebViewProps extends WebViewSharedProps {

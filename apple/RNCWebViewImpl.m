@@ -169,6 +169,7 @@ RCTAutoInsetsProtocol>
     _allowsLinkPreview = YES;
     _showsVerticalScrollIndicator = YES;
     _directionalLockEnabled = YES;
+    _scrollsToTop = YES;
     _useSharedProcessPool = YES;
     _cacheEnabled = YES;
     _mediaPlaybackRequiresUserAction = YES;
@@ -545,6 +546,7 @@ RCTAutoInsetsProtocol>
     }
 
     _webView.scrollView.directionalLockEnabled = _directionalLockEnabled;
+    _webView.scrollView.scrollsToTop = _scrollsToTop;
 #endif // !TARGET_OS_OSX
     _webView.allowsLinkPreview = _allowsLinkPreview;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];
@@ -1106,6 +1108,13 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
   }
 }
+
+- (void)setScrollsToTop:(BOOL)scrollsToTop
+{
+  _scrollsToTop = scrollsToTop;
+  _webView.scrollView.scrollsToTop = scrollsToTop;
+}
+
 #endif // !TARGET_OS_OSX
 
 - (void)postMessage:(NSString *)message
