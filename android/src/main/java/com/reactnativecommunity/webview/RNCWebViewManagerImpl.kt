@@ -721,4 +721,8 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
             WebSettingsCompat.setPaymentRequestEnabled(view.settings, enabled)
         }
     }
+
+    fun setPullToRefreshEnabled(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
+        viewWrapper.setPullToRefreshEnabled(enabled)
+    }
 }

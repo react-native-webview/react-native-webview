@@ -279,6 +279,11 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
         mRNCWebViewManagerImpl.setPaymentRequestEnabled(view, value);
     }
 
+    @ReactProp(name = "pullToRefreshEnabled")
+    public void setPullToRefreshEnabled(RNCWebViewWrapper view, boolean value) {
+        mRNCWebViewManagerImpl.setPullToRefreshEnabled(view, value);
+    }
+
     @Override
     protected void addEventEmitters(@NonNull ThemedReactContext reactContext, RNCWebViewWrapper viewWrapper) {
         // Do not register default touch emitter and let WebView implementation handle touches
