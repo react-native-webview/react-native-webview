@@ -1,7 +1,9 @@
 # Guida al Debugging di React Native WebView
+
 Ecco alcuni utili consigli per il debugging di React Native WebView.
 
 ## Errori di Script
+
 Può essere difficile risolvere errori di sintassi e altri errori di script in WebView, poiché gli errori di solito non vengono visualizzati in una console di default.
 
 Un'opzione (se stai caricando HTML da una fonte esterna) è quella di iniettare un handler degli errori prima del caricamento del contenuto.
@@ -16,8 +18,7 @@ Un'opzione (se stai caricando HTML da una fonte esterna) è quella di iniettare 
     true;
   `}
   source={{
-    uri:
-      'https://bl.ocks.org/jamonholmgren/raw/48423fd99537283beace1daa2688e80f/',
+    uri: 'https://bl.ocks.org/jamonholmgren/raw/48423fd99537283beace1daa2688e80f/',
   }}
 />
 ```
@@ -67,6 +68,7 @@ Inoltre, se non vedi il tuo dispositivo nel menu Sviluppo e hai avviato Safari p
 È possibile eseguire il debug dei contenuti WebView nell'emulatore Android o su un dispositivo utilizzando Chrome DevTools.
 
 1. Dovrai apportare la seguente modifica a MainApplication.java per abilitare il debug dei contenuti Web:
+
 ```java
   import android.webkit.WebView;
 
@@ -77,6 +79,7 @@ Inoltre, se non vedi il tuo dispositivo nel menu Sviluppo e hai avviato Safari p
     WebView.setWebContentsDebuggingEnabled(true);
   }
 ```
+
 2. Avvia l'applicazione con React Native WebView nell'emulatore Android o sul dispositivo Android.
 3. Apri `chrome://inspect/#devices` su Chrome (Riferimento: [Debug remoto dei dispositivi Android](https://developer.chrome.com/docs/devtools/remote-debugging/)).
 4. Seleziona il tuo dispositivo sulla sinistra e seleziona "Inspect" sui contenuti WebView che desideri ispezionare.
@@ -90,8 +93,9 @@ Quando si esegue il debug su un dispositivo, è necessario abilitare il debug US
 
 Impostazioni -> Sistema -> Informazioni sul telefono -> Opzioni sviluppatore -> abilita il debug USB
 
-
 ### Traduzioni
+
 Questo file è disponibile nelle seguenti lingue:
+
 - [Inglese](Debugging.md)
 - [Portoghese brasiliano](Debugging.portuguese.md)

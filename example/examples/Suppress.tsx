@@ -20,7 +20,7 @@ const HTML = `
     </p>
   </body>
 </html>
-`
+`;
 
 export default class NativeWebpage extends Component<Props, State> {
   state = {};
@@ -32,13 +32,24 @@ export default class NativeWebpage extends Component<Props, State> {
           source={{ html: HTML }}
           style={{ width: '100%', height: '100%' }}
           onShouldStartLoadWithRequest={(event) => {
-            console.log("onShouldStartLoadWithRequest", event);
+            console.log('onShouldStartLoadWithRequest', event);
             return true;
           }}
           onLoadStart={(event) => {
-            console.log("onLoadStart", event.nativeEvent);
+            console.log('onLoadStart', event.nativeEvent);
           }}
-          suppressMenuItems={["cut", "copy", "paste", "replace", "bold", "italic", "underline", "select", "share", "lookup"]}
+          suppressMenuItems={[
+            'cut',
+            'copy',
+            'paste',
+            'replace',
+            'bold',
+            'italic',
+            'underline',
+            'select',
+            'share',
+            'lookup',
+          ]}
         />
       </View>
     );

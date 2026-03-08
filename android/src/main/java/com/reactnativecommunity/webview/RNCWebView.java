@@ -93,10 +93,6 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         progressChangedFilter = new ProgressChangedFilter();
     }
 
-    public void setIgnoreErrFailedForThisURL(String url) {
-        mRNCWebViewClient.setIgnoreErrFailedForThisURL(url);
-    }
-
     public void setBasicAuthCredential(RNCBasicAuthCredential credential) {
         mRNCWebViewClient.setBasicAuthCredential(credential);
     }

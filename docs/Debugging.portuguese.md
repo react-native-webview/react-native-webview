@@ -18,8 +18,7 @@ Uma opção (se você estiver carregando HTML de uma fonte externa) é injetar u
     true;
   `}
   source={{
-    uri:
-      'https://bl.ocks.org/jamonholmgren/raw/48423fd99537283beace1daa2688e80f/',
+    uri: 'https://bl.ocks.org/jamonholmgren/raw/48423fd99537283beace1daa2688e80f/',
   }}
 />
 ```

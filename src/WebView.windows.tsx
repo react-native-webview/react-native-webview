@@ -10,12 +10,7 @@
  * Licensed under the MIT License.
  */
 
-import React, {
-  forwardRef,
-  useCallback,
-  useImperativeHandle,
-  useRef,
-} from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { View, Image, ImageSourcePropType, NativeModules } from 'react-native';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import invariant from 'invariant';
@@ -43,9 +38,9 @@ const Commands = codegenNativeCommands({
     'loadUrl',
   ],
 });
-const { resolveAssetSource } = Image;
+const resolveAssetSource = (source: ImageSourcePropType) => Image.resolveAssetSource(source);
 
-const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
+const WebViewComponent = forwardRef<unknown, WindowsWebViewProps>(
   (
     {
       cacheEnabled = true,
@@ -71,7 +66,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
       useWebView2,
       ...otherProps
     },
-    ref
+    ref,
   ) => {
     const webViewRef = useRef<NativeWebViewWindows | null>(null);
 
@@ -83,19 +78,19 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
           if (RCTWebViewString === 'RCTWebView') {
             NativeModules.RCTWebView.onShouldStartLoadWithRequestCallback(
               shouldStart,
-              lockIdentifier
+              lockIdentifier,
             );
           } else {
             NativeModules.RCTWebView2.onShouldStartLoadWithRequestCallback(
               shouldStart,
-              lockIdentifier
+              lockIdentifier,
             );
           }
         } else if (shouldStart) {
           Commands.loadUrl(webViewRef, url);
         }
       },
-      [RCTWebViewString]
+      [RCTWebViewString],
     );
 
     const {
@@ -136,32 +131,25 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
           Commands.reload(webViewRef.current);
         },
         stopLoading: () => Commands.stopLoading(webViewRef.current),
-        postMessage: (data: string) =>
-          Commands.postMessage(webViewRef.current, data),
-        injectJavaScript: (data: string) =>
-          Commands.injectJavaScript(webViewRef.current, data),
+        postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
+        injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
         requestFocus: () => Commands.requestFocus(webViewRef.current),
         clearCache: () => Commands.clearCache(webViewRef.current),
         loadUrl: (url: string) => Commands.loadUrl(webViewRef.current, url),
       }),
-      [setViewState, webViewRef]
+      [setViewState, webViewRef],
     );
 
     let otherView = null;
     if (viewState === 'LOADING') {
       otherView = (renderLoading || defaultRenderLoading)();
     } else if (viewState === 'ERROR') {
-      invariant(
-        lastErrorEvent != null,
-        'lastErrorEvent expected to be non-null'
-      );
+      invariant(lastErrorEvent != null, 'lastErrorEvent expected to be non-null');
       otherView = (renderError || defaultRenderError)(
         lastErrorEvent.domain,
         lastErrorEvent.code,
-        lastErrorEvent.description
+        lastErrorEvent.description,
       );
-    } else if (viewState !== 'IDLE') {
-      console.error(`RNCWebView invalid state encountered: ${viewState}`);
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
@@ -185,7 +173,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
         onOpenWindow={onOpenWindow}
         onSourceChanged={onSourceChanged}
         ref={webViewRef}
-        // TODO: find a better way to type this.
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         source={resolveAssetSource(source as ImageSourcePropType)}
         style={webViewStyles}
         cacheEnabled={cacheEnabled}
@@ -199,7 +187,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
         {otherView}
       </View>
     );
-  }
+  },
 );
 
 // native implementation should return "true" only for Android 5+

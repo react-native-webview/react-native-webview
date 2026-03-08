@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {Button, Switch, StyleSheet, Text, View} from 'react-native';
+import React, { Component } from 'react';
+import { Button, Switch, StyleSheet, Text, View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -53,49 +53,47 @@ const HTML = `
 
 type Props = {};
 type State = {
-  shouldInterceptOpenWindow: boolean,
-  text: string,
-  webViewKey: number
+  shouldInterceptOpenWindow: boolean;
+  text: string;
+  webViewKey: number;
 };
 
 export default class OpenWindow extends Component<Props, State> {
   state = {
     shouldInterceptOpenWindow: true,
     text: 'No OpenWindow event intercepted yet',
-    webViewKey: 1
+    webViewKey: 1,
   };
 
   interceptOpenWindow = (syntheticEvent) => {
-    const { nativeEvent } = syntheticEvent
-    const { targetUrl } = nativeEvent
+    const { nativeEvent } = syntheticEvent;
+    const { targetUrl } = nativeEvent;
     this.setState({
-      text: `Intercepted OpenWindow event for ${targetUrl} at ${Date.now()}`
-    })
+      text: `Intercepted OpenWindow event for ${targetUrl} at ${Date.now()}`,
+    });
   };
 
   toggleShouldInterceptOpenWindow = () => {
-    this.setState(prevState => ({
-      shouldInterceptOpenWindow: !prevState.shouldInterceptOpenWindow
-    }))
+    this.setState((prevState) => ({
+      shouldInterceptOpenWindow: !prevState.shouldInterceptOpenWindow,
+    }));
   };
 
   resetWebView = () => {
-    this.setState(prevState => ({
-      webViewKey: prevState.webViewKey + 1
-    }))
+    this.setState((prevState) => ({
+      webViewKey: prevState.webViewKey + 1,
+    }));
   };
 
   render() {
     const onOpenWindow = this.state.shouldInterceptOpenWindow
       ? this.interceptOpenWindow
-      : undefined
+      : undefined;
 
     return (
       <View style={styles.container}>
         <View style={styles.interceptSection}>
-          <Text style={styles.text}>
-            Intercept OpenWindow event
-          </Text>
+          <Text style={styles.text}>Intercept OpenWindow event</Text>
           <Switch
             onValueChange={this.toggleShouldInterceptOpenWindow}
             value={this.state.shouldInterceptOpenWindow}
@@ -103,14 +101,15 @@ export default class OpenWindow extends Component<Props, State> {
         </View>
         <WebView
           key={this.state.webViewKey}
-          source={{html: HTML}}
+          source={{ html: HTML }}
           automaticallyAdjustContentInsets={false}
           onOpenWindow={onOpenWindow}
         />
-        <Text style={styles.text}>
-          {this.state.text}
-        </Text>
-        <Button title="Reset webview" onPress={this.resetWebView} />
+        <Text style={styles.text}>{this.state.text}</Text>
+        <Button
+          title="Reset webview"
+          onPress={this.resetWebView}
+        />
       </View>
     );
   }
@@ -118,15 +117,15 @@ export default class OpenWindow extends Component<Props, State> {
 
 const styles = StyleSheet.create({
   container: {
-    height: 300
+    height: 300,
   },
   interceptSection: {
     alignItems: 'center',
-    flexDirection: "row",
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20
+    marginBottom: 20,
   },
   text: {
-    color: 'black'
-  }
-})
+    color: 'black',
+  },
+});
