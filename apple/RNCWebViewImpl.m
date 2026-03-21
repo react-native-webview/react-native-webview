@@ -25,6 +25,14 @@ static NSDictionary* customCertificatesForHost;
 
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
+static NSString *RNCSharedCookieIdentifier(NSHTTPCookie *cookie)
+{
+  return [NSString stringWithFormat:@"%@|%@|%@",
+    cookie.name ?: @"",
+    cookie.domain ?: @"",
+    cookie.path ?: @""];
+}
+
 #if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -1583,8 +1591,16 @@ didFinishNavigation:(WKNavigation *)navigation
     if(_sharedCookiesEnabled) {
       // Write all cookies from WKWebView back to sharedHTTPCookieStorage
       [cookieStore getAllCookies:^(NSArray* cookies) {
+        NSHTTPCookieStorage *sharedCookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        NSMutableSet<NSString *> *webViewCookieIdentifiers = [NSMutableSet setWithCapacity:cookies.count];
         for (NSHTTPCookie *cookie in cookies) {
-          [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+          [webViewCookieIdentifiers addObject:RNCSharedCookieIdentifier(cookie)];
+          [sharedCookieStorage setCookie:cookie];
+        }
+        for (NSHTTPCookie *sharedCookie in sharedCookieStorage.cookies) {
+          if (![webViewCookieIdentifiers containsObject:RNCSharedCookieIdentifier(sharedCookie)]) {
+            [sharedCookieStorage deleteCookie:sharedCookie];
+          }
         }
       }];
     }
