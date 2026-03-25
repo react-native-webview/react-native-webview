@@ -24,7 +24,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
         shell: bash
       - name: Build Android test app
         uses: gradle/gradle-build-action@v2
