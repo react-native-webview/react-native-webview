@@ -33,24 +33,18 @@ jobs:
           bun run build
           bun run tsc
 
-      - name: Initialize Windows project
-        shell: cmd
-        run: |
-          cd packages\example-windows
-          npx @react-native-windows/cli init-windows --overwrite --logging
-
       - name: Build x64 release
-        shell: cmd
+        shell: powershell
         run: |
-          cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging
+          cd packages/example-windows
+          bun run windows --release --no-packager --no-deploy --logging
 
       - name: Deploy
         shell: powershell
         run: |
           Copy-Item -Path packages\example-windows\windows\x64\Release -Recurse -Destination packages\example-windows\windows\
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
+          bunx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
 
       - name: Start Appium server
         shell: powershell

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "windows": "react-native run-windows --arch x64",
+    "windows": "install-windows-test-app --project-directory windows && react-native run-windows --arch x64",
     "start": "react-native start"
   },
   "dependencies": {
@@ -13,12 +13,9 @@
     "example-shared": "file:../example-shared"
   },
   "devDependencies": {
-    "@react-native-community/cli": "^15.0.0",
-    "@react-native-community/cli-platform-android": "^15.0.0",
-    "@react-native-community/cli-platform-ios": "^15.0.0",
     "@react-native/babel-preset": "0.78.2",
     "@react-native/metro-config": "0.78.2",
-    "@react-native-windows/cli": "0.82.0",
-    "react-native-windows": "0.82.1"
+    "react-native-test-app": "*",
+    "react-native-windows": "0.81.4"
   }
 }
