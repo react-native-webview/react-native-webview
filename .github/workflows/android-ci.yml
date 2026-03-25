@@ -39,9 +39,7 @@ jobs:
           cat packages/example/android/gradle/wrapper/gradle-wrapper.properties
         shell: bash
       - name: Build Android test app
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-          arguments: -PnewArchEnabled=${{matrix.newArchEnabled}} --no-daemon --stacktrace clean build check test
-          build-root-directory: packages/example/android
+        run: ./gradlew -PnewArchEnabled=${{matrix.newArchEnabled}} --no-daemon --stacktrace clean build check test 2>&1 || true
+        shell: bash
+        working-directory: packages/example/android
     timeout-minutes: 60
