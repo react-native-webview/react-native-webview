@@ -17,7 +17,7 @@ jobs:
       - name: Install dependencies
         run: bun install
       - name: Link workspace node_modules
-        run: ln -sf ../../node_modules packages/example-mobile/node_modules
+        run: rm -rf packages/example-mobile/node_modules && ln -s ../../node_modules packages/example-mobile/node_modules
       - name: Install Pods
         run: pod install
         working-directory: packages/example-mobile/ios

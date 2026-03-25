@@ -27,7 +27,7 @@ jobs:
         run: bun install
         shell: bash
       - name: Link workspace node_modules
-        run: ln -sf ../../node_modules packages/example-mobile/node_modules
+        run: rm -rf packages/example-mobile/node_modules && ln -s ../../node_modules packages/example-mobile/node_modules
         shell: bash
       - name: Build Android test app
         run: ./gradlew --no-daemon --stacktrace clean build check test
