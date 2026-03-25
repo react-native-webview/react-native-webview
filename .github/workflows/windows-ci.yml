@@ -21,8 +21,12 @@ jobs:
           vs-version: '[17.0,)'
           msbuild-architecture: x64
 
-      - name: Install dependencies
+      - name: Install workspace dependencies
         run: bun install
+
+      - name: Install Windows example dependencies
+        run: bun install
+        working-directory: packages/example-windows
 
       - name: Build
         run: |
@@ -31,7 +35,9 @@ jobs:
 
       - name: Build x64 release
         shell: powershell
-        run: bun run windows --release --no-packager --no-deploy --logging
+        run: |
+          cd packages/example-windows
+          bun run windows --release --no-packager --no-deploy --logging
 
       - name: Deploy
         shell: powershell

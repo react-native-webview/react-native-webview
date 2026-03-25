@@ -2,7 +2,9 @@
   "name": "react-native-webview-monorepo",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/react-native-webview",
+    "packages/example-shared",
+    "packages/example-mobile"
   ],
   "scripts": {
     "build": "bun run --cwd packages/react-native-webview build",
