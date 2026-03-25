@@ -24,7 +24,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Install dependencies
-        run: bun install
+        run: bun install --linker hoisted
         shell: bash
       - name: Debug node_modules
         run: |

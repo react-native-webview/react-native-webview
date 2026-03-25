@@ -22,7 +22,7 @@ jobs:
           msbuild-architecture: x64
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --linker hoisted
 
       - name: Build
         run: |
