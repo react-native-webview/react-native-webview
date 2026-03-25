@@ -73,7 +73,7 @@
     "react": "^18.2.0",
     "react-native": "0.73.5",
     "react-native-macos": "0.73.17",
-    "react-native-windows": "0.82.1",
+    "react-native-windows": "0.73.8",
     "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",
     "semantic-release": "25.0.3",
