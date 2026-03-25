@@ -3,9 +3,7 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "packages/react-native-webview",
-      "packages/example-shared",
-      "packages/example-mobile"
+      "packages/*"
     ],
     "catalog": {
       "react": "^19.1.0",

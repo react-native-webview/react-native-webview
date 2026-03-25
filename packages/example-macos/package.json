@@ -9,8 +9,8 @@
   "dependencies": {
     "react": "^19.1.4",
     "react-native": "0.81.6",
-    "react-native-webview": "link:../react-native-webview",
-    "example-shared": "link:../example-shared"
+    "react-native-webview": "workspace:*",
+    "example-shared": "workspace:*"
   },
   "devDependencies": {
     "@react-native/babel-preset": "0.81.6",
