@@ -4,14 +4,14 @@ const project = (() => {
     const { configureProjects } = require('react-native-test-app');
     return configureProjects({
       android: {
-        sourceDir: path.join('example', 'android'),
+        sourceDir: path.join('..', 'example', 'android'),
       },
       ios: {
-        sourceDir: 'example/ios',
+        sourceDir: '../example/ios',
       },
       windows: {
-        sourceDir: path.join('example', 'windows'),
-        solutionFile: path.join('example', 'windows', 'WebviewExample.sln'),
+        sourceDir: path.join('..', 'example', 'windows'),
+        solutionFile: path.join('..', 'example', 'windows', 'WebviewExample.sln'),
       },
     });
   } catch (e) {
