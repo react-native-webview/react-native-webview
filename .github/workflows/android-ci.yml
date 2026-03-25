@@ -39,7 +39,15 @@ jobs:
           echo "::notice::DEBUG bun=$(bun --version) RN_root=$RN_ROOT RN_mobile=$RN_MOBILE RNTA_root=$RNTA_ROOT RNTA_mobile=$RNTA_MOBILE root=$ROOT_COUNT mobile=$MOBILE_COUNT rnta_loc=$RNTA_LOC"
         shell: bash
       - name: Build Android test app
-        run: ./gradlew --no-daemon --stacktrace clean build check test
+        run: |
+          set +e
+          OUTPUT=$(./gradlew --no-daemon --stacktrace clean build check test 2>&1)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            LAST_LINES=$(echo "$OUTPUT" | tail -30)
+            echo "::error::GRADLE_ERROR: $LAST_LINES"
+            exit $EXIT_CODE
+          fi
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60
