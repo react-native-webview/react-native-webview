@@ -1,15 +1,11 @@
 {
   "name": "react-native-webview-monorepo",
   "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ],
-    "nohoist": [
-      "example-windows/**",
-      "example-macos/**"
-    ]
-  },
+  "workspaces": [
+    "packages/react-native-webview",
+    "packages/example-shared",
+    "packages/example-mobile"
+  ],
   "scripts": {
     "build": "bun run --cwd packages/react-native-webview build",
     "tsc": "bun run --cwd packages/react-native-webview lint:tsgo",

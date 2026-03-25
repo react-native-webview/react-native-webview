@@ -43,7 +43,8 @@ jobs:
         shell: powershell
         run: |
           Copy-Item -Path packages\example-windows\windows\x64\Release -Recurse -Destination packages\example-windows\windows\
-          bunx react-native run-windows --arch x64 --release --root packages/example-windows --logging --no-build --no-packager --deploy-from-layout
+          cd packages\example-windows
+          bunx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
 
       - name: Start Appium server
         shell: powershell
@@ -51,7 +52,9 @@ jobs:
 
       - name: Start React server
         shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run start"
+        run: |
+          cd packages/example-windows
+          Start-Process PowerShell -ArgumentList "bun run start"
 
       - name: Run tests
         run: bun run test:windows
