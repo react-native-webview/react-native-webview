@@ -28,22 +28,14 @@ jobs:
         shell: bash
       - name: Debug node_modules
         run: |
-          {
-            echo "## Debug: node_modules layout"
-            echo '```'
-            echo "bunfig.toml: $(cat bunfig.toml)"
-            echo "Root node_modules:"
-            ls node_modules/ 2>/dev/null | head -30 || echo "EMPTY"
-            echo ""
-            echo "example-mobile node_modules:"
-            ls packages/example-mobile/node_modules/ 2>/dev/null | head -20 || echo "EMPTY"
-            echo ""
-            echo "react-native at root: $(node -e "try{console.log(require('./node_modules/react-native/package.json').version)}catch(e){console.log('NOT FOUND')}" 2>&1)"
-            echo "react-native in example-mobile: $(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native/package.json').version)}catch(e){console.log('NOT FOUND')}" 2>&1)"
-            echo "react-native-test-app: $(node -e "try{console.log(require('./node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT FOUND')}" 2>&1)"
-            echo "RNTA in example-mobile: $(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT FOUND')}" 2>&1)"
-            echo '```'
-          } >> $GITHUB_STEP_SUMMARY
+          RN_ROOT=$(node -e "try{console.log(require('./node_modules/react-native/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
+          RN_MOBILE=$(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
+          RNTA_ROOT=$(node -e "try{console.log(require('./node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
+          RNTA_MOBILE=$(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
+          ROOT_COUNT=$(ls node_modules/ 2>/dev/null | wc -l)
+          MOBILE_COUNT=$(ls packages/example-mobile/node_modules/ 2>/dev/null | wc -l)
+          RNTA_EXISTS=$(test -f packages/example-mobile/node_modules/react-native-test-app/test-app.gradle && echo "YES" || echo "NO")
+          echo "::notice::DEBUG: RN_root=$RN_ROOT RN_mobile=$RN_MOBILE RNTA_root=$RNTA_ROOT RNTA_mobile=$RNTA_MOBILE root_pkgs=$ROOT_COUNT mobile_pkgs=$MOBILE_COUNT rnta_gradle=$RNTA_EXISTS"
         shell: bash
       - name: Build Android test app
         run: ./gradlew --no-daemon --stacktrace clean build check test
