@@ -1,4 +1,4 @@
-require_relative '../../../node_modules/react-native-test-app/test_app'
+require_relative '../node_modules/react-native-test-app/test_app'
 
 workspace 'WebviewExample.xcworkspace'
 
