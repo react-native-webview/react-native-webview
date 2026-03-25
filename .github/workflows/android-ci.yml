@@ -26,32 +26,11 @@ jobs:
       - name: Install dependencies
         run: bun install
         shell: bash
-      - name: Debug node_modules
-        run: |
-          set +e
-          RN_ROOT=$(node -e "try{console.log(require('./node_modules/react-native/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
-          RN_MOBILE=$(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
-          RNTA_ROOT=$(node -e "try{console.log(require('./node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
-          RNTA_MOBILE=$(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
-          ROOT_COUNT=$(ls node_modules/ 2>/dev/null | wc -l || echo 0)
-          MOBILE_COUNT=$(ls packages/example-mobile/node_modules/ 2>/dev/null | wc -l || echo 0)
-          if [ -d "packages/example-mobile/node_modules/react-native-test-app/android" ]; then RNTA_LOC="MOBILE"; elif [ -d "node_modules/react-native-test-app/android" ]; then RNTA_LOC="ROOT"; else RNTA_LOC="NONE"; fi
-          echo "::notice::DEBUG bun=$(bun --version) RN_root=$RN_ROOT RN_mobile=$RN_MOBILE RNTA_root=$RNTA_ROOT RNTA_mobile=$RNTA_MOBILE root=$ROOT_COUNT mobile=$MOBILE_COUNT rnta_loc=$RNTA_LOC"
+      - name: Link workspace node_modules
+        run: ln -sf ../../node_modules packages/example-mobile/node_modules
         shell: bash
       - name: Build Android test app
-        run: |
-          set +e
-          OUTPUT=$(./gradlew --no-daemon --stacktrace clean build check test 2>&1)
-          EXIT_CODE=$?
-          if [ $EXIT_CODE -ne 0 ]; then
-            LINE1=$(echo "$OUTPUT" | grep -A1 "What went wrong" | tail -1 | tr -d '\n')
-            LINE2=$(echo "$OUTPUT" | grep -A2 "What went wrong" | tail -1 | tr -d '\n')
-            LINE3=$(echo "$OUTPUT" | grep "Exception\|Error\|Could not\|Cannot\|not found\|No such" | head -3 | tr '\n' ' ')
-            echo "::error::WHAT1: $LINE1"
-            echo "::error::WHAT2: $LINE2"
-            echo "::error::ERRORS: $LINE3"
-            exit $EXIT_CODE
-          fi
+        run: ./gradlew --no-daemon --stacktrace clean build check test
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60
