@@ -28,6 +28,7 @@
     "android": "bun run --cwd packages/example-mobile android",
     "ios": "bun run --cwd packages/example-mobile ios",
     "macos": "cd packages/example-macos && bun run macos",
-    "windows": "cd packages/example-windows && bun run windows"
+    "windows": "cd packages/example-windows && bun run windows",
+    "visionos": "cd packages/example-visionos && bun run visionos"
   }
 }

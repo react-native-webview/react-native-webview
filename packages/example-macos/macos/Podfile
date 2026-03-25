@@ -1,4 +1,5 @@
-require_relative '../node_modules/react-native-test-app/macos/test_app'
+rnta_path = `node --print "require('path').dirname(require.resolve('react-native-test-app/package.json'))"`.strip
+require_relative "#{rnta_path}/macos/test_app"
 
 workspace 'WebviewExample.xcworkspace'
 

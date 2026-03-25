@@ -1,8 +1,0 @@
-require_relative(
-  `node --print "require.resolve('react-native-test-app/visionos/test_app.rb', {paths: ['#{__dir__}/..']})"`
-    .strip
-)
-
-workspace 'WebviewExample.xcworkspace'
-
-use_test_app!
