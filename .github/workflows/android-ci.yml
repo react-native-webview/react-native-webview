@@ -44,8 +44,12 @@ jobs:
           OUTPUT=$(./gradlew --no-daemon --stacktrace clean build check test 2>&1)
           EXIT_CODE=$?
           if [ $EXIT_CODE -ne 0 ]; then
-            LAST_LINES=$(echo "$OUTPUT" | tail -30)
-            echo "::error::GRADLE_ERROR: $LAST_LINES"
+            ERR1=$(echo "$OUTPUT" | grep -A5 "FAILURE:" | head -10)
+            ERR2=$(echo "$OUTPUT" | grep -A5 "What went wrong:" | head -10)
+            ERR3=$(echo "$OUTPUT" | grep -B2 "BUILD FAILED" | head -5)
+            echo "::error::GRADLE_FAILURE: $ERR1"
+            echo "::error::GRADLE_WHAT: $ERR2"
+            echo "::error::GRADLE_BUILD: $ERR3"
             exit $EXIT_CODE
           fi
         shell: bash
