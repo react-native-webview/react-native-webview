@@ -19,7 +19,17 @@ jobs:
       - name: Link workspace node_modules
         run: rm -rf packages/example-mobile/node_modules && ln -s ../../node_modules packages/example-mobile/node_modules
       - name: Install Pods
-        run: pod install
+        run: |
+          set +e
+          OUTPUT=$(pod install 2>&1)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            ERR=$(echo "$OUTPUT" | grep -i "error\|Error\|cannot\|Could not\|not found\|No such\|LoadError\|undefined\|Codegen\|autolinking" | head -5 | tr '\n' ' ')
+            LAST=$(echo "$OUTPUT" | tail -10 | tr '\n' ' ')
+            echo "::error::POD_ERR: $ERR"
+            echo "::error::POD_TAIL: $LAST"
+            exit $EXIT_CODE
+          fi
         working-directory: packages/example-mobile/ios
       - name: Build iOS test app
         run: |
