@@ -6,9 +6,6 @@ on:
   pull_request:
 jobs:
   build:
-    strategy:
-      matrix:
-        extraEnv: [FOO=BAR, RCT_NEW_ARCH_ENABLED=1]
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -20,7 +17,7 @@ jobs:
       - name: Install dependencies
         run: bun install
       - name: Install Pods
-        run: ${{matrix.extraEnv}} pod install
+        run: pod install
         working-directory: packages/example-mobile/ios
       - name: Build iOS test app
         run: |

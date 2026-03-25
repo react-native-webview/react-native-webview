@@ -10,7 +10,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        newArchEnabled: [false, true]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -28,7 +27,7 @@ jobs:
         run: bun install
         shell: bash
       - name: Build Android test app
-        run: ./gradlew -PnewArchEnabled=${{matrix.newArchEnabled}} --no-daemon --stacktrace clean build check test
+        run: ./gradlew --no-daemon --stacktrace clean build check test
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60
