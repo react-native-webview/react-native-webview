@@ -1,11 +1,21 @@
 {
   "name": "react-native-webview-monorepo",
   "private": true,
-  "workspaces": [
-    "packages/react-native-webview",
-    "packages/example-shared",
-    "packages/example-mobile"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/react-native-webview",
+      "packages/example-shared",
+      "packages/example-mobile"
+    ],
+    "catalog": {
+      "react": "^19.1.0",
+      "react-native": "0.83.4",
+      "@react-native/babel-preset": "0.83.4",
+      "@react-native/metro-config": "0.83.4",
+      "@react-native/typescript-config": "0.83.4",
+      "react-native-test-app": "*"
+    }
+  },
   "scripts": {
     "build": "bun run --cwd packages/react-native-webview build",
     "tsc": "bun run --cwd packages/react-native-webview lint:tsgo",
