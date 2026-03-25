@@ -1,5 +1,5 @@
 buildscript {
-    def androidTestAppDir = "../../node_modules/react-native-test-app/android"
+    def androidTestAppDir = "../../../node_modules/react-native-test-app/android"
     apply(from: "${androidTestAppDir}/dependencies.gradle")
 
     repositories {
