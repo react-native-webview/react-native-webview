@@ -8,5 +8,11 @@ pluginManagement {
 
 rootProject.name = "WebviewExample"
 
-apply(from: "../node_modules/react-native-test-app/test-app.gradle")
+def generators = new File(
+    new String(new groovy.json.JsonSlurper()
+        .parseText(["node", "--print", "JSON.stringify(require.resolve('react-native-test-app/package.json'))"].execute(null, rootDir.parentFile).text)
+    ).replace("package.json", ""),
+    "test-app.gradle"
+)
+apply(from: generators)
 applyTestAppSettings(settings)

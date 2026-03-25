@@ -1,5 +1,8 @@
 buildscript {
-    def androidTestAppDir = "../node_modules/react-native-test-app/android"
+    def generators = new String(new groovy.json.JsonSlurper()
+        .parseText(["node", "--print", "JSON.stringify(require.resolve('react-native-test-app/package.json'))"].execute(null, rootDir.parentFile).text)
+    ).replace("package.json", "")
+    def androidTestAppDir = "${generators}android"
     apply(from: "${androidTestAppDir}/dependencies.gradle")
 
     repositories {
