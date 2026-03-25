@@ -8,5 +8,5 @@ pluginManagement {
 
 rootProject.name = "WebviewExample"
 
-apply(from: "../node_modules/react-native-test-app/test-app.gradle")
+apply(from: new File(["node", "--print", "require.resolve('react-native-test-app/package.json')"].execute(null, rootDir.parentFile).text.trim()).getParentFile().toString() + "/test-app.gradle")
 applyTestAppSettings(settings)
