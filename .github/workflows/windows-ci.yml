@@ -31,18 +31,13 @@ jobs:
 
       - name: Build x64 release
         shell: powershell
-        run: |
-          bun run windows --release --no-packager --no-deploy --logging 2>&1
-          if ($LASTEXITCODE -ne 0) { Write-Host "Build failed with exit code $LASTEXITCODE"; exit $LASTEXITCODE }
+        run: bun run windows --release --no-packager --no-deploy --logging
 
-      # Workaround for a bug in package searching during deploy.
-      # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the packages at windows/x64/Release.
-      # Copy the packages to Windows/Release before deploying.
       - name: Deploy
         shell: powershell
         run: |
-          Copy-Item -Path packages\example\windows\x64\Release -Recurse -Destination packages\example\windows\
-          bunx react-native run-windows --arch x64 --release --root packages/example --logging --no-build --no-packager --deploy-from-layout
+          Copy-Item -Path packages\example-windows\windows\x64\Release -Recurse -Destination packages\example-windows\windows\
+          bunx react-native run-windows --arch x64 --release --root packages/example-windows --logging --no-build --no-packager --deploy-from-layout
 
       - name: Start Appium server
         shell: powershell

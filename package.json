@@ -12,10 +12,10 @@
     "lint:ci": "bun run --cwd packages/react-native-webview lint:ci",
     "test:windows": "bun run --cwd packages/react-native-webview test:windows",
     "ci:publish": "bun run --cwd packages/react-native-webview ci:publish",
-    "start": "bun run --cwd packages/example start",
-    "android": "bun run --cwd packages/example android",
-    "ios": "bun run --cwd packages/example ios",
-    "macos": "bun run --cwd packages/example macos",
-    "windows": "bun run --cwd packages/example windows"
+    "start": "bun run --cwd packages/example-mobile start",
+    "android": "bun run --cwd packages/example-mobile android",
+    "ios": "bun run --cwd packages/example-mobile ios",
+    "macos": "bun run --cwd packages/example-macos macos",
+    "windows": "bun run --cwd packages/example-windows windows"
   }
 }
