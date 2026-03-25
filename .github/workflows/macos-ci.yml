@@ -15,7 +15,7 @@ jobs:
         with:
           bun-version: 1.3.10
       - name: Install workspace dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
       - name: Install macOS example dependencies
         run: bun install
         working-directory: packages/example-macos
