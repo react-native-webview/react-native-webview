@@ -22,7 +22,7 @@ jobs:
           msbuild-architecture: x64
 
       - name: Install workspace dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Install Windows example dependencies
         run: bun install
