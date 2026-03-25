@@ -3,7 +3,9 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "packages/*"
+      "packages/react-native-webview",
+      "packages/example-shared",
+      "packages/example-mobile"
     ],
     "catalog": {
       "react": "^19.1.0",
@@ -25,7 +27,7 @@
     "start": "bun run --cwd packages/example-mobile start",
     "android": "bun run --cwd packages/example-mobile android",
     "ios": "bun run --cwd packages/example-mobile ios",
-    "macos": "bun run --cwd packages/example-macos macos",
-    "windows": "bun run --cwd packages/example-windows windows"
+    "macos": "cd packages/example-macos && bun run macos",
+    "windows": "cd packages/example-windows && bun run windows"
   }
 }
