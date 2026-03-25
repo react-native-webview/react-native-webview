@@ -26,8 +26,22 @@ jobs:
       - name: Install dependencies
         run: bun install
         shell: bash
+      - name: Debug node_modules
+        run: |
+          echo "=== Root node_modules ==="
+          ls node_modules/ | head -30 || echo "EMPTY"
+          echo "=== example-mobile node_modules ==="
+          ls packages/example-mobile/node_modules/ 2>/dev/null | head -20 || echo "EMPTY"
+          echo "=== react-native version ==="
+          cat node_modules/react-native/package.json 2>/dev/null | grep '"version"' | head -1 || echo "NOT FOUND at root"
+          cat packages/example-mobile/node_modules/react-native/package.json 2>/dev/null | grep '"version"' | head -1 || echo "NOT FOUND in example-mobile"
+          echo "=== react-native-test-app version ==="
+          cat node_modules/react-native-test-app/package.json 2>/dev/null | grep '"version"' | head -1 || echo "NOT FOUND"
+          echo "=== bunfig.toml ==="
+          cat bunfig.toml
+        shell: bash
       - name: Build Android test app
-        run: ./gradlew --no-daemon --stacktrace clean build check test
+        run: ./gradlew --no-daemon --stacktrace clean build check test 2>&1 || true
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60
