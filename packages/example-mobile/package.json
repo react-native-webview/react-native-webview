@@ -16,12 +16,6 @@
   "devDependencies": {
     "@react-native/babel-preset": "0.83.4",
     "@react-native/metro-config": "0.83.4",
-    "@react-native-community/cli": "20.0.0",
-    "@react-native-community/cli-platform-android": "20.0.0",
-    "@react-native-community/cli-platform-ios": "20.0.0",
-    "@react-native/codegen": "0.83.4",
-    "@react-native/community-cli-plugin": "0.83.4",
-    "@callstack/react-native-visionos": "0.79.6",
-    "react-native-test-app": "^3.10.0"
+    "react-native-test-app": "*"
   }
 }
