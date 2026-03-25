@@ -28,20 +28,23 @@ jobs:
         shell: bash
       - name: Debug node_modules
         run: |
-          echo "=== Root node_modules ==="
-          ls node_modules/ | head -30 || echo "EMPTY"
-          echo "=== example-mobile node_modules ==="
-          ls packages/example-mobile/node_modules/ 2>/dev/null | head -20 || echo "EMPTY"
-          echo "=== react-native version ==="
-          cat node_modules/react-native/package.json 2>/dev/null | grep '"version"' | head -1 || echo "NOT FOUND at root"
-          cat packages/example-mobile/node_modules/react-native/package.json 2>/dev/null | grep '"version"' | head -1 || echo "NOT FOUND in example-mobile"
-          echo "=== react-native-test-app version ==="
-          cat node_modules/react-native-test-app/package.json 2>/dev/null | grep '"version"' | head -1 || echo "NOT FOUND"
           echo "=== bunfig.toml ==="
           cat bunfig.toml
+          echo "=== Root node_modules (first 30) ==="
+          ls node_modules/ 2>/dev/null | head -30 || echo "EMPTY"
+          echo "=== example-mobile node_modules ==="
+          ls packages/example-mobile/node_modules/ 2>/dev/null | head -20 || echo "EMPTY"
+          echo "=== react-native version at root ==="
+          node -e "try{console.log(require('./node_modules/react-native/package.json').version)}catch(e){console.log('NOT FOUND')}"
+          echo "=== react-native version in example-mobile ==="
+          node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native/package.json').version)}catch(e){console.log('NOT FOUND')}"
+          echo "=== react-native-test-app version ==="
+          node -e "try{console.log(require('./node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT FOUND')}"
+          echo "=== settings.gradle ==="
+          cat packages/example-mobile/android/settings.gradle
         shell: bash
       - name: Build Android test app
-        run: ./gradlew --no-daemon --stacktrace clean build check test 2>&1 || true
+        run: ./gradlew --no-daemon --stacktrace clean build check test
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60

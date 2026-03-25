@@ -18,21 +18,16 @@ jobs:
         run: bun install
       - name: Debug node_modules
         run: |
-          echo "=== Root node_modules ==="
-          ls node_modules/ | head -30 || echo "EMPTY"
-          echo "=== example-macos node_modules ==="
-          ls packages/example-macos/node_modules/ 2>/dev/null | head -20 || echo "EMPTY"
-          echo "=== react-native-test-app location ==="
-          find . -path "*/node_modules/react-native-test-app/package.json" -not -path "*/.bun/*" 2>/dev/null | head -5
-          echo "=== react-native location ==="
-          find . -path "*/node_modules/react-native/package.json" -not -path "*/.bun/*" 2>/dev/null | head -5
-          echo "=== Podfile ==="
-          cat packages/example-macos/macos/Podfile
+          echo "=== react-native-test-app ==="
+          ls packages/example-macos/node_modules/react-native-test-app/macos/ 2>/dev/null || ls node_modules/react-native-test-app/macos/ 2>/dev/null || echo "NOT FOUND"
+          echo "=== react-native ==="
+          node -e "console.log(require('packages/example-macos/node_modules/react-native/package.json').version)" 2>/dev/null || node -e "console.log(require('./node_modules/react-native/package.json').version)" 2>/dev/null || echo "NOT FOUND"
+          echo "=== react-native-macos ==="
+          node -e "console.log(require('packages/example-macos/node_modules/react-native-macos/package.json').version)" 2>/dev/null || node -e "console.log(require('./node_modules/react-native-macos/package.json').version)" 2>/dev/null || echo "NOT FOUND"
       - name: Install Pods
-        run: pod install 2>&1 || true
+        run: pod install
         working-directory: packages/example-macos/macos
       - name: Build macOS test app
-        if: success()
         run: |
           xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
         working-directory: packages/example-macos/macos
