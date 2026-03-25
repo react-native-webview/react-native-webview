@@ -30,7 +30,19 @@ jobs:
         run: rm -rf packages/example-mobile/node_modules && ln -s ../../node_modules packages/example-mobile/node_modules
         shell: bash
       - name: Build Android test app
-        run: ./gradlew --no-daemon --stacktrace clean build check test
+        run: |
+          set +e
+          OUTPUT=$(./gradlew --no-daemon --stacktrace clean build check test 2>&1)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            LINE1=$(echo "$OUTPUT" | grep -A1 "What went wrong" | tail -1 | tr -d '\n')
+            LINE2=$(echo "$OUTPUT" | grep -A2 "What went wrong" | tail -1 | tr -d '\n')
+            LINE3=$(echo "$OUTPUT" | grep "Exception\|Error\|Could not\|Cannot\|not found\|No such" | head -3 | tr '\n' ' ')
+            echo "::error::WHAT1: $LINE1"
+            echo "::error::WHAT2: $LINE2"
+            echo "::error::ERRORS: $LINE3"
+            exit $EXIT_CODE
+          fi
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60
