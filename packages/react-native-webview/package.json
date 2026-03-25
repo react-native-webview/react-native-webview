@@ -72,8 +72,6 @@
     "oxlint-tsgolint": "0.15.0",
     "react": "^19.1.0",
     "react-native": "0.83.4",
-    "react-native-macos": "0.81.4",
-    "react-native-windows": "0.82.1",
     "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",
     "semantic-release": "25.0.3",
