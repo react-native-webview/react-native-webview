@@ -2,7 +2,12 @@ buildscript {
     def androidTestAppDir = "../node_modules/react-native-test-app/android"
     apply(from: "${androidTestAppDir}/dependencies.gradle")
 
+    def reactNativePath = findNodeModulesPath("react-native", rootDir)
+
     repositories {
+        maven {
+            url = uri("${reactNativePath}/android")
+        }
         mavenCentral()
         google()
     }
