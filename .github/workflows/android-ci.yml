@@ -28,20 +28,22 @@ jobs:
         shell: bash
       - name: Debug node_modules
         run: |
-          echo "=== bunfig.toml ==="
-          cat bunfig.toml
-          echo "=== Root node_modules (first 30) ==="
-          ls node_modules/ 2>/dev/null | head -30 || echo "EMPTY"
-          echo "=== example-mobile node_modules ==="
-          ls packages/example-mobile/node_modules/ 2>/dev/null | head -20 || echo "EMPTY"
-          echo "=== react-native version at root ==="
-          node -e "try{console.log(require('./node_modules/react-native/package.json').version)}catch(e){console.log('NOT FOUND')}"
-          echo "=== react-native version in example-mobile ==="
-          node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native/package.json').version)}catch(e){console.log('NOT FOUND')}"
-          echo "=== react-native-test-app version ==="
-          node -e "try{console.log(require('./node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT FOUND')}"
-          echo "=== settings.gradle ==="
-          cat packages/example-mobile/android/settings.gradle
+          {
+            echo "## Debug: node_modules layout"
+            echo '```'
+            echo "bunfig.toml: $(cat bunfig.toml)"
+            echo "Root node_modules:"
+            ls node_modules/ 2>/dev/null | head -30 || echo "EMPTY"
+            echo ""
+            echo "example-mobile node_modules:"
+            ls packages/example-mobile/node_modules/ 2>/dev/null | head -20 || echo "EMPTY"
+            echo ""
+            echo "react-native at root: $(node -e "try{console.log(require('./node_modules/react-native/package.json').version)}catch(e){console.log('NOT FOUND')}" 2>&1)"
+            echo "react-native in example-mobile: $(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native/package.json').version)}catch(e){console.log('NOT FOUND')}" 2>&1)"
+            echo "react-native-test-app: $(node -e "try{console.log(require('./node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT FOUND')}" 2>&1)"
+            echo "RNTA in example-mobile: $(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT FOUND')}" 2>&1)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
         shell: bash
       - name: Build Android test app
         run: ./gradlew --no-daemon --stacktrace clean build check test
