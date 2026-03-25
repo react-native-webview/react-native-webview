@@ -28,33 +28,29 @@ jobs:
         run: bun install
         working-directory: packages/example-windows
 
-      - name: Build
+      - name: Build JS
         run: |
           bun run build
           bun run tsc
 
-      - name: Setup Windows project
-        shell: bash
+      - name: Initialize Windows project
+        shell: cmd
         run: |
-          cd packages/example-windows
-          npx install-windows-test-app --project-directory windows
+          cd packages\example-windows
+          npx @react-native-windows/cli init-windows --overwrite --logging
 
       - name: Build x64 release
         shell: cmd
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging 2>&1
-          if %errorlevel% neq 0 (
-            echo ::error::WIN_BUILD_FAILED with exit code %errorlevel%
-            exit /b %errorlevel%
-          )
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging
 
       - name: Deploy
         shell: powershell
         run: |
           Copy-Item -Path packages\example-windows\windows\x64\Release -Recurse -Destination packages\example-windows\windows\
           cd packages\example-windows
-          bunx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
+          npx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
 
       - name: Start Appium server
         shell: powershell
