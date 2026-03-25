@@ -26,6 +26,18 @@ jobs:
       - name: Install dependencies
         run: bun install
         shell: bash
+      - name: Debug node_modules
+        run: |
+          RN_ROOT=$(node -e "try{console.log(require('./node_modules/react-native/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
+          RN_MOBILE=$(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
+          RNTA_ROOT=$(node -e "try{console.log(require('./node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
+          RNTA_MOBILE=$(node -e "try{console.log(require('./packages/example-mobile/node_modules/react-native-test-app/package.json').version)}catch(e){console.log('NOT_FOUND')}" 2>&1)
+          ROOT_COUNT=$(ls node_modules/ 2>/dev/null | wc -l)
+          MOBILE_COUNT=$(ls packages/example-mobile/node_modules/ 2>/dev/null | wc -l)
+          RNTA_GRADLE=$(test -d packages/example-mobile/node_modules/react-native-test-app/android && echo "YES" || test -d node_modules/react-native-test-app/android && echo "AT_ROOT" || echo "NO")
+          SETTINGS=$(cat packages/example-mobile/android/settings.gradle | head -3)
+          echo "::notice::DEBUG: bun=$(bun --version) RN_root=$RN_ROOT RN_mobile=$RN_MOBILE RNTA_root=$RNTA_ROOT RNTA_mobile=$RNTA_MOBILE root_pkgs=$ROOT_COUNT mobile_pkgs=$MOBILE_COUNT rnta_android=$RNTA_GRADLE"
+        shell: bash
       - name: Build Android test app
         run: ./gradlew --no-daemon --stacktrace clean build check test
         shell: bash
