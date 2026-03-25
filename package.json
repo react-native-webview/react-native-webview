@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "build": "bun run --cwd packages/react-native-webview build",
+    "tsc": "bun run --cwd packages/react-native-webview lint:tsgo",
     "prepare": "bun run --cwd packages/react-native-webview prepare",
     "lint": "bun run --cwd packages/react-native-webview lint",
     "lint:ci": "bun run --cwd packages/react-native-webview lint:ci",
