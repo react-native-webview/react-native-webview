@@ -18,7 +18,17 @@ jobs:
         run: bun install
         working-directory: packages/example-macos
       - name: Install Pods
-        run: pod install
+        run: |
+          set +e
+          OUTPUT=$(pod install 2>&1)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            ERR=$(echo "$OUTPUT" | grep -i "error\|Error\|cannot\|Could not\|not found\|No such\|LoadError\|undefined" | head -5 | tr '\n' ' ')
+            LAST=$(echo "$OUTPUT" | tail -5 | tr '\n' ' ')
+            echo "::error::POD_ERROR: $ERR"
+            echo "::error::POD_TAIL: $LAST"
+            exit $EXIT_CODE
+          fi
         working-directory: packages/example-macos/macos
       - name: Build macOS test app
         run: |
