@@ -24,33 +24,10 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Install dependencies
-        run: |
-          bun install
-          if [ ! -d "packages/example-mobile/node_modules/react-native" ]; then
-            rm -rf packages/example-mobile/node_modules
-            if [ "$RUNNER_OS" = "Windows" ]; then
-              cmd //c "mklink /J packages\\example-mobile\\node_modules node_modules"
-            else
-              ln -s ../../node_modules packages/example-mobile/node_modules
-            fi
-          fi
+        run: bun install
         shell: bash
       - name: Build Android test app
-        run: |
-          set +e
-          OUTPUT=$(./gradlew --no-daemon --stacktrace clean build check test 2>&1)
-          EXIT_CODE=$?
-          if [ $EXIT_CODE -ne 0 ]; then
-            LINE1=$(echo "$OUTPUT" | grep -A1 "What went wrong" | tail -1 | tr -d '\n')
-            LINE2=$(echo "$OUTPUT" | grep -A2 "What went wrong" | tail -1 | tr -d '\n')
-            LINE3=$(echo "$OUTPUT" | grep "Could not find\|Could not resolve\|Could not get\|artifact" | head -5 | tr '\n' ' ')
-            RN_PATH=$(echo "$OUTPUT" | grep "reactNativePath\|react-native/android\|maven" | head -3 | tr '\n' ' ')
-            echo "::error::WHAT1: $LINE1"
-            echo "::error::WHAT2: $LINE2"
-            echo "::error::MISSING: $LINE3"
-            echo "::error::PATHS: $RN_PATH"
-            exit $EXIT_CODE
-          fi
+        run: ./gradlew --no-daemon --stacktrace clean build check test
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60

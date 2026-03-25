@@ -16,34 +16,15 @@ jobs:
           bun-version: 1.3.10
       - name: Install dependencies
         run: bun install
-      - name: Link workspace node_modules
-        run: rm -rf packages/example-mobile/node_modules && ln -s ../../node_modules packages/example-mobile/node_modules
       - name: Install Pods
-        run: |
-          set +e
-          OUTPUT=$(pod install 2>&1)
-          EXIT_CODE=$?
-          if [ $EXIT_CODE -ne 0 ]; then
-            ERR=$(echo "$OUTPUT" | grep -i "error\|Error\|cannot\|Could not\|not found\|No such\|LoadError\|undefined\|Codegen\|autolinking" | head -5 | tr '\n' ' ')
-            LAST=$(echo "$OUTPUT" | tail -10 | tr '\n' ' ')
-            echo "::error::POD_ERR: $ERR"
-            echo "::error::POD_TAIL: $LAST"
-            exit $EXIT_CODE
-          fi
+        run: pod install
         working-directory: packages/example-mobile/ios
       - name: Build iOS test app
         run: |
-          set +e
           device_name='iPhone 17'
           device=$(xcrun simctl list devices "${device_name}" available | grep "${device_name} (")
           re='\(([-0-9A-Fa-f]+)\)'
           [[ $device =~ $re ]] || exit 1
-          OUTPUT=$(xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination "platform=iOS Simulator,id=${BASH_REMATCH[1]}" CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build 2>&1)
-          EXIT_CODE=$?
-          if [ $EXIT_CODE -ne 0 ]; then
-            ERRS=$(echo "$OUTPUT" | grep "error:" | tail -5 | tr '\n' ' ')
-            echo "::error::XCODE_ERRORS: $ERRS"
-            exit $EXIT_CODE
-          fi
+          xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination "platform=iOS Simulator,id=${BASH_REMATCH[1]}" CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
         working-directory: packages/example-mobile/ios
     timeout-minutes: 60
