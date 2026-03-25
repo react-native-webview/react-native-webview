@@ -26,10 +26,13 @@ jobs:
       - name: Install dependencies
         run: |
           bun install
-          echo "::notice::MOBILE_PKGS=$(ls packages/example-mobile/node_modules/ 2>/dev/null | wc -l) ROOT_PKGS=$(ls node_modules/ 2>/dev/null | wc -l) BUNFIG=$(cat bunfig.toml 2>/dev/null) BUN=$(bun --version)"
           if [ ! -d "packages/example-mobile/node_modules/react-native" ]; then
-            echo "::notice::CREATING_SYMLINK: mobile node_modules empty, symlinking to root"
-            rm -rf packages/example-mobile/node_modules && ln -s ../../node_modules packages/example-mobile/node_modules
+            rm -rf packages/example-mobile/node_modules
+            if [ "$RUNNER_OS" = "Windows" ]; then
+              cmd //c "mklink /J packages\\example-mobile\\node_modules node_modules"
+            else
+              ln -s ../../node_modules packages/example-mobile/node_modules
+            fi
           fi
         shell: bash
       - name: Build Android test app
