@@ -39,8 +39,8 @@ jobs:
       - name: Deploy
         shell: powershell
         run: |
-          Copy-Item -Path example\windows\x64\Release -Recurse -Destination example\windows\
-          bunx react-native run-windows --arch x64 --release --root example --logging --no-build --no-packager --deploy-from-layout
+          Copy-Item -Path packages\example\windows\x64\Release -Recurse -Destination packages\example\windows\
+          bunx react-native run-windows --arch x64 --release --root packages/example --logging --no-build --no-packager --deploy-from-layout
 
       - name: Start Appium server
         shell: powershell

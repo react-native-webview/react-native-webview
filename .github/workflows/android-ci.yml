@@ -31,5 +31,5 @@ jobs:
         with:
           gradle-version: wrapper
           arguments: -PnewArchEnabled=${{matrix.newArchEnabled}} --no-daemon clean build check test
-          build-root-directory: example/android
+          build-root-directory: packages/example/android
     timeout-minutes: 60
