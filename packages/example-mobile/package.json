@@ -14,9 +14,6 @@
     "example-shared": "workspace:*"
   },
   "devDependencies": {
-    "@react-native-community/cli": "20.0.0",
-    "@react-native-community/cli-platform-android": "20.0.0",
-    "@react-native-community/cli-platform-ios": "20.0.0",
     "@react-native/babel-preset": "catalog:",
     "@react-native/metro-config": "catalog:",
     "react-native-test-app": "catalog:"
