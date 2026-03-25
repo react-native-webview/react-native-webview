@@ -37,7 +37,11 @@ jobs:
         shell: powershell
         run: |
           cd packages/example-windows
-          bun run windows --release --no-packager --no-deploy --logging
+          bun run windows --release --no-packager --no-deploy --logging 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::WIN_BUILD_FAILED with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
 
       - name: Deploy
         shell: powershell
