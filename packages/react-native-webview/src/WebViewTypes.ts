@@ -35,7 +35,6 @@ export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<
 >;
 export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>;
 export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>;
-export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>;
 
 type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
 
@@ -55,21 +54,17 @@ interface ErrorState extends BaseState {
 
 export type State = NormalState | ErrorState;
 
-// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T> = new (...args: any[]) => T;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}
 declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewMacOSComponent;
 export class NativeWebViewMacOS extends NativeWebViewMacOSBase {}
 
-declare class NativeWebViewWindowsComponent extends Component<WindowsNativeWebViewProps> {}
-declare const NativeWebViewWindowsBase: Constructor<NativeMethodsMixin> &
-  typeof NativeWebViewWindowsComponent;
-export class NativeWebViewWindows extends NativeWebViewWindowsBase {}
-
 export interface ContentInsetProp {
   top?: number;
+  left?: number;
   left?: number;
   bottom?: number;
   right?: number;
@@ -346,55 +341,9 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
 }
 
-export interface WindowsNativeWebViewProps extends CommonNativeWebViewProps {
-  testID?: string;
-  linkHandlingEnabled?: boolean;
-  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
-  onSourceChanged?: (event: WebViewNavigationEvent) => void;
-}
-
-export interface WindowsWebViewProps extends WebViewSharedProps {
-  /**
-   * Boolean value that detenmines whether the web view should use the new chromium based edge webview.
-   */
-  useWebView2?: boolean;
-  /**
-   * Function that is invoked when the `WebView` should open a new window.
-   *
-   * This happens when the JS calls `window.open('http://someurl', '_blank')`
-   * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
-   *
-   * Only works with `useWebView2` set to `true`.
-   *
-   * @platform windows
-   */
-  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
-
-  /**
-   * Function that is invoked when the `WebView` responds to a request to load a new resource.
-   * Works only on Windows.
-   *
-   * Only works with `useWebView2` set to `true`.
-   *
-   * @platform windows
-   */
-  onSourceChanged?: (event: WebViewNavigationEvent) => void;
-}
-
 export interface IOSWebViewProps extends WebViewSharedProps {
   /**
    * Does not store any data within the lifetime of the WebView.
-   */
-  incognito?: boolean;
-
-  /**
-   * Boolean value that determines whether the web view bounces
-   * when it reaches the edge of the content. The default value is `true`.
-   * @platform ios
-   */
-  bounces?: boolean;
-
-  /**
    * A floating-point number that determines how quickly the scroll view
    * decelerates after the user lifts their finger. You may also use the
    * string shortcuts `"normal"` and `"fast"` which match the underlying iOS

@@ -10,37 +10,57 @@
  * Licensed under the MIT License.
  */
 
-import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
-import { View, Image, ImageSourcePropType, NativeModules } from 'react-native';
-import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+} from 'react';
+import { View, Image, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
-import { RCTWebView, RCTWebView2 } from './WebViewNativeComponent.windows';
+import RCTWebView2, {
+  Commands,
+  NativeProps,
+} from './RCTWebView2NativeComponent';
+import RNCWebViewModule from './NativeWebviewModule';
 import {
   useWebViewLogic,
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
 } from './WebViewShared';
-import { NativeWebViewWindows, WindowsWebViewProps } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const Commands = codegenNativeCommands({
-  supportedCommands: [
-    'goBack',
-    'goForward',
-    'reload',
-    'stopLoading',
-    'injectJavaScript',
-    'requestFocus',
-    'clearCache',
-    'postMessage',
-    'loadUrl',
-  ],
-});
-const resolveAssetSource = (source: ImageSourcePropType) => Image.resolveAssetSource(source);
+// Re-export types for external consumers
+export type { NativeProps as NativeWebViewWindows } from './RCTWebView2NativeComponent';
 
-const WebViewComponent = forwardRef<unknown, WindowsWebViewProps>(
+// Windows-specific WebViewProps that extends shared props
+import {
+  WebViewSharedProps,
+  WebViewOpenWindowEvent,
+  WebViewNavigationEvent,
+} from './WebViewTypes';
+
+export interface WindowsWebViewProps extends WebViewSharedProps {
+  /**
+   * Boolean value that determines whether the web view should use the new chromium based edge webview.
+   */
+  useWebView2?: boolean;
+  /**
+   * Function that is invoked when the `WebView` should open a new window.
+   * @platform windows
+   */
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
+  /**
+   * Function that is invoked when the `WebView` responds to a request to load a new resource.
+   * @platform windows
+   */
+  onSourceChanged?: (event: WebViewNavigationEvent) => void;
+}
+const { resolveAssetSource } = Image;
+
+const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
   (
     {
       cacheEnabled = true,
@@ -63,34 +83,28 @@ const WebViewComponent = forwardRef<unknown, WindowsWebViewProps>(
       source,
       nativeConfig,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-      useWebView2,
+      useWebView2: _useWebView2,
+      onScroll: _onScroll, // Exclude from otherProps - not currently supported on Windows
       ...otherProps
     },
-    ref,
+    ref
   ) => {
-    const webViewRef = useRef<NativeWebViewWindows | null>(null);
-
-    const RCTWebViewString = useWebView2 ? 'RCTWebView2' : 'RCTWebView';
+    const webViewRef = useRef<React.ComponentRef<
+      HostComponent<NativeProps>
+    > | null>(null);
 
     const onShouldStartLoadWithRequestCallback = useCallback(
       (shouldStart: boolean, url: string, lockIdentifier?: number) => {
         if (lockIdentifier) {
-          if (RCTWebViewString === 'RCTWebView') {
-            NativeModules.RCTWebView.onShouldStartLoadWithRequestCallback(
-              shouldStart,
-              lockIdentifier,
-            );
-          } else {
-            NativeModules.RCTWebView2.onShouldStartLoadWithRequestCallback(
-              shouldStart,
-              lockIdentifier,
-            );
-          }
-        } else if (shouldStart) {
-          Commands.loadUrl(webViewRef, url);
+          RNCWebViewModule?.shouldStartLoadWithLockIdentifier(
+            shouldStart,
+            lockIdentifier
+          );
+        } else if (shouldStart && webViewRef.current) {
+          Commands.loadUrl(webViewRef.current, url);
         }
       },
-      [RCTWebViewString],
+      []
     );
 
     const {
@@ -124,20 +138,31 @@ const WebViewComponent = forwardRef<unknown, WindowsWebViewProps>(
     useImperativeHandle(
       ref,
       () => ({
-        goForward: () => Commands.goForward(webViewRef.current),
-        goBack: () => Commands.goBack(webViewRef.current),
+        goForward: () =>
+          webViewRef.current && Commands.goForward(webViewRef.current),
+        goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
         reload: () => {
           setViewState('LOADING');
-          Commands.reload(webViewRef.current);
+          if (webViewRef.current) {
+            Commands.reload(webViewRef.current);
+          }
         },
-        stopLoading: () => Commands.stopLoading(webViewRef.current),
-        postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
-        injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
-        requestFocus: () => Commands.requestFocus(webViewRef.current),
-        clearCache: () => Commands.clearCache(webViewRef.current),
-        loadUrl: (url: string) => Commands.loadUrl(webViewRef.current, url),
+        stopLoading: () =>
+          webViewRef.current && Commands.stopLoading(webViewRef.current),
+        postMessage: (data: string) =>
+          webViewRef.current && Commands.postMessage(webViewRef.current, data),
+        injectJavaScript: (data: string) =>
+          webViewRef.current &&
+          Commands.injectJavaScript(webViewRef.current, data),
+        requestFocus: () =>
+          webViewRef.current && Commands.requestFocus(webViewRef.current),
+        clearCache: (includeDiskFiles: boolean = true) =>
+          webViewRef.current &&
+          Commands.clearCache(webViewRef.current, includeDiskFiles),
+        loadUrl: (url: string) =>
+          webViewRef.current && Commands.loadUrl(webViewRef.current, url),
       }),
-      [setViewState, webViewRef],
+      [setViewState, webViewRef]
     );
 
     let otherView = null;
@@ -155,10 +180,27 @@ const WebViewComponent = forwardRef<unknown, WindowsWebViewProps>(
     const webViewStyles = [styles.container, styles.webView, style];
     const webViewContainerStyle = [styles.container, containerStyle];
 
-    const NativeWebView = useWebView2 ? RCTWebView2 : RCTWebView;
+    // Transform source to newSource format for Windows native component
+    const sourceResolved = resolveAssetSource(source as ImageSourcePropType);
+    const newSource =
+      typeof sourceResolved === 'object'
+        ? {
+            uri: (sourceResolved as any).uri,
+            method: (sourceResolved as any).method,
+            body: (sourceResolved as any).body,
+            html: (sourceResolved as any).html,
+            baseUrl: (sourceResolved as any).baseUrl,
+          }
+        : {};
+
+    // Headers as JSON string (workaround for codegen nested array limitation)
+    const sourceHeaders =
+      typeof sourceResolved === 'object' && (sourceResolved as any).headers
+        ? JSON.stringify((sourceResolved as any).headers)
+        : undefined;
 
     const webView = (
-      <NativeWebView
+      <RCTWebView2
         key="webViewKey"
         {...otherProps}
         messagingEnabled={typeof onMessageProp === 'function'}
@@ -173,8 +215,8 @@ const WebViewComponent = forwardRef<unknown, WindowsWebViewProps>(
         onOpenWindow={onOpenWindow}
         onSourceChanged={onSourceChanged}
         ref={webViewRef}
-        // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        source={resolveAssetSource(source as ImageSourcePropType)}
+        newSource={newSource}
+        sourceHeaders={sourceHeaders}
         style={webViewStyles}
         cacheEnabled={cacheEnabled}
         {...nativeConfig?.props}

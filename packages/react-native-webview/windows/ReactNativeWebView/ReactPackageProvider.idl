@@ -1,7 +1,9 @@
-namespace ReactNativeWebView {
-[webhosthidden]
-[default_interface] 
-runtimeclass ReactPackageProvider : Microsoft.ReactNative.IReactPackageProvider {
-  ReactPackageProvider();
-};
-} // namespace ReactNativeWebView
+namespace ReactNativeWebView
+{
+  [webhosthidden]
+  [default_interface]
+  runtimeclass ReactPackageProvider : Microsoft.ReactNative.IReactPackageProvider
+  {
+    ReactPackageProvider();
+  };
+}
