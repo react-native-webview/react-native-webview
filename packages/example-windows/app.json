@@ -1,13 +1,4 @@
 {
   "name": "WebviewExample",
-  "displayName": "WebviewExample",
-  "components": [
-    {
-      "appKey": "WebviewExample",
-      "displayName": "WebviewExample"
-    }
-  ],
-  "resources": {
-    "windows": ["dist/assets", "dist/main.windows.bundle"]
-  }
+  "displayName": "WebviewExample"
 }

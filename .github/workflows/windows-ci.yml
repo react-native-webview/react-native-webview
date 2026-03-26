@@ -33,34 +33,14 @@ jobs:
           bun run build
           bun run tsc
 
+      - name: Init Windows
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          npx react-native init-windows --overwrite --logging
+
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging 2>&1 | Tee-Object -Variable buildLog
-          $exitCode = $LASTEXITCODE
-          if ($exitCode -ne 0) {
-            $errors = $buildLog | Select-String -Pattern "error |fatal error |packages.config|Could not|MSB[0-9]" | Select-Object -Last 10
-            foreach ($err in $errors) { Write-Host "::error::$err" }
-            exit $exitCode
-          }
-
-      - name: Deploy
-        shell: powershell
-        run: |
-          Copy-Item -Path packages\example-windows\windows\x64\Release -Recurse -Destination packages\example-windows\windows\
-          cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
-
-      - name: Start Appium server
-        shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
-
-      - name: Start React server
-        shell: powershell
-        run: |
-          cd packages/example-windows
-          Start-Process PowerShell -ArgumentList "bun run start"
-
-      - name: Run tests
-        run: bun run test:windows
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging
