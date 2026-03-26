@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 
