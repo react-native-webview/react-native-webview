@@ -46,7 +46,7 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          msbuild windows\ReactNativeWebviewExample.sln /restore /p:Configuration=Release /p:Platform=x64 /p:RestorePackagesConfig=false /p:DeployOnBuild=false
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --no-autolink --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj
 
       - name: Deploy
         shell: powershell
