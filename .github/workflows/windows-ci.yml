@@ -37,7 +37,7 @@ jobs:
         shell: cmd
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj 2>&1
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj --msbuildprops RestorePackagesConfig=false,NuGetConfigFile=%CD%\NuGet.config 2>&1
           if %errorlevel% neq 0 exit /b %errorlevel%
 
       - name: Deploy
