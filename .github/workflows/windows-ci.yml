@@ -39,8 +39,23 @@ jobs:
           cd packages\example-windows
           npx react-native init-windows --overwrite --logging
 
+      - name: Debug generated project
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          $sln = Get-ChildItem -Path windows -Filter "*.sln" -Recurse | Select-Object -First 1
+          $proj = Get-ChildItem -Path windows -Filter "*.vcxproj" -Recurse | Select-Object -First 1
+          Write-Host "::notice::SLN=$($sln.FullName)"
+          Write-Host "::notice::PROJ=$($proj.FullName)"
+          Write-Host "::notice::WIN_FILES=$(Get-ChildItem -Path windows -Recurse | Measure-Object | Select-Object -ExpandProperty Count)"
+
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging 2>&1 | Tee-Object -Variable log
+          if ($LASTEXITCODE -ne 0) {
+            $errs = $log | Select-String "error |MSB[0-9]|packages.config|Could not" | Select-Object -Last 10
+            foreach ($e in $errs) { Write-Host "::error::$e" }
+            exit $LASTEXITCODE
+          }
