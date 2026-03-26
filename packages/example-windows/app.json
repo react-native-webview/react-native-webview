@@ -9,8 +9,5 @@
   ],
   "resources": {
     "windows": ["dist/assets", "dist/main.windows.bundle"]
-  },
-  "windows": {
-    "appxManifest": "windows/Package.appxmanifest"
   }
 }
