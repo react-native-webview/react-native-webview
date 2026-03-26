@@ -42,12 +42,6 @@ jobs:
           dir packages\example-windows\node_modules\react-native-webview\ 2>nul || echo ::notice::WEBVIEW_DIR=EMPTY
           dir packages\example-windows\node_modules\react-native-webview\windows\ 2>nul || echo ::notice::WEBVIEW_WINDOWS=EMPTY
 
-      - name: Autolink Windows
-        shell: powershell
-        run: |
-          cd packages\example-windows
-          npx @react-native-windows/cli autolink-windows --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj
-
       - name: Restore NuGet packages
         shell: powershell
         run: |
