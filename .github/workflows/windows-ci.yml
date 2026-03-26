@@ -42,17 +42,11 @@ jobs:
           dir packages\example-windows\node_modules\react-native-webview\ 2>nul || echo ::notice::WEBVIEW_DIR=EMPTY
           dir packages\example-windows\node_modules\react-native-webview\windows\ 2>nul || echo ::notice::WEBVIEW_WINDOWS=EMPTY
 
-      - name: Restore NuGet packages
-        shell: powershell
-        run: |
-          cd packages\example-windows
-          msbuild windows\ReactNativeWebviewExample.sln /t:Restore /p:Configuration=Release /p:Platform=x64 /p:RestorePackagesConfig=false
-
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          msbuild windows\ReactNativeWebviewExample.sln /t:Build /p:Configuration=Release /p:Platform=x64
+          msbuild windows\ReactNativeWebviewExample.sln /restore /p:Configuration=Release /p:Platform=x64 /p:RestorePackagesConfig=false /p:DeployOnBuild=false
 
       - name: Deploy
         shell: powershell
