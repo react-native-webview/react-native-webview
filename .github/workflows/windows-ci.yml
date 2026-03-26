@@ -33,11 +33,17 @@ jobs:
           bun run build
           bun run tsc
 
+      - name: Setup Windows project
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          npx install-windows-test-app --project-directory windows
+
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          bun run windows --release --no-packager --no-deploy --logging
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging
 
       - name: Deploy
         shell: powershell
