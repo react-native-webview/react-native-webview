@@ -54,7 +54,7 @@ interface ErrorState extends BaseState {
 
 export type State = NormalState | ErrorState;
 
-type Constructor<T> = new (...args: any[]) => T;
+type Constructor<T> = new (...args: unknown[]) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}

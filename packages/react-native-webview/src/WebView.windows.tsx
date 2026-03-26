@@ -196,8 +196,8 @@ const WebViewComponent = forwardRef<Record<string, never>, WindowsWebViewProps>(
 
     // Headers as JSON string (workaround for codegen nested array limitation)
     const sourceHeaders =
-      typeof sourceResolved === 'object' && (sourceResolved as any).headers
-        ? JSON.stringify((sourceResolved as any).headers)
+      typeof sourceResolved === 'object' && (sourceResolved as Record<string, unknown>).headers
+        ? JSON.stringify((sourceResolved as Record<string, unknown>).headers)
         : undefined;
 
     const webView = (
