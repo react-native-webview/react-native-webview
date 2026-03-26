@@ -24,16 +24,13 @@ jest.mock('react-native', () => {
 });
 
 // Mock NativeComponentRegistry
-jest.mock(
-  'react-native/Libraries/NativeComponent/NativeComponentRegistry',
-  () => ({
-    get: jest.fn((name, viewConfigFactory) => {
-      viewConfigFactory();
-      const MockComponent = 'RCTWebView2-Mock';
-      return MockComponent;
-    }),
-  })
-);
+jest.mock('react-native/Libraries/NativeComponent/NativeComponentRegistry', () => ({
+  get: jest.fn((name, viewConfigFactory) => {
+    viewConfigFactory();
+    const MockComponent = 'RCTWebView2-Mock';
+    return MockComponent;
+  }),
+}));
 
 // Mock codegenNativeCommands
 jest.mock('react-native/Libraries/Utilities/codegenNativeCommands', () => {
@@ -52,9 +49,7 @@ describe('RCTWebView2NativeComponent', () => {
   });
 
   test('registers component with correct name', () => {
-    const {
-      get,
-    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     // Re-require to trigger registration
     jest.isolateModules(() => {
       require('../RCTWebView2NativeComponent');
@@ -63,9 +58,7 @@ describe('RCTWebView2NativeComponent', () => {
   });
 
   test('view config has correct uiViewClassName', () => {
-    const {
-      get,
-    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     let capturedViewConfig;
     get.mockImplementation((name, factory) => {
       capturedViewConfig = factory();
@@ -80,9 +73,7 @@ describe('RCTWebView2NativeComponent', () => {
   });
 
   test('view config registers all required direct event types', () => {
-    const {
-      get,
-    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     let capturedViewConfig;
     get.mockImplementation((name, factory) => {
       capturedViewConfig = factory();
@@ -125,9 +116,7 @@ describe('RCTWebView2NativeComponent', () => {
   });
 
   test('view config registers all valid attributes', () => {
-    const {
-      get,
-    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     let capturedViewConfig;
     get.mockImplementation((name, factory) => {
       capturedViewConfig = factory();
@@ -187,9 +176,7 @@ describe('RCTWebView2NativeComponent', () => {
   });
 
   test('no bubblingEventTypes are registered', () => {
-    const {
-      get,
-    } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
+    const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     let capturedViewConfig;
     get.mockImplementation((name, factory) => {
       capturedViewConfig = factory();

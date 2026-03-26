@@ -35,10 +35,7 @@ async function waitForElement(name, timeoutMs = 10000) {
 
 describe('WebView2 New Architecture Tests', () => {
   beforeAll(async () => {
-    await driver.startWithCapabilities(
-      setup.capabilities,
-      WindowsApplicationDriverUrl
-    );
+    await driver.startWithCapabilities(setup.capabilities, WindowsApplicationDriverUrl);
     // Wait for app to fully load
     await new Promise((r) => setTimeout(r, 5000));
   });
@@ -65,7 +62,7 @@ describe('WebView2 New Architecture Tests', () => {
 
       // Wait for the Win32 MessageBox to appear
       await new Promise((r) => setTimeout(r, 1000));
-      
+
       // The native MessageBox should show the alert text
       const okButton = By2.nativeXpath('//Button[@Name="OK"]');
       await okButton.click();
@@ -87,16 +84,12 @@ describe('WebView2 New Architecture Tests', () => {
     });
 
     test('WebView HTML content loads (Send post message button visible)', async () => {
-      const sendButton = By2.nativeName(
-        'Send post message from JS to WebView'
-      );
+      const sendButton = By2.nativeName('Send post message from JS to WebView');
       expect(sendButton).not.toBeNull();
     });
 
     test('Clicking send button triggers onMessage in RN', async () => {
-      const sendButton = By2.nativeName(
-        'Send post message from JS to WebView'
-      );
+      const sendButton = By2.nativeName('Send post message from JS to WebView');
       await sendButton.click();
 
       // Wait for message to propagate
@@ -119,17 +112,13 @@ describe('WebView2 New Architecture Tests', () => {
     test('MultiMessaging tab renders two WebViews', async () => {
       // Both WebViews should have "Send post message" buttons
       // Use XPath to find multiple elements
-      const buttons = By2.nativeXpath(
-        '//Button[@Name="Send post message from JS to WebView"]'
-      );
+      const buttons = By2.nativeXpath('//Button[@Name="Send post message from JS to WebView"]');
       expect(buttons).not.toBeNull();
     });
 
     test('Messages flow between WebViews', async () => {
       // Click the send button in the first WebView
-      const sendButton = By2.nativeName(
-        'Send post message from JS to WebView'
-      );
+      const sendButton = By2.nativeName('Send post message from JS to WebView');
       await sendButton.click();
       await new Promise((r) => setTimeout(r, 1000));
       // If no crash, message flow works
@@ -153,28 +142,28 @@ describe('WebView2 New Architecture Tests', () => {
   describe('Tab Switching Stability', () => {
     test('Can switch between all tabs without crash', async () => {
       const tabs = ['Alerts', 'Messaging', 'MultiMessaging', 'OpenWindow', 'Alerts'];
-      
+
       for (const tabName of tabs) {
         const tab = By2.nativeName(tabName);
         await tab.click();
         // Wait for WebView to initialize on each tab
         await new Promise((r) => setTimeout(r, 2000));
       }
-      
+
       // If we get here without crash, the test passes
       expect(true).toBe(true);
     });
 
     test('Rapid tab switching does not crash', async () => {
       const tabs = ['Messaging', 'Alerts', 'MultiMessaging', 'Messaging', 'OpenWindow', 'Alerts'];
-      
+
       for (const tabName of tabs) {
         const tab = By2.nativeName(tabName);
         await tab.click();
         // Short delay for rapid switching
         await new Promise((r) => setTimeout(r, 500));
       }
-      
+
       // If we get here without crash, the test passes
       expect(true).toBe(true);
     });
