@@ -37,12 +37,18 @@ jobs:
         shell: cmd
         run: |
           cd packages\example-windows
-          node node_modules\react-native-test-app\windows\app.mjs --project-directory windows 2>&1
-          echo Exit code: %errorlevel%
-          if %errorlevel% neq 0 (
-            echo ::error::RNTA exit code %errorlevel%
-            dir windows\ 2>nul
-            exit /b %errorlevel%
+          echo ::notice::RNTA_VER=
+          node -e "console.log(require('react-native-test-app/package.json').version)"
+          echo ::notice::RNW_VER=
+          node -e "console.log(require('react-native-windows/package.json').version)"
+          node node_modules\react-native-test-app\windows\app.mjs --project-directory windows > rnta_output.txt 2>&1
+          set RNTA_EXIT=%errorlevel%
+          echo Exit code: %RNTA_EXIT%
+          type rnta_output.txt
+          if %RNTA_EXIT% neq 0 (
+            for /f "usebackq delims=" %%i in (`type rnta_output.txt`) do set LAST_LINE=%%i
+            echo ::error::RNTA_OUTPUT: %LAST_LINE%
+            exit /b %RNTA_EXIT%
           )
 
       - name: Build x64 release
