@@ -37,7 +37,14 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          npx install-windows-test-app --project-directory windows
+          $output = npx install-windows-test-app --project-directory windows 2>&1 | Out-String
+          $exitCode = $LASTEXITCODE
+          if ($exitCode -ne 0) {
+            $lines = $output -split "`n" | Select-Object -Last 10
+            $msg = $lines -join " | "
+            Write-Host "::error::RNTA_SETUP: $msg"
+            exit $exitCode
+          }
 
       - name: Build x64 release
         shell: powershell
