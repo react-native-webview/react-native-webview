@@ -46,15 +46,11 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          $output = npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln 2>&1 | Out-String
-          $exitCode = $LASTEXITCODE
-          if ($exitCode -ne 0) {
-            $errors = ($output -split "`n" | Select-String -Pattern ": error |: fatal error |NETSDK|MSB[0-9]" | Select-Object -Last 10) -join " | "
-            $nuget = ($output -split "`n" | Select-String -Pattern "nuget|restore|packages.config|Could not" -CaseSensitive:$false | Select-Object -Last 5) -join " | "
-            Write-Host "::error::BUILD_ERRORS: $errors"
-            Write-Host "::error::NUGET_ISSUES: $nuget"
-            exit $exitCode
-          }
+          # Run autolink first
+          npx @react-native-windows/cli autolink-windows --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj
+          # Build with MSBuild directly
+          msbuild windows\ReactNativeWebviewExample.sln /t:Restore /p:Configuration=Release /p:Platform=x64 /p:RestorePackagesConfig=false
+          msbuild windows\ReactNativeWebviewExample.sln /t:Build /p:Configuration=Release /p:Platform=x64
 
       - name: Deploy
         shell: powershell
