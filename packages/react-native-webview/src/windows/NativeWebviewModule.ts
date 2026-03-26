@@ -15,14 +15,10 @@ export interface Spec extends TurboModule {
    * @param shouldStart - Whether to allow the load request
    * @param lockIdentifier - Unique identifier for the request
    */
-  shouldStartLoadWithLockIdentifier(
-    shouldStart: boolean,
-    lockIdentifier: number
-  ): void;
+  shouldStartLoadWithLockIdentifier(shouldStart: boolean, lockIdentifier: number): void;
 }
 
 // RNCWebView module for Windows
-export const RNCWebViewModule =
-  TurboModuleRegistry.get<Spec>('RNCWebViewModule');
+export const RNCWebViewModule = TurboModuleRegistry.get<Spec>('RNCWebViewModule');
 
 export default RNCWebViewModule;

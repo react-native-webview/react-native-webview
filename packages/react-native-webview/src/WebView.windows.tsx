@@ -11,18 +11,10 @@
  * Licensed under the MIT License.
  */
 
-import React, {
-  forwardRef,
-  useCallback,
-  useImperativeHandle,
-  useRef,
-} from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { View, Image, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
-import RCTWebView2, {
-  Commands,
-  NativeProps,
-} from './windows/RCTWebView2NativeComponent';
+import RCTWebView2, { Commands, NativeProps } from './windows/RCTWebView2NativeComponent';
 import { RNCWebViewModule } from './windows/NativeWebviewModule';
 import {
   useWebViewLogic,
@@ -37,11 +29,7 @@ import styles from './WebView.styles';
 export type { NativeProps as NativeWebViewWindows } from './RCTWebView2NativeComponent';
 
 // Windows-specific WebViewProps that extends shared props
-import {
-  WebViewSharedProps,
-  WebViewOpenWindowEvent,
-  WebViewNavigationEvent,
-} from './WebViewTypes';
+import { WebViewSharedProps, WebViewOpenWindowEvent, WebViewNavigationEvent } from './WebViewTypes';
 
 export interface WindowsWebViewProps extends WebViewSharedProps {
   /**
@@ -88,24 +76,19 @@ const WebViewComponent = forwardRef<Record<string, never>, WindowsWebViewProps>(
       onScroll: _onScroll, // Exclude from otherProps - not currently supported on Windows
       ...otherProps
     },
-    ref
+    ref,
   ) => {
-    const webViewRef = useRef<React.ComponentRef<
-      HostComponent<NativeProps>
-    > | null>(null);
+    const webViewRef = useRef<React.ComponentRef<HostComponent<NativeProps>> | null>(null);
 
     const onShouldStartLoadWithRequestCallback = useCallback(
       (shouldStart: boolean, url: string, lockIdentifier?: number) => {
         if (lockIdentifier) {
-          RNCWebViewModule?.shouldStartLoadWithLockIdentifier(
-            shouldStart,
-            lockIdentifier
-          );
+          RNCWebViewModule?.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
         } else if (shouldStart && webViewRef.current) {
           Commands.loadUrl(webViewRef.current, url);
         }
       },
-      []
+      [],
     );
 
     const {
@@ -139,8 +122,7 @@ const WebViewComponent = forwardRef<Record<string, never>, WindowsWebViewProps>(
     useImperativeHandle(
       ref,
       () => ({
-        goForward: () =>
-          webViewRef.current && Commands.goForward(webViewRef.current),
+        goForward: () => webViewRef.current && Commands.goForward(webViewRef.current),
         goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
         reload: () => {
           setViewState('LOADING');
@@ -148,22 +130,17 @@ const WebViewComponent = forwardRef<Record<string, never>, WindowsWebViewProps>(
             Commands.reload(webViewRef.current);
           }
         },
-        stopLoading: () =>
-          webViewRef.current && Commands.stopLoading(webViewRef.current),
+        stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
         postMessage: (data: string) =>
           webViewRef.current && Commands.postMessage(webViewRef.current, data),
         injectJavaScript: (data: string) =>
-          webViewRef.current &&
-          Commands.injectJavaScript(webViewRef.current, data),
-        requestFocus: () =>
-          webViewRef.current && Commands.requestFocus(webViewRef.current),
+          webViewRef.current && Commands.injectJavaScript(webViewRef.current, data),
+        requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
         clearCache: (includeDiskFiles: boolean = true) =>
-          webViewRef.current &&
-          Commands.clearCache(webViewRef.current, includeDiskFiles),
-        loadUrl: (url: string) =>
-          webViewRef.current && Commands.loadUrl(webViewRef.current, url),
+          webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
+        loadUrl: (url: string) => webViewRef.current && Commands.loadUrl(webViewRef.current, url),
       }),
-      [setViewState, webViewRef]
+      [setViewState, webViewRef],
     );
 
     let otherView = null;

@@ -82,13 +82,7 @@ export type WebViewNavigationEvent = Readonly<{
   canGoBack: boolean;
   canGoForward: boolean;
   lockIdentifier: Double;
-  navigationType:
-    | 'click'
-    | 'formsubmit'
-    | 'backforward'
-    | 'reload'
-    | 'formresubmit'
-    | 'other';
+  navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
 }>;
 
@@ -99,13 +93,7 @@ export type ShouldStartLoadRequestEvent = Readonly<{
   canGoBack: boolean;
   canGoForward: boolean;
   lockIdentifier: Double;
-  navigationType:
-    | 'click'
-    | 'formsubmit'
-    | 'backforward'
-    | 'reload'
-    | 'formresubmit'
-    | 'other';
+  navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
   isTopFrame: boolean;
 }>;
@@ -156,10 +144,7 @@ export interface NativeProps extends ViewProps {
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   injectedJavaScriptForMainFrameOnly?: WithDefault<boolean, true>;
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: WithDefault<
-    boolean,
-    true
-  >;
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: WithDefault<boolean, true>;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   javaScriptEnabled?: WithDefault<boolean, true>;
   mediaPlaybackRequiresUserAction?: WithDefault<boolean, true>;
@@ -214,20 +199,14 @@ export interface NativeCommands {
   stopLoading: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   injectJavaScript: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    javascript: string
+    javascript: string,
   ) => void;
   requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
-  postMessage: (
-    viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    data: string
-  ) => void;
-  loadUrl: (
-    viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    url: string
-  ) => void;
+  postMessage: (viewRef: React.ElementRef<HostComponent<NativeProps>>, data: string) => void;
+  loadUrl: (viewRef: React.ElementRef<HostComponent<NativeProps>>, url: string) => void;
   clearCache: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
-    includeDiskFiles: boolean
+    includeDiskFiles: boolean,
   ) => void;
 }
 
