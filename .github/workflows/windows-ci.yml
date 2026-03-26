@@ -33,11 +33,6 @@ jobs:
           bun run build
           bun run tsc
 
-      - name: NuGet restore
-        shell: cmd
-        run: |
-          nuget restore packages\example-windows\windows\ReactNativeWebviewExample.sln -ConfigFile packages\example-windows\NuGet.config
-
       - name: Build x64 release
         shell: cmd
         run: |
