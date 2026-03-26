@@ -33,20 +33,11 @@ jobs:
           bun run build
           bun run tsc
 
-      - name: Debug Windows node_modules
-        shell: cmd
-        run: |
-          echo ::notice::VCXPROJ_EXISTS=%ERRORLEVEL%
-          if exist packages\example-windows\node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj (echo ::notice::LIB_VCXPROJ=EXISTS) else (echo ::notice::LIB_VCXPROJ=MISSING)
-          if exist packages\example-windows\node_modules\react-native-windows\package.json (echo ::notice::RNW=EXISTS) else (echo ::notice::RNW=MISSING)
-          dir packages\example-windows\node_modules\react-native-webview\ 2>nul || echo ::notice::WEBVIEW_DIR=EMPTY
-          dir packages\example-windows\node_modules\react-native-webview\windows\ 2>nul || echo ::notice::WEBVIEW_WINDOWS=EMPTY
-
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --no-autolink --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj
+          bun run windows --release --no-packager --no-deploy --logging
 
       - name: Deploy
         shell: powershell
