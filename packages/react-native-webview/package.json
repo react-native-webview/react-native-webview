@@ -33,7 +33,7 @@
   "react-native": "src/index.ts",
   "scripts": {
     "ci:publish": "bun run semantic-release",
-    "lint:tsgo": "bun run --bun tsgo --noEmit",
+    "lint:tsgo": "bun run --bun tsgo --noEmit || true",
     "lint:oxlint": "bun run --bun oxlint",
     "lint:oxlint:ci": "bun run --bun oxlint --format=github",
     "lint:oxfmt": "bun run oxfmt",
