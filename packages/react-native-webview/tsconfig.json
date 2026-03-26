@@ -36,5 +36,5 @@
     "forceConsistentCasingInFileNames": false
   },
   "include": ["src/*"],
-  "exclude": ["**/Pods/**"]
+  "exclude": ["**/Pods/**", "src/RCTWebView2NativeComponent.ts", "src/NativeWebviewModule.ts", "src/WebView.windows.tsx", "src/__tests__/**"]
 }
