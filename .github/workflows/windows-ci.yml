@@ -34,10 +34,14 @@ jobs:
           bun run tsc
 
       - name: Build x64 release
-        shell: powershell
+        shell: cmd
         run: |
-          cd packages/example-windows
-          bun run windows --release --no-packager --no-deploy --logging
+          cd packages\example-windows
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj 2>&1
+          if %errorlevel% neq 0 (
+            echo ::error::WIN_BUILD_EXIT_CODE=%errorlevel%
+            exit /b %errorlevel%
+          )
 
       - name: Deploy
         shell: powershell
