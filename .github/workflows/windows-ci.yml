@@ -28,14 +28,6 @@ jobs:
         run: bun install
         working-directory: packages/example-windows
 
-      - name: Install RNW dependencies
-        shell: powershell
-        run: |
-          $rnwDeps = "packages/example-windows/node_modules/react-native-windows/scripts/rnw-dependencies.ps1"
-          if (Test-Path $rnwDeps) {
-            & $rnwDeps -NoPrompt
-          }
-
       - name: Build JS
         run: |
           bun run build
