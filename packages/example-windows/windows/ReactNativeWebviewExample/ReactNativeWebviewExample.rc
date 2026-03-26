@@ -1,0 +1,2 @@
+#include "resource.h"
+IDI_ICON1 ICON "ReactNativeWebviewExample.ico"

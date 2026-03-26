@@ -33,28 +33,11 @@ jobs:
           bun run build
           bun run tsc
 
-      - name: Setup Windows project
-        shell: bash
-        run: |
-          set +e
-          cd packages/example-windows
-          RNTA_VER=$(node -e "console.log(require('react-native-test-app/package.json').version)" 2>&1)
-          RNW_VER=$(node -e "console.log(require('react-native-windows/package.json').version)" 2>&1)
-          echo "::notice::VERSIONS: RNTA=$RNTA_VER RNW=$RNW_VER"
-          OUTPUT=$(node node_modules/react-native-test-app/windows/app.mjs --project-directory windows 2>&1)
-          EXIT_CODE=$?
-          echo "::notice::RNTA_EXIT=$EXIT_CODE"
-          if [ $EXIT_CODE -ne 0 ]; then
-            LAST=$(echo "$OUTPUT" | tail -5 | tr '\n' ' ')
-            echo "::error::RNTA_FAIL: $LAST"
-            exit $EXIT_CODE
-          fi
-
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --no-autolink --logging
 
       - name: Deploy
         shell: powershell
