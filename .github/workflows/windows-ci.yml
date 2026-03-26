@@ -34,10 +34,17 @@ jobs:
           bun run tsc
 
       - name: Build x64 release
-        shell: powershell
+        shell: bash
         run: |
-          cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --no-autolink --logging
+          set +e
+          cd packages/example-windows
+          OUTPUT=$(npx react-native run-windows --arch x64 --release --no-packager --no-deploy --no-autolink --logging --sln windows/ReactNativeWebviewExample.sln --proj windows/ReactNativeWebviewExample/ReactNativeWebviewExample.vcxproj 2>&1)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            ERRS=$(echo "$OUTPUT" | grep -i ": error \|: fatal error \|MSB[0-9]\|packages.config\|Could not\|InvalidConfig" | tail -5 | tr '\n' '|')
+            echo "::error::WIN_BUILD: $ERRS"
+            exit $EXIT_CODE
+          fi
 
       - name: Deploy
         shell: powershell
