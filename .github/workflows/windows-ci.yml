@@ -34,10 +34,19 @@ jobs:
           bun run tsc
 
       - name: Build x64 release
-        shell: cmd
+        shell: bash
         run: |
-          cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj 2>&1
+          set +e
+          cd packages/example-windows
+          OUTPUT=$(npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows/ReactNativeWebviewExample.sln --proj windows/ReactNativeWebviewExample/ReactNativeWebviewExample.vcxproj 2>&1)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            ERRS=$(echo "$OUTPUT" | grep -i ": error " | tail -5 | tr '\n' ' ')
+            WARNS=$(echo "$OUTPUT" | grep -i "Couldn't restore\|NETSDK\|Could not" | head -3 | tr '\n' ' ')
+            echo "::error::MSBUILD_ERRORS: $ERRS"
+            echo "::error::MSBUILD_ISSUES: $WARNS"
+            exit $EXIT_CODE
+          fi
 
       - name: Deploy
         shell: powershell
