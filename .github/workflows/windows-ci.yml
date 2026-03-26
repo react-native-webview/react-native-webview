@@ -37,7 +37,9 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
+          Copy-Item metro.config.js metro.config.js.bak
           npx react-native init-windows --overwrite --logging
+          Copy-Item metro.config.js.bak metro.config.js -Force
 
       - name: Debug generated project
         shell: powershell
