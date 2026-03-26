@@ -34,11 +34,19 @@ jobs:
           bun run tsc
 
       - name: Build x64 release
-        shell: cmd
+        shell: bash
         run: |
-          cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj --msbuildprops RestorePackagesConfig=false,NuGetConfigFile=%CD%\NuGet.config 2>&1
-          if %errorlevel% neq 0 exit /b %errorlevel%
+          set +e
+          cd packages/example-windows
+          OUTPUT=$(npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows/ReactNativeWebviewExample.sln --proj windows/ReactNativeWebviewExample/ReactNativeWebviewExample.vcxproj 2>&1)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            ERRORS=$(echo "$OUTPUT" | grep -i ": error \|: fatal error \|NETSDK\|MSB[0-9]" | tail -10 | tr '\n' '|')
+            NUGET=$(echo "$OUTPUT" | grep -i "nuget\|restore\|packages.config\|Could not" | tail -5 | tr '\n' '|')
+            echo "::error::BUILD_ERRORS: $ERRORS"
+            echo "::error::NUGET_ISSUES: $NUGET"
+            exit $EXIT_CODE
+          fi
 
       - name: Deploy
         shell: powershell
