@@ -23,7 +23,7 @@ import RCTWebView2, {
   Commands,
   NativeProps,
 } from './windows/RCTWebView2NativeComponent';
-import RNCWebViewModule from './windows/NativeWebviewModule';
+import { RNCWebViewModule } from './windows/NativeWebviewModule';
 import {
   useWebViewLogic,
   defaultOriginWhitelist,
@@ -61,7 +61,7 @@ export interface WindowsWebViewProps extends WebViewSharedProps {
 }
 const { resolveAssetSource } = Image;
 
-const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
+const WebViewComponent = forwardRef<Record<string, never>, WindowsWebViewProps>(
   (
     {
       cacheEnabled = true,
@@ -186,11 +186,11 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
     const newSource =
       typeof sourceResolved === 'object'
         ? {
-            uri: (sourceResolved as any).uri,
-            method: (sourceResolved as any).method,
-            body: (sourceResolved as any).body,
-            html: (sourceResolved as any).html,
-            baseUrl: (sourceResolved as any).baseUrl,
+            uri: (sourceResolved as Record<string, string>).uri,
+            method: (sourceResolved as Record<string, string>).method,
+            body: (sourceResolved as Record<string, string>).body,
+            html: (sourceResolved as Record<string, string>).html,
+            baseUrl: (sourceResolved as Record<string, string>).baseUrl,
           }
         : {};
 

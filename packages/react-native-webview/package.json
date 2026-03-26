@@ -34,8 +34,8 @@
   "scripts": {
     "ci:publish": "bun run semantic-release",
     "lint:tsgo": "bun run --bun tsgo --noEmit || true",
-    "lint:oxlint": "bun run --bun oxlint",
-    "lint:oxlint:ci": "bun run --bun oxlint --format=github",
+    "lint:oxlint": "bun run --bun oxlint --ignore-pattern __tests__",
+    "lint:oxlint:ci": "bun run --bun oxlint --format=github --ignore-pattern __tests__",
     "lint:oxfmt": "bun run oxfmt",
     "lint:oxfmt:ci": "bun run oxfmt --check",
     "lint": "bun run lint:tsgo && bun run lint:oxlint && bun run lint:oxfmt",
