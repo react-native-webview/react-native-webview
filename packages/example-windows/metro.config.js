@@ -13,6 +13,10 @@ const config = {
   resolver: {
     platforms: [...(defaultConfig.resolver?.platforms || []), 'windows'],
     resolverMainFields: ['main-internal', 'browser', 'main'],
+    nodeModulesPaths: [
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(monorepoRoot, 'node_modules'),
+    ],
     extraNodeModules: {
       'react-native-webview': webviewPackage,
       'example-shared': sharedPackage,
