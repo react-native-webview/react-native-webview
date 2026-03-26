@@ -28,27 +28,36 @@ jobs:
         run: bun install
         working-directory: packages/example-windows
 
+      - name: Install RNW dependencies
+        shell: powershell
+        run: |
+          $rnwDeps = "packages/example-windows/node_modules/react-native-windows/scripts/rnw-dependencies.ps1"
+          if (Test-Path $rnwDeps) {
+            & $rnwDeps -NoPrompt
+          }
+
       - name: Build JS
         run: |
           bun run build
           bun run tsc
+
+      - name: NuGet restore
+        shell: cmd
+        run: |
+          nuget restore packages\example-windows\windows\ReactNativeWebviewExample.sln -ConfigFile packages\example-windows\NuGet.config
 
       - name: Build x64 release
         shell: cmd
         run: |
           cd packages\example-windows
           npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj 2>&1
-          if %errorlevel% neq 0 (
-            echo ::error::WIN_BUILD_EXIT_CODE=%errorlevel%
-            exit /b %errorlevel%
-          )
 
       - name: Deploy
         shell: powershell
         run: |
           Copy-Item -Path packages\example-windows\windows\x64\Release -Recurse -Destination packages\example-windows\windows\
           cd packages\example-windows
-          bunx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
+          npx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
 
       - name: Start Appium server
         shell: powershell
