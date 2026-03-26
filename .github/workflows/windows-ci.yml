@@ -42,14 +42,22 @@ jobs:
           dir packages\example-windows\node_modules\react-native-webview\ 2>nul || echo ::notice::WEBVIEW_DIR=EMPTY
           dir packages\example-windows\node_modules\react-native-webview\windows\ 2>nul || echo ::notice::WEBVIEW_WINDOWS=EMPTY
 
+      - name: Autolink Windows
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          npx @react-native-windows/cli autolink-windows --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj
+
+      - name: Restore NuGet packages
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          msbuild windows\ReactNativeWebviewExample.sln /t:Restore /p:Configuration=Release /p:Platform=x64 /p:RestorePackagesConfig=false
+
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          # Run autolink first
-          npx @react-native-windows/cli autolink-windows --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj
-          # Build with MSBuild directly
-          msbuild windows\ReactNativeWebviewExample.sln /t:Restore /p:Configuration=Release /p:Platform=x64 /p:RestorePackagesConfig=false
           msbuild windows\ReactNativeWebviewExample.sln /t:Build /p:Configuration=Release /p:Platform=x64
 
       - name: Deploy
