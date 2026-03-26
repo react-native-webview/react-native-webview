@@ -34,17 +34,16 @@ jobs:
           bun run tsc
 
       - name: Setup Windows project
-        shell: powershell
+        shell: cmd
         run: |
           cd packages\example-windows
-          $output = npx install-windows-test-app --project-directory windows 2>&1 | Out-String
-          $exitCode = $LASTEXITCODE
-          if ($exitCode -ne 0) {
-            $lines = $output -split "`n" | Select-Object -Last 10
-            $msg = $lines -join " | "
-            Write-Host "::error::RNTA_SETUP: $msg"
-            exit $exitCode
-          }
+          npx install-windows-test-app --project-directory windows 2>&1
+          if %errorlevel% neq 0 (
+            echo ::error::RNTA_FAILED with exit code %errorlevel%
+            dir windows\ 2>nul
+            type app.json
+            exit /b %errorlevel%
+          )
 
       - name: Build x64 release
         shell: powershell
