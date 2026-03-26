@@ -22,8 +22,8 @@ import invariant from 'invariant';
 import RCTWebView2, {
   Commands,
   NativeProps,
-} from './RCTWebView2NativeComponent';
-import RNCWebViewModule from './NativeWebviewModule';
+} from './windows/RCTWebView2NativeComponent';
+import RNCWebViewModule from './windows/NativeWebviewModule';
 import {
   useWebViewLogic,
   defaultOriginWhitelist,
