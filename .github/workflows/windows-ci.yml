@@ -37,11 +37,11 @@ jobs:
         shell: cmd
         run: |
           cd packages\example-windows
-          npx install-windows-test-app --project-directory windows 2>&1
+          node node_modules\react-native-test-app\windows\app.mjs --project-directory windows 2>&1
+          echo Exit code: %errorlevel%
           if %errorlevel% neq 0 (
-            echo ::error::RNTA_FAILED with exit code %errorlevel%
+            echo ::error::RNTA exit code %errorlevel%
             dir windows\ 2>nul
-            type app.json
             exit /b %errorlevel%
           )
 
