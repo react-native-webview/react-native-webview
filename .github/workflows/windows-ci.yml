@@ -37,7 +37,7 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj 2>&1 | Tee-Object -Variable buildLog
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging 2>&1 | Tee-Object -Variable buildLog
           $exitCode = $LASTEXITCODE
           if ($exitCode -ne 0) {
             $errors = $buildLog | Select-String -Pattern "error |fatal error |packages.config|Could not|MSB[0-9]" | Select-Object -Last 10
