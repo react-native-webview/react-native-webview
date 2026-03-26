@@ -1,20 +1,15 @@
 const path = require('path');
 
-let project;
-try {
-  const { configureProjects } = require('react-native-test-app');
-  project = configureProjects({
+module.exports = {
+  project: {
     windows: {
       sourceDir: 'windows',
       solutionFile: 'ReactNativeWebviewExample.sln',
+      project: {
+        projectFile: 'ReactNativeWebviewExample\\ReactNativeWebviewExample.vcxproj',
+      },
     },
-  });
-} catch (_) {
-  project = undefined;
-}
-
-module.exports = {
-  ...(project ? { project } : undefined),
+  },
   dependencies: {
     'react-native-webview': {
       root: path.resolve(__dirname, '../react-native-webview'),

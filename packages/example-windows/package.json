@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "windows": "install-windows-test-app --project-directory windows && react-native run-windows --arch x64",
+    "windows": "react-native run-windows --arch x64 --sln windows/ReactNativeWebviewExample.sln --proj windows/ReactNativeWebviewExample/ReactNativeWebviewExample.vcxproj",
     "start": "react-native start"
   },
   "dependencies": {
@@ -15,7 +15,6 @@
   "devDependencies": {
     "@react-native/babel-preset": "0.78.2",
     "@react-native/metro-config": "0.78.2",
-    "react-native-test-app": "*",
     "react-native-windows": "0.82.1"
   }
 }
