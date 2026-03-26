@@ -34,19 +34,18 @@ jobs:
           bun run tsc
 
       - name: Build x64 release
-        shell: bash
+        shell: powershell
         run: |
-          set +e
-          cd packages/example-windows
-          OUTPUT=$(npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows/ReactNativeWebviewExample.sln --proj windows/ReactNativeWebviewExample/ReactNativeWebviewExample.vcxproj 2>&1)
-          EXIT_CODE=$?
-          if [ $EXIT_CODE -ne 0 ]; then
-            ERRORS=$(echo "$OUTPUT" | grep -i ": error \|: fatal error \|NETSDK\|MSB[0-9]" | tail -10 | tr '\n' '|')
-            NUGET=$(echo "$OUTPUT" | grep -i "nuget\|restore\|packages.config\|Could not" | tail -5 | tr '\n' '|')
-            echo "::error::BUILD_ERRORS: $ERRORS"
-            echo "::error::NUGET_ISSUES: $NUGET"
-            exit $EXIT_CODE
-          fi
+          cd packages\example-windows
+          $output = npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --sln windows\ReactNativeWebviewExample.sln --proj windows\ReactNativeWebviewExample\ReactNativeWebviewExample.vcxproj 2>&1 | Out-String
+          $exitCode = $LASTEXITCODE
+          if ($exitCode -ne 0) {
+            $errors = ($output -split "`n" | Select-String -Pattern ": error |: fatal error |NETSDK|MSB[0-9]" | Select-Object -Last 10) -join " | "
+            $nuget = ($output -split "`n" | Select-String -Pattern "nuget|restore|packages.config|Could not" -CaseSensitive:$false | Select-Object -Last 5) -join " | "
+            Write-Host "::error::BUILD_ERRORS: $errors"
+            Write-Host "::error::NUGET_ISSUES: $nuget"
+            exit $exitCode
+          }
 
       - name: Deploy
         shell: powershell
