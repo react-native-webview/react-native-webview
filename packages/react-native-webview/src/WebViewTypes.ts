@@ -54,17 +54,17 @@ interface ErrorState extends BaseState {
 
 export type State = NormalState | ErrorState;
 
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T> = new (...args: unknown[]) => T;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}
 declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewMacOSComponent;
 export class NativeWebViewMacOS extends NativeWebViewMacOSBase {}
 
+
 export interface ContentInsetProp {
   top?: number;
-  left?: number;
   left?: number;
   bottom?: number;
   right?: number;
@@ -344,6 +344,17 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
 export interface IOSWebViewProps extends WebViewSharedProps {
   /**
    * Does not store any data within the lifetime of the WebView.
+   */
+  incognito?: boolean;
+
+  /**
+   * Boolean value that determines whether the web view bounces
+   * when it reaches the edge of the content. The default value is `true`.
+   * @platform ios
+   */
+  bounces?: boolean;
+
+  /**
    * A floating-point number that determines how quickly the scroll view
    * decelerates after the user lifts their finger. You may also use the
    * string shortcuts `"normal"` and `"fast"` which match the underlying iOS
