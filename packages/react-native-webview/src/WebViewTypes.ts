@@ -55,7 +55,7 @@ interface ErrorState extends BaseState {
 export type State = NormalState | ErrorState;
 
 // oxlint-disable-next-line @typescript-eslint/no-explicit-any
-type Constructor<T> = new (...args: unknown[]) => T;
+type Constructor<T> = new (...args: any[]) => T;
 
 declare class NativeWebViewMacOSComponent extends Component<MacOSNativeWebViewProps> {}
 declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
