@@ -55,6 +55,18 @@ jobs:
           Write-Host "::notice::INDEX_JS=$(Get-Content index.js -TotalCount 3 | Out-String)"
           Write-Host "::notice::METRO_HAS_SHARED=$(Select-String -Path metro.config.js -Pattern 'example-shared' -Quiet)"
 
+      - name: Test Metro bundle
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          $output = npx @react-native-community/cli bundle --platform windows --entry-file index.js --bundle-output windows\ExampleWindows\Bundle\index.windows.bundle --dev false 2>&1 | Out-String
+          if ($LASTEXITCODE -ne 0) {
+            $lines = $output -split "`n" | Select-Object -Last 15
+            foreach ($l in $lines) { Write-Host "::error::METRO: $l" }
+            exit $LASTEXITCODE
+          }
+          Write-Host "::notice::BUNDLE_OK=true"
+
       - name: Build x64 release
         shell: powershell
         run: |
