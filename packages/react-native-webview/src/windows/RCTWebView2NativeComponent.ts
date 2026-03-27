@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import type { HostComponent, ViewProps } from 'react-native';
 import { codegenNativeCommands } from 'react-native';
