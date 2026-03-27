@@ -56,16 +56,19 @@ jobs:
           Write-Host "::notice::METRO_HAS_SHARED=$(Select-String -Path metro.config.js -Pattern 'example-shared' -Quiet)"
 
       - name: Test Metro bundle
-        shell: powershell
+        shell: cmd
         run: |
           cd packages\example-windows
-          $output = npx @react-native-community/cli bundle --platform windows --entry-file index.js --bundle-output windows\ExampleWindows\Bundle\index.windows.bundle --dev false 2>&1 | Out-String
-          if ($LASTEXITCODE -ne 0) {
-            $lines = $output -split "`n" | Select-Object -Last 15
-            foreach ($l in $lines) { Write-Host "::error::METRO: $l" }
-            exit $LASTEXITCODE
-          }
-          Write-Host "::notice::BUNDLE_OK=true"
+          mkdir windows\ExampleWindows\Bundle 2>nul
+          npx @react-native-community/cli bundle --platform windows --entry-file index.js --bundle-output windows\ExampleWindows\Bundle\index.windows.bundle --dev false > metro_output.txt 2>&1
+          set METRO_EXIT=%errorlevel%
+          if %METRO_EXIT% neq 0 (
+            echo ::error::METRO_EXIT=%METRO_EXIT%
+            type metro_output.txt
+            for /f "usebackq delims=" %%i in (`findstr /i "error Unable Could module" metro_output.txt`) do echo ::error::METRO: %%i
+            exit /b %METRO_EXIT%
+          )
+          echo ::notice::BUNDLE_OK=true
 
       - name: Build x64 release
         shell: powershell
