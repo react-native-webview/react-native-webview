@@ -25,7 +25,7 @@ import {
 import styles from './WebView.styles';
 
 // Re-export types for external consumers
-export type { NativeProps as NativeWebViewWindows } from './RCTWebView2NativeComponent';
+export type { NativeProps as NativeWebViewWindows } from './windows/RCTWebView2NativeComponent';
 
 // Windows-specific WebViewProps that extends shared props
 import { WebViewSharedProps, WebViewOpenWindowEvent, WebViewNavigationEvent } from './WebViewTypes';
@@ -48,7 +48,19 @@ export interface WindowsWebViewProps extends WebViewSharedProps {
 }
 const { resolveAssetSource } = Image;
 
-const WebViewComponent = forwardRef<Record<string, never>, WindowsWebViewProps>(
+interface WebViewRefMethods {
+  goBack: () => void;
+  goForward: () => void;
+  reload: () => void;
+  stopLoading: () => void;
+  postMessage: (data: string) => void;
+  injectJavaScript: (data: string) => void;
+  requestFocus: () => void;
+  clearCache: (includeDiskFiles?: boolean) => void;
+  loadUrl: (url: string) => void;
+}
+
+const WebViewComponent = forwardRef<WebViewRefMethods, WindowsWebViewProps>(
   (
     {
       cacheEnabled = true,
@@ -162,18 +174,19 @@ const WebViewComponent = forwardRef<Record<string, never>, WindowsWebViewProps>(
     const newSource =
       typeof sourceResolved === 'object'
         ? {
-            uri: (sourceResolved as Record<string, string>).uri,
-            method: (sourceResolved as Record<string, string>).method,
-            body: (sourceResolved as Record<string, string>).body,
-            html: (sourceResolved as Record<string, string>).html,
-            baseUrl: (sourceResolved as Record<string, string>).baseUrl,
+            uri: (sourceResolved as unknown as Record<string, string>).uri,
+            method: (sourceResolved as unknown as Record<string, string>).method,
+            body: (sourceResolved as unknown as Record<string, string>).body,
+            html: (sourceResolved as unknown as Record<string, string>).html,
+            baseUrl: (sourceResolved as unknown as Record<string, string>).baseUrl,
           }
         : {};
 
     // Headers as JSON string (workaround for codegen nested array limitation)
     const sourceHeaders =
-      typeof sourceResolved === 'object' && (sourceResolved as Record<string, unknown>).headers
-        ? JSON.stringify((sourceResolved as Record<string, unknown>).headers)
+      typeof sourceResolved === 'object' &&
+      (sourceResolved as unknown as Record<string, unknown>).headers
+        ? JSON.stringify((sourceResolved as unknown as Record<string, unknown>).headers)
         : undefined;
 
     const webView = (
