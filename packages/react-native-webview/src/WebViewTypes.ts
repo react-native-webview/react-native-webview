@@ -62,7 +62,6 @@ declare const NativeWebViewMacOSBase: Constructor<NativeMethodsMixin> &
   typeof NativeWebViewMacOSComponent;
 export class NativeWebViewMacOS extends NativeWebViewMacOSBase {}
 
-
 export interface ContentInsetProp {
   top?: number;
   left?: number;
