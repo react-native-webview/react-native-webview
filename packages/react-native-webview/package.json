@@ -33,7 +33,7 @@
   "react-native": "src/index.ts",
   "scripts": {
     "ci:publish": "bun run semantic-release",
-    "lint:tsgo": "bun run --bun tsgo --noEmit || true",
+    "lint:tsgo": "bun run --bun tsgo --noEmit",
     "lint:oxlint": "bun run --bun oxlint --ignore-pattern __tests__",
     "lint:oxlint:ci": "bun run --bun oxlint --format=github --ignore-pattern __tests__",
     "lint:oxfmt": "bun run oxfmt",
@@ -41,7 +41,7 @@
     "lint": "bun run lint:tsgo && bun run lint:oxlint && bun run lint:oxfmt",
     "lint:ci": "bun run lint:tsgo && bun run lint:oxlint:ci && bun run lint:oxfmt:ci",
     "build": "babel --extensions \".ts,.tsx\" --out-dir lib src",
-    "prepare:types": "tsgo --noEmit false --emitDeclarationOnly --declaration --rootDir src --outDir lib || true",
+    "prepare:types": "tsgo --noEmit false --emitDeclarationOnly --declaration --rootDir src --outDir lib",
     "prepare": "bun run --bun prepare:types && bun run --bun build",
     "test:windows": "bun run jest --setupFiles=./jest-setups/jest.setup.js"
   },
