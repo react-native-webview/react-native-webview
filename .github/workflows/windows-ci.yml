@@ -38,8 +38,10 @@ jobs:
         run: |
           cd packages\example-windows
           Copy-Item metro.config.js metro.config.js.bak
+          Copy-Item index.js index.js.bak
           npx react-native init-windows --overwrite --logging
           Copy-Item metro.config.js.bak metro.config.js -Force
+          Copy-Item index.js.bak index.js -Force
 
       - name: Debug generated project
         shell: powershell
@@ -50,6 +52,8 @@ jobs:
           Write-Host "::notice::SLN=$($sln.FullName)"
           Write-Host "::notice::PROJ=$($proj.FullName)"
           Write-Host "::notice::WIN_FILES=$(Get-ChildItem -Path windows -Recurse | Measure-Object | Select-Object -ExpandProperty Count)"
+          Write-Host "::notice::INDEX_JS=$(Get-Content index.js -TotalCount 3 | Out-String)"
+          Write-Host "::notice::METRO_HAS_SHARED=$(Select-String -Path metro.config.js -Pattern 'example-shared' -Quiet)"
 
       - name: Build x64 release
         shell: powershell
