@@ -55,6 +55,12 @@ jobs:
           Write-Host "::notice::INDEX_JS=$(Get-Content index.js -TotalCount 3 | Out-String)"
           Write-Host "::notice::METRO_HAS_SHARED=$(Select-String -Path metro.config.js -Pattern 'example-shared' -Quiet)"
 
+      - name: Autolink Windows
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          npx @react-native-community/cli autolink-windows --sln windows\ExampleWindows.sln --proj windows\ExampleWindows\ExampleWindows.vcxproj
+
       - name: Create bundle output directories
         shell: powershell
         run: |
