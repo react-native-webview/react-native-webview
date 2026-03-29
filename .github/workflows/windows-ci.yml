@@ -55,6 +55,14 @@ jobs:
           Write-Host "::notice::INDEX_JS=$(Get-Content index.js -TotalCount 3 | Out-String)"
           Write-Host "::notice::METRO_HAS_SHARED=$(Select-String -Path metro.config.js -Pattern 'example-shared' -Quiet)"
 
+      - name: Create bundle output directories
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          New-Item -ItemType Directory -Force -Path "windows\ExampleWindows\Bundle"
+          New-Item -ItemType Directory -Force -Path "windows\x64\Release\sourcemaps\react"
+          New-Item -ItemType Directory -Force -Path "windows\x64\Release\ExampleWindows\Bundle"
+
       - name: Build x64 release
         shell: powershell
         run: |
