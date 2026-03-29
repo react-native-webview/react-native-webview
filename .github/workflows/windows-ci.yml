@@ -67,10 +67,4 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --msbuildprops "Bundle=false" 2>&1 | Tee-Object -FilePath build_output.txt
-          $exitCode = $LASTEXITCODE
-          if ($exitCode -ne 0) {
-            $errs = Get-Content build_output.txt | Select-String -Pattern "error |ENOENT|source.?map|compose|MSB[0-9]|hermes|Could not|fatal" | Select-Object -Last 10
-            foreach ($e in $errs) { Write-Host "::error::BUILD: $e" }
-            exit $exitCode
-          }
+          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /restore
