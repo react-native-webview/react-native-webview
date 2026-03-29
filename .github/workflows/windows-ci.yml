@@ -67,4 +67,10 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /restore
+          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /restore 2>&1 | Tee-Object -FilePath build_output.txt
+          $exitCode = $LASTEXITCODE
+          if ($exitCode -ne 0) {
+            $errs = Get-Content build_output.txt | Select-String -Pattern ": error |: fatal error |NETSDK|MSB[0-9]|packages.config|Could not|LINK :" | Select-Object -Last 10
+            foreach ($e in $errs) { Write-Host "::error::BUILD: $e" }
+            exit $exitCode
+          }
