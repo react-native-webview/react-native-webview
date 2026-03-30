@@ -1,6 +1,9 @@
 name: Windows CI
 on: [pull_request]
 
+permissions:
+  contents: write
+
 jobs:
   run-windows-tests:
     name: Build & run tests
@@ -9,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         name: Checkout Code
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ github.token }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -21,34 +27,47 @@ jobs:
           vs-version: '[17.0,)'
           msbuild-architecture: x64
 
-      - name: Install dependencies
+      - name: Install workspace dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build
+      - name: Install Windows example dependencies
+        run: bun install --frozen-lockfile
+        working-directory: packages/example-windows
+
+      - name: Build JS
         run: |
           bun run build
           bun run tsc
 
-      - name: Build x64 release
-        shell: powershell
-        run: bun run windows --release --no-packager --no-deploy --logging
-
-      # Workaround for a bug in package searching during deploy.
-      # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the packages at windows/x64/Release.
-      # Copy the packages to Windows/Release before deploying.
-      - name: Deploy
+      # TEMPORARY: Generate Windows project files and commit them.
+      # Remove this block once the files are committed to the repo.
+      - name: Generate Windows project
         shell: powershell
         run: |
-          Copy-Item -Path example\windows\x64\Release -Recurse -Destination example\windows\
-          bunx react-native run-windows --arch x64 --release --root example --logging --no-build --no-packager --deploy-from-layout
+          cd packages\example-windows
+          if (-not (Test-Path "windows")) {
+            Copy-Item metro.config.js metro.config.js.bak
+            Copy-Item index.js index.js.bak
+            npx react-native init-windows --overwrite --logging
+            Copy-Item metro.config.js.bak metro.config.js -Force
+            Copy-Item index.js.bak index.js -Force
+          }
 
-      - name: Start Appium server
+      - name: Commit generated files
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/example-windows/windows/
+          git diff --cached --quiet || (git commit -m "chore: commit Windows project files [skip ci]" && git push origin HEAD:${{ github.head_ref }})
+
+      - name: Build x64 release
         shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
-
-      - name: Start React server
-        shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run start"
-
-      - name: Run tests
-        run: bun run test:windows
+        run: |
+          cd packages\example-windows
+          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /p:RunAutolinkCheck=false /restore 2>&1 | Tee-Object -FilePath build.log
+          $code = $LASTEXITCODE
+          if ($code -ne 0) {
+            Get-Content build.log | Select-String ": error |autolink|packages.config|Could not|MSB[0-9]" | Select-Object -Last 10 | ForEach-Object { Write-Host "::error::$_" }
+            exit $code
+          }

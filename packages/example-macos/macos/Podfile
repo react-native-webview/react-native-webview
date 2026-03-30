@@ -1,0 +1,6 @@
+rnta_path = `node --print "require('path').dirname(require.resolve('react-native-test-app/package.json'))"`.strip
+require "#{rnta_path}/macos/test_app"
+
+workspace 'WebviewExample.xcworkspace'
+
+use_test_app! :hermes_enabled => false

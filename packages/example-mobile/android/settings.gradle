@@ -1,0 +1,13 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenLocal()
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "WebviewExample"
+
+apply(from: "../../../node_modules/react-native-test-app/test-app.gradle")
+applyTestAppSettings(settings)

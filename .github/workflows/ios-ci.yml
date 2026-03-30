@@ -6,9 +6,6 @@ on:
   pull_request:
 jobs:
   build:
-    strategy:
-      matrix:
-        extraEnv: [FOO=BAR, RCT_NEW_ARCH_ENABLED=1]
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -20,8 +17,8 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Install Pods
-        run: ${{matrix.extraEnv}} pod install
-        working-directory: example/ios
+        run: pod install
+        working-directory: packages/example-mobile/ios
       - name: Build iOS test app
         run: |
           device_name='iPhone 17'
@@ -29,5 +26,5 @@ jobs:
           re='\(([-0-9A-Fa-f]+)\)'
           [[ $device =~ $re ]] || exit 1
           xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination "platform=iOS Simulator,id=${BASH_REMATCH[1]}" CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
-        working-directory: example/ios
+        working-directory: packages/example-mobile/ios
     timeout-minutes: 60
