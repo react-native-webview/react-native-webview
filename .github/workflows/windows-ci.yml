@@ -39,12 +39,15 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          if (-not (Test-Path "windows\*.sln")) {
+          if (-not (Test-Path "windows")) {
+            # Temporarily remove config that references the library (init-windows doesn't need it)
+            if (Test-Path "react-native.config.js") { Rename-Item react-native.config.js react-native.config.js.tmp }
             Copy-Item metro.config.js metro.config.js.bak
             Copy-Item index.js index.js.bak
             npx react-native init-windows --overwrite --logging
             Copy-Item metro.config.js.bak metro.config.js -Force
             Copy-Item index.js.bak index.js -Force
+            if (Test-Path "react-native.config.js.tmp") { Rename-Item react-native.config.js.tmp react-native.config.js }
           }
 
       - name: Commit generated files
