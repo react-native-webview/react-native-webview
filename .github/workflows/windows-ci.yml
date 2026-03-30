@@ -65,4 +65,4 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging --msbuildprops Bundle=false
+          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /restore
