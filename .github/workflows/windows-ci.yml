@@ -54,11 +54,11 @@ jobs:
           }
 
       - name: Commit generated files
-        if: success()
+        continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add packages/example-windows/windows/ packages/example-windows/react-native.config.js
+          git add packages/example-windows/windows/
           git diff --cached --quiet || (git commit -m "chore: commit Windows project files [skip ci]" && git push origin HEAD:${{ github.head_ref }})
 
       - name: Build x64 release
