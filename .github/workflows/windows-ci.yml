@@ -33,7 +33,9 @@ jobs:
           bun run build
           bun run tsc
 
-      - name: Init Windows
+      # RNW 0.82 requires init-windows to generate the native project
+      # (RNTA 5.x only supports up to RNW 0.81)
+      - name: Init Windows project
         shell: powershell
         run: |
           cd packages\example-windows
@@ -43,40 +45,17 @@ jobs:
           Copy-Item metro.config.js.bak metro.config.js -Force
           Copy-Item index.js.bak index.js -Force
 
-      - name: Debug generated project
+      - name: Autolink Windows
         shell: powershell
         run: |
           cd packages\example-windows
           $sln = Get-ChildItem -Path windows -Filter "*.sln" -Recurse | Select-Object -First 1
           $proj = Get-ChildItem -Path windows -Filter "*.vcxproj" -Recurse | Select-Object -First 1
-          Write-Host "::notice::SLN=$($sln.FullName)"
-          Write-Host "::notice::PROJ=$($proj.FullName)"
-          Write-Host "::notice::WIN_FILES=$(Get-ChildItem -Path windows -Recurse | Measure-Object | Select-Object -ExpandProperty Count)"
-          Write-Host "::notice::INDEX_JS=$(Get-Content index.js -TotalCount 3 | Out-String)"
-          Write-Host "::notice::METRO_HAS_SHARED=$(Select-String -Path metro.config.js -Pattern 'example-shared' -Quiet)"
-
-      - name: Autolink Windows
-        shell: powershell
-        run: |
-          cd packages\example-windows
-          npx @react-native-community/cli autolink-windows --sln windows\ExampleWindows.sln --proj windows\ExampleWindows\ExampleWindows.vcxproj
-
-      - name: Create bundle output directories
-        shell: powershell
-        run: |
-          cd packages\example-windows
-          New-Item -ItemType Directory -Force -Path "windows\ExampleWindows\Bundle"
-          New-Item -ItemType Directory -Force -Path "windows\x64\Release\sourcemaps\react"
-          New-Item -ItemType Directory -Force -Path "windows\x64\Release\ExampleWindows\Bundle"
+          npx @react-native-community/cli autolink-windows --sln $sln.FullName --proj $proj.FullName
 
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /restore 2>&1 | Tee-Object -FilePath build_output.txt
-          $exitCode = $LASTEXITCODE
-          if ($exitCode -ne 0) {
-            $errs = Get-Content build_output.txt | Select-String -Pattern ": error |: fatal error |NETSDK|MSB[0-9]|packages.config|Could not|LINK :" | Select-Object -Last 10
-            foreach ($e in $errs) { Write-Host "::error::BUILD: $e" }
-            exit $exitCode
-          }
+          $sln = Get-ChildItem -Path windows -Filter "*.sln" -Recurse | Select-Object -First 1
+          msbuild $sln.FullName /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /restore
