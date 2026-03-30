@@ -27,6 +27,7 @@ import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import SslError from './examples/SslError';
+import PullToRefresh from './examples/PullToRefresh';
 
 const TESTS = {
   Messaging: {
@@ -165,6 +166,14 @@ const TESTS = {
       return <SslError />;
     },
   },
+  PullToRefresh: {
+    title: 'Pull To Refresh',
+    testId: 'PullToRefresh',
+    description: 'Pull to refresh test',
+    render() {
+      return <PullToRefresh />;
+    },
+  },
 };
 
 interface State {
@@ -296,6 +305,11 @@ export default class App extends Component<unknown, State> {
             testID="testType_sslError"
             title="SslError"
             onPress={() => this._changeTest('SslError')}
+          />
+          <Button
+            testID="testType_pullToRefresh"
+            title="PullToRefresh"
+            onPress={() => this._changeTest('PullToRefresh')}
           />
         </View>
 
