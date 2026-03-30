@@ -332,7 +332,8 @@ static inline std::string nullSafeStringWithLength(id value) {
     REMAP_WEBVIEW_PROP(showsHorizontalScrollIndicator)
     REMAP_WEBVIEW_PROP(showsVerticalScrollIndicator)
     REMAP_WEBVIEW_PROP(keyboardDisplayRequiresUserAction)
-
+    REMAP_WEBVIEW_PROP(scrollsToTop)
+	
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
 #endif
