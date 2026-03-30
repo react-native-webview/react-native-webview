@@ -33,34 +33,30 @@ jobs:
           bun run build
           bun run tsc
 
-      # TEMPORARY: Generate and commit Windows project + autolink files.
-      # After this runs once, remove everything between the --- markers
-      # and keep only the "Build x64 release" step.
-      # ---
+      # TEMPORARY: Generate Windows project files and commit them.
+      # Remove this block once the files are committed to the repo.
       - name: Generate Windows project
         shell: powershell
         run: |
           cd packages\example-windows
-          Copy-Item metro.config.js metro.config.js.bak
-          Copy-Item index.js index.js.bak
-          npx react-native init-windows --overwrite --logging
-          Copy-Item metro.config.js.bak metro.config.js -Force
-          Copy-Item index.js.bak index.js -Force
-          $sln = Get-ChildItem -Path windows -Filter "*.sln" -Recurse | Select-Object -First 1
-          $proj = Get-ChildItem -Path windows -Filter "*.vcxproj" -Recurse | Select-Object -First 1
-          npx @react-native-community/cli autolink-windows --sln $sln.FullName --proj $proj.FullName
+          if (-not (Test-Path "windows\*.sln")) {
+            Copy-Item metro.config.js metro.config.js.bak
+            Copy-Item index.js index.js.bak
+            npx react-native init-windows --overwrite --logging
+            Copy-Item metro.config.js.bak metro.config.js -Force
+            Copy-Item index.js.bak index.js -Force
+          }
 
       - name: Commit generated files
+        if: success()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add packages/example-windows/windows/
-          git diff --cached --quiet || (git commit -m "chore: commit Windows project and autolink files [skip ci]" && git push origin HEAD:${{ github.head_ref }})
-      # ---
+          git add packages/example-windows/windows/ packages/example-windows/react-native.config.js
+          git diff --cached --quiet || (git commit -m "chore: commit Windows project files [skip ci]" && git push origin HEAD:${{ github.head_ref }})
 
       - name: Build x64 release
         shell: powershell
         run: |
           cd packages\example-windows
-          $sln = Get-ChildItem -Path windows -Filter "*.sln" -Recurse | Select-Object -First 1
-          msbuild $sln.FullName /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /restore
+          npx react-native run-windows --arch x64 --release --no-packager --no-deploy --logging
