@@ -33,8 +33,8 @@ jobs:
           bun run build
           bun run tsc
 
-      # RNW 0.82 requires init-windows to generate the native project
-      # (RNTA 5.x only supports up to RNW 0.81)
+      # Generate Windows project files (temporary - these should be committed)
+      # Once committed, replace this block with just the autolink + build steps
       - name: Init Windows project
         shell: powershell
         run: |
@@ -52,6 +52,14 @@ jobs:
           $sln = Get-ChildItem -Path windows -Filter "*.sln" -Recurse | Select-Object -First 1
           $proj = Get-ChildItem -Path windows -Filter "*.vcxproj" -Recurse | Select-Object -First 1
           npx @react-native-community/cli autolink-windows --sln $sln.FullName --proj $proj.FullName
+
+      - name: Commit generated project
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/example-windows/windows/
+          git diff --cached --quiet || git commit -m "chore: commit init-windows generated project files"
+          git push origin HEAD:${{ github.head_ref }} || true
 
       - name: Build x64 release
         shell: powershell
