@@ -2,8 +2,8 @@ let project;
 try {
   const { configureProjects } = require('react-native-test-app');
   project = configureProjects({
-    macos: {
-      sourceDir: 'macos',
+    visionos: {
+      sourceDir: 'visionos',
     },
   });
 } catch (e) {
