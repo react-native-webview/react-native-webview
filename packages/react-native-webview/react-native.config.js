@@ -9,10 +9,6 @@ const project = (() => {
       ios: {
         sourceDir: '../example-mobile/ios',
       },
-      windows: {
-        sourceDir: path.join('..', 'example-windows', 'windows'),
-        solutionFile: path.join('..', 'example-windows', 'windows', 'WebviewExample.sln'),
-      },
     });
   } catch (e) {
     return undefined;
