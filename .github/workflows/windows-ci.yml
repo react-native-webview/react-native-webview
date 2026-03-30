@@ -33,9 +33,11 @@ jobs:
           bun run build
           bun run tsc
 
-      # Generate Windows project files (temporary - these should be committed)
-      # Once committed, replace this block with just the autolink + build steps
-      - name: Init Windows project
+      # TEMPORARY: Generate and commit Windows project + autolink files.
+      # After this runs once, remove everything between the --- markers
+      # and keep only the "Build x64 release" step.
+      # ---
+      - name: Generate Windows project
         shell: powershell
         run: |
           cd packages\example-windows
@@ -44,22 +46,17 @@ jobs:
           npx react-native init-windows --overwrite --logging
           Copy-Item metro.config.js.bak metro.config.js -Force
           Copy-Item index.js.bak index.js -Force
-
-      - name: Autolink Windows
-        shell: powershell
-        run: |
-          cd packages\example-windows
           $sln = Get-ChildItem -Path windows -Filter "*.sln" -Recurse | Select-Object -First 1
           $proj = Get-ChildItem -Path windows -Filter "*.vcxproj" -Recurse | Select-Object -First 1
           npx @react-native-community/cli autolink-windows --sln $sln.FullName --proj $proj.FullName
 
-      - name: Commit generated project
+      - name: Commit generated files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add packages/example-windows/windows/
-          git diff --cached --quiet || git commit -m "chore: commit init-windows generated project files"
-          git push origin HEAD:${{ github.head_ref }} || true
+          git diff --cached --quiet || (git commit -m "chore: commit Windows project and autolink files [skip ci]" && git push origin HEAD:${{ github.head_ref }})
+      # ---
 
       - name: Build x64 release
         shell: powershell
