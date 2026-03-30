@@ -1,6 +1,9 @@
 name: Windows CI
 on: [pull_request]
 
+permissions:
+  contents: write
+
 jobs:
   run-windows-tests:
     name: Build & run tests
@@ -9,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         name: Checkout Code
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ github.token }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
