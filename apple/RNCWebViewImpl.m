@@ -1843,7 +1843,7 @@ didFinishNavigation:(WKNavigation *)navigation
                                            @"(function(history) {\n"
                                          "  function notify(type) {\n"
                                          "    setTimeout(function() {\n"
-                                         "      window.webkit.messageHandlers.%@.postMessage(type)\n"
+                                         "      try { window.webkit.messageHandlers.%@.postMessage(type) } catch(e) {}\n"
                                          "    }, 0)\n"
                                          "  }\n"
                                          "  function shim(f) {\n"
