@@ -195,18 +195,23 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+        String permissionToRequest = null;
 
         if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
+            permissionToRequest = Manifest.permission.ACCESS_FINE_LOCATION;
+        } else if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionToRequest = Manifest.permission.ACCESS_COARSE_LOCATION;
+        }
 
+        if (permissionToRequest != null) {
             /*
              * Keep the trace of callback and origin for the async permission request
              */
             geolocationPermissionCallback = callback;
             geolocationPermissionOrigin = origin;
-
-            requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
-
+            requestPermissions(Collections.singletonList(permissionToRequest));
         } else {
             callback.invoke(origin, true, false);
         }
@@ -264,7 +269,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             String permission = permissions[i];
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
 
-            if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION)
+            if ((permission.equals(Manifest.permission.ACCESS_FINE_LOCATION) || permission.equals(Manifest.permission.ACCESS_COARSE_LOCATION))
                     && geolocationPermissionCallback != null
                     && geolocationPermissionOrigin != null) {
 
