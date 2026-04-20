@@ -3,6 +3,7 @@ package com.reactnativecommunity.webview;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -33,6 +34,7 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -195,23 +197,32 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-        String permissionToRequest = null;
 
-        if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            permissionToRequest = Manifest.permission.ACCESS_FINE_LOCATION;
-        } else if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            permissionToRequest = Manifest.permission.ACCESS_COARSE_LOCATION;
+        boolean fineLocationDeclared = false;
+
+        try {
+            Context context = this.mWebView.getThemedReactContext();
+            String[] requestedPermissions = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions;
+            if (Arrays.asList(requestedPermissions).contains(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                fineLocationDeclared = true;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            fineLocationDeclared = true;
         }
+    
+        // If ACCESS_FINE_LOCATION is available to request, we use that, otherwise fall back to ACCESS_COARSE_LOCATION
+        String locationPermission = fineLocationDeclared
+                ? Manifest.permission.ACCESS_FINE_LOCATION
+                : Manifest.permission.ACCESS_COARSE_LOCATION;
 
-        if (permissionToRequest != null) {
+        if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), locationPermission)
+                != PackageManager.PERMISSION_GRANTED) {
             /*
              * Keep the trace of callback and origin for the async permission request
              */
             geolocationPermissionCallback = callback;
             geolocationPermissionOrigin = origin;
-            requestPermissions(Collections.singletonList(permissionToRequest));
+            requestPermissions(Collections.singletonList(locationPermission));
         } else {
             callback.invoke(origin, true, false);
         }
