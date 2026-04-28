@@ -15,7 +15,10 @@ import android.webkit.CookieManager
 import android.webkit.DownloadListener
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.webkit.Profile
+import androidx.webkit.ProfileStore
 import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
@@ -485,6 +488,28 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         view.clearFormData();
         view.settings.savePassword = false;
         view.settings.saveFormData = false;
+    }
+
+    fun setProfile(viewWrapper: RNCWebViewWrapper, profileName: String?) {
+        val view = viewWrapper.webView
+        if (profileName.isNullOrEmpty()) return
+
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            Log.w(TAG, "WebView profile '$profileName' ignored: MULTI_PROFILE not supported on this device.")
+            return
+        }
+
+        // setProfile must be called before any URL is loaded; once a non-default
+        // profile is attached it cannot be reassigned.
+        val current = WebViewCompat.getProfile(view)
+        if (current.name == profileName) return
+        if (current.name != Profile.DEFAULT_PROFILE_NAME) {
+            Log.w(TAG, "Cannot change WebView profile from '${current.name}' to '$profileName' after creation.")
+            return
+        }
+
+        ProfileStore.getInstance().getOrCreateProfile(profileName)
+        WebViewCompat.setProfile(view, profileName)
     }
 
     fun setInjectedJavaScript(viewWrapper: RNCWebViewWrapper, injectedJavaScript: String?) {
