@@ -65,6 +65,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
 - [`keyboardDisplayRequiresUserAction`](Reference.md#keyboardDisplayRequiresUserAction)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
+- [`removeIosKeyboardObserver`](Reference.md#removeioskeyboardobserver)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
@@ -1271,6 +1272,18 @@ If `false`, web content can programmatically display the keyboard. The default v
 ### `hideKeyboardAccessoryView`[⬆](#props-index)
 
 If `true`, this will hide the keyboard accessory view (< > and Done).
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+---
+
+### `removeIosKeyboardObserver`[⬆](#props-index)
+
+If `true`, removes the keyboard notification observers (`UIKeyboardWillShow`, `UIKeyboardWillHide`, `UIKeyboardWillChangeFrame`) that `WKWebView` registers internally. Useful when the keyboard is managed by surrounding native code and the WebView's automatic scroll/inset adjustments interfere with it.
+
+The default value is `false`. The value is read once when the WebView mounts and cannot be toggled afterwards — `WKWebView` registers these observers via private internal selectors, so once removed they cannot be re-registered. Remount the WebView to apply a new value.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
