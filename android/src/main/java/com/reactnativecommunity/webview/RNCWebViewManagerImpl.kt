@@ -15,7 +15,6 @@ import android.webkit.CookieManager
 import android.webkit.DownloadListener
 import android.webkit.WebSettings
 import android.webkit.WebView
-import androidx.webkit.Profile
 import androidx.webkit.ProfileStore
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
@@ -499,17 +498,16 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
             return
         }
 
-        // setProfile must be called before any URL is loaded; once a non-default
-        // profile is attached it cannot be reassigned.
-        val current = WebViewCompat.getProfile(view)
-        if (current.name == profileName) return
-        if (current.name != Profile.DEFAULT_PROFILE_NAME) {
-            Log.w(TAG, "Cannot change WebView profile from '${current.name}' to '$profileName' after creation.")
-            return
+        // setProfile must be called before any URL is loaded AND before getProfile
+        // is ever called — calling getProfile itself locks the WebView to its
+        // current profile. The catch covers the case where the prop is changed
+        // after first mount, which the underlying API doesn't allow.
+        try {
+            ProfileStore.getInstance().getOrCreateProfile(profileName)
+            WebViewCompat.setProfile(view, profileName)
+        } catch (e: IllegalStateException) {
+            Log.w(TAG, "Cannot change WebView profile to '$profileName': ${e.message}")
         }
-
-        ProfileStore.getInstance().getOrCreateProfile(profileName)
-        WebViewCompat.setProfile(view, profileName)
     }
 
     fun setInjectedJavaScript(viewWrapper: RNCWebViewWrapper, injectedJavaScript: String?) {
