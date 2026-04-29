@@ -279,6 +279,11 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
         mRNCWebViewManagerImpl.setPaymentRequestEnabled(view, value);
     }
 
+    @ReactProp(name = "profile")
+    public void setProfile(RNCWebViewWrapper view, @Nullable String value) {
+        mRNCWebViewManagerImpl.setProfile(view, value);
+    }
+
     @Override
     protected void addEventEmitters(@NonNull ThemedReactContext reactContext, RNCWebViewWrapper viewWrapper) {
         // Do not register default touch emitter and let WebView implementation handle touches

@@ -26,6 +26,7 @@ import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
+import ProfileExample from './examples/Profile';
 import SslError from './examples/SslError';
 
 const TESTS = {
@@ -165,6 +166,14 @@ const TESTS = {
       return <SslError />;
     },
   },
+  Profile: {
+    title: 'Profile (Android)',
+    testId: 'profile',
+    description: 'Isolated cookie jars via androidx.webkit Profile',
+    render() {
+      return <ProfileExample />;
+    },
+  },
 };
 
 interface State {
@@ -296,6 +305,11 @@ export default class App extends Component<unknown, State> {
             testID="testType_sslError"
             title="SslError"
             onPress={() => this._changeTest('SslError')}
+          />
+          <Button
+            testID="testType_profile"
+            title="Profile"
+            onPress={() => this._changeTest('Profile')}
           />
         </View>
 

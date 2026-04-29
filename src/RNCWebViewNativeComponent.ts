@@ -235,6 +235,7 @@ export interface NativeProps extends ViewProps {
   }>;
   cacheEnabled?: WithDefault<boolean, true>;
   incognito?: boolean;
+  profile?: string;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   injectedJavaScriptForMainFrameOnly?: WithDefault<boolean, true>;

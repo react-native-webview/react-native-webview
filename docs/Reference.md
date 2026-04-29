@@ -71,6 +71,7 @@ This document lays out the current public properties and methods for the React N
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`cacheEnabled`](Reference.md#cacheEnabled)
 - [`cacheMode`](Reference.md#cacheMode)
+- [`profile`](Reference.md#profile)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
@@ -1342,6 +1343,28 @@ Possible values are:
 | Type   | Required | Default      | Platform |
 | ------ | -------- | ------------ | -------- |
 | string | No       | LOAD_DEFAULT | Android  |
+
+---
+
+### `profile`[⬆](#props-index)
+
+Name of the [androidx.webkit `Profile`](https://developer.android.com/reference/androidx/webkit/Profile) to use for this WebView. When set, the WebView gets an isolated cookie jar, web storage, geolocation permissions, and service workers scoped to this profile, separate from the default profile used by other WebViews in the app. Useful for embedded auth flows, multi-account support, or any case where a WebView's cookies need to be independent from the rest of the app.
+
+If a profile with the given name does not exist yet, it is created on first use via `ProfileStore.getOrCreateProfile`. Profiles persist across app launches.
+
+Requires `WebViewFeature.MULTI_PROFILE` (androidx.webkit 1.9+, Android 10+ with a recent WebView). On unsupported devices the prop is ignored — the WebView falls back to the default profile and a warning is logged via Logcat.
+
+> **Note**: this prop must be set when the WebView is first mounted. The Android Profile API does not allow changing a WebView's profile after it has loaded; later changes to this prop are ignored with a warning.
+
+```jsx
+// Two WebViews with isolated cookies
+<WebView source={{ uri: 'https://example.com' }} profile="account-a" />
+<WebView source={{ uri: 'https://example.com' }} profile="account-b" />
+```
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
 
 ---
 
