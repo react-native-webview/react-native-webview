@@ -51,31 +51,29 @@ jobs:
           Get-ChildItem -Path node_modules\.generated\windows -Recurse -Name -ErrorAction SilentlyContinue | Select-Object -First 30
           Write-Host "=== AutolinkedNativeModules.g.cpp ==="
           $genCpp = Get-ChildItem -Path node_modules\.generated\windows -Filter "AutolinkedNativeModules.g.cpp" -Recurse | Select-Object -First 1
-          if ($genCpp) { Get-Content $genCpp.FullName }
-
-      - name: Autolink Windows native modules
-        working-directory: packages/example-windows
-        run: bunx react-native autolink-windows --logging
+          if ($genCpp) { Get-Content $genCpp.FullName } else { Write-Host "NOT FOUND" }
 
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows
         run: |
-          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /restore 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
-            Write-Host "::group::Build errors (last 60 lines matching error patterns)"
-            Get-Content build.log | Select-String ": error |: fatal error|autolink|hermes|Could not|MSB[0-9]|LNK[0-9]|bundle|BundleCommand" | Select-Object -Last 60 | ForEach-Object { Write-Host "::error::$_" }
+            Write-Host "::group::Build errors"
+            Get-Content build.log | Select-String ": error |: fatal error|LNK[0-9]" | Select-Object -Last 60 | ForEach-Object { Write-Host "::error::$_" }
             Write-Host "::endgroup::"
             exit $code
           }
 
-      - name: Upload build log
+      - name: Upload build logs
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: windows-build-log
-          path: packages/example-windows/build.log
+          name: windows-build-logs
+          path: |
+            packages/example-windows/build.log
+            packages/example-windows/build.binlog
 
       - name: Deploy
         shell: powershell
