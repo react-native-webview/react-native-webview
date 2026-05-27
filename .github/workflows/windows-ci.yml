@@ -13,7 +13,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.10
+          bun-version: 1.3.14
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1.3
@@ -29,7 +29,7 @@ jobs:
           # Tests use WinAppDriver, not chromedriver. The chromedriver
           # postinstall hits a deprecated Google XML endpoint and fails.
           APPIUM_SKIP_CHROMEDRIVER_INSTALL: 'true'
-        run: bun install --linker hoisted
+        run: bun install --frozen-lockfile
         working-directory: packages/example-windows
 
       - name: Build JS
