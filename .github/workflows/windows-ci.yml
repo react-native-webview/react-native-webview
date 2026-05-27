@@ -64,9 +64,18 @@ jobs:
           msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /restore 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
-            Get-Content build.log | Select-String ": error |autolink|hermes|Could not|MSB[0-9]|bundle|BundleCommand" | Select-Object -Last 30 | ForEach-Object { Write-Host "::error::$_" }
+            Write-Host "::group::Build errors (last 60 lines matching error patterns)"
+            Get-Content build.log | Select-String ": error |: fatal error|autolink|hermes|Could not|MSB[0-9]|LNK[0-9]|bundle|BundleCommand" | Select-Object -Last 60 | ForEach-Object { Write-Host "::error::$_" }
+            Write-Host "::endgroup::"
             exit $code
           }
+
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-log
+          path: packages/example-windows/build.log
 
       - name: Deploy
         shell: powershell
