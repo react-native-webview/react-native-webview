@@ -42,20 +42,23 @@ jobs:
         working-directory: packages/example-windows
         run: bunx install-windows-test-app --use-fabric --project-directory windows
 
-      - name: Test Metro bundle
+      - name: Create JS bundle
         shell: powershell
+        working-directory: packages/example-windows
         run: |
-          cd packages\example-windows
-          New-Item -ItemType Directory -Force -Path windows\ExampleWindows\Bundle | Out-Null
-          npx @react-native-community/cli bundle --platform windows --entry-file index.js --bundle-output windows\ExampleWindows\Bundle\index.windows.bundle --dev false 2>&1
-          if ($LASTEXITCODE -ne 0) { Write-Host "::error::METRO_BUNDLE_FAILED"; exit $LASTEXITCODE }
-          Write-Host "::notice::BUNDLE_SIZE=$((Get-Item windows\ExampleWindows\Bundle\index.windows.bundle).Length)"
+          # Find the RNTA-generated app directory
+          $appDir = Get-ChildItem -Path windows -Filter "*.vcxproj" -Recurse | Select-Object -First 1 | Split-Path
+          $bundleDir = Join-Path $appDir "Bundle"
+          New-Item -ItemType Directory -Force -Path $bundleDir | Out-Null
+          npx @react-native-community/cli bundle --platform windows --entry-file index.js --bundle-output "$bundleDir\index.windows.bundle" --assets-dest "$bundleDir" --dev false
+          Write-Host "::notice::BUNDLE_DIR=$bundleDir"
+          Write-Host "::notice::BUNDLE_SIZE=$((Get-Item "$bundleDir\index.windows.bundle").Length)"
 
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows
         run: |
-          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=true /p:AppxBundle=Never /p:BundlePlatform=windows /restore 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /restore 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Get-Content build.log | Select-String ": error |autolink|hermes|Could not|MSB[0-9]|bundle" | Select-Object -Last 10 | ForEach-Object { Write-Host "::error::$_" }
