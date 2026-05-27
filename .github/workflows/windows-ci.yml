@@ -40,16 +40,21 @@ jobs:
       - name: Generate Windows test app project
         shell: powershell
         working-directory: packages/example-windows
-        run: bunx install-windows-test-app --use-fabric --project-directory windows
+        run: |
+          bunx install-windows-test-app --use-fabric --project-directory windows
+          Write-Host "::group::Generated project files"
+          Get-ChildItem -Path windows -Recurse -Name | Select-Object -First 30
+          Get-ChildItem -Path node_modules\.generated\windows -Recurse -Name -ErrorAction SilentlyContinue | Select-Object -First 30
+          Write-Host "::endgroup::"
 
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows
         run: |
-          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never "/p:BundleCliCommand=bunx react-native bundle" /restore 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /restore 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
-            Get-Content build.log | Select-String ": error |autolink|hermes|Could not|MSB[0-9]|bundle" | Select-Object -Last 20 | ForEach-Object { Write-Host "::error::$_" }
+            Get-Content build.log | Select-String ": error |autolink|hermes|Could not|MSB[0-9]|bundle|BundleCommand" | Select-Object -Last 30 | ForEach-Object { Write-Host "::error::$_" }
             exit $code
           }
 
