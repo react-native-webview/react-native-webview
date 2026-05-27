@@ -46,12 +46,24 @@ jobs:
         working-directory: packages/example-windows
         run: |
           Write-Host "=== windows/ ==="
-          Get-ChildItem -Path windows -Recurse -Name | Select-Object -First 30
+          Get-ChildItem -Path windows -Recurse -Name | Select-Object -First 40
           Write-Host "=== node_modules/.generated/windows/ ==="
-          Get-ChildItem -Path node_modules\.generated\windows -Recurse -Name -ErrorAction SilentlyContinue | Select-Object -First 30
+          Get-ChildItem -Path node_modules\.generated\windows -Recurse -Name -ErrorAction SilentlyContinue | Select-Object -First 40
           Write-Host "=== AutolinkedNativeModules.g.cpp ==="
           $genCpp = Get-ChildItem -Path node_modules\.generated\windows -Filter "AutolinkedNativeModules.g.cpp" -Recurse | Select-Object -First 1
-          if ($genCpp) { Get-Content $genCpp.FullName } else { Write-Host "NOT FOUND" }
+          if ($genCpp) {
+            $content = Get-Content $genCpp.FullName -Raw
+            Write-Host $content
+            if ($content -match '\{\{') {
+              Write-Host "::error::AutolinkedNativeModules.g.cpp still has template placeholders - autolink did not run!"
+            }
+          } else { Write-Host "::warning::AutolinkedNativeModules.g.cpp NOT FOUND in generated dir" }
+          Write-Host "=== Solution projects ==="
+          if (Test-Path windows\WebviewExample.sln) {
+            Select-String -Path windows\WebviewExample.sln -Pattern "Project\(" | ForEach-Object { Write-Host $_.Line }
+          } else { Write-Host "::error::WebviewExample.sln not found!" }
+          Write-Host "=== ExperimentalFeatures.props ==="
+          if (Test-Path windows\ExperimentalFeatures.props) { Get-Content windows\ExperimentalFeatures.props } else { Write-Host "NOT FOUND" }
 
       - name: Build x64 release
         shell: powershell
