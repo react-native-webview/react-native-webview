@@ -65,9 +65,30 @@ jobs:
         shell: powershell
         run: |
           cd packages\example-windows
-          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=false /p:AppxBundle=Never /p:RunAutolinkCheck=false /restore 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=true /p:AppxBundle=Never /p:RunAutolinkCheck=false /restore 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Get-Content build.log | Select-String ": error |autolink|packages.config|Could not|MSB[0-9]" | Select-Object -Last 10 | ForEach-Object { Write-Host "::error::$_" }
             exit $code
           }
+
+      - name: Deploy
+        shell: powershell
+        working-directory: packages/example-windows
+        run: |
+          Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
+          bunx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
+
+      - name: Start Appium server
+        shell: powershell
+        working-directory: packages/example-windows
+        run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
+
+      - name: Start React server
+        shell: powershell
+        working-directory: packages/example-windows
+        run: Start-Process PowerShell -ArgumentList "bun run start"
+
+      - name: Run tests
+        working-directory: packages/example-windows
+        run: bun run test
