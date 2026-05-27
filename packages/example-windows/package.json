@@ -25,6 +25,7 @@
     "@types/selenium-webdriver": "4.0.9",
     "appium": "1.17.0",
     "jest": "^29.6.3",
+    "react-native-test-app": "^5.1.9",
     "react-native-windows": "0.82.1",
     "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",

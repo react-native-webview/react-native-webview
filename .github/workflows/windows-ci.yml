@@ -1,9 +1,6 @@
 name: Windows CI
 on: [pull_request]
 
-permissions:
-  contents: write
-
 jobs:
   run-windows-tests:
     name: Build & run tests
@@ -12,9 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         name: Checkout Code
-        with:
-          ref: ${{ github.head_ref }}
-          token: ${{ github.token }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -43,33 +37,16 @@ jobs:
           bun run build
           bun run tsc
 
-      # TEMPORARY: Generate Windows project files and commit them.
-      # Remove this block once the files are committed to the repo.
-      - name: Generate Windows project
+      - name: Generate Windows test app project
         shell: powershell
-        run: |
-          cd packages\example-windows
-          if (-not (Test-Path "windows")) {
-            Copy-Item metro.config.js metro.config.js.bak
-            Copy-Item index.js index.js.bak
-            npx react-native init-windows --overwrite --logging
-            Copy-Item metro.config.js.bak metro.config.js -Force
-            Copy-Item index.js.bak index.js -Force
-          }
-
-      - name: Commit generated files
-        continue-on-error: true
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add packages/example-windows/windows/
-          git diff --cached --quiet || (git commit -m "chore: commit Windows project files [skip ci]" && git push origin HEAD:${{ github.head_ref }})
+        working-directory: packages/example-windows
+        run: bunx install-windows-test-app --use-fabric --project-directory windows
 
       - name: Build x64 release
         shell: powershell
+        working-directory: packages/example-windows
         run: |
-          cd packages\example-windows
-          msbuild windows\ExampleWindows.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=true /p:AppxBundle=Never /p:RunAutolinkCheck=false /restore 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:Bundle=true /p:AppxBundle=Never /restore 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Get-Content build.log | Select-String ": error |autolink|packages.config|Could not|MSB[0-9]" | Select-Object -Last 10 | ForEach-Object { Write-Host "::error::$_" }
