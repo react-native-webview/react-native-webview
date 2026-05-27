@@ -42,6 +42,15 @@ jobs:
         working-directory: packages/example-windows
         run: bunx install-windows-test-app --use-fabric --project-directory windows
 
+      - name: Test Metro bundle
+        shell: powershell
+        run: |
+          cd packages\example-windows
+          New-Item -ItemType Directory -Force -Path windows\ExampleWindows\Bundle | Out-Null
+          npx @react-native-community/cli bundle --platform windows --entry-file index.js --bundle-output windows\ExampleWindows\Bundle\index.windows.bundle --dev false 2>&1
+          if ($LASTEXITCODE -ne 0) { Write-Host "::error::METRO_BUNDLE_FAILED"; exit $LASTEXITCODE }
+          Write-Host "::notice::BUNDLE_SIZE=$((Get-Item windows\ExampleWindows\Bundle\index.windows.bundle).Length)"
+
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows
