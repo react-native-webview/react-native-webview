@@ -1,5 +1,6 @@
 const path = require('path');
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const { default: exclusionList } = require('metro-config/private/defaults/exclusionList');
 
 const monorepoRoot = path.resolve(__dirname, '../..');
 const webviewPackage = path.resolve(__dirname, '../react-native-webview');
@@ -13,6 +14,10 @@ const config = {
   resolver: {
     platforms: [...(defaultConfig.resolver?.platforms || []), 'windows'],
     resolverMainFields: ['main-internal', 'browser', 'main'],
+    blockList: exclusionList([
+      /node_modules\/.*\/node_modules\/react-native\/.*/,
+      /.*\.ProjectImports\.zip/,
+    ]),
     nodeModulesPaths: [
       path.resolve(__dirname, 'node_modules'),
       path.resolve(monorepoRoot, 'node_modules'),
@@ -22,14 +27,23 @@ const config = {
       'example-shared': sharedPackage,
     },
     resolveRequest: (context, moduleName, platform) => {
-      if (platform === 'windows' && moduleName === 'react-native') {
-        return context.resolveRequest(
+      const defaultResolve = (name) =>
+        context.resolveRequest(
           { ...context, resolveRequest: undefined },
-          'react-native-windows',
+          name,
           platform,
         );
+      if (platform === 'windows') {
+        if (moduleName === 'react-native') {
+          return defaultResolve('react-native-windows');
+        }
+        if (moduleName.startsWith('react-native/')) {
+          return defaultResolve(
+            moduleName.replace('react-native/', 'react-native-windows/'),
+          );
+        }
       }
-      return context.resolveRequest(context, moduleName, platform);
+      return defaultResolve(moduleName);
     },
   },
 };
