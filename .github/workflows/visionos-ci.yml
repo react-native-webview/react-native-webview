@@ -28,7 +28,13 @@ jobs:
         working-directory: packages/example-visionos/visionos
       - name: Install Pods
         run: |
-          pod install 2>&1 || (tail -20 /tmp/pod_install.log 2>/dev/null; exit 1)
+          pod install 2>&1 | tee pod_output.txt
+          EXIT=${PIPESTATUS[0]}
+          if [ $EXIT -ne 0 ]; then
+            ERRS=$(grep -i "error\|Error\|fatal\|abort\|LoadError\|cannot\|undefined\|No such\|not found" pod_output.txt | tail -5)
+            echo "::error::POD_FAIL: $ERRS"
+            exit $EXIT
+          fi
         working-directory: packages/example-visionos/visionos
       - name: Build visionOS test app
         run: |
