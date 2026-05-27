@@ -46,7 +46,7 @@
     "test:windows": "bun run jest --setupFiles=./jest-setups/jest.setup.js"
   },
   "dependencies": {
-    "@typescript/native-preview": "^7.0.0-dev.20260301.1",
+    "@typescript/native-preview": "^7.0.0-dev.20260527.1",
     "escape-string-regexp": "^4.0.0",
     "invariant": "2.2.4"
   },
