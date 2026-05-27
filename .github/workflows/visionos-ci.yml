@@ -15,7 +15,10 @@ jobs:
         with:
           bun-version: 1.3.10
       - name: Install dependencies
-        run: npm install
+        run: |
+          bun install 2>&1 || (echo "::error::BUN_INSTALL_FAILED" && exit 1)
+          echo "::notice::NM_COUNT=$(ls node_modules/ 2>/dev/null | wc -l)"
+          echo "::notice::RNTA=$(ls node_modules/react-native-test-app/package.json 2>/dev/null && echo EXISTS || echo MISSING)"
         working-directory: packages/example-visionos
       - name: Install Pods
         run: pod install
