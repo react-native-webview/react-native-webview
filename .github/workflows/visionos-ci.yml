@@ -20,8 +20,15 @@ jobs:
           echo "::notice::NM_COUNT=$(ls node_modules/ 2>/dev/null | wc -l)"
           echo "::notice::RNTA=$(ls node_modules/react-native-test-app/package.json 2>/dev/null && echo EXISTS || echo MISSING)"
         working-directory: packages/example-visionos
+      - name: Debug RNTA
+        run: |
+          echo "::notice::RNTA_VISIONOS=$(ls ../node_modules/react-native-test-app/visionos/test_app.rb 2>/dev/null && echo EXISTS || echo MISSING)"
+          echo "::notice::RNTA_VER=$(node -e "console.log(require('../node_modules/react-native-test-app/package.json').version)")"
+          echo "::notice::POD_VER=$(pod --version)"
+        working-directory: packages/example-visionos/visionos
       - name: Install Pods
-        run: pod install
+        run: |
+          pod install 2>&1 || (tail -20 /tmp/pod_install.log 2>/dev/null; exit 1)
         working-directory: packages/example-visionos/visionos
       - name: Build visionOS test app
         run: |
