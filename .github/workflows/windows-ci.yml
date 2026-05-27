@@ -31,7 +31,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Install Windows example dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
         working-directory: packages/example-windows
 
       - name: Build JS
