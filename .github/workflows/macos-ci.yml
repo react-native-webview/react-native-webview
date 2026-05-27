@@ -17,21 +17,8 @@ jobs:
       - name: Install dependencies
         run: bun install --linker hoisted
         working-directory: packages/example-macos
-      - name: Debug before pods
-        working-directory: packages/example-macos
-        run: |
-          echo "::notice::NODE=$(which node) BUN=$(which bun)"
-          echo "::notice::RNTA=$(node -e "try{console.log(require.resolve('react-native-test-app/package.json'))}catch(e){console.log('NOT_FOUND: '+e.message)}")"
-          echo "::notice::NM_COUNT=$(ls node_modules/ 2>/dev/null | wc -l)"
-          echo "::notice::RNTA_DIR=$(ls -d node_modules/react-native-test-app 2>/dev/null || echo MISSING)"
       - name: Install Pods
-        run: |
-          pod install 2>&1 | tee pod_output.txt || true
-          if [ $? -ne 0 ] || grep -qi "error\|fatal\|abort\|LoadError\|cannot load" pod_output.txt; then
-            ERRS=$(grep -i "error\|fatal\|abort\|LoadError\|cannot\|No such" pod_output.txt | tail -5)
-            echo "::error::POD_FAIL: $ERRS"
-            exit 1
-          fi
+        run: pod install
         working-directory: packages/example-macos/macos
       - name: Build macOS test app
         run: |
