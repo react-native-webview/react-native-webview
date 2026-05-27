@@ -47,6 +47,14 @@ jobs:
           Get-ChildItem -Path node_modules\.generated\windows -Recurse -Name -ErrorAction SilentlyContinue | Select-Object -First 30
           Write-Host "::endgroup::"
 
+      - name: Autolink Windows native modules
+        shell: powershell
+        working-directory: packages/example-windows
+        run: |
+          $vcxproj = Get-ChildItem -Path node_modules\.generated\windows -Filter "*.vcxproj" -Recurse | Select-Object -First 1
+          Write-Host "::notice::vcxproj=$($vcxproj.FullName)"
+          bunx react-native autolink-windows --sln windows\WebviewExample.sln --proj $($vcxproj.FullName) --logging
+
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows
