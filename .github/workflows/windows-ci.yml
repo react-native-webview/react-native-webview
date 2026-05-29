@@ -37,9 +37,11 @@ jobs:
         shell: powershell
         working-directory: packages/example-windows
         run: |
+          $generatedProject = "node_modules\.generated\windows\Win32\ReactApp.vcxproj"
           $generatedDir = "node_modules\.generated"
           $cppWinRTIncludes = Join-Path $generatedDir "CppWinRTIncludes.h"
           $versionMacros = Join-Path $generatedDir "VersionMacros.h"
+          $content = Get-Content $generatedProject -Raw
 
           @"
           #pragma once
@@ -66,6 +68,17 @@ jobs:
 
           #endif
           "@ | Set-Content -Path $versionMacros -NoNewline
+
+          if ($content -notlike "*ReactNativeWebView\windows\ReactNativeWebView*") {
+            $content = $content.Replace(
+              '$(ReactAppGeneratedDir);',
+              '$(ReactAppGeneratedDir);' + "`r`n        " + '$(ProjectRootDir)\node_modules\react-native-webview\windows\ReactNativeWebView\$(Platform)\$(Configuration)\Generated Files;'
+            )
+            Set-Content -Path $generatedProject -Value $content -NoNewline
+            Write-Host "Added ReactNativeWebView generated include directory to generated project"
+          } else {
+            Write-Host "Generated project already includes ReactNativeWebView generated headers"
+          }
 
           Write-Host "Added generated Win32 compatibility headers to $generatedDir"
 
@@ -95,7 +108,7 @@ jobs:
           foreach ($file in $generatedProps) {
             if (Test-Path $file) {
               Write-Host "::group::$file"
-              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle|CppWinRT|VersionMacros|Microsoft.ReactNative.Cxx|AdditionalIncludeDirectories" | ForEach-Object {
+              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle|CppWinRT|VersionMacros|Microsoft.ReactNative.Cxx|ReactNativeWebView|AdditionalIncludeDirectories" | ForEach-Object {
                 Write-Host "$($_.LineNumber): $($_.Line)"
               }
               Write-Host "::endgroup::"
