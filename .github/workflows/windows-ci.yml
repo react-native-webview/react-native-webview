@@ -90,16 +90,14 @@ jobs:
           #include <winrt/Microsoft.ReactNative.h>
 
           namespace winrt::ReactNativeWebView {
-          struct ReactPackageProvider : winrt::Microsoft::ReactNative::IReactPackageProvider {
-            ReactPackageProvider()
-                : IReactPackageProvider(winrt::create_instance<winrt::Microsoft::ReactNative::IReactPackageProvider>(
-                      L"ReactNativeWebView.ReactPackageProvider",
-                      CLSCTX_INPROC_SERVER)) {}
+          struct ReactPackageProvider : winrt::implements<ReactPackageProvider, winrt::Microsoft::ReactNative::IReactPackageProvider> {
+            void CreatePackage(winrt::Microsoft::ReactNative::IReactPackageBuilder const &) noexcept {}
           };
           } // namespace winrt::ReactNativeWebView
           "@ | Set-Content -Path $reactNativeWebViewProjection -NoNewline
 
           @"
+          #include "pch.h"
           #include <winrt/Microsoft.ReactNative.h>
 
           namespace winrt::Microsoft::ReactNative {
