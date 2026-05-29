@@ -127,7 +127,7 @@ jobs:
             Write-Host "Using fallback Windows app id from Jest setup"
           }
 
-          Get-Process ReactApp -ErrorAction SilentlyContinue | Stop-Process -Force
+          "WINDOWS_ATTACH_TO_ROOT=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Start Appium server
         shell: powershell

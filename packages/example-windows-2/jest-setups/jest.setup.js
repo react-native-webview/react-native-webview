@@ -7,9 +7,10 @@ switch (platform) {
     const appId =
       process.env.WINDOWS_APP_ID ||
       '40411fc5-8e92-4d46-b68d-b62df44b1366_3x6rhkkr9xcf6!App';
+    const app = process.env.WINDOWS_ATTACH_TO_ROOT === 'true' ? 'Root' : appId;
     module.exports = {
       capabilities: {
-        ...windowsAppDriverCapabilities(appId),
+        ...windowsAppDriverCapabilities(app),
         createSessionTimeout: 60000,
         'ms:waitForAppLaunch': 25,
       },
