@@ -18,9 +18,9 @@ const html = `
         flex-direction: column;
         font-family: Segoe UI, sans-serif;
         gap: 16px;
-        justify-content: center;
+        justify-content: flex-start;
         margin: 0;
-        min-height: 100vh;
+        padding: 24px;
       }
       button {
         background: #2563eb;
@@ -34,7 +34,13 @@ const html = `
   </head>
   <body>
     <h1>Example Windows 2 WebView</h1>
-    <button onclick="window.ReactNativeWebView.postMessage('ping')">Ping from WebView</button>
+    <button
+      id="ping-button"
+      aria-label="Ping from WebView"
+      onclick="window.ReactNativeWebView.postMessage('ping')"
+    >
+      Ping from WebView
+    </button>
   </body>
 </html>
 `;

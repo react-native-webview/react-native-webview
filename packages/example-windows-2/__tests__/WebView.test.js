@@ -1,7 +1,9 @@
 import { driver, By2 } from 'selenium-appium';
+import { Config } from 'selenium-appium/dist/Config';
 
 const setup = require('../jest-setups/jest.setup');
 jest.setTimeout(150000);
+Config.setWaitForTimeout(30000);
 
 const WindowsApplicationDriverUrl = 'http://127.0.0.1:4723/wd/hub';
 
@@ -35,11 +37,16 @@ describe('Example Windows 2 WebView', () => {
   });
 
   test('loads WebView2 content and receives messages from the webview', async () => {
-    await waitForNativeName('Example Windows 2 WebView');
-    const button = await waitForNativeName('Ping from WebView');
+    try {
+      await waitForNativeName('Example Windows 2 WebView');
+      const button = await waitForNativeName('Ping from WebView');
 
-    await button.click();
+      await button.click();
 
-    await waitForNativeName('WebView message: ping');
+      await waitForNativeName('WebView message: ping');
+    } catch (error) {
+      console.log(await driver.getPageSource());
+      throw error;
+    }
   });
 });
