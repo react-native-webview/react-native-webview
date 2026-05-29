@@ -123,7 +123,7 @@ jobs:
         run: |
           $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
           Write-Host "NuGet root: $nugetRoot"
-          msbuild windows\ExampleWindows2.sln /t:Restore /p:Configuration=Release /p:Platform=x64 /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:NuGetPackageRoot="$nugetRoot\" -v:normal 2>&1 | Tee-Object -FilePath restore.log
+          msbuild windows\ExampleWindows2.sln /t:Restore /p:Configuration=Release /p:Platform=x64 /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:UseFabric=true /p:UseWinUI3=true /p:UseHermes=true /p:NuGetPackageRoot="$nugetRoot\" -v:normal 2>&1 | Tee-Object -FilePath restore.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Write-Host "::error::NuGet restore failed!"
@@ -147,7 +147,7 @@ jobs:
         working-directory: packages/example-windows
         run: |
           $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
-          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:NuGetPackageRoot="$nugetRoot\" /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:UseFabric=true /p:UseWinUI3=true /p:UseHermes=true /p:NuGetPackageRoot="$nugetRoot\" /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Write-Host "::group::Build errors"
