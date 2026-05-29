@@ -37,10 +37,9 @@ jobs:
         shell: powershell
         working-directory: packages/example-windows-2
         run: |
-          $generatedProject = "node_modules\.generated\windows\Win32\ReactApp.vcxproj"
-          $generatedDir = "node_modules\.generated\windows"
+          $generatedDir = "node_modules\.generated"
           $cppWinRTIncludes = Join-Path $generatedDir "CppWinRTIncludes.h"
-          $content = Get-Content $generatedProject -Raw
+          $versionMacros = Join-Path $generatedDir "VersionMacros.h"
 
           @"
           #pragma once
@@ -49,16 +48,26 @@ jobs:
           #include <winrt/Windows.Foundation.h>
           "@ | Set-Content -Path $cppWinRTIncludes -NoNewline
 
-          if ($content -notlike "*Microsoft.ReactNative.Cxx*") {
-            $content = $content.Replace(
-              '$(ReactAppGeneratedDir);',
-              '$(ReactAppGeneratedDir);' + "`r`n        " + '$(ReactNativeWindowsDir)Microsoft.ReactNative.Cxx;'
-            )
-            Set-Content -Path $generatedProject -Value $content -NoNewline
-            Write-Host "Added Microsoft.ReactNative.Cxx include directory to generated project"
-          } else {
-            Write-Host "Generated project already includes Microsoft.ReactNative.Cxx"
-          }
+          @"
+          #pragma once
+
+          #ifdef RNW_CANARY
+          #define RNW_VERSION_AT_LEAST(major, minor, patch) true
+          #define RNW_VERSION_LESS_THAN(major, minor, patch) false
+          #else
+
+          #define RNW_VERSION_AT_LEAST(major, minor, patch)                      \
+            ((RNW_MAJOR > major) || (RNW_MAJOR == major && RNW_MINOR > minor) || \
+             (RNW_MAJOR == major && RNW_MINOR == minor && RNW_PATCH >= patch))
+
+          #define RNW_VERSION_LESS_THAN(major, minor, patch)                     \
+            ((RNW_MAJOR < major) || (RNW_MAJOR == major && RNW_MINOR < minor) || \
+             (RNW_MAJOR == major && RNW_MINOR == minor && RNW_PATCH < patch))
+
+          #endif
+          "@ | Set-Content -Path $versionMacros -NoNewline
+
+          Write-Host "Added generated Win32 compatibility headers to $generatedDir"
 
       - name: Inspect generated Windows project
         shell: powershell
@@ -79,12 +88,14 @@ jobs:
           Write-Host "node version: $(node --version)"
           Write-Host "NuGet package root: $nugetRoot"
           Write-Host "Generated project exists: $(Test-Path $generatedProject)"
+          Write-Host "Generated CppWinRTIncludes.h exists: $(Test-Path 'node_modules\.generated\CppWinRTIncludes.h')"
+          Write-Host "Generated VersionMacros.h exists: $(Test-Path 'node_modules\.generated\VersionMacros.h')"
           Write-Host "Hermes package exists before MSBuild restore: $(Test-Path $hermesPackage)"
 
           foreach ($file in $generatedProps) {
             if (Test-Path $file) {
               Write-Host "::group::$file"
-              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle|CppWinRT|AdditionalIncludeDirectories" | ForEach-Object {
+              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle|CppWinRT|VersionMacros|Microsoft.ReactNative.Cxx|AdditionalIncludeDirectories" | ForEach-Object {
                 Write-Host "$($_.LineNumber): $($_.Line)"
               }
               Write-Host "::endgroup::"
