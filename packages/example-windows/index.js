@@ -7,7 +7,7 @@ const html = `
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WebviewExample WebView</title>
+    <title>Example Windows 2 WebView</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
       body {
@@ -33,7 +33,7 @@ const html = `
     </style>
   </head>
   <body>
-    <h1>WebviewExample WebView</h1>
+    <h1>Example Windows 2 WebView</h1>
     <button
       id="ping-button"
       aria-label="Ping from WebView"
@@ -61,7 +61,7 @@ function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>WebviewExample</Text>
+        <Text style={styles.title}>Example Windows 2</Text>
         <View style={styles.webViewContainer}>
           <WebView
             source={{ html }}

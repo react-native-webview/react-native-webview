@@ -4,7 +4,7 @@ module.exports = {
   project: configureProjects({
     windows: {
       sourceDir: 'windows',
-      solutionFile: 'windows/WebviewExample.sln',
+      solutionFile: 'windows/ExampleWindows2.sln',
     },
   }),
   dependencies: {},

@@ -109,7 +109,7 @@ jobs:
         working-directory: packages/example-windows
         run: |
           $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
-          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:NuGetPackageRoot="$nugetRoot\" /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:NuGetPackageRoot="$nugetRoot\" /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Write-Host "::group::Build errors"

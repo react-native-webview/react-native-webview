@@ -26,10 +26,10 @@ async function waitForNativeName(name, timeoutMs = 20000) {
   throw lastError || new Error(`Element "${name}" was not found`);
 }
 
-describe('WebviewExample WebView', () => {
+describe('Example Windows 2 WebView', () => {
   beforeAll(async () => {
     await driver.startWithCapabilities(setup.capabilities, WindowsApplicationDriverUrl);
-    await waitForNativeName('WebviewExample');
+    await waitForNativeName('Example Windows 2');
   });
 
   afterAll(async () => {
@@ -38,7 +38,7 @@ describe('WebviewExample WebView', () => {
 
   test('loads WebView2 content and receives messages from the webview', async () => {
     try {
-      await waitForNativeName('WebviewExample WebView');
+      await waitForNativeName('Example Windows 2 WebView');
       await waitForNativeName('WebView message: ping');
     } catch (error) {
       console.log(await driver.getPageSource());
