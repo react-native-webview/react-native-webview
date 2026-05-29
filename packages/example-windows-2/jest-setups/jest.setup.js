@@ -8,7 +8,11 @@ switch (platform) {
       process.env.WINDOWS_APP_ID ||
       '40411fc5-8e92-4d46-b68d-b62df44b1366_3x6rhkkr9xcf6!App';
     module.exports = {
-      capabilities: windowsAppDriverCapabilities(appId),
+      capabilities: {
+        ...windowsAppDriverCapabilities(appId),
+        createSessionTimeout: 60000,
+        'ms:waitForAppLaunch': 25,
+      },
     };
     break;
   }

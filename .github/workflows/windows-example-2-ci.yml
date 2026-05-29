@@ -127,6 +127,8 @@ jobs:
             Write-Host "Using fallback Windows app id from Jest setup"
           }
 
+          Get-Process ReactApp -ErrorAction SilentlyContinue | Stop-Process -Force
+
       - name: Start Appium server
         shell: powershell
         working-directory: packages/example-windows-2
