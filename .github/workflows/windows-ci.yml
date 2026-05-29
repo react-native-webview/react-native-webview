@@ -87,6 +87,25 @@ jobs:
             Write-Host "Generated project already includes ReactNativeWebView generated headers"
           }
 
+          if ($content -notlike "*ReactNativeWebView.vcxproj*") {
+            $webViewProjectReference = @'
+          <ItemGroup>
+            <ProjectReference Include="$(ProjectRootDir)\node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj">
+              <Project>{30CADFC7-80EF-4296-A405-47E4B97C0C71}</Project>
+              <LinkLibraryDependencies>true</LinkLibraryDependencies>
+            </ProjectReference>
+          </ItemGroup>
+          '@
+            $content = $content.Replace(
+              '  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />',
+              $webViewProjectReference + "`r`n" + '  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />'
+            )
+            Set-Content -Path $generatedProject -Value $content -NoNewline
+            Write-Host "Added ReactNativeWebView project reference to generated project"
+          } else {
+            Write-Host "Generated project already includes ReactNativeWebView project reference"
+          }
+
           Write-Host "Added generated Win32 compatibility headers to $generatedDir"
 
       - name: Inspect generated Windows project
@@ -116,7 +135,7 @@ jobs:
           foreach ($file in $generatedProps) {
             if (Test-Path $file) {
               Write-Host "::group::$file"
-              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle|CppWinRT|VersionMacros|Microsoft.ReactNative.Cxx|ReactNativeWebView|AdditionalIncludeDirectories" | ForEach-Object {
+              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle|CppWinRT|VersionMacros|Microsoft.ReactNative.Cxx|ReactNativeWebView|AdditionalIncludeDirectories|ProjectReference" | ForEach-Object {
                 Write-Host "$($_.LineNumber): $($_.Line)"
               }
               Write-Host "::endgroup::"
