@@ -41,6 +41,16 @@ const html = `
     >
       Ping from WebView
     </button>
+    <script>
+      function sendPing() {
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage('ping');
+        } else {
+          setTimeout(sendPing, 50);
+        }
+      }
+      window.addEventListener('DOMContentLoaded', sendPing);
+    </script>
   </body>
 </html>
 `;

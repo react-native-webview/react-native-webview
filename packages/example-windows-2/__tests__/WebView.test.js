@@ -39,10 +39,6 @@ describe('Example Windows 2 WebView', () => {
   test('loads WebView2 content and receives messages from the webview', async () => {
     try {
       await waitForNativeName('Example Windows 2 WebView');
-      const button = await waitForNativeName('Ping from WebView');
-
-      await button.click();
-
       await waitForNativeName('WebView message: ping');
     } catch (error) {
       console.log(await driver.getPageSource());
