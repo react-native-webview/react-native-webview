@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate Windows test app project
         working-directory: packages/example-windows
-        run: bunx install-windows-test-app --use-fabric --project-directory windows
+        run: bunx install-windows-test-app --use-fabric --use-nuget --project-directory windows
 
       - name: Patch generated Windows test app project
         shell: powershell
@@ -109,7 +109,7 @@ jobs:
         working-directory: packages/example-windows
         run: |
           $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
-          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:NuGetPackageRoot="$nugetRoot\" /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:UseExperimentalNuget=true /p:NuGetPackageRoot="$nugetRoot\" /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Write-Host "::group::Build errors"
