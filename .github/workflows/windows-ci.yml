@@ -150,60 +150,16 @@ jobs:
             }
           }
 
-      - name: Build ReactNativeWebView library
-        shell: powershell
-        working-directory: packages/example-windows
-        run: |
-          $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
-          $webviewProj = "node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj"
-          $solutionDir = (Resolve-Path "windows").Path + "\"
-          $solutionPath = (Resolve-Path "windows\ExampleWindows2.sln").Path
-          $solutionFileName = "ExampleWindows2.sln"
-          Write-Host "Building webview library: $webviewProj"
-          Write-Host "SolutionDir: $solutionDir"
-          Write-Host "SolutionPath: $solutionPath"
-          Write-Host "SolutionFileName: $solutionFileName"
-          msbuild $webviewProj /t:Restore /p:Configuration=Release /p:Platform=x64 /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:UseFabric=true /p:UseWinUI3=true /p:UseHermes=true /p:SolutionDir="$solutionDir" /p:SolutionPath="$solutionPath" /p:SolutionFileName="$solutionFileName" /p:NuGetPackageRoot="$nugetRoot\" -v:normal 2>&1 | Tee-Object -FilePath webview-restore.log
-          if ($LASTEXITCODE -ne 0) { Write-Host "::error::WebView library restore failed"; exit $LASTEXITCODE }
-          msbuild $webviewProj /p:Configuration=Release /p:Platform=x64 /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:UseFabric=true /p:UseWinUI3=true /p:UseHermes=true /p:SolutionDir="$solutionDir" /p:SolutionPath="$solutionPath" /p:SolutionFileName="$solutionFileName" /p:NuGetPackageRoot="$nugetRoot\" 2>&1 | Tee-Object -FilePath webview-build.log
-          if ($LASTEXITCODE -ne 0) {
-            Get-Content webview-build.log | Select-String ": error |: fatal error" | Select-Object -Last 20 | ForEach-Object { Write-Host "::error::$_" }
-            exit $LASTEXITCODE
-          }
-          Write-Host "ReactNativeWebView library built successfully"
-
-      - name: Restore NuGet packages
-        shell: powershell
-        working-directory: packages/example-windows
-        run: |
-          $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
-          Write-Host "NuGet root: $nugetRoot"
-          msbuild windows\ExampleWindows2.sln /t:Restore /p:Configuration=Release /p:Platform=x64 /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:UseFabric=true /p:UseWinUI3=true /p:UseHermes=true /p:NuGetPackageRoot="$nugetRoot\" -v:normal 2>&1 | Tee-Object -FilePath restore.log
-          $code = $LASTEXITCODE
-          if ($code -ne 0) {
-            Write-Host "::error::NuGet restore failed!"
-            Get-Content restore.log | Select-String "error|warning|Microsoft.ReactNative|PackageReference" | Select-Object -Last 30 | ForEach-Object { Write-Host "::error::$_" }
-            exit $code
-          }
-          Write-Host "=== Restored NuGet packages ==="
-          Get-ChildItem "$nugetRoot" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match "microsoft\.(reactnative|windowsappsdk|windows\.cppwinrt)" } | ForEach-Object { Write-Host "  $($_.Name)" }
-          Write-Host "=== WindowsAppSDK packages ==="
-          Get-ChildItem "$nugetRoot\microsoft.windowsappsdk*" -ErrorAction SilentlyContinue | ForEach-Object {
-            Write-Host "  $($_.Name)"
-            Get-ChildItem $_.FullName -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "    $($_.Name)" }
-          }
-          Write-Host "=== WinMD files in NuGet cache ==="
-          Get-ChildItem "$nugetRoot" -Recurse -Filter "*.winmd" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -match "microsoft\.(reactnative|windowsappsdk|ui)" } | Select-Object -First 20 | ForEach-Object { Write-Host "  $($_.FullName)" }
-          Write-Host "=== obj/ project.assets.json ==="
-          $assets = Get-ChildItem -Path node_modules\.generated\windows -Filter "project.assets.json" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-          if ($assets) { Write-Host "  Exists at: $($assets.FullName) ($('{0:N0}' -f $assets.Length) bytes)" } else { Write-Host "  NOT FOUND!" }
-
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows
         run: |
           $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
-          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:UseFabric=true /p:UseWinUI3=true /p:UseHermes=true /p:NuGetPackageRoot="$nugetRoot\" /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
+          $props = "/p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:UseFabric=true /p:UseWinUI3=true /p:UseHermes=true /p:NuGetPackageRoot=""$nugetRoot\"""
+          # Single MSBuild invocation: /restore handles NuGet for both the solution
+          # AND the webview library (referenced via ProjectReference in the vcxproj).
+          # This ensures consistent output paths so the linker finds the webview .lib.
+          Invoke-Expression "msbuild windows\ExampleWindows2.sln $props /restore /bl:build.binlog 2>&1" | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Write-Host "::group::Build errors"
