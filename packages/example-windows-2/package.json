@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "react": "^19.1.0",
-    "react-native": "0.82.0"
+    "react-native": "0.82.0",
+    "react-native-webview": "file:../react-native-webview"
   },
   "devDependencies": {
     "@react-native-community/cli": "^15.0.0",
