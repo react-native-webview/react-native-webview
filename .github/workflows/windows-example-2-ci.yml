@@ -38,7 +38,16 @@ jobs:
         working-directory: packages/example-windows-2
         run: |
           $generatedProject = "node_modules\.generated\windows\Win32\ReactApp.vcxproj"
+          $generatedDir = "node_modules\.generated\windows"
+          $cppWinRTIncludes = Join-Path $generatedDir "CppWinRTIncludes.h"
           $content = Get-Content $generatedProject -Raw
+
+          @"
+          #pragma once
+
+          #include <winrt/Windows.Foundation.Collections.h>
+          #include <winrt/Windows.Foundation.h>
+          "@ | Set-Content -Path $cppWinRTIncludes -NoNewline
 
           if ($content -notlike "*Microsoft.ReactNative.Cxx*") {
             $content = $content.Replace(
