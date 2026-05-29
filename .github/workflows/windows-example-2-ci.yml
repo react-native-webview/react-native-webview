@@ -29,11 +29,45 @@ jobs:
         working-directory: packages/example-windows-2
         run: bunx install-windows-test-app --use-fabric --project-directory windows
 
+      - name: Inspect generated Windows project
+        shell: powershell
+        working-directory: packages/example-windows-2
+        run: |
+          $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
+          $hermesVersion = "0.0.0-2512.22001-bc3d0ed7"
+          $hermesPackage = Join-Path $nugetRoot "microsoft.javascript.hermes\$hermesVersion"
+          $generatedProject = "node_modules\.generated\windows\Win32\ReactApp.vcxproj"
+          $generatedProps = @(
+            "windows\ExperimentalFeatures.props",
+            "windows\Directory.Build.props",
+            "node_modules\.generated\windows\Win32\ReactApp.Package.wapproj",
+            $generatedProject
+          )
+
+          Write-Host "bun version: $(bun --version)"
+          Write-Host "node version: $(node --version)"
+          Write-Host "NuGet package root: $nugetRoot"
+          Write-Host "Generated project exists: $(Test-Path $generatedProject)"
+          Write-Host "Hermes package exists before MSBuild restore: $(Test-Path $hermesPackage)"
+
+          foreach ($file in $generatedProps) {
+            if (Test-Path $file) {
+              Write-Host "::group::$file"
+              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle" | ForEach-Object {
+                Write-Host "$($_.LineNumber): $($_.Line)"
+              }
+              Write-Host "::endgroup::"
+            } else {
+              Write-Host "Missing generated file: $file"
+            }
+          }
+
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows-2
         run: |
-          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
+          $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
+          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:NuGetPackageRoot="$nugetRoot\" /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Write-Host "::group::Build errors"
