@@ -41,7 +41,10 @@ jobs:
           $generatedDir = "node_modules\.generated"
           $cppWinRTIncludes = Join-Path $generatedDir "CppWinRTIncludes.h"
           $versionMacros = Join-Path $generatedDir "VersionMacros.h"
+          $winrtDir = Join-Path $generatedDir "winrt"
+          $microsoftUIInterop = Join-Path $winrtDir "Microsoft.UI.interop.h"
           $content = Get-Content $generatedProject -Raw
+          New-Item -ItemType Directory -Force -Path $winrtDir | Out-Null
 
           @"
           #pragma once
@@ -68,6 +71,10 @@ jobs:
 
           #endif
           "@ | Set-Content -Path $versionMacros -NoNewline
+
+          @"
+          #pragma once
+          "@ | Set-Content -Path $microsoftUIInterop -NoNewline
 
           if ($content -notlike "*ReactNativeWebView\windows\ReactNativeWebView*") {
             $content = $content.Replace(
@@ -103,6 +110,7 @@ jobs:
           Write-Host "Generated project exists: $(Test-Path $generatedProject)"
           Write-Host "Generated CppWinRTIncludes.h exists: $(Test-Path 'node_modules\.generated\CppWinRTIncludes.h')"
           Write-Host "Generated VersionMacros.h exists: $(Test-Path 'node_modules\.generated\VersionMacros.h')"
+          Write-Host "Generated Microsoft.UI.interop.h exists: $(Test-Path 'node_modules\.generated\winrt\Microsoft.UI.interop.h')"
           Write-Host "Hermes package exists before MSBuild restore: $(Test-Path $hermesPackage)"
 
           foreach ($file in $generatedProps) {
