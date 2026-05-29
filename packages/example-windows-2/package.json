@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "appium": "appium",
     "start": "react-native start",
+    "test": "jest --setupFiles=./jest-setups/jest.setup.js",
     "windows": "react-native run-windows --arch x64"
   },
   "dependencies": {
@@ -18,7 +20,12 @@
     "@react-native-windows/cli": "0.82.0",
     "@react-native/babel-preset": "0.82.0",
     "@react-native/metro-config": "0.82.0",
+    "appium": "1.17.0",
+    "jest": "^29.6.3",
     "react-native-test-app": "^5.1.9",
-    "react-native-windows": "0.82.1"
+    "react-native-windows": "0.82.1",
+    "selenium-appium": "1.0.2",
+    "selenium-webdriver": "4.0.0-alpha.7",
+    "winappdriver": "^0.0.7"
   }
 }

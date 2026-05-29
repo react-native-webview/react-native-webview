@@ -22,6 +22,10 @@ jobs:
           msbuild-architecture: x64
 
       - name: Install Windows example dependencies
+        env:
+          # Tests use WinAppDriver, not chromedriver. The chromedriver
+          # postinstall hits a deprecated Google XML endpoint and fails.
+          APPIUM_SKIP_CHROMEDRIVER_INSTALL: 'true'
         run: bun install --frozen-lockfile
         working-directory: packages/example-windows-2
 
@@ -84,3 +88,32 @@ jobs:
           path: |
             packages/example-windows-2/build.log
             packages/example-windows-2/build.binlog
+
+      - name: Deploy
+        shell: powershell
+        working-directory: packages/example-windows-2
+        run: |
+          Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
+          bunx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
+
+          [xml]$manifest = Get-Content node_modules\.generated\windows\Win32\Package.appxmanifest
+          $packageName = $manifest.Package.Identity.Name
+          $app = Get-StartApps | Where-Object {
+            $_.AppID -like "$packageName*!App"
+          } | Select-Object -First 1
+
+          if ($app) {
+            "WINDOWS_APP_ID=$($app.AppID)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            Write-Host "Resolved Windows app id: $($app.AppID)"
+          } else {
+            Write-Host "Using fallback Windows app id from Jest setup"
+          }
+
+      - name: Start Appium server
+        shell: powershell
+        working-directory: packages/example-windows-2
+        run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
+
+      - name: Run WebView smoke tests
+        working-directory: packages/example-windows-2
+        run: bun run test

@@ -6,8 +6,5 @@
       "appKey": "ExampleWindows2",
       "displayName": "ExampleWindows2"
     }
-  ],
-  "resources": {
-    "windows": ["dist/assets", "dist/main.windows.bundle"]
-  }
+  ]
 }

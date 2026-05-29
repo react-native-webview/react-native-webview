@@ -1,14 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppRegistry, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import WebView from 'react-native-webview';
 import { name as appName } from './app.json';
 
+const html = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Example Windows 2 WebView</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body {
+        align-items: center;
+        background: #f9fafb;
+        color: #111827;
+        display: flex;
+        flex-direction: column;
+        font-family: Segoe UI, sans-serif;
+        gap: 16px;
+        justify-content: center;
+        margin: 0;
+        min-height: 100vh;
+      }
+      button {
+        background: #2563eb;
+        border: 0;
+        border-radius: 4px;
+        color: white;
+        font-size: 16px;
+        padding: 10px 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Example Windows 2 WebView</h1>
+    <button onclick="window.ReactNativeWebView.postMessage('ping')">Ping from WebView</button>
+  </body>
+</html>
+`;
+
 function App() {
+  const [message, setMessage] = useState('none');
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>Example Windows 2</Text>
-        <Text style={styles.body}>
-          Standalone React Native Windows test app. WebView is intentionally not linked yet.
+        <View style={styles.webViewContainer}>
+          <WebView
+            source={{ html }}
+            onMessage={(event) => {
+              setMessage(event.nativeEvent.data);
+            }}
+            automaticallyAdjustContentInsets={false}
+            useWebView2
+          />
+        </View>
+        <Text accessibilityLabel={`WebView message: ${message}`} style={styles.body}>
+          WebView message: {message}
         </Text>
       </View>
     </SafeAreaView>
@@ -22,8 +71,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 24,
   },
   title: {
@@ -31,6 +78,14 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     marginBottom: 12,
+    textAlign: 'center',
+  },
+  webViewContainer: {
+    borderColor: '#d1d5db',
+    borderWidth: 1,
+    flex: 1,
+    marginBottom: 16,
+    minHeight: 320,
   },
   body: {
     color: '#4b5563',
