@@ -104,12 +104,37 @@ jobs:
             }
           }
 
+      - name: Restore NuGet packages
+        shell: powershell
+        working-directory: packages/example-windows
+        run: |
+          $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
+          Write-Host "NuGet root: $nugetRoot"
+          msbuild windows\ExampleWindows2.sln /t:Restore /p:Configuration=Release /p:Platform=x64 /p:UseExperimentalNuget=true /p:NuGetPackageRoot="$nugetRoot\" -v:normal 2>&1 | Tee-Object -FilePath restore.log
+          $code = $LASTEXITCODE
+          if ($code -ne 0) {
+            Write-Host "::error::NuGet restore failed!"
+            Get-Content restore.log | Select-String "error|warning|Microsoft.ReactNative|PackageReference" | Select-Object -Last 30 | ForEach-Object { Write-Host "::error::$_" }
+            exit $code
+          }
+          Write-Host "=== Restored NuGet packages ==="
+          Get-ChildItem "$nugetRoot\microsoft.reactnative*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.Name }
+          Get-ChildItem "$nugetRoot\microsoft.windows.cppwinrt" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.Name }
+          Write-Host "=== CppWinRT check ==="
+          $rnPkg = Get-ChildItem "$nugetRoot\microsoft.reactnative\0.82*" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($rnPkg) {
+            Write-Host "Microsoft.ReactNative package: $($rnPkg.FullName)"
+            Get-ChildItem $rnPkg.FullName -Recurse -Filter "*.winmd" | ForEach-Object { Write-Host "  WinMD: $($_.FullName)" }
+          } else {
+            Write-Host "::warning::Microsoft.ReactNative package NOT found in NuGet cache!"
+          }
+
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows
         run: |
           $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
-          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:UseExperimentalNuget=true /p:NuGetPackageRoot="$nugetRoot\" /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
+          msbuild windows\ExampleWindows2.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:UseExperimentalNuget=true /p:NuGetPackageRoot="$nugetRoot\" /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Write-Host "::group::Build errors"
