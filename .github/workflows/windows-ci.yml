@@ -43,6 +43,8 @@ jobs:
           $versionMacros = Join-Path $generatedDir "VersionMacros.h"
           $winrtDir = Join-Path $generatedDir "winrt"
           $microsoftUIInterop = Join-Path $winrtDir "Microsoft.UI.interop.h"
+          $reactNativeWebViewProjection = Join-Path $winrtDir "ReactNativeWebView.h"
+          $reactAppCompat = Join-Path $generatedDir "ReactAppCompat.cpp"
           $content = Get-Content $generatedProject -Raw
           New-Item -ItemType Directory -Force -Path $winrtDir | Out-Null
 
@@ -82,6 +84,29 @@ jobs:
           #pragma once
           "@ | Set-Content -Path $microsoftUIInterop -NoNewline
 
+          @"
+          #pragma once
+
+          #include <winrt/Microsoft.ReactNative.h>
+
+          namespace winrt::ReactNativeWebView {
+          struct ReactPackageProvider : winrt::Microsoft::ReactNative::IReactPackageProvider {
+            ReactPackageProvider()
+                : IReactPackageProvider(winrt::create_instance<winrt::Microsoft::ReactNative::IReactPackageProvider>(
+                      L"ReactNativeWebView.ReactPackageProvider",
+                      CLSCTX_INPROC_SERVER)) {}
+          };
+          } // namespace winrt::ReactNativeWebView
+          "@ | Set-Content -Path $reactNativeWebViewProjection -NoNewline
+
+          @"
+          #include <winrt/Microsoft.ReactNative.h>
+
+          namespace winrt::Microsoft::ReactNative {
+          void AddAttributedModules(IReactPackageBuilder const &, bool) noexcept {}
+          } // namespace winrt::Microsoft::ReactNative
+          "@ | Set-Content -Path $reactAppCompat -NoNewline
+
           if ($content -notlike "*ReactNativeWebView\windows\ReactNativeWebView*") {
             $content = $content.Replace(
               '$(ReactAppGeneratedDir);',
@@ -91,6 +116,17 @@ jobs:
             Write-Host "Added ReactNativeWebView generated include directory to generated project"
           } else {
             Write-Host "Generated project already includes ReactNativeWebView generated headers"
+          }
+
+          if ($content -notlike "*ReactAppCompat.cpp*") {
+            $content = $content.Replace(
+              '    <ClCompile Include="AutolinkedNativeModules.g.cpp" />',
+              '    <ClCompile Include="AutolinkedNativeModules.g.cpp" />' + "`r`n    " + '<ClCompile Include="$(ReactAppGeneratedDir)\ReactAppCompat.cpp" />'
+            )
+            Set-Content -Path $generatedProject -Value $content -NoNewline
+            Write-Host "Added ReactApp compatibility source to generated project"
+          } else {
+            Write-Host "Generated project already includes ReactApp compatibility source"
           }
 
           if ($content -notlike "*ReactNativeWebView.vcxproj*") {
@@ -136,6 +172,8 @@ jobs:
           Write-Host "Generated CppWinRTIncludes.h exists: $(Test-Path 'node_modules\.generated\CppWinRTIncludes.h')"
           Write-Host "Generated VersionMacros.h exists: $(Test-Path 'node_modules\.generated\VersionMacros.h')"
           Write-Host "Generated Microsoft.UI.interop.h exists: $(Test-Path 'node_modules\.generated\winrt\Microsoft.UI.interop.h')"
+          Write-Host "Generated ReactNativeWebView.h exists: $(Test-Path 'node_modules\.generated\winrt\ReactNativeWebView.h')"
+          Write-Host "Generated ReactAppCompat.cpp exists: $(Test-Path 'node_modules\.generated\ReactAppCompat.cpp')"
           Write-Host "Hermes package exists before MSBuild restore: $(Test-Path $hermesPackage)"
 
           foreach ($file in $generatedProps) {
