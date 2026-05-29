@@ -1,6 +1,6 @@
 name: Windows CI
-on: [pull_request]
-
+on:
+  workflow_dispatch:
 jobs:
   run-windows-tests:
     name: Build & run tests
