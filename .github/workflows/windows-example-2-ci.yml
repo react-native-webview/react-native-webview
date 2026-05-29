@@ -33,6 +33,24 @@ jobs:
         working-directory: packages/example-windows-2
         run: bunx install-windows-test-app --use-fabric --project-directory windows
 
+      - name: Patch generated Windows test app project
+        shell: powershell
+        working-directory: packages/example-windows-2
+        run: |
+          $generatedProject = "node_modules\.generated\windows\Win32\ReactApp.vcxproj"
+          $content = Get-Content $generatedProject -Raw
+
+          if ($content -notlike "*Microsoft.ReactNative.Cxx*") {
+            $content = $content.Replace(
+              '$(ReactAppGeneratedDir);',
+              '$(ReactAppGeneratedDir);' + "`r`n        " + '$(ReactNativeWindowsDir)Microsoft.ReactNative.Cxx;'
+            )
+            Set-Content -Path $generatedProject -Value $content -NoNewline
+            Write-Host "Added Microsoft.ReactNative.Cxx include directory to generated project"
+          } else {
+            Write-Host "Generated project already includes Microsoft.ReactNative.Cxx"
+          }
+
       - name: Inspect generated Windows project
         shell: powershell
         working-directory: packages/example-windows-2
@@ -57,7 +75,7 @@ jobs:
           foreach ($file in $generatedProps) {
             if (Test-Path $file) {
               Write-Host "::group::$file"
-              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle" | ForEach-Object {
+              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle|CppWinRT|AdditionalIncludeDirectories" | ForEach-Object {
                 Write-Host "$($_.LineNumber): $($_.Line)"
               }
               Write-Host "::endgroup::"
