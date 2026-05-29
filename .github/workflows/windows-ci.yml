@@ -46,6 +46,12 @@ jobs:
           $content = Get-Content $generatedProject -Raw
           New-Item -ItemType Directory -Force -Path $winrtDir | Out-Null
 
+          if ($content -like "*%(AdditionalDependenices)*") {
+            $content = $content.Replace('%(AdditionalDependenices)', '%(AdditionalDependencies)')
+            Set-Content -Path $generatedProject -Value $content -NoNewline
+            Write-Host "Fixed generated linker dependency inheritance typo"
+          }
+
           @"
           #pragma once
 
