@@ -2,9 +2,6 @@ const path = require('path');
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
 const monorepoRoot = path.resolve(__dirname, '../..');
-const webviewPackage = path.resolve(__dirname, '../react-native-webview');
-const sharedPackage = path.resolve(__dirname, '../example-shared');
-
 const defaultConfig = getDefaultConfig(__dirname);
 
 const blockList = new RegExp(
@@ -16,7 +13,7 @@ const blockList = new RegExp(
 
 const config = {
   projectRoot: __dirname,
-  watchFolders: [monorepoRoot, webviewPackage, sharedPackage],
+  watchFolders: [monorepoRoot],
   resolver: {
     platforms: [...(defaultConfig.resolver?.platforms || []), 'windows'],
     resolverMainFields: ['main-internal', 'browser', 'main'],
@@ -25,10 +22,6 @@ const config = {
       path.resolve(__dirname, 'node_modules'),
       path.resolve(monorepoRoot, 'node_modules'),
     ],
-    extraNodeModules: {
-      'react-native-webview': webviewPackage,
-      'example-shared': sharedPackage,
-    },
     resolveRequest: (context, moduleName, platform) => {
       const defaultResolve = (name) =>
         context.resolveRequest(

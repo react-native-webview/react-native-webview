@@ -6,8 +6,5 @@
       "appKey": "WebviewExample",
       "displayName": "WebviewExample"
     }
-  ],
-  "resources": {
-    "windows": ["dist/assets", "dist/main.windows.bundle"]
-  }
+  ]
 }

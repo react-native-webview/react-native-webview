@@ -21,9 +21,6 @@ jobs:
           vs-version: '[17.0,)'
           msbuild-architecture: x64
 
-      - name: Install workspace dependencies
-        run: bun install --frozen-lockfile
-
       - name: Install Windows example dependencies
         env:
           # Tests use WinAppDriver, not chromedriver. The chromedriver
@@ -32,24 +29,87 @@ jobs:
         run: bun install --frozen-lockfile
         working-directory: packages/example-windows
 
-      - name: Build JS
-        run: |
-          bun run build
-          bun run tsc
-
       - name: Generate Windows test app project
         working-directory: packages/example-windows
         run: bunx install-windows-test-app --use-fabric --project-directory windows
 
-      - name: Patch autolink and solution
+      - name: Patch generated Windows test app project
+        shell: powershell
         working-directory: packages/example-windows
-        run: node scripts/patch-autolink.js
+        run: |
+          $generatedDir = "node_modules\.generated"
+          $cppWinRTIncludes = Join-Path $generatedDir "CppWinRTIncludes.h"
+          $versionMacros = Join-Path $generatedDir "VersionMacros.h"
+
+          @"
+          #pragma once
+
+          #include <winrt/Windows.Foundation.Collections.h>
+          #include <winrt/Windows.Foundation.h>
+          "@ | Set-Content -Path $cppWinRTIncludes -NoNewline
+
+          @"
+          #pragma once
+
+          #ifdef RNW_CANARY
+          #define RNW_VERSION_AT_LEAST(major, minor, patch) true
+          #define RNW_VERSION_LESS_THAN(major, minor, patch) false
+          #else
+
+          #define RNW_VERSION_AT_LEAST(major, minor, patch)                      \
+            ((RNW_MAJOR > major) || (RNW_MAJOR == major && RNW_MINOR > minor) || \
+             (RNW_MAJOR == major && RNW_MINOR == minor && RNW_PATCH >= patch))
+
+          #define RNW_VERSION_LESS_THAN(major, minor, patch)                     \
+            ((RNW_MAJOR < major) || (RNW_MAJOR == major && RNW_MINOR < minor) || \
+             (RNW_MAJOR == major && RNW_MINOR == minor && RNW_PATCH < patch))
+
+          #endif
+          "@ | Set-Content -Path $versionMacros -NoNewline
+
+          Write-Host "Added generated Win32 compatibility headers to $generatedDir"
+
+      - name: Inspect generated Windows project
+        shell: powershell
+        working-directory: packages/example-windows
+        run: |
+          $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
+          $hermesVersion = "0.0.0-2512.22001-bc3d0ed7"
+          $hermesPackage = Join-Path $nugetRoot "microsoft.javascript.hermes\$hermesVersion"
+          $generatedProject = "node_modules\.generated\windows\Win32\ReactApp.vcxproj"
+          $generatedProps = @(
+            "windows\ExperimentalFeatures.props",
+            "windows\Directory.Build.props",
+            "node_modules\.generated\windows\Win32\ReactApp.Package.wapproj",
+            $generatedProject
+          )
+
+          Write-Host "bun version: $(bun --version)"
+          Write-Host "node version: $(node --version)"
+          Write-Host "NuGet package root: $nugetRoot"
+          Write-Host "Generated project exists: $(Test-Path $generatedProject)"
+          Write-Host "Generated CppWinRTIncludes.h exists: $(Test-Path 'node_modules\.generated\CppWinRTIncludes.h')"
+          Write-Host "Generated VersionMacros.h exists: $(Test-Path 'node_modules\.generated\VersionMacros.h')"
+          Write-Host "Hermes package exists before MSBuild restore: $(Test-Path $hermesPackage)"
+
+          foreach ($file in $generatedProps) {
+            if (Test-Path $file) {
+              Write-Host "::group::$file"
+              Select-String -Path $file -Pattern "Hermes|NuGetPackageRoot|Bundle|CppWinRT|VersionMacros|Microsoft.ReactNative.Cxx|AdditionalIncludeDirectories" | ForEach-Object {
+                Write-Host "$($_.LineNumber): $($_.Line)"
+              }
+              Write-Host "::endgroup::"
+            } else {
+              Write-Host "Missing generated file: $file"
+            }
+          }
 
       - name: Build x64 release
         shell: powershell
         working-directory: packages/example-windows
         run: |
-          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
+          $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
+          msbuild windows\WebviewExample.sln /p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:NuGetPackageRoot="$nugetRoot\" /restore /bl:build.binlog 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           if ($code -ne 0) {
             Write-Host "::group::Build errors"
@@ -74,16 +134,26 @@ jobs:
           Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
           bunx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
 
+          [xml]$manifest = Get-Content node_modules\.generated\windows\Win32\Package.appxmanifest
+          $packageName = $manifest.Package.Identity.Name
+          $app = Get-StartApps | Where-Object {
+            $_.AppID -like "$packageName*!App"
+          } | Select-Object -First 1
+
+          if ($app) {
+            "WINDOWS_APP_ID=$($app.AppID)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            Write-Host "Resolved Windows app id: $($app.AppID)"
+          } else {
+            Write-Host "Using fallback Windows app id from Jest setup"
+          }
+
+          "WINDOWS_ATTACH_TO_ROOT=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Start Appium server
         shell: powershell
         working-directory: packages/example-windows
         run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
 
-      - name: Start React server
-        shell: powershell
-        working-directory: packages/example-windows
-        run: Start-Process PowerShell -ArgumentList "bun run start"
-
-      - name: Run tests
+      - name: Run WebView smoke tests
         working-directory: packages/example-windows
         run: bun run test

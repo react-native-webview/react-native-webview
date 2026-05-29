@@ -3,16 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "react-native start",
-    "windows": "react-native run-windows --arch x64",
     "appium": "appium",
-    "test": "jest --setupFiles=./jest-setups/jest.setup.js"
+    "start": "react-native start",
+    "test": "jest --setupFiles=./jest-setups/jest.setup.js",
+    "windows": "react-native run-windows --arch x64"
   },
   "dependencies": {
     "react": "^19.1.0",
     "react-native": "0.82.0",
-    "react-native-webview": "file:../react-native-webview",
-    "example-shared": "file:../example-shared"
+    "react-native-webview": "file:../react-native-webview"
   },
   "devDependencies": {
     "@react-native-community/cli": "^15.0.0",
@@ -21,8 +20,6 @@
     "@react-native-windows/cli": "0.82.0",
     "@react-native/babel-preset": "0.82.0",
     "@react-native/metro-config": "0.82.0",
-    "@types/jest": "^29.5.12",
-    "@types/selenium-webdriver": "4.0.9",
     "appium": "1.17.0",
     "jest": "^29.6.3",
     "react-native-test-app": "^5.1.9",
