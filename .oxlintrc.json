@@ -25,7 +25,7 @@
     "import/unambiguous": "off",
     "import/no-relative-parent-imports": "off"
   },
-  "ignorePatterns": ["node_modules", "lib", "android", "ios", "macos", "windows", "example"],
+  "ignorePatterns": ["node_modules", "lib", "android", "ios", "macos", "windows"],
   "categories": {
     "correctness": "error",
     "perf": "error",

@@ -1,0 +1,24 @@
+{
+  "name": "example-mobile",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "react-native-webview": "workspace:*",
+    "example-shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@react-native-community/cli": "20.0.0",
+    "@react-native-community/cli-platform-android": "20.0.0",
+    "@react-native-community/cli-platform-ios": "20.0.0",
+    "@react-native/babel-preset": "catalog:",
+    "@react-native/metro-config": "catalog:",
+    "react-native-test-app": "catalog:"
+  }
+}

@@ -13,7 +13,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.10
+          bun-version: 1.3.14
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1.3
@@ -21,34 +21,166 @@ jobs:
           vs-version: '[17.0,)'
           msbuild-architecture: x64
 
-      - name: Install dependencies
+      - name: Install Windows example dependencies
+        env:
+          # Tests use WinAppDriver, not chromedriver. The chromedriver
+          # postinstall hits a deprecated Google XML endpoint and fails.
+          APPIUM_SKIP_CHROMEDRIVER_INSTALL: 'true'
         run: bun install --frozen-lockfile
+        working-directory: packages/example-windows
 
-      - name: Build
+      - name: Generate Windows test app project
+        working-directory: packages/example-windows
+        run: bunx install-windows-test-app --use-fabric --use-nuget --project-directory windows
+
+      - name: Patch generated Windows test app project
+        shell: powershell
+        working-directory: packages/example-windows
         run: |
-          bun run build
-          bun run tsc
+          $generatedProject = "node_modules\.generated\windows\Win32\ReactApp.vcxproj"
+          $generatedDir = "node_modules\.generated"
+          $cppWinRTIncludes = Join-Path $generatedDir "CppWinRTIncludes.h"
+          $versionMacros = Join-Path $generatedDir "VersionMacros.h"
+          $winrtDir = Join-Path $generatedDir "winrt"
+          $microsoftUIInterop = Join-Path $winrtDir "Microsoft.UI.interop.h"
+          $reactNativeWebViewProjection = Join-Path $winrtDir "ReactNativeWebView.h"
+          $content = Get-Content $generatedProject -Raw
+          New-Item -ItemType Directory -Force -Path $winrtDir | Out-Null
+
+          if ($content -like "*%(AdditionalDependenices)*") {
+            $content = $content.Replace('%(AdditionalDependenices)', '%(AdditionalDependencies)')
+            Set-Content -Path $generatedProject -Value $content -NoNewline
+            Write-Host "Fixed generated linker dependency inheritance typo"
+          }
+
+          @"
+          #pragma once
+
+          #include <winrt/Windows.Foundation.Collections.h>
+          #include <winrt/Windows.Foundation.h>
+          "@ | Set-Content -Path $cppWinRTIncludes -NoNewline
+
+          @"
+          #pragma once
+
+          #ifdef RNW_CANARY
+          #define RNW_VERSION_AT_LEAST(major, minor, patch) true
+          #define RNW_VERSION_LESS_THAN(major, minor, patch) false
+          #else
+
+          #define RNW_VERSION_AT_LEAST(major, minor, patch)                      \
+            ((RNW_MAJOR > major) || (RNW_MAJOR == major && RNW_MINOR > minor) || \
+             (RNW_MAJOR == major && RNW_MINOR == minor && RNW_PATCH >= patch))
+
+          #define RNW_VERSION_LESS_THAN(major, minor, patch)                     \
+            ((RNW_MAJOR < major) || (RNW_MAJOR == major && RNW_MINOR < minor) || \
+             (RNW_MAJOR == major && RNW_MINOR == minor && RNW_PATCH < patch))
+
+          #endif
+          "@ | Set-Content -Path $versionMacros -NoNewline
+
+          @"
+          #pragma once
+          "@ | Set-Content -Path $microsoftUIInterop -NoNewline
+
+          @"
+          #pragma once
+
+          #include <winrt/Microsoft.ReactNative.h>
+
+          namespace winrt::ReactNativeWebView {
+          struct ReactPackageProvider : winrt::implements<ReactPackageProvider, winrt::Microsoft::ReactNative::IReactPackageProvider> {
+            void CreatePackage(winrt::Microsoft::ReactNative::IReactPackageBuilder const &) noexcept {}
+          };
+          } // namespace winrt::ReactNativeWebView
+          "@ | Set-Content -Path $reactNativeWebViewProjection -NoNewline
+
+          if ($content -notlike "*ReactNativeWebView\windows\ReactNativeWebView*") {
+            $content = $content.Replace(
+              '$(ReactAppGeneratedDir);',
+              '$(ReactAppGeneratedDir);' + "`r`n        " + '$(ReactNativeWindowsDir)\Microsoft.ReactNative.Cxx;' + "`r`n        " + '$(ProjectRootDir)\node_modules\react-native-webview\windows\ReactNativeWebView\$(Platform)\$(Configuration)\Generated Files;'
+            )
+            Set-Content -Path $generatedProject -Value $content -NoNewline
+            Write-Host "Added ReactNativeWebView generated include directory to generated project"
+          } else {
+            Write-Host "Generated project already includes ReactNativeWebView generated headers"
+          }
+
+          if ($content -notlike "*ReactNativeWebView.vcxproj*") {
+            $webViewProjectReference = @'
+          <ItemGroup>
+            <ProjectReference Include="$(ProjectRootDir)\node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj">
+              <Project>{30CADFC7-80EF-4296-A405-47E4B97C0C71}</Project>
+              <LinkLibraryDependencies>true</LinkLibraryDependencies>
+            </ProjectReference>
+          </ItemGroup>
+          '@
+            $content = $content.Replace(
+              '  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />',
+              $webViewProjectReference + "`r`n" + '  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />'
+            )
+            Set-Content -Path $generatedProject -Value $content -NoNewline
+            Write-Host "Added ReactNativeWebView project reference to generated project"
+          } else {
+            Write-Host "Generated project already includes ReactNativeWebView project reference"
+          }
+
+          Write-Host "Added generated Win32 compatibility headers to $generatedDir"
 
       - name: Build x64 release
         shell: powershell
-        run: bun run windows --release --no-packager --no-deploy --logging
+        working-directory: packages/example-windows
+        run: |
+          $nugetRoot = Join-Path $env:USERPROFILE ".nuget\packages"
+          $props = "/p:Configuration=Release /p:Platform=x64 /p:AppxBundle=Never /p:UseExperimentalNuget=true /p:RnwNewArch=true /p:UseFabric=true /p:UseWinUI3=true /p:UseHermes=true /p:NuGetPackageRoot=""$nugetRoot\"""
+          # Single MSBuild invocation: /restore handles NuGet for both the solution
+          # AND the webview library (referenced via ProjectReference in the vcxproj).
+          # This ensures consistent output paths so the linker finds the webview .lib.
+          Invoke-Expression "msbuild windows\ExampleWindows2.sln $props /restore /bl:build.binlog 2>&1" | Tee-Object -FilePath build.log
+          $code = $LASTEXITCODE
+          if ($code -ne 0) {
+            Write-Host "::group::Build errors"
+            Get-Content build.log | Select-String ": error |: fatal error|LNK[0-9]" | Select-Object -Last 60 | ForEach-Object { Write-Host "::error::$_" }
+            Write-Host "::endgroup::"
+            exit $code
+          }
 
-      # Workaround for a bug in package searching during deploy.
-      # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the packages at windows/x64/Release.
-      # Copy the packages to Windows/Release before deploying.
+      - name: Upload build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-logs
+          path: |
+            packages/example-windows/build.log
+            packages/example-windows/build.binlog
+
       - name: Deploy
         shell: powershell
+        working-directory: packages/example-windows
         run: |
-          Copy-Item -Path example\windows\x64\Release -Recurse -Destination example\windows\
-          bunx react-native run-windows --arch x64 --release --root example --logging --no-build --no-packager --deploy-from-layout
+          Copy-Item -Path windows\x64\Release -Recurse -Destination windows\
+          bunx react-native run-windows --arch x64 --release --logging --no-build --no-packager --deploy-from-layout
+
+          [xml]$manifest = Get-Content node_modules\.generated\windows\Win32\Package.appxmanifest
+          $packageName = $manifest.Package.Identity.Name
+          $app = Get-StartApps | Where-Object {
+            $_.AppID -like "$packageName*!App"
+          } | Select-Object -First 1
+
+          if ($app) {
+            "WINDOWS_APP_ID=$($app.AppID)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            Write-Host "Resolved Windows app id: $($app.AppID)"
+          } else {
+            Write-Host "Using fallback Windows app id from Jest setup"
+          }
+
+          "WINDOWS_ATTACH_TO_ROOT=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Start Appium server
         shell: powershell
+        working-directory: packages/example-windows
         run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
 
-      - name: Start React server
-        shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run start"
-
-      - name: Run tests
-        run: bun run test:windows
+      - name: Run WebView smoke tests
+        working-directory: packages/example-windows
+        run: bun run test

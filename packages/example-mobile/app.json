@@ -1,0 +1,14 @@
+{
+  "name": "WebviewExample",
+  "displayName": "WebviewExample",
+  "components": [
+    {
+      "appKey": "WebviewExample",
+      "displayName": "WebviewExample"
+    }
+  ],
+  "resources": {
+    "android": ["dist/res", "dist/main.android.jsbundle"],
+    "ios": ["dist/assets", "dist/main.ios.jsbundle"]
+  }
+}

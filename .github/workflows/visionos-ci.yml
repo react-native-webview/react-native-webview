@@ -1,0 +1,27 @@
+name: visionOS
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        working-directory: packages/example-visionos
+      - name: Install Pods
+        run: pod install
+        working-directory: packages/example-visionos/visionos
+      - name: Build visionOS test app
+        run: |
+          xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination 'generic/platform=visionOS Simulator' CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
+        working-directory: packages/example-visionos/visionos
+    timeout-minutes: 60

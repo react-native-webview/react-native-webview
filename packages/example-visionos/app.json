@@ -1,0 +1,10 @@
+{
+  "name": "WebviewExample",
+  "displayName": "WebviewExample",
+  "components": [
+    {
+      "appKey": "WebviewExample",
+      "displayName": "WebviewExample"
+    }
+  ]
+}
