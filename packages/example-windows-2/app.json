@@ -1,0 +1,10 @@
+{
+  "name": "ExampleWindows2",
+  "displayName": "ExampleWindows2",
+  "components": [
+    {
+      "appKey": "ExampleWindows2",
+      "displayName": "ExampleWindows2"
+    }
+  ]
+}
