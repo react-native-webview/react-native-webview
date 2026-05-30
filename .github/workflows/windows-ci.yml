@@ -43,7 +43,6 @@ jobs:
           $versionMacros = Join-Path $generatedDir "VersionMacros.h"
           $winrtDir = Join-Path $generatedDir "winrt"
           $microsoftUIInterop = Join-Path $winrtDir "Microsoft.UI.interop.h"
-          $reactNativeWebViewProjection = Join-Path $winrtDir "ReactNativeWebView.h"
           $reactAppCompat = Join-Path $generatedDir "ReactAppCompat.cpp"
           $content = Get-Content $generatedProject -Raw
           New-Item -ItemType Directory -Force -Path $winrtDir | Out-Null
@@ -83,18 +82,6 @@ jobs:
           @"
           #pragma once
           "@ | Set-Content -Path $microsoftUIInterop -NoNewline
-
-          @"
-          #pragma once
-
-          #include <winrt/Microsoft.ReactNative.h>
-
-          namespace winrt::ReactNativeWebView {
-          struct ReactPackageProvider : winrt::implements<ReactPackageProvider, winrt::Microsoft::ReactNative::IReactPackageProvider> {
-            void CreatePackage(winrt::Microsoft::ReactNative::IReactPackageBuilder const &) noexcept {}
-          };
-          } // namespace winrt::ReactNativeWebView
-          "@ | Set-Content -Path $reactNativeWebViewProjection -NoNewline
 
           @"
           #include "pch.h"
