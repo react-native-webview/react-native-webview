@@ -41,8 +41,15 @@ RCT_EXPORT_MODULE(RNCWebView)
 }
 
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
-// New arch only
-RCT_CUSTOM_VIEW_PROPERTY(newSource, NSDictionary, RNCWebViewImpl) {}
+// New arch only. Forward newSource on the legacy view-manager fallback path —
+// an empty macro here drops the source and leaves the WebView blank on iOS (#3863).
+RCT_CUSTOM_VIEW_PROPERTY(newSource, NSDictionary, RNCWebViewImpl) {
+  if (json == nil) {
+    [view setSource:@{}];
+  } else {
+    [view setSource:json];
+  }
+}
 RCT_EXPORT_VIEW_PROPERTY(onFileDownload, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingStart, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingFinish, RCTDirectEventBlock)
