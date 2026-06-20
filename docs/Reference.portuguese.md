@@ -449,9 +449,6 @@ url
 
 Função que é invocada quando a `WebView` recebe um erro http.
 
-> **_Observação_**
-> API Android nível mínimo 23.
-
 | Tipo     | Requerido |
 | -------- | --------- |
 | function | Não       |
@@ -868,7 +865,7 @@ Os valores possíveis para `mixedContentMode` são:
 
 ### `thirdPartyCookiesEnabled`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
-Valor booleano para habilitar cookies de terceiros na `WebView`. Usado no Android Lollipop e acima apenas porque os cookies de terceiros são ativados por padrão no Android Kitkat e abaixo e no iOS. O valor padrão é `true`. Para saber mais sobre cookies, leia o [Guia](Guide.portuguese.md#Managing-Cookies)
+Valor booleano para habilitar cookies de terceiros na `WebView`. O valor padrão é `true`. Para saber mais sobre cookies, leia o [Guia](Guide.portuguese.md#Managing-Cookies)
 
 | Tipo | Requerido | Plataforma |
 | ---- | --------- | ---------- |

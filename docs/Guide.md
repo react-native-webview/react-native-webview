@@ -179,18 +179,7 @@ Video recording:
 
 ##### Android
 
-Add permission in AndroidManifest.xml:
-
-```xml
-<manifest ...>
-  ......
-
-  <!-- this is required only for Android 4.1-5.1 (api 16-22)  -->
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-  ......
-</manifest>
-```
+File uploads do not require storage permissions on supported Android versions.
 
 ###### Camera option availability in uploading for Android
 
@@ -210,7 +199,7 @@ Normally, apps that do not have permission to use the camera can prompt the user
 
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
-File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
+File Upload using `<input type="file" />` is supported on Android:
 
 ```jsx
 import { WebView } from 'react-native-webview';
@@ -379,7 +368,7 @@ By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the J
 
 > On iOS, ~~`injectedJavaScriptBeforeContentLoaded` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentStart`. As a consequence, `injectedJavaScriptBeforeContentLoaded` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
-> Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
+> Note on Android Compatibility: JavaScript state from an empty WebView is not persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
 
 #### The `injectedJavaScriptObject` prop
 

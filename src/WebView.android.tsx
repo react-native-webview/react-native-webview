@@ -305,8 +305,7 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
   },
 );
 
-// native implementation should return "true" only for Android 5+
-const isFileUploadSupported = async () => RNCWebViewModule.isFileUploadSupported();
+const isFileUploadSupported = async () => true;
 
 const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });
 
