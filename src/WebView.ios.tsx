@@ -77,6 +77,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
       incognito,
       decelerationRate: decelerationRateProp,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+      removeIosKeyboardObserver,
       ...otherProps
     },
     ref,
@@ -149,6 +150,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
     useWarnIfChanges(incognito, 'incognito');
     useWarnIfChanges(mediaPlaybackRequiresUserAction, 'mediaPlaybackRequiresUserAction');
     useWarnIfChanges(dataDetectorTypes, 'dataDetectorTypes');
+    useWarnIfChanges(removeIosKeyboardObserver, 'removeIosKeyboardObserver');
 
     let otherView = null;
     if (viewState === 'LOADING') {
@@ -233,6 +235,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
         allowsPictureInPictureMediaPlayback={allowsPictureInPictureMediaPlayback}
         incognito={incognito}
         mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
+        removeIosKeyboardObserver={removeIosKeyboardObserver}
         newSource={newSource}
         style={webViewStyles}
         hasOnFileDownload={!!onFileDownload}

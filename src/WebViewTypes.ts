@@ -516,6 +516,19 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    */
   hideKeyboardAccessoryView?: boolean;
   /**
+   * If `true`, removes the keyboard notification observers (`UIKeyboardWillShow`,
+   * `UIKeyboardWillHide`, `UIKeyboardWillChangeFrame`) that `WKWebView` registers
+   * internally. Useful when the keyboard is managed by surrounding native code
+   * and the WebView's automatic scroll/inset adjustments interfere with it.
+   *
+   * Defaults to `false`. The value is read once when the WebView mounts and
+   * cannot be toggled afterwards — `WKWebView` registers these observers via
+   * private internal selectors, so once removed they cannot be re-registered.
+   * Remount the WebView to apply a new value.
+   * @platform ios
+   */
+  removeIosKeyboardObserver?: boolean;
+  /**
    * A Boolean value indicating whether horizontal swipe gestures will trigger
    * back-forward list navigations.
    */
