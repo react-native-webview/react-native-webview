@@ -230,6 +230,7 @@ export declare type SuppressMenuItem =
   | 'cut'
   | 'copy'
   | 'paste'
+  | 'delete'
   | 'replace'
   | 'bold'
   | 'italic'
