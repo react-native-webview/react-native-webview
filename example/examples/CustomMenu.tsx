@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Button, Linking, Text, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Text, View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -51,13 +51,19 @@ const HTML = `
 </html>
 `;
 
-interface Props {}
-interface State {}
+type CustomMenuSelection = {
+  key?: string;
+  label?: string;
+  selectedText?: string;
+};
 
-// export default class CustomMenu extends Component<Props, State> {
-export default (CustomMenu = () => {
-  const [selectionInfo, setSelectionInfo] = React.useState(null);
-  const webviewRef = React.useRef();
+type CustomMenuSelectionEvent = {
+  nativeEvent: CustomMenuSelection;
+};
+
+export default function CustomMenu() {
+  const [selectionInfo, setSelectionInfo] = useState<CustomMenuSelection | null>(null);
+  const webviewRef = useRef<WebView | null>(null);
 
   return (
     <View>
@@ -70,7 +76,7 @@ export default (CustomMenu = () => {
             { label: 'Highlight', key: 'highlight' },
             { label: 'Strikethrough', key: 'strikethrough' },
           ]}
-          onCustomMenuSelection={(webViewEvent) => {
+          onCustomMenuSelection={(webViewEvent: CustomMenuSelectionEvent) => {
             const { label, key, selectedText } = webViewEvent.nativeEvent;
             setSelectionInfo(webViewEvent.nativeEvent);
             // clearing the selection by sending a message. This would need a script on the source page to listen to the message.
@@ -87,4 +93,4 @@ export default (CustomMenu = () => {
       )}
     </View>
   );
-});
+}
