@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Button, Linking, Text, View } from 'react-native';
 
 import WebView from 'react-native-webview';
@@ -36,34 +36,26 @@ const HTML = `
 </html>
 `;
 
-type Props = {};
-type State = {};
-
-export default class Uploads extends Component<Props, State> {
-  state = {};
-
-  render() {
-    return (
-      <View>
-        <View style={{ height: 120 }}>
-          <WebView
-            source={{ html: HTML }}
-            automaticallyAdjustContentInsets={false}
-          />
-        </View>
-        <Text>
-          Android limitation: If the file input should show camera options for the user, and the app
-          has the ability to request the camera permission, then the user must grant permission
-          first in order to see the options. Since this example app does have the permission
-          declared, you must allow it in settings to be able to see camera options. If your app does
-          not have the camera permission declared, then there is no restriction to showing the
-          camera options.
-        </Text>
-        <Button
-          title="Open settings"
-          onPress={() => Linking.openSettings()}
+export default function Uploads() {
+  return (
+    <View>
+      <View style={{ height: 120 }}>
+        <WebView
+          source={{ html: HTML }}
+          automaticallyAdjustContentInsets={false}
         />
       </View>
-    );
-  }
+      <Text>
+        Android limitation: If the file input should show camera options for the user, and the app
+        has the ability to request the camera permission, then the user must grant permission first
+        in order to see the options. Since this example app does have the permission declared, you
+        must allow it in settings to be able to see camera options. If your app does not have the
+        camera permission declared, then there is no restriction to showing the camera options.
+      </Text>
+      <Button
+        title="Open settings"
+        onPress={() => Linking.openSettings()}
+      />
+    </View>
+  );
 }

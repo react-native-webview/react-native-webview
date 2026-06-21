@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
-interface Props {}
-interface State {}
+type LoadStartEvent = {
+  nativeEvent: unknown;
+};
 
 const HTML = `
 <!DOCTYPE html>
@@ -22,36 +23,32 @@ const HTML = `
 </html>
 `;
 
-export default class NativeWebpage extends Component<Props, State> {
-  state = {};
-
-  render() {
-    return (
-      <View style={{ height: 400 }}>
-        <WebView
-          source={{ html: HTML }}
-          style={{ width: '100%', height: '100%' }}
-          onShouldStartLoadWithRequest={(event) => {
-            console.log('onShouldStartLoadWithRequest', event);
-            return true;
-          }}
-          onLoadStart={(event) => {
-            console.log('onLoadStart', event.nativeEvent);
-          }}
-          suppressMenuItems={[
-            'cut',
-            'copy',
-            'paste',
-            'replace',
-            'bold',
-            'italic',
-            'underline',
-            'select',
-            'share',
-            'lookup',
-          ]}
-        />
-      </View>
-    );
-  }
+export default function SuppressMenuItems() {
+  return (
+    <View style={{ height: 400 }}>
+      <WebView
+        source={{ html: HTML }}
+        style={{ width: '100%', height: '100%' }}
+        onShouldStartLoadWithRequest={(event: unknown) => {
+          console.log('onShouldStartLoadWithRequest', event);
+          return true;
+        }}
+        onLoadStart={(event: LoadStartEvent) => {
+          console.log('onLoadStart', event.nativeEvent);
+        }}
+        suppressMenuItems={[
+          'cut',
+          'copy',
+          'paste',
+          'replace',
+          'bold',
+          'italic',
+          'underline',
+          'select',
+          'share',
+          'lookup',
+        ]}
+      />
+    </View>
+  );
 }
