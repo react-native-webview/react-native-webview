@@ -5,7 +5,11 @@
 #import "RNCWebViewSpec/RNCWebViewSpec.h"
 #endif /* RCT_NEW_ARCH_ENABLED */
 
+#if __has_include(<React/RCTBridgeModule.h>)
 #import <React/RCTBridgeModule.h>
+#else
+#import <React_Core/RCTBridgeModule.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -1,4 +1,8 @@
+#if __has_include(<React/RCTUIManager.h>)
 #import <React/RCTUIManager.h>
+#else
+#import <React_Core/RCTUIManager.h>
+#endif
 
 #import "RNCWebViewManager.h"
 #import "RNCWebViewImpl.h"
