@@ -43,6 +43,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
 
     public static final int PICKER = 1;
     public static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
+    public static final int CAMERA_PERMISSION_REQUEST = 2;
 
     final private ReactApplicationContext mContext;
 
@@ -208,6 +209,44 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
     }
 
     public boolean startPhotoPickerIntent(final String[] acceptTypes, final boolean allowMultiple, final ValueCallback<Uri[]> callback, final boolean isCaptureEnabled) {
+        // A capture-enabled file input (e.g. <input type="file" accept="image/*" capture>) needs
+        // the camera. When the app declares CAMERA but it isn't granted yet, request it and launch
+        // once the user responds. Without this the capture intent is silently dropped (see
+        // needsCameraPermission / "there is no Camera permission" below) and nothing opens.
+        if (isCaptureEnabled && needsCameraPermission()) {
+            try {
+                getPermissionAwareActivity().requestPermissions(
+                        new String[]{Manifest.permission.CAMERA},
+                        CAMERA_PERMISSION_REQUEST,
+                        getCameraPermissionListener(acceptTypes, allowMultiple, callback, isCaptureEnabled));
+                return true;
+            } catch (IllegalStateException e) {
+                // Host Activity doesn't implement PermissionAwareActivity — fall back to the
+                // previous behaviour instead of crashing.
+                Log.w("RNCWebViewModule", "Unable to request CAMERA permission", e);
+            }
+        }
+
+        return launchPhotoPickerIntent(acceptTypes, allowMultiple, callback, isCaptureEnabled);
+    }
+
+    private PermissionListener getCameraPermissionListener(final String[] acceptTypes, final boolean allowMultiple, final ValueCallback<Uri[]> callback, final boolean isCaptureEnabled) {
+        return new PermissionListener() {
+            @Override
+            public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+                if (requestCode == CAMERA_PERMISSION_REQUEST) {
+                    // Launch regardless of the result: if granted, the capture intent is now built;
+                    // if denied, needsCameraPermission() stays true and the existing "no Camera
+                    // permission" branch handles it — so there is no re-request loop.
+                    launchPhotoPickerIntent(acceptTypes, allowMultiple, callback, isCaptureEnabled);
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
+    private boolean launchPhotoPickerIntent(final String[] acceptTypes, final boolean allowMultiple, final ValueCallback<Uri[]> callback, final boolean isCaptureEnabled) {
         mFilePathCallback = callback;
         Activity activity = mContext.getCurrentActivity();
 
