@@ -179,6 +179,9 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
         mRNCWebViewManagerImpl.setMediaPlaybackRequiresUserAction(view, value);
     }
 
+    @ReactProp(name = "mediaCapturePermissionGrantType")
+    public void setMediaCapturePermissionGrantType(RNCWebViewWrapper view, @Nullable String value) {}
+
     @ReactProp(name = "deviceOrientationAndMotionGrantType")
     public void setDeviceOrientationAndMotionGrantType(RNCWebViewWrapper view, @Nullable String value) {}
 

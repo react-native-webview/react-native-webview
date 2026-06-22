@@ -1561,11 +1561,13 @@ This property specifies how to handle device orientation and motion permission r
 
 Possible values:
 
-- `grantIfSameHostElsePrompt`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted. Otherwise, the user gets prompted.
-- `grantIfSameHostElseDeny`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted. Otherwise, it gets denied.
+- `grantIfSameHostElsePrompt`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted if it has been granted before. Otherwise, the user gets prompted.
+- `grantIfSameHostElseDeny`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted if it has been granted before. Otherwise, it gets denied.
 - `deny`
-- `grant`
+- `grant`: The permission is granted if it has been granted before.
 - `prompt`
+
+Note that a grant may still result in a prompt, for example if the user has never been prompted for the permission before.
 
 On Android, device orientation and motion events do not trigger a native runtime permission prompt, so this prop is accepted as a no-op.
 

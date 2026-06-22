@@ -221,7 +221,7 @@ static WKPermissionDecision RNCWebViewPermissionDecisionForOrigin(
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
     _deviceOrientationAndMotionGrantType = RNCWebViewPermissionGrantType_Prompt;
 #endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 /* iOS 15 */
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 /* iOS 16 */
     if (@available(iOS 16.0, *)) {
       _editMenuInteraction = [[UIEditMenuInteraction alloc] initWithDelegate:self];
       [self addInteraction:_editMenuInteraction];
