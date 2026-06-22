@@ -1,5 +1,9 @@
 #import <Foundation/Foundation.h>
+#if __has_include(<React/RCTLog.h>)
 #import <React/RCTLog.h>
+#else
+#import <React_Core/RCTLog.h>
+#endif
 #import <WebKit/WebKit.h>
 
 typedef void (^DecisionBlock)(BOOL);

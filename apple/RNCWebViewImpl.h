@@ -5,8 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#if __has_include(<React/RCTView.h>)
 #import <React/RCTView.h>
 #import <React/RCTDefines.h>
+#else
+#import <React_Core/RCTView.h>
+#import <React_Core/RCTDefines.h>
+#endif
 #import <WebKit/WKDataDetectorTypes.h>
 #import <WebKit/WebKit.h>
 
