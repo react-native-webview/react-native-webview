@@ -322,6 +322,8 @@ export declare type MediaCapturePermissionGrantType =
   | 'grant'
   | 'prompt';
 
+export declare type DeviceOrientationAndMotionGrantType = MediaCapturePermissionGrantType;
+
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -729,6 +731,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * Available on iOS 15 and later.
    */
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
+
+  /**
+   * This property specifies how to handle device orientation and motion permission requests.
+   * Defaults to `prompt`, resulting in the user being prompted repeatedly.
+   * Available on iOS 15 and later.
+   */
+  deviceOrientationAndMotionGrantType?: DeviceOrientationAndMotionGrantType;
 
   /**
    * A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support.

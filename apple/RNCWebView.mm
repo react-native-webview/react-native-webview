@@ -481,6 +481,19 @@ static inline std::string nullSafeStringWithLength(id value) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
         }
     }
+    if (oldViewProps.deviceOrientationAndMotionGrantType != newViewProps.deviceOrientationAndMotionGrantType) {
+        if (newViewProps.deviceOrientationAndMotionGrantType == RNCWebViewDeviceOrientationAndMotionGrantType::Prompt) {
+            [_view setDeviceOrientationAndMotionGrantType:RNCWebViewPermissionGrantType_Prompt];
+        } else if (newViewProps.deviceOrientationAndMotionGrantType == RNCWebViewDeviceOrientationAndMotionGrantType::Grant) {
+            [_view setDeviceOrientationAndMotionGrantType:RNCWebViewPermissionGrantType_Grant];
+        } else if (newViewProps.deviceOrientationAndMotionGrantType == RNCWebViewDeviceOrientationAndMotionGrantType::Deny) {
+            [_view setDeviceOrientationAndMotionGrantType:RNCWebViewPermissionGrantType_Deny];
+        } else if (newViewProps.deviceOrientationAndMotionGrantType == RNCWebViewDeviceOrientationAndMotionGrantType::GrantIfSameHostElsePrompt) {
+            [_view setDeviceOrientationAndMotionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt];
+        } else if (newViewProps.deviceOrientationAndMotionGrantType == RNCWebViewDeviceOrientationAndMotionGrantType::GrantIfSameHostElseDeny) {
+            [_view setDeviceOrientationAndMotionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
+        }
+    }
 #endif
     if (oldViewProps.indicatorStyle != newViewProps.indicatorStyle) {
         if (newViewProps.indicatorStyle == RNCWebViewIndicatorStyle::Black) {

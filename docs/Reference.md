@@ -84,6 +84,7 @@ This document lays out the current public properties and methods for the React N
 - [`textInteractionEnabled`](Reference.md#textInteractionEnabled)
 - [`suppressMenuItems`](Reference.md#suppressMenuItems)
 - [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)
+- [`deviceOrientationAndMotionGrantType`](Reference.md#deviceOrientationAndMotionGrantType)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 - [`basicAuthCredential`](Reference.md#basicAuthCredential)
@@ -1550,6 +1551,32 @@ Example:
 
 ```jsx
 <WebView mediaCapturePermissionGrantType={'grantIfSameHostElsePrompt'} />
+```
+
+---
+
+### `deviceOrientationAndMotionGrantType`[⬆](#props-index)
+
+This property specifies how to handle device orientation and motion permission requests. Defaults to `prompt`, resulting in the user being prompted repeatedly. Available on iOS 15 and later.
+
+Possible values:
+
+- `grantIfSameHostElsePrompt`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted. Otherwise, the user gets prompted.
+- `grantIfSameHostElseDeny`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted. Otherwise, it gets denied.
+- `deny`
+- `grant`
+- `prompt`
+
+On Android, device orientation and motion events do not trigger a native runtime permission prompt, so this prop is accepted as a no-op.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
+
+Example:
+
+```jsx
+<WebView deviceOrientationAndMotionGrantType={'grant'} />
 ```
 
 ---
