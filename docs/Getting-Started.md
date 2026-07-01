@@ -2,6 +2,8 @@
 
 Here's how to get started quickly with the React Native WebView.
 
+> **Note:** react-native-webview requires the React Native [New Architecture](https://reactnative.dev/architecture/landing-page). The legacy (Paper) architecture is no longer supported.
+
 ## 1. Add react-native-webview to your dependencies
 
 ```

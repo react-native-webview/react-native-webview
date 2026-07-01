@@ -27,17 +27,16 @@ public class RNCWebViewPackage extends TurboReactPackage {
     public ReactModuleInfoProvider getReactModuleInfoProvider() {
         return () -> {
             final Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
-            boolean isTurboModule = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
             moduleInfos.put(
-                    RNCWebViewModuleImpl.NAME,
+                    RNCWebViewModule.NAME,
                     new ReactModuleInfo(
-                            RNCWebViewModuleImpl.NAME,
-                            RNCWebViewModuleImpl.NAME,
+                            RNCWebViewModule.NAME,
+                            RNCWebViewModule.NAME,
                             false, // canOverrideExistingModule
                             false, // needsEagerInit
                             true, // hasConstants
                             false, // isCxxModule
-                            isTurboModule // isTurboModule
+                            true // isTurboModule
                     ));
             return moduleInfos;
         };
@@ -46,7 +45,7 @@ public class RNCWebViewPackage extends TurboReactPackage {
     @Nullable
     @Override
     public NativeModule getModule(String name, ReactApplicationContext reactContext) {
-        if (name.equals(RNCWebViewModuleImpl.NAME)) {
+        if (name.equals(RNCWebViewModule.NAME)) {
             return new RNCWebViewModule(reactContext);
         } else {
             return null;

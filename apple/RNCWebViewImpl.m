@@ -621,11 +621,7 @@ RCTAutoInsetsProtocol>
 }
 #endif
 
-#ifdef RCT_NEW_ARCH_ENABLED
 - (void)destroyWebView
-#else
-- (void)removeFromSuperview
-#endif
 {
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
@@ -650,10 +646,6 @@ RCTAutoInsetsProtocol>
       _onContentProcessDidTerminate(event);
     }
   }
-
-#ifndef RCT_NEW_ARCH_ENABLED
-  [super removeFromSuperview];
-#endif
 }
 
 #if TARGET_OS_IOS

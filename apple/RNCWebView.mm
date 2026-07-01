@@ -1,5 +1,3 @@
-// This guard prevent the code from being compiled in the old architecture
-#ifdef RCT_NEW_ARCH_ENABLED
 #import "RNCWebView.h"
 #import "RNCWebViewImpl.h"
 
@@ -575,4 +573,3 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
 }
 
 @end
-#endif
