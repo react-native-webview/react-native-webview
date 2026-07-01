@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -22,9 +23,9 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.widget.Toast;
 
-import com.facebook.common.activitylistener.ActivityListenerManager;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 
@@ -38,7 +39,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static android.app.Activity.RESULT_OK;
 
-public class RNCWebViewModuleImpl implements ActivityEventListener {
+@ReactModule(name = RNCWebViewModule.NAME)
+public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements ActivityEventListener {
     public static final String NAME = "RNCWebViewModule";
 
     public static final int PICKER = 1;
@@ -52,9 +54,16 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
     private File mOutputImage;
     private File mOutputVideo;
 
-    public RNCWebViewModuleImpl(ReactApplicationContext context) {
-        mContext = context;
-        context.addActivityEventListener(this);
+    public RNCWebViewModule(ReactApplicationContext reactContext) {
+        super(reactContext);
+        mContext = reactContext;
+        reactContext.addActivityEventListener(this);
+    }
+
+    @NonNull
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     @Override
@@ -77,7 +86,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         // the camera activity doesn't properly return the filename* (I think?) so we use
         // this filename instead
         switch (requestCode) {
-            case RNCWebViewModuleImpl.PICKER:
+            case PICKER:
                 if (resultCode != RESULT_OK) {
                     if (mFilePathCallback != null) {
                         mFilePathCallback.onReceiveValue(null);
@@ -174,6 +183,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         };
     }
 
+    @Override
     public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         final AtomicReference<ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = shouldOverrideUrlLoadingLock.getLock(lockIdentifier);
         if (lockObject != null) {
@@ -207,7 +217,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         return null;
     }
 
-    public boolean startPhotoPickerIntent(final String[] acceptTypes, final boolean allowMultiple, final ValueCallback<Uri[]> callback, final boolean isCaptureEnabled) {
+    public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final String[] acceptTypes, final boolean allowMultiple, final boolean isCaptureEnabled) {
         mFilePathCallback = callback;
         Activity activity = mContext.getCurrentActivity();
 

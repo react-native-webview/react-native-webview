@@ -33,6 +33,7 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
       useSharedProcessPool = true,
       injectedJavaScript,
       injectedJavaScriptBeforeContentLoaded,
+      injectedJavaScriptObject,
       startInLoadingState,
       onNavigationStateChange,
       onLoadStart,
@@ -181,14 +182,13 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
         onContentProcessDidTerminate={onContentProcessDidTerminate}
         injectedJavaScript={injectedJavaScript}
         injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
+        injectedJavaScriptObject={JSON.stringify(injectedJavaScriptObject)}
         allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
         allowsInlineMediaPlayback={allowsInlineMediaPlayback}
         allowsPictureInPictureMediaPlayback={allowsPictureInPictureMediaPlayback}
         incognito={incognito}
         mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
         ref={webViewRef}
-        // @ts-expect-error old arch only
-        source={sourceResolved}
         style={webViewStyles}
         {...nativeConfig?.props}
       />

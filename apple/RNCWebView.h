@@ -1,5 +1,3 @@
-// This guard prevent this file to be compiled in the old architecture.
-#ifdef RCT_NEW_ARCH_ENABLED
 #import <React/RCTViewComponentView.h>
 #import <React/RCTConversions.h>
 #import <WebKit/WKDataDetectorTypes.h>
@@ -32,4 +30,3 @@ namespace react {
 NS_ASSUME_NONNULL_END
 
 #endif /* NativeComponentExampleComponentView_h */
-#endif /* RCT_NEW_ARCH_ENABLED */
