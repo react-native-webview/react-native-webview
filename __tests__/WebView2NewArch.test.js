@@ -56,14 +56,14 @@ describe('WebView2 New Architecture Tests', () => {
       expect(showAlertButton).not.toBeNull();
     });
 
-    test('Show Alert button triggers native alert dialog', async () => {
+    test('Show Alert button triggers the in-app alert', async () => {
       const showAlertButton = By2.nativeName('Show alert');
       await showAlertButton.click();
 
-      // Wait for the Win32 MessageBox to appear
+      // Wait for the in-app alert to render
       await new Promise((r) => setTimeout(r, 1000));
 
-      // The native MessageBox should show the alert text
+      // The in-app alert renders an OK button
       const okButton = By2.nativeXpath('//Button[@Name="OK"]');
       await okButton.click();
     });

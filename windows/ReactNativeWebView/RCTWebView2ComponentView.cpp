@@ -15,6 +15,8 @@
 #include <winrt/Windows.Security.Cryptography.h>
 #include <limits>
 #include <optional>
+#include <string>
+#include <thread>
 
 namespace winrt::ReactNativeWebView::implementation {
 
@@ -441,9 +443,13 @@ void RCTWebView2ComponentView::HandleMessageFromJS(winrt::hstring const& message
                 auto type = v.GetString();
                 if (type == L"__alert") {
                     // Use Win32 MessageBoxW instead of UWP MessageDialog which is incompatible
-                    // with Win32/WinAppSDK Composition apps
-                    auto alertMsg = jsonObject.GetNamedString(L"message");
-                    MessageBoxW(nullptr, alertMsg.c_str(), L"Alert", MB_OK);
+                    // with Win32/WinAppSDK Composition apps. MessageBoxW blocks its calling
+                    // thread, so run it detached to keep the UI thread responsive while the
+                    // dialog is up.
+                    std::wstring alertMsg{jsonObject.GetNamedString(L"message")};
+                    std::thread([msg = std::move(alertMsg)]() {
+                        MessageBoxW(nullptr, msg.c_str(), L"Alert", MB_OK);
+                    }).detach();
                     return;
                 }
             }
