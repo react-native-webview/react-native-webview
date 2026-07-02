@@ -16,8 +16,9 @@ jobs:
           bun-version: 1.3.10
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Install macOS dependencies
-        if: false # Enable this if react-native-macos falls behind
+      # react-native-macos (0.81) lags core react-native (0.86). Align the
+      # installed core to the macOS fork so its codegen can parse the specs.
+      - name: Align react-native with react-native-macos
         run: bun run add:macos
       - name: Install Pods
         run: pod install
