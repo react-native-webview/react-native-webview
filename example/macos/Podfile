@@ -2,4 +2,4 @@ require_relative '../../node_modules/react-native-test-app/macos/test_app'
 
 workspace 'WebviewExample.xcworkspace'
 
-use_test_app! :hermes_enabled => false
+use_test_app! :hermes_enabled => true

@@ -6,7 +6,6 @@
 *.sln.docstates
 
 # Build results
-ARM/
 ARM64/
 AppPackages/
 [Bb]in/
@@ -25,9 +24,10 @@ packages/
 
 **/Generated Files/**
 *.binlog
+*.err
 *.hprof
 *.sln
-ExperimentalFeatures.props
+*.wrn
 NuGet.Config
 dist/
 msbuild.binlog
