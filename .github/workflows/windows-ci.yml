@@ -48,12 +48,17 @@ jobs:
         shell: powershell
         run: bun run windows --release --no-packager --no-deploy --no-launch --logging --msbuildprops WindowsTargetPlatformVersion=10.0.26100.0
 
+      # react-native-test-app's Win32 template keeps the project name
+      # `ReactApp`. Prefer the exe inside the .Package layout, which carries
+      # the Windows App SDK runtime next to it.
       - name: Locate test app
         shell: powershell
         run: |
-          $exe = Get-ChildItem -Path example\windows -Recurse -Filter WebviewExample.exe | Select-Object -First 1
+          $exe = Get-ChildItem -Path example\windows -Recurse -Include WebviewExample.exe, ReactApp.exe |
+            Sort-Object { $_.FullName -notmatch '\.Package\\' } |
+            Select-Object -First 1
           if (-not $exe) {
-            Write-Host "WebviewExample.exe not found; executables under example\windows:"
+            Write-Host "Test app exe not found; executables under example\windows:"
             Get-ChildItem -Path example\windows -Recurse -Filter *.exe | ForEach-Object { Write-Host $_.FullName }
             exit 1
           }

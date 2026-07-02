@@ -15,10 +15,12 @@ switch (platform) {
         '..',
         'example',
         'windows',
+        'ReactApp.Package',
+        'bin',
         'x64',
         'Release',
-        'WebviewExample',
-        'WebviewExample.exe',
+        'ReactApp',
+        'ReactApp.exe',
       );
     module.exports = {
       capabilities: windowsAppDriverCapabilities(appPath),
