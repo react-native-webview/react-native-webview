@@ -48,26 +48,41 @@ jobs:
         shell: powershell
         run: bun run windows --release --no-packager --no-deploy --no-launch --logging --msbuildprops WindowsTargetPlatformVersion=10.0.26100.0
 
-      # react-native-test-app's Win32 template keeps the project name
-      # `ReactApp`. Prefer the exe inside the .Package layout, which carries
-      # the Windows App SDK runtime next to it.
-      - name: Locate test app
+      # WinAppDriver launches packaged apps by Application User Model ID (it
+      # crashes when handed the bare Win32 exe path). Install the Windows App
+      # SDK runtime dependencies staged by the .wapproj, register the loose
+      # layout (no signing required), and resolve the AUMID.
+      - name: Deploy test app
         shell: powershell
         run: |
-          $exe = Get-ChildItem -Path example\windows -Recurse -Include WebviewExample.exe, ReactApp.exe |
-            Sort-Object { $_.FullName -notmatch '\.Package\\' } |
-            Select-Object -First 1
-          if (-not $exe) {
-            Write-Host "Test app exe not found; executables under example\windows:"
-            Get-ChildItem -Path example\windows -Recurse -Filter *.exe | ForEach-Object { Write-Host $_.FullName }
+          Get-ChildItem -Path example\windows\ReactApp.Package\bin, example\windows\ReactApp.Package\AppPackages -Recurse -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match '\.(msix|appx)$' -or $_.Name -eq 'AppxManifest.xml' } |
+            ForEach-Object { Write-Host $_.FullName }
+          Get-ChildItem -Path example\windows\ReactApp.Package -Recurse -Include *.msix, *.appx -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match 'Dependencies' } |
+            ForEach-Object {
+              Write-Host "Installing dependency $($_.FullName)"
+              Add-AppxPackage -Path $_.FullName -ErrorAction Continue
+            }
+          $manifest = Get-ChildItem -Path example\windows\ReactApp.Package\bin -Recurse -Filter AppxManifest.xml | Select-Object -First 1
+          if (-not $manifest) {
+            Write-Host "AppxManifest.xml not found under example\windows\ReactApp.Package\bin"
             exit 1
           }
-          Write-Host "Found test app at $($exe.FullName)"
-          "WEBVIEW_APP_PATH=$($exe.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "Registering $($manifest.FullName)"
+          Add-AppxPackage -Register $manifest.FullName
+          $pkg = Get-AppxPackage -Name 40411fc5-8e92-4d46-b68d-b62df44b1366
+          if (-not $pkg) {
+            Write-Host "Package not found after registration"
+            exit 1
+          }
+          $aumid = "$($pkg.PackageFamilyName)!App"
+          Write-Host "App User Model ID: $aumid"
+          "WEBVIEW_APP_PATH=$aumid" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Start Appium server
         shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
+        run: Start-Process -FilePath powershell -ArgumentList @('-Command', 'bun run --bun appium *> appium.log')
 
       - name: Start React server
         shell: powershell
@@ -75,4 +90,9 @@ jobs:
 
       - name: Run tests
         run: bun run test:windows
+
+      - name: Appium log
+        if: failure()
+        shell: powershell
+        run: if (Test-Path appium.log) { Get-Content appium.log -Tail 200 } else { Write-Host 'no appium.log' }
     timeout-minutes: 60
