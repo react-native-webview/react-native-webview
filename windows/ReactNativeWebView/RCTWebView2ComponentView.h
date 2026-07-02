@@ -55,6 +55,7 @@ struct RCTWebView2ComponentView : winrt::implements<RCTWebView2ComponentView, wi
     void HandleClearCacheCommand(bool includeDiskFiles) noexcept override;
 
 private:
+    void Cleanup() noexcept;
     void RefreshSize();
     void RegisterEvents();
     void RegisterCoreWebView2Events();
@@ -86,6 +87,7 @@ private:
     winrt::Microsoft::ReactNative::IComponentState m_state{nullptr};
 
     // Event revokers
+    winrt::Microsoft::ReactNative::ComponentView::Destroying_revoker m_destroyingRevoker{};
     winrt::event_token m_messageToken;
     winrt::Microsoft::UI::Xaml::Controls::WebView2::NavigationStarting_revoker m_navigationStartingRevoker{};
     winrt::Microsoft::UI::Xaml::Controls::WebView2::NavigationCompleted_revoker m_navigationCompletedRevoker{};

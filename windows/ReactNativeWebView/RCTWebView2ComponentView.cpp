@@ -99,10 +99,52 @@ void RCTWebView2ComponentView::InitializeContentIsland(
     m_island.Content(m_webView);
     islandView.Connect(m_island.ContentIsland());
     m_islandView = winrt::make_weak(islandView);
-    
+
+    // Tear down the XamlIsland and WebView2 when the component view is
+    // destroyed. Leaving the orphaned island alive breaks input routing for
+    // the entire window: after unmounting a WebView, every composition-level
+    // click in the app starts failing.
+    m_destroyingRevoker = islandView.Destroying(
+        winrt::auto_revoke,
+        [wkThis = get_weak()](auto const & /*sender*/, auto const & /*args*/) noexcept {
+            if (auto strongThis = wkThis.get()) {
+                strongThis->Cleanup();
+            }
+        });
+
     // Explicitly trigger CoreWebView2 initialization.
     // In XamlIsland hosting, the WebView2 won't auto-initialize its browser process.
     m_webView.EnsureCoreWebView2Async();
+}
+
+void RCTWebView2ComponentView::Cleanup() noexcept {
+    m_navigationStartingRevoker.revoke();
+    m_navigationCompletedRevoker.revoke();
+    m_CoreWebView2InitializedRevoker.revoke();
+    m_webResourceRequestedRevoker.revoke();
+    m_CoreWebView2DOMContentLoadedRevoker.revoke();
+    m_sourceChangedRevoker.revoke();
+    m_newWindowRequestedRevoker.revoke();
+
+    try {
+        if (m_webView) {
+            if (m_messageToken) {
+                m_webView.WebMessageReceived(m_messageToken);
+                m_messageToken = {};
+            }
+            m_webView.Close();
+            m_webView = nullptr;
+        }
+        if (m_island) {
+            m_island.Content(nullptr);
+            if (auto closable = m_island.try_as<winrt::Windows::Foundation::IClosable>()) {
+                closable.Close();
+            }
+            m_island = nullptr;
+        }
+    } catch (...) {
+        // Teardown must not throw
+    }
 }
 
 void RCTWebView2ComponentView::UpdateProps(
