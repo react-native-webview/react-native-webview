@@ -5,7 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View, Keyboard, Button } from 'reac
 // in ReactNativeViewConfigRegistry before the Fabric renderer attempts to
 // mount any RCTWebView2 instance.
 // oxlint-disable-next-line import/no-unassigned-import
-import '../src/RCTWebView2NativeComponent';
+import '../src/RCTWebView2NativeComponent.windows';
 
 import Alerts from './examples/Alerts';
 import Messaging from './examples/Messaging';

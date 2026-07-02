@@ -3,41 +3,28 @@ import { windowsAppDriverCapabilities } from 'selenium-appium';
 const { platform } = require('./jest.setup.windows');
 
 switch (platform) {
-  case 'windows':
-    // For New Architecture (Win32/WinAppSDK cpp-app), use the executable path.
-    // For old architecture (UWP), use the App ID: 'WebViewWindows_3x6rhkkr9xcf6!App'
-    const isNewArch = process.env.RNW_NEW_ARCH === 'true';
-
-    if (isNewArch) {
-      // Win32 app - use executable path
-      const path = require('path');
-      const appPath =
-        process.env.WEBVIEW_APP_PATH ||
-        path.resolve(
-          __dirname,
-          '..',
-          'example',
-          'windows',
-          'x64',
-          'Debug',
-          'WebviewExample',
-          'WebviewExample.exe',
-        );
-      module.exports = {
-        capabilities: {
-          platformName: 'Windows',
-          'appium:app': appPath,
-          'appium:deviceName': 'WindowsPC',
-        },
-      };
-    } else {
-      // Legacy UWP app
-      const webViewWindowsAppId = 'WebViewWindows_3x6rhkkr9xcf6!App';
-      module.exports = {
-        capabilities: windowsAppDriverCapabilities(webViewWindowsAppId),
-      };
-    }
+  case 'windows': {
+    // The New Architecture (Win32/WinAppSDK) test app is launched by
+    // executable path; WinAppDriver accepts either an app ID or an exe path
+    // in the `app` capability.
+    const path = require('path');
+    const appPath =
+      process.env.WEBVIEW_APP_PATH ||
+      path.resolve(
+        __dirname,
+        '..',
+        'example',
+        'windows',
+        'x64',
+        'Release',
+        'WebviewExample',
+        'WebviewExample.exe',
+      );
+    module.exports = {
+      capabilities: windowsAppDriverCapabilities(appPath),
+    };
     break;
+  }
   default:
     throw 'Unknown platform: ' + platform;
 }

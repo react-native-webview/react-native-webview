@@ -48,7 +48,9 @@
     "prepare:types": "tsgo --noEmit false --emitDeclarationOnly --declaration --rootDir src --outDir lib",
     "prepare": "bun run --bun prepare:types && bun run --bun build",
     "test:windows": "bun run jest --setupFiles=./jest-setups/jest.setup.js",
-    "add:macos": "bun add --no-save --ignore-scripts react-native@0.81.6"
+    "add:macos": "bun add --no-save --ignore-scripts react-native@0.81.6 react-native-macos@0.81.8",
+    "add:visionos": "bun add --no-save --ignore-scripts @callstack/react-native-visionos@0.79.6",
+    "add:windows": "bun add --no-save --ignore-scripts react-native-windows@0.83.2 @react-native-windows/find-dotnet-tools@0.84.0"
   },
   "dependencies": {
     "escape-string-regexp": "^4.0.0",
@@ -58,8 +60,6 @@
     "@babel/cli": "^7.29.7",
     "@babel/core": "^7.29.7",
     "@babel/runtime": "^7.29.7",
-    "@callstack/react-native-visionos": "0.79.6",
-    "@react-native-windows/find-dotnet-tools": "0.84.0",
     "@react-native/babel-preset": "0.86.0",
     "@react-native/eslint-config": "0.86.0",
     "@react-native/jest-preset": "0.86.0",
@@ -83,9 +83,7 @@
     "oxlint-tsgolint": "0.15.0",
     "react": "19.2.7",
     "react-native": "0.86.0",
-    "react-native-macos": "0.81.8",
     "react-native-test-app": "5.4.1",
-    "react-native-windows": "0.83.2",
     "selenium-appium": "1.0.2",
     "selenium-webdriver": "4.0.0-alpha.7",
     "semantic-release": "25.0.3",

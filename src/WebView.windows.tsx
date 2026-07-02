@@ -13,8 +13,8 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { View, Image, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
-import RCTWebView2, { Commands, NativeProps } from './RCTWebView2NativeComponent';
-import { RNCWebViewModule } from './NativeWebviewModule';
+import RCTWebView2, { Commands, NativeProps } from './RCTWebView2NativeComponent.windows';
+import RNCWebViewModule from './NativeRNCWebViewModule';
 import {
   useWebViewLogic,
   defaultOriginWhitelist,
@@ -25,7 +25,7 @@ import {
 import styles from './WebView.styles';
 
 // Re-export types for external consumers
-export type { NativeProps as NativeWebViewWindows } from './RCTWebView2NativeComponent';
+export type { NativeProps as NativeWebViewWindows } from './RCTWebView2NativeComponent.windows';
 
 // Windows-specific WebViewProps that extends shared props
 import {
@@ -88,7 +88,7 @@ const WebViewComponent = forwardRef<unknown, WindowsWebViewProps>(
     const onShouldStartLoadWithRequestCallback = useCallback(
       (shouldStart: boolean, url: string, lockIdentifier?: number) => {
         if (lockIdentifier) {
-          RNCWebViewModule?.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
+          RNCWebViewModule.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
         } else if (shouldStart && webViewRef.current) {
           Commands.loadUrl(webViewRef.current, url);
         }
