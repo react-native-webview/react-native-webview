@@ -50,7 +50,7 @@
     "test:windows": "bun run jest --setupFiles=./jest-setups/jest.setup.js",
     "add:macos": "bun add --no-save --ignore-scripts react-native@0.81.6 react-native-macos@0.81.8",
     "add:visionos": "bun add --no-save --ignore-scripts @callstack/react-native-visionos@0.79.6",
-    "add:windows": "bun add --no-save --ignore-scripts react-native-windows@0.83.2 @react-native-windows/find-dotnet-tools@0.84.0"
+    "add:windows": "bun add -d --ignore-scripts react-native-windows@0.83.2 @react-native-windows/find-dotnet-tools@0.84.0"
   },
   "dependencies": {
     "escape-string-regexp": "^4.0.0",

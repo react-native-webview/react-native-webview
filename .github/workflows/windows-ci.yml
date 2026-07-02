@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      # Saved to the (ephemeral) CI workspace's package.json because the
+      # react-native CLI only discovers the windows platform from package.json
+      # dependencies; the checked-in package.json intentionally omits it.
       - name: Install Windows dependencies
         run: bun run add:windows
 
