@@ -33,6 +33,22 @@ async function waitForElement(name, timeoutMs = 10000) {
   throw new Error(`Element "${name}" not found within ${timeoutMs}ms`);
 }
 
+/**
+ * Helper: click an element by name, retrying on transient WinAppDriver
+ * failures (e.g. while a WebView is initializing).
+ */
+async function clickByNameWithRetry(name, attempts = 3) {
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      await By2.nativeName(name).click();
+      return;
+    } catch (e) {
+      if (i === attempts - 1) throw e;
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+  }
+}
+
 describe('WebView2 New Architecture Tests', () => {
   beforeAll(async () => {
     await driver.startWithCapabilities(setup.capabilities, WindowsApplicationDriverUrl);
@@ -63,8 +79,9 @@ describe('WebView2 New Architecture Tests', () => {
       // Wait for the in-app alert to render
       await new Promise((r) => setTimeout(r, 1000));
 
-      // The in-app alert renders an OK button
-      const okButton = By2.nativeXpath('//Button[@Name="OK"]');
+      // The in-app alert renders an OK button. Match by name: React Native
+      // buttons do not necessarily expose the UIA Button control type.
+      const okButton = By2.nativeName('OK');
       await okButton.click();
     });
   });
@@ -72,8 +89,7 @@ describe('WebView2 New Architecture Tests', () => {
   describe('Messaging Tab', () => {
     beforeAll(async () => {
       // Switch to Messaging tab
-      const messagingButton = By2.nativeName('Messaging');
-      await messagingButton.click();
+      await clickByNameWithRetry('Messaging');
       // Wait for WebView to initialize
       await new Promise((r) => setTimeout(r, 3000));
     });
@@ -104,8 +120,7 @@ describe('WebView2 New Architecture Tests', () => {
   describe('MultiMessaging Tab', () => {
     beforeAll(async () => {
       // Switch to MultiMessaging tab
-      const multiButton = By2.nativeName('MultiMessaging');
-      await multiButton.click();
+      await clickByNameWithRetry('MultiMessaging');
       await new Promise((r) => setTimeout(r, 3000));
     });
 
@@ -128,8 +143,7 @@ describe('WebView2 New Architecture Tests', () => {
   describe('OpenWindow Tab', () => {
     beforeAll(async () => {
       // Switch to OpenWindow tab
-      const openWindowButton = By2.nativeName('OpenWindow');
-      await openWindowButton.click();
+      await clickByNameWithRetry('OpenWindow');
       await new Promise((r) => setTimeout(r, 3000));
     });
 
@@ -144,8 +158,7 @@ describe('WebView2 New Architecture Tests', () => {
       const tabs = ['Alerts', 'Messaging', 'MultiMessaging', 'OpenWindow', 'Alerts'];
 
       for (const tabName of tabs) {
-        const tab = By2.nativeName(tabName);
-        await tab.click();
+        await clickByNameWithRetry(tabName);
         // Wait for WebView to initialize on each tab
         await new Promise((r) => setTimeout(r, 2000));
       }
@@ -158,8 +171,7 @@ describe('WebView2 New Architecture Tests', () => {
       const tabs = ['Messaging', 'Alerts', 'MultiMessaging', 'Messaging', 'OpenWindow', 'Alerts'];
 
       for (const tabName of tabs) {
-        const tab = By2.nativeName(tabName);
-        await tab.click();
+        await clickByNameWithRetry(tabName);
         // Short delay for rapid switching
         await new Promise((r) => setTimeout(r, 500));
       }

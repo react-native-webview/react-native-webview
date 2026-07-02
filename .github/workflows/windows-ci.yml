@@ -126,5 +126,17 @@ jobs:
       - name: Appium log
         if: failure()
         shell: powershell
-        run: if (Test-Path appium.log) { Get-Content appium.log -Tail 200 } else { Write-Host 'no appium.log' }
+        run: |
+          if (Test-Path appium.log) {
+            Write-Host '===== appium.log errors (with context) ====='
+            Select-String -Path appium.log -Pattern 'Original error|Internal Error|"status":13|ERR' -Context 3, 3 |
+              Select-Object -Last 40 |
+              ForEach-Object { $_.ToString() }
+          } else {
+            Write-Host 'no appium.log'
+          }
+          Write-Host '===== recent Application error events ====='
+          Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
+            Where-Object { $_.ProviderName -match 'Windows Error Reporting|Application Error' } |
+            ForEach-Object { Write-Host $_.Message; Write-Host '-----' }
     timeout-minutes: 60
