@@ -59,7 +59,7 @@ jobs:
             Where-Object { $_.Name -match '\.(msix|appx)$' -or $_.Name -eq 'AppxManifest.xml' } |
             ForEach-Object { Write-Host $_.FullName }
           Get-ChildItem -Path example\windows\ReactApp.Package -Recurse -Include *.msix, *.appx -ErrorAction SilentlyContinue |
-            Where-Object { $_.FullName -match 'Dependencies' } |
+            Where-Object { $_.FullName -match 'Dependencies\\x64' } |
             ForEach-Object {
               Write-Host "Installing dependency $($_.FullName)"
               Add-AppxPackage -Path $_.FullName -ErrorAction Continue
@@ -87,6 +87,38 @@ jobs:
       - name: Start React server
         shell: powershell
         run: Start-Process PowerShell -ArgumentList "bun run start"
+
+      # Launch the app ourselves and hand the tests its top-level window
+      # handle: WinAppDriver only waits a few seconds for a launched app's
+      # window, which the first cold start (WebView2 + Hermes init) can
+      # exceed. Also surfaces the crash event log if the app dies.
+      - name: Launch test app
+        shell: powershell
+        run: |
+          Start-Process "shell:AppsFolder\$env:WEBVIEW_APP_PATH"
+          $handle = 0
+          foreach ($i in 1..30) {
+            Start-Sleep -Seconds 2
+            $proc = Get-Process -Name ReactApp -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+            if ($proc) {
+              $handle = $proc.MainWindowHandle
+              Write-Host "ReactApp pid $($proc.Id) window title '$($proc.MainWindowTitle)' handle $handle"
+              break
+            }
+            if (-not (Get-Process -Name ReactApp -ErrorAction SilentlyContinue)) {
+              Write-Host "ReactApp process is not running (attempt $i)"
+            }
+          }
+          if ($handle -eq 0) {
+            Write-Host "No top-level window found; recent Application error events:"
+            Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
+              Where-Object { $_.ProviderName -match 'Windows Error Reporting|Application Error' } |
+              ForEach-Object { Write-Host $_.Message; Write-Host '-----' }
+            exit 1
+          }
+          $hex = '0x{0:X}' -f [int64]$handle
+          Write-Host "Top-level window handle: $hex"
+          "WEBVIEW_APP_HANDLE=$hex" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Run tests
         run: bun run test:windows
