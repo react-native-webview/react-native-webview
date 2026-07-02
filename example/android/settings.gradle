@@ -1,12 +1,21 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        mavenLocal()
+        mavenCentral()
         google()
     }
 }
 
 rootProject.name = "WebviewExample"
 
-apply(from: "../../node_modules/react-native-test-app/test-app.gradle")
+apply(from: {
+    def searchDir = rootDir.toPath()
+    do {
+        def p = searchDir.resolve("node_modules/react-native-test-app/test-app.gradle")
+        if (p.toFile().exists()) {
+            return p.toRealPath().toString()
+        }
+    } while (searchDir = searchDir.getParent())
+    throw new GradleException("Could not find `react-native-test-app`");
+}())
 applyTestAppSettings(settings)
