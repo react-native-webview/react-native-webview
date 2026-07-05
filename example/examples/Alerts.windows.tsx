@@ -1,5 +1,5 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Button, Text, View } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -21,43 +21,47 @@ const HTML = `
   </head>
   <body>
     <button onclick="showAlert()">Show alert</button>
-    <button onclick="showConfirm()">Show confirm</button>
-    <button onclick="showPrompt()">Show prompt</button>
-    <p id="demo"></p>    
+    <p id="demo"></p>
     <script>
       function showAlert() {
-        alert("Hello! I am an alert box!");
-        document.getElementById("demo").innerHTML = "Alert dismissed!";
+        window.ReactNativeWebView.postMessage('show-alert');
       }
-      function showConfirm() {
-        var response;
-        if (confirm("Press a button!")) {
-          response = "You pressed OK on confirm!";
-        } else {
-          response = "You pressed Cancel on confirm!";
-        }
-        document.getElementById("demo").innerHTML = response;
-      }
-      function showPrompt() {
-        var message;
-        const name = prompt("Please enter your name", "Name");
-        if (name !== null) {
-          message = "Hello " + name;
-        } else {
-          message = "You pressed Cancel on prompt!";
-        }
-        document.getElementById("demo").innerHTML = message;
-      }
+      window.addEventListener('message', function (event) {
+        document.getElementById('demo').innerHTML = event.data;
+      });
+      document.addEventListener('message', function (event) {
+        document.getElementById('demo').innerHTML = event.data;
+      });
     </script>
   </body>
 </html>
 `;
 
+// The alert is rendered in-app because the RNW alert module is not supported
+// in Win32/WinAppSDK composition apps, and a native modal would block the UI
+// thread and be invisible to UI automation.
 export default function Alerts() {
+  const webView = useRef<WebView | null>(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+
   return (
-    <View style={{ height: 120 }}>
+    <View style={{ height: 200 }}>
+      {alertVisible ? (
+        <View style={{ padding: 8, backgroundColor: '#eee' }}>
+          <Text>Hello! I am an alert box!</Text>
+          <Button
+            title="OK"
+            onPress={() => {
+              setAlertVisible(false);
+              webView.current?.postMessage('Alert dismissed!');
+            }}
+          />
+        </View>
+      ) : null}
       <WebView
+        ref={webView}
         source={{ html: HTML }}
+        onMessage={() => setAlertVisible(true)}
         automaticallyAdjustContentInsets={false}
         useWebView2
       />
