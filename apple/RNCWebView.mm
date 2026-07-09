@@ -481,6 +481,20 @@ static inline std::string nullSafeStringWithLength(id value) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
         }
     }
+
+    if (oldViewProps.geolocationPermissionGrantType != newViewProps.geolocationPermissionGrantType) {
+        if (newViewProps.geolocationPermissionGrantType == RNCWebViewGeolocationPermissionGrantType::Prompt) {
+            [_view setGeolocationPermissionGrantType:RNCWebViewPermissionGrantType_Prompt];
+        } else if (newViewProps.geolocationPermissionGrantType == RNCWebViewGeolocationPermissionGrantType::Grant) {
+            [_view setGeolocationPermissionGrantType:RNCWebViewPermissionGrantType_Grant];
+        } else if (newViewProps.geolocationPermissionGrantType == RNCWebViewGeolocationPermissionGrantType::Deny) {
+            [_view setGeolocationPermissionGrantType:RNCWebViewPermissionGrantType_Deny];
+        } else if (newViewProps.geolocationPermissionGrantType == RNCWebViewGeolocationPermissionGrantType::GrantIfSameHostElsePrompt) {
+            [_view setGeolocationPermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt];
+        } else if (newViewProps.geolocationPermissionGrantType == RNCWebViewGeolocationPermissionGrantType::GrantIfSameHostElseDeny) {
+            [_view setGeolocationPermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
+        }
+    }
 #endif
     if (oldViewProps.indicatorStyle != newViewProps.indicatorStyle) {
         if (newViewProps.indicatorStyle == RNCWebViewIndicatorStyle::Black) {

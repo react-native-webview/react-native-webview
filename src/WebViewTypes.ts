@@ -322,6 +322,13 @@ export declare type MediaCapturePermissionGrantType =
   | 'grant'
   | 'prompt';
 
+export declare type GeolocationPermissionGrantType =
+  | 'grantIfSameHostElsePrompt'
+  | 'grantIfSameHostElseDeny'
+  | 'deny'
+  | 'grant'
+  | 'prompt';
+
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -729,6 +736,15 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * Available on iOS 15 and later.
    */
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
+
+  /**
+   * This property specifies how to handle geolocation permission requests.
+   * Without a decision handler, WKWebView leaves `navigator.geolocation`
+   * calls unresolved forever instead of erroring, which can hang pages that
+   * await a location before continuing. Defaults to `prompt`, which lets
+   * WebKit show its native permission alert. Available on iOS 15 and later.
+   */
+  geolocationPermissionGrantType?: GeolocationPermissionGrantType;
 
   /**
    * A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support.

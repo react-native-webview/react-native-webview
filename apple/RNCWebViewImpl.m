@@ -197,6 +197,7 @@ RCTAutoInsetsProtocol>
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
+    _geolocationPermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000 /* iOS 15 */
     if (@available(iOS 16.0, *)) {
@@ -1318,6 +1319,29 @@ RCTAutoInsetsProtocol>
   } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Deny) {
     decisionHandler(WKPermissionDecisionDeny);
   } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Grant) {
+    decisionHandler(WKPermissionDecisionGrant);
+  } else {
+    decisionHandler(WKPermissionDecisionPrompt);
+  }
+}
+
+/**
+ * Geolocation permissions (prevent hanging forever when unimplemented)
+ */
+- (void)                       webView:(WKWebView *)webView
+  requestGeolocationPermissionForOrigin:(WKSecurityOrigin *)origin
+                        initiatedByFrame:(WKFrameInfo *)frame
+                         decisionHandler:(void (^)(WKPermissionDecision decision))decisionHandler {
+  if (_geolocationPermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt || _geolocationPermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny) {
+    if ([origin.host isEqualToString:webView.URL.host]) {
+      decisionHandler(WKPermissionDecisionGrant);
+    } else {
+      WKPermissionDecision decision = _geolocationPermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt ? WKPermissionDecisionPrompt : WKPermissionDecisionDeny;
+      decisionHandler(decision);
+    }
+  } else if (_geolocationPermissionGrantType == RNCWebViewPermissionGrantType_Deny) {
+    decisionHandler(WKPermissionDecisionDeny);
+  } else if (_geolocationPermissionGrantType == RNCWebViewPermissionGrantType_Grant) {
     decisionHandler(WKPermissionDecisionGrant);
   } else {
     decisionHandler(WKPermissionDecisionPrompt);

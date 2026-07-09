@@ -134,6 +134,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
 @property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
+@property (nonatomic, assign) RNCWebViewPermissionGrantType geolocationPermissionGrantType;
 #endif
 
 #if !TARGET_OS_OSX
