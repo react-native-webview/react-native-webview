@@ -6,13 +6,22 @@
  */
 
 #import "RNCWebViewImpl.h"
+#if __has_include(<React/RCTConvert.h>)
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#else
+#import <React_Core/RCTConvert.h>
+#import <React_Core/RCTAutoInsetsProtocol.h>
+#endif
 #import "RNCWKProcessPoolManager.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
+#if __has_include(<React/RCTUIKit.h>)
 #import <React/RCTUIKit.h>
+#else
+#import <React_Core/RCTUIKit.h>
+#endif
 #endif // !TARGET_OS_OSX
 
 #import "objc/runtime.h"
