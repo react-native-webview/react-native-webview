@@ -208,6 +208,10 @@ export interface NativeProps extends ViewProps {
     'prompt' | 'grant' | 'deny' | 'grantIfSameHostElsePrompt' | 'grantIfSameHostElseDeny',
     'prompt'
   >;
+  deviceOrientationAndMotionGrantType?: WithDefault<
+    'prompt' | 'grant' | 'deny' | 'grantIfSameHostElsePrompt' | 'grantIfSameHostElseDeny',
+    'prompt'
+  >;
   pagingEnabled?: boolean;
   pullToRefreshEnabled?: boolean;
   refreshControlLightMode?: boolean;

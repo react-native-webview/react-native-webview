@@ -430,6 +430,9 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper>
     public void setMediaCapturePermissionGrantType(RNCWebViewWrapper view, @Nullable String value) {}
 
     @Override
+    public void setDeviceOrientationAndMotionGrantType(RNCWebViewWrapper view, @Nullable String value) {}
+
+    @Override
     public void setFraudulentWebsiteWarningEnabled(RNCWebViewWrapper view, boolean value) {}
     /* !iOS PROPS - no implemented here */
 

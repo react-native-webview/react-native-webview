@@ -102,6 +102,7 @@ RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
 RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, RNCWebViewPermissionGrantType)
+RCT_EXPORT_VIEW_PROPERTY(deviceOrientationAndMotionGrantType, RNCWebViewPermissionGrantType)
 #endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
