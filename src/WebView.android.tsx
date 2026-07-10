@@ -25,6 +25,7 @@ import {
 import {
   AndroidWebViewProps,
   WebViewSourceUri,
+  type IOSWebViewProps,
   type WebViewMessageEvent,
   type ShouldStartLoadRequestEvent,
 } from './WebViewTypes';
@@ -99,6 +100,9 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
     },
     ref,
   ) => {
+    // Strip the iOS-only prop before Android Fabric's generated delegate casts it to a double.
+    const { decelerationRate: _decelerationRate, ...androidProps } =
+      otherProps as typeof otherProps & Pick<IOSWebViewProps, 'decelerationRate'>;
     const messagingModuleName = useRef<string>(`WebViewMessageHandler${(uniqueRef += 1)}`).current;
     const webViewRef = useRef<React.ComponentRef<HostComponent<NativeProps>> | null>(null);
 
@@ -257,10 +261,10 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
     const webView = (
       <NativeWebView
         key="webViewKey"
-        {...otherProps}
+        {...androidProps}
         messagingEnabled={typeof onMessageProp === 'function'}
         messagingModuleName={messagingModuleName}
-        hasOnScroll={!!otherProps.onScroll}
+        hasOnScroll={!!androidProps.onScroll}
         onLoadingError={onLoadingError}
         onLoadingSubResourceError={onLoadingSubResourceError}
         onLoadingFinish={onLoadingFinish}
