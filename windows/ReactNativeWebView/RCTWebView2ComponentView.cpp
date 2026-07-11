@@ -319,9 +319,19 @@ bool RCTWebView2ComponentView::Is17763OrHigher() {
     return hasUniversalAPIContract_v7.value();
 }
 
+std::string RCTWebView2ComponentView::CurrentTitle() const noexcept {
+    try {
+        if (m_webView && m_webView.CoreWebView2()) {
+            return winrt::to_string(m_webView.CoreWebView2().DocumentTitle());
+        }
+    } catch (...) {
+    }
+    return {};
+}
+
 void RCTWebView2ComponentView::OnNavigationStarting(
     winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationStartingEventArgs const& /*args*/) {
-    
+
     try {
         if (auto eventEmitter = EventEmitter()) {
             RNCWebViewCodegen::RCTWebView2EventEmitter::OnLoadingStart event;
@@ -329,6 +339,7 @@ void RCTWebView2ComponentView::OnNavigationStarting(
                 event.url = winrt::to_string(m_webView.Source().AbsoluteCanonicalUri());
             }
             event.loading = true;
+            event.title = CurrentTitle();
             event.canGoBack = m_webView ? m_webView.CanGoBack() : false;
             event.canGoForward = m_webView ? m_webView.CanGoForward() : false;
             event.navigationType = "other";
@@ -359,8 +370,43 @@ void RCTWebView2ComponentView::OnNavigationStarting(
 }
 
 void RCTWebView2ComponentView::OnNavigationCompleted(
-    winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationCompletedEventArgs const& /*args*/) {
-    
+    winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationCompletedEventArgs const& args) {
+
+    // args.IsSuccess() / args.WebErrorStatus() were previously never
+    // consulted, so DNS failures, TLS errors, and offline states all
+    // reported onLoadingFinish -- indistinguishable from a real successful
+    // load from JS's point of view.
+    bool success = true;
+    int32_t webErrorStatus = 0;
+    try {
+        success = args.IsSuccess();
+        webErrorStatus = static_cast<int32_t>(args.WebErrorStatus());
+    } catch (...) {
+        // Can't read the args; fall back to the previous "assume success"
+        // behavior rather than misreport a failure.
+    }
+
+    if (!success) {
+        try {
+            if (auto eventEmitter = EventEmitter()) {
+                RNCWebViewCodegen::RCTWebView2EventEmitter::OnLoadingError event;
+                if (m_webView && m_webView.Source()) {
+                    event.url = winrt::to_string(m_webView.Source().AbsoluteCanonicalUri());
+                }
+                event.loading = false;
+                event.title = CurrentTitle();
+                event.canGoBack = m_webView ? m_webView.CanGoBack() : false;
+                event.canGoForward = m_webView ? m_webView.CanGoForward() : false;
+                event.code = webErrorStatus;
+                event.description = "WebView2 navigation failed (CoreWebView2WebErrorStatus)";
+                eventEmitter->onLoadingError(event);
+            }
+        } catch (...) {
+            // Event dispatch failure is non-fatal
+        }
+        return; // don't run the message-bridge injection below on a failed load
+    }
+
     try {
         if (auto eventEmitter = EventEmitter()) {
             RNCWebViewCodegen::RCTWebView2EventEmitter::OnLoadingFinish event;
@@ -368,6 +414,7 @@ void RCTWebView2ComponentView::OnNavigationCompleted(
                 event.url = winrt::to_string(m_webView.Source().AbsoluteCanonicalUri());
             }
             event.loading = false;
+            event.title = CurrentTitle();
             event.canGoBack = m_webView ? m_webView.CanGoBack() : false;
             event.canGoForward = m_webView ? m_webView.CanGoForward() : false;
             event.navigationType = "other";
@@ -444,6 +491,7 @@ void RCTWebView2ComponentView::OnCoreWebView2SourceChanged(
             event.url = winrt::to_string(m_webView.Source().AbsoluteCanonicalUri());
         }
         event.loading = false;
+        event.title = CurrentTitle();
         event.canGoBack = m_webView ? m_webView.CanGoBack() : false;
         event.canGoForward = m_webView ? m_webView.CanGoForward() : false;
         event.navigationType = "other";
