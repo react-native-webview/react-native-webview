@@ -103,7 +103,7 @@
     },
     "ios": {
       "componentProvider": {
-        "RNCWebView": "RNCWebView"
+        "RNCWebViewIOS": "RNCWebView"
       },
       "modulesProvider": {
         "RNCWebViewModule": "RNCWebViewModule"
