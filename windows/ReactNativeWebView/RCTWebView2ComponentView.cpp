@@ -11,6 +11,7 @@
 #include <winrt/Windows.System.h>
 #include <winrt/Windows.Data.Json.h>
 #include <winrt/Windows.Web.Http.h>
+#include <winrt/Windows.Storage.h>
 #include <winrt/Windows.Storage.Streams.h>
 #include <winrt/Windows.Security.Cryptography.h>
 #include <limits>
@@ -19,6 +20,24 @@
 #include <thread>
 
 namespace winrt::ReactNativeWebView::implementation {
+
+namespace {
+// A packaged app's install directory (Program Files\WindowsApps\...) is
+// read-only, so WebView2's default "<exe-name>.WebView2" user-data folder
+// -- created next to the executable -- fails there. Use the app's writable
+// LocalFolder when packaged, or %TEMP% for unpackaged / loose dev builds
+// (ApplicationData requires package identity and throws without it).
+winrt::hstring DefaultUserDataFolder() noexcept {
+    try {
+        auto folder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+        return folder.Path() + L"\\ReactNativeWebView2";
+    } catch (...) {
+    }
+    wchar_t temp[MAX_PATH]{};
+    const DWORD n = ::GetTempPathW(MAX_PATH, temp);
+    return (n ? winrt::hstring{temp, n} : winrt::hstring{L".\\"}) + L"ReactNativeWebView2";
+}
+} // namespace
 
 void RegisterRCTWebView2ComponentView(
     winrt::Microsoft::ReactNative::IReactPackageBuilder const &packageBuilder) noexcept {
@@ -112,9 +131,61 @@ void RCTWebView2ComponentView::InitializeContentIsland(
             }
         });
 
-    // Explicitly trigger CoreWebView2 initialization.
-    // In XamlIsland hosting, the WebView2 won't auto-initialize its browser process.
-    m_webView.EnsureCoreWebView2Async();
+    // Explicitly trigger CoreWebView2 initialization. In XamlIsland hosting,
+    // the WebView2 won't auto-initialize its browser process on its own; see
+    // InitializeCoreWebView2Async for why we pass an explicit environment
+    // instead of calling the parameterless EnsureCoreWebView2Async().
+    InitializeCoreWebView2Async();
+}
+
+winrt::fire_and_forget RCTWebView2ComponentView::InitializeCoreWebView2Async() {
+    auto strongThis = get_strong();
+    try {
+        // Explicit environment with a writable, packaged-safe user-data
+        // folder. The parameterless EnsureCoreWebView2Async() lazily
+        // creates a default environment next to the executable; on a
+        // packaged app that folder is read-only, and on a machine without
+        // the WebView2 Evergreen Runtime installed (stripped/managed
+        // images, some Server SKUs) creation fails with nothing surfaced to
+        // JS -- the view just stays blank. Creating the environment
+        // ourselves lets us catch that failure directly, and gives us a
+        // folder that won't hit ERROR_ACCESS_DENIED.
+        auto environment = co_await winrt::Microsoft::Web::WebView2::Core::CoreWebView2Environment::CreateWithOptionsAsync(
+            L"" /* browserExecutableFolder: use the installed Evergreen Runtime */,
+            DefaultUserDataFolder(),
+            nullptr /* options */);
+
+        if (!strongThis->m_webView) {
+            co_return; // torn down while we were awaiting environment creation
+        }
+        co_await strongThis->m_webView.EnsureCoreWebView2Async(environment);
+        // Success or failure of EnsureCoreWebView2Async is reported via the
+        // CoreWebView2Initialized event -- see OnCoreWebView2Initialized.
+    } catch (winrt::hresult_error const& e) {
+        // CoreWebView2Environment::CreateWithOptionsAsync throws directly
+        // when the WebView2 Runtime isn't present at all. That failure
+        // never reaches CoreWebView2Initialized, because we never got far
+        // enough to call EnsureCoreWebView2Async.
+        strongThis->EmitCoreWebView2InitError(
+            static_cast<int32_t>(e.code().value),
+            "CoreWebView2 environment creation failed (WebView2 Runtime missing?)");
+    }
+}
+
+void RCTWebView2ComponentView::EmitCoreWebView2InitError(int32_t hresult, std::string const& description) noexcept {
+    try {
+        if (auto eventEmitter = EventEmitter()) {
+            RNCWebViewCodegen::RCTWebView2EventEmitter::OnLoadingError event;
+            event.loading = false;
+            event.canGoBack = false;
+            event.canGoForward = false;
+            event.code = hresult;
+            event.description = description;
+            eventEmitter->onLoadingError(event);
+        }
+    } catch (...) {
+        // Event dispatch failure is non-fatal
+    }
 }
 
 void RCTWebView2ComponentView::Cleanup() noexcept {
@@ -397,10 +468,20 @@ void RCTWebView2ComponentView::OnNavigationCompleted(
 }
 
 void RCTWebView2ComponentView::OnCoreWebView2Initialized(
-    winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& /*args*/) {
-    
+    winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& args) {
+
+    if (args.Exception()) {
+        // EnsureCoreWebView2Async failed even with an explicit environment
+        // -- e.g. the WebView2 Runtime was removed between environment
+        // creation and controller creation, or the user-data folder became
+        // unwritable. Without this, the view just stays blank and JS never
+        // learns why.
+        EmitCoreWebView2InitError(args.Exception().value, "CoreWebView2 initialization failed");
+        return;
+    }
+
     if (!m_webView || !m_webView.CoreWebView2()) return;
-    
+
     RegisterCoreWebView2Events();
     
     // Apply user agent if set
