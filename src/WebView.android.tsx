@@ -258,6 +258,10 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
       <NativeWebView
         key="webViewKey"
         {...otherProps}
+        // decelerationRate is iOS-only but may arrive through untyped props;
+        // the codegen spec types it as a Double, so forwarding the "normal" /
+        // "fast" string shortcuts would throw during Fabric prop conversion.
+        decelerationRate={undefined}
         messagingEnabled={typeof onMessageProp === 'function'}
         messagingModuleName={messagingModuleName}
         hasOnScroll={!!otherProps.onScroll}

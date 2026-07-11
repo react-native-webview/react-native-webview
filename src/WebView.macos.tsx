@@ -167,6 +167,10 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
       <NativeWebView
         key="webViewKey"
         {...otherProps}
+        // decelerationRate is iOS-only but may arrive through untyped props;
+        // the codegen spec types it as a Double, so forwarding the "normal" /
+        // "fast" string shortcuts would throw during Fabric prop conversion.
+        decelerationRate={undefined}
         javaScriptEnabled={javaScriptEnabled}
         cacheEnabled={cacheEnabled}
         useSharedProcessPool={useSharedProcessPool}
