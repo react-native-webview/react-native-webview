@@ -2,4 +2,6 @@ require_relative '../../node_modules/react-native-test-app/visionos/test_app'
 
 workspace 'WebviewExample.xcworkspace'
 
-use_test_app!
+# :new_arch_enabled is required until react-native-visionos reaches 0.82+,
+# where the new architecture becomes the only option.
+use_test_app! :new_arch_enabled => true

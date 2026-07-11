@@ -258,6 +258,10 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
       <NativeWebView
         key="webViewKey"
         {...otherProps}
+        // decelerationRate is iOS-only but may arrive through untyped props;
+        // the codegen spec types it as a Double, so forwarding the "normal" /
+        // "fast" string shortcuts would throw during Fabric prop conversion.
+        decelerationRate={undefined}
         messagingEnabled={typeof onMessageProp === 'function'}
         messagingModuleName={messagingModuleName}
         hasOnScroll={!!otherProps.onScroll}
@@ -273,9 +277,6 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
         hasOnOpenWindowEvent={onOpenWindowProp !== undefined}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         ref={webViewRef}
-        // TODO: find a better way to type this.
-        // @ts-expect-error source is old arch
-        source={sourceResolved}
         newSource={newSource}
         style={webViewStyles}
         overScrollMode={overScrollMode}

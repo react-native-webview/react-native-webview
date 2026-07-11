@@ -24,7 +24,7 @@ Shout-out to [Jamon Holmgren](https://github.com/jamonholmgren) from [Infinite R
 
 ### Disclaimer
 
-Maintaining WebView is very complex because it is often used for many different use cases (rendering SVGs, PDFs, login flows, and much more). We also support many platforms and both architectures of react-native.
+Maintaining WebView is very complex because it is often used for many different use cases (rendering SVGs, PDFs, login flows, and much more). We also support many platforms.
 
 Since WebView was extracted from the React Native core, nearly 500 pull requests have been merged.  
 Considering that we have limited time, issues will mostly serve as a discussion place for the community, while **we will prioritize reviewing and merging pull requests.**
@@ -32,7 +32,7 @@ Considering that we have limited time, issues will mostly serve as a discussion 
 ### Platform compatibility
 
 This project is compatible with **iOS**, **Android**, **Windows** and **macOS**.  
-This project supports both **the old** (paper) **and the new architecture** (fabric).  
+This project only supports **the new architecture** (fabric); the legacy architecture (paper) is no longer supported. This requires **React Native 0.76 or newer** (with the new architecture enabled) and **iOS 15.1 or newer**; on macOS, react-native-macos 0.76 or newer.  
 This project is compatible with [expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
 ### Getting Started

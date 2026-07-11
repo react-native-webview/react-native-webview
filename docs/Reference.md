@@ -310,6 +310,8 @@ NOTE: the default `true` value might cause some videos to hang loading on iOS. S
 
 Override the native component used to render the WebView. Enables a custom native WebView which uses the same JavaScript as the original WebView.
 
+> **Note:** since the removal of legacy-architecture support, the custom component receives the codegen (Fabric) props. In particular the source is delivered through the processed `newSource` prop — an object whose `headers` are an array of `{ name, value }` entries — and the legacy `source` prop is no longer passed.
+
 The `nativeConfig` prop expects an object with the following keys:
 
 - `component` (any)

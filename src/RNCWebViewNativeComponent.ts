@@ -145,7 +145,7 @@ export interface NativeProps extends ViewProps {
   forceDarkOn?: boolean;
   geolocationEnabled?: boolean;
   lackPermissionToDownloadMessage?: string;
-  messagingModuleName: string;
+  messagingModuleName?: string;
   minimumFontSize?: Int32;
   mixedContentMode?: WithDefault<'never' | 'always' | 'compatibility', 'never'>;
   nestedScrollEnabled?: boolean;
@@ -171,6 +171,7 @@ export interface NativeProps extends ViewProps {
   allowsAirPlayForMediaPlayback?: boolean;
   allowsLinkPreview?: WithDefault<boolean, true>;
   automaticallyAdjustContentInsets?: WithDefault<boolean, true>;
+  automaticallyAdjustsScrollIndicatorInsets?: WithDefault<boolean, false>;
   autoManageStatusBarEnabled?: WithDefault<boolean, true>;
   bounces?: WithDefault<boolean, true>;
   contentInset?: Readonly<{
@@ -246,7 +247,7 @@ export interface NativeProps extends ViewProps {
   mediaPlaybackRequiresUserAction?: WithDefault<boolean, true>;
   messagingEnabled: boolean;
   onLoadingError: DirectEventHandler<WebViewErrorEvent>;
-  onLoadingSubResourceError: DirectEventHandler<WebViewErrorEvent>;
+  onLoadingSubResourceError?: DirectEventHandler<WebViewErrorEvent>;
   onLoadingFinish: DirectEventHandler<WebViewNavigationEvent>;
   onLoadingProgress: DirectEventHandler<WebViewNativeProgressEvent>;
   onLoadingStart: DirectEventHandler<WebViewNavigationEvent>;

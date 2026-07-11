@@ -32,7 +32,7 @@ En considérant que nous possédons un temps limité, les issues github serviron
 ### Platform compatibles
 
 Ce projet est compatible avec **iOS**, **Android**, **Windows** et **macOS**.  
-Ce projet supporte à la fois **l'ancienne** (paper) **et la nouvelle architecture** (fabric).  
+Ce projet supporte uniquement **la nouvelle architecture** (fabric) ; l'ancienne architecture (paper) n'est plus supportée.  
 Ce projet est compatible avec [expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
 ## Débuter
