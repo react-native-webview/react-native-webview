@@ -634,6 +634,11 @@ RCTAutoInsetsProtocol>
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
     [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+    if (@available(iOS 11.0, *)) {
+      // WKHTTPCookieStore does not retain its observers; deregister before
+      // dropping the reference (dealloc can no longer do it once _webView is nil).
+      [_webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
+    }
     [_webView removeFromSuperview];
     if (@available(iOS 15.0, macOS 12.0, *)) {
         [_webView pauseAllMediaPlaybackWithCompletionHandler:nil];

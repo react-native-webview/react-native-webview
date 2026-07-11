@@ -571,7 +571,7 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
 }
 
 - (void)clearCache:(BOOL)includeDiskFiles {
-    // android only
+    [_view clearCache:includeDiskFiles];
 }
 
 - (void)clearHistory {
