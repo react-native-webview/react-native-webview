@@ -96,7 +96,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
                 ((RNCWebView) view).dispatchEvent(
                     view,
-                    new TopOpenWindowEvent(RNCWebViewWrapper.getReactTagFromWebView(view), event)
+                    new TopOpenWindowEvent(UIManagerHelper.getSurfaceId(view), RNCWebViewWrapper.getReactTagFromWebView(view), event)
                 );
 
                 return true;
@@ -136,7 +136,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         event.putBoolean("canGoForward", webView.canGoForward());
         event.putDouble("progress", (float) newProgress / 100);
 
-        UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(reactTag, event));
+        UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(UIManagerHelper.getSurfaceId(webView), reactTag, event));
     }
 
     @Override
