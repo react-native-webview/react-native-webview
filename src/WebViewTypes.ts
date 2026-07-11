@@ -9,7 +9,12 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 
-import type NativeWebViewComponent from './RNCWebViewNativeComponent';
+import type NativeWebViewAndroidComponent from './specs/RNCWebViewAndroidNativeComponent';
+import type NativeWebViewAppleComponent from './specs/RNCWebViewAppleNativeComponent';
+
+type NativeWebViewComponent =
+  | typeof NativeWebViewAndroidComponent
+  | typeof NativeWebViewAppleComponent;
 
 type WebViewCommands =
   | 'goForward'
@@ -251,7 +256,7 @@ export interface WebViewNativeConfig {
   /**
    * The native component used to render the WebView.
    */
-  component?: typeof NativeWebViewMacOS | typeof NativeWebViewComponent;
+  component?: typeof NativeWebViewMacOS | NativeWebViewComponent;
   /**
    * Set props directly on the native component WebView. Enables custom props which the
    * original WebView doesn't pass through.
@@ -1213,7 +1218,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Function that is invoked when the `WebView` scrolls.
    */
-  onScroll?: ComponentProps<typeof NativeWebViewComponent>['onScroll'];
+  onScroll?: ComponentProps<NativeWebViewComponent>['onScroll'];
 
   /**
    * Function that is invoked when the `WebView` has finished loading.

@@ -1,8 +1,8 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
-import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
-import RNCWebViewModule from './NativeRNCWebViewModule';
+import RNCWebView, { Commands, NativeProps } from './specs/RNCWebViewAppleNativeComponent';
+import RNCWebViewModule from './specs/NativeRNCWebViewModule';
 import {
   defaultOriginWhitelist,
   defaultRenderError,

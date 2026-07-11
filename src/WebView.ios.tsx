@@ -2,8 +2,8 @@ import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'rea
 import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
 
-import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
-import RNCWebViewModule from './NativeRNCWebViewModule';
+import RNCWebView, { Commands, NativeProps } from './specs/RNCWebViewAppleNativeComponent';
+import RNCWebViewModule from './specs/NativeRNCWebViewModule';
 
 import {
   defaultOriginWhitelist,
@@ -206,7 +206,6 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
         textInteractionEnabled={textInteractionEnabled}
         decelerationRate={decelerationRate}
         messagingEnabled={typeof onMessageProp === 'function'}
-        messagingModuleName="" // android ONLY
         onLoadingError={onLoadingError}
         onLoadingFinish={onLoadingFinish}
         onLoadingProgress={onLoadingProgress}
