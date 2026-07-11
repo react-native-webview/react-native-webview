@@ -334,6 +334,7 @@ static inline std::string nullSafeStringWithLength(id value) {
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
     REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
+    REMAP_WEBVIEW_PROP(automaticallyAdjustsScrollIndicatorInsets)
 #endif
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
     REMAP_WEBVIEW_PROP(limitsNavigationsToAppBoundDomains)

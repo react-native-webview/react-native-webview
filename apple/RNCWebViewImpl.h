@@ -87,6 +87,9 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL mediaPlaybackRequiresUserAction;
 @property (nonatomic, assign) UIEdgeInsets contentInset;
 @property (nonatomic, assign) BOOL automaticallyAdjustContentInsets;
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
+- (void)setAutomaticallyAdjustsScrollIndicatorInsets:(BOOL)automaticallyAdjustsScrollIndicatorInsets;
+#endif
 @property (nonatomic, assign) BOOL keyboardDisplayRequiresUserAction;
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 @property (nonatomic, assign) BOOL removeIosKeyboardObserver;

@@ -181,6 +181,13 @@ RCTAutoInsetsProtocol>
     _injectedJavaScriptBeforeContentLoaded = nil;
     _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
     _enableApplePay = NO;
+#if !TARGET_OS_OSX
+    // Match the codegen prop defaults: with Fabric, updateProps only runs a
+    // conversion when the incoming prop differs from the default, so the
+    // implementation must start from the same values.
+    _decelerationRate = UIScrollViewDecelerationRateNormal;
+    _dataDetectorTypes = WKDataDetectorTypePhoneNumber;
+#endif // !TARGET_OS_OSX
 #if TARGET_OS_IOS
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;

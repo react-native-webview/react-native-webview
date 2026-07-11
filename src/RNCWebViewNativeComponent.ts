@@ -171,6 +171,7 @@ export interface NativeProps extends ViewProps {
   allowsAirPlayForMediaPlayback?: boolean;
   allowsLinkPreview?: WithDefault<boolean, true>;
   automaticallyAdjustContentInsets?: WithDefault<boolean, true>;
+  automaticallyAdjustsScrollIndicatorInsets?: WithDefault<boolean, false>;
   autoManageStatusBarEnabled?: WithDefault<boolean, true>;
   bounces?: WithDefault<boolean, true>;
   contentInset?: Readonly<{
