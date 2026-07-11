@@ -102,6 +102,10 @@ private:
     bool m_linkHandlingEnabled{true};
     winrt::hstring m_injectedJavascript{L""};
     winrt::hstring m_userAgent{L""};
+    // Mirrors RCTWebView2Props::javaScriptEnabled (default true). Stored so
+    // OnCoreWebView2Initialized can (re)apply it once CoreWebView2 exists,
+    // even if UpdateProps ran first.
+    bool m_javaScriptEnabled{true};
     bool m_updating{false};
     std::string m_pendingHtml{};
 };
