@@ -81,6 +81,13 @@ private:
     bool Is17763OrHigher();
     void WriteCookiesToWebView2(std::string const& cookies);
 
+    // Registers the window.ReactNativeWebView message bridge and (if set)
+    // injectedJavaScriptBeforeContentLoaded via
+    // AddScriptToExecuteOnDocumentCreatedAsync, once, when CoreWebView2
+    // becomes available. See OnCoreWebView2Initialized / the .cpp for why
+    // this replaced injecting the bridge in NavigationCompleted.
+    winrt::fire_and_forget RegisterDocumentStartScripts();
+
     winrt::weak_ref<winrt::Microsoft::ReactNative::Composition::ContentIslandComponentView> m_islandView;
     winrt::Microsoft::UI::Xaml::XamlIsland m_island{nullptr};
     winrt::Microsoft::UI::Xaml::Controls::WebView2 m_webView{nullptr};
@@ -101,6 +108,7 @@ private:
     bool m_messagingEnabled{true};
     bool m_linkHandlingEnabled{true};
     winrt::hstring m_injectedJavascript{L""};
+    winrt::hstring m_injectedJavaScriptBeforeContentLoaded{L""};
     winrt::hstring m_userAgent{L""};
     bool m_updating{false};
     std::string m_pendingHtml{};

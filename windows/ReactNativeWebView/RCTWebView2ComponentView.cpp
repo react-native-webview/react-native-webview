@@ -20,6 +20,27 @@
 
 namespace winrt::ReactNativeWebView::implementation {
 
+namespace {
+// Registered once via AddScriptToExecuteOnDocumentCreatedAsync (see
+// RegisterDocumentStartScripts) so window.ReactNativeWebView exists before
+// ANY page script runs -- including a synchronous inline <script> in
+// <head>. Previously this same script was run via ExecuteScriptAsync from
+// NavigationCompleted, i.e. after the page had already finished loading;
+// page scripts that read window.ReactNativeWebView during load never saw
+// it. Contents unchanged from the original NavigationCompleted injection.
+constexpr wchar_t kMessageBridgeScript[] =
+    LR"(
+        window.alert = function (msg) {window.chrome.webview.postMessage(`{"type":"__alert","message":"${msg}"}`)};
+        window.ReactNativeWebView = {postMessage: function (data) {window.chrome.webview.postMessage(String(data))}};
+        const originalPostMessage = globalThis.postMessage;
+        globalThis.postMessage = function (data) { originalPostMessage(data); globalThis.ReactNativeWebView.postMessage(typeof data == 'string' ? data : JSON.stringify(data));};
+        window.chrome.webview.addEventListener('message', function(e) {
+            window.dispatchEvent(new MessageEvent('message', {data: e.data}));
+            document.dispatchEvent(new MessageEvent('message', {data: e.data}));
+        });
+    )";
+} // namespace
+
 void RegisterRCTWebView2ComponentView(
     winrt::Microsoft::ReactNative::IReactPackageBuilder const &packageBuilder) noexcept {
     
@@ -176,7 +197,19 @@ void RCTWebView2ComponentView::UpdateProps(
     if (newProps->injectedJavaScript.has_value()) {
         m_injectedJavascript = winrt::to_hstring(newProps->injectedJavaScript.value());
     }
-    
+
+    // Apply pre-content-load injected JavaScript. This prop already existed
+    // in the codegen'd spec (RCTWebView2Props::injectedJavaScriptBeforeContentLoaded)
+    // but was never read on Windows. Applied once, at CoreWebView2 init (see
+    // RegisterDocumentStartScripts) -- same limitation as the message
+    // bridge script below: WebView2 has no API to swap a document-created
+    // script after the fact, so changing this prop after first mount takes
+    // effect on remount, not immediately.
+    if (newProps->injectedJavaScriptBeforeContentLoaded.has_value()) {
+        m_injectedJavaScriptBeforeContentLoaded =
+            winrt::to_hstring(newProps->injectedJavaScriptBeforeContentLoaded.value());
+    }
+
     // Apply user agent
     if (newProps->userAgent.has_value()) {
         m_userAgent = winrt::to_hstring(newProps->userAgent.value());
@@ -338,24 +371,9 @@ void RCTWebView2ComponentView::OnNavigationStarting(
         // Event dispatch failure is non-fatal
     }
 
-    if (m_messagingEnabled && m_webView) {
-        try {
-            if (m_messageToken) {
-                m_webView.WebMessageReceived(m_messageToken);
-            }
-            m_messageToken = m_webView.WebMessageReceived(
-                [this](auto const& /*sender*/, winrt::Microsoft::Web::WebView2::Core::CoreWebView2WebMessageReceivedEventArgs const& messageArgs) {
-                    try {
-                        auto message = messageArgs.TryGetWebMessageAsString();
-                        OnMessagePosted(message);
-                    } catch (...) {
-                        return;
-                    }
-                });
-        } catch (...) {
-            // WebMessageReceived registration failure
-        }
-    }
+    // WebMessageReceived is now registered once, at CoreWebView2 init (see
+    // OnCoreWebView2Initialized / RegisterDocumentStartScripts), instead of
+    // being re-registered on every navigation start.
 }
 
 void RCTWebView2ComponentView::OnNavigationCompleted(
@@ -377,37 +395,43 @@ void RCTWebView2ComponentView::OnNavigationCompleted(
         // Event dispatch failure is non-fatal
     }
 
-    if (m_messagingEnabled && m_webView) {
-        try {
-            winrt::hstring message = LR"(
-                window.alert = function (msg) {window.chrome.webview.postMessage(`{"type":"__alert","message":"${msg}"}`)};
-                window.ReactNativeWebView = {postMessage: function (data) {window.chrome.webview.postMessage(String(data))}};
-                const originalPostMessage = globalThis.postMessage;
-                globalThis.postMessage = function (data) { originalPostMessage(data); globalThis.ReactNativeWebView.postMessage(typeof data == 'string' ? data : JSON.stringify(data));};
-                window.chrome.webview.addEventListener('message', function(e) {
-                    window.dispatchEvent(new MessageEvent('message', {data: e.data}));
-                    document.dispatchEvent(new MessageEvent('message', {data: e.data}));
-                });
-            )";
-            m_webView.ExecuteScriptAsync(message);
-        } catch (...) {
-            // JS injection failure
-        }
-    }
+    // The message bridge is registered once, at document-creation time (see
+    // RegisterDocumentStartScripts), rather than re-injected here on every
+    // completed navigation -- see kMessageBridgeScript for why.
 }
 
 void RCTWebView2ComponentView::OnCoreWebView2Initialized(
     winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& /*args*/) {
     
     if (!m_webView || !m_webView.CoreWebView2()) return;
-    
+
     RegisterCoreWebView2Events();
-    
+
+    if (m_messagingEnabled) {
+        // window.ReactNativeWebView + (optional) injectedJavaScriptBeforeContentLoaded.
+        RegisterDocumentStartScripts();
+
+        // WebMessageReceived is registered once here rather than on every
+        // NavigationStarting.
+        if (m_messageToken) {
+            m_webView.WebMessageReceived(m_messageToken);
+        }
+        m_messageToken = m_webView.WebMessageReceived(
+            [this](auto const& /*sender*/, winrt::Microsoft::Web::WebView2::Core::CoreWebView2WebMessageReceivedEventArgs const& messageArgs) {
+                try {
+                    auto message = messageArgs.TryGetWebMessageAsString();
+                    OnMessagePosted(message);
+                } catch (...) {
+                    return;
+                }
+            });
+    }
+
     // Apply user agent if set
     if (!m_userAgent.empty()) {
         m_webView.CoreWebView2().Settings().UserAgent(m_userAgent);
     }
-    
+
     // Navigate to deferred HTML source if pending
     if (!m_pendingHtml.empty()) {
         try {
@@ -416,6 +440,24 @@ void RCTWebView2ComponentView::OnCoreWebView2Initialized(
             // Deferred navigation failed
         }
         m_pendingHtml.clear();
+    }
+}
+
+winrt::fire_and_forget RCTWebView2ComponentView::RegisterDocumentStartScripts() {
+    auto strongThis = get_strong();
+    if (!strongThis->m_webView || !strongThis->m_webView.CoreWebView2()) {
+        co_return;
+    }
+    auto coreWebView = strongThis->m_webView.CoreWebView2();
+    try {
+        co_await coreWebView.AddScriptToExecuteOnDocumentCreatedAsync(kMessageBridgeScript);
+        if (!strongThis->m_injectedJavaScriptBeforeContentLoaded.empty()) {
+            co_await coreWebView.AddScriptToExecuteOnDocumentCreatedAsync(
+                strongThis->m_injectedJavaScriptBeforeContentLoaded);
+        }
+    } catch (...) {
+        // Script registration failure is non-fatal: the page still loads,
+        // just without window.ReactNativeWebView / the pre-content script.
     }
 }
 
