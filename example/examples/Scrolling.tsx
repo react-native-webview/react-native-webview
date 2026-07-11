@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Button, Text, View } from 'react-native';
 
 import WebView from 'react-native-webview';
@@ -29,40 +29,32 @@ const HTML = `
 </html>
 `;
 
-type Props = {};
-type State = {
-  scrollEnabled: boolean;
-  lastScrollEvent: string;
-};
+type ScrollEvent = Parameters<NonNullable<React.ComponentProps<typeof WebView>['onScroll']>>[0];
 
-export default class Scrolling extends Component<Props, State> {
-  state = {
-    scrollEnabled: true,
-    lastScrollEvent: '',
+export default function Scrolling() {
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+  const [lastScrollEvent, setLastScrollEvent] = useState('');
+
+  const onScroll = (event: ScrollEvent) => {
+    setLastScrollEvent(JSON.stringify(event.nativeEvent));
   };
 
-  render() {
-    return (
-      <View>
-        <View style={{ height: 120 }}>
-          <WebView
-            source={{ html: HTML }}
-            automaticallyAdjustContentInsets={false}
-            onScroll={this._onScroll}
-            scrollEnabled={this.state.scrollEnabled}
-          />
-        </View>
-        <Button
-          title={this.state.scrollEnabled ? 'Scroll enabled' : 'Scroll disabled'}
-          onPress={() => this.setState({ scrollEnabled: !this.state.scrollEnabled })}
+  return (
+    <View>
+      <View style={{ height: 120 }}>
+        <WebView
+          source={{ html: HTML }}
+          automaticallyAdjustContentInsets={false}
+          onScroll={onScroll}
+          scrollEnabled={scrollEnabled}
         />
-        <Text>Last scroll event:</Text>
-        <Text>{this.state.lastScrollEvent}</Text>
       </View>
-    );
-  }
-
-  _onScroll = (event) => {
-    this.setState({ lastScrollEvent: JSON.stringify(event.nativeEvent) });
-  };
+      <Button
+        title={scrollEnabled ? 'Scroll enabled' : 'Scroll disabled'}
+        onPress={() => setScrollEnabled((value) => !value)}
+      />
+      <Text>Last scroll event:</Text>
+      <Text>{lastScrollEvent}</Text>
+    </View>
+  );
 }

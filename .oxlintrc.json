@@ -9,23 +9,20 @@
     "no-shadow": "off",
     "no-undefined": "off",
     "no-console": "off",
-
     "react/jsx-filename-extension": "off",
     "react/react-in-jsx-scope": "off",
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "error",
-
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off",
     "typescript/no-var-requires": "off",
     "typescript/no-require-imports": "off",
-
     "import/no-default-export": "off",
     "import/no-commonjs": "off",
     "import/unambiguous": "off",
     "import/no-relative-parent-imports": "off"
   },
-  "ignorePatterns": ["node_modules", "lib", "android", "ios", "macos", "windows", "example"],
+  "ignorePatterns": ["node_modules", "lib", "android", "ios", "macos", "windows"],
   "categories": {
     "correctness": "error",
     "perf": "error",
@@ -34,5 +31,14 @@
   },
   "env": {
     "builtin": true
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**"],
+      "rules": {
+        "no-await-in-loop": "off",
+        "import/no-unassigned-import": "off"
+      }
+    }
+  ]
 }

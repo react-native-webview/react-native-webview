@@ -18,6 +18,10 @@ def getExtOrIntegerDefault(prop) {
   return rootProject.ext.has(prop) ? rootProject.ext.get(prop) : (project.properties['ReactNativeWebView_' + prop]).toInteger()
 }
 
+def getReactNativeWebViewMinSdkVersion() {
+  return Math.max(getExtOrIntegerDefault('minSdkVersion').toInteger(), 24)
+}
+
 static def findNodeModulePath(baseDir, packageName) {
     def basePath = baseDir.toPath().normalize()
     // Node's module resolution algorithm searches up to the root directory,
@@ -32,8 +36,10 @@ static def findNodeModulePath(baseDir, packageName) {
     return null
 }
 
-def isNewArchitectureEnabled() {
-    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+// The legacy (Paper) architecture is no longer supported. On recent React Native
+// versions the New Architecture is the default, so only an explicit opt-out is rejected.
+if (project.hasProperty("newArchEnabled") && project.newArchEnabled == "false") {
+    throw new GradleException("react-native-webview only supports the React Native New Architecture. Remove newArchEnabled=false from your gradle.properties.")
 }
 
 def supportsNamespace() {
@@ -50,17 +56,12 @@ def supportsNamespace() {
 }
 
 apply plugin: 'com.android.library'
-if (isNewArchitectureEnabled()) {
-    apply plugin: 'com.facebook.react'
-}
+apply plugin: 'com.facebook.react'
 apply plugin: 'kotlin-android'
 
 android {
     if (supportsNamespace()) {
         namespace "com.reactnativecommunity.webview"
-        buildFeatures {
-            buildConfig true
-        }
 
         sourceSets {
             main {
@@ -72,28 +73,12 @@ android {
     compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
 
     defaultConfig {
-        minSdkVersion getExtOrIntegerDefault('minSdkVersion')
+        minSdkVersion getReactNativeWebViewMinSdkVersion()
         targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
-        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-    }
-
-    sourceSets {
-        main {
-            if (isNewArchitectureEnabled()) {
-                java.srcDirs += ['src/newarch']
-            } else {
-                java.srcDirs += ['src/oldarch']
-            }
-        }
     }
 }
 
 def reactNativePath = findNodeModulePath(projectDir, "react-native")
-def codegenPath = findNodeModulePath(projectDir, "@react-native/codegen")
-if (codegenPath == null) {
-  // Compat for 0.71 and lower (to be removed)
-  codegenPath = findNodeModulePath(projectDir, "react-native-codegen")
-}
 
 repositories {
     maven {

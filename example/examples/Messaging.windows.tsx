@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { View, Alert, TextInput } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, TextInput } from 'react-native';
 
 import WebView from 'react-native-webview';
 
@@ -41,38 +41,36 @@ const HTML = `<!DOCTYPE html>\n
   </body>
 </html>`;
 
-type Props = {};
-type State = {};
+export default function Messaging() {
+  const webView = useRef<WebView | null>(null);
+  // Displayed inline because the RNW alert module is not supported in
+  // Win32/WinAppSDK composition apps.
+  const [lastMessage, setLastMessage] = useState('');
 
-export default class Messaging extends Component<Props, State> {
-  state = {};
-
-  constructor(props) {
-    super(props);
-    this.webView = React.createRef();
-  }
-
-  render() {
-    return (
-      <View style={{ height: 120 }}>
-        <TextInput
-          onSubmitEditing={(e) => {
-            this.webView.current.postMessage(e.nativeEvent.text);
-          }}
-        />
-        <WebView
-          ref={this.webView}
-          source={{ html: HTML }}
-          onLoadEnd={() => {
-            this.webView.current.postMessage('Hello from RN');
-          }}
-          automaticallyAdjustContentInsets={false}
-          onMessage={(e: { nativeEvent: { data?: string } }) => {
-            Alert.alert('Message received from JS: ', e.nativeEvent.data);
-          }}
-          useWebView2
-        />
-      </View>
-    );
-  }
+  return (
+    <View style={{ height: 120 }}>
+      {lastMessage ? (
+        <Text style={{ padding: 4, backgroundColor: '#eee' }}>Message from JS: {lastMessage}</Text>
+      ) : null}
+      <TextInput
+        placeholder="Type a message and press Enter"
+        onSubmitEditing={(e) => {
+          webView.current?.postMessage(e.nativeEvent.text);
+        }}
+      />
+      <WebView
+        ref={webView}
+        source={{ html: HTML }}
+        onLoadEnd={() => {
+          webView.current?.postMessage('Hello from RN');
+        }}
+        automaticallyAdjustContentInsets={false}
+        onMessage={(e: { nativeEvent: { data?: string } }) => {
+          console.log('Message received from JS: ', e.nativeEvent.data);
+          setLastMessage(e.nativeEvent.data || '');
+        }}
+        useWebView2
+      />
+    </View>
+  );
 }

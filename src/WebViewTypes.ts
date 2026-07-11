@@ -1053,9 +1053,8 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   androidLayerType?: AndroidLayerType;
 
   /**
-   * Boolean value to enable third party cookies in the `WebView`. Used on
-   * Android Lollipop and above only as third party cookies are enabled by
-   * default on Android Kitkat and below and on iOS. The default value is `true`.
+   * Boolean value to enable third party cookies in the `WebView`.
+   * The default value is `true`.
    * @platform android
    */
   thirdPartyCookiesEnabled?: boolean;
@@ -1238,7 +1237,7 @@ export interface WebViewSharedProps extends ViewProps {
 
   /**
    * Function that is invoked when the `WebView` receives an error status code.
-   * Works on iOS and Android (minimum API level 23).
+   * Works on iOS and Android.
    */
   onHttpError?: (event: WebViewHttpErrorEvent) => void;
 

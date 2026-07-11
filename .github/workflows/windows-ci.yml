@@ -3,8 +3,13 @@ on: [pull_request]
 
 jobs:
   run-windows-tests:
-    name: Build & run tests
+    name: Build & run tests (New Architecture)
     runs-on: windows-2022
+    env:
+      # react-native-windows 0.83 defaults to Visual Studio 2026 (18.6+);
+      # windows-2022 runners ship Visual Studio 2022. Same override as
+      # react-native-test-app's own CI.
+      VisualStudioVersion: '17.0'
 
     steps:
       - uses: actions/checkout@v6
@@ -16,7 +21,7 @@ jobs:
           bun-version: 1.3.10
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1.3
+        uses: microsoft/setup-msbuild@v2
         with:
           vs-version: '[17.0,)'
           msbuild-architecture: x64
@@ -24,31 +29,114 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build
-        run: |
-          bun run build
-          bun run tsc
+      # Saved to the (ephemeral) CI workspace's package.json because the
+      # react-native CLI only discovers the windows platform from package.json
+      # dependencies; the checked-in package.json intentionally omits it.
+      - name: Install Windows dependencies
+        run: bun run add:windows
 
+      - name: Build library
+        run: bun run build
+
+      - name: Type check
+        run: bun run lint:tsgo
+
+      # `install-windows-test-app` generates a Fabric (New Architecture) app by
+      # default for react-native-windows >= 0.80, and the module is built as
+      # part of the app solution via autolinking.
       - name: Build x64 release
         shell: powershell
-        run: bun run windows --release --no-packager --no-deploy --logging
+        run: bun run windows --release --no-packager --no-deploy --no-launch --logging --msbuildprops WindowsTargetPlatformVersion=10.0.26100.0
 
-      # Workaround for a bug in package searching during deploy.
-      # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the packages at windows/x64/Release.
-      # Copy the packages to Windows/Release before deploying.
-      - name: Deploy
+      # WinAppDriver launches packaged apps by Application User Model ID (it
+      # crashes when handed the bare Win32 exe path). Install the Windows App
+      # SDK runtime dependencies staged by the .wapproj, register the loose
+      # layout (no signing required), and resolve the AUMID.
+      - name: Deploy test app
         shell: powershell
         run: |
-          Copy-Item -Path example\windows\x64\Release -Recurse -Destination example\windows\
-          bunx react-native run-windows --arch x64 --release --root example --logging --no-build --no-packager --deploy-from-layout
+          Get-ChildItem -Path example\windows\ReactApp.Package\bin, example\windows\ReactApp.Package\AppPackages -Recurse -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match '\.(msix|appx)$' -or $_.Name -eq 'AppxManifest.xml' } |
+            ForEach-Object { Write-Host $_.FullName }
+          Get-ChildItem -Path example\windows\ReactApp.Package -Recurse -Include *.msix, *.appx -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match 'Dependencies\\x64' } |
+            ForEach-Object {
+              Write-Host "Installing dependency $($_.FullName)"
+              Add-AppxPackage -Path $_.FullName -ErrorAction Continue
+            }
+          $manifest = Get-ChildItem -Path example\windows\ReactApp.Package\bin -Recurse -Filter AppxManifest.xml | Select-Object -First 1
+          if (-not $manifest) {
+            Write-Host "AppxManifest.xml not found under example\windows\ReactApp.Package\bin"
+            exit 1
+          }
+          Write-Host "Registering $($manifest.FullName)"
+          Add-AppxPackage -Register $manifest.FullName
+          $pkg = Get-AppxPackage -Name 40411fc5-8e92-4d46-b68d-b62df44b1366
+          if (-not $pkg) {
+            Write-Host "Package not found after registration"
+            exit 1
+          }
+          $aumid = "$($pkg.PackageFamilyName)!App"
+          Write-Host "App User Model ID: $aumid"
+          "WEBVIEW_APP_PATH=$aumid" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Start Appium server
         shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
+        run: Start-Process -FilePath powershell -ArgumentList @('-Command', 'bun run --bun appium *> appium.log')
 
       - name: Start React server
         shell: powershell
         run: Start-Process PowerShell -ArgumentList "bun run start"
 
+      # Launch the app ourselves and hand the tests its top-level window
+      # handle: WinAppDriver only waits a few seconds for a launched app's
+      # window, which the first cold start (WebView2 + Hermes init) can
+      # exceed. Also surfaces the crash event log if the app dies.
+      - name: Launch test app
+        shell: powershell
+        run: |
+          Start-Process "shell:AppsFolder\$env:WEBVIEW_APP_PATH"
+          $handle = 0
+          foreach ($i in 1..30) {
+            Start-Sleep -Seconds 2
+            $proc = Get-Process -Name ReactApp -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+            if ($proc) {
+              $handle = $proc.MainWindowHandle
+              Write-Host "ReactApp pid $($proc.Id) window title '$($proc.MainWindowTitle)' handle $handle"
+              break
+            }
+            if (-not (Get-Process -Name ReactApp -ErrorAction SilentlyContinue)) {
+              Write-Host "ReactApp process is not running (attempt $i)"
+            }
+          }
+          if ($handle -eq 0) {
+            Write-Host "No top-level window found; recent Application error events:"
+            Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
+              Where-Object { $_.ProviderName -match 'Windows Error Reporting|Application Error' } |
+              ForEach-Object { Write-Host $_.Message; Write-Host '-----' }
+            exit 1
+          }
+          $hex = '0x{0:X}' -f [int64]$handle
+          Write-Host "Top-level window handle: $hex"
+          "WEBVIEW_APP_HANDLE=$hex" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Run tests
         run: bun run test:windows
+
+      - name: Appium log
+        if: failure()
+        shell: powershell
+        run: |
+          if (Test-Path appium.log) {
+            Write-Host '===== appium.log errors (with context) ====='
+            Select-String -Path appium.log -Pattern 'Original error|Internal Error|"status":13|ERR' -Context 3, 3 |
+              Select-Object -Last 40 |
+              ForEach-Object { $_.ToString() }
+          } else {
+            Write-Host 'no appium.log'
+          }
+          Write-Host '===== recent Application error events ====='
+          Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
+            Where-Object { $_.ProviderName -match 'Windows Error Reporting|Application Error' } |
+            ForEach-Object { Write-Host $_.Message; Write-Host '-----' }
+    timeout-minutes: 60

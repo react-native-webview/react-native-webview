@@ -1,11 +1,9 @@
 package com.reactnativecommunity.webview;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.View;
@@ -19,7 +17,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import com.facebook.react.bridge.Arguments;
@@ -99,7 +96,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
                 ((RNCWebView) view).dispatchEvent(
                     view,
-                    new TopOpenWindowEvent(RNCWebViewWrapper.getReactTagFromWebView(view), event)
+                    new TopOpenWindowEvent(UIManagerHelper.getSurfaceId(view), RNCWebViewWrapper.getReactTagFromWebView(view), event)
                 );
 
                 return true;
@@ -139,7 +136,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         event.putBoolean("canGoForward", webView.canGoForward());
         event.putDouble("progress", (float) newProgress / 100);
 
-        UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(reactTag, event));
+        UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(UIManagerHelper.getSurfaceId(webView), reactTag, event));
     }
 
     @Override
@@ -315,18 +312,6 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
         return true;
     };
-
-    protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptType);
-    }
-
-    protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, "");
-    }
-
-    protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptType);
-    }
 
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {

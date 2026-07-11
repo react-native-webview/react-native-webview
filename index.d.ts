@@ -5,7 +5,10 @@ export { FileDownload, WebViewMessageEvent, WebViewNavigation } from './lib/WebV
 
 export type WebViewProps = IOSWebViewProps & AndroidWebViewProps & WindowsWebViewProps;
 
-declare class WebView<P = undefined> extends Component<WebViewProps & P> {
+// `{}` is the identity for intersections: `WebViewProps & undefined` would
+// collapse the props to `never` (https://github.com/react-native-webview/react-native-webview/issues/3977).
+// oxlint-disable-next-line @typescript-eslint/no-empty-object-type
+declare class WebView<P = {}> extends Component<WebViewProps & P> {
   /**
    * Go back one page in the webview's history.
    */
