@@ -70,13 +70,11 @@ static inline std::string nullSafeStringWithLength(id value) {
     return concreteComponentDescriptorProvider<RNCWebViewComponentDescriptor>();
 }
 
-#if !TARGET_OS_OSX
 // Reproduce the idea from here: https://github.com/facebook/react-native/blob/8bd3edec88148d0ab1f225d2119435681fbbba33/React/Fabric/Mounting/ComponentViews/InputAccessory/RCTInputAccessoryComponentView.mm#L142
 - (void)prepareForRecycle {
     [super prepareForRecycle];
     [_view destroyWebView];
 }
-#endif // !TARGET_OS_OSX
 
 // Needed because of this: https://github.com/facebook/react-native/pull/37274
 + (void)load
@@ -346,25 +344,32 @@ static inline std::string nullSafeStringWithLength(id value) {
 
 #if !TARGET_OS_OSX
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
+        // WKDataDetectorTypes is a bit mask: combine every requested type,
+        // mirroring the RCT_MULTI_ENUM_CONVERTER previously used on Paper.
         WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
-            if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
-                dataDetectorTypes |= WKDataDetectorTypeAddress;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Link) {
-                dataDetectorTypes |= WKDataDetectorTypeLink;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::CalendarEvent) {
-                dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::TrackingNumber) {
-                dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::FlightNumber) {
-                dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::LookupSuggestion) {
-                dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::PhoneNumber) {
-                dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::All) {
-                dataDetectorTypes |= WKDataDetectorTypeAll;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::None) {
-                dataDetectorTypes = WKDataDetectorTypeNone;
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
+            dataDetectorTypes |= WKDataDetectorTypeAddress;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::Link) {
+            dataDetectorTypes |= WKDataDetectorTypeLink;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::CalendarEvent) {
+            dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::TrackingNumber) {
+            dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::FlightNumber) {
+            dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::LookupSuggestion) {
+            dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::PhoneNumber) {
+            dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::All) {
+            dataDetectorTypes = WKDataDetectorTypeAll;
         }
         [_view setDataDetectorTypes:dataDetectorTypes];
     }

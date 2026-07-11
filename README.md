@@ -32,7 +32,7 @@ Considering that we have limited time, issues will mostly serve as a discussion 
 ### Platform compatibility
 
 This project is compatible with **iOS**, **Android**, **Windows** and **macOS**.  
-This project only supports **the new architecture** (fabric); the legacy architecture (paper) is no longer supported.  
+This project only supports **the new architecture** (fabric); the legacy architecture (paper) is no longer supported. This requires **React Native 0.71 or newer** with the new architecture enabled (react-native-macos 0.76 or newer on macOS).  
 This project is compatible with [expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
 ### Getting Started

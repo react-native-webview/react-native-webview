@@ -2,7 +2,7 @@
 
 Here's how to get started quickly with the React Native WebView.
 
-> **Note:** react-native-webview requires the React Native [New Architecture](https://reactnative.dev/architecture/landing-page). The legacy (Paper) architecture is no longer supported.
+> **Note:** react-native-webview requires the React Native [New Architecture](https://reactnative.dev/architecture/landing-page). The legacy (Paper) architecture is no longer supported. This requires React Native 0.71 or newer with the new architecture enabled (react-native-macos 0.76 or newer on macOS, where Fabric first became available).
 
 ## 1. Add react-native-webview to your dependencies
 
