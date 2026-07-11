@@ -332,16 +332,11 @@ static inline std::string nullSafeStringWithLength(id value) {
     REMAP_WEBVIEW_PROP(removeIosKeyboardObserver)
     #endif // !TARGET_OS_OSX
 
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-    REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
+#if !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(automaticallyAdjustsScrollIndicatorInsets)
-#endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
     REMAP_WEBVIEW_PROP(limitsNavigationsToAppBoundDomains)
-#endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* iOS 14.5 */
     REMAP_WEBVIEW_PROP(textInteractionEnabled)
-#endif
+#endif // !TARGET_OS_OSX
 
 #if !TARGET_OS_OSX
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
@@ -459,7 +454,7 @@ static inline std::string nullSafeStringWithLength(id value) {
         }
     }
 //
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
+#if !TARGET_OS_OSX
     if (oldViewProps.contentMode != newViewProps.contentMode) {
         if (newViewProps.contentMode == RNCWebViewContentMode::Recommended) {
             [_view setContentMode: WKContentModeRecommended];
@@ -469,9 +464,7 @@ static inline std::string nullSafeStringWithLength(id value) {
             [_view setContentMode:WKContentModeDesktop];
         }
     }
-#endif
 
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     if (oldViewProps.mediaCapturePermissionGrantType != newViewProps.mediaCapturePermissionGrantType) {
         if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Prompt) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Prompt];
@@ -485,7 +478,7 @@ static inline std::string nullSafeStringWithLength(id value) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
         }
     }
-#endif
+#endif // !TARGET_OS_OSX
     if (oldViewProps.indicatorStyle != newViewProps.indicatorStyle) {
         if (newViewProps.indicatorStyle == RNCWebViewIndicatorStyle::Black) {
             [_view setIndicatorStyle:@"black"];
