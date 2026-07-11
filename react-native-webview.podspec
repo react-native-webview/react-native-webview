@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
 
   s.authors      = package['author']
   s.homepage     = package['homepage']
-  s.platforms    = { :ios => '11.0', :osx => "10.13", :visionos => "1.0" }
+  s.platforms    = { :ios => '15.1', :osx => "10.13", :visionos => "1.0" }
 
   s.source       = { :git => "https://github.com/react-native-webview/react-native-webview.git", :tag => "v#{s.version}" }
 
