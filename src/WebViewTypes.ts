@@ -9,8 +9,8 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 
-import type NativeWebViewAndroidComponent from './RNCWebViewAndroidNativeComponent';
-import type NativeWebViewAppleComponent from './RNCWebViewAppleNativeComponent';
+import type NativeWebViewAndroidComponent from './specs/RNCWebViewAndroidNativeComponent';
+import type NativeWebViewAppleComponent from './specs/RNCWebViewAppleNativeComponent';
 
 type NativeWebViewComponent =
   | typeof NativeWebViewAndroidComponent
