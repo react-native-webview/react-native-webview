@@ -80,6 +80,9 @@ private:
     void HandleMessageFromJS(winrt::hstring const& message);
     bool Is17763OrHigher();
     void WriteCookiesToWebView2(std::string const& cookies);
+    // DocumentTitle(), best-effort -- empty string before CoreWebView2 exists
+    // or if the read throws.
+    std::string CurrentTitle() const noexcept;
 
     winrt::weak_ref<winrt::Microsoft::ReactNative::Composition::ContentIslandComponentView> m_islandView;
     winrt::Microsoft::UI::Xaml::XamlIsland m_island{nullptr};
