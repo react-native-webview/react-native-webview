@@ -1018,7 +1018,7 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 
 ### `allowsPictureInPictureMediaPlayback`[⬆](#props-index)
 
-Boolean value that indicates whether HTML5 videos can play Picture in Picture. The default value is `false`.
+Boolean value that indicates whether HTML5 videos can play Picture in Picture. The default value is `true`.
 
 > **NOTE**
 >
