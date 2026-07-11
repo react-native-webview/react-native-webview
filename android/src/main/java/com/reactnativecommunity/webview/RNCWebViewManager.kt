@@ -681,6 +681,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     override fun setAutomaticallyAdjustContentInsets(view: RNCWebViewWrapper, value: Boolean) {}
 
+    override fun setAutomaticallyAdjustsScrollIndicatorInsets(view: RNCWebViewWrapper, value: Boolean) {}
+
     override fun setAutoManageStatusBarEnabled(view: RNCWebViewWrapper, value: Boolean) {}
 
     override fun setBounces(view: RNCWebViewWrapper, value: Boolean) {}
