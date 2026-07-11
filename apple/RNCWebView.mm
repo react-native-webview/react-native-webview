@@ -343,28 +343,28 @@ static inline std::string nullSafeStringWithLength(id value) {
         // WKDataDetectorTypes is a bit mask: combine every requested type,
         // mirroring the RCT_MULTI_ENUM_CONVERTER previously used on Paper.
         WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::Address) {
             dataDetectorTypes |= WKDataDetectorTypeAddress;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::Link) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::Link) {
             dataDetectorTypes |= WKDataDetectorTypeLink;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::CalendarEvent) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::CalendarEvent) {
             dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::TrackingNumber) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::TrackingNumber) {
             dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::FlightNumber) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::FlightNumber) {
             dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::LookupSuggestion) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::LookupSuggestion) {
             dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::PhoneNumber) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::PhoneNumber) {
             dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::All) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::All) {
             dataDetectorTypes = WKDataDetectorTypeAll;
         }
         [_view setDataDetectorTypes:dataDetectorTypes];
@@ -390,13 +390,13 @@ static inline std::string nullSafeStringWithLength(id value) {
 
 #if !TARGET_OS_OSX
     if (oldViewProps.contentInsetAdjustmentBehavior != newViewProps.contentInsetAdjustmentBehavior) {
-        if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Never) {
+        if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewAppleContentInsetAdjustmentBehavior::Never) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Automatic) {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewAppleContentInsetAdjustmentBehavior::Automatic) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAutomatic];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::ScrollableAxes) {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewAppleContentInsetAdjustmentBehavior::ScrollableAxes) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentScrollableAxes];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Always) {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewAppleContentInsetAdjustmentBehavior::Always) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAlways];
         }
     }
@@ -456,33 +456,33 @@ static inline std::string nullSafeStringWithLength(id value) {
 //
 #if !TARGET_OS_OSX
     if (oldViewProps.contentMode != newViewProps.contentMode) {
-        if (newViewProps.contentMode == RNCWebViewContentMode::Recommended) {
+        if (newViewProps.contentMode == RNCWebViewAppleContentMode::Recommended) {
             [_view setContentMode: WKContentModeRecommended];
-        } else if (newViewProps.contentMode == RNCWebViewContentMode::Mobile) {
+        } else if (newViewProps.contentMode == RNCWebViewAppleContentMode::Mobile) {
             [_view setContentMode:WKContentModeMobile];
-        } else if (newViewProps.contentMode == RNCWebViewContentMode::Desktop) {
+        } else if (newViewProps.contentMode == RNCWebViewAppleContentMode::Desktop) {
             [_view setContentMode:WKContentModeDesktop];
         }
     }
 
     if (oldViewProps.mediaCapturePermissionGrantType != newViewProps.mediaCapturePermissionGrantType) {
-        if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Prompt) {
+        if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::Prompt) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Prompt];
-        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Grant) {
+        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::Grant) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Grant];
-        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Deny) {
+        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::Deny) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Deny];
-        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::GrantIfSameHostElsePrompt) {
+        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::GrantIfSameHostElsePrompt) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt];
-        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::GrantIfSameHostElseDeny) {
+        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::GrantIfSameHostElseDeny) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
         }
     }
 #endif // !TARGET_OS_OSX
     if (oldViewProps.indicatorStyle != newViewProps.indicatorStyle) {
-        if (newViewProps.indicatorStyle == RNCWebViewIndicatorStyle::Black) {
+        if (newViewProps.indicatorStyle == RNCWebViewAppleIndicatorStyle::Black) {
             [_view setIndicatorStyle:@"black"];
-        } else if (newViewProps.indicatorStyle == RNCWebViewIndicatorStyle::White) {
+        } else if (newViewProps.indicatorStyle == RNCWebViewAppleIndicatorStyle::White) {
             [_view setIndicatorStyle:@"white"];
         } else {
             [_view setIndicatorStyle:@"default"];

@@ -1,4 +1,4 @@
 {
   "extends": "@react-native/typescript-config",
-  "include": ["src/**/*"]
+  "include": ["src/*", "src/specs/*"]
 }
