@@ -264,6 +264,6 @@ export const Commands = codegenNativeCommands<NativeCommands>({
   ],
 });
 
-export default codegenNativeComponent<NativeProps>('RNCWebViewIOS', {
+export default codegenNativeComponent<NativeProps>('RNCWebViewApple', {
   excludedPlatforms: ['android'],
 }) as HostComponent<NativeProps>;

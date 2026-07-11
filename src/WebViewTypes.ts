@@ -10,11 +10,11 @@ import {
 } from 'react-native';
 
 import type NativeWebViewAndroidComponent from './RNCWebViewAndroidNativeComponent';
-import type NativeWebViewIOSComponent from './RNCWebViewIOSNativeComponent';
+import type NativeWebViewAppleComponent from './RNCWebViewAppleNativeComponent';
 
 type NativeWebViewComponent =
   | typeof NativeWebViewAndroidComponent
-  | typeof NativeWebViewIOSComponent;
+  | typeof NativeWebViewAppleComponent;
 
 type WebViewCommands =
   | 'goForward'
