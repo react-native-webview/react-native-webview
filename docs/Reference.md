@@ -1667,10 +1667,10 @@ Function called when a custom menu item is selected. It receives a Native event,
 
 ### `basicAuthCredential`[⬆](#props-index)
 
-An object that specifies the credentials of a user to be used for basic authentication.
+An object that specifies the credentials of a user to be used for HTTP authentication. Both Basic and Digest authentication schemes are supported (Android & iOS).
 
-- `username` (string) - A username used for basic authentication.
-- `password` (string) - A password used for basic authentication.
+- `username` (string) - A username used for HTTP authentication.
+- `password` (string) - A password used for HTTP authentication.
 
 | Type   | Required |
 | ------ | -------- |
