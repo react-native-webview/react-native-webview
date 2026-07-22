@@ -94,12 +94,33 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
   return NO;
 }
 - (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AVAILABLE(ios(13.0))  {
-    if (@available(iOS 16.0, *)) {
-      if(self.menuItems){
-        [builder removeMenuForIdentifier:UIMenuLookup];
-      }
-    }
-    [super buildMenuWithBuilder:builder];
+  // Build the default menu first. Removing system items *before* super is a no-op:
+  // super re-injects Look Up / Translate / Search Web under UIEditMenuInteraction (iOS 16+).
+  [super buildMenuWithBuilder:builder];
+
+  // menuItems non-nil (including an empty array) means the host owns selection menu UX.
+  // Docs: an empty array suppresses the system menu.
+  if (self.menuItems == nil) {
+    return;
+  }
+
+  if (@available(iOS 16.0, *)) {
+    [builder removeMenuForIdentifier:UIMenuStandardEdit];
+    [builder removeMenuForIdentifier:UIMenuLookup];
+    [builder removeMenuForIdentifier:UIMenuShare];
+    [builder removeMenuForIdentifier:UIMenuLearn];
+    [builder removeMenuForIdentifier:UIMenuSpeech];
+    [builder removeMenuForIdentifier:UIMenuSpelling];
+    [builder removeMenuForIdentifier:UIMenuSubstitution];
+    [builder removeMenuForIdentifier:UIMenuTransformation];
+  }
+
+  // Empty menuItems: fully suppress residual items that lack stable identifiers (e.g. Search Web).
+  if (self.menuItems.count == 0) {
+    [builder replaceChildrenOfMenuForIdentifier:UIMenuRoot fromChildrenBlock:^NSArray<UIMenuElement *> *(NSArray<UIMenuElement *> *children) {
+      return @[];
+    }];
+  }
 }
 #else // TARGET_OS_OSX
 - (void)scrollWheel:(NSEvent *)theEvent {
@@ -255,19 +276,21 @@ RCTAutoInsetsProtocol>
     if (pressSender.state != UIGestureRecognizerStateEnded || !self.menuItems) {
         return;
     }
+    // Empty menuItems means fully suppress the system/edit menu — do not present one.
+    if (self.menuItems.count == 0) {
+      if (@available(iOS 13.0, *)) {
+        UIMenuController *menuController = [UIMenuController sharedMenuController];
+        menuController.menuItems = nil;
+        [menuController hideMenu];
+      }
+      return;
+    }
     if (@available(iOS 16.0, *)) {
       CGPoint location = [pressSender locationInView:self];
       UIEditMenuConfiguration *config = [UIEditMenuConfiguration configurationWithIdentifier:nil sourcePoint:location];
       [_editMenuInteraction presentEditMenuWithConfiguration:config];
     } else {
       // When a long press ends, bring up our custom UIMenu if defined
-      if (self.menuItems.count == 0) {
-        UIMenuController *menuController = [UIMenuController sharedMenuController];
-        menuController.menuItems = nil;
-        [menuController showMenuFromView:self rect:self.bounds];
-        return;
-      }
-
       UIMenuController *menuController = [UIMenuController sharedMenuController];
       NSMutableArray *menuControllerItems = [NSMutableArray arrayWithCapacity:self.menuItems.count];
 
