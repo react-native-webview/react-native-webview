@@ -21,8 +21,8 @@
 namespace winrt::ReactNativeWebView::implementation {
 
 namespace {
-// Registered once via AddScriptToExecuteOnDocumentCreatedAsync (see
-// RegisterDocumentStartScripts) so window.ReactNativeWebView exists before
+// Registered via AddScriptToExecuteOnDocumentCreatedAsync (see
+// ResetupDocumentStartScripts) so window.ReactNativeWebView exists before
 // ANY page script runs -- including a synchronous inline <script> in
 // <head>. Previously this same script was run via ExecuteScriptAsync from
 // NavigationCompleted, i.e. after the page had already finished loading;
@@ -139,6 +139,16 @@ void RCTWebView2ComponentView::InitializeContentIsland(
 }
 
 void RCTWebView2ComponentView::Cleanup() noexcept {
+    // Supersede any in-flight ResetupDocumentStartScripts coroutine so it stops
+    // before writing its script ID into a member of a view being torn down. Note
+    // this does NOT stop it touching the CoreWebView2: on a generation mismatch it
+    // still calls RemoveScriptToExecuteOnDocumentCreated on the core view that
+    // Cleanup() closes just below, which then throws and is swallowed by that
+    // coroutine's catch-all. Harmless, but it is a swallowed throw, not avoidance.
+    ++m_documentStartScriptGeneration;
+    m_bridgeScriptId = winrt::hstring{};
+    m_beforeContentLoadedScriptId = winrt::hstring{};
+
     m_navigationStartingRevoker.revoke();
     m_navigationCompletedRevoker.revoke();
     m_CoreWebView2InitializedRevoker.revoke();
@@ -185,9 +195,18 @@ void RCTWebView2ComponentView::UpdateProps(
     
     m_updating = true;
 
+    // Snapshot the document-start script inputs BEFORE any prop member is
+    // overwritten below. The dirty check at the bottom of this function
+    // compares these captured old values against the members as they stand
+    // after every assignment has run -- old-vs-new by construction, no matter
+    // where the individual assignments sit or later move to.
+    const bool previousMessagingEnabled = m_messagingEnabled;
+    const winrt::hstring previousInjectedJavaScriptBeforeContentLoaded =
+        m_injectedJavaScriptBeforeContentLoaded;
+
     // Apply messaging enabled
     m_messagingEnabled = newProps->messagingEnabled;
-    
+
     // Apply link handling
     if (newProps->linkHandlingEnabled.has_value()) {
         m_linkHandlingEnabled = newProps->linkHandlingEnabled.value();
@@ -200,15 +219,16 @@ void RCTWebView2ComponentView::UpdateProps(
 
     // Apply pre-content-load injected JavaScript. This prop already existed
     // in the codegen'd spec (RCTWebView2Props::injectedJavaScriptBeforeContentLoaded)
-    // but was never read on Windows. Applied once, at CoreWebView2 init (see
-    // RegisterDocumentStartScripts) -- same limitation as the message
-    // bridge script below: WebView2 has no API to swap a document-created
-    // script after the fact, so changing this prop after first mount takes
-    // effect on remount, not immediately.
-    if (newProps->injectedJavaScriptBeforeContentLoaded.has_value()) {
-        m_injectedJavaScriptBeforeContentLoaded =
-            winrt::to_hstring(newProps->injectedJavaScriptBeforeContentLoaded.value());
-    }
+    // but was never read on Windows. Registered as a document-created script by
+    // ResetupDocumentStartScripts; a change applies to the next navigation, not
+    // to the document already loaded -- the same as a WKUserScript at
+    // WKUserScriptInjectionTimeAtDocumentStart on iOS. Clearing the prop
+    // removes the script, matching iOS handing nil to
+    // -setInjectedJavaScriptBeforeContentLoaded:.
+    m_injectedJavaScriptBeforeContentLoaded =
+        newProps->injectedJavaScriptBeforeContentLoaded.has_value()
+            ? winrt::to_hstring(newProps->injectedJavaScriptBeforeContentLoaded.value())
+            : winrt::hstring{};
 
     // Apply user agent
     if (newProps->userAgent.has_value()) {
@@ -247,6 +267,22 @@ void RCTWebView2ComponentView::UpdateProps(
     // Apply JavaScript enabled
     if (m_webView.CoreWebView2()) {
         m_webView.CoreWebView2().Settings().IsScriptEnabled(newProps->javaScriptEnabled);
+    }
+
+    // Swap the document-created scripts (message bridge +
+    // injectedJavaScriptBeforeContentLoaded) when either input actually
+    // changed: compare the old values captured at the top of this function --
+    // before the assignments above overwrote them -- against the members as
+    // they now stand. The swap removes the previous script by ID and re-adds,
+    // which is not free, so it must only run on a real change. Skipped until
+    // CoreWebView2 exists -- OnCoreWebView2Initialized does the first
+    // registration with whatever props have arrived by then.
+    const bool documentStartScriptsDirty =
+        m_messagingEnabled != previousMessagingEnabled ||
+        m_injectedJavaScriptBeforeContentLoaded !=
+            previousInjectedJavaScriptBeforeContentLoaded;
+    if (documentStartScriptsDirty && m_webView.CoreWebView2()) {
+        ResetupDocumentStartScripts();
     }
 
     m_updating = false;
@@ -372,8 +408,8 @@ void RCTWebView2ComponentView::OnNavigationStarting(
     }
 
     // WebMessageReceived is now registered once, at CoreWebView2 init (see
-    // OnCoreWebView2Initialized / RegisterDocumentStartScripts), instead of
-    // being re-registered on every navigation start.
+    // OnCoreWebView2Initialized), instead of being re-registered on every
+    // navigation start.
 }
 
 void RCTWebView2ComponentView::OnNavigationCompleted(
@@ -395,8 +431,8 @@ void RCTWebView2ComponentView::OnNavigationCompleted(
         // Event dispatch failure is non-fatal
     }
 
-    // The message bridge is registered once, at document-creation time (see
-    // RegisterDocumentStartScripts), rather than re-injected here on every
+    // The message bridge is registered as a document-created script (see
+    // ResetupDocumentStartScripts), rather than re-injected here on every
     // completed navigation -- see kMessageBridgeScript for why.
 }
 
@@ -407,25 +443,31 @@ void RCTWebView2ComponentView::OnCoreWebView2Initialized(
 
     RegisterCoreWebView2Events();
 
-    if (m_messagingEnabled) {
-        // window.ReactNativeWebView + (optional) injectedJavaScriptBeforeContentLoaded.
-        RegisterDocumentStartScripts();
+    // window.ReactNativeWebView (when messagingEnabled) + (optional)
+    // injectedJavaScriptBeforeContentLoaded.
+    ResetupDocumentStartScripts();
 
-        // WebMessageReceived is registered once here rather than on every
-        // NavigationStarting.
-        if (m_messageToken) {
-            m_webView.WebMessageReceived(m_messageToken);
-        }
-        m_messageToken = m_webView.WebMessageReceived(
-            [this](auto const& /*sender*/, winrt::Microsoft::Web::WebView2::Core::CoreWebView2WebMessageReceivedEventArgs const& messageArgs) {
-                try {
-                    auto message = messageArgs.TryGetWebMessageAsString();
-                    OnMessagePosted(message);
-                } catch (...) {
-                    return;
-                }
-            });
+    // WebMessageReceived is registered once here rather than on every
+    // NavigationStarting. It is registered unconditionally and the handler
+    // checks the current messagingEnabled instead: the JS side derives
+    // messagingEnabled from `typeof onMessage === 'function'`, so it can flip
+    // to true after mount, and this way there is no handler to re-hook when it
+    // does.
+    if (m_messageToken) {
+        m_webView.WebMessageReceived(m_messageToken);
     }
+    m_messageToken = m_webView.WebMessageReceived(
+        [this](auto const& /*sender*/, winrt::Microsoft::Web::WebView2::Core::CoreWebView2WebMessageReceivedEventArgs const& messageArgs) {
+            if (!m_messagingEnabled) {
+                return;
+            }
+            try {
+                auto message = messageArgs.TryGetWebMessageAsString();
+                OnMessagePosted(message);
+            } catch (...) {
+                return;
+            }
+        });
 
     // Apply user agent if set
     if (!m_userAgent.empty()) {
@@ -443,21 +485,124 @@ void RCTWebView2ComponentView::OnCoreWebView2Initialized(
     }
 }
 
-winrt::fire_and_forget RCTWebView2ComponentView::RegisterDocumentStartScripts() {
+winrt::fire_and_forget RCTWebView2ComponentView::ResetupDocumentStartScripts() {
     auto strongThis = get_strong();
-    if (!strongThis->m_webView || !strongThis->m_webView.CoreWebView2()) {
-        co_return;
-    }
-    auto coreWebView = strongThis->m_webView.CoreWebView2();
+
+    // Called on the UI thread; every CoreWebView2 call and every member write
+    // below has to stay there, so hop back after each co_await instead of
+    // trusting the async completion to resume in this apartment.
+    winrt::apartment_context uiThread;
+
+    // Any call supersedes an earlier one that is still awaiting an
+    // AddScriptToExecuteOnDocumentCreatedAsync completion.
+    const uint32_t generation = ++strongThis->m_documentStartScriptGeneration;
+
     try {
-        co_await coreWebView.AddScriptToExecuteOnDocumentCreatedAsync(kMessageBridgeScript);
-        if (!strongThis->m_injectedJavaScriptBeforeContentLoaded.empty()) {
-            co_await coreWebView.AddScriptToExecuteOnDocumentCreatedAsync(
-                strongThis->m_injectedJavaScriptBeforeContentLoaded);
+        if (!strongThis->m_webView || !strongThis->m_webView.CoreWebView2()) {
+            co_return;
+        }
+        auto coreWebView = strongThis->m_webView.CoreWebView2();
+
+        // Drop whatever is registered now. RemoveScriptToExecuteOnDocumentCreated
+        // is synchronous and takes the ID the matching Add call returned. The
+        // members are cleared first so a throw cannot leave a stale ID behind,
+        // and each removal is isolated so that failing to remove one script
+        // still registers the new ones below.
+        const winrt::hstring previousBridgeScriptId = strongThis->m_bridgeScriptId;
+        const winrt::hstring previousBeforeContentLoadedScriptId =
+            strongThis->m_beforeContentLoadedScriptId;
+        strongThis->m_bridgeScriptId = winrt::hstring{};
+        strongThis->m_beforeContentLoadedScriptId = winrt::hstring{};
+        if (!previousBridgeScriptId.empty()) {
+            try {
+                coreWebView.RemoveScriptToExecuteOnDocumentCreated(previousBridgeScriptId);
+            } catch (...) {
+                // Already gone (e.g. a recreated CoreWebView2).
+            }
+        }
+        if (!previousBeforeContentLoadedScriptId.empty()) {
+            try {
+                coreWebView.RemoveScriptToExecuteOnDocumentCreated(previousBeforeContentLoadedScriptId);
+            } catch (...) {
+                // Already gone (e.g. a recreated CoreWebView2).
+            }
+        }
+
+        // Read the props once: they can change again while the Add calls below
+        // are in flight, and that change bumps the generation.
+        const bool messagingEnabled = strongThis->m_messagingEnabled;
+        const winrt::hstring beforeContentLoaded =
+            strongThis->m_injectedJavaScriptBeforeContentLoaded;
+
+        if (messagingEnabled) {
+            const auto scriptId =
+                co_await coreWebView.AddScriptToExecuteOnDocumentCreatedAsync(kMessageBridgeScript);
+
+            // The script is registered from here on, so until its ID reaches the
+            // member every exit has to remove it. Letting a throw escape with the
+            // ID only in this local would orphan the registration: the next call
+            // would read an empty m_bridgeScriptId, remove nothing, and Add a
+            // SECOND bridge -- and because kMessageBridgeScript is not
+            // IIFE-wrapped, its top-level `const originalPostMessage` would then
+            // be a redeclaration and the second copy would die on a SyntaxError.
+            // co_await on an apartment_context is check_hresult'd and can throw,
+            // and so can Remove, hence the explicit handling on both.
+            bool keepScript = false;
+            try {
+                co_await uiThread;
+                keepScript = (generation == strongThis->m_documentStartScriptGeneration);
+                if (keepScript) {
+                    strongThis->m_bridgeScriptId = scriptId;
+                }
+            } catch (...) {
+                keepScript = false;
+            }
+            if (!keepScript) {
+                // Either the hop failed, or a newer call (or Cleanup) took over
+                // while this one was in flight. Undo the Add and let that one win.
+                // Best effort: if this Remove also fails the script stays
+                // registered, but no ID is stored, which is the one residual case
+                // the redeclaration guard cannot cover.
+                try {
+                    coreWebView.RemoveScriptToExecuteOnDocumentCreated(scriptId);
+                } catch (...) {
+                }
+                co_return;
+            }
+        }
+
+        // Registered whether or not messaging is enabled, matching iOS
+        // (-resetupScripts: adds atStartScript outside the messagingEnabled
+        // branch) and Android (callInjectedJavaScriptBeforeContentLoaded runs
+        // from onPageStarted regardless of messagingEnabled).
+        if (!beforeContentLoaded.empty()) {
+            const auto scriptId =
+                co_await coreWebView.AddScriptToExecuteOnDocumentCreatedAsync(beforeContentLoaded);
+
+            // Same ownership window as the bridge script above: registered now,
+            // so every exit before the member write has to remove it.
+            bool keepScript = false;
+            try {
+                co_await uiThread;
+                keepScript = (generation == strongThis->m_documentStartScriptGeneration);
+                if (keepScript) {
+                    strongThis->m_beforeContentLoadedScriptId = scriptId;
+                }
+            } catch (...) {
+                keepScript = false;
+            }
+            if (!keepScript) {
+                try {
+                    coreWebView.RemoveScriptToExecuteOnDocumentCreated(scriptId);
+                } catch (...) {
+                }
+                co_return;
+            }
         }
     } catch (...) {
         // Script registration failure is non-fatal: the page still loads,
         // just without window.ReactNativeWebView / the pre-content script.
+        // Nothing may escape a fire_and_forget -- it would terminate the app.
     }
 }
 
