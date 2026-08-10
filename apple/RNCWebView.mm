@@ -6,6 +6,7 @@
 #import <react/renderer/components/RNCWebViewSpec/Props.h>
 #import <react/renderer/components/RNCWebViewSpec/RCTComponentViewHelpers.h>
 
+#import <React/RCTConversions.h>
 #import <React/RCTFabricComponentsPlugins.h>
 
 using namespace facebook::react;
@@ -274,6 +275,10 @@ static inline std::string nullSafeStringWithLength(id value) {
 {
     const auto &oldViewProps = *std::static_pointer_cast<RNCWebViewProps const>(_props);
     const auto &newViewProps = *std::static_pointer_cast<RNCWebViewProps const>(props);
+
+    if (oldViewProps.backgroundColor != newViewProps.backgroundColor) {
+        [_view setBackgroundColor:RCTUIColorFromSharedColor(newViewProps.backgroundColor)];
+    }
 
 #define REMAP_WEBVIEW_PROP(name)                    \
     if (oldViewProps.name != newViewProps.name) {   \
