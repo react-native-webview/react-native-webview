@@ -319,10 +319,10 @@ bool RCTWebView2ComponentView::Is17763OrHigher() {
     return hasUniversalAPIContract_v7.value();
 }
 
-std::string RCTWebView2ComponentView::CurrentTitle() const noexcept {
+winrt::hstring RCTWebView2ComponentView::CurrentTitle() const noexcept {
     try {
         if (m_webView && m_webView.CoreWebView2()) {
-            return winrt::to_string(m_webView.CoreWebView2().DocumentTitle());
+            return m_webView.CoreWebView2().DocumentTitle();
         }
     } catch (...) {
     }
@@ -339,7 +339,7 @@ void RCTWebView2ComponentView::OnNavigationStarting(
                 event.url = winrt::to_string(m_webView.Source().AbsoluteCanonicalUri());
             }
             event.loading = true;
-            event.title = CurrentTitle();
+            event.title = winrt::to_string(CurrentTitle());
             event.canGoBack = m_webView ? m_webView.CanGoBack() : false;
             event.canGoForward = m_webView ? m_webView.CanGoForward() : false;
             event.navigationType = "other";
@@ -394,7 +394,7 @@ void RCTWebView2ComponentView::OnNavigationCompleted(
                     event.url = winrt::to_string(m_webView.Source().AbsoluteCanonicalUri());
                 }
                 event.loading = false;
-                event.title = CurrentTitle();
+                event.title = winrt::to_string(CurrentTitle());
                 event.canGoBack = m_webView ? m_webView.CanGoBack() : false;
                 event.canGoForward = m_webView ? m_webView.CanGoForward() : false;
                 event.code = webErrorStatus;
@@ -414,7 +414,7 @@ void RCTWebView2ComponentView::OnNavigationCompleted(
                 event.url = winrt::to_string(m_webView.Source().AbsoluteCanonicalUri());
             }
             event.loading = false;
-            event.title = CurrentTitle();
+            event.title = winrt::to_string(CurrentTitle());
             event.canGoBack = m_webView ? m_webView.CanGoBack() : false;
             event.canGoForward = m_webView ? m_webView.CanGoForward() : false;
             event.navigationType = "other";
@@ -491,7 +491,7 @@ void RCTWebView2ComponentView::OnCoreWebView2SourceChanged(
             event.url = winrt::to_string(m_webView.Source().AbsoluteCanonicalUri());
         }
         event.loading = false;
-        event.title = CurrentTitle();
+        event.title = winrt::to_string(CurrentTitle());
         event.canGoBack = m_webView ? m_webView.CanGoBack() : false;
         event.canGoForward = m_webView ? m_webView.CanGoForward() : false;
         event.navigationType = "other";
