@@ -20,6 +20,7 @@ This document lays out the current public properties and methods for the React N
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
 - [`onLoadProgress`](Reference.md#onloadprogress)
+- [`onPerformanceMetric`](Reference.md#onperformancemetric)
 - [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
@@ -497,6 +498,32 @@ target
 title
 url
 ```
+
+---
+
+### `onPerformanceMetric`[⬆](#props-index)
+
+Function that is invoked when the main frame reaches First Contentful Paint or Largest Contentful Paint. Each duration is measured from navigation start in milliseconds.
+
+This callback requires a version of Android System WebView that supports the NavigationListener API. It is not invoked when that API is unavailable, and delivery may be delayed by the underlying WebView implementation.
+
+| Type     | Required | Platform |
+| -------- | -------- | -------- |
+| function | No       | Android  |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onPerformanceMetric={({ nativeEvent }) => {
+    const { url, metric, durationMillis } = nativeEvent;
+    console.log(`${metric} for ${url}: ${durationMillis} ms`);
+  }}
+/>
+```
+
+The `metric` value is either `firstContentfulPaint` or `largestContentfulPaint`. Largest Contentful Paint may be reported more than once as the browser identifies a new candidate; the latest value is the current result for that navigation.
 
 ---
 

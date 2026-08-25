@@ -38,6 +38,7 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent
 import com.reactnativecommunity.webview.events.TopMessageEvent
 import com.reactnativecommunity.webview.events.TopOpenWindowEvent
+import com.reactnativecommunity.webview.events.TopPerformanceMetricEvent
 import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent
 import org.json.JSONException
@@ -471,6 +472,11 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         view.webView.setHasScrollEvent(value)
     }
 
+    @ReactProp(name = "hasOnPerformanceMetric")
+    override fun setHasOnPerformanceMetric(view: RNCWebViewWrapper, value: Boolean) {
+        view.webView.setHasOnPerformanceMetric(value)
+    }
+
     @ReactProp(name = "incognito")
     override fun setIncognito(view: RNCWebViewWrapper, value: Boolean) {
         // Don't do anything when incognito is disabled
@@ -812,6 +818,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         // !Default events but adding them here explicitly for clarity
 
         export[TopLoadingProgressEvent.EVENT_NAME] = MapBuilder.of("registrationName", "onLoadingProgress")
+        export[TopPerformanceMetricEvent.EVENT_NAME] = MapBuilder.of("registrationName", "onPerformanceMetric")
         export[TopShouldStartLoadWithRequestEvent.EVENT_NAME] = MapBuilder.of("registrationName", "onShouldStartLoadWithRequest")
         export[ScrollEventType.getJSEventName(ScrollEventType.SCROLL)] = MapBuilder.of("registrationName", "onScroll")
         export[TopHttpErrorEvent.EVENT_NAME] = MapBuilder.of("registrationName", "onHttpError")
