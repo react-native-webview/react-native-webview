@@ -88,6 +88,12 @@ export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
   progress: number;
 }
 
+export interface WebViewPerformanceMetric {
+  url: string;
+  metric: 'firstContentfulPaint' | 'largestContentfulPaint';
+  durationMillis: number;
+}
+
 export interface WebViewNavigation extends WebViewNativeEvent {
   navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
@@ -132,6 +138,8 @@ export interface WebViewOpenWindow {
 export type WebViewEvent = NativeSyntheticEvent<WebViewNativeEvent>;
 
 export type WebViewProgressEvent = NativeSyntheticEvent<WebViewNativeProgressEvent>;
+
+export type WebViewPerformanceMetricEvent = NativeSyntheticEvent<WebViewPerformanceMetric>;
 
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 
@@ -956,6 +964,19 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Works only on Android (minimum API level 26).
    */
   onRenderProcessGone?: (event: WebViewRenderProcessGoneEvent) => void;
+
+  /**
+   * Function that is invoked when the main frame reaches First Contentful Paint
+   * or Largest Contentful Paint. The duration is measured from navigation start.
+   *
+   * The callback requires a version of Android System WebView that supports the
+   * NavigationListener API. It is not invoked when that API is unavailable.
+   * Largest Contentful Paint may be reported more than once as new candidates
+   * are identified.
+   *
+   * @platform android
+   */
+  onPerformanceMetric?: (event: WebViewPerformanceMetricEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` should open a new window.
