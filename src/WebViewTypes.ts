@@ -287,6 +287,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   mediaPlaybackRequiresUserAction?: boolean;
+  googleMobileAdsWebViewRegistrationEnabled?: boolean;
   webviewDebuggingEnabled?: boolean;
   messagingEnabled: boolean;
   onScroll?: (event: WebViewScrollEvent) => void;
@@ -1349,6 +1350,15 @@ export interface WebViewSharedProps extends ViewProps {
    * Inject a JavaScript object to be accessed as a JSON string via JavaScript in the WebView.
    */
   injectedJavaScriptObject?: object;
+
+  /**
+   * Registers the native WebView with the Google Mobile Ads SDK so ads rendered
+   * by AdSense or Google Ad Manager can receive app signals.
+   *
+   * Requires the Google Mobile Ads SDK to be installed in the native app, for
+   * example through `react-native-google-mobile-ads`. The default value is `false`.
+   */
+  googleMobileAdsWebViewRegistrationEnabled?: boolean;
 
   /**
    * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
