@@ -44,6 +44,8 @@ import com.reactnativecommunity.webview.events.TopMessageEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -160,29 +162,43 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return super.startActionMode(callback, type);
       }
 
+      final List<Map<String, String>> configuredMenuItems = new ArrayList<>(menuCustomItems);
       return super.startActionMode(new ActionMode.Callback2() {
+        private final Map<Integer, Map<String, String>> customMenuItems = new HashMap<>();
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-          for (int i = 0; i < menuCustomItems.size(); i++) {
-            menu.add(Menu.NONE, i, i, (menuCustomItems.get(i)).get("label"));
+          if (!callback.onCreateActionMode(mode, menu)) {
+            return false;
+          }
+
+          for (Map<String, String> menuItem : configuredMenuItems) {
+            int itemId = View.generateViewId();
+            int order = customMenuItems.size();
+            customMenuItems.put(itemId, menuItem);
+            menu.add(Menu.NONE, itemId, order, menuItem.get("label"));
           }
           return true;
         }
 
         @Override
         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-          return false;
+          return callback.onPrepareActionMode(actionMode, menu);
         }
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+          Map<String, String> menuItemMap = customMenuItems.get(item.getItemId());
+          if (menuItemMap == null) {
+            return callback.onActionItemClicked(mode, item);
+          }
+
           WritableMap wMap = Arguments.createMap();
           RNCWebView.this.evaluateJavascript(
             "(function(){return {selection: window.getSelection().toString()} })()",
             new ValueCallback<String>() {
               @Override
               public void onReceiveValue(String selectionJson) {
-                Map<String, String> menuItemMap = menuCustomItems.get(item.getItemId());
                 wMap.putString("label", menuItemMap.get("label"));
                 wMap.putString("key", menuItemMap.get("key"));
                 String selectionText = "";
@@ -200,7 +216,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-          mode = null;
+          customMenuItems.clear();
+          callback.onDestroyActionMode(mode);
         }
 
         @Override
