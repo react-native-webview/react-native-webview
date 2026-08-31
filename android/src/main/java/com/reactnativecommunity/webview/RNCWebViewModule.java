@@ -218,12 +218,17 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
     }
 
     public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final String[] acceptTypes, final boolean allowMultiple, final boolean isCaptureEnabled) {
-        mFilePathCallback = callback;
         Activity activity = mContext.getCurrentActivity();
+        if (activity == null) {
+            Log.w("RNCWebViewModule", "Cannot open a file picker without a foreground Activity");
+            callback.onReceiveValue(null);
+            return false;
+        }
+        mFilePathCallback = callback;
 
         ArrayList<Parcelable> extraIntents = new ArrayList<>();
         Intent photoIntent = null;
-        if (!needsCameraPermission()) {
+        if (!needsCameraPermission(activity)) {
             if (acceptsImages(acceptTypes)) {
                 photoIntent = getPhotoIntent();
                 if (photoIntent != null) {
@@ -294,14 +299,14 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         return result;
     }
 
-    protected boolean needsCameraPermission() {
-        Activity activity = mContext.getCurrentActivity();
+    protected boolean needsCameraPermission(Activity activity) {
         boolean needed = false;
 
         PackageManager packageManager = activity.getPackageManager();
         try {
             String[] requestedPermissions = packageManager.getPackageInfo(activity.getApplicationContext().getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions;
-            if (Arrays.asList(requestedPermissions).contains(Manifest.permission.CAMERA)
+            if (requestedPermissions != null
+                    && Arrays.asList(requestedPermissions).contains(Manifest.permission.CAMERA)
                     && ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 needed = true;
             }
