@@ -102,7 +102,6 @@ private:
     bool m_linkHandlingEnabled{true};
     winrt::hstring m_injectedJavascript{L""};
     winrt::hstring m_userAgent{L""};
-    bool m_updating{false};
     std::string m_pendingHtml{};
 };
 
