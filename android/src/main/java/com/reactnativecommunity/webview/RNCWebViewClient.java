@@ -194,7 +194,7 @@ public class RNCWebViewClient extends WebViewClient {
 
         description = descriptionPrefix + description;
 
-      if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
+      if (topWindowUrl != null && failingUrl != null && !topWindowUrl.equalsIgnoreCase(failingUrl)) {
         // If error is not due to top-level navigation, then do not call onReceivedError()
         Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
         this.onReceivedSubResourceSslError(
