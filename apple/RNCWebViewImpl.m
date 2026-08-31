@@ -149,6 +149,7 @@ RCTAutoInsetsProtocol>
 #if !TARGET_OS_OSX
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
+  UILongPressGestureRecognizer *_menuItemsLongPressRecognizer;
 #endif // !TARGET_OS_OSX
 }
 
@@ -247,6 +248,28 @@ RCTAutoInsetsProtocol>
   }else{
     return NO;
   }
+}
+
+- (void)updateMenuItemsLongPressRecognizer
+{
+  if (self.menuItems == nil || self.window == nil) {
+    if (_menuItemsLongPressRecognizer != nil) {
+      [self removeGestureRecognizer:_menuItemsLongPressRecognizer];
+      _menuItemsLongPressRecognizer = nil;
+    }
+    return;
+  }
+
+  if (_menuItemsLongPressRecognizer != nil) {
+    return;
+  }
+
+  _menuItemsLongPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startLongPress:)];
+  _menuItemsLongPressRecognizer.delegate = self;
+  _menuItemsLongPressRecognizer.minimumPressDuration = 0.4f;
+  _menuItemsLongPressRecognizer.numberOfTouchesRequired = 1;
+  _menuItemsLongPressRecognizer.cancelsTouchesInView = YES;
+  [self addGestureRecognizer:_menuItemsLongPressRecognizer];
 }
 
 // Listener for long presses
@@ -559,16 +582,7 @@ RCTAutoInsetsProtocol>
   }
 
 #if !TARGET_OS_OSX
-  // Allow this object to recognize gestures
-  if (self.menuItems != nil) {
-    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startLongPress:)];
-    longPress.delegate = self;
-
-    longPress.minimumPressDuration = 0.4f;
-    longPress.numberOfTouchesRequired = 1;
-    longPress.cancelsTouchesInView = YES;
-    [self addGestureRecognizer:longPress];
-  }
+  [self updateMenuItemsLongPressRecognizer];
 #endif // !TARGET_OS_OSX
 }
 
@@ -858,6 +872,7 @@ RCTAutoInsetsProtocol>
 -(void)setMenuItems:(NSArray<NSDictionary *> *)menuItems {
     _menuItems = menuItems;
     _webView.menuItems = menuItems;
+    [self updateMenuItemsLongPressRecognizer];
 }
 
 -(void)setSuppressMenuItems:(NSArray<NSString *> *)suppressMenuItems {
