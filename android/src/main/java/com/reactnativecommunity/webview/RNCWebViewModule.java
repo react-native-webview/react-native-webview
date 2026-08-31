@@ -68,7 +68,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (mFilePathCallback == null) {
+        if (requestCode != PICKER || mFilePathCallback == null) {
             return;
         }
 
@@ -85,22 +85,14 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         // based off of which button was pressed, we get an activity result and a file
         // the camera activity doesn't properly return the filename* (I think?) so we use
         // this filename instead
-        switch (requestCode) {
-            case PICKER:
-                if (resultCode != RESULT_OK) {
-                    if (mFilePathCallback != null) {
-                        mFilePathCallback.onReceiveValue(null);
-                    }
-                } else {
-                    if (imageTaken) {
-                        mFilePathCallback.onReceiveValue(new Uri[]{getOutputUri(mOutputImage)});
-                    } else if (videoTaken) {
-                        mFilePathCallback.onReceiveValue(new Uri[]{getOutputUri(mOutputVideo)});
-                    } else {
-                        mFilePathCallback.onReceiveValue(getSelectedFiles(data, resultCode));
-                    }
-                }
-                break;
+        if (resultCode != RESULT_OK) {
+            mFilePathCallback.onReceiveValue(null);
+        } else if (imageTaken) {
+            mFilePathCallback.onReceiveValue(new Uri[]{getOutputUri(mOutputImage)});
+        } else if (videoTaken) {
+            mFilePathCallback.onReceiveValue(new Uri[]{getOutputUri(mOutputVideo)});
+        } else {
+            mFilePathCallback.onReceiveValue(getSelectedFiles(data, resultCode));
         }
 
         if (mOutputImage != null && !imageTaken) {
