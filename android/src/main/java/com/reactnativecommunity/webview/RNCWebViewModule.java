@@ -3,6 +3,7 @@ package com.reactnativecommunity.webview;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -218,6 +219,9 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
     }
 
     public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final String[] acceptTypes, final boolean allowMultiple, final boolean isCaptureEnabled) {
+        if (mFilePathCallback != null) {
+            mFilePathCallback.onReceiveValue(null);
+        }
         mFilePathCallback = callback;
         Activity activity = mContext.getCurrentActivity();
 
@@ -248,17 +252,22 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
         }
 
-        if (chooserIntent != null) {
-            if (chooserIntent.resolveActivity(activity.getPackageManager()) != null) {
-                activity.startActivityForResult(chooserIntent, PICKER);
-            } else {
-                Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
-            }
-        } else {
+        if (chooserIntent == null) {
             Log.w("RNCWebViewModule", "there is no Camera permission");
+        } else if (chooserIntent.resolveActivity(activity.getPackageManager()) == null) {
+            Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
+        } else {
+            try {
+                activity.startActivityForResult(chooserIntent, PICKER);
+                return true;
+            } catch (ActivityNotFoundException e) {
+                Log.w("RNCWebViewModule", "there is no Activity to handle this Intent", e);
+            }
         }
 
-        return true;
+        mFilePathCallback = null;
+        callback.onReceiveValue(null);
+        return false;
     }
 
     public void setDownloadRequest(DownloadManager.Request request) {
