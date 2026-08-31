@@ -127,6 +127,25 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(false, 'https://www.example.com/', 1);
     });
 
+    test('resolves the native request when onShouldStartLoadWithRequest throws', () => {
+      const error = new Error('callback failed');
+      const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+        loadRequest,
+        defaultOriginWhitelist,
+        () => {
+          throw error;
+        },
+      );
+
+      expect(() =>
+        onShouldStartLoadWithRequest({
+          nativeEvent: { url: 'https://www.example.com/', lockIdentifier: 1 },
+        }),
+      ).toThrow(error);
+
+      expect(loadRequest).toHaveBeenLastCalledWith(true, 'https://www.example.com/', 1);
+    });
+
     test('loadRequest with limited whitelist', async () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(loadRequest, [
         'https://*',
