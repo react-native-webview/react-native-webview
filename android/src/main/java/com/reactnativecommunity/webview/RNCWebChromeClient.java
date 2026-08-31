@@ -29,8 +29,9 @@ import com.facebook.react.uimanager.UIManagerHelper;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 
 public class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
@@ -58,20 +59,49 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
      * to be stored to send permissions results to the webview
      */
 
-    // Webview camera & audio permission callback
-    protected PermissionRequest permissionRequest;
-    // Webview camera & audio permission already granted
-    protected List<String> grantedPermissions;
+    private static final class PendingPermissionRequest {
+        final List<String> androidPermissions;
+        final PermissionRequest webViewRequest;
+        final List<String> grantedWebResources;
+        final GeolocationPermissions.Callback geolocationCallback;
+        final String geolocationOrigin;
 
-    // Webview geolocation permission callback
-    protected GeolocationPermissions.Callback geolocationPermissionCallback;
-    // Webview geolocation permission origin callback
-    protected String geolocationPermissionOrigin;
+        PendingPermissionRequest(
+                List<String> androidPermissions,
+                PermissionRequest webViewRequest,
+                List<String> grantedWebResources,
+                GeolocationPermissions.Callback geolocationCallback,
+                String geolocationOrigin) {
+            this.androidPermissions = androidPermissions;
+            this.webViewRequest = webViewRequest;
+            this.grantedWebResources = grantedWebResources;
+            this.geolocationCallback = geolocationCallback;
+            this.geolocationOrigin = geolocationOrigin;
+        }
 
-    // true if native permissions dialog is shown, false otherwise
-    protected boolean permissionsRequestShown = false;
-    // Pending Android permissions for the next request
-    protected List<String> pendingPermissions = new ArrayList<>();
+        boolean isGeolocationRequest() {
+            return geolocationCallback != null;
+        }
+
+        static PendingPermissionRequest forWebView(
+                List<String> androidPermissions,
+                PermissionRequest webViewRequest,
+                List<String> grantedWebResources) {
+            return new PendingPermissionRequest(
+                    androidPermissions, webViewRequest, grantedWebResources, null, null);
+        }
+
+        static PendingPermissionRequest forGeolocation(
+                List<String> androidPermissions,
+                GeolocationPermissions.Callback callback,
+                String origin) {
+            return new PendingPermissionRequest(
+                    androidPermissions, null, null, callback, origin);
+        }
+    }
+
+    private final Deque<PendingPermissionRequest> pendingPermissionRequests = new ArrayDeque<>();
+    private PendingPermissionRequest activePermissionRequest;
 
     protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
     protected boolean mAllowsProtectedMedia = false;
@@ -142,7 +172,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     @Override
     public void onPermissionRequest(final PermissionRequest request) {
 
-        grantedPermissions = new ArrayList<>();
+        List<String> grantedPermissions = new ArrayList<>();
 
         ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
         for (String requestedResource : request.getResources()) {
@@ -178,15 +208,13 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         // If all the permissions are already granted, send the response to the WebView synchronously
         if (requestedAndroidPermissions.isEmpty()) {
             request.grant(grantedPermissions.toArray(new String[0]));
-            grantedPermissions = null;
             return;
         }
 
-        // Otherwise, ask to Android System for native permissions asynchronously
-
-        this.permissionRequest = request;
-
-        requestPermissions(requestedAndroidPermissions);
+        enqueuePermissionRequest(PendingPermissionRequest.forWebView(
+                requestedAndroidPermissions,
+                request,
+                grantedPermissions));
     }
 
 
@@ -196,13 +224,12 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            /*
-             * Keep the trace of callback and origin for the async permission request
-             */
-            geolocationPermissionCallback = callback;
-            geolocationPermissionOrigin = origin;
-
-            requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
+            List<String> permissions = new ArrayList<>();
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+            enqueuePermissionRequest(PendingPermissionRequest.forGeolocation(
+                    permissions,
+                    callback,
+                    origin));
 
         } else {
             callback.invoke(origin, true, false);
@@ -219,98 +246,87 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         return (PermissionAwareActivity) activity;
     }
 
-    private synchronized void requestPermissions(List<String> permissions) {
+    private synchronized void enqueuePermissionRequest(PendingPermissionRequest request) {
+        pendingPermissionRequests.add(request);
+        requestNextPermissionRequest();
+    }
 
-        /*
-         * If permissions request dialog is displayed on the screen and another request is sent to the
-         * activity, the last permission asked is skipped. As a work-around, we use pendingPermissions
-         * to store next required permissions.
-         */
-
-        if (permissionsRequestShown) {
-            pendingPermissions.addAll(permissions);
+    private synchronized void requestNextPermissionRequest() {
+        if (activePermissionRequest != null) {
             return;
         }
 
-        PermissionAwareActivity activity = getPermissionAwareActivity();
-        permissionsRequestShown = true;
+        activePermissionRequest = pendingPermissionRequests.poll();
+        if (activePermissionRequest == null) {
+            return;
+        }
 
-        activity.requestPermissions(
-                permissions.toArray(new String[0]),
-                COMMON_PERMISSION_REQUEST,
-                webviewPermissionsListener
-        );
-
-        // Pending permissions have been sent, the list can be cleared
-        pendingPermissions.clear();
+        try {
+            getPermissionAwareActivity().requestPermissions(
+                    activePermissionRequest.androidPermissions.toArray(new String[0]),
+                    COMMON_PERMISSION_REQUEST,
+                    webviewPermissionsListener
+            );
+        } catch (IllegalStateException exception) {
+            denyPermissionRequest(activePermissionRequest);
+            activePermissionRequest = null;
+            requestNextPermissionRequest();
+        }
     }
 
+    private void denyPermissionRequest(PendingPermissionRequest request) {
+        if (request.isGeolocationRequest()) {
+            request.geolocationCallback.invoke(request.geolocationOrigin, false, false);
+        } else {
+            request.webViewRequest.deny();
+        }
+    }
 
     private PermissionListener webviewPermissionsListener = (requestCode, permissions, grantResults) -> {
+        PendingPermissionRequest completedRequest;
+        synchronized (this) {
+            completedRequest = activePermissionRequest;
+            activePermissionRequest = null;
+        }
 
-        permissionsRequestShown = false;
+        if (completedRequest == null) {
+            return true;
+        }
 
-        /*
-         * As a "pending requests" approach is used, requestCode cannot help to define if the request
-         * came from geolocation or camera/audio. This is why shouldAnswerToPermissionRequest is used
-         */
-        boolean shouldAnswerToPermissionRequest = false;
-
-        for (int i = 0; i < permissions.length; i++) {
-
+        boolean locationGranted = false;
+        for (int i = 0; i < permissions.length && i < grantResults.length; i++) {
             String permission = permissions[i];
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
 
-            if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION)
-                    && geolocationPermissionCallback != null
-                    && geolocationPermissionOrigin != null) {
-
-                if (granted) {
-                    geolocationPermissionCallback.invoke(geolocationPermissionOrigin, true, false);
-                } else {
-                    geolocationPermissionCallback.invoke(geolocationPermissionOrigin, false, false);
+            if (completedRequest.isGeolocationRequest()) {
+                if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    locationGranted = granted;
                 }
-
-                geolocationPermissionCallback = null;
-                geolocationPermissionOrigin = null;
-            }
-
-            if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
-                if (granted && grantedPermissions != null) {
-                    grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
+            } else if (granted) {
+                if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
+                    completedRequest.grantedWebResources.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
+                } else if (permission.equals(Manifest.permission.CAMERA)) {
+                    completedRequest.grantedWebResources.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+                } else if (permission.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+                    completedRequest.grantedWebResources.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
                 }
-                shouldAnswerToPermissionRequest = true;
-            }
-
-            if (permission.equals(Manifest.permission.CAMERA)) {
-                if (granted && grantedPermissions != null) {
-                    grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
-                }
-                shouldAnswerToPermissionRequest = true;
-            }
-
-            if (permission.equals(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
-                if (granted && grantedPermissions != null) {
-                    grantedPermissions.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID);
-                }
-                shouldAnswerToPermissionRequest = true;
             }
         }
 
-        if (shouldAnswerToPermissionRequest
-                && permissionRequest != null
-                && grantedPermissions != null) {
-            permissionRequest.grant(grantedPermissions.toArray(new String[0]));
-            permissionRequest = null;
-            grantedPermissions = null;
+        if (completedRequest.isGeolocationRequest()) {
+            completedRequest.geolocationCallback.invoke(
+                    completedRequest.geolocationOrigin,
+                    locationGranted,
+                    false);
+        } else {
+            completedRequest.webViewRequest.grant(
+                    completedRequest.grantedWebResources.toArray(new String[0]));
         }
 
-        if (!pendingPermissions.isEmpty()) {
-            requestPermissions(pendingPermissions);
-            return false;
+        requestNextPermissionRequest();
+        synchronized (this) {
+            return activePermissionRequest == null && pendingPermissionRequests.isEmpty();
         }
-
-        return true;
     };
 
     @Override
