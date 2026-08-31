@@ -222,25 +222,29 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         Activity activity = mContext.getCurrentActivity();
 
         ArrayList<Parcelable> extraIntents = new ArrayList<>();
-        Intent photoIntent = null;
+        Intent captureIntent = null;
         if (!needsCameraPermission()) {
             if (acceptsImages(acceptTypes)) {
-                photoIntent = getPhotoIntent();
+                Intent photoIntent = getPhotoIntent();
                 if (photoIntent != null) {
                     extraIntents.add(photoIntent);
+                    captureIntent = photoIntent;
                 }
             }
             if (acceptsVideo(acceptTypes)) {
                 Intent videoIntent = getVideoIntent();
                 if (videoIntent != null) {
                     extraIntents.add(videoIntent);
+                    if (captureIntent == null) {
+                        captureIntent = videoIntent;
+                    }
                 }
             }
         }
 
         Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
         if (isCaptureEnabled) {
-            chooserIntent = photoIntent;
+            chooserIntent = captureIntent;
         } else {
             Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
 
