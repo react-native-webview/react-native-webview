@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.view.View
 import android.webkit.WebView
 import android.widget.FrameLayout
+import com.facebook.react.bridge.ReadableMap
 
 /**
  * A [FrameLayout] container to hold the [RNCWebView].
@@ -21,6 +22,16 @@ class RNCWebViewWrapper(context: Context, webView: RNCWebView) : FrameLayout(con
   }
 
   val webView: RNCWebView = getChildAt(0) as RNCWebView
+
+  // Props belong to each mounted WebView. The manager instance is shared.
+  internal var allowsFullscreenVideo = false
+  internal var allowsProtectedMedia = false
+  internal var downloadingMessage: String? = null
+  internal var lackPermissionToDownloadMessage: String? = null
+  internal var hasOnOpenWindowEvent = false
+  internal var pendingSource: ReadableMap? = null
+  internal var userAgent: String? = null
+  internal var userAgentWithApplicationName: String? = null
 
   companion object {
     /**
