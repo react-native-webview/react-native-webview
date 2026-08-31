@@ -13,6 +13,9 @@ import {
   WebViewOpenWindowEvent,
   WebViewProgressEvent,
   WebViewRenderProcessGoneEvent,
+  WebViewSource,
+  WebViewSourceHtml,
+  WebViewSourceUri,
   WebViewTerminatedEvent,
 } from './WebViewTypes';
 import styles from './WebView.styles';
@@ -34,6 +37,31 @@ const passesWhitelist = (compiledWhitelist: readonly string[], url: string) => {
 
 const compileWhitelist = (originWhitelist: readonly string[]): readonly string[] =>
   ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
+
+type NativeWebViewSource =
+  | (Omit<WebViewSourceUri, 'headers'> & {
+      headers?: ReadonlyArray<Readonly<{ name: string; value: string }>>;
+    })
+  | WebViewSourceHtml;
+
+const getNativeSource = (source: WebViewSource | undefined): NativeWebViewSource | undefined => {
+  if (!source || !('uri' in source)) {
+    return source;
+  }
+
+  const { headers, ...nativeSource } = source;
+  if (!headers || typeof headers !== 'object') {
+    return nativeSource;
+  }
+
+  return {
+    ...nativeSource,
+    headers: Object.entries(headers as Record<string, string>).map(([name, value]) => ({
+      name,
+      value,
+    })),
+  };
+};
 
 const createOnShouldStartLoadWithRequest = (
   loadRequest: (shouldStart: boolean, url: string, lockIdentifier: number) => void,
@@ -88,6 +116,7 @@ export {
   createOnShouldStartLoadWithRequest,
   defaultRenderLoading,
   defaultRenderError,
+  getNativeSource,
 };
 
 export const useWebViewLogic = ({

@@ -1,6 +1,10 @@
 import { Linking } from 'react-native';
 
-import { defaultOriginWhitelist, createOnShouldStartLoadWithRequest } from '../WebViewShared';
+import {
+  defaultOriginWhitelist,
+  createOnShouldStartLoadWithRequest,
+  getNativeSource,
+} from '../WebViewShared';
 
 Linking.openURL.mockResolvedValue(undefined);
 Linking.canOpenURL.mockResolvedValue(true);
@@ -29,6 +33,36 @@ async function flushPromises() {
 describe('WebViewShared', () => {
   test('exports defaultOriginWhitelist', () => {
     expect(defaultOriginWhitelist).toMatchSnapshot();
+  });
+
+  describe('getNativeSource', () => {
+    test('converts header records to native name-value pairs without mutating the source', () => {
+      const source = {
+        uri: 'https://example.com',
+        method: 'GET',
+        headers: { Authorization: 'Bearer token', Accept: 'application/json' },
+      };
+
+      expect(getNativeSource(source)).toEqual({
+        uri: 'https://example.com',
+        method: 'GET',
+        headers: [
+          { name: 'Authorization', value: 'Bearer token' },
+          { name: 'Accept', value: 'application/json' },
+        ],
+      });
+      expect(source.headers).toEqual({
+        Authorization: 'Bearer token',
+        Accept: 'application/json',
+      });
+    });
+
+    test('returns HTML and undefined sources unchanged', () => {
+      const htmlSource = { html: '<h1>Hello</h1>', baseUrl: 'https://example.com' };
+
+      expect(getNativeSource(htmlSource)).toBe(htmlSource);
+      expect(getNativeSource(undefined)).toBeUndefined();
+    });
   });
 
   describe('createOnShouldStartLoadWithRequest', () => {
