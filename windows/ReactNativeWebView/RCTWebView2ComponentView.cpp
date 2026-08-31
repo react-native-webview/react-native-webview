@@ -162,8 +162,6 @@ void RCTWebView2ComponentView::UpdateProps(
         return;
     }
     
-    m_updating = true;
-
     // Apply messaging enabled
     m_messagingEnabled = newProps->messagingEnabled;
     
@@ -216,7 +214,6 @@ void RCTWebView2ComponentView::UpdateProps(
         m_webView.CoreWebView2().Settings().IsScriptEnabled(newProps->javaScriptEnabled);
     }
 
-    m_updating = false;
 }
 
 void RCTWebView2ComponentView::RefreshSize() {
