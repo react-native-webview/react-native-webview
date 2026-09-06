@@ -18,6 +18,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.ScriptHandler;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -60,11 +61,18 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     WebViewCompat.WebMessageListener bridgeListener = null;
 
     /**
-     * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
-     * than the main frame, so these two properties are mostly here just for parity with iOS & macOS.
+     * When either flag is {@code false}, the corresponding injected script is delivered to every
+     * frame (including cross-origin subframes) by registering it with
+     * {@link WebViewCompat#addDocumentStartJavaScript(WebView, String, java.util.Set)}, the Android
+     * equivalent of a {@code WKUserScript} with {@code forMainFrameOnly: NO}. The registration is
+     * held in the matching {@link ScriptHandler} until it needs to be updated or removed.
      */
     protected boolean injectedJavaScriptForMainFrameOnly = true;
     protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
+    protected @Nullable
+    ScriptHandler allFramesBeforeContentLoadedScriptHandler;
+    protected @Nullable
+    ScriptHandler allFramesInjectedJavaScriptScriptHandler;
 
     protected boolean messagingEnabled = false;
     protected @Nullable
@@ -271,6 +279,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
           }
         }
         injectJavascriptObject();
+        configureAllFramesInjectedScripts();
     }
 
     private void injectJavascriptObject() {
@@ -301,21 +310,146 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     public void callInjectedJavaScript() {
+        configureAllFramesInjectedScripts();
         if (getSettings().getJavaScriptEnabled() &&
                 injectedJS != null &&
                 !TextUtils.isEmpty(injectedJS)) {
-            evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
             injectJavascriptObject(); // re-inject the Javascript object in case it has been overwritten.
+            // When all-frames injection is active, the HTML delivered through the all-frames
+            // document-start registration marks the current document and delivers the script to
+            // every frame (including the main frame). Guard with the same marker so the fallback
+            // below does not run the script a second time on the main frame.
+            evaluateJavascriptWithFallback("(function() {\n" +
+                    "  if (window.__reactNativeWebViewInjectedAfterContentLoaded) { return; }\n" +
+                    "  window.__reactNativeWebViewInjectedAfterContentLoaded = true;\n" +
+                    "  (function() {\n" +
+                    injectedJS + ";\n" +
+                    "  })();\n" +
+                    "})();");
         }
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
+        configureAllFramesInjectedScripts();
         if (getSettings().getJavaScriptEnabled() &&
                 injectedJSBeforeContentLoaded != null &&
                 !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
-            evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
             injectJavascriptObject();  // re-inject the Javascript object in case it has been overwritten.
+            // Guard with the same marker that the all-frames document-start registration sets, so
+            // whichever path delivers the script first wins and the other one is skipped.
+            evaluateJavascriptWithFallback("(function() {\n" +
+                    "  if (window.__reactNativeWebViewInjectedBeforeContentLoaded) { return; }\n" +
+                    "  window.__reactNativeWebViewInjectedBeforeContentLoaded = true;\n" +
+                    "  (function() {\n" +
+                    injectedJSBeforeContentLoaded + ";\n" +
+                    "  })();\n" +
+                    "})();");
         }
+    }
+
+    public void setInjectedJS(@Nullable String js) {
+        this.injectedJS = js;
+        configureAllFramesInjectedScripts();
+    }
+
+    public void setInjectedJSBeforeContentLoaded(@Nullable String js) {
+        this.injectedJSBeforeContentLoaded = js;
+        configureAllFramesInjectedScripts();
+    }
+
+    public void setInjectedJavaScriptForMainFrameOnly(boolean onlyMainFrame) {
+        this.injectedJavaScriptForMainFrameOnly = onlyMainFrame;
+        configureAllFramesInjectedScripts();
+    }
+
+    public void setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(boolean onlyMainFrame) {
+        this.injectedJavaScriptBeforeContentLoadedForMainFrameOnly = onlyMainFrame;
+        configureAllFramesInjectedScripts();
+    }
+
+    /**
+     * Registers or removes the all-frames document-start scripts that deliver
+     * {@link #injectedJS} / {@link #injectedJSBeforeContentLoaded} to every frame whenever the
+     * corresponding {@code *ForMainFrameOnly} flag is {@code false}.
+     *
+     * <p>The AndroidX WebKit API only exposes all-frames injection at document start
+     * ({@link WebViewFeature#DOCUMENT_START_SCRIPT}). "Before content loaded" scripts therefore run
+     * directly when each frame's document starts, mirroring {@code WKUserScript}
+     * {@code AtDocumentStart}. "After content loaded" scripts are wrapped so that each frame runs
+     * them once its DOM is ready, mirroring {@code WKUserScript} {@code AtDocumentEnd}.
+     *
+     * <p>Scripts registered this way will only run in frames which begin loading after the call
+     * returns, which matches the iOS behaviour of applying the {@code WKUserScript}s on the
+     * following navigation.
+     */
+    protected void configureAllFramesInjectedScripts() {
+        boolean supportsAllFrames = WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT);
+
+        boolean deliverBeforeToAllFrames =
+                supportsAllFrames
+                        && !injectedJavaScriptBeforeContentLoadedForMainFrameOnly
+                        && !TextUtils.isEmpty(injectedJSBeforeContentLoaded);
+        if (deliverBeforeToAllFrames) {
+            if (allFramesBeforeContentLoadedScriptHandler == null) {
+                String script = "(function() {\n" +
+                        "  if (window.__reactNativeWebViewInjectedBeforeContentLoaded) { return; }\n" +
+                        "  window.__reactNativeWebViewInjectedBeforeContentLoaded = true;\n" +
+                        injectedJavaScriptObjectSetup() +
+                        "  (function() {\n" +
+                        injectedJSBeforeContentLoaded + ";\n" +
+                        "  })();\n" +
+                        "})();";
+                allFramesBeforeContentLoadedScriptHandler =
+                        WebViewCompat.addDocumentStartJavaScript(this, script, Set.of("*"));
+            }
+        } else if (allFramesBeforeContentLoadedScriptHandler != null) {
+            allFramesBeforeContentLoadedScriptHandler.remove();
+            allFramesBeforeContentLoadedScriptHandler = null;
+        }
+
+        boolean deliverAfterToAllFrames =
+                supportsAllFrames
+                        && !injectedJavaScriptForMainFrameOnly
+                        && !TextUtils.isEmpty(injectedJS);
+        if (deliverAfterToAllFrames) {
+            if (allFramesInjectedJavaScriptScriptHandler == null) {
+                String script = "(function() {\n" +
+                        "  if (window.__reactNativeWebViewInjectedAfterContentLoaded) { return; }\n" +
+                        "  window.__reactNativeWebViewInjectedAfterContentLoaded = true;\n" +
+                        injectedJavaScriptObjectSetup() +
+                        "  var runInjectedJavaScript = function() {\n" +
+                        "    (function() {\n" +
+                        injectedJS + ";\n" +
+                        "    })();\n" +
+                        "  };\n" +
+                        "  if (document.readyState === 'interactive' || document.readyState === 'complete') {\n" +
+                        "    runInjectedJavaScript();\n" +
+                        "  } else {\n" +
+                        "    document.addEventListener('DOMContentLoaded', runInjectedJavaScript, { once: true });\n" +
+                        "  }\n" +
+                        "})();";
+                allFramesInjectedJavaScriptScriptHandler =
+                        WebViewCompat.addDocumentStartJavaScript(this, script, Set.of("*"));
+            }
+        } else if (allFramesInjectedJavaScriptScriptHandler != null) {
+            allFramesInjectedJavaScriptScriptHandler.remove();
+            allFramesInjectedJavaScriptScriptHandler = null;
+        }
+    }
+
+    /**
+     * JavaScript that makes {@code window.ReactNativeWebView.injectedObjectJson} available in the
+     * current document/frame. This is required to expose {@link #injectedJavaScriptObject} to the
+     * injected scripts of every frame, not only the main frame, which in turn keeps the inline
+     * {@link #injectJavascriptObject()} behaviour consistent when all-frames injection is in use.
+     */
+    private String injectedJavaScriptObjectSetup() {
+        String json = "null";
+        if (injectedJavaScriptObject != null) {
+            json = "`" + injectedJavaScriptObject + "`";
+        }
+        return "  window." + JAVASCRIPT_INTERFACE + " = window." + JAVASCRIPT_INTERFACE + " || {};\n" +
+                "  window." + JAVASCRIPT_INTERFACE + ".injectedObjectJson = function () { return " + json + "; };\n";
     }
 
     protected String injectedJavaScriptObject = null;
@@ -323,6 +457,23 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     public void setInjectedJavaScriptObject(String obj) {
       this.injectedJavaScriptObject = obj;
       injectJavascriptObject();
+      // The all-frames document-start registrations embed the current value of
+      // injectedJavaScriptObject, so re-register them to pick up the updated object in frames
+      // which load from now on. This keeps the injected scripts consistent with the (main-frame)
+      // object delivered by injectJavascriptObject().
+      removeAllFramesInjectedScriptHandlers();
+      configureAllFramesInjectedScripts();
+    }
+
+    private void removeAllFramesInjectedScriptHandlers() {
+      if (allFramesBeforeContentLoadedScriptHandler != null) {
+        allFramesBeforeContentLoadedScriptHandler.remove();
+        allFramesBeforeContentLoadedScriptHandler = null;
+      }
+      if (allFramesInjectedJavaScriptScriptHandler != null) {
+        allFramesInjectedJavaScriptScriptHandler.remove();
+        allFramesInjectedJavaScriptScriptHandler = null;
+      }
     }
 
     public void onMessage(String message, String sourceUrl) {
@@ -418,6 +569,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     @Override
     public void destroy() {
+        removeAllFramesInjectedScriptHandlers();
         if (mWebChromeClient != null) {
             mWebChromeClient.onHideCustomView();
         }

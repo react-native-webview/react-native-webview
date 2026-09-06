@@ -234,25 +234,25 @@ const INJECTED_JAVASCRIPT = `(function() {
 
 ### `injectedJavaScriptForMainFrameOnly`[⬆](#props-index)
 
-If `true` (default; mandatory for Android), loads the `injectedJavaScript` only into the main frame.
+If `true` (default), loads the `injectedJavaScript` only into the main frame.
 
-If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+If `false`, loads it into all frames (e.g. iframes). On iOS and macOS this is implemented via `WKUserScript`; on Android the WebView's `addDocumentStartJavaScript` is used.
 
-| Type | Required | Platform                                          |
-| ---- | -------- | ------------------------------------------------- |
-| bool | No       | iOS and macOS (only `true` supported for Android) |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS, macOS, Android |
 
 ---
 
 ### `injectedJavaScriptBeforeContentLoadedForMainFrameOnly`[⬆](#props-index)
 
-If `true` (default; mandatory for Android), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
+If `true` (default), loads the `injectedJavaScriptBeforeContentLoaded` only into the main frame.
 
-If `false`, (only supported on iOS and macOS), loads it into all frames (e.g. iframes).
+If `false`, loads it into all frames (e.g. iframes). On iOS and macOS this is implemented via `WKUserScript`; on Android the WebView's `addDocumentStartJavaScript` is used.
 
-| Type | Required | Platform                                          |
-| ---- | -------- | ------------------------------------------------- |
-| bool | No       | iOS and macOS (only `true` supported for Android) |
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | iOS, macOS, Android |
 
 ---
 
