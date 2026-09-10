@@ -25,6 +25,21 @@ static NSDictionary* customCertificatesForHost;
 
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
+#if !TARGET_OS_OSX
+static void RNCCompleteJavaScriptDialogOnMainQueue(dispatch_block_t completionHandler)
+{
+  if (!completionHandler) {
+    return;
+  }
+
+  if ([NSThread isMainThread]) {
+    completionHandler();
+  } else {
+    dispatch_async(dispatch_get_main_queue(), completionHandler);
+  }
+}
+#endif // !TARGET_OS_OSX
+
 #if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -126,6 +141,11 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *injectedObjectJsonScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
+#if !TARGET_OS_OSX
+- (NSObject *)beginJavaScriptDialogWithFallback:(dispatch_block_t)fallback;
+- (BOOL)consumeJavaScriptDialogWithToken:(NSObject *)token;
+- (void)resolvePendingJavaScriptDialog;
+#endif // !TARGET_OS_OSX
 @end
 
 @implementation RNCWebViewImpl
@@ -143,6 +163,10 @@ RCTAutoInsetsProtocol>
   BOOL _isFullScreenVideoOpen;
 #if !TARGET_OS_OSX
   UIStatusBarStyle _savedStatusBarStyle;
+  // WebKit raises an exception if a JavaScript dialog completion handler is
+  // released without being called.
+  NSObject *_pendingJavaScriptDialogToken;
+  dispatch_block_t _pendingJavaScriptDialogCompletionHandler;
 #endif // !TARGET_OS_OSX
   BOOL _savedStatusBarHidden;
 
@@ -302,8 +326,41 @@ RCTAutoInsetsProtocol>
 }
 #endif // !TARGET_OS_OSX
 
+#if !TARGET_OS_OSX
+- (NSObject *)beginJavaScriptDialogWithFallback:(dispatch_block_t)fallback
+{
+  [self resolvePendingJavaScriptDialog];
+  NSObject *token = [NSObject new];
+  _pendingJavaScriptDialogToken = token;
+  _pendingJavaScriptDialogCompletionHandler = fallback;
+  return token;
+}
+
+- (BOOL)consumeJavaScriptDialogWithToken:(NSObject *)token
+{
+  if (_pendingJavaScriptDialogToken != token) {
+    return NO;
+  }
+
+  _pendingJavaScriptDialogToken = nil;
+  _pendingJavaScriptDialogCompletionHandler = nil;
+  return YES;
+}
+
+- (void)resolvePendingJavaScriptDialog
+{
+  dispatch_block_t completionHandler = _pendingJavaScriptDialogCompletionHandler;
+  _pendingJavaScriptDialogToken = nil;
+  _pendingJavaScriptDialogCompletionHandler = nil;
+  RNCCompleteJavaScriptDialogOnMainQueue(completionHandler);
+}
+#endif // !TARGET_OS_OSX
+
 - (void)dealloc
 {
+#if !TARGET_OS_OSX
+  [self resolvePendingJavaScriptDialog];
+#endif // !TARGET_OS_OSX
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self.webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
 }
@@ -492,6 +549,12 @@ RCTAutoInsetsProtocol>
 
 - (void)didMoveToWindow
 {
+#if !TARGET_OS_OSX
+  if (self.window == nil) {
+    [self resolvePendingJavaScriptDialog];
+  }
+#endif // !TARGET_OS_OSX
+
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
@@ -586,6 +649,9 @@ RCTAutoInsetsProtocol>
 
 - (void)destroyWebView
 {
+#if !TARGET_OS_OSX
+  [self resolvePendingJavaScriptDialog];
+#endif // !TARGET_OS_OSX
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
@@ -1172,11 +1238,23 @@ RCTAutoInsetsProtocol>
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
 #if !TARGET_OS_OSX
+  NSObject *completionToken = [self beginJavaScriptDialogWithFallback:^{
+    completionHandler();
+  }];
+  UIViewController *presentingViewController = [self topViewController];
+  if (!presentingViewController || !presentingViewController.viewIfLoaded.window) {
+    [self resolvePendingJavaScriptDialog];
+    return;
+  }
+
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
   [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+      return;
+    }
     completionHandler();
   }]];
-  [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+  [presentingViewController presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
   [alert setMessageText:message];
@@ -1191,14 +1269,29 @@ RCTAutoInsetsProtocol>
  */
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
 #if !TARGET_OS_OSX
+  NSObject *completionToken = [self beginJavaScriptDialogWithFallback:^{
+    completionHandler(NO);
+  }];
+  UIViewController *presentingViewController = [self topViewController];
+  if (!presentingViewController || !presentingViewController.viewIfLoaded.window) {
+    [self resolvePendingJavaScriptDialog];
+    return;
+  }
+
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
   [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+      return;
+    }
     completionHandler(YES);
   }]];
   [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action) {
+    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+      return;
+    }
     completionHandler(NO);
   }]];
-  [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+  [presentingViewController presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
   [alert setMessageText:message];
@@ -1216,20 +1309,35 @@ RCTAutoInsetsProtocol>
  */
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *))completionHandler{
 #if !TARGET_OS_OSX
+  NSObject *completionToken = [self beginJavaScriptDialogWithFallback:^{
+    completionHandler(nil);
+  }];
+  UIViewController *presentingViewController = [self topViewController];
+  if (!presentingViewController || !presentingViewController.viewIfLoaded.window) {
+    [self resolvePendingJavaScriptDialog];
+    return;
+  }
+
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
   [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
     textField.text = defaultText;
   }];
   UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+      return;
+    }
     completionHandler([[alert.textFields lastObject] text]);
   }];
   [alert addAction:okAction];
   UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action) {
+    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+      return;
+    }
     completionHandler(nil);
   }];
   [alert addAction:cancelAction];
   alert.preferredAction = okAction;
-  [[self topViewController] presentViewController:alert animated:YES completion:NULL];
+  [presentingViewController presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
   [alert setMessageText:prompt];
