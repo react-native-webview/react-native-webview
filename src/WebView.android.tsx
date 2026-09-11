@@ -3,6 +3,7 @@ import React, {
   ReactElement,
   useCallback,
   useEffect,
+  useId,
   useImperativeHandle,
   useRef,
 } from 'react';
@@ -53,11 +54,6 @@ registerCallableModule('RNCWebViewMessagingModule', {
   },
 });
 
-/**
- * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
- */
-let uniqueRef = 0;
-
 const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
   (
     {
@@ -99,7 +95,8 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
     },
     ref,
   ) => {
-    const messagingModuleName = useRef<string>(`WebViewMessageHandler${(uniqueRef += 1)}`).current;
+    const id = useId();
+    const messagingModuleName = `WebViewMessageHandler${id}`;
     const webViewRef = useRef<React.ComponentRef<HostComponent<NativeProps>> | null>(null);
 
     const onShouldStartLoadWithRequestCallback = useCallback(
