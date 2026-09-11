@@ -10,6 +10,7 @@
     "no-undefined": "off",
     "no-console": "off",
     "react/jsx-filename-extension": "off",
+    "react/forbid-component-props": "off",
     "react/react-in-jsx-scope": "off",
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "error",
