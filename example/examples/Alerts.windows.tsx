@@ -48,7 +48,7 @@ export default function Alerts() {
     <View style={{ height: 200 }}>
       {alertVisible ? (
         <View style={{ padding: 8, backgroundColor: '#eee' }}>
-          <Text>Hello! I am an alert box!</Text>
+          <Text>{'Hello! I am an alert box!'}</Text>
           <Button
             title="OK"
             onPress={() => {

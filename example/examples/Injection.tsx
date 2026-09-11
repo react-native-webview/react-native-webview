@@ -143,54 +143,66 @@ export default function Injection() {
         </View>
       </View>
       <Text>
-        This test presents three iframes: iframe_0 (yellow); iframe_1 (pink); and iframe_2
-        (transparent, because its 'X-Frame-Options' is set to 'SAMEORIGIN').
+        {
+          "This test presents three iframes: iframe_0 (yellow); iframe_1 (pink); and iframe_2 (transparent, because its 'X-Frame-Options' is set to 'SAMEORIGIN')."
+        }
       </Text>
       <Text>
-        Before injection, the main frame's background is the browser's default value (transparent or
-        white) and each frame has its natural colour.
+        {
+          "Before injection, the main frame's background is the browser's default value (transparent or white) and each frame has its natural colour."
+        }
       </Text>
       {/*<Text>1a) At injection time "beforeContentLoaded", a variable will be set in each frame to set 'orange' as the "colour to be used".</Text>*/}
       {/*<Text>1b) Also upon "beforeContentLoaded", a style element to change the text "beforeContentLoaded failed" -> "beforeContentLoaded succeeded" will be applied as soon as the head has loaded.</Text>*/}
       {/*<Text>2a) At injection time "afterContentLoaded", that variable will be read – if present, the colour orange will be injected into all frames. Otherwise, cyan.</Text>*/}
       {/*<Text>2b) Also upon "afterContentLoaded", a style element to change the text "afterContentLoaded failed" -> "afterContentLoaded succeeded" will be applied as soon as the head has loaded.</Text>*/}
       <Text>
-        ✅ If the main frame becomes orange, then top-frame injection both beforeContentLoaded and
-        afterContentLoaded is supported.
+        {
+          '✅ If the main frame becomes orange, then top-frame injection both beforeContentLoaded and afterContentLoaded is supported.'
+        }
       </Text>
       <Text>
-        ✅ If iframe_0, and iframe_1 become orange, then multi-frame injection beforeContentLoaded
-        and afterContentLoaded is supported.
+        {
+          '✅ If iframe_0, and iframe_1 become orange, then multi-frame injection beforeContentLoaded and afterContentLoaded is supported.'
+        }
       </Text>
       <Text>
-        ✅ If the two texts say "beforeContentLoaded on the top frame succeeded!" and
-        "afterContentLoaded on the top frame succeeded!", then both injection times are supported at
-        least on the main frame.
+        {
+          '✅ If the two texts say "beforeContentLoaded on the top frame succeeded!" and "afterContentLoaded on the top frame succeeded!", then both injection times are supported at least on the main frame.'
+        }
       </Text>
       <Text>
-        ❌ If either of the two iframes become coloured cyan, then for that given frame, JS
-        injection succeeded after the content loaded, but didn't occur before the content loaded.
-      </Text>
-      <Text>❌ If "Names of iframes that called beforeContentLoaded: " is [], then see above.</Text>
-      <Text>
-        ❌ If "Names of iframes that called afterContentLoaded: " is [], then afterContentLoaded is
-        not supported in iframes.
+        {
+          "❌ If either of the two iframes become coloured cyan, then for that given frame, JS injection succeeded after the content loaded, but didn't occur before the content loaded."
+        }
       </Text>
       <Text>
-        ❌ If the main frame becomes coloured cyan, then JS injection succeeded after the content
-        loaded, but didn't occur before the content loaded.
+        {'❌ If "Names of iframes that called beforeContentLoaded: " is [], then see above.'}
       </Text>
       <Text>
-        ❌ If the text "beforeContentLoaded on the top frame failed" remains unchanged, then JS
-        injection has failed on the main frame before the content loaded.
+        {
+          '❌ If "Names of iframes that called afterContentLoaded: " is [], then afterContentLoaded is not supported in iframes.'
+        }
       </Text>
       <Text>
-        ❌ If the text "afterContentLoaded on the top frame failed" remains unchanged, then JS
-        injection has failed on the main frame after the content loaded.
+        {
+          "❌ If the main frame becomes coloured cyan, then JS injection succeeded after the content loaded, but didn't occur before the content loaded."
+        }
       </Text>
       <Text>
-        ❌ If the iframes remain their original colours (yellow and pink), then multi-frame
-        injection is not supported at all.
+        {
+          '❌ If the text "beforeContentLoaded on the top frame failed" remains unchanged, then JS injection has failed on the main frame before the content loaded.'
+        }
+      </Text>
+      <Text>
+        {
+          '❌ If the text "afterContentLoaded on the top frame failed" remains unchanged, then JS injection has failed on the main frame after the content loaded.'
+        }
+      </Text>
+      <Text>
+        {
+          '❌ If the iframes remain their original colours (yellow and pink), then multi-frame injection is not supported at all.'
+        }
       </Text>
     </ScrollView>
   );

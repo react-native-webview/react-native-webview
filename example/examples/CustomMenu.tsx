@@ -86,9 +86,16 @@ export default function CustomMenu() {
       </View>
       {selectionInfo && (
         <Text>
-          onCustomMenuSelection called: {'\n'}- label: {selectionInfo?.label}
-          {'\n'}- key: {selectionInfo?.key}
-          {'\n'}- selectedText: {selectionInfo?.selectedText}
+          {'onCustomMenuSelection called: '}
+          {'\n'}
+          {'- label: '}
+          {selectionInfo?.label}
+          {'\n'}
+          {'- key: '}
+          {selectionInfo?.key}
+          {'\n'}
+          {'- selectedText: '}
+          {selectionInfo?.selectedText}
         </Text>
       )}
     </View>

@@ -37,7 +37,7 @@ export default function Background() {
           />
         </View>
       </View>
-      <Text>WebView is transparent contained in a View with a red backgroundColor</Text>
+      <Text>{'WebView is transparent contained in a View with a red backgroundColor'}</Text>
     </View>
   );
 }
