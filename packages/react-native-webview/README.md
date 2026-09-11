@@ -9,10 +9,10 @@
 
 ### Maintainers
 
-**Many thanks to these companies** for providing us with time to work on open source.  
+**Many thanks to these companies** for providing us with time to work on open source.
 Please note that maintainers spend a lot of free time working on this too so feel free to sponsor them, **it really makes a difference.**
 
-- [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://www.brigad.co/en-gb/about-us)  
+- [Thibault Malbranche](https://github.com/Titozzz) ([Twitter @titozzz](https://twitter.com/titozzz)) from [Brigad](https://www.brigad.co/en-gb/about-us)
   [_Sponsor me_ ❤️ !](https://github.com/sponsors/Titozzz)
 
 Windows and macOS are managed by Microsoft, notably:
@@ -26,18 +26,18 @@ Shout-out to [Jamon Holmgren](https://github.com/jamonholmgren) from [Infinite R
 
 Maintaining WebView is very complex because it is often used for many different use cases (rendering SVGs, PDFs, login flows, and much more). We also support many platforms.
 
-Since WebView was extracted from the React Native core, nearly 500 pull requests have been merged.  
+Since WebView was extracted from the React Native core, nearly 500 pull requests have been merged.
 Considering that we have limited time, issues will mostly serve as a discussion place for the community, while **we will prioritize reviewing and merging pull requests.**
 
 ### Platform compatibility
 
-This project is compatible with **iOS**, **Android**, **Windows** and **macOS**.  
-This project only supports **the new architecture** (fabric); the legacy architecture (paper) is no longer supported. This requires **React Native 0.76 or newer** (with the new architecture enabled) and **iOS 15.1 or newer**; on macOS, react-native-macos 0.76 or newer.  
+This project is compatible with **iOS**, **Android**, **Windows** and **macOS**.
+This project only supports **the new architecture** (fabric); the legacy architecture (paper) is no longer supported. This requires **React Native 0.76 or newer** (with the new architecture enabled) and **iOS 15.1 or newer**; on macOS, react-native-macos 0.76 or newer.
 This project is compatible with [expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
 ### Getting Started
 
-Read our [Getting Started Guide](docs/Getting-Started.md). If any step seems unclear, please create a pull request.
+Read our [Getting Started Guide](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Getting-Started.md). If any step seems unclear, please create a pull request.
 
 ### Versioning
 
@@ -63,7 +63,7 @@ const MyWebComponent = () => {
 };
 ```
 
-For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide.md). If you're interested in contributing, check out the [Contributing Guide](./docs/Contributing.md).
+For more, read the [API Reference](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md) and [Guide](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Guide.md). If you're interested in contributing, check out the [Contributing Guide](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Contributing.md).
 
 ### Common issues
 
@@ -77,7 +77,7 @@ Contributions are welcome, see [Contributing.md](https://github.com/react-native
 The library lives in `packages/react-native-webview`. Platform example apps live
 in `packages/example-mobile`, `packages/example-windows`, `packages/example-macos`,
 and `packages/example-visionos`, with screens shared through `packages/example-shared`.
-See the [development instructions](docs/Contributing.md#testing-within-react-native-webview)
+See the [development instructions](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Contributing.md#testing-within-react-native-webview)
 for each platform's install and run commands.
 
 ### License
@@ -88,6 +88,6 @@ MIT
 
 This readme is available in:
 
-- [Brazilian portuguese](docs/README.portuguese.md)
-- [French](docs/README.french.md)
-- [Italian](docs/README.italian.md)
+- [Brazilian portuguese](https://github.com/react-native-webview/react-native-webview/blob/master/docs/README.portuguese.md)
+- [French](https://github.com/react-native-webview/react-native-webview/blob/master/docs/README.french.md)
+- [Italian](https://github.com/react-native-webview/react-native-webview/blob/master/docs/README.italian.md)

@@ -1,4 +1,4 @@
-name: macOS
+name: visionOS
 on:
   push:
     branches:
@@ -16,15 +16,15 @@ jobs:
           bun-version: 1.4.1
       - name: Install dependencies
         run: bun install --frozen-lockfile
-        working-directory: packages/example-macos
+        working-directory: packages/example-visionos
       - name: Bundle example JavaScript
         run: bun run bundle
-        working-directory: packages/example-macos
+        working-directory: packages/example-visionos
       - name: Install Pods
         run: pod install
-        working-directory: packages/example-macos/macos
-      - name: Build macOS test app
+        working-directory: packages/example-visionos/visionos
+      - name: Build visionOS test app
         run: |
-          xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
-        working-directory: packages/example-macos/macos
+          xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination 'generic/platform=visionOS Simulator' CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
+        working-directory: packages/example-visionos/visionos
     timeout-minutes: 60

@@ -1,0 +1,13 @@
+{
+  "name": "WebviewExample",
+  "displayName": "WebviewExample",
+  "components": [
+    {
+      "appKey": "WebviewExample",
+      "displayName": "WebviewExample"
+    }
+  ],
+  "resources": {
+    "visionos": ["dist/assets", "dist/main.visionos.jsbundle"]
+  }
+}

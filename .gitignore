@@ -60,3 +60,7 @@ lib/
 .settings/
 msbuild.binlog
 example/msbuild.binlog
+
+# Example bundles and native build output
+packages/example-*/dist/
+*.tgz

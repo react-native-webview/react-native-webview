@@ -1,0 +1,25 @@
+{
+  "name": "example-visionos",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "react-native start",
+    "visionos": "react-native run-visionos",
+    "bundle": "react-native bundle --platform ios --resolver-option platformExtension=visionos --dev false --entry-file index.js --bundle-output dist/main.visionos.jsbundle --assets-dest dist/assets"
+  },
+  "dependencies": {
+    "example-shared": "file:../example-shared",
+    "react": "19.0.0",
+    "react-native": "0.79.6",
+    "react-native-webview": "file:../react-native-webview"
+  },
+  "devDependencies": {
+    "@callstack/out-of-tree-platforms": "0.77.0",
+    "@callstack/react-native-visionos": "0.79.6",
+    "@react-native-community/cli": "20.0.0",
+    "@react-native/babel-preset": "0.79.6",
+    "@react-native/metro-config": "0.79.6",
+    "@rnx-kit/metro-config": "2.2.4",
+    "react-native-test-app": "5.4.1"
+  }
+}
