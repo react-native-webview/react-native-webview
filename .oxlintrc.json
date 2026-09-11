@@ -15,6 +15,7 @@
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "error",
     "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-member-accessibility": "off",
     "typescript/explicit-module-boundary-types": "off",
     "typescript/no-var-requires": "off",
     "typescript/no-require-imports": "off",
