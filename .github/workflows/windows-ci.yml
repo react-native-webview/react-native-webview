@@ -39,7 +39,7 @@ jobs:
         run: bun run build
 
       - name: Type check
-        run: bun run lint:tsgo
+        run: bun run lint:tsc
 
       # `install-windows-test-app` generates a Fabric (New Architecture) app by
       # default for react-native-windows >= 0.80, and the module is built as
