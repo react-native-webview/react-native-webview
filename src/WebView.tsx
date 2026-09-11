@@ -9,7 +9,7 @@ export type WebViewProps = IOSWebViewProps & AndroidWebViewProps & WindowsWebVie
 // like for example Expo SDK "web" platform.
 const WebView: React.FunctionComponent<WebViewProps> = () => (
   <View style={styles.flexStart}>
-    <Text style={styles.colorRed}>React Native WebView does not support this platform.</Text>
+    <Text style={styles.colorRed}>{'React Native WebView does not support this platform.'}</Text>
   </View>
 );
 

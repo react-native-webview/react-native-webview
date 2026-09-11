@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
 import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
@@ -18,10 +18,12 @@ const resolveAssetSource = (source: ImageSourcePropType) => Image.resolveAssetSo
 // oxlint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
   const ref = useRef(value);
-  if (ref.current !== value) {
-    console.warn(`Changes to property ${name} do nothing after the initial render.`);
-    ref.current = value;
-  }
+  useEffect(() => {
+    if (ref.current !== value) {
+      console.warn(`Changes to property ${name} do nothing after the initial render.`);
+      ref.current = value;
+    }
+  }, [value, name]);
 };
 
 const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(

@@ -120,7 +120,7 @@ export default function App() {
         style={styles.restartButton}
         activeOpacity={0.6}
       >
-        <Text>Simulate Restart</Text>
+        <Text>{'Simulate Restart'}</Text>
       </TouchableOpacity>
 
       <View style={styles.testPickerContainer}>

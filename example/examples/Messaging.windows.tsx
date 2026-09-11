@@ -50,7 +50,10 @@ export default function Messaging() {
   return (
     <View style={{ height: 120 }}>
       {lastMessage ? (
-        <Text style={{ padding: 4, backgroundColor: '#eee' }}>Message from JS: {lastMessage}</Text>
+        <Text style={{ padding: 4, backgroundColor: '#eee' }}>
+          {'Message from JS: '}
+          {lastMessage}
+        </Text>
       ) : null}
       <TextInput
         placeholder="Type a message and press Enter"

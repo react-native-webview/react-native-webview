@@ -76,7 +76,7 @@ const defaultRenderError = (
   errorDesc: string,
 ) => (
   <View style={styles.loadingOrErrorView}>
-    <Text style={styles.errorTextTitle}>Error loading page</Text>
+    <Text style={styles.errorTextTitle}>{'Error loading page'}</Text>
     <Text style={styles.errorText}>{`Domain: ${errorDomain}`}</Text>
     <Text style={styles.errorText}>{`Error Code: ${errorCode}`}</Text>
     <Text style={styles.errorText}>{`Description: ${errorDesc}`}</Text>

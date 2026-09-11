@@ -53,7 +53,7 @@ export default function Scrolling() {
         title={scrollEnabled ? 'Scroll enabled' : 'Scroll disabled'}
         onPress={() => setScrollEnabled((value) => !value)}
       />
-      <Text>Last scroll event:</Text>
+      <Text>{'Last scroll event:'}</Text>
       <Text>{lastScrollEvent}</Text>
     </View>
   );

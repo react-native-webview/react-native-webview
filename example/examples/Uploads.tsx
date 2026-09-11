@@ -46,11 +46,9 @@ export default function Uploads() {
         />
       </View>
       <Text>
-        Android limitation: If the file input should show camera options for the user, and the app
-        has the ability to request the camera permission, then the user must grant permission first
-        in order to see the options. Since this example app does have the permission declared, you
-        must allow it in settings to be able to see camera options. If your app does not have the
-        camera permission declared, then there is no restriction to showing the camera options.
+        {
+          'Android limitation: If the file input should show camera options for the user, and the app has the ability to request the camera permission, then the user must grant permission first in order to see the options. Since this example app does have the permission declared, you must allow it in settings to be able to see camera options. If your app does not have the camera permission declared, then there is no restriction to showing the camera options.'
+        }
       </Text>
       <Button
         title="Open settings"

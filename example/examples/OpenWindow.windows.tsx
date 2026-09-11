@@ -94,7 +94,7 @@ export default function OpenWindow() {
   return (
     <View style={styles.container}>
       <View style={styles.interceptSection}>
-        <Text style={styles.text}>Intercept OpenWindow event</Text>
+        <Text style={styles.text}>{'Intercept OpenWindow event'}</Text>
         <Switch
           onValueChange={toggleShouldInterceptOpenWindow}
           value={shouldInterceptOpenWindow}
