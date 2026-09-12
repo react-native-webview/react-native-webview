@@ -8,7 +8,13 @@ import React, {
   useRef,
 } from 'react';
 
-import { Image, View, ImageSourcePropType, HostComponent, registerCallableModule } from 'react-native';
+import {
+  Image,
+  View,
+  ImageSourcePropType,
+  HostComponent,
+  registerCallableModule,
+} from 'react-native';
 
 import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 
