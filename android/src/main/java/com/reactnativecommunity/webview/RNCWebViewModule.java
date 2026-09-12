@@ -48,8 +48,6 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
 
     final private ReactApplicationContext mContext;
 
-    private DownloadManager.Request mDownloadRequest;
-
     private ValueCallback<Uri[]> mFilePathCallback;
     private File mOutputImage;
     private File mOutputVideo;
@@ -161,7 +159,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         }
     }
 
-    private PermissionListener getWebviewFileDownloaderPermissionListener(String downloadingMessage, String lackPermissionToDownloadMessage) {
+    private PermissionListener getWebviewFileDownloaderPermissionListener(DownloadManager.Request downloadRequest, String downloadingMessage, String lackPermissionToDownloadMessage) {
         return new PermissionListener() {
             @Override
             public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -169,9 +167,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
                     case FILE_DOWNLOAD_PERMISSION_REQUEST: {
                         // If request is cancelled, the result arrays are empty.
                         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                            if (mDownloadRequest != null) {
-                                downloadFile(downloadingMessage);
-                            }
+                            downloadFile(downloadRequest, downloadingMessage);
                         } else {
                             Toast.makeText(mContext, lackPermissionToDownloadMessage, Toast.LENGTH_LONG).show();
                         }
@@ -261,15 +257,11 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         return true;
     }
 
-    public void setDownloadRequest(DownloadManager.Request request) {
-        mDownloadRequest = request;
-    }
-
-    public void downloadFile(String downloadingMessage) {
+    public void downloadFile(DownloadManager.Request downloadRequest, String downloadingMessage) {
         DownloadManager dm = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
         try {
-            dm.enqueue(mDownloadRequest);
+            dm.enqueue(downloadRequest);
         } catch (IllegalArgumentException | SecurityException e) {
             Log.w("RNCWebViewModule", "Unsupported URI, aborting download", e);
             return;
@@ -278,7 +270,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         Toast.makeText(mContext, downloadingMessage, Toast.LENGTH_LONG).show();
     }
 
-    public boolean grantFileDownloaderPermissions(String downloadingMessage, String lackPermissionToDownloadMessage) {
+    public boolean grantFileDownloaderPermissions(DownloadManager.Request downloadRequest, String downloadingMessage, String lackPermissionToDownloadMessage) {
         Activity activity = mContext.getCurrentActivity();
         // Permission not required for Android Q and above
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
@@ -288,7 +280,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         boolean result = ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         if (!result) {
             PermissionAwareActivity PAactivity = getPermissionAwareActivity();
-            PAactivity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, FILE_DOWNLOAD_PERMISSION_REQUEST, getWebviewFileDownloaderPermissionListener(downloadingMessage, lackPermissionToDownloadMessage));
+            PAactivity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, FILE_DOWNLOAD_PERMISSION_REQUEST, getWebviewFileDownloaderPermissionListener(downloadRequest, downloadingMessage, lackPermissionToDownloadMessage));
         }
 
         return result;
