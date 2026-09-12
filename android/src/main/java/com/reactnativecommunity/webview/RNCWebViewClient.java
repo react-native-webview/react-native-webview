@@ -101,17 +101,19 @@ public class RNCWebViewClient extends WebViewClient {
             try {
                 assert lockObject != null;
                 synchronized (lockObject) {
-                    final long startTime = SystemClock.elapsedRealtime();
+                    final long deadline = SystemClock.elapsedRealtime() + SHOULD_OVERRIDE_URL_LOADING_TIMEOUT;
                     while (lockObject.get() == RNCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.UNDECIDED) {
-                        if (SystemClock.elapsedRealtime() - startTime > SHOULD_OVERRIDE_URL_LOADING_TIMEOUT) {
+                        final long remaining = deadline - SystemClock.elapsedRealtime();
+                        if (remaining <= 0) {
                             FLog.w(TAG, "Did not receive response to shouldOverrideUrlLoading in time, defaulting to allow loading.");
                             RNCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
                             return false;
                         }
-                        lockObject.wait(SHOULD_OVERRIDE_URL_LOADING_TIMEOUT);
+                        lockObject.wait(remaining);
                     }
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 FLog.e(TAG, "shouldOverrideUrlLoading was interrupted while waiting for result.", e);
                 RNCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
                 return false;
