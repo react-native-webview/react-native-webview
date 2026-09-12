@@ -26,6 +26,13 @@ static NSDictionary* customCertificatesForHost;
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 #if TARGET_OS_IOS
+@protocol RNCGoogleMobileAds <NSObject>
++ (instancetype)sharedInstance;
+- (void)registerWebView:(WKWebView *)webView;
+@end
+#endif // TARGET_OS_IOS
+
+#if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
 @interface _SwizzleHelperWK : UIView
@@ -126,6 +133,9 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *injectedObjectJsonScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
+#if TARGET_OS_IOS
+- (void)registerWebViewWithGoogleMobileAds;
+#endif // TARGET_OS_IOS
 @end
 
 @implementation RNCWebViewImpl
@@ -137,6 +147,9 @@ RCTAutoInsetsProtocol>
 #endif // !TARGET_OS_OSX
   BOOL _savedHideKeyboardAccessoryView;
   BOOL _savedKeyboardDisplayRequiresUserAction;
+#if TARGET_OS_IOS
+  BOOL _googleMobileAdsWebViewRegistered;
+#endif // TARGET_OS_IOS
 
   // Workaround for StatusBar appearance bug for iOS 12
   // https://github.com/react-native-webview/react-native-webview/issues/62
@@ -490,11 +503,50 @@ RCTAutoInsetsProtocol>
   return wkWebViewConfig;
 }
 
+- (void)setGoogleMobileAdsWebViewRegistrationEnabled:(BOOL)enabled
+{
+  _googleMobileAdsWebViewRegistrationEnabled = enabled;
+#if TARGET_OS_IOS
+  if (enabled && _webView != nil) {
+    [self registerWebViewWithGoogleMobileAds];
+  }
+#endif // TARGET_OS_IOS
+}
+
+#if TARGET_OS_IOS
+- (void)registerWebViewWithGoogleMobileAds
+{
+  if (_googleMobileAdsWebViewRegistered) {
+    return;
+  }
+
+  Class<RNCGoogleMobileAds> mobileAdsClass = (Class<RNCGoogleMobileAds>)NSClassFromString(@"GADMobileAds");
+  if (mobileAdsClass == nil || ![mobileAdsClass respondsToSelector:@selector(sharedInstance)]) {
+    RCTLogWarn(@"Unable to register WebView with Google Mobile Ads because the SDK is unavailable");
+    return;
+  }
+
+  id<RNCGoogleMobileAds> mobileAds = [mobileAdsClass sharedInstance];
+  if (![mobileAds respondsToSelector:@selector(registerWebView:)]) {
+    RCTLogWarn(@"Unable to register WebView with Google Mobile Ads because registerWebView: is unavailable");
+    return;
+  }
+
+  [mobileAds registerWebView:_webView];
+  _googleMobileAdsWebViewRegistered = YES;
+}
+#endif // TARGET_OS_IOS
+
 - (void)didMoveToWindow
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
     _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+#if TARGET_OS_IOS
+    if (_googleMobileAdsWebViewRegistrationEnabled) {
+      [self registerWebViewWithGoogleMobileAds];
+    }
+#endif // TARGET_OS_IOS
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     // Apply once at creation time. The prop is documented as non-reactive —
@@ -607,6 +659,9 @@ RCTAutoInsetsProtocol>
     }
 #endif // !TARGET_OS_OSX
     _webView = nil;
+#if TARGET_OS_IOS
+  _googleMobileAdsWebViewRegistered = NO;
+#endif // TARGET_OS_IOS
     if (_onContentProcessDidTerminate) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
       _onContentProcessDidTerminate(event);

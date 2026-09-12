@@ -243,6 +243,7 @@ export interface NativeProps extends ViewProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: WithDefault<boolean, true>;
   javaScriptCanOpenWindowsAutomatically?: boolean;
   javaScriptEnabled?: WithDefault<boolean, true>;
+  googleMobileAdsWebViewRegistrationEnabled?: boolean;
   webviewDebuggingEnabled?: boolean;
   mediaPlaybackRequiresUserAction?: WithDefault<boolean, true>;
   messagingEnabled: boolean;
