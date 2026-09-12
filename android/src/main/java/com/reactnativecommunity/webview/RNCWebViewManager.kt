@@ -496,22 +496,22 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "injectedJavaScript")
     override fun setInjectedJavaScript(view: RNCWebViewWrapper, value: String?) {
-        view.webView.injectedJS = value
+        view.webView.setInjectedJS(value)
     }
 
     @ReactProp(name = "injectedJavaScriptBeforeContentLoaded")
     override fun setInjectedJavaScriptBeforeContentLoaded(view: RNCWebViewWrapper, value: String?) {
-        view.webView.injectedJSBeforeContentLoaded = value
+        view.webView.setInjectedJSBeforeContentLoaded(value)
     }
 
     @ReactProp(name = "injectedJavaScriptForMainFrameOnly")
     override fun setInjectedJavaScriptForMainFrameOnly(view: RNCWebViewWrapper, value: Boolean) {
-        view.webView.injectedJavaScriptForMainFrameOnly = value
+        view.webView.setInjectedJavaScriptForMainFrameOnly(value)
     }
 
     @ReactProp(name = "injectedJavaScriptBeforeContentLoadedForMainFrameOnly")
     override fun setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(view: RNCWebViewWrapper, value: Boolean) {
-        view.webView.injectedJavaScriptBeforeContentLoadedForMainFrameOnly = value
+        view.webView.setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(value)
     }
 
     @ReactProp(name = "injectedJavaScriptObject")
