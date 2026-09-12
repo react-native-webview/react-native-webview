@@ -128,6 +128,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL limitsNavigationsToAppBoundDomains;
 @property (nonatomic, assign) BOOL textInteractionEnabled;
 @property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
+@property (nonatomic, assign) RNCWebViewPermissionGrantType deviceOrientationAndMotionGrantType;
 #endif  // !TARGET_OS_OSX
 
 #if !TARGET_OS_OSX

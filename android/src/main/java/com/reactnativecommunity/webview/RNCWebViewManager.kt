@@ -729,6 +729,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     override fun setMediaCapturePermissionGrantType(view: RNCWebViewWrapper, value: String?) {}
 
+    override fun setDeviceOrientationAndMotionGrantType(view: RNCWebViewWrapper, value: String?) {}
+
     override fun setFraudulentWebsiteWarningEnabled(view: RNCWebViewWrapper, value: Boolean) {}
     /* !iOS PROPS - not implemented here */
 

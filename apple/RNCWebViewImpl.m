@@ -196,6 +196,7 @@ RCTAutoInsetsProtocol>
     _fraudulentWebsiteWarningEnabled = YES;
     _textInteractionEnabled = YES;
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
+    _deviceOrientationAndMotionGrantType = RNCWebViewPermissionGrantType_Prompt;
     if (@available(iOS 16.0, *)) {
       _editMenuInteraction = [[UIEditMenuInteraction alloc] initWithDelegate:self];
       [self addInteraction:_editMenuInteraction];
@@ -1272,6 +1273,29 @@ RCTAutoInsetsProtocol>
   } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Deny) {
     decisionHandler(WKPermissionDecisionDeny);
   } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Grant) {
+    decisionHandler(WKPermissionDecisionGrant);
+  } else {
+    decisionHandler(WKPermissionDecisionPrompt);
+  }
+}
+
+/**
+ * Device orientation and motion permissions (prevent multiple prompts)
+ */
+- (void)                                  webView:(WKWebView *)webView
+  requestDeviceOrientationAndMotionPermissionForOrigin:(WKSecurityOrigin *)origin
+                                  initiatedByFrame:(WKFrameInfo *)frame
+                                   decisionHandler:(void (^)(WKPermissionDecision decision))decisionHandler {
+  if (_deviceOrientationAndMotionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt || _deviceOrientationAndMotionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny) {
+    if ([origin.host isEqualToString:webView.URL.host]) {
+      decisionHandler(WKPermissionDecisionGrant);
+    } else {
+      WKPermissionDecision decision = _deviceOrientationAndMotionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt ? WKPermissionDecisionPrompt : WKPermissionDecisionDeny;
+      decisionHandler(decision);
+    }
+  } else if (_deviceOrientationAndMotionGrantType == RNCWebViewPermissionGrantType_Deny) {
+    decisionHandler(WKPermissionDecisionDeny);
+  } else if (_deviceOrientationAndMotionGrantType == RNCWebViewPermissionGrantType_Grant) {
     decisionHandler(WKPermissionDecisionGrant);
   } else {
     decisionHandler(WKPermissionDecisionPrompt);
