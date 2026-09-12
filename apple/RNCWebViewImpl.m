@@ -1698,6 +1698,10 @@ didFinishNavigation:(WKNavigation *)navigation
     // forMainFrameOnly:_messagingEnabledForMainFrameOnly
     forMainFrameOnly:YES
   ];
+
+  if(_webView != nil){
+    [self resetupScripts:_webView.configuration];
+  }
 }
 
 - (void)setEnableApplePay:(BOOL)enableApplePay {
