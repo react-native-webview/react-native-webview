@@ -73,11 +73,47 @@ jobs:
 
       - name: Start Appium server
         shell: powershell
-        run: Start-Process -WindowStyle Hidden -FilePath powershell -ArgumentList @('-Command', 'bun run --bun appium *> appium.log')
+        run: |
+          $appium = Start-Process -WindowStyle Hidden -FilePath (Get-Command bun).Source -ArgumentList @('run', '--bun', 'appium', '--log-timestamp') -RedirectStandardOutput appium.log -RedirectStandardError appium.error.log -PassThru
+          $ready = $false
+          foreach ($attempt in 1..30) {
+            if ($appium.HasExited) { break }
+            try {
+              $status = Invoke-RestMethod -Uri http://127.0.0.1:4723/wd/hub/status -TimeoutSec 2
+              if ($status.value.build.version) {
+                $ready = $true
+                break
+              }
+            } catch {}
+            Start-Sleep -Seconds 2
+          }
+          if (-not $ready) {
+            Get-Content appium.log, appium.error.log -Tail 100 -ErrorAction SilentlyContinue
+            throw 'Appium did not become ready on port 4723'
+          }
+          Write-Host "Appium $($status.value.build.version) is ready"
 
       - name: Start React server
         shell: powershell
-        run: Start-Process -WindowStyle Hidden PowerShell -ArgumentList "bun run start"
+        run: |
+          $metro = Start-Process -WindowStyle Hidden -FilePath (Get-Command bun).Source -ArgumentList @('run', 'start', '--no-interactive') -RedirectStandardOutput metro.log -RedirectStandardError metro.error.log -PassThru
+          $ready = $false
+          foreach ($attempt in 1..30) {
+            if ($metro.HasExited) { break }
+            try {
+              $status = Invoke-RestMethod -Uri http://127.0.0.1:8081/status -TimeoutSec 2
+              if ($status -eq 'packager-status:running') {
+                $ready = $true
+                break
+              }
+            } catch {}
+            Start-Sleep -Seconds 2
+          }
+          if (-not $ready) {
+            Get-Content metro.log, metro.error.log -Tail 100 -ErrorAction SilentlyContinue
+            throw 'Metro did not become ready on port 8081'
+          }
+          Write-Host 'Metro is ready'
 
       # Launch the app ourselves and hand the tests its top-level window
       # handle: WinAppDriver only waits a few seconds for a launched app's
@@ -114,17 +150,15 @@ jobs:
       - name: Run tests
         run: bun run test
 
-      - name: Appium log
+      - name: Test server logs
         if: failure()
         shell: powershell
         run: |
-          if (Test-Path appium.log) {
-            Write-Host '===== appium.log errors (with context) ====='
-            Select-String -Path appium.log -Pattern 'Original error|Internal Error|"status":13|ERR' -Context 3, 3 |
-              Select-Object -Last 40 |
-              ForEach-Object { $_.ToString() }
-          } else {
-            Write-Host 'no appium.log'
+          foreach ($log in 'appium.log', 'appium.error.log', 'metro.log', 'metro.error.log') {
+            if (Test-Path $log) {
+              Write-Host "===== $log ====="
+              Get-Content $log -Tail 100
+            }
           }
           Write-Host '===== recent Application error events ====='
           Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
