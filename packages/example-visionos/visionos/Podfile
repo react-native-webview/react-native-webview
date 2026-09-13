@@ -1,7 +1,10 @@
 require_relative '../node_modules/react-native-test-app/visionos/test_app'
 
+# Upstream prebuilt frameworks do not contain visionOS slices.
+ENV['RCT_USE_RN_DEP'] = '0'
+ENV['RCT_USE_PREBUILT_RNCORE'] = '0'
+ENV['RCT_BUILD_HERMES_FROM_SOURCE'] = 'true'
+
 workspace 'WebviewExample.xcworkspace'
 
-# :new_arch_enabled is required until react-native-visionos reaches 0.82+,
-# where the new architecture becomes the only option.
-use_test_app! :new_arch_enabled => true
+use_test_app!

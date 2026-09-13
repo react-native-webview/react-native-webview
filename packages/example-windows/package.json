@@ -16,7 +16,7 @@
     "react-native-webview": "file:../react-native-webview"
   },
   "devDependencies": {
-    "@react-native-community/cli": "20.0.0",
+    "@react-native-community/cli": "20.2.0",
     "@react-native-windows/find-dotnet-tools": "0.84.0",
     "@react-native/babel-preset": "0.84.1",
     "@react-native/metro-config": "0.84.1",

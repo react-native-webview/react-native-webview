@@ -31,11 +31,11 @@
     "@babel/cli": "^7.29.7",
     "@babel/core": "^7.29.7",
     "@babel/runtime": "^7.29.7",
-    "@react-native/babel-preset": "0.86.0",
-    "@react-native/eslint-config": "0.86.0",
-    "@react-native/jest-preset": "0.86.0",
-    "@react-native/metro-config": "0.86.0",
-    "@react-native/typescript-config": "0.86.0",
+    "@react-native/babel-preset": "0.87.1",
+    "@react-native/eslint-config": "0.87.1",
+    "@react-native/jest-preset": "0.87.1",
+    "@react-native/metro-config": "0.87.1",
+    "@react-native/typescript-config": "0.87.1",
     "@rnx-kit/metro-config": "2.2.4",
     "@semantic-release/commit-analyzer": "13.0.1",
     "@semantic-release/git": "10.0.1",
@@ -50,9 +50,12 @@
     "oxlint": "1.82.0",
     "oxlint-tsgolint": "7.0.2001",
     "react": "19.2.7",
-    "react-native": "0.86.0",
+    "react-native": "0.87.1",
     "semantic-release": "25.0.3",
     "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": "^22.13.0 || ^24.3.0 || >=26.0.0"
   },
   "packageManager": "bun@1.4.1"
 }

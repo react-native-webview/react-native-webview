@@ -1,4 +1,7 @@
 {
   "extends": "@react-native/typescript-config",
+  "compilerOptions": {
+    "customConditions": ["react-native", "react-native-legacy-deep-imports"]
+  },
   "include": ["packages/react-native-webview/src/*"]
 }
