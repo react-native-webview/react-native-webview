@@ -71,84 +71,92 @@ jobs:
           Write-Host "App User Model ID: $aumid"
           "WEBVIEW_APP_PATH=$aumid" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Start Appium server
+      # Keep the servers and tests in the same step. The runner can terminate
+      # child processes when their launching shell exits with open output streams.
+      - name: Run Windows end-to-end tests
         shell: powershell
         run: |
-          $appium = Start-Process -WindowStyle Hidden -FilePath (Get-Command bun).Source -ArgumentList @('run', '--bun', 'appium', '--log-timestamp') -RedirectStandardOutput appium.log -RedirectStandardError appium.error.log -PassThru
-          $ready = $false
-          foreach ($attempt in 1..30) {
-            if ($appium.HasExited) { break }
-            try {
-              $status = Invoke-RestMethod -Uri http://127.0.0.1:4723/wd/hub/status -TimeoutSec 2
-              if ($status.value.build.version) {
-                $ready = $true
+          $appium = $null
+          $metro = $null
+          $testExitCode = 1
+          try {
+            $appium = Start-Process -WindowStyle Hidden -FilePath (Get-Command bun).Source -ArgumentList @('run', '--bun', 'appium', '--log-timestamp') -RedirectStandardOutput appium.log -RedirectStandardError appium.error.log -PassThru
+            $ready = $false
+            foreach ($attempt in 1..30) {
+              if ($appium.HasExited) { break }
+              try {
+                $status = Invoke-RestMethod -Uri http://127.0.0.1:4723/wd/hub/status -TimeoutSec 2
+                if ($status.value.build.version) {
+                  $ready = $true
+                  break
+                }
+              } catch {}
+              Start-Sleep -Seconds 2
+            }
+            if (-not $ready) {
+              Get-Content appium.log, appium.error.log -Tail 100 -ErrorAction SilentlyContinue
+              throw 'Appium did not become ready on port 4723'
+            }
+            Write-Host "Appium $($status.value.build.version) is ready"
+
+            $metro = Start-Process -WindowStyle Hidden -FilePath (Get-Command bun).Source -ArgumentList @('run', 'start', '--no-interactive') -RedirectStandardOutput metro.log -RedirectStandardError metro.error.log -PassThru
+            $ready = $false
+            foreach ($attempt in 1..30) {
+              if ($metro.HasExited) { break }
+              try {
+                $status = Invoke-RestMethod -Uri http://127.0.0.1:8081/status -TimeoutSec 2
+                if ($status -eq 'packager-status:running') {
+                  $ready = $true
+                  break
+                }
+              } catch {}
+              Start-Sleep -Seconds 2
+            }
+            if (-not $ready) {
+              Get-Content metro.log, metro.error.log -Tail 100 -ErrorAction SilentlyContinue
+              throw 'Metro did not become ready on port 8081'
+            }
+            Write-Host 'Metro is ready'
+
+            # Attach to an existing window: a cold start can exceed WinAppDriver's launch timeout.
+            Start-Process "shell:AppsFolder\$env:WEBVIEW_APP_PATH"
+            $handle = 0
+            foreach ($i in 1..30) {
+              Start-Sleep -Seconds 2
+              $proc = Get-Process -Name ReactApp -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+              if ($proc) {
+                $handle = $proc.MainWindowHandle
+                Write-Host "ReactApp pid $($proc.Id) window title '$($proc.MainWindowTitle)' handle $handle"
                 break
               }
-            } catch {}
-            Start-Sleep -Seconds 2
-          }
-          if (-not $ready) {
-            Get-Content appium.log, appium.error.log -Tail 100 -ErrorAction SilentlyContinue
-            throw 'Appium did not become ready on port 4723'
-          }
-          Write-Host "Appium $($status.value.build.version) is ready"
-
-      - name: Start React server
-        shell: powershell
-        run: |
-          $metro = Start-Process -WindowStyle Hidden -FilePath (Get-Command bun).Source -ArgumentList @('run', 'start', '--no-interactive') -RedirectStandardOutput metro.log -RedirectStandardError metro.error.log -PassThru
-          $ready = $false
-          foreach ($attempt in 1..30) {
-            if ($metro.HasExited) { break }
-            try {
-              $status = Invoke-RestMethod -Uri http://127.0.0.1:8081/status -TimeoutSec 2
-              if ($status -eq 'packager-status:running') {
-                $ready = $true
-                break
+              if (-not (Get-Process -Name ReactApp -ErrorAction SilentlyContinue)) {
+                Write-Host "ReactApp process is not running (attempt $i)"
               }
-            } catch {}
-            Start-Sleep -Seconds 2
-          }
-          if (-not $ready) {
-            Get-Content metro.log, metro.error.log -Tail 100 -ErrorAction SilentlyContinue
-            throw 'Metro did not become ready on port 8081'
-          }
-          Write-Host 'Metro is ready'
-
-      # Launch the app ourselves and hand the tests its top-level window
-      # handle: WinAppDriver only waits a few seconds for a launched app's
-      # window, which the first cold start (WebView2 + Hermes init) can
-      # exceed. Also surfaces the crash event log if the app dies.
-      - name: Launch test app
-        shell: powershell
-        run: |
-          Start-Process "shell:AppsFolder\$env:WEBVIEW_APP_PATH"
-          $handle = 0
-          foreach ($i in 1..30) {
-            Start-Sleep -Seconds 2
-            $proc = Get-Process -Name ReactApp -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
-            if ($proc) {
-              $handle = $proc.MainWindowHandle
-              Write-Host "ReactApp pid $($proc.Id) window title '$($proc.MainWindowTitle)' handle $handle"
-              break
             }
-            if (-not (Get-Process -Name ReactApp -ErrorAction SilentlyContinue)) {
-              Write-Host "ReactApp process is not running (attempt $i)"
+            if ($handle -eq 0) {
+              Write-Host "No top-level window found; recent Application error events:"
+              Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
+                Where-Object { $_.ProviderName -match 'Windows Error Reporting|Application Error' } |
+                ForEach-Object { Write-Host $_.Message; Write-Host '-----' }
+              throw 'Test app did not create a top-level window'
+            }
+            $hex = '0x{0:X}' -f [int64]$handle
+            Write-Host "Top-level window handle: $hex"
+            $env:WEBVIEW_APP_HANDLE = $hex
+
+            if ($appium.HasExited -or $metro.HasExited) {
+              throw 'A test server exited before Jest started'
+            }
+            bun run test
+            $testExitCode = $LASTEXITCODE
+          } finally {
+            foreach ($server in @($metro, $appium)) {
+              if ($server -and -not $server.HasExited) {
+                & taskkill.exe /PID $server.Id /T /F
+              }
             }
           }
-          if ($handle -eq 0) {
-            Write-Host "No top-level window found; recent Application error events:"
-            Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
-              Where-Object { $_.ProviderName -match 'Windows Error Reporting|Application Error' } |
-              ForEach-Object { Write-Host $_.Message; Write-Host '-----' }
-            exit 1
-          }
-          $hex = '0x{0:X}' -f [int64]$handle
-          Write-Host "Top-level window handle: $hex"
-          "WEBVIEW_APP_HANDLE=$hex" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Run tests
-        run: bun run test
+          exit $testExitCode
 
       - name: Test server logs
         if: failure()
