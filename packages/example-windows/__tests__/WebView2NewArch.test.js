@@ -20,6 +20,7 @@
  */
 
 import { driver, By2 } from 'selenium-appium';
+import { Key } from 'selenium-webdriver';
 
 const setup = require('../jest-setups/jest.setup');
 jest.setTimeout(150000);
@@ -122,15 +123,22 @@ describe('WebView2 New Architecture Tests', () => {
       expect(await sendButton.getText()).toBe('Send post message from JS to WebView');
     });
 
-    test('Clicking send button triggers onMessage in RN', async () => {
+    test('Sending a WebView message triggers onMessage in RN', async () => {
+      // Keep a reference to the result before sending. Searching by its new
+      // text can stall WinAppDriver while traversing the WebView subtree.
+      const messageText = await driver.findElement(
+        By2.nativeAccessibilityId('messaging-last-message'),
+      );
       const sendButton = await findByName('Send post message from JS to WebView');
-      await sendButton.click();
+      // WinAppDriver can report a successful mouse click without activating
+      // a button in hosted WebView2 content. Keyboard activation is reliable.
+      await sendButton.sendKeys(Key.ENTER);
 
-      // Wait for message to propagate
-      await new Promise((r) => setTimeout(r, 1000));
-
-      // The lastMessage state should update and display in Text component
-      const messageText = await findByName('Message from JS: Message from JS');
+      await driver.wait(
+        async () => (await messageText.getText()) === 'Message from JS: Message from JS',
+        15000,
+        'The WebView message did not reach the React Native result text',
+      );
       expect(await messageText.getText()).toBe('Message from JS: Message from JS');
     });
   });

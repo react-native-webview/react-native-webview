@@ -25,7 +25,7 @@ const HTML = `<!DOCTYPE html>\n
 
     <script>
       function sendPostMessage() {
-        window.postMessage('Message from JS');
+        window.ReactNativeWebView.postMessage('Message from JS');
       }
 
       window.addEventListener('message',function(event){
@@ -49,12 +49,13 @@ export default function Messaging() {
 
   return (
     <View style={{ height: 120 }}>
-      {lastMessage ? (
-        <Text style={{ padding: 4, backgroundColor: '#eee' }}>
-          {'Message from JS: '}
-          {lastMessage}
-        </Text>
-      ) : null}
+      <Text
+        testID="messaging-last-message"
+        accessible
+        style={{ padding: 4, backgroundColor: '#eee' }}
+      >
+        {lastMessage ? `Message from JS: ${lastMessage}` : 'No message received'}
+      </Text>
       <TextInput
         placeholder="Type a message and press Enter"
         onSubmitEditing={(e) => {
