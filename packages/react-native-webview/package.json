@@ -1,0 +1,70 @@
+{
+  "name": "react-native-webview",
+  "version": "16.0.0",
+  "description": "React Native WebView component for iOS, Android, macOS, and Windows",
+  "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
+  "license": "MIT",
+  "author": "Jamon Holmgren <jamon@infinite.red>",
+  "contributors": [
+    "Thibault Malbranche <malbranche.thibault@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/react-native-webview/react-native-webview.git",
+    "directory": "packages/react-native-webview"
+  },
+  "files": [
+    "android/src",
+    "android/build.gradle",
+    "android/gradle.properties",
+    "apple",
+    "ios",
+    "macos",
+    "windows",
+    "lib",
+    "src",
+    "index.js",
+    "index.d.ts",
+    "react-native-webview.podspec",
+    "react-native.config.js"
+  ],
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "react-native": "src/index.ts",
+  "scripts": {
+    "build": "babel --extensions \".ts,.tsx\" --out-dir lib src",
+    "prepare:types": "tsc --noEmit false --emitDeclarationOnly --declaration --rootDir src --outDir lib",
+    "prepublishOnly": "bun run prepare:types && bun run build",
+    "test": "jest --runInBand",
+    "version": "bun install --cwd ../.. --lockfile-only --ignore-scripts"
+  },
+  "dependencies": {
+    "escape-string-regexp": "^4.0.0",
+    "invariant": "2.2.4"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "codegenConfig": {
+    "name": "RNCWebViewSpec",
+    "type": "all",
+    "jsSrcsDir": "./src",
+    "android": {
+      "javaPackageName": "com.reactnativecommunity.webview"
+    },
+    "ios": {
+      "componentProvider": {
+        "RNCWebView": "RNCWebView"
+      },
+      "modulesProvider": {
+        "RNCWebViewModule": "RNCWebViewModule"
+      }
+    }
+  },
+  "main-internal": "src/index.ts",
+  "rn-docs": {
+    "title": "Webview",
+    "type": "Component"
+  }
+}
