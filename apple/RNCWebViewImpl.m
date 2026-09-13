@@ -1577,8 +1577,11 @@ didFinishNavigation:(WKNavigation *)navigation
    * manually call [_webView loadRequest:request].
    */
   NSURLRequest *request = [self requestForSource:self.source];
+  // WebKit clears URL when its content process exits, but keeps the current history item
+  // for reload recovery.
+  BOOL hasCurrentHistoryItem = _webView.backForwardList.currentItem != nil;
 
-  if (request.URL && !_webView.URL.absoluteString.length) {
+  if (request.URL && !hasCurrentHistoryItem) {
     [_webView loadRequest:request];
   } else {
     [_webView reload];
