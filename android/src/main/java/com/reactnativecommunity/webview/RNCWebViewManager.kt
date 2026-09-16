@@ -45,7 +45,9 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.Collections
 import java.util.Locale
+import java.util.WeakHashMap
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
@@ -84,6 +86,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     private var mUserAgent: String? = null
     private var mUserAgentWithApplicationName: String? = null
+    private val registeredGoogleMobileAdsWebViews =
+        Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
 
     override fun getDelegate(): ViewManagerDelegate<RNCWebViewWrapper> = mDelegate
 
@@ -646,6 +650,20 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     @ReactProp(name = "thirdPartyCookiesEnabled")
     override fun setThirdPartyCookiesEnabled(view: RNCWebViewWrapper, value: Boolean) {
         CookieManager.getInstance().setAcceptThirdPartyCookies(view.webView, value)
+    }
+
+    @ReactProp(name = "googleMobileAdsWebViewRegistrationEnabled")
+    override fun setGoogleMobileAdsWebViewRegistrationEnabled(view: RNCWebViewWrapper, value: Boolean) {
+        if (value && registeredGoogleMobileAdsWebViews.add(view.webView)) {
+            try {
+                Class.forName("com.google.android.gms.ads.MobileAds")
+                    .getMethod("registerWebView", WebView::class.java)
+                    .invoke(null, view.webView)
+            } catch (exception: ReflectiveOperationException) {
+                registeredGoogleMobileAdsWebViews.remove(view.webView)
+                Log.w(TAG, "Unable to register WebView with Google Mobile Ads", exception)
+            }
+        }
     }
 
     @ReactProp(name = "webviewDebuggingEnabled")

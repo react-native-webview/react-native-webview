@@ -94,6 +94,7 @@ This document lays out the current public properties and methods for the React N
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
+- [`googleMobileAdsWebViewRegistrationEnabled`](Reference.md#googleMobileAdsWebViewRegistrationEnabled)
 - [`webviewDebuggingEnabled`](Reference.md#webviewDebuggingEnabled)
 - [`paymentRequestEnabled`](Reference.md#paymentRequestEnabled)
 
@@ -1736,6 +1737,18 @@ A Boolean value that indicates whether the web view shows warnings for suspected
 | Type    | Required | Default | Platform |
 | ------- | -------- | ------- | -------- |
 | boolean | No       | true    | iOS      |
+
+### `googleMobileAdsWebViewRegistrationEnabled`[⬆](#props-index)
+
+Registers the native WebView with the Google Mobile Ads SDK so ads rendered by AdSense or Google Ad Manager can receive app signals. The default is `false`.
+
+The Google Mobile Ads SDK must be installed in the native app, for example through [`react-native-google-mobile-ads`](https://github.com/invertase/react-native-google-mobile-ads). React Native WebView does not install the SDK itself.
+
+Registration occurs once per native WebView. Setting this prop back to `false` does not unregister a WebView that was already registered.
+
+| Type    | Required | Default | Platform      |
+| ------- | -------- | ------- | ------------- |
+| boolean | No       | false   | iOS & Android |
 
 ### `webviewDebuggingEnabled`[⬆](#props-index)
 
