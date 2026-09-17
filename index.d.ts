@@ -21,6 +21,11 @@ export type WebViewFeature = 'WEB_AUTHENTICATION' | (string & {});
 // oxlint-disable-next-line @typescript-eslint/no-empty-object-type
 declare class WebView<P = {}> extends Component<WebViewProps & P> {
   /**
+   * Returns whether file upload is supported by the current platform WebView implementation.
+   */
+  static isFileUploadSupported: () => Promise<boolean>;
+
+  /**
    * Returns whether a specific Android WebView feature is supported at runtime.
    */
   static isWebViewFeatureSupported: (feature: WebViewFeature) => Promise<boolean>;
