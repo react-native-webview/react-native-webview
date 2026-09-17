@@ -5,10 +5,31 @@ export { FileDownload, WebViewMessageEvent, WebViewNavigation } from './lib/WebV
 
 export type WebViewProps = IOSWebViewProps & AndroidWebViewProps & WindowsWebViewProps;
 
+/**
+ * Android WebView feature name for runtime checks.
+ *
+ * Includes known literals for editor completion while still allowing
+ * forward-compatible string values supported by newer AndroidX WebKit versions.
+ *
+ * @see https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
+ */
+// oxlint-disable-next-line @typescript-eslint/no-empty-object-type
+export type WebViewFeature = 'WEB_AUTHENTICATION' | (string & {});
+
 // `{}` is the identity for intersections: `WebViewProps & undefined` would
 // collapse the props to `never` (https://github.com/react-native-webview/react-native-webview/issues/3977).
 // oxlint-disable-next-line @typescript-eslint/no-empty-object-type
 declare class WebView<P = {}> extends Component<WebViewProps & P> {
+  /**
+   * Returns whether file upload is supported by the current platform WebView implementation.
+   */
+  static isFileUploadSupported: () => Promise<boolean>;
+
+  /**
+   * Returns whether a specific Android WebView feature is supported at runtime.
+   */
+  static isWebViewFeatureSupported: (feature: WebViewFeature) => Promise<boolean>;
+
   /**
    * Go back one page in the webview's history.
    */

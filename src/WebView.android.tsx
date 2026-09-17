@@ -303,6 +303,12 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
 
 const isFileUploadSupported = async () => true;
 
-const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });
+const isWebViewFeatureSupported: (feature: string) => Promise<boolean> = (feature) =>
+  RNCWebViewModule.isWebViewFeatureSupported(feature);
+
+const WebView = Object.assign(WebViewComponent, {
+  isFileUploadSupported,
+  isWebViewFeatureSupported,
+});
 
 export default WebView;

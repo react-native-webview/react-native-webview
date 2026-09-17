@@ -223,6 +223,13 @@ const WebViewComponent = forwardRef<unknown, WindowsWebViewProps>(
 // native implementation should return "true" only for Android 5+
 const isFileUploadSupported: () => Promise<boolean> = async () => false;
 
-const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });
+// WebViewFeature is only on Android
+const isWebViewFeatureSupported: (feature: string) => Promise<boolean> = async () =>
+  Promise.reject(new Error('isWebViewFeatureSupported is not supported on Windows'));
+
+const WebView = Object.assign(WebViewComponent, {
+  isFileUploadSupported,
+  isWebViewFeatureSupported,
+});
 
 export default WebView;

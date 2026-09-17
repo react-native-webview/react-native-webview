@@ -176,6 +176,8 @@ export type AndroidLayerType = 'none' | 'software' | 'hardware';
 
 export type IndicatorStyleType = 'default' | 'black' | 'white';
 
+export type WebAuthenticationSupportType = 'none' | 'app' | 'browser';
+
 export interface WebViewSourceUri {
   /**
    * The URI to load in the `WebView`. Can be a local or remote file.
@@ -998,6 +1000,23 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * is `true`.
    */
   scalesPageToFit?: boolean;
+
+  /**
+   * Sets the Web Authentication (WebAuthn/Passkeys) support level for the WebView.
+   * Maps to `WebSettingsCompat.setWebAuthenticationSupport`.
+   *
+   * Possible values:
+   * - `'none'` — Disables web authentication (`WEB_AUTHENTICATION_SUPPORT_NONE`)
+   * - `'app'` — Enables web authentication for the app (`WEB_AUTHENTICATION_SUPPORT_FOR_APP`)
+   * - `'browser'` — Enables web authentication for the browser (`WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER`)
+   *
+   * Requires AndroidX WebKit 1.12.1+ and the device to support
+   * `WebViewFeature.WEB_AUTHENTICATION`. Use `WebView.isWebViewFeatureSupported('WEB_AUTHENTICATION')`
+   * to check availability at runtime. If the feature is not supported, this prop is a no-op.
+   *
+   * @platform android
+   */
+  webAuthenticationSupport?: WebAuthenticationSupportType;
 
   /**
    * Sets whether Geolocation is enabled. The default is false.

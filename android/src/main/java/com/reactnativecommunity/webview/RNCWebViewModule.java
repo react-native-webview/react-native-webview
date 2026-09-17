@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
+import androidx.webkit.WebViewFeature;
 
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -24,6 +25,7 @@ import android.webkit.WebChromeClient;
 import android.widget.Toast;
 
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
@@ -118,6 +120,15 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
     @Override
     public void onNewIntent(Intent intent) {
 
+    }
+
+    @Override
+    public void isWebViewFeatureSupported(String feature, Promise promise) {
+        try {
+            promise.resolve(WebViewFeature.isFeatureSupported(feature));
+        } catch (Exception e) {
+            promise.resolve(false);
+        }
     }
 
     protected static class ShouldOverrideUrlLoadingLock {
