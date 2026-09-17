@@ -1764,9 +1764,9 @@ Sets the Web Authentication (WebAuthn/Passkeys) support level for the WebView, m
 
 This prop is Android-only. On iOS, no equivalent setting is needed—hosting the `apple-app-site-association` file and enabling the Associated Domains (`webcredentials:`) entitlement is enough for passkey authentication to work inside a `WKWebView`.
 
-- `'none'` - Disables web authentication ([`WEB_AUTHENTICATION_SUPPORT_NONE`](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_NONE()))
-- `'app'` - Enables web authentication for the app ([`WEB_AUTHENTICATION_SUPPORT_FOR_APP`](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_FOR_APP()))
-- `'browser'` - Enables web authentication for the browser ([`WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER`](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER()))
+- `'none'` - Disables web authentication ([`WEB_AUTHENTICATION_SUPPORT_NONE`](<https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_NONE()>))
+- `'app'` - Enables web authentication for the app ([`WEB_AUTHENTICATION_SUPPORT_FOR_APP`](<https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_FOR_APP()>))
+- `'browser'` - Enables web authentication for the browser ([`WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER`](<https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER()>))
   - This value is meant for apps that act as a full web browser. Setting `'browser'` alone does not make browser-level passkey support work—your app also needs to satisfy Android's requirements for privileged/browser apps. Read [Enable passkeys in privileged apps](https://developer.android.com/identity/sign-in/privileged-apps) before relying on this value.
 
 Requires AndroidX WebKit 1.12.1+ and a device that supports `WebViewFeature.WEB_AUTHENTICATION`. Use [`WebView.isWebViewFeatureSupported('WEB_AUTHENTICATION')`](Guide.md#checking-android-webview-feature-support-with-static-iswebviewfeaturesupported) to check availability at runtime; if the feature isn't supported, this prop is a no-op.
