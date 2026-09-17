@@ -212,6 +212,13 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
 // no native implementation for macOS, depends only on permissions
 const isFileUploadSupported: () => Promise<boolean> = async () => true;
 
-const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });
+// WebViewFeature is only on Android
+const isWebViewFeatureSupported: (feature: string) => Promise<boolean> = async () =>
+  Promise.reject(new Error('isWebViewFeatureSupported is not supported on macOS'));
+
+const WebView = Object.assign(WebViewComponent, {
+  isFileUploadSupported,
+  isWebViewFeatureSupported,
+});
 
 export default WebView;

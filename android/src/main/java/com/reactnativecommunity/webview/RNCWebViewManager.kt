@@ -461,6 +461,21 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         }
     }
 
+    @ReactProp(name = "webAuthenticationSupport")
+    override fun setWebAuthenticationSupport(viewWrapper: RNCWebViewWrapper, value: String?) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+            Log.w(TAG, "WebViewFeature.WEB_AUTHENTICATION is not supported on this device")
+            return
+        }
+        val view = viewWrapper.webView
+        val support = when (value) {
+            "app" -> WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
+            "browser" -> WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER
+            else -> WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_NONE
+        }
+        WebSettingsCompat.setWebAuthenticationSupport(view.settings, support)
+    }
+
     @ReactProp(name = "geolocationEnabled")
     override fun setGeolocationEnabled(view: RNCWebViewWrapper, value: Boolean) {
         view.webView.settings.setGeolocationEnabled(value)
