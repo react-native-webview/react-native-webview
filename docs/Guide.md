@@ -11,6 +11,7 @@ _This guide is currently a work in progress._
 - [Loading local HTML files](Guide.md#loading-local-html-files)
 - [Controlling navigation state changes](Guide.md#controlling-navigation-state-changes)
 - [Add support for File Upload](Guide.md#add-support-for-file-upload)
+- [Checking Android WebView feature support](Guide.md#checking-android-webview-feature-support-with-static-iswebviewfeaturesupported)
 - [Multiple files upload](Guide.md#multiple-files-upload)
 - [Add support for File Download](Guide.md#add-support-for-file-download)
 - [Communicating between JS and Native](Guide.md#communicating-between-js-and-native)
@@ -220,6 +221,24 @@ Add read access for `User Selected File` in `Signing & Capabilities` tab under `
 <img width="856" alt="settings screenshot" src="https://user-images.githubusercontent.com/36531255/200541359-dde130d0-169e-4b58-8b2f-205442d76fdd.png">
 
 Note: Attempting to open a file input without this permission will crash the webview.
+
+### Checking Android WebView feature support, with `static isWebViewFeatureSupported()`
+
+Some newer WebView capabilities—such as [`webAuthenticationSupport`](Reference.md#webAuthenticationSupport)—are only available on devices with a sufficiently up-to-date WebView implementation. Use `WebView.isWebViewFeatureSupported()` to check at runtime whether a given [`androidx.webkit.WebViewFeature`](https://developer.android.com/reference/androidx/webkit/WebViewFeature) is supported before relying on it:
+
+```jsx
+import { WebView } from 'react-native-webview';
+
+WebView.isWebViewFeatureSupported('WEB_AUTHENTICATION').then((isSupported) => {
+  if (isSupported) {
+    // Safe to configure WebAuthn/Passkeys support via the `webAuthenticationSupport` prop
+  }
+});
+```
+
+Note: `isWebViewFeatureSupported()` only reports whether the device's underlying Android WebView implementation supports the given `WebViewFeature`. It does not mean react-native-webview itself exposes a corresponding prop or command for that feature—check the [Reference docs](Reference.md) to confirm the library actually wires up the feature you're checking for.
+
+This method is Android-only; calling it on iOS, macOS, or Windows rejects with an error.
 
 ### Multiple Files Upload
 

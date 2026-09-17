@@ -96,6 +96,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
 - [`webviewDebuggingEnabled`](Reference.md#webviewDebuggingEnabled)
 - [`paymentRequestEnabled`](Reference.md#paymentRequestEnabled)
+- [`webAuthenticationSupport`](Reference.md#webAuthenticationSupport)
 
 ## Methods Index
 
@@ -1754,6 +1755,27 @@ This is needed for Google Pay to work within the WebView.
 | Type    | Required | Platform |
 | ------- | -------- | -------- |
 | boolean | No       | Android  |
+
+### `webAuthenticationSupport`[⬆](#props-index)
+
+Sets the Web Authentication (WebAuthn/Passkeys) support level for the WebView, mapping to Android's `WebSettingsCompat.setWebAuthenticationSupport`.
+
+> INFO: If you need passkey authentication, consider using [CustomTabs](https://developer.chrome.com/docs/android/custom-tabs)/[AuthTabs](https://developer.chrome.com/docs/android/custom-tabs/guide-auth-tab) on Android, or `SFSafariViewController`/`ASWebAuthenticationSession` on iOS, instead of authenticating inside a WebView. Only use WebView-based passkey authentication if you have a specific reason you can't use those. If you do implement passkey authentication inside a WebView, your authentication server also needs to host the relevant relying-party association file—see [WebAuthn `rp.id`](https://web.dev/articles/webauthn-rp-id).
+
+This prop is Android-only. On iOS, no equivalent setting is needed—hosting the `apple-app-site-association` file and enabling the Associated Domains (`webcredentials:`) entitlement is enough for passkey authentication to work inside a `WKWebView`.
+
+- `'none'` - Disables web authentication ([`WEB_AUTHENTICATION_SUPPORT_NONE`](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_NONE()))
+- `'app'` - Enables web authentication for the app ([`WEB_AUTHENTICATION_SUPPORT_FOR_APP`](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_FOR_APP()))
+- `'browser'` - Enables web authentication for the browser ([`WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER`](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER()))
+  - This value is meant for apps that act as a full web browser. Setting `'browser'` alone does not make browser-level passkey support work—your app also needs to satisfy Android's requirements for privileged/browser apps. Read [Enable passkeys in privileged apps](https://developer.android.com/identity/sign-in/privileged-apps) before relying on this value.
+
+Requires AndroidX WebKit 1.12.1+ and a device that supports `WebViewFeature.WEB_AUTHENTICATION`. Use [`WebView.isWebViewFeatureSupported('WEB_AUTHENTICATION')`](Guide.md#checking-android-webview-feature-support-with-static-iswebviewfeaturesupported) to check availability at runtime; if the feature isn't supported, this prop is a no-op.
+
+> NOTE: This library's default `androidx.webkit:webkit` version already satisfies the 1.12.1+ requirement. If you override it via the `ReactNativeWebView_webkitVersion` Gradle property, make sure the version you pin still supports `WebViewFeature.WEB_AUTHENTICATION`.
+
+| Type                               | Required | Default  | Platform |
+| ---------------------------------- | -------- | -------- | -------- |
+| `'none'` \| `'app'` \| `'browser'` | No       | `'none'` | Android  |
 
 ## Methods
 
