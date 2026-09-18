@@ -75,16 +75,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         RNCWebViewManagerDelegate<RNCWebViewWrapper, RNCWebViewManager>(this)
 
     private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
-    private var mAllowsFullscreenVideo = false
-    private var mAllowsProtectedMedia = false
-    private var mDownloadingMessage: String? = null
-    private var mLackPermissionToDownloadMessage: String? = null
-    private var mHasOnOpenWindowEvent = false
-    private var mPendingSource: ReadableMap? = null
-
-    private var mUserAgent: String? = null
-    private var mUserAgentWithApplicationName: String? = null
-
     override fun getDelegate(): ViewManagerDelegate<RNCWebViewWrapper> = mDelegate
 
     override fun getName(): String = NAME
@@ -99,7 +89,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     }
 
     fun createViewInstance(context: ThemedReactContext, webView: RNCWebView): RNCWebViewWrapper {
-        setupWebChromeClient(webView)
+        val viewWrapper = RNCWebViewWrapper(context, webView)
+        setupWebChromeClient(viewWrapper)
         context.addLifecycleEventListener(webView)
         mWebViewConfig.configWebView(webView)
         val settings = webView.settings
@@ -156,23 +147,24 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
             module.setDownloadRequest(request)
             if (module.grantFileDownloaderPermissions(
-                    getDownloadingMessageOrDefault(),
-                    getLackPermissionToDownloadMessageOrDefault()
+                    getDownloadingMessageOrDefault(viewWrapper),
+                    getLackPermissionToDownloadMessageOrDefault(viewWrapper)
                 )
             ) {
                 module.downloadFile(
-                    getDownloadingMessageOrDefault()
+                    getDownloadingMessageOrDefault(viewWrapper)
                 )
             }
         })
-        return RNCWebViewWrapper(context, webView)
+        return viewWrapper
     }
 
     private fun setupWebChromeClient(
-        webView: RNCWebView,
+        viewWrapper: RNCWebViewWrapper,
     ) {
+        val webView = viewWrapper.webView
         val activity = webView.themedReactContext.currentActivity
-        if (mAllowsFullscreenVideo && activity != null) {
+        if (viewWrapper.allowsFullscreenVideo && activity != null) {
             val initialRequestedOrientation = activity.requestedOrientation
             val webChromeClient: RNCWebChromeClient =
                 object : RNCWebChromeClient(webView) {
@@ -236,8 +228,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
                         mWebView.themedReactContext.removeLifecycleEventListener(this)
                     }
                 }
-            webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia)
-            webChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent)
+            webChromeClient.setAllowsProtectedMedia(viewWrapper.allowsProtectedMedia)
+            webChromeClient.setHasOnOpenWindowEvent(viewWrapper.hasOnOpenWindowEvent)
             webView.webChromeClient = webChromeClient
         } else {
             var webChromeClient = webView.webChromeClient as RNCWebChromeClient?
@@ -247,8 +239,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
                     return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
                 }
             }
-            webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia)
-            webChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent)
+            webChromeClient.setAllowsProtectedMedia(viewWrapper.allowsProtectedMedia)
+            webChromeClient.setHasOnOpenWindowEvent(viewWrapper.hasOnOpenWindowEvent)
             webView.webChromeClient = webChromeClient
         }
     }
@@ -256,11 +248,11 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     private fun setUserAgentString(viewWrapper: RNCWebViewWrapper) {
         val view = viewWrapper.webView
         when {
-            mUserAgent != null -> {
-                view.settings.userAgentString = mUserAgent
+            viewWrapper.userAgent != null -> {
+                view.settings.userAgentString = viewWrapper.userAgent
             }
-            mUserAgentWithApplicationName != null -> {
-                view.settings.userAgentString = mUserAgentWithApplicationName
+            viewWrapper.userAgentWithApplicationName != null -> {
+                view.settings.userAgentString = viewWrapper.userAgentWithApplicationName
             }
             else -> {
                 view.settings.userAgentString = WebSettings.getDefaultUserAgent(view.context)
@@ -268,12 +260,12 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         }
     }
 
-    private fun getDownloadingMessageOrDefault(): String? {
-        return mDownloadingMessage ?: DEFAULT_DOWNLOADING_MESSAGE
+    private fun getDownloadingMessageOrDefault(viewWrapper: RNCWebViewWrapper): String {
+        return viewWrapper.downloadingMessage ?: DEFAULT_DOWNLOADING_MESSAGE
     }
 
-    private fun getLackPermissionToDownloadMessageOrDefault(): String? {
-        return mLackPermissionToDownloadMessage
+    private fun getLackPermissionToDownloadMessageOrDefault(viewWrapper: RNCWebViewWrapper): String {
+        return viewWrapper.lackPermissionToDownloadMessage
             ?: DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE
     }
 
@@ -355,16 +347,16 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "allowsFullscreenVideo")
     override fun setAllowsFullscreenVideo(view: RNCWebViewWrapper, value: Boolean) {
-        mAllowsFullscreenVideo = value
-        setupWebChromeClient(view.webView)
+        view.allowsFullscreenVideo = value
+        setupWebChromeClient(view)
     }
 
     @ReactProp(name = "allowsProtectedMedia")
     override fun setAllowsProtectedMedia(view: RNCWebViewWrapper, value: Boolean) {
-        // This variable is used to keep consistency
+        // This value is stored on the wrapper to keep consistency
         // in case a new WebChromeClient is created
-        // (eg. when mAllowsFullScreenVideo changes)
-        mAllowsProtectedMedia = value
+        // (eg. when allowsFullscreenVideo changes)
+        view.allowsProtectedMedia = value
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val client = view.webView.webChromeClient
             if (client != null && client is RNCWebChromeClient) {
@@ -388,10 +380,10 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         when {
             value != null -> {
                 val defaultUserAgent = WebSettings.getDefaultUserAgent(view.webView.context)
-                mUserAgentWithApplicationName = "$defaultUserAgent $value"
+                view.userAgentWithApplicationName = "$defaultUserAgent $value"
             }
             else -> {
-                mUserAgentWithApplicationName = null
+                view.userAgentWithApplicationName = null
             }
         }
         setUserAgentString(view)
@@ -433,7 +425,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "downloadingMessage")
     override fun setDownloadingMessage(view: RNCWebViewWrapper, value: String?) {
-        mDownloadingMessage = value
+        view.downloadingMessage = value
     }
 
     @ReactProp(name = "forceDarkOn")
@@ -531,13 +523,13 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "lackPermissionToDownloadMessage")
     override fun setLackPermissionToDownloadMessage(view: RNCWebViewWrapper, value: String?) {
-        mLackPermissionToDownloadMessage = value
+        view.lackPermissionToDownloadMessage = value
     }
 
     @ReactProp(name = "hasOnOpenWindowEvent")
     override fun setHasOnOpenWindowEvent(view: RNCWebViewWrapper, value: Boolean) {
-        mHasOnOpenWindowEvent = value
-        setupWebChromeClient(view.webView)
+        view.hasOnOpenWindowEvent = value
+        setupWebChromeClient(view)
     }
 
     @ReactProp(name = "mediaPlaybackRequiresUserAction")
@@ -635,7 +627,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "newSource")
     override fun setNewSource(view: RNCWebViewWrapper, value: ReadableMap?) {
-        mPendingSource = value
+        view.pendingSource = value
     }
 
     @ReactProp(name = "textZoom")
@@ -662,7 +654,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "userAgent")
     override fun setUserAgent(view: RNCWebViewWrapper, value: String?) {
-        mUserAgent = value
+        view.userAgent = value
         setUserAgentString(view)
     }
 
@@ -823,10 +815,10 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     override fun onAfterUpdateTransaction(view: RNCWebViewWrapper) {
         super.onAfterUpdateTransaction(view)
-        mPendingSource?.let { source ->
+        view.pendingSource?.let { source ->
             loadSource(view, source)
         }
-        mPendingSource = null
+        view.pendingSource = null
     }
 
     override fun onDropViewInstance(view: RNCWebViewWrapper) {
