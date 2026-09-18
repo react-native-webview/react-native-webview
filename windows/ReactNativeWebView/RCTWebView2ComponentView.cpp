@@ -177,11 +177,15 @@ void RCTWebView2ComponentView::UpdateProps(
         m_injectedJavascript = winrt::to_hstring(newProps->injectedJavaScript.value());
     }
     
-    // Apply user agent
-    if (newProps->userAgent.has_value()) {
-        m_userAgent = winrt::to_hstring(newProps->userAgent.value());
+    // Apply user agent, restoring WebView2's original default when the prop is cleared.
+    const winrt::hstring userAgent = newProps->userAgent.has_value()
+        ? winrt::to_hstring(newProps->userAgent.value())
+        : winrt::hstring{};
+    if (userAgent != m_userAgent) {
+        m_userAgent = userAgent;
         if (m_webView.CoreWebView2()) {
-            m_webView.CoreWebView2().Settings().UserAgent(m_userAgent);
+            m_webView.CoreWebView2().Settings().UserAgent(
+                m_userAgent.empty() ? m_defaultUserAgent : m_userAgent);
         }
     }
     
@@ -206,9 +210,13 @@ void RCTWebView2ComponentView::UpdateProps(
         }
     }
     
-    // Apply debugging enabled
-    if (newProps->webviewDebuggingEnabled.has_value() && m_webView.CoreWebView2()) {
-        m_webView.CoreWebView2().Settings().AreDevToolsEnabled(newProps->webviewDebuggingEnabled.value());
+    // Apply debugging enabled and retain it until CoreWebView2 is initialized.
+    const bool webviewDebuggingEnabled = newProps->webviewDebuggingEnabled.value_or(false);
+    if (webviewDebuggingEnabled != m_webviewDebuggingEnabled) {
+        m_webviewDebuggingEnabled = webviewDebuggingEnabled;
+        if (m_webView.CoreWebView2()) {
+            m_webView.CoreWebView2().Settings().AreDevToolsEnabled(m_webviewDebuggingEnabled);
+        }
     }
     
     // Apply JavaScript enabled
@@ -402,11 +410,16 @@ void RCTWebView2ComponentView::OnCoreWebView2Initialized(
     if (!m_webView || !m_webView.CoreWebView2()) return;
     
     RegisterCoreWebView2Events();
+
+    auto settings = m_webView.CoreWebView2().Settings();
+    m_defaultUserAgent = settings.UserAgent();
     
     // Apply user agent if set
     if (!m_userAgent.empty()) {
-        m_webView.CoreWebView2().Settings().UserAgent(m_userAgent);
+        settings.UserAgent(m_userAgent);
     }
+
+    settings.AreDevToolsEnabled(m_webviewDebuggingEnabled);
     
     // Navigate to deferred HTML source if pending
     if (!m_pendingHtml.empty()) {
