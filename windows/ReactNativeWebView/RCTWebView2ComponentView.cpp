@@ -578,8 +578,14 @@ void RCTWebView2ComponentView::HandlePostMessageCommand(std::string data) noexce
 }
 
 void RCTWebView2ComponentView::HandleLoadUrlCommand(std::string url) noexcept {
-    if (m_webView) {
+    if (!m_webView) {
+        return;
+    }
+
+    try {
         m_webView.Source(winrt::Windows::Foundation::Uri(winrt::to_hstring(url)));
+    } catch (...) {
+        // Invalid URI or navigation failure must not escape this noexcept command handler.
     }
 }
 
