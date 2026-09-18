@@ -380,7 +380,7 @@ void RCTWebView2ComponentView::OnNavigationCompleted(
     if (m_messagingEnabled && m_webView) {
         try {
             winrt::hstring message = LR"(
-                window.alert = function (msg) {window.chrome.webview.postMessage(`{"type":"__alert","message":"${msg}"}`)};
+                window.alert = function (msg) {window.chrome.webview.postMessage(JSON.stringify({type: "__alert", message: String(msg)}))};
                 window.ReactNativeWebView = {postMessage: function (data) {window.chrome.webview.postMessage(String(data))}};
                 const originalPostMessage = globalThis.postMessage;
                 globalThis.postMessage = function (data) { originalPostMessage(data); globalThis.ReactNativeWebView.postMessage(typeof data == 'string' ? data : JSON.stringify(data));};
