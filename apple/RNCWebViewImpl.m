@@ -17,7 +17,6 @@
 
 #import "objc/runtime.h"
 
-static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
@@ -145,6 +144,10 @@ RCTAutoInsetsProtocol>
   UIStatusBarStyle _savedStatusBarStyle;
 #endif // !TARGET_OS_OSX
   BOOL _savedStatusBarHidden;
+
+#if TARGET_OS_IOS
+  NSTimer *_keyboardTimer;
+#endif // TARGET_OS_IOS
 
 #if !TARGET_OS_OSX
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
@@ -304,6 +307,9 @@ RCTAutoInsetsProtocol>
 
 - (void)dealloc
 {
+#if TARGET_OS_IOS
+  [_keyboardTimer invalidate];
+#endif // TARGET_OS_IOS
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self.webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
 }
@@ -586,6 +592,10 @@ RCTAutoInsetsProtocol>
 
 - (void)destroyWebView
 {
+#if TARGET_OS_IOS
+  [_keyboardTimer invalidate];
+  _keyboardTimer = nil;
+#endif // TARGET_OS_IOS
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
@@ -646,17 +656,18 @@ RCTAutoInsetsProtocol>
 
 -(void)keyboardWillHide
 {
-  keyboardTimer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
-  [[NSRunLoop mainRunLoop] addTimer:keyboardTimer forMode:NSRunLoopCommonModes];
+  [_keyboardTimer invalidate];
+  _keyboardTimer = [NSTimer timerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
+  [[NSRunLoop mainRunLoop] addTimer:_keyboardTimer forMode:NSRunLoopCommonModes];
 }
 -(void)keyboardWillShow
 {
-  if (keyboardTimer != nil) {
-    [keyboardTimer invalidate];
-  }
+  [_keyboardTimer invalidate];
+  _keyboardTimer = nil;
 }
 -(void)keyboardDisplacementFix
 {
+  _keyboardTimer = nil;
   // Additional viewport checks to prevent unintentional scrolls
   UIScrollView *scrollView = self.webView.scrollView;
   double maxContentOffset = scrollView.contentSize.height - scrollView.frame.size.height;
