@@ -26,11 +26,12 @@ import {
   defaultOriginWhitelist,
   defaultRenderError,
   defaultRenderLoading,
+  getNativeSource,
   useWebViewLogic,
 } from './WebViewShared';
 import {
   AndroidWebViewProps,
-  WebViewSourceUri,
+  WebViewSource,
   type WebViewMessageEvent,
   type ShouldStartLoadRequestEvent,
 } from './WebViewTypes';
@@ -228,26 +229,8 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
 
     // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const sourceResolved = resolveAssetSource(source as ImageSourcePropType);
-    const newSource =
-      typeof sourceResolved === 'object'
-        ? Object.entries(sourceResolved as WebViewSourceUri).reduce(
-            (prev, [currKey, currValue]) => {
-              return {
-                ...prev,
-                [currKey]:
-                  currKey === 'headers' && currValue && typeof currValue === 'object'
-                    ? Object.entries(currValue).map(([key, value]) => {
-                        return {
-                          name: key,
-                          value,
-                        };
-                      })
-                    : currValue,
-              };
-            },
-            {},
-          )
-        : sourceResolved;
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    const newSource = getNativeSource(sourceResolved as WebViewSource | undefined) ?? {};
 
     const webView = (
       <NativeWebView
