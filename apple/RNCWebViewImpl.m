@@ -310,25 +310,38 @@ RCTAutoInsetsProtocol>
 
 - (void)tappedMenuItem:(NSString *)eventType
 {
+  RCTDirectEventBlock onCustomMenuSelection = self.onCustomMenuSelection;
+  if (!onCustomMenuSelection) {
+    RCTLogWarn(@"Error evaluating onCustomMenuSelection: You must implement an `onCustomMenuSelection` callback when using custom menu items");
+    return;
+  }
+
+  NSDictionary *selectedMenuItem = nil;
+  for (NSDictionary *menuItem in self.menuItems) {
+    NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
+    if ([menuItemKey isEqualToString:eventType]) {
+      selectedMenuItem = menuItem;
+      break;
+    }
+  }
+
+  if (selectedMenuItem == nil) {
+    RCTLogWarn(@"Unable to find custom menu item with key `%@`", eventType);
+    return;
+  }
+
+  NSString *label = [RCTConvert NSString:selectedMenuItem[@"label"]];
   // Get the selected text
   // NOTE: selecting text in an iframe or shadow DOM will not work
   [self.webView evaluateJavaScript: @"window.getSelection().toString()" completionHandler: ^(id result, NSError *error) {
     if (error != nil) {
       RCTLogWarn(@"%@", [NSString stringWithFormat:@"Error evaluating injectedJavaScript: This is possibly due to an unsupported return type. Try adding true to the end of your injectedJavaScript string. %@", error]);
     } else {
-      if (self.onCustomMenuSelection) {
-        NSPredicate *filter = [NSPredicate predicateWithFormat:@"key contains[c] %@ ",eventType];
-        NSArray *filteredMenuItems = [self.menuItems filteredArrayUsingPredicate:filter];
-        NSDictionary *selectedMenuItem = filteredMenuItems[0];
-        NSString *label = [RCTConvert NSString:selectedMenuItem[@"label"]];
-        self.onCustomMenuSelection(@{
-          @"key": eventType,
-          @"label": label,
-          @"selectedText": result
-        });
-      } else {
-        RCTLogWarn(@"Error evaluating onCustomMenuSelection: You must implement an `onCustomMenuSelection` callback when using custom menu items");
-      }
+      onCustomMenuSelection(@{
+        @"key": eventType,
+        @"label": label,
+        @"selectedText": result
+      });
     }
   }];
 }
