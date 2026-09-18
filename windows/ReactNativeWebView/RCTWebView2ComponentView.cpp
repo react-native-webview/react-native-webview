@@ -187,6 +187,7 @@ void RCTWebView2ComponentView::UpdateProps(
     
     // Handle source navigation
     if (newProps->newSource.uri.has_value() && !newProps->newSource.uri.value().empty()) {
+        m_pendingHtml.clear();
         try {
             auto uri = winrt::Windows::Foundation::Uri(winrt::to_hstring(newProps->newSource.uri.value()));
             m_webView.Source(uri);
@@ -195,6 +196,7 @@ void RCTWebView2ComponentView::UpdateProps(
         }
     } else if (newProps->newSource.html.has_value() && !newProps->newSource.html.value().empty()) {
         if (m_webView.CoreWebView2()) {
+            m_pendingHtml.clear();
             try {
                 m_webView.NavigateToString(winrt::to_hstring(newProps->newSource.html.value()));
             } catch (...) {
@@ -204,6 +206,8 @@ void RCTWebView2ComponentView::UpdateProps(
             // CoreWebView2 not ready yet - save HTML for later navigation in OnCoreWebView2Initialized
             m_pendingHtml = newProps->newSource.html.value();
         }
+    } else {
+        m_pendingHtml.clear();
     }
     
     // Apply debugging enabled
