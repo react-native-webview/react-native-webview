@@ -1152,7 +1152,8 @@ RCTAutoInsetsProtocol>
       }
     }
   }
-  if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodHTTPBasic) {
+  if ([[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodHTTPBasic ||
+      [[challenge protectionSpace] authenticationMethod] == NSURLAuthenticationMethodHTTPDigest) {
     NSString *username = [_basicAuthCredential valueForKey:@"username"];
     NSString *password = [_basicAuthCredential valueForKey:@"password"];
     if (username && password) {
