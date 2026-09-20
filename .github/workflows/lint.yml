@@ -16,3 +16,7 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Run lint
         run: bun run lint:ci
+      - name: Run unit tests
+        run: bun run test
+      - name: Build package and declarations
+        run: bun run prepublishOnly

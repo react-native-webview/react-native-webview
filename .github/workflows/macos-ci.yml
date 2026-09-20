@@ -16,15 +16,15 @@ jobs:
           bun-version: 1.4.1
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      # react-native-macos (0.81) lags core react-native (0.86). Align the
-      # installed core to the macOS fork so its codegen can parse the specs.
-      - name: Align react-native with react-native-macos
-        run: bun run add:macos
+        working-directory: packages/example-macos
+      - name: Bundle example JavaScript
+        run: bun run bundle
+        working-directory: packages/example-macos
       - name: Install Pods
         run: pod install
-        working-directory: example/macos
+        working-directory: packages/example-macos/macos
       - name: Build macOS test app
         run: |
           xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
-        working-directory: example/macos
+        working-directory: packages/example-macos/macos
     timeout-minutes: 60
