@@ -40,7 +40,7 @@ describe('RCTWebView2NativeComponent', () => {
     const { get } = require('react-native/Libraries/NativeComponent/NativeComponentRegistry');
     // Re-require to trigger registration
     jest.isolateModules(() => {
-      require('../RCTWebView2NativeComponent.windows');
+      require('../specs/RCTWebView2NativeComponent.windows');
     });
     expect(get).toHaveBeenCalledWith('RCTWebView2', expect.any(Function));
   });
@@ -54,7 +54,7 @@ describe('RCTWebView2NativeComponent', () => {
     });
 
     jest.isolateModules(() => {
-      require('../RCTWebView2NativeComponent.windows');
+      require('../specs/RCTWebView2NativeComponent.windows');
     });
 
     expect(capturedViewConfig.uiViewClassName).toBe('RCTWebView2');
@@ -69,7 +69,7 @@ describe('RCTWebView2NativeComponent', () => {
     });
 
     jest.isolateModules(() => {
-      require('../RCTWebView2NativeComponent.windows');
+      require('../specs/RCTWebView2NativeComponent.windows');
     });
 
     const directEvents = capturedViewConfig.directEventTypes;
@@ -112,7 +112,7 @@ describe('RCTWebView2NativeComponent', () => {
     });
 
     jest.isolateModules(() => {
-      require('../RCTWebView2NativeComponent.windows');
+      require('../specs/RCTWebView2NativeComponent.windows');
     });
 
     const attrs = capturedViewConfig.validAttributes;
@@ -145,7 +145,7 @@ describe('RCTWebView2NativeComponent', () => {
     const { codegenNativeCommands } = require('react-native');
 
     jest.isolateModules(() => {
-      require('../RCTWebView2NativeComponent.windows');
+      require('../specs/RCTWebView2NativeComponent.windows');
     });
 
     expect(codegenNativeCommands).toHaveBeenCalledWith({
@@ -172,7 +172,7 @@ describe('RCTWebView2NativeComponent', () => {
     });
 
     jest.isolateModules(() => {
-      require('../RCTWebView2NativeComponent.windows');
+      require('../specs/RCTWebView2NativeComponent.windows');
     });
 
     expect(capturedViewConfig.bubblingEventTypes).toEqual({});

@@ -120,10 +120,6 @@ type ScrollEvent = Readonly<{
   responderIgnoreScroll?: boolean;
 }>;
 
-type WebViewRenderProcessGoneEvent = Readonly<{
-  didCrash: boolean;
-}>;
-
 type WebViewDownloadEvent = Readonly<{
   downloadUrl: string;
 }>;
@@ -131,39 +127,6 @@ type WebViewDownloadEvent = Readonly<{
 // type MenuItem = Readonly<{label: string, key: string}>;
 
 export interface NativeProps extends ViewProps {
-  // Android only
-  allowFileAccess?: boolean;
-  allowsProtectedMedia?: boolean;
-  allowsFullscreenVideo?: boolean;
-  androidLayerType?: WithDefault<'none' | 'software' | 'hardware', 'none'>;
-  cacheMode?: WithDefault<
-    'LOAD_DEFAULT' | 'LOAD_CACHE_ELSE_NETWORK' | 'LOAD_NO_CACHE' | 'LOAD_CACHE_ONLY',
-    'LOAD_DEFAULT'
-  >;
-  domStorageEnabled?: boolean;
-  downloadingMessage?: string;
-  forceDarkOn?: boolean;
-  geolocationEnabled?: boolean;
-  lackPermissionToDownloadMessage?: string;
-  messagingModuleName?: string;
-  minimumFontSize?: Int32;
-  mixedContentMode?: WithDefault<'never' | 'always' | 'compatibility', 'never'>;
-  nestedScrollEnabled?: boolean;
-  onContentSizeChange?: DirectEventHandler<WebViewNativeEvent>;
-  onRenderProcessGone?: DirectEventHandler<WebViewRenderProcessGoneEvent>;
-  overScrollMode?: string;
-  saveFormDataDisabled?: boolean;
-  scalesPageToFit?: WithDefault<boolean, true>;
-  setBuiltInZoomControls?: WithDefault<boolean, true>;
-  setDisplayZoomControls?: boolean;
-  setSupportMultipleWindows?: WithDefault<boolean, true>;
-  textZoom?: Int32;
-  thirdPartyCookiesEnabled?: WithDefault<boolean, true>;
-  // Workaround to watch if listener if defined
-  hasOnScroll?: boolean;
-  // !Android only
-
-  // iOS only
   allowingReadAccessToURL?: string;
   allowsBackForwardNavigationGestures?: boolean;
   allowsInlineMediaPlayback?: boolean;
@@ -226,7 +189,6 @@ export interface NativeProps extends ViewProps {
   // Workaround to watch if listener if defined
   hasOnFileDownload?: boolean;
   fraudulentWebsiteWarningEnabled?: WithDefault<boolean, true>;
-  // !iOS only
 
   allowFileAccessFromFileURLs?: boolean;
   allowUniversalAccessFromFileURLs?: boolean;
@@ -247,7 +209,6 @@ export interface NativeProps extends ViewProps {
   mediaPlaybackRequiresUserAction?: WithDefault<boolean, true>;
   messagingEnabled: boolean;
   onLoadingError: DirectEventHandler<WebViewErrorEvent>;
-  onLoadingSubResourceError?: DirectEventHandler<WebViewErrorEvent>;
   onLoadingFinish: DirectEventHandler<WebViewNavigationEvent>;
   onLoadingProgress: DirectEventHandler<WebViewNativeProgressEvent>;
   onLoadingStart: DirectEventHandler<WebViewNavigationEvent>;
@@ -271,7 +232,6 @@ export interface NativeProps extends ViewProps {
   }>;
   userAgent?: string;
   injectedJavaScriptObject?: string;
-  paymentRequestEnabled?: boolean;
 }
 
 export interface NativeCommands {
@@ -285,15 +245,10 @@ export interface NativeCommands {
   ) => void;
   requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   postMessage: (viewRef: React.ElementRef<HostComponent<NativeProps>>, data: string) => void;
-  // Android Only
-  loadUrl: (viewRef: React.ElementRef<HostComponent<NativeProps>>, url: string) => void;
-  clearFormData: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   clearCache: (
     viewRef: React.ElementRef<HostComponent<NativeProps>>,
     includeDiskFiles: boolean,
   ) => void;
-  clearHistory: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
-  // !Android Only
 }
 
 export const Commands = codegenNativeCommands<NativeCommands>({
@@ -305,11 +260,10 @@ export const Commands = codegenNativeCommands<NativeCommands>({
     'injectJavaScript',
     'requestFocus',
     'postMessage',
-    'loadUrl',
-    'clearFormData',
     'clearCache',
-    'clearHistory',
   ],
 });
 
-export default codegenNativeComponent<NativeProps>('RNCWebView') as HostComponent<NativeProps>;
+export default codegenNativeComponent<NativeProps>('RNCWebViewApple', {
+  excludedPlatforms: ['android'],
+}) as HostComponent<NativeProps>;

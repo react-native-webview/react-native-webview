@@ -26,8 +26,8 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.ViewManagerDelegate
 import com.facebook.react.uimanager.annotations.ReactProp
-import com.facebook.react.viewmanagers.RNCWebViewManagerDelegate
-import com.facebook.react.viewmanagers.RNCWebViewManagerInterface
+import com.facebook.react.viewmanagers.RNCWebViewAndroidManagerDelegate
+import com.facebook.react.viewmanagers.RNCWebViewAndroidManagerInterface
 import com.facebook.react.views.scroll.ScrollEventType
 import com.reactnativecommunity.webview.events.SubResourceErrorEvent
 import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent
@@ -51,10 +51,10 @@ val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
 @ReactModule(name = RNCWebViewManager.NAME)
 open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
-    RNCWebViewManagerInterface<RNCWebViewWrapper> {
+    RNCWebViewAndroidManagerInterface<RNCWebViewWrapper> {
 
     companion object {
-        const val NAME = "RNCWebView"
+        const val NAME = "RNCWebViewAndroid"
 
         private const val HTML_ENCODING = "UTF-8"
         private const val HTML_MIME_TYPE = "text/html"
@@ -72,7 +72,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     private val TAG = "RNCWebViewManager"
 
     private val mDelegate: ViewManagerDelegate<RNCWebViewWrapper> =
-        RNCWebViewManagerDelegate<RNCWebViewWrapper, RNCWebViewManager>(this)
+        RNCWebViewAndroidManagerDelegate<RNCWebViewWrapper, RNCWebViewManager>(this)
 
     private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
     private var mAllowsFullscreenVideo = false
@@ -553,9 +553,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         }
     }
 
-    @ReactProp(name = "suppressMenuItems")
-    override fun setSuppressMenuItems(view: RNCWebViewWrapper, value: ReadableArray?) {}
-
     @ReactProp(name = "messagingEnabled")
     override fun setMessagingEnabled(view: RNCWebViewWrapper, value: Boolean) {
         view.webView.setMessagingEnabled(value)
@@ -665,72 +662,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         mUserAgent = value
         setUserAgentString(view)
     }
-
-    /* iOS PROPS - not implemented here */
-    override fun setAllowingReadAccessToURL(view: RNCWebViewWrapper, value: String?) {}
-
-    override fun setAllowsBackForwardNavigationGestures(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setAllowsInlineMediaPlayback(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setAllowsPictureInPictureMediaPlayback(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setAllowsAirPlayForMediaPlayback(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setAllowsLinkPreview(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setAutomaticallyAdjustContentInsets(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setAutomaticallyAdjustsScrollIndicatorInsets(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setAutoManageStatusBarEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setBounces(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setContentInset(view: RNCWebViewWrapper, value: ReadableMap?) {}
-
-    override fun setContentInsetAdjustmentBehavior(view: RNCWebViewWrapper, value: String?) {}
-
-    override fun setContentMode(view: RNCWebViewWrapper, value: String?) {}
-
-    override fun setDataDetectorTypes(view: RNCWebViewWrapper, value: ReadableArray?) {}
-
-    override fun setDecelerationRate(view: RNCWebViewWrapper, value: Double) {}
-
-    override fun setDirectionalLockEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setEnableApplePay(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setHideKeyboardAccessoryView(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setKeyboardDisplayRequiresUserAction(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setPagingEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setPullToRefreshEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setRefreshControlLightMode(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setRemoveIosKeyboardObserver(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setIndicatorStyle(view: RNCWebViewWrapper, value: String?) {}
-
-    override fun setScrollEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setSharedCookiesEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setUseSharedProcessPool(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setLimitsNavigationsToAppBoundDomains(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setTextInteractionEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setHasOnFileDownload(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setMediaCapturePermissionGrantType(view: RNCWebViewWrapper, value: String?) {}
-
-    override fun setFraudulentWebsiteWarningEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-    /* !iOS PROPS - not implemented here */
 
     override fun goBack(view: RNCWebViewWrapper) {
         view.webView.goBack()

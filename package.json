@@ -96,13 +96,13 @@
   "codegenConfig": {
     "name": "RNCWebViewSpec",
     "type": "all",
-    "jsSrcsDir": "./src",
+    "jsSrcsDir": "./src/specs",
     "android": {
       "javaPackageName": "com.reactnativecommunity.webview"
     },
     "ios": {
       "componentProvider": {
-        "RNCWebView": "RNCWebView"
+        "RNCWebViewApple": "RNCWebView"
       },
       "modulesProvider": {
         "RNCWebViewModule": "RNCWebViewModule"

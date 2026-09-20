@@ -13,8 +13,8 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { View, Image, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
-import RCTWebView2, { Commands, NativeProps } from './RCTWebView2NativeComponent.windows';
-import RNCWebViewModule from './NativeRNCWebViewModule';
+import RCTWebView2, { Commands, NativeProps } from './specs/RCTWebView2NativeComponent.windows';
+import RNCWebViewModule from './specs/NativeRNCWebViewModule';
 import {
   useWebViewLogic,
   defaultOriginWhitelist,
@@ -25,7 +25,7 @@ import {
 import styles from './WebView.styles';
 
 // Re-export types for external consumers
-export type { NativeProps as NativeWebViewWindows } from './RCTWebView2NativeComponent.windows';
+export type { NativeProps as NativeWebViewWindows } from './specs/RCTWebView2NativeComponent.windows';
 
 // Windows-specific WebViewProps that extends shared props
 import {

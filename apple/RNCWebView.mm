@@ -11,30 +11,30 @@
 using namespace facebook::react;
 
 auto stringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string value) {
-    if (value == "click") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Click;
-    if (value == "formsubmit") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Formsubmit;
-    if (value == "backforward") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Backforward;
-    if (value == "reload") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Reload;
-    if (value == "formresubmit") return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Formresubmit;
-    return RNCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Other;
+    if (value == "click") return RNCWebViewAppleEventEmitter::OnShouldStartLoadWithRequestNavigationType::Click;
+    if (value == "formsubmit") return RNCWebViewAppleEventEmitter::OnShouldStartLoadWithRequestNavigationType::Formsubmit;
+    if (value == "backforward") return RNCWebViewAppleEventEmitter::OnShouldStartLoadWithRequestNavigationType::Backforward;
+    if (value == "reload") return RNCWebViewAppleEventEmitter::OnShouldStartLoadWithRequestNavigationType::Reload;
+    if (value == "formresubmit") return RNCWebViewAppleEventEmitter::OnShouldStartLoadWithRequestNavigationType::Formresubmit;
+    return RNCWebViewAppleEventEmitter::OnShouldStartLoadWithRequestNavigationType::Other;
 }
 
 auto stringToOnLoadingStartNavigationTypeEnum(std::string value) {
-    if (value == "click") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Click;
-    if (value == "formsubmit") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Formsubmit;
-    if (value == "backforward") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Backforward;
-    if (value == "reload") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Reload;
-    if (value == "formresubmit") return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Formresubmit;
-    return RNCWebViewEventEmitter::OnLoadingStartNavigationType::Other;
+    if (value == "click") return RNCWebViewAppleEventEmitter::OnLoadingStartNavigationType::Click;
+    if (value == "formsubmit") return RNCWebViewAppleEventEmitter::OnLoadingStartNavigationType::Formsubmit;
+    if (value == "backforward") return RNCWebViewAppleEventEmitter::OnLoadingStartNavigationType::Backforward;
+    if (value == "reload") return RNCWebViewAppleEventEmitter::OnLoadingStartNavigationType::Reload;
+    if (value == "formresubmit") return RNCWebViewAppleEventEmitter::OnLoadingStartNavigationType::Formresubmit;
+    return RNCWebViewAppleEventEmitter::OnLoadingStartNavigationType::Other;
 }
 
 auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
-    if (value == "click") return RNCWebViewEventEmitter::OnLoadingFinishNavigationType::Click;
-    if (value == "formsubmit") return RNCWebViewEventEmitter::OnLoadingFinishNavigationType::Formsubmit;
-    if (value == "backforward") return RNCWebViewEventEmitter::OnLoadingFinishNavigationType::Backforward;
-    if (value == "reload") return RNCWebViewEventEmitter::OnLoadingFinishNavigationType::Reload;
-    if (value == "formresubmit") return RNCWebViewEventEmitter::OnLoadingFinishNavigationType::Formresubmit;
-    return RNCWebViewEventEmitter::OnLoadingFinishNavigationType::Other;
+    if (value == "click") return RNCWebViewAppleEventEmitter::OnLoadingFinishNavigationType::Click;
+    if (value == "formsubmit") return RNCWebViewAppleEventEmitter::OnLoadingFinishNavigationType::Formsubmit;
+    if (value == "backforward") return RNCWebViewAppleEventEmitter::OnLoadingFinishNavigationType::Backforward;
+    if (value == "reload") return RNCWebViewAppleEventEmitter::OnLoadingFinishNavigationType::Reload;
+    if (value == "formresubmit") return RNCWebViewAppleEventEmitter::OnLoadingFinishNavigationType::Formresubmit;
+    return RNCWebViewAppleEventEmitter::OnLoadingFinishNavigationType::Other;
 }
 
 static inline std::string nullSafeString(id value) {
@@ -57,7 +57,7 @@ static inline std::string nullSafeStringWithLength(id value) {
     return utf8String ? std::string(utf8String, length) : std::string();
 }
 
-@interface RNCWebView () <RCTRNCWebViewViewProtocol>
+@interface RNCWebView () <RCTRNCWebViewAppleViewProtocol>
 
 @end
 
@@ -67,7 +67,7 @@ static inline std::string nullSafeStringWithLength(id value) {
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-    return concreteComponentDescriptorProvider<RNCWebViewComponentDescriptor>();
+    return concreteComponentDescriptorProvider<RNCWebViewAppleComponentDescriptor>();
 }
 
 // Reproduce the idea from here: https://github.com/facebook/react-native/blob/8bd3edec88148d0ab1f225d2119435681fbbba33/React/Fabric/Mounting/ComponentViews/InputAccessory/RCTInputAccessoryComponentView.mm#L142
@@ -85,15 +85,15 @@ static inline std::string nullSafeStringWithLength(id value) {
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-        static const auto defaultProps = std::make_shared<const RNCWebViewProps>();
+        static const auto defaultProps = std::make_shared<const RNCWebViewAppleProps>();
         _props = defaultProps;
 
         _view = [[RNCWebViewImpl alloc] init];
 
         _view.onShouldStartLoadWithRequest = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnShouldStartLoadWithRequest data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnShouldStartLoadWithRequest data = {
                     .url = nullSafeString([dictionary valueForKey:@"url"]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = nullSafeString([dictionary valueForKey:@"title"]),
@@ -109,8 +109,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         };
         _view.onLoadingStart = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnLoadingStart data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnLoadingStart data = {
                     .url = nullSafeString([dictionary valueForKey:@"url"]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = nullSafeString([dictionary valueForKey:@"title"]),
@@ -125,8 +125,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         };
         _view.onLoadingError = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnLoadingError data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnLoadingError data = {
                     .url = nullSafeString([dictionary valueForKey:@"url"]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = nullSafeString([dictionary valueForKey:@"title"]),
@@ -142,8 +142,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         };
         _view.onMessage = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnMessage data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnMessage data = {
                     .url = nullSafeString([dictionary valueForKey:@"url"]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = nullSafeString([dictionary valueForKey:@"title"]),
@@ -157,8 +157,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         };
         _view.onLoadingFinish = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnLoadingFinish data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnLoadingFinish data = {
                     .url = nullSafeString([dictionary valueForKey:@"url"]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = nullSafeString([dictionary valueForKey:@"title"]),
@@ -173,8 +173,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         };
         _view.onLoadingProgress = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnLoadingProgress data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnLoadingProgress data = {
                     .url = nullSafeString([dictionary valueForKey:@"url"]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = nullSafeString([dictionary valueForKey:@"title"]),
@@ -188,8 +188,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         };
         _view.onContentProcessDidTerminate = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnContentProcessDidTerminate data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnContentProcessDidTerminate data = {
                     .url = nullSafeString([dictionary valueForKey:@"url"]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = nullSafeString([dictionary valueForKey:@"title"]),
@@ -202,8 +202,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         };
         _view.onCustomMenuSelection = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnCustomMenuSelection data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnCustomMenuSelection data = {
                     .selectedText = nullSafeString([dictionary valueForKey:@"selectedText"]),
                     .key = nullSafeString([dictionary valueForKey:@"key"]),
                     .label = nullSafeString([dictionary valueForKey:@"label"])
@@ -220,8 +220,8 @@ static inline std::string nullSafeStringWithLength(id value) {
                 NSDictionary* layoutMeasurement = [dictionary valueForKey:@"layoutMeasurement"];
                 double zoomScale = [[dictionary valueForKey:@"zoomScale"] doubleValue];
 
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnScroll data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnScroll data = {
                     .contentOffset = {
                         .x = [[contentOffset valueForKey:@"x"] doubleValue],
                         .y = [[contentOffset valueForKey:@"y"] doubleValue]
@@ -246,8 +246,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         };
         _view.onHttpError = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
-                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                facebook::react::RNCWebViewEventEmitter::OnHttpError data = {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewAppleEventEmitter::OnHttpError data = {
                     .url = nullSafeString([dictionary valueForKey:@"url"]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = nullSafeString([dictionary valueForKey:@"title"]),
@@ -272,8 +272,8 @@ static inline std::string nullSafeStringWithLength(id value) {
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    const auto &oldViewProps = *std::static_pointer_cast<RNCWebViewProps const>(_props);
-    const auto &newViewProps = *std::static_pointer_cast<RNCWebViewProps const>(props);
+    const auto &oldViewProps = *std::static_pointer_cast<RNCWebViewAppleProps const>(_props);
+    const auto &newViewProps = *std::static_pointer_cast<RNCWebViewAppleProps const>(props);
 
 #define REMAP_WEBVIEW_PROP(name)                    \
     if (oldViewProps.name != newViewProps.name) {   \
@@ -343,28 +343,28 @@ static inline std::string nullSafeStringWithLength(id value) {
         // WKDataDetectorTypes is a bit mask: combine every requested type,
         // mirroring the RCT_MULTI_ENUM_CONVERTER previously used on Paper.
         WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::Address) {
             dataDetectorTypes |= WKDataDetectorTypeAddress;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::Link) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::Link) {
             dataDetectorTypes |= WKDataDetectorTypeLink;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::CalendarEvent) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::CalendarEvent) {
             dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::TrackingNumber) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::TrackingNumber) {
             dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::FlightNumber) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::FlightNumber) {
             dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::LookupSuggestion) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::LookupSuggestion) {
             dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::PhoneNumber) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::PhoneNumber) {
             dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
         }
-        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::All) {
+        if (newViewProps.dataDetectorTypes & RNCWebViewAppleDataDetectorTypes::All) {
             dataDetectorTypes = WKDataDetectorTypeAll;
         }
         [_view setDataDetectorTypes:dataDetectorTypes];
@@ -390,13 +390,13 @@ static inline std::string nullSafeStringWithLength(id value) {
 
 #if !TARGET_OS_OSX
     if (oldViewProps.contentInsetAdjustmentBehavior != newViewProps.contentInsetAdjustmentBehavior) {
-        if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Never) {
+        if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewAppleContentInsetAdjustmentBehavior::Never) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Automatic) {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewAppleContentInsetAdjustmentBehavior::Automatic) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAutomatic];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::ScrollableAxes) {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewAppleContentInsetAdjustmentBehavior::ScrollableAxes) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentScrollableAxes];
-        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewContentInsetAdjustmentBehavior::Always) {
+        } else if (newViewProps.contentInsetAdjustmentBehavior == RNCWebViewAppleContentInsetAdjustmentBehavior::Always) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAlways];
         }
     }
@@ -427,8 +427,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         if (newViewProps.hasOnFileDownload) {
             _view.onFileDownload = [self](NSDictionary* dictionary) {
                 if (_eventEmitter) {
-                    auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                    facebook::react::RNCWebViewEventEmitter::OnFileDownload data = {
+                    auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                    facebook::react::RNCWebViewAppleEventEmitter::OnFileDownload data = {
                         .downloadUrl = nullSafeString([dictionary valueForKey:@"downloadUrl"])
                     };
                     webViewEventEmitter->onFileDownload(data);
@@ -442,8 +442,8 @@ static inline std::string nullSafeStringWithLength(id value) {
         if (newViewProps.hasOnOpenWindowEvent) {
             _view.onOpenWindow = [self](NSDictionary* dictionary) {
                 if (_eventEmitter) {
-                    auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
-                    facebook::react::RNCWebViewEventEmitter::OnOpenWindow data = {
+                    auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewAppleEventEmitter const>(_eventEmitter);
+                    facebook::react::RNCWebViewAppleEventEmitter::OnOpenWindow data = {
                         .targetUrl = nullSafeString([dictionary valueForKey:@"targetUrl"])
                     };
                     webViewEventEmitter->onOpenWindow(data);
@@ -456,33 +456,33 @@ static inline std::string nullSafeStringWithLength(id value) {
 //
 #if !TARGET_OS_OSX
     if (oldViewProps.contentMode != newViewProps.contentMode) {
-        if (newViewProps.contentMode == RNCWebViewContentMode::Recommended) {
+        if (newViewProps.contentMode == RNCWebViewAppleContentMode::Recommended) {
             [_view setContentMode: WKContentModeRecommended];
-        } else if (newViewProps.contentMode == RNCWebViewContentMode::Mobile) {
+        } else if (newViewProps.contentMode == RNCWebViewAppleContentMode::Mobile) {
             [_view setContentMode:WKContentModeMobile];
-        } else if (newViewProps.contentMode == RNCWebViewContentMode::Desktop) {
+        } else if (newViewProps.contentMode == RNCWebViewAppleContentMode::Desktop) {
             [_view setContentMode:WKContentModeDesktop];
         }
     }
 
     if (oldViewProps.mediaCapturePermissionGrantType != newViewProps.mediaCapturePermissionGrantType) {
-        if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Prompt) {
+        if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::Prompt) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Prompt];
-        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Grant) {
+        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::Grant) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Grant];
-        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Deny) {
+        } else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::Deny) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Deny];
-        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::GrantIfSameHostElsePrompt) {
+        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::GrantIfSameHostElsePrompt) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt];
-        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::GrantIfSameHostElseDeny) {
+        }else if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewAppleMediaCapturePermissionGrantType::GrantIfSameHostElseDeny) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
         }
     }
 #endif // !TARGET_OS_OSX
     if (oldViewProps.indicatorStyle != newViewProps.indicatorStyle) {
-        if (newViewProps.indicatorStyle == RNCWebViewIndicatorStyle::Black) {
+        if (newViewProps.indicatorStyle == RNCWebViewAppleIndicatorStyle::Black) {
             [_view setIndicatorStyle:@"black"];
-        } else if (newViewProps.indicatorStyle == RNCWebViewIndicatorStyle::White) {
+        } else if (newViewProps.indicatorStyle == RNCWebViewAppleIndicatorStyle::White) {
             [_view setIndicatorStyle:@"white"];
         } else {
             [_view setIndicatorStyle:@"default"];
@@ -518,7 +518,7 @@ static inline std::string nullSafeStringWithLength(id value) {
 }
 
 - (void)handleCommand:(nonnull const NSString *)commandName args:(nonnull const NSArray *)args {
-    RCTRNCWebViewHandleCommand(self, commandName, args);
+    RCTRNCWebViewAppleHandleCommand(self, commandName, args);
 }
 
 
@@ -539,10 +539,6 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
     [_view injectJavaScript:javascript];
 }
 
-- (void)loadUrl:(nonnull NSString *)url {
-    // android only
-}
-
 - (void)postMessage:(nonnull NSString *)data {
     [_view postMessage:data];
 }
@@ -559,16 +555,8 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
     [_view stopLoading];
 }
 
-- (void)clearFormData {
-    // android only
-}
-
 - (void)clearCache:(BOOL)includeDiskFiles {
     [_view clearCache:includeDiskFiles];
-}
-
-- (void)clearHistory {
-    // android only
 }
 
 @end
