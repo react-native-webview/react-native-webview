@@ -44,24 +44,26 @@ const createOnShouldStartLoadWithRequest = (
     let shouldStart = true;
     const { url, lockIdentifier } = nativeEvent;
 
-    if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      Linking.canOpenURL(url)
-        .then(async (supported) => {
-          if (supported) {
-            return Linking.openURL(url);
-          }
-          console.warn(`Can't open url: ${url}`);
-          return undefined;
-        })
-        .catch((e: unknown) => {
-          console.warn('Error opening URL: ', e);
-        });
-      shouldStart = false;
-    } else if (onShouldStartLoadWithRequest) {
-      shouldStart = onShouldStartLoadWithRequest(nativeEvent);
+    try {
+      if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
+        shouldStart = false;
+        Linking.canOpenURL(url)
+          .then(async (supported) => {
+            if (supported) {
+              return Linking.openURL(url);
+            }
+            console.warn(`Can't open url: ${url}`);
+            return undefined;
+          })
+          .catch((e: unknown) => {
+            console.warn('Error opening URL: ', e);
+          });
+      } else if (onShouldStartLoadWithRequest) {
+        shouldStart = onShouldStartLoadWithRequest(nativeEvent);
+      }
+    } finally {
+      loadRequest(shouldStart, url, lockIdentifier);
     }
-
-    loadRequest(shouldStart, url, lockIdentifier);
   };
 };
 
