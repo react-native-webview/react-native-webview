@@ -55,9 +55,27 @@ def supportsNamespace() {
   return major >= 8
 }
 
+def usesBuiltInKotlin() {
+  def major = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0].toInteger()
+
+  // Built-in Kotlin support was added in AGP 9.0.0, where it is on by default.
+  if (major < 9) {
+    return false
+  }
+
+  def builtInKotlin = project.findProperty('android.builtInKotlin')
+  return builtInKotlin == null || builtInKotlin.toString().toBoolean()
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'com.facebook.react'
-apply plugin: 'kotlin-android'
+
+// AGP 9 applies the Kotlin plugin itself, and applying 'kotlin-android' on top
+// of it fails the configuration phase. Only apply it explicitly when AGP is not
+// already providing Kotlin support.
+if (!usesBuiltInKotlin()) {
+  apply plugin: 'kotlin-android'
+}
 
 android {
     if (supportsNamespace()) {
