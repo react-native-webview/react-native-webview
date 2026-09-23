@@ -1682,6 +1682,12 @@ didFinishNavigation:(WKNavigation *)navigation
 - (void)setInjectedJavaScriptObject:(NSString *)source
 {
   _injectedJavaScriptObject = source;
+  // Embed `source` as a JS expression (JSON is a subset of JS object-literal
+  // syntax) rather than inside a template literal. Template literals unescape
+  // `\"` -> `"`, which corrupts payloads that contain already-stringified JSON
+  // (e.g. `{"state": "{\"k\":\"v\"}"}`). `JSON.stringify(...)` then re-emits a
+  // valid JSON string so existing callers of `injectedObjectJson()` (which
+  // typically `JSON.parse` the result) keep working unchanged.
   self.injectedObjectJsonScript = [
     [WKUserScript alloc]
     initWithSource: [
@@ -1689,7 +1695,7 @@ didFinishNavigation:(WKNavigation *)navigation
       stringWithFormat:
        @"window.%@ = window.%@ || {};"
       "window.%@.injectedObjectJson = function () {"
-      "  return `%@`;"
+      "  return JSON.stringify(%@);"
       "};", MessageHandlerName, MessageHandlerName, MessageHandlerName, source
     ]
     injectionTime:WKUserScriptInjectionTimeAtDocumentStart
