@@ -5,6 +5,10 @@
 [![NPM Version](https://img.shields.io/npm/v/react-native-webview.svg?style=flat-square)](https://www.npmjs.com/package/react-native-webview)
 ![Npm Downloads](https://img.shields.io/npm/dm/react-native-webview.svg)
 
+> [!IMPORTANT]
+> **📢 Keep Android Open** — Starting September 2026, Google plans to block apps from unregistered developers on all certified Android devices, threatening sideloading and independent app distribution.
+> Learn more at [keepandroidopen.org](https://keepandroidopen.org/) and add the countdown banner to your own website: [https://keepandroidopen.org/banner/](https://keepandroidopen.org/banner/)
+
 **React Native WebView** is a community-maintained WebView component for React Native. It is intended to be a replacement for the built-in WebView (which was [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
 ### Maintainers
