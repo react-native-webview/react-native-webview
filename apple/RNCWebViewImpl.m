@@ -80,9 +80,14 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
 - (BOOL)canPerformAction:(SEL)action
               withSender:(id)sender{
+  NSString *sel = NSStringFromSelector(action);
+  if ([sel hasPrefix:CUSTOM_SELECTOR]) {
+    return YES;
+  }
+
   if(self.suppressMenuItems) {
-      NSString * sel = [self stringFromAction:action];
-      if ([self.suppressMenuItems containsObject: sel]) {
+      NSString * mappedSel = [self stringFromAction:action];
+      if ([self.suppressMenuItems containsObject: mappedSel]) {
           return NO;
       }
   }
@@ -97,9 +102,59 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     if (@available(iOS 16.0, *)) {
       if(self.menuItems){
         [builder removeMenuForIdentifier:UIMenuLookup];
+        [builder removeMenuForIdentifier:UIMenuStandardEdit];
+        [builder removeMenuForIdentifier:UIMenuFormat];
+        [builder removeMenuForIdentifier:UIMenuShare];
+
+        NSMutableArray<UICommand *> *commands = [NSMutableArray new];
+        for(NSDictionary *menuItem in self.menuItems) {
+          NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
+          NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
+          NSString *selStr = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
+          UICommand *command = [UICommand commandWithTitle:menuItemLabel
+                                                     image:nil
+                                                    action:NSSelectorFromString(selStr)
+                                              propertyList:nil];
+          [commands addObject:command];
+        }
+        UIMenu *customMenu = [UIMenu menuWithTitle:@""
+                                             image:nil
+                                        identifier:nil
+                                           options:UIMenuOptionsDisplayInline
+                                          children:commands];
+        [builder insertChildMenu:customMenu atStartOfMenuForIdentifier:UIMenuRoot];
+        return;
       }
     }
     [super buildMenuWithBuilder:builder];
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
+  NSMethodSignature *existing = [super methodSignatureForSelector:sel];
+  if (existing) {
+    return existing;
+  }
+  NSString *selStr = NSStringFromSelector(sel);
+  if ([selStr hasPrefix:CUSTOM_SELECTOR]) {
+    return [NSMethodSignature signatureWithObjCTypes:"v@:@"];
+  }
+  return nil;
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation {
+  NSString *sel = NSStringFromSelector([invocation selector]);
+  if ([sel hasPrefix:CUSTOM_SELECTOR]) {
+    NSString *key = [sel substringFromIndex:CUSTOM_SELECTOR.length];
+    RNCWebViewImpl *impl = (RNCWebViewImpl *)[self superview];
+    if ([impl isKindOfClass:[RNCWebViewImpl class]]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+      [impl performSelector:NSSelectorFromString(@"tappedMenuItem:") withObject:key];
+#pragma clang diagnostic pop
+    }
+  } else {
+    [super forwardInvocation:invocation];
+  }
 }
 #else // TARGET_OS_OSX
 - (void)scrollWheel:(NSEvent *)theEvent {
