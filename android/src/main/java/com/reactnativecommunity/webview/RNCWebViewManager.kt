@@ -761,17 +761,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             val eventInitDict = JSONObject()
             eventInitDict.put("data", data)
             view.webView.evaluateJavascriptWithFallback(
-                "(function () {" +
-                    "var event;" +
-                    "var data = " + eventInitDict.toString() + ";" +
-                    "try {" +
-                    "event = new MessageEvent('message', data);" +
-                    "} catch (e) {" +
-                    "event = document.createEvent('MessageEvent');" +
-                    "event.initMessageEvent('message', true, true, data.data, data.origin, data.lastEventId, data.source);" +
-                    "}" +
-                    "document.dispatchEvent(event);" +
-                    "})();"
+                "window.dispatchEvent(new MessageEvent('message', " + eventInitDict.toString() + "));"
             )
         } catch (e: JSONException) {
             throw RuntimeException(e)
