@@ -32,10 +32,6 @@ const HTML = `<!DOCTYPE html>\n
         document.getElementById('test').innerHTML = event.data;
         console.log("Message received from RN: ",event.data);
       },false);
-      document.addEventListener('message',function(event){
-        document.getElementById('test').innerHTML = event.data;
-        console.log("Message received from RN: ",event.data);
-      },false);
 
     </script>
   </body>

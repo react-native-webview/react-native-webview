@@ -1813,7 +1813,15 @@ Request the webView to ask for focus. (People working on TV apps might want havi
 postMessage('message');
 ```
 
-Post a message to WebView, handled by [`onMessage`](Reference.md#onmessage).
+Post a message to the web page. It is delivered as a `message` event on `window`, so the page receives it with:
+
+```javascript
+window.addEventListener('message', (event) => {
+  console.log(event.data);
+});
+```
+
+To send messages the other way (web page -> React Native), see [`onMessage`](Reference.md#onmessage).
 
 ### `clearFormData()`[⬆](#methods-index)
 
