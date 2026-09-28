@@ -27,6 +27,7 @@ import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import SslError from './examples/SslError';
+import PerformanceMetrics from './examples/PerformanceMetrics';
 
 const TESTS = {
   Messaging: {
@@ -163,6 +164,14 @@ const TESTS = {
     description: 'SSL error test',
     render() {
       return <SslError />;
+    },
+  },
+  PerformanceMetrics: {
+    title: 'Performance Metrics',
+    testId: 'PerformanceMetrics',
+    description: 'First and Largest Contentful Paint metrics',
+    render() {
+      return <PerformanceMetrics />;
     },
   },
 };
@@ -335,6 +344,13 @@ export default function App() {
           title="SslError"
           onPress={() => changeTest('SslError')}
         />
+        {Platform.OS === 'android' && (
+          <Button
+            testID="testType_performanceMetrics"
+            title="PerformanceMetrics"
+            onPress={() => changeTest('PerformanceMetrics')}
+          />
+        )}
       </View>
 
       {restarting ? null : (

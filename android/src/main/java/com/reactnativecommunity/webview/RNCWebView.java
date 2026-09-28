@@ -18,6 +18,8 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.NavigationListener;
+import androidx.webkit.Page;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -40,6 +42,7 @@ import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.reactnativecommunity.webview.events.TopCustomMenuSelectionEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
+import com.reactnativecommunity.webview.events.TopPerformanceMetricEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,6 +81,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+    protected @Nullable
+    NavigationListener performanceMetricsListener;
 
     /**
      * WebView must be created with an context of the current activity
@@ -105,6 +110,44 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     public void setNestedScrollEnabled(boolean nestedScrollEnabled) {
         this.nestedScrollEnabled = nestedScrollEnabled;
+    }
+
+    public void setHasOnPerformanceMetric(boolean enabled) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.NAVIGATION_LISTENER)) {
+            return;
+        }
+
+        if (enabled && performanceMetricsListener == null) {
+            performanceMetricsListener = new NavigationListener() {
+                @Override
+                public void onFirstContentfulPaintMillis(@NonNull Page page, long durationMillis) {
+                    dispatchPerformanceMetric(page, "firstContentfulPaint", durationMillis);
+                }
+
+                @Override
+                public void onLargestContentfulPaintMillis(@NonNull Page page, long durationMillis) {
+                    dispatchPerformanceMetric(page, "largestContentfulPaint", durationMillis);
+                }
+            };
+            WebViewCompat.addNavigationListener(this, performanceMetricsListener);
+        } else if (!enabled && performanceMetricsListener != null) {
+            WebViewCompat.removeNavigationListener(this, performanceMetricsListener);
+            performanceMetricsListener = null;
+        }
+    }
+
+    private void dispatchPerformanceMetric(Page page, String metric, long durationMillis) {
+        WritableMap eventData = Arguments.createMap();
+        eventData.putString("url", page.getUrl().toString());
+        eventData.putString("metric", metric);
+        eventData.putDouble("durationMillis", durationMillis);
+
+        dispatchEvent(
+                this,
+                new TopPerformanceMetricEvent(
+                        UIManagerHelper.getSurfaceId(this),
+                        RNCWebViewWrapper.getReactTagFromWebView(this),
+                        eventData));
     }
 
     @Override
@@ -418,6 +461,11 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     @Override
     public void destroy() {
+        if (performanceMetricsListener != null &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.NAVIGATION_LISTENER)) {
+            WebViewCompat.removeNavigationListener(this, performanceMetricsListener);
+            performanceMetricsListener = null;
+        }
         if (mWebChromeClient != null) {
             mWebChromeClient.onHideCustomView();
         }

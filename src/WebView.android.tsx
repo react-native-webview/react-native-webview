@@ -77,6 +77,7 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
       onLoadEnd,
       onLoadSubResourceError,
       onLoadProgress,
+      onPerformanceMetric,
       onHttpError: onHttpErrorProp,
       onRenderProcessGone: onRenderProcessGoneProp,
       onMessage: onMessageProp,
@@ -264,6 +265,8 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
         onLoadingSubResourceError={onLoadingSubResourceError}
         onLoadingFinish={onLoadingFinish}
         onLoadingProgress={onLoadingProgress}
+        onPerformanceMetric={onPerformanceMetric}
+        hasOnPerformanceMetric={onPerformanceMetric !== undefined}
         onLoadingStart={onLoadingStart}
         onHttpError={onHttpError}
         onRenderProcessGone={onRenderProcessGone}

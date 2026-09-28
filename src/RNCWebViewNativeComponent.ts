@@ -66,6 +66,12 @@ export type WebViewNativeProgressEvent = Readonly<{
   progress: Double;
 }>;
 
+export type WebViewPerformanceMetricEvent = Readonly<{
+  url: string;
+  metric: 'firstContentfulPaint' | 'largestContentfulPaint';
+  durationMillis: Double;
+}>;
+
 export type WebViewNavigationEvent = Readonly<{
   url: string;
   loading: boolean;
@@ -150,6 +156,7 @@ export interface NativeProps extends ViewProps {
   mixedContentMode?: WithDefault<'never' | 'always' | 'compatibility', 'never'>;
   nestedScrollEnabled?: boolean;
   onContentSizeChange?: DirectEventHandler<WebViewNativeEvent>;
+  onPerformanceMetric?: DirectEventHandler<WebViewPerformanceMetricEvent>;
   onRenderProcessGone?: DirectEventHandler<WebViewRenderProcessGoneEvent>;
   overScrollMode?: string;
   saveFormDataDisabled?: boolean;
@@ -161,6 +168,7 @@ export interface NativeProps extends ViewProps {
   thirdPartyCookiesEnabled?: WithDefault<boolean, true>;
   // Workaround to watch if listener if defined
   hasOnScroll?: boolean;
+  hasOnPerformanceMetric?: boolean;
   // !Android only
 
   // iOS only
