@@ -169,6 +169,24 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(false, 'fakehttps://insecure.com/', 4);
     });
 
+    test('does not allow an origin that only starts with an exact whitelist entry', async () => {
+      const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(loadRequest, [
+        'https://trusted.example',
+      ]);
+
+      onShouldStartLoadWithRequest({
+        nativeEvent: {
+          url: 'https://trusted.example.attacker/',
+          lockIdentifier: 1,
+        },
+      });
+
+      await flushPromises();
+
+      expect(Linking.openURL).toHaveBeenLastCalledWith('https://trusted.example.attacker/');
+      expect(loadRequest).toHaveBeenLastCalledWith(false, 'https://trusted.example.attacker/', 1);
+    });
+
     test('loadRequest allows for valid URIs', async () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(loadRequest, [
         'plus+https://*',

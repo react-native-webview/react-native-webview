@@ -24,15 +24,15 @@ const extractOrigin = (url: string): string => {
   return result === null ? '' : result[0];
 };
 
-const originWhitelistToRegex = (originWhitelist: string): string =>
-  `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}`;
+const originWhitelistToRegex = (originWhitelist: string): RegExp =>
+  new RegExp(`^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`);
 
-const passesWhitelist = (compiledWhitelist: readonly string[], url: string) => {
+const passesWhitelist = (compiledWhitelist: readonly RegExp[], url: string) => {
   const origin = extractOrigin(url);
-  return compiledWhitelist.some((x) => new RegExp(x).test(origin));
+  return compiledWhitelist.some((regex) => regex.test(origin));
 };
 
-const compileWhitelist = (originWhitelist: readonly string[]): readonly string[] =>
+const compileWhitelist = (originWhitelist: readonly string[]): readonly RegExp[] =>
   ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
 
 const createOnShouldStartLoadWithRequest = (
@@ -40,11 +40,13 @@ const createOnShouldStartLoadWithRequest = (
   originWhitelist: readonly string[],
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
+  const compiledWhitelist = compileWhitelist(originWhitelist);
+
   return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
     let shouldStart = true;
     const { url, lockIdentifier } = nativeEvent;
 
-    if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
+    if (!passesWhitelist(compiledWhitelist, url)) {
       Linking.canOpenURL(url)
         .then(async (supported) => {
           if (supported) {
