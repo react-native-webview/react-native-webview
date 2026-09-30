@@ -185,35 +185,58 @@ void RCTWebView2ComponentView::UpdateProps(
         }
     }
     
-    // Handle source navigation
+    // Handle source navigation. UpdateProps is called with the FULL current
+    // prop set whenever ANY prop changes (not just source-related ones), so
+    // re-setting Source() / calling NavigateToString() unconditionally here
+    // re-navigates -- for Source() specifically, possibly reloading the
+    // page -- on every unrelated prop change (e.g. toggling
+    // javaScriptEnabled). Diff against oldProps so navigation only happens
+    // when the source actually changed; oldProps is null on first mount, in
+    // which case we always want to navigate.
+    const bool uriChanged = !oldProps ||
+        oldProps->newSource.uri.value_or(std::string{}) != newProps->newSource.uri.value_or(std::string{});
+    const bool htmlChanged = !oldProps ||
+        oldProps->newSource.html.value_or(std::string{}) != newProps->newSource.html.value_or(std::string{});
+
     if (newProps->newSource.uri.has_value() && !newProps->newSource.uri.value().empty()) {
-        try {
-            auto uri = winrt::Windows::Foundation::Uri(winrt::to_hstring(newProps->newSource.uri.value()));
-            m_webView.Source(uri);
-        } catch (...) {
-            // Invalid URI
+        if (uriChanged) {
+            try {
+                auto uri = winrt::Windows::Foundation::Uri(winrt::to_hstring(newProps->newSource.uri.value()));
+                m_webView.Source(uri);
+            } catch (...) {
+                // Invalid URI
+            }
         }
     } else if (newProps->newSource.html.has_value() && !newProps->newSource.html.value().empty()) {
-        if (m_webView.CoreWebView2()) {
-            try {
-                m_webView.NavigateToString(winrt::to_hstring(newProps->newSource.html.value()));
-            } catch (...) {
-                // Navigation failed
+        if (htmlChanged) {
+            if (m_webView.CoreWebView2()) {
+                try {
+                    m_webView.NavigateToString(winrt::to_hstring(newProps->newSource.html.value()));
+                } catch (...) {
+                    // Navigation failed
+                }
+            } else {
+                // CoreWebView2 not ready yet - save HTML for later navigation in OnCoreWebView2Initialized
+                m_pendingHtml = newProps->newSource.html.value();
             }
-        } else {
-            // CoreWebView2 not ready yet - save HTML for later navigation in OnCoreWebView2Initialized
-            m_pendingHtml = newProps->newSource.html.value();
         }
     }
-    
+
     // Apply debugging enabled
     if (newProps->webviewDebuggingEnabled.has_value() && m_webView.CoreWebView2()) {
         m_webView.CoreWebView2().Settings().AreDevToolsEnabled(newProps->webviewDebuggingEnabled.value());
     }
-    
-    // Apply JavaScript enabled
+
+    // Apply JavaScript enabled. Stored on the instance (m_javaScriptEnabled)
+    // so OnCoreWebView2Initialized can (re)apply it once CoreWebView2 exists
+    // -- previously, javaScriptEnabled={false} set before CoreWebView2 was
+    // ready (e.g. on first render) was silently dropped: this branch was a
+    // no-op because CoreWebView2() was still null, and
+    // OnCoreWebView2Initialized never reapplied it (only userAgent and
+    // pending HTML were reapplied there).
+    m_javaScriptEnabled = newProps->javaScriptEnabled;
     if (m_webView.CoreWebView2()) {
-        m_webView.CoreWebView2().Settings().IsScriptEnabled(newProps->javaScriptEnabled);
+        m_webView.CoreWebView2().Settings().IsScriptEnabled(m_javaScriptEnabled);
     }
 
     m_updating = false;
@@ -402,12 +425,17 @@ void RCTWebView2ComponentView::OnCoreWebView2Initialized(
     if (!m_webView || !m_webView.CoreWebView2()) return;
     
     RegisterCoreWebView2Events();
-    
+
     // Apply user agent if set
     if (!m_userAgent.empty()) {
         m_webView.CoreWebView2().Settings().UserAgent(m_userAgent);
     }
-    
+
+    // Re-apply javaScriptEnabled here too: UpdateProps may have run before
+    // CoreWebView2 existed, in which case the Settings().IsScriptEnabled()
+    // call there was skipped (see UpdateProps).
+    m_webView.CoreWebView2().Settings().IsScriptEnabled(m_javaScriptEnabled);
+
     // Navigate to deferred HTML source if pending
     if (!m_pendingHtml.empty()) {
         try {
