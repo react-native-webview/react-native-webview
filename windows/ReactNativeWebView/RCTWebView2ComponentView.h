@@ -15,6 +15,10 @@
 #include <winrt/Microsoft.UI.Xaml.h>
 #include <winrt/Microsoft.Web.WebView2.Core.h>
 
+// For uint32_t (m_documentStartScriptGeneration). Nothing in this file used a
+// fixed-width integer type before, so do not rely on it arriving transitively.
+#include <cstdint>
+
 namespace winrt::ReactNativeWebView::implementation {
 
 // State to store the WebView2 size
@@ -81,6 +85,20 @@ private:
     bool Is17763OrHigher();
     void WriteCookiesToWebView2(std::string const& cookies);
 
+    // Registers the window.ReactNativeWebView message bridge (when
+    // messagingEnabled) and injectedJavaScriptBeforeContentLoaded (when set)
+    // via AddScriptToExecuteOnDocumentCreatedAsync, and re-registers them when
+    // either prop changes after mount: the previous scripts are dropped with
+    // RemoveScriptToExecuteOnDocumentCreated using the script IDs the Add call
+    // handed back. Called from OnCoreWebView2Initialized for the first
+    // registration and from UpdateProps for later changes.
+    //
+    // A document-created script only applies to *future* navigations, so a
+    // change takes effect on the next navigation rather than on the document
+    // already loaded -- the same semantics as iOS, where -resetupScripts:
+    // calls removeAllUserScripts and re-adds the WKUserScript set.
+    winrt::fire_and_forget ResetupDocumentStartScripts();
+
     winrt::weak_ref<winrt::Microsoft::ReactNative::Composition::ContentIslandComponentView> m_islandView;
     winrt::Microsoft::UI::Xaml::XamlIsland m_island{nullptr};
     winrt::Microsoft::UI::Xaml::Controls::WebView2 m_webView{nullptr};
@@ -101,7 +119,19 @@ private:
     bool m_messagingEnabled{true};
     bool m_linkHandlingEnabled{true};
     winrt::hstring m_injectedJavascript{L""};
+    winrt::hstring m_injectedJavaScriptBeforeContentLoaded{L""};
     winrt::hstring m_userAgent{L""};
+
+    // Script IDs returned by AddScriptToExecuteOnDocumentCreatedAsync, kept so
+    // ResetupDocumentStartScripts can hand them to
+    // RemoveScriptToExecuteOnDocumentCreated. Empty == nothing registered.
+    winrt::hstring m_bridgeScriptId{L""};
+    winrt::hstring m_beforeContentLoadedScriptId{L""};
+    // Bumped by every ResetupDocumentStartScripts call (and by Cleanup) so a
+    // coroutine still awaiting an Add... completion can tell it has been
+    // superseded and undo the script it just added.
+    uint32_t m_documentStartScriptGeneration{0};
+
     bool m_updating{false};
     std::string m_pendingHtml{};
 };
