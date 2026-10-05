@@ -59,7 +59,15 @@ private:
     void RefreshSize();
     void RegisterEvents();
     void RegisterCoreWebView2Events();
-    
+
+    // Kicks off CoreWebView2 creation with an explicit environment (see the
+    // .cpp for why) instead of the parameterless EnsureCoreWebView2Async().
+    winrt::fire_and_forget InitializeCoreWebView2Async();
+    // Emits onLoadingError for a CoreWebView2 init failure, whether it came
+    // from environment creation (caught directly) or from
+    // EnsureCoreWebView2Async itself (CoreWebView2Initialized's Exception()).
+    void EmitCoreWebView2InitError(int32_t hresult, std::string const& description) noexcept;
+
     void OnNavigationStarting(winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationStartingEventArgs const& args);
     void OnNavigationCompleted(winrt::Microsoft::Web::WebView2::Core::CoreWebView2NavigationCompletedEventArgs const& args);
     void OnCoreWebView2Initialized(winrt::Microsoft::UI::Xaml::Controls::CoreWebView2InitializedEventArgs const& args);
