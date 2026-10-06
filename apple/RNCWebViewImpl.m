@@ -1740,7 +1740,8 @@ didFinishNavigation:(WKNavigation *)navigation
       stringWithFormat:
        @"window.%@ = window.%@ || {};"
       "window.%@.postMessage = function (data) {"
-      "  window.webkit.messageHandlers.%@.postMessage(String(data));"
+      "  var handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.%@;"
+      "  if (handler) handler.postMessage(String(data));"
       "};", MessageHandlerName, MessageHandlerName, MessageHandlerName, MessageHandlerName
     ]
     injectionTime:WKUserScriptInjectionTimeAtDocumentStart
@@ -1801,7 +1802,8 @@ didFinishNavigation:(WKNavigation *)navigation
                                            @"(function(history) {\n"
                                          "  function notify(type) {\n"
                                          "    setTimeout(function() {\n"
-                                         "      window.webkit.messageHandlers.%@.postMessage(type)\n"
+                                         "      var handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.%@\n"
+                                         "      if (handler) handler.postMessage(type)\n"
                                          "    }, 0)\n"
                                          "  }\n"
                                          "  function shim(f) {\n"
