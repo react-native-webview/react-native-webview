@@ -844,7 +844,7 @@ RCTAutoInsetsProtocol>
       [webView loadHTMLString:@"" baseURL:nil];
       return;
     }
-    if (request.URL.host) {
+    if (!request.URL.isFileURL) {
       [webView loadRequest:request];
     }
     else {
