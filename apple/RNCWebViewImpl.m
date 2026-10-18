@@ -818,10 +818,12 @@ RCTAutoInsetsProtocol>
   // Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
   NSString *headerCookie = [RCTConvert NSString:_source[@"headers"][@"cookie"]];
   if(headerCookie) {
-    NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys:headerCookie,@"Set-Cookie",nil];
     NSURL *urlString = [NSURL URLWithString:_source[@"uri"]];
-    NSArray *httpCookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:urlString];
-    [self writeCookiesToWebView:httpCookies completion:nil];
+    if (urlString.host) {
+      NSDictionary *headers = [NSDictionary dictionaryWithObjectsAndKeys:headerCookie,@"Set-Cookie",nil];
+      NSArray *httpCookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:urlString];
+      [self writeCookiesToWebView:httpCookies completion:nil];
+    }
   }
 
   NSURLRequest *request = [self requestForSource:_source];
@@ -847,9 +849,12 @@ RCTAutoInsetsProtocol>
     if (request.URL.host) {
       [webView loadRequest:request];
     }
-    else {
+    else if ([request.URL isFileURL]) {
       NSURL* readAccessUrl = allowingReadAccessToURL ? [RCTConvert NSURL:allowingReadAccessToURL] : request.URL;
       [webView loadFileURL:request.URL allowingReadAccessToURL:readAccessUrl];
+    }
+    else {
+      [webView loadHTMLString:@"" baseURL:[NSURL URLWithString:@"about:blank"]];
     }
   }];
 }
