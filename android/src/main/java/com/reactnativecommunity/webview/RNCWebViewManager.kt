@@ -556,6 +556,12 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     @ReactProp(name = "suppressMenuItems")
     override fun setSuppressMenuItems(view: RNCWebViewWrapper, value: ReadableArray?) {}
 
+    @ReactProp(name = "nativeWindowHosts")
+    override fun setNativeWindowHosts(view: RNCWebViewWrapper, value: ReadableArray?) {}
+
+    @ReactProp(name = "nativeWindowNavigationHosts")
+    override fun setNativeWindowNavigationHosts(view: RNCWebViewWrapper, value: ReadableArray?) {}
+
     @ReactProp(name = "messagingEnabled")
     override fun setMessagingEnabled(view: RNCWebViewWrapper, value: Boolean) {
         view.webView.setMessagingEnabled(value)

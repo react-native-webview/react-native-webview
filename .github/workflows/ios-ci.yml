@@ -27,4 +27,8 @@ jobs:
           [[ $device =~ $re ]] || exit 1
           xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination "platform=iOS Simulator,id=${BASH_REMATCH[1]}" CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
         working-directory: example/ios
+      - name: Run native popup unit tests
+        run: |
+          ruby appleTests/create-project.rb
+          xcodebuild test -project build/NativeWindowTests.xcodeproj -scheme NativeWindowTests -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/NativeWindowTestsDerivedData CODE_SIGNING_ALLOWED=NO
     timeout-minutes: 60
