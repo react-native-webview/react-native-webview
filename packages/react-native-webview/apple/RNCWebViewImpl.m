@@ -38,6 +38,32 @@ static void RNCCompleteJavaScriptDialogOnMainQueue(dispatch_block_t completionHa
     dispatch_async(dispatch_get_main_queue(), completionHandler);
   }
 }
+
+static char RNCJavaScriptDialogLifetimeKey;
+
+// Attached to a JavaScript dialog's alert so the dialog can be completed when the alert
+// goes away without a button being tapped (presentation refused, dismissed with a parent, ...).
+@interface RNCJavaScriptDialogLifetime : NSObject
+- (instancetype)initWithDeallocHandler:(dispatch_block_t)deallocHandler;
+@end
+
+@implementation RNCJavaScriptDialogLifetime {
+  dispatch_block_t _deallocHandler;
+}
+
+- (instancetype)initWithDeallocHandler:(dispatch_block_t)deallocHandler
+{
+  if (self = [super init]) {
+    _deallocHandler = [deallocHandler copy];
+  }
+  return self;
+}
+
+- (void)dealloc
+{
+  RNCCompleteJavaScriptDialogOnMainQueue(_deallocHandler);
+}
+@end
 #endif // !TARGET_OS_OSX
 
 #if TARGET_OS_IOS
@@ -145,6 +171,7 @@ RCTAutoInsetsProtocol>
 - (NSObject *)beginJavaScriptDialogWithFallback:(dispatch_block_t)fallback;
 - (BOOL)consumeJavaScriptDialogWithToken:(NSObject *)token;
 - (void)resolvePendingJavaScriptDialog;
+- (void)resolveJavaScriptDialogWithToken:(NSObject *)token whenAlertIsReleased:(UIAlertController *)alert;
 #endif // !TARGET_OS_OSX
 @end
 
@@ -353,6 +380,18 @@ RCTAutoInsetsProtocol>
   _pendingJavaScriptDialogToken = nil;
   _pendingJavaScriptDialogCompletionHandler = nil;
   RNCCompleteJavaScriptDialogOnMainQueue(completionHandler);
+}
+
+- (void)resolveJavaScriptDialogWithToken:(NSObject *)token whenAlertIsReleased:(UIAlertController *)alert
+{
+  __weak RNCWebViewImpl *weakSelf = self;
+  RNCJavaScriptDialogLifetime *lifetime = [[RNCJavaScriptDialogLifetime alloc] initWithDeallocHandler:^{
+    RNCWebViewImpl *strongSelf = weakSelf;
+    if (strongSelf && strongSelf->_pendingJavaScriptDialogToken == token) {
+      [strongSelf resolvePendingJavaScriptDialog];
+    }
+  }];
+  objc_setAssociatedObject(alert, &RNCJavaScriptDialogLifetimeKey, lifetime, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 #endif // !TARGET_OS_OSX
 
@@ -1247,13 +1286,15 @@ RCTAutoInsetsProtocol>
     return;
   }
 
+  __weak RNCWebViewImpl *weakSelf = self;
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
   [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
-    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+    if (![weakSelf consumeJavaScriptDialogWithToken:completionToken]) {
       return;
     }
     completionHandler();
   }]];
+  [self resolveJavaScriptDialogWithToken:completionToken whenAlertIsReleased:alert];
   [presentingViewController presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
@@ -1278,19 +1319,21 @@ RCTAutoInsetsProtocol>
     return;
   }
 
+  __weak RNCWebViewImpl *weakSelf = self;
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
   [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
-    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+    if (![weakSelf consumeJavaScriptDialogWithToken:completionToken]) {
       return;
     }
     completionHandler(YES);
   }]];
   [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action) {
-    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+    if (![weakSelf consumeJavaScriptDialogWithToken:completionToken]) {
       return;
     }
     completionHandler(NO);
   }]];
+  [self resolveJavaScriptDialogWithToken:completionToken whenAlertIsReleased:alert];
   [presentingViewController presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
@@ -1318,25 +1361,28 @@ RCTAutoInsetsProtocol>
     return;
   }
 
+  __weak RNCWebViewImpl *weakSelf = self;
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:prompt preferredStyle:UIAlertControllerStyleAlert];
   [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
     textField.text = defaultText;
   }];
+  __weak UIAlertController *weakAlert = alert;
   UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
-    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+    if (![weakSelf consumeJavaScriptDialogWithToken:completionToken]) {
       return;
     }
-    completionHandler([[alert.textFields lastObject] text]);
+    completionHandler([[weakAlert.textFields lastObject] text]);
   }];
   [alert addAction:okAction];
   UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action) {
-    if (![self consumeJavaScriptDialogWithToken:completionToken]) {
+    if (![weakSelf consumeJavaScriptDialogWithToken:completionToken]) {
       return;
     }
     completionHandler(nil);
   }];
   [alert addAction:cancelAction];
   alert.preferredAction = okAction;
+  [self resolveJavaScriptDialogWithToken:completionToken whenAlertIsReleased:alert];
   [presentingViewController presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
