@@ -747,6 +747,21 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   enableApplePay?: boolean;
 
   /**
+   * HTTPS hosts (including subdomains) whose popups open in a native child window.
+   * Matching requests bypass onOpenWindow and onShouldStartLoadWithRequest.
+   * Defaults to an empty array (disabled). Only one child is supported at a time.
+   * @platform ios
+   */
+  nativeWindowHosts?: string[];
+
+  /**
+   * Additional HTTPS hosts (including subdomains) allowed for top-level navigation
+   * inside the native child window. Defaults to an empty array.
+   * @platform ios
+   */
+  nativeWindowNavigationHosts?: string[];
+
+  /**
    * An array of objects which will be shown when selecting text. An empty array will suppress the menu.
    * These will appear after a long press to select text.
    * @platform ios, android

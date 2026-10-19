@@ -423,6 +423,20 @@ static inline std::string nullSafeStringWithLength(id value) {
 
         [_view setSuppressMenuItems:suppressMenuItems];
     }
+    if (oldViewProps.nativeWindowHosts != newViewProps.nativeWindowHosts) {
+        NSMutableArray *hosts = [NSMutableArray array];
+        for (const auto &host: newViewProps.nativeWindowHosts) {
+            [hosts addObject: RCTNSStringFromString(host)];
+        }
+        [_view setNativeWindowHosts:hosts];
+    }
+    if (oldViewProps.nativeWindowNavigationHosts != newViewProps.nativeWindowNavigationHosts) {
+        NSMutableArray *hosts = [NSMutableArray array];
+        for (const auto &host: newViewProps.nativeWindowNavigationHosts) {
+            [hosts addObject: RCTNSStringFromString(host)];
+        }
+        [_view setNativeWindowNavigationHosts:hosts];
+    }
     if (oldViewProps.hasOnFileDownload != newViewProps.hasOnFileDownload) {
         if (newViewProps.hasOnFileDownload) {
             _view.onFileDownload = [self](NSDictionary* dictionary) {

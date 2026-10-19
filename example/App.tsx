@@ -24,11 +24,20 @@ import ApplePay from './examples/ApplePay';
 import GooglePay from './examples/GooglePay';
 import CustomMenu from './examples/CustomMenu';
 import OpenWindow from './examples/OpenWindow';
+import NativeWindow from './examples/NativeWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import SslError from './examples/SslError';
 
 const TESTS = {
+  NativeWindow: {
+    title: 'Native window',
+    testId: 'nativeWindow',
+    description: 'iOS popup opener, isolation, and lifecycle checks',
+    render() {
+      return <NativeWindow />;
+    },
+  },
   Messaging: {
     title: 'Messaging',
     testId: 'messaging',

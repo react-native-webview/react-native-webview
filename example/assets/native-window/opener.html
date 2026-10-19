@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>Native popup opener</title>
+  </head>
+  <body>
+    <h1>Native popup opener</h1>
+    <button id="open">Open child</button>
+    <button id="second">Open child, then try a second popup after 3 seconds</button>
+    <pre id="status">Ready</pre>
+    <script>
+      let popup;
+      const status = document.getElementById('status');
+      const report = (value) => {
+        status.textContent = value;
+        window.ReactNativeWebView?.postMessage(value);
+      };
+      document.getElementById('open').onclick = () => {
+        popup = window.open('/child.html');
+        report('Popup handle: ' + Boolean(popup));
+      };
+      document.getElementById('second').onclick = () => {
+        popup = window.open('/child.html');
+        setTimeout(() => {
+          const second = window.open('/child.html?second');
+          report('Second popup handle: ' + Boolean(second));
+        }, 3000);
+      };
+      window.addEventListener('message', (event) => {
+        if (event.origin === location.origin && event.source === popup) {
+          report(JSON.stringify(event.data));
+        }
+      });
+      setInterval(() => {
+        if (popup?.closed) {
+          report('closed: true');
+          popup = null;
+        }
+      }, 500);
+    </script>
+  </body>
+</html>

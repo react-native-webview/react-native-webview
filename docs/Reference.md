@@ -24,6 +24,8 @@ This document lays out the current public properties and methods for the React N
 - [`onMessage`](Reference.md#onmessage)
 - [`onNavigationStateChange`](Reference.md#onnavigationstatechange)
 - [`onOpenWindow`](Reference.md#onopenwindow)
+- [`nativeWindowHosts`](Reference.md#nativewindowhosts)
+- [`nativeWindowNavigationHosts`](Reference.md#nativewindownavigationhosts)
 - [`onContentProcessDidTerminate`](Reference.md#oncontentprocessdidterminate)
 - [`onScroll`](Reference.md#onscroll)
 - [`originWhitelist`](Reference.md#originwhitelist)
@@ -1857,3 +1859,68 @@ This file is available in:
 
 - [Brazilian portuguese](Reference.portuguese.md)
 - [Italian](Reference.italian.md)
+
+### `nativeWindowHosts`
+
+Opt in to a native modal child `WKWebView` for `window.open()` and
+`target="_blank"` requests whose initial URL uses HTTPS and matches a listed
+host or one of its subdomains. The default is an empty array (disabled).
+
+| Type     | Required | Platform |
+| -------- | -------- | -------- |
+| string[] | No       | iOS      |
+
+The child is created with WebKit's supplied configuration, preserving the
+popup/opener relationship. It shares the supplied website data store and copies
+the parent's custom `userAgent`, but has a new `WKUserContentController`: the
+parent's injected scripts, script message handlers, and React Native bridge are
+not installed in the child. A reference through `window.opener` is still subject
+to normal browser same-origin rules; this does not isolate same-origin pages
+from each other.
+
+**Matching popup requests bypass `onOpenWindow`, `originWhitelist`, and
+`onShouldStartLoadWithRequest`.** The child uses the native host rules instead.
+Its top-level navigations require HTTPS and a matching host in either host
+array; `about:blank` is also permitted within an existing child. Its subframes
+may load any HTTPS origin or `about:blank`. Host matching is case-insensitive
+and includes subdomains and any port: this is not an exact-origin allowlist.
+Use narrowly scoped host lists. Nonmatching popup requests retain the existing
+behavior. Changes to these props apply to future children; an existing child
+keeps the host list captured at creation.
+
+Only one child is supported per parent WebView. Additional matching popups and
+nested popups are rejected rather than loading over the existing window. The
+child closes on `window.close()`, the native Close button, swipe dismissal,
+parent destruction, or child content-process termination. Native dismissal asks
+the page to close, with a teardown fallback after 500 ms. No provider-specific
+cancellation messages are sent. A popup that starts with `about:blank` is not
+selected by this host-based creation policy. Child windows do not forward the
+parent's navigation, permission, download, or JavaScript dialog callbacks.
+
+For Google Pay, also append `GOOGLE_PAY_SUPPORTED` as described in
+[Google's WKWebView recipe](https://developers.google.com/pay/api/web/guides/recipes/using-ios-wkwebview).
+For example:
+
+```tsx
+<WebView
+  source={{ uri: 'https://your-merchant.example/checkout' }}
+  applicationNameForUserAgent="GOOGLE_PAY_SUPPORTED"
+  nativeWindowHosts={['pay.google.com']}
+  nativeWindowNavigationHosts={['accounts.google.com']}
+/>
+```
+
+The sign-in hosts needed by a particular integration may differ; verify them
+before expanding the navigation list. See the **Native window** example and
+[the native test instructions](../appleTests/README.md) for a provider-independent
+reproduction. This feature alone does not certify a payment integration.
+
+### `nativeWindowNavigationHosts`
+
+Additional HTTPS hosts (and subdomains) allowed for top-level navigation inside
+a child selected by `nativeWindowHosts`. This array does not itself enable
+native popups. The default is an empty array.
+
+| Type     | Required | Platform |
+| -------- | -------- | -------- |
+| string[] | No       | iOS      |

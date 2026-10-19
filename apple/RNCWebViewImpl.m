@@ -6,6 +6,7 @@
  */
 
 #import "RNCWebViewImpl.h"
+#import "RNCWebViewNativeWindow.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
@@ -122,6 +123,9 @@ UIGestureRecognizerDelegate,
 RCTAutoInsetsProtocol>
 
 @property (nonatomic, copy) RNCWKWebView *webView;
+#if TARGET_OS_IOS
+@property (nonatomic, strong) RNCWebViewNativeWindow *nativeWindow;
+#endif
 @property (nonatomic, strong) WKUserScript *postMessageScript;
 @property (nonatomic, strong) WKUserScript *injectedObjectJsonScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
@@ -304,6 +308,9 @@ RCTAutoInsetsProtocol>
 
 - (void)dealloc
 {
+#if TARGET_OS_IOS
+  [_nativeWindow close];
+#endif
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self.webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
 }
@@ -383,6 +390,28 @@ RCTAutoInsetsProtocol>
 {
   if (!navigationAction.targetFrame.isMainFrame) {
     NSURL *url = navigationAction.request.URL;
+
+#if TARGET_OS_IOS
+    if (navigationAction.targetFrame == nil && RNCNativeWindowAllowsURL(url, _nativeWindowHosts)) {
+      UIViewController *presenter = [self topViewController];
+      if (_nativeWindow != nil || self.window == nil || presenter.view.window == nil ||
+          presenter.isBeingPresented || presenter.isBeingDismissed || presenter.presentedViewController != nil) {
+        return nil;
+      }
+      NSArray<NSString *> *hosts = [_nativeWindowHosts arrayByAddingObjectsFromArray:_nativeWindowNavigationHosts ?: @[]];
+      RNCWebViewNativeWindow *window = [[RNCWebViewNativeWindow alloc] initWithConfiguration:configuration
+                                                                           allowedHosts:hosts
+                                                                              userAgent:webView.customUserAgent];
+      __weak RNCWebViewImpl *weakSelf = self;
+      window.onClose = ^{
+        weakSelf.nativeWindow = nil;
+      };
+      self.nativeWindow = window;
+      UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:window];
+      [presenter presentViewController:navigationController animated:YES completion:nil];
+      return window.webView;
+    }
+#endif
 
     if (_onOpenWindow) {
       NSMutableDictionary<NSString *, id> *event = [self baseEvent];
@@ -586,6 +615,9 @@ RCTAutoInsetsProtocol>
 
 - (void)destroyWebView
 {
+#if TARGET_OS_IOS
+  [self.nativeWindow close];
+#endif
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
@@ -1315,6 +1347,13 @@ RCTAutoInsetsProtocol>
     NSURLRequest *request = navigationAction.request;
     BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
     BOOL hasTargetFrame = navigationAction.targetFrame != nil;
+
+#if TARGET_OS_IOS
+    if (!hasTargetFrame && RNCNativeWindowAllowsURL(request.URL, _nativeWindowHosts)) {
+      decisionHandler(_nativeWindow == nil ? WKNavigationActionPolicyAllow : WKNavigationActionPolicyCancel);
+      return;
+    }
+#endif
 
     if (_onOpenWindow && !hasTargetFrame) {
       // When OnOpenWindow should be called, we want to prevent the navigation

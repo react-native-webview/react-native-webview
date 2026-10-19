@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>Native popup child</title>
+  </head>
+  <body>
+    <h1>Native popup child</h1>
+    <pre id="status"></pre>
+    <button id="close">Close from JavaScript</button>
+    <button id="nested">Try a nested popup</button>
+    <p><a href="https://example.org/">Blocked HTTPS host</a></p>
+    <p><a href="http://example.com/">Blocked HTTP navigation</a></p>
+    <script>
+      const result = {
+        opener: Boolean(window.opener),
+        bridge: typeof window.ReactNativeWebView,
+        injected: typeof window.parentInjected,
+        userAgent: navigator.userAgent,
+      };
+      document.getElementById('status').textContent = JSON.stringify(result, null, 2);
+      window.opener?.postMessage(result, location.origin);
+      document.getElementById('close').onclick = () => window.close();
+      document.getElementById('nested').onclick = () => window.open('/child.html?nested');
+    </script>
+  </body>
+</html>
