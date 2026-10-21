@@ -13,8 +13,6 @@ class TopShouldStartLoadWithRequestEvent(surfaceId: Int, viewId: Int, private va
 
   init {
     mData.putString("navigationType", "other")
-    // Android does not raise shouldOverrideUrlLoading for inner frames
-    mData.putBoolean("isTopFrame", true)
   }
 
   override fun getEventName(): String = EVENT_NAME
