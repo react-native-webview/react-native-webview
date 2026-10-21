@@ -7,23 +7,25 @@ module.exports = function makeExampleMetroConfig(projectRoot, platformResolver) 
   const monorepoRoot = path.resolve(projectRoot, '../..');
   const webview = path.join(monorepoRoot, 'packages/react-native-webview');
   const shared = path.join(monorepoRoot, 'packages/example-shared');
-  const isMobile = path.basename(projectRoot) === 'example-mobile';
+  const packages = { 'react-native-webview': webview, 'example-shared': shared };
+  // Apps in the root workspace resolve dependencies from the hoisted root node_modules.
+  const { workspaces } = require('../package.json');
+  const inRootWorkspace = workspaces.includes(
+    path.relative(monorepoRoot, projectRoot).split(path.sep).join('/'),
+  );
 
   const config = makeMetroConfig({
     projectRoot,
-    watchFolders: [webview, shared, ...(isMobile ? [monorepoRoot] : [])],
+    watchFolders: [webview, shared, ...(inRootWorkspace ? [monorepoRoot] : [])],
     resolver: {
       resolverMainFields: ['main-internal', 'browser', 'main'],
       // Shared source must resolve React and RN from the consuming platform app.
       disableHierarchicalLookup: true,
       nodeModulesPaths: [
         path.join(projectRoot, 'node_modules'),
-        ...(isMobile ? [path.join(monorepoRoot, 'node_modules')] : []),
+        ...(inRootWorkspace ? [path.join(monorepoRoot, 'node_modules')] : []),
       ],
-      extraNodeModules: {
-        'react-native-webview': webview,
-        'example-shared': shared,
-      },
+      extraNodeModules: packages,
     },
     transformer: {
       getTransformOptions: async () => ({
@@ -34,7 +36,6 @@ module.exports = function makeExampleMetroConfig(projectRoot, platformResolver) 
 
   const resolveRequest = config.resolver.resolveRequest;
   config.resolver.resolveRequest = (context, moduleName, platform) => {
-    const packages = { 'react-native-webview': webview, 'example-shared': shared };
     let target = moduleName;
     for (const [name, directory] of Object.entries(packages)) {
       if (moduleName === name || moduleName.startsWith(`${name}/`)) {
