@@ -1,0 +1,10 @@
+require_relative '../node_modules/react-native-test-app/visionos/test_app'
+
+# Upstream prebuilt frameworks do not contain visionOS slices.
+ENV['RCT_USE_RN_DEP'] = '0'
+ENV['RCT_USE_PREBUILT_RNCORE'] = '0'
+ENV['RCT_BUILD_HERMES_FROM_SOURCE'] = 'true'
+
+workspace 'WebviewExample.xcworkspace'
+
+use_test_app!

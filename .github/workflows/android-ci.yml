@@ -25,10 +25,13 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
         shell: bash
+      - name: Bundle example JavaScript
+        run: bun run bundle:android
+        working-directory: packages/example-mobile
       - name: Build Android test app
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: wrapper
           arguments: --no-daemon clean build check test
-          build-root-directory: example/android
+          build-root-directory: packages/example-mobile/android
     timeout-minutes: 60

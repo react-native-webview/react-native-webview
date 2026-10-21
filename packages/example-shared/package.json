@@ -1,0 +1,11 @@
+{
+  "name": "example-shared",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/App",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-webview": "*"
+  }
+}

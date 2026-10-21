@@ -1,0 +1,13 @@
+{
+  "name": "WebviewExample",
+  "displayName": "WebviewExample",
+  "components": [
+    {
+      "appKey": "WebviewExample",
+      "displayName": "WebviewExample"
+    }
+  ],
+  "resources": {
+    "macos": ["dist/assets", "dist/main.macos.jsbundle"]
+  }
+}
