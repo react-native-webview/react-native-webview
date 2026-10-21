@@ -337,7 +337,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     if (mRNCWebViewClient == null) {
                         return;
                     }
-                    WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, sourceUrl);
+                    WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, sourceUrl, true);
                     data.putString("data", message);
 
                     if (mMessagingJSModule != null) {

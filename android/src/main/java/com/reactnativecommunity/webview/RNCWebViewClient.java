@@ -72,7 +72,7 @@ public class RNCWebViewClient extends WebViewClient {
         new TopLoadingStartEvent(
           UIManagerHelper.getSurfaceId(webView),
           RNCWebViewWrapper.getReactTagFromWebView(webView),
-          createWebViewEvent(webView, url)));
+          createWebViewEvent(webView, url, true)));
     }
 
     @Override
@@ -85,7 +85,7 @@ public class RNCWebViewClient extends WebViewClient {
     }
 
     @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+    public boolean shouldOverrideUrlLoading(WebView view, String url, boolean isTopFrame) {
         final RNCWebView rncWebView = (RNCWebView) view;
         final boolean isJsDebugging = rncWebView.getReactApplicationContext().getJavaScriptContextHolder().get() == 0;
 
@@ -94,7 +94,7 @@ public class RNCWebViewClient extends WebViewClient {
             final double lockIdentifier = lock.first;
             final AtomicReference<RNCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = lock.second;
 
-            final WritableMap event = createWebViewEvent(view, url);
+            final WritableMap event = createWebViewEvent(view, url, isTopFrame);
             event.putDouble("lockIdentifier", lockIdentifier);
             rncWebView.dispatchDirectShouldStartLoadWithRequest(event);
 
@@ -129,7 +129,7 @@ public class RNCWebViewClient extends WebViewClient {
             UIManagerHelper.getEventDispatcherForReactTag((ReactContext) view.getContext(), reactTag).dispatchEvent(new TopShouldStartLoadWithRequestEvent(
                     UIManagerHelper.getSurfaceId(view),
                     reactTag,
-                    createWebViewEvent(view, url)));
+                    createWebViewEvent(view, url, isTopFrame)));
             return true;
         }
     }
@@ -137,7 +137,7 @@ public class RNCWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         final String url = request.getUrl().toString();
-        return this.shouldOverrideUrlLoading(view, url);
+        return this.shouldOverrideUrlLoading(view, url, request.isForMainFrame());
     }
 
     @Override
@@ -220,7 +220,7 @@ public class RNCWebViewClient extends WebViewClient {
       String description,
       String failingUrl) {
 
-      WritableMap eventData = createWebViewEvent(webView, failingUrl);
+      WritableMap eventData = createWebViewEvent(webView, failingUrl, false);
       eventData.putDouble("code", errorCode);
       eventData.putString("description", description);
 
@@ -242,7 +242,7 @@ public class RNCWebViewClient extends WebViewClient {
         // Android WebView does it in the opposite way, so we need to simulate that behavior
         emitFinishEvent(webView, failingUrl);
 
-        WritableMap eventData = createWebViewEvent(webView, failingUrl);
+        WritableMap eventData = createWebViewEvent(webView, failingUrl, true);
         eventData.putDouble("code", errorCode);
         eventData.putString("description", description);
 
@@ -258,7 +258,7 @@ public class RNCWebViewClient extends WebViewClient {
         super.onReceivedHttpError(webView, request, errorResponse);
 
         if (request.isForMainFrame()) {
-            WritableMap eventData = createWebViewEvent(webView, request.getUrl().toString());
+            WritableMap eventData = createWebViewEvent(webView, request.getUrl().toString(), true);
             eventData.putInt("statusCode", errorResponse.getStatusCode());
             eventData.putString("description", errorResponse.getReasonPhrase());
 
@@ -289,7 +289,7 @@ public class RNCWebViewClient extends WebViewClient {
             return true;
         }
 
-        WritableMap event = createWebViewEvent(webView, webView.getUrl());
+        WritableMap event = createWebViewEvent(webView, webView.getUrl(), true);
         event.putBoolean("didCrash", detail.didCrash());
         int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
         UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopRenderProcessGoneEvent(UIManagerHelper.getSurfaceId(webView), reactTag, event));
@@ -300,10 +300,10 @@ public class RNCWebViewClient extends WebViewClient {
 
     protected void emitFinishEvent(WebView webView, String url) {
         int reactTag = RNCWebViewWrapper.getReactTagFromWebView(webView);
-        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingFinishEvent(UIManagerHelper.getSurfaceId(webView), reactTag, createWebViewEvent(webView, url)));
+        UIManagerHelper.getEventDispatcherForReactTag((ReactContext) webView.getContext(), reactTag).dispatchEvent(new TopLoadingFinishEvent(UIManagerHelper.getSurfaceId(webView), reactTag, createWebViewEvent(webView, url, true)));
     }
 
-    protected WritableMap createWebViewEvent(WebView webView, String url) {
+    protected WritableMap createWebViewEvent(WebView webView, String url, boolean isTopFrame) {
         WritableMap event = Arguments.createMap();
         event.putDouble("target", RNCWebViewWrapper.getReactTagFromWebView(webView));
         // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
@@ -313,6 +313,7 @@ public class RNCWebViewClient extends WebViewClient {
         event.putString("title", webView.getTitle());
         event.putBoolean("canGoBack", webView.canGoBack());
         event.putBoolean("canGoForward", webView.canGoForward());
+        event.putBoolean("isTopFrame", isTopFrame);
         return event;
     }
 
