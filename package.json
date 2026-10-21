@@ -9,8 +9,8 @@
   "scripts": {
     "build": "bun run --cwd packages/react-native-webview build",
     "prepare:types": "bun run --cwd packages/react-native-webview prepare:types",
-    "prepublishOnly": "bun run --cwd packages/react-native-webview prepublishOnly",
-    "ci:publish": "bun run prepublishOnly && npm_config_workspaces_update=false semantic-release",
+    "prepare": "bun run --cwd packages/react-native-webview prepare",
+    "ci:publish": "npm_config_workspaces_update=false semantic-release",
     "lint:tsc": "tsc --noEmit && tsc --noEmit --project tsconfig.example.json",
     "lint:oxlint": "bun run --bun oxlint",
     "lint:oxlint:ci": "bun run --bun oxlint --format=github",

@@ -19,4 +19,4 @@ jobs:
       - name: Run unit tests
         run: bun run test
       - name: Build package and declarations
-        run: bun run prepublishOnly
+        run: bun run prepare

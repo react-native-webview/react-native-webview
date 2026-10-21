@@ -34,7 +34,7 @@
   "scripts": {
     "build": "babel --extensions \".ts,.tsx\" --out-dir lib src",
     "prepare:types": "tsc --noEmit false --emitDeclarationOnly --declaration --rootDir src --outDir lib",
-    "prepublishOnly": "bun run prepare:types && bun run build",
+    "prepare": "bun run prepare:types && bun run build",
     "test": "jest --runInBand",
     "version": "bun install --cwd ../.. --lockfile-only --ignore-scripts"
   },
