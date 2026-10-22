@@ -27,6 +27,7 @@ import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import SslError from './examples/SslError';
+import UnmountWithPendingNavigation from './examples/UnmountWithPendingNavigation';
 
 const TESTS = {
   Messaging: {
@@ -163,6 +164,14 @@ const TESTS = {
     description: 'SSL error test',
     render() {
       return <SslError />;
+    },
+  },
+  UnmountWithPendingNavigation: {
+    title: 'UnmountWithPendingNavigation',
+    testId: 'UnmountWithPendingNavigation',
+    description: 'Unmount while a navigation decision is pending',
+    render() {
+      return <UnmountWithPendingNavigation />;
     },
   },
 };
@@ -334,6 +343,11 @@ export default function App() {
           testID="testType_sslError"
           title="SslError"
           onPress={() => changeTest('SslError')}
+        />
+        <Button
+          testID="testType_unmountWithPendingNavigation"
+          title="UnmountWithPendingNavigation"
+          onPress={() => changeTest('UnmountWithPendingNavigation')}
         />
       </View>
 
