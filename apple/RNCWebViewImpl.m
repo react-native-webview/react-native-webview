@@ -1450,6 +1450,22 @@ RCTAutoInsetsProtocol>
   didFailProvisionalNavigation:(WKNavigation *)navigation
                      withError:(NSError *)error
 {
+  [self handleNavigationError:error provisional:YES];
+}
+
+/**
+ * Called when an error occurs after the navigation has been committed,
+ * e.g. when the connection is lost while the page content is still loading.
+ */
+- (void)    webView:(WKWebView *)webView
+  didFailNavigation:(WKNavigation *)navigation
+          withError:(NSError *)error
+{
+  [self handleNavigationError:error provisional:NO];
+}
+
+- (void)handleNavigationError:(NSError *)error provisional:(BOOL)provisional
+{
   if (_onLoadingError) {
     if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) {
       // NSURLErrorCancelled is reported when a page has a redirect OR if you load
@@ -1469,7 +1485,7 @@ RCTAutoInsetsProtocol>
 
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     [event addEntriesFromDictionary:@{
-      @"didFailProvisionalNavigation": @YES,
+      @"didFailProvisionalNavigation": @(provisional),
       @"domain": error.domain,
       @"code": @(error.code),
       @"description": error.localizedDescription,
