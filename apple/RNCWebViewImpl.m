@@ -48,13 +48,83 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @end
 #endif // TARGET_OS_IOS
 
+#if TARGET_OS_OSX
+// WebKit tracks the pointer over the web view's whole frame, even where another view is drawn on
+// top of the page, and sets the page's cursor there. This stands in front of one of WebKit's
+// tracking areas and passes on the pointer's moves only where the web view is the view under the
+// pointer. Elsewhere the pointer is over that other view, and gets the arrow.
+@interface RNCWebViewPointerFilter : NSObject
+@property (nonatomic, weak, readonly) id owner;
+@end
+
+@implementation RNCWebViewPointerFilter {
+  __weak NSView *_webView;
+  BOOL _isOverWebView;
+  // WebKit sends the page's cursor only when the page changes it, so the one it set before the
+  // pointer went over another view is put back when the pointer returns.
+  NSCursor *_pageCursor;
+}
+
+- (instancetype)initWithWebView:(NSView *)webView owner:(id)owner {
+  if (self = [super init]) {
+    _webView = webView;
+    _owner = owner;
+    _isOverWebView = YES;
+  }
+  return self;
+}
+
+- (BOOL)isOverWebView:(NSEvent *)event {
+  NSView *hitView = [_webView.window.contentView.superview hitTest:event.locationInWindow];
+  return hitView == nil || [hitView isDescendantOf:_webView];
+}
+
+- (void)forward:(SEL)selector event:(NSEvent *)event {
+  if ([_owner respondsToSelector:selector]) {
+    ((void (*)(id, SEL, NSEvent *))[_owner methodForSelector:selector])(_owner, selector, event);
+  }
+}
+
+- (void)mouseEntered:(NSEvent *)event { [self forward:_cmd event:event]; }
+- (void)mouseExited:(NSEvent *)event { [self forward:_cmd event:event]; }
+
+- (void)mouseMoved:(NSEvent *)event {
+  if ([self isOverWebView:event]) {
+    if (!_isOverWebView) {
+      _isOverWebView = YES;
+      [_pageCursor set];
+    }
+    [self forward:_cmd event:event];
+  } else {
+    if (_isOverWebView) {
+      _isOverWebView = NO;
+      _pageCursor = [NSCursor currentCursor];
+    }
+    [[NSCursor arrowCursor] set];
+  }
+}
+
+- (void)cursorUpdate:(NSEvent *)event {
+  if ([self isOverWebView:event]) {
+    [self forward:_cmd event:event];
+  } else {
+    [[NSCursor arrowCursor] set];
+  }
+}
+@end
+#endif // TARGET_OS_OSX
+
 @interface RNCWKWebView : WKWebView
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
 @property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;
 #endif // !TARGET_OS_OSX
 @end
-@implementation RNCWKWebView
+@implementation RNCWKWebView {
+#if TARGET_OS_OSX
+  NSMutableArray<RNCWebViewPointerFilter *> *_pointerFilters;
+#endif // TARGET_OS_OSX
+}
 #if !TARGET_OS_OSX
 - (NSString *)stringFromAction:(SEL) action {
   NSString *sel = NSStringFromSelector(action);
@@ -110,6 +180,48 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
     return;
   }
   [super scrollWheel:theEvent];
+}
+
+// Puts a RNCWebViewPointerFilter in front of each of WebKit's tracking areas that follows the
+// pointer's moves. WebKit makes them as the view is made, so this runs as it goes on screen, and
+// again whenever AppKit asks for tracking areas, in case WebKit has made new ones since.
+- (void)filterPointerTracking {
+  if (_pointerFilters == nil) {
+    _pointerFilters = [NSMutableArray new];
+  }
+  for (NSTrackingArea *area in [self.trackingAreas copy]) {
+    id owner = area.owner;
+    BOOL followsPointer = (area.options & (NSTrackingMouseMoved | NSTrackingCursorUpdate)) != 0;
+    if (owner == self || [owner isKindOfClass:[RNCWebViewPointerFilter class]] || !followsPointer) {
+      continue;
+    }
+    // A new area from WebKit replaces the one it had, so the filter in front of that one goes.
+    for (NSTrackingArea *filtered in [self.trackingAreas copy]) {
+      RNCWebViewPointerFilter *previous = filtered.owner;
+      if ([previous isKindOfClass:[RNCWebViewPointerFilter class]] && previous.owner == owner &&
+          filtered.options == area.options) {
+        [self removeTrackingArea:filtered];
+        [_pointerFilters removeObject:previous];
+      }
+    }
+    RNCWebViewPointerFilter *filter = [[RNCWebViewPointerFilter alloc] initWithWebView:self owner:owner];
+    [_pointerFilters addObject:filter];
+    [self removeTrackingArea:area];
+    [self addTrackingArea:[[NSTrackingArea alloc] initWithRect:area.rect
+                                                       options:area.options
+                                                         owner:filter
+                                                      userInfo:area.userInfo]];
+  }
+}
+
+- (void)viewDidMoveToWindow {
+  [super viewDidMoveToWindow];
+  [self filterPointerTracking];
+}
+
+- (void)updateTrackingAreas {
+  [super updateTrackingAreas];
+  [self filterPointerTracking];
 }
 #endif // TARGET_OS_OSX
 @end
