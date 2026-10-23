@@ -1474,6 +1474,15 @@ RCTAutoInsetsProtocol>
       @"code": @(error.code),
       @"description": error.localizedDescription,
     }];
+
+    // A provisional navigation fails before it commits, so _webView.URL is still
+    // empty on the first load (or the previous page). Report the URL that failed,
+    // like Android does with failingUrl.
+    NSURL *failingURL = error.userInfo[NSURLErrorFailingURLErrorKey];
+    NSString *failingURLString = failingURL.absoluteString ?: error.userInfo[NSURLErrorFailingURLStringErrorKey];
+    if (failingURLString.length > 0) {
+      event[@"url"] = failingURLString;
+    }
     _onLoadingError(event);
   }
 }
