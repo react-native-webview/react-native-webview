@@ -25,6 +25,7 @@
     "index.js",
     "index.d.ts",
     "react-native-webview.podspec",
+    "Package.swift",
     "react-native.config.js"
   ],
   "main": "index.js",
@@ -92,6 +93,9 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
+  },
+  "swiftpmConfig": {
+    "name": "react-native-webview"
   },
   "codegenConfig": {
     "name": "RNCWebViewSpec",
