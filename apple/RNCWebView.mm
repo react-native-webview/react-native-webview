@@ -381,6 +381,17 @@ static inline std::string nullSafeStringWithLength(id value) {
         [_view setContentInset: edgesInsets];
     }
 
+#if !TARGET_OS_OSX
+    if (oldViewProps.scrollEdgeEffects.top != newViewProps.scrollEdgeEffects.top || oldViewProps.scrollEdgeEffects.left != newViewProps.scrollEdgeEffects.left || oldViewProps.scrollEdgeEffects.bottom != newViewProps.scrollEdgeEffects.bottom || oldViewProps.scrollEdgeEffects.right != newViewProps.scrollEdgeEffects.right) {
+        [_view setScrollEdgeEffects:@{
+            @"top": RCTNSStringFromString(newViewProps.scrollEdgeEffects.top),
+            @"left": RCTNSStringFromString(newViewProps.scrollEdgeEffects.left),
+            @"bottom": RCTNSStringFromString(newViewProps.scrollEdgeEffects.bottom),
+            @"right": RCTNSStringFromString(newViewProps.scrollEdgeEffects.right)
+        }];
+    }
+#endif // !TARGET_OS_OSX
+
     if (oldViewProps.basicAuthCredential.username != newViewProps.basicAuthCredential.username || oldViewProps.basicAuthCredential.password != newViewProps.basicAuthCredential.password) {
         [_view setBasicAuthCredential: @{
             @"username": RCTNSStringFromString(newViewProps.basicAuthCredential.username),

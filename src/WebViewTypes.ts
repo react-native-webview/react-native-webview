@@ -75,6 +75,15 @@ export interface ContentInsetProp {
   right?: number;
 }
 
+export type ScrollEdgeEffect = 'automatic' | 'soft' | 'hard' | 'hidden';
+
+export interface ScrollEdgeEffectsProp {
+  top?: ScrollEdgeEffect;
+  left?: ScrollEdgeEffect;
+  bottom?: ScrollEdgeEffect;
+  right?: ScrollEdgeEffect;
+}
+
 export interface WebViewNativeEvent {
   url: string;
   loading: boolean;
@@ -452,6 +461,15 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   contentInset?: ContentInsetProp;
+
+  /**
+   * The scroll edge effect iOS draws where content scrolls under a bar or the
+   * status bar, per edge or one value for every edge. `automatic` leaves the
+   * system's choice, `soft` and `hard` pick a style, and `hidden` removes the
+   * effect. Defaults to `automatic` on every edge. Has no effect before iOS 26.
+   * @platform ios
+   */
+  scrollEdgeEffects?: ScrollEdgeEffect | ScrollEdgeEffectsProp;
 
   /**
    * Defaults to `recommended`, which loads mobile content on iPhone

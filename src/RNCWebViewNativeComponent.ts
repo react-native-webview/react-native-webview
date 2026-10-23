@@ -184,6 +184,12 @@ export interface NativeProps extends ViewProps {
     'never' | 'automatic' | 'scrollableAxes' | 'always',
     'never'
   >;
+  scrollEdgeEffects?: Readonly<{
+    top?: string;
+    left?: string;
+    bottom?: string;
+    right?: string;
+  }>;
   contentMode?: WithDefault<'recommended' | 'mobile' | 'desktop', 'recommended'>;
   dataDetectorTypes?: WithDefault<
     ReadonlyArray<
