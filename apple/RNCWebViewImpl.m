@@ -128,6 +128,21 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *atEndScript;
 @end
 
+#if !TARGET_OS_OSX && defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 260000 /* __IPHONE_26_0 */
+API_AVAILABLE(ios(26.0))
+static void RNCApplyScrollEdgeEffect(UIScrollEdgeEffect *effect, NSString *value)
+{
+  effect.hidden = [value isEqualToString:@"hidden"];
+  if ([value isEqualToString:@"soft"]) {
+    effect.style = UIScrollEdgeEffectStyle.softStyle;
+  } else if ([value isEqualToString:@"hard"]) {
+    effect.style = UIScrollEdgeEffectStyle.hardStyle;
+  } else {
+    effect.style = UIScrollEdgeEffectStyle.automaticStyle;
+  }
+}
+#endif
+
 @implementation RNCWebViewImpl
 {
 #if !TARGET_OS_OSX
@@ -547,6 +562,7 @@ RCTAutoInsetsProtocol>
 #if !TARGET_OS_OSX
     _webView.scrollView.contentInsetAdjustmentBehavior = _savedContentInsetAdjustmentBehavior;
     _webView.scrollView.automaticallyAdjustsScrollIndicatorInsets = _savedAutomaticallyAdjustsScrollIndicatorInsets;
+    [self applyScrollEdgeEffects];
 #endif  // !TARGET_OS_OSX
 
     if (@available(macOS 13.3, iOS 16.4, *))
@@ -725,6 +741,28 @@ RCTAutoInsetsProtocol>
     _webView.scrollView.contentInsetAdjustmentBehavior = behavior;
     _webView.scrollView.contentOffset = contentOffset;
   }
+}
+
+- (void)setScrollEdgeEffects:(NSDictionary<NSString *, NSString *> *)scrollEdgeEffects
+{
+  _scrollEdgeEffects = [scrollEdgeEffects copy];
+  [self applyScrollEdgeEffects];
+}
+
+- (void)applyScrollEdgeEffects
+{
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 260000 /* __IPHONE_26_0 */
+  if (_webView == nil) {
+    return;
+  }
+  if (@available(iOS 26.0, *)) {
+    UIScrollView *scrollView = _webView.scrollView;
+    RNCApplyScrollEdgeEffect(scrollView.topEdgeEffect, _scrollEdgeEffects[@"top"]);
+    RNCApplyScrollEdgeEffect(scrollView.leftEdgeEffect, _scrollEdgeEffects[@"left"]);
+    RNCApplyScrollEdgeEffect(scrollView.bottomEdgeEffect, _scrollEdgeEffects[@"bottom"]);
+    RNCApplyScrollEdgeEffect(scrollView.rightEdgeEffect, _scrollEdgeEffects[@"right"]);
+  }
+#endif
 }
 #endif // !TARGET_OS_OSX
 
