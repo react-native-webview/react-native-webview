@@ -55,6 +55,7 @@ This document lays out the current public properties and methods for the React N
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`indicatorStyle`](Reference.md#indicatorStyle)
 - [`scrollEnabled`](Reference.md#scrollenabled)
+- [`scrollEdgeEffects`](Reference.md#scrolledgeeffects)
 - [`nestedScrollEnabled`](Reference.md#nestedscrollenabled)
 - [`setBuiltInZoomControls`](Reference.md#setBuiltInZoomControls)
 - [`setDisplayZoomControls`](Reference.md#setDisplayZoomControls)
@@ -1142,6 +1143,26 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 | Type | Required | Platform      |
 | ---- | -------- | ------------- |
 | bool | No       | iOS and macOS |
+
+---
+
+### `scrollEdgeEffects`[⬆](#props-index)
+
+The scroll edge effect iOS 26 draws where content scrolls under a bar or the status bar. Pass one value for every edge, or an object with a value per edge (`top`, `left`, `bottom`, `right`). Has no effect before iOS 26.
+
+- `'automatic'` (default): the system chooses the style
+- `'soft'`: a soft blur
+- `'hard'`: a hard divider
+- `'hidden'`: no effect, for pages that draw their own content under the bars
+
+```jsx
+<WebView scrollEdgeEffects="hidden" />
+<WebView scrollEdgeEffects={{ top: 'hidden', bottom: 'soft' }} />
+```
+
+| Type             | Required | Platform |
+| ---------------- | -------- | -------- |
+| string or object | No       | iOS      |
 
 ---
 

@@ -80,6 +80,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
       decelerationRate: decelerationRateProp,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       removeIosKeyboardObserver,
+      scrollEdgeEffects,
       ...otherProps
     },
     ref,
@@ -238,6 +239,16 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
         incognito={incognito}
         mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
         removeIosKeyboardObserver={removeIosKeyboardObserver}
+        scrollEdgeEffects={
+          typeof scrollEdgeEffects === 'string'
+            ? {
+                top: scrollEdgeEffects,
+                left: scrollEdgeEffects,
+                bottom: scrollEdgeEffects,
+                right: scrollEdgeEffects,
+              }
+            : scrollEdgeEffects
+        }
         newSource={newSource}
         style={webViewStyles}
         hasOnFileDownload={!!onFileDownload}

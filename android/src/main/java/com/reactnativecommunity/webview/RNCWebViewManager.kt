@@ -713,6 +713,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     override fun setRemoveIosKeyboardObserver(view: RNCWebViewWrapper, value: Boolean) {}
 
+    override fun setScrollEdgeEffects(view: RNCWebViewWrapper, value: ReadableMap?) {}
+
     override fun setIndicatorStyle(view: RNCWebViewWrapper, value: String?) {}
 
     override fun setScrollEnabled(view: RNCWebViewWrapper, value: Boolean) {}

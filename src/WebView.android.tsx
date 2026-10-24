@@ -89,6 +89,10 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
       nativeConfig,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       injectedJavaScriptObject,
+      // iOS-only: its string form would reach the native prop, which takes an
+      // object, and abort Fabric.
+      // @ts-expect-error -- not part of AndroidWebViewProps
+      scrollEdgeEffects: _scrollEdgeEffects,
       ...otherProps
     },
     ref,
