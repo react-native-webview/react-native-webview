@@ -27,6 +27,7 @@ import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import SslError from './examples/SslError';
+import LoadError from './examples/LoadError';
 
 const TESTS = {
   Messaging: {
@@ -163,6 +164,14 @@ const TESTS = {
     description: 'SSL error test',
     render() {
       return <SslError />;
+    },
+  },
+  LoadError: {
+    title: 'LoadError',
+    testId: 'LoadError',
+    description: 'onError reports the URL that failed',
+    render() {
+      return <LoadError />;
     },
   },
 };
@@ -334,6 +343,11 @@ export default function App() {
           testID="testType_sslError"
           title="SslError"
           onPress={() => changeTest('SslError')}
+        />
+        <Button
+          testID="testType_loadError"
+          title="LoadError"
+          onPress={() => changeTest('LoadError')}
         />
       </View>
 
