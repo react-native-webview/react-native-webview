@@ -39,6 +39,8 @@ This project is compatible with [expo](https://docs.expo.dev/versions/latest/sdk
 
 Read our [Getting Started Guide](docs/Getting-Started.md). If any step seems unclear, please create a pull request.
 
+**Swift Package Manager:** iOS apps using React Native's SwiftPM mode (`npx react-native spm`) are supported from React Native 0.88. CocoaPods remains supported and unchanged.
+
 ### Versioning
 
 This project follows [semantic versioning](https://semver.org/). We do not hesitate to release breaking changes but they will be in a major version.
