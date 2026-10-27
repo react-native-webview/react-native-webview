@@ -587,6 +587,11 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         view.webView.nestedScrollEnabled = value
     }
 
+    @ReactProp(name = "longPressHapticFeedbackEnabled", defaultBoolean = true)
+    override fun setLongPressHapticFeedbackEnabled(view: RNCWebViewWrapper, value: Boolean) {
+        view.webView.longPressHapticFeedbackEnabled = value
+    }
+
     @ReactProp(name = "overScrollMode")
     override fun setOverScrollMode(view: RNCWebViewWrapper, value: String?) {
         view.webView.overScrollMode = when (value) {

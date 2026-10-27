@@ -69,6 +69,7 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
       setBuiltInZoomControls = true,
       setDisplayZoomControls = false,
       nestedScrollEnabled = false,
+      longPressHapticFeedbackEnabled = true,
       startInLoadingState,
       onNavigationStateChange,
       onLoadStart,
@@ -287,6 +288,7 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
         setBuiltInZoomControls={setBuiltInZoomControls}
         setDisplayZoomControls={setDisplayZoomControls}
         nestedScrollEnabled={nestedScrollEnabled}
+        longPressHapticFeedbackEnabled={longPressHapticFeedbackEnabled}
         injectedJavaScriptObject={JSON.stringify(injectedJavaScriptObject)}
         {...nativeConfig?.props}
       />

@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.ActionMode;
+import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -77,6 +78,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     private OnScrollDispatchHelper mOnScrollDispatchHelper;
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
+    protected boolean longPressHapticFeedbackEnabled = true;
     protected ProgressChangedFilter progressChangedFilter;
 
     /**
@@ -105,6 +107,22 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     public void setNestedScrollEnabled(boolean nestedScrollEnabled) {
         this.nestedScrollEnabled = nestedScrollEnabled;
+    }
+
+    public void setLongPressHapticFeedbackEnabled(boolean longPressHapticFeedbackEnabled) {
+        this.longPressHapticFeedbackEnabled = longPressHapticFeedbackEnabled;
+    }
+
+    // Chromium buzzes LONG_PRESS for any long press the page consumes, even with
+    // selection and the callout off in CSS. A text field keeps it, as a native one would.
+    @Override
+    public boolean performHapticFeedback(int feedbackConstant, int flags) {
+        if (!longPressHapticFeedbackEnabled
+                && feedbackConstant == HapticFeedbackConstants.LONG_PRESS
+                && getHitTestResult().getType() != HitTestResult.EDIT_TEXT_TYPE) {
+            return false;
+        }
+        return super.performHapticFeedback(feedbackConstant, flags);
     }
 
     @Override

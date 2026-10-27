@@ -56,6 +56,7 @@ This document lays out the current public properties and methods for the React N
 - [`indicatorStyle`](Reference.md#indicatorStyle)
 - [`scrollEnabled`](Reference.md#scrollenabled)
 - [`nestedScrollEnabled`](Reference.md#nestedscrollenabled)
+- [`longPressHapticFeedbackEnabled`](Reference.md#longpresshapticfeedbackenabled)
 - [`setBuiltInZoomControls`](Reference.md#setBuiltInZoomControls)
 - [`setDisplayZoomControls`](Reference.md#setDisplayZoomControls)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
@@ -1160,6 +1161,18 @@ The colorstyle of the scroll indicator. The default value is `default`.
 Boolean value that determines whether scrolling is possible in the `WebView` when used inside a `ScrollView` on Android. The default value is `false`.
 
 Setting this to `true` will prevent the `ScrollView` to scroll when scrolling from inside the `WebView`.
+
+| Type | Required | Platform |
+| ---- | -------- | -------- |
+| bool | No       | Android  |
+
+---
+
+### `longPressHapticFeedbackEnabled`[⬆](#props-index)
+
+Boolean value that determines whether a long press buzzes the haptic motor on Android. The default value is `true`.
+
+Chromium triggers the buzz for any long press the page handles, even when text selection and the callout are turned off in CSS. Set this to `false` to turn it off. Long presses on a text field still buzz.
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |

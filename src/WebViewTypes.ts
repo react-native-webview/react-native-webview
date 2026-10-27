@@ -1135,6 +1135,14 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   nestedScrollEnabled?: boolean;
 
   /**
+   * Whether a long press outside a text field buzzes the haptic motor.
+   * Default to true
+   *
+   * @platform android
+   */
+  longPressHapticFeedbackEnabled?: boolean;
+
+  /**
    * Sets the minimum font size.
    * A non-negative integer between 1 and 72. Any number outside the specified range will be pinned.
    * Default is 8.
