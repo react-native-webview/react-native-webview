@@ -84,6 +84,7 @@ This document lays out the current public properties and methods for the React N
 - [`textInteractionEnabled`](Reference.md#textInteractionEnabled)
 - [`suppressMenuItems`](Reference.md#suppressMenuItems)
 - [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)
+- [`geolocationPermissionGrantType`](Reference.md#geolocationPermissionGrantType)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
 - [`basicAuthCredential`](Reference.md#basicAuthCredential)
@@ -1552,6 +1553,32 @@ Example:
 
 ```jsx
 <WebView mediaCapturePermissionGrantType={'grantIfSameHostElsePrompt'} />
+```
+
+---
+
+### `geolocationPermissionGrantType`[⬆](#props-index)
+
+This property specifies how to handle geolocation permission requests from `navigator.geolocation`. Defaults to `prompt`, resulting in the user being prompted repeatedly. Available on iOS 27 and later. Earlier versions ignore it and always prompt.
+
+Possible values:
+
+- `grantIfSameHostElsePrompt`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted if it has been granted before. Otherwise, the user gets prompted.
+- `grantIfSameHostElseDeny`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted if it has been granted before. Otherwise, it gets denied.
+- `deny`
+- `grant`: The permission is granted if it has been granted before.
+- `prompt`
+
+Note that a grant only applies to the web page. The app itself still needs location permission (including an `NSLocationWhenInUseUsageDescription` entry in `Info.plist`), and the user is prompted for it if they haven't been before. On Android, use [`geolocationEnabled`](Reference.md#geolocationEnabled) instead.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
+
+Example:
+
+```jsx
+<WebView geolocationPermissionGrantType={'grantIfSameHostElsePrompt'} />
 ```
 
 ---

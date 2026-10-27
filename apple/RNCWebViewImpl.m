@@ -196,6 +196,7 @@ RCTAutoInsetsProtocol>
     _fraudulentWebsiteWarningEnabled = YES;
     _textInteractionEnabled = YES;
     _mediaCapturePermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
+    _geolocationPermissionGrantType = RNCWebViewPermissionGrantType_Prompt;
     if (@available(iOS 16.0, *)) {
       _editMenuInteraction = [[UIEditMenuInteraction alloc] initWithDelegate:self];
       [self addInteraction:_editMenuInteraction];
@@ -1272,6 +1273,30 @@ RCTAutoInsetsProtocol>
   } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Deny) {
     decisionHandler(WKPermissionDecisionDeny);
   } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Grant) {
+    decisionHandler(WKPermissionDecisionGrant);
+  } else {
+    decisionHandler(WKPermissionDecisionPrompt);
+  }
+}
+
+/**
+ * Geolocation permissions (prevent multiple prompts). WebKit only calls this
+ * on iOS 27 and later; earlier versions always show WebKit's own prompt.
+ */
+- (void)                        webView:(WKWebView *)webView
+  requestGeolocationPermissionForOrigin:(WKSecurityOrigin *)origin
+                       initiatedByFrame:(WKFrameInfo *)frame
+                        decisionHandler:(void (^)(WKPermissionDecision decision))decisionHandler {
+  if (_geolocationPermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt || _geolocationPermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny) {
+    if ([origin.host isEqualToString:webView.URL.host]) {
+      decisionHandler(WKPermissionDecisionGrant);
+    } else {
+      WKPermissionDecision decision = _geolocationPermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt ? WKPermissionDecisionPrompt : WKPermissionDecisionDeny;
+      decisionHandler(decision);
+    }
+  } else if (_geolocationPermissionGrantType == RNCWebViewPermissionGrantType_Deny) {
+    decisionHandler(WKPermissionDecisionDeny);
+  } else if (_geolocationPermissionGrantType == RNCWebViewPermissionGrantType_Grant) {
     decisionHandler(WKPermissionDecisionGrant);
   } else {
     decisionHandler(WKPermissionDecisionPrompt);

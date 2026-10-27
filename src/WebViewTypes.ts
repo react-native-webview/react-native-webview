@@ -323,6 +323,13 @@ export declare type MediaCapturePermissionGrantType =
   | 'grant'
   | 'prompt';
 
+export declare type GeolocationPermissionGrantType =
+  | 'grantIfSameHostElsePrompt'
+  | 'grantIfSameHostElseDeny'
+  | 'deny'
+  | 'grant'
+  | 'prompt';
+
 export declare type ContentMode = 'recommended' | 'mobile' | 'desktop';
 
 export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
@@ -730,6 +737,13 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * Available on iOS 15 and later.
    */
   mediaCapturePermissionGrantType?: MediaCapturePermissionGrantType;
+
+  /**
+   * This property specifies how to handle geolocation permission requests.
+   * Defaults to `prompt`, resulting in the user being prompted repeatedly.
+   * Available on iOS 27 and later. Earlier versions ignore it and always prompt.
+   */
+  geolocationPermissionGrantType?: GeolocationPermissionGrantType;
 
   /**
    * A Boolean value which, when set to `true`, WebView will be rendered with Apple Pay support.

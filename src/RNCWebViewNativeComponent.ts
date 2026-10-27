@@ -202,6 +202,10 @@ export interface NativeProps extends ViewProps {
   decelerationRate?: Double;
   directionalLockEnabled?: WithDefault<boolean, true>;
   enableApplePay?: boolean;
+  geolocationPermissionGrantType?: WithDefault<
+    'prompt' | 'grant' | 'deny' | 'grantIfSameHostElsePrompt' | 'grantIfSameHostElseDeny',
+    'prompt'
+  >;
   hideKeyboardAccessoryView?: boolean;
   keyboardDisplayRequiresUserAction?: WithDefault<boolean, true>;
   limitsNavigationsToAppBoundDomains?: boolean;
