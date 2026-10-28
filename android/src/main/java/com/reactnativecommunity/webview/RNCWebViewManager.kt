@@ -666,6 +666,11 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         setUserAgentString(view)
     }
 
+    @ReactProp(name = "pullToRefreshEnabled")
+    override fun setPullToRefreshEnabled(view: RNCWebViewWrapper, value: Boolean) {
+        view.setPullToRefreshEnabled(value)
+    }
+
     /* iOS PROPS - not implemented here */
     override fun setAllowingReadAccessToURL(view: RNCWebViewWrapper, value: String?) {}
 
@@ -706,8 +711,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     override fun setKeyboardDisplayRequiresUserAction(view: RNCWebViewWrapper, value: Boolean) {}
 
     override fun setPagingEnabled(view: RNCWebViewWrapper, value: Boolean) {}
-
-    override fun setPullToRefreshEnabled(view: RNCWebViewWrapper, value: Boolean) {}
 
     override fun setRefreshControlLightMode(view: RNCWebViewWrapper, value: Boolean) {}
 
