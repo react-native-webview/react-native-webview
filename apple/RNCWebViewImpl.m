@@ -149,6 +149,7 @@ RCTAutoInsetsProtocol>
 #if !TARGET_OS_OSX
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
+  BOOL _pullToRefreshTriggered;
 #endif // !TARGET_OS_OSX
 }
 
@@ -996,6 +997,16 @@ RCTAutoInsetsProtocol>
 {
   scrollView.decelerationRate = _decelerationRate;
 }
+
+// UIScrollViewDelegate method
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+  if (_pullToRefreshTriggered) {
+    _pullToRefreshTriggered = NO;
+    [self reload];
+    [_refreshControl endRefreshing];
+  }
+}
 #endif // !TARGET_OS_OSX
 
 - (void)setUserAgent:(NSString*)userAgent
@@ -1016,6 +1027,12 @@ RCTAutoInsetsProtocol>
 // UIScrollViewDelegate method
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+  // Cancel pull-to-refresh if user scrolled back up past the threshold
+  if (_pullToRefreshTriggered && scrollView.contentOffset.y >= 0) {
+    _pullToRefreshTriggered = NO;
+    [_refreshControl endRefreshing];
+  }
+
   // Don't allow scrolling the scrollView.
   if (!_scrollEnabled) {
     scrollView.bounds = _webView.bounds;
@@ -1476,6 +1493,12 @@ RCTAutoInsetsProtocol>
     }];
     _onLoadingError(event);
   }
+
+#if !TARGET_OS_OSX
+  if (_refreshControl && _refreshControl.isRefreshing) {
+    [_refreshControl endRefreshing];
+  }
+#endif
 }
 
 - (void)evaluateJS:(NSString *)js
@@ -1540,6 +1563,12 @@ didFinishNavigation:(WKNavigation *)navigation
   if (_onLoadingFinish) {
     _onLoadingFinish([self baseEvent]);
   }
+
+#if !TARGET_OS_OSX
+  if (_refreshControl && _refreshControl.isRefreshing) {
+    [_refreshControl endRefreshing];
+  }
+#endif
 }
 
 - (void)cookiesDidChangeInCookieStore:(WKHTTPCookieStore *)cookieStore
@@ -1598,8 +1627,7 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (void)pullToRefresh:(UIRefreshControl *)refreshControl
 {
-  [self reload];
-  [refreshControl endRefreshing];
+  _pullToRefreshTriggered = YES;
 }
 
 
