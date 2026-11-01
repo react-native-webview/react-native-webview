@@ -9,16 +9,16 @@
   },
   "dependencies": {
     "example-shared": "file:../example-shared",
-    "react": "19.1.4",
-    "react-native": "0.81.6",
+    "react": "19.2.0",
+    "react-native": "0.83.10",
     "react-native-webview": "file:../react-native-webview"
   },
   "devDependencies": {
     "@react-native-community/cli": "20.2.0",
-    "@react-native/babel-preset": "0.81.6",
-    "@react-native/metro-config": "0.81.6",
-    "@rnx-kit/metro-config": "2.2.4",
-    "react-native-macos": "0.81.9",
-    "react-native-test-app": "5.4.10"
+    "@react-native/babel-preset": "0.83.10",
+    "@react-native/metro-config": "0.83.10",
+    "@rnx-kit/metro-config": "2.2.6",
+    "react-native-macos": "0.83.0",
+    "react-native-test-app": "5.4.15"
   }
 }

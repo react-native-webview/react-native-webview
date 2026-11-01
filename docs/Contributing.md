@@ -21,19 +21,19 @@ The repository contains one published library and separate platform apps:
 | ------------------------------- | ------------------------------------------------------ |
 | `packages/react-native-webview` | Library source, native implementations, and unit tests |
 | `packages/example-shared`       | Shared example screens and assets                      |
-| `packages/example-mobile`       | Android and iOS, React Native 0.87.1                   |
-| `packages/example-windows`      | Windows, React Native Windows 0.84.0, and E2E tests    |
-| `packages/example-macos`        | macOS, React Native macOS 0.81.9                       |
+| `packages/example-mobile`       | Android and iOS, React Native 0.88.1                   |
+| `packages/example-windows`      | Windows, React Native Windows 0.85.0, and E2E tests    |
+| `packages/example-macos`        | macOS, React Native macOS 0.83.0                       |
 | `packages/example-visionos`     | visionOS, ReactVision React Native visionOS 0.86.4     |
 
 Use Node.js 22.13+ on the 22.x line, 24.3+ on the 24.x line, or 26+, and
-Bun 1.4.1 (also pinned in `.prototools`). The root workspace includes the
+Bun 1.4.4 (also pinned in `.prototools`). The root workspace includes the
 library, shared screens, and mobile app. The other apps have separate installs
 and lockfiles because their React Native versions differ. Install only the
 platforms you are developing.
 
-The examples use RNTA 5.4.10 and React Native CLI 20.2.0. The mobile app uses
-Gradle 9.4.1 with the AGP 9 compatibility flags recommended by React Native 0.87.
+The examples use RNTA 5.4.15 and React Native CLI 20.2.0. The mobile app uses
+Gradle 9.4.1 with the AGP 9 compatibility flags recommended by React Native 0.88.
 The shared library currently uses legacy React Native declarations.
 `tsconfig.json` enables the supported
 `react-native-legacy-deep-imports` condition; migration to the strict TypeScript
@@ -80,6 +80,9 @@ bun run macos
 
 The macOS example app will be built, the Metro bundler will launch, and the example app will be installed and started.
 
+The app uses React Native macOS 0.83.0 with React Native 0.83.10. RNTA 5.4.15
+still declares a peer range ending at React Native macOS 0.81.
+
 #### For Windows:
 
 ```powershell
@@ -91,9 +94,8 @@ bun run windows
 The Windows example app will be built, the Metro bundler will launch, and the example app will be installed and started.
 
 Windows requires Visual Studio 2026 18.6.1 or newer and the Windows 11 SDK (10.0.26100.0),
-matching the `windows-2025-vs2026` CI runner. The app uses RNW 0.84.0 with
-React Native 0.84.1. RNTA 5.4.10 still declares a peer range ending at RNW 0.83;
-the 0.84 pairing builds and launches locally with the maintainer's guidance.
+matching the `windows-2025-vs2026` CI runner. The app uses RNW 0.85.0 with
+React Native 0.85.3. RNTA 5.4.15 still declares a peer range ending at RNW 0.83.
 
 The RNW CLI currently detects full Visual Studio editions only. With standalone
 Visual Studio Build Tools, build directly with MSBuild instead. From
@@ -122,7 +124,7 @@ Architecture limitations and skipped cases are documented in the test file.
 The visionOS app uses `@reactvision/react-native-visionos` 0.86.4, whose React
 Native dependencies are based on 0.86.2. Metro maps React Native imports to this
 fork, and `visionos.reactNativePath` in `app.json` points RNTA to the same package.
-RNTA 5.4.10 still defaults to the older Callstack package, so this path override
+RNTA 5.4.15 still defaults to the older Callstack package, so this path override
 is required. Native builds require macOS, Xcode with the visionOS SDK, CocoaPods,
 and CMake. The Podfile builds React Native, its dependencies, and Hermes from
 source because the upstream prebuilt frameworks do not include visionOS slices.

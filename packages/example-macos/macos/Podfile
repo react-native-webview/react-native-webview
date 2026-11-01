@@ -2,6 +2,6 @@ require_relative '../node_modules/react-native-test-app/macos/test_app'
 
 workspace 'WebviewExample.xcworkspace'
 
-# :new_arch_enabled is required until react-native-macos reaches 0.82+,
-# where the new architecture becomes the only option.
+# react-native-macos 0.83 only supports the new architecture. Keep it explicit
+# because RNTA 5.4.15 predates react-native-macos 0.83.
 use_test_app! :hermes_enabled => true, :new_arch_enabled => true

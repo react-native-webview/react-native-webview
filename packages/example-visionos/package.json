@@ -20,7 +20,7 @@
     "@react-native/babel-preset": "0.86.2",
     "@react-native/metro-config": "0.86.2",
     "@reactvision/react-native-visionos": "0.86.4",
-    "@rnx-kit/metro-config": "2.2.4",
-    "react-native-test-app": "5.4.10"
+    "@rnx-kit/metro-config": "2.2.6",
+    "react-native-test-app": "5.4.15"
   }
 }

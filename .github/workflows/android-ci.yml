@@ -12,13 +12,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.1
+          bun-version: 1.4.4
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
@@ -28,10 +28,12 @@ jobs:
       - name: Bundle example JavaScript
         run: bun run bundle:android
         working-directory: packages/example-mobile
-      - name: Build Android test app
-        uses: gradle/gradle-build-action@v2
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: wrapper
-          arguments: --no-daemon clean build check test
-          build-root-directory: packages/example-mobile/android
+          cache-provider: basic
+      - name: Build Android test app
+        run: ./gradlew --no-daemon clean build check test
+        shell: bash
+        working-directory: packages/example-mobile/android
     timeout-minutes: 60
