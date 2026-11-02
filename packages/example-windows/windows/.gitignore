@@ -1,0 +1,34 @@
+.vs/
+
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+ARM64/
+AppPackages/
+[Bb]in/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Oo]bj/
+[Rr]elease/
+[Rr]eleases/
+bld/
+build/
+x64/
+x86/
+
+# NuGet Packages Directory
+packages/
+
+**/Generated Files/**
+*.binlog
+*.err
+*.hprof
+*.sln
+*.wrn
+NuGet.Config
+dist/
+msbuild.binlog
+node_modules/

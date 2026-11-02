@@ -1,0 +1,95 @@
+import java.nio.file.Paths
+
+buildscript {
+    ext.safeExtGet = {prop ->
+        rootProject.ext.has(prop) ? rootProject.ext.get(prop) : project.properties['ReactNativeWebView_' + prop]
+    }
+    repositories {
+        google()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${safeExtGet('kotlinVersion')}")
+        classpath("com.android.tools.build:gradle:7.0.4")
+    }
+}
+
+def getExtOrIntegerDefault(prop) {
+  return rootProject.ext.has(prop) ? rootProject.ext.get(prop) : (project.properties['ReactNativeWebView_' + prop]).toInteger()
+}
+
+def getReactNativeWebViewMinSdkVersion() {
+  return Math.max(getExtOrIntegerDefault('minSdkVersion').toInteger(), 24)
+}
+
+static def findNodeModulePath(baseDir, packageName) {
+    def basePath = baseDir.toPath().normalize()
+    // Node's module resolution algorithm searches up to the root directory,
+    // after which the base path will be null
+    while (basePath) {
+        def candidatePath = Paths.get(basePath.toString(), "node_modules", packageName)
+        if (candidatePath.toFile().exists()) {
+            return candidatePath.toString()
+        }
+        basePath = basePath.getParent()
+    }
+    return null
+}
+
+// The legacy (Paper) architecture is no longer supported. On recent React Native
+// versions the New Architecture is the default, so only an explicit opt-out is rejected.
+if (project.hasProperty("newArchEnabled") && project.newArchEnabled == "false") {
+    throw new GradleException("react-native-webview only supports the React Native New Architecture. Remove newArchEnabled=false from your gradle.properties.")
+}
+
+def supportsNamespace() {
+  def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+  def major = parsed[0].toInteger()
+  def minor = parsed[1].toInteger()
+
+  // Namespace support was added in 7.3.0
+  if (major == 7 && minor >= 3) {
+    return true
+  }
+
+  return major >= 8
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.facebook.react'
+apply plugin: 'kotlin-android'
+
+android {
+    if (supportsNamespace()) {
+        namespace "com.reactnativecommunity.webview"
+
+        sourceSets {
+            main {
+                manifest.srcFile "src/main/AndroidManifestNew.xml"
+            }
+        }
+    }
+
+    compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+
+    defaultConfig {
+        minSdkVersion getReactNativeWebViewMinSdkVersion()
+        targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
+    }
+}
+
+def reactNativePath = findNodeModulePath(projectDir, "react-native")
+
+repositories {
+    maven {
+        url "${reactNativePath}/android"
+    }
+    mavenCentral()
+    google()
+}
+
+dependencies {
+    implementation 'com.facebook.react:react-native:+'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
+    implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
+}

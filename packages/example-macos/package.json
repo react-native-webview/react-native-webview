@@ -1,0 +1,24 @@
+{
+  "name": "example-macos",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "react-native start",
+    "macos": "react-native run-macos --scheme WebviewExample --project-path macos",
+    "bundle": "react-native bundle --platform macos --dev false --entry-file index.js --bundle-output dist/main.macos.jsbundle --assets-dest dist/assets"
+  },
+  "dependencies": {
+    "example-shared": "file:../example-shared",
+    "react": "19.2.0",
+    "react-native": "0.83.10",
+    "react-native-webview": "file:../react-native-webview"
+  },
+  "devDependencies": {
+    "@react-native-community/cli": "20.2.0",
+    "@react-native/babel-preset": "0.83.10",
+    "@react-native/metro-config": "0.83.10",
+    "@rnx-kit/metro-config": "2.2.6",
+    "react-native-macos": "0.83.0",
+    "react-native-test-app": "5.4.15"
+  }
+}
