@@ -65,6 +65,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
 - [`keyboardDisplayRequiresUserAction`](Reference.md#keyboardDisplayRequiresUserAction)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
+- [`removeIosKeyboardObserver`](Reference.md#removeioskeyboardobserver)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
@@ -309,6 +310,8 @@ NOTE: the default `true` value might cause some videos to hang loading on iOS. S
 
 Override the native component used to render the WebView. Enables a custom native WebView which uses the same JavaScript as the original WebView.
 
+> **Note:** since the removal of legacy-architecture support, the custom component receives the codegen (Fabric) props. In particular the source is delivered through the processed `newSource` prop — an object whose `headers` are an array of `{ name, value }` entries — and the legacy `source` prop is no longer passed.
+
 The `nativeConfig` prop expects an object with the following keys:
 
 - `component` (any)
@@ -500,9 +503,6 @@ url
 ### `onHttpError`[⬆](#props-index)
 
 Function that is invoked when the `WebView` receives an http error.
-
-> **_Note_**
-> Android API minimum level 23.
 
 | Type     | Required |
 | -------- | -------- |
@@ -956,7 +956,7 @@ Possible values for `mixedContentMode` are:
 
 ### `thirdPartyCookiesEnabled`[⬆](#props-index)
 
-Boolean value to enable third party cookies in the `WebView`. Used on Android Lollipop and above only as third party cookies are enabled by default on Android Kitkat and below and on iOS. The default value is `true`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
+Boolean value to enable third party cookies in the `WebView`. The default value is `true`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -1018,7 +1018,7 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 
 ### `allowsPictureInPictureMediaPlayback`[⬆](#props-index)
 
-Boolean value that indicates whether HTML5 videos can play Picture in Picture. The default value is `false`.
+Boolean value that indicates whether HTML5 videos can play Picture in Picture. The default value is `true`.
 
 > **NOTE**
 >
@@ -1271,6 +1271,18 @@ If `false`, web content can programmatically display the keyboard. The default v
 ### `hideKeyboardAccessoryView`[⬆](#props-index)
 
 If `true`, this will hide the keyboard accessory view (< > and Done).
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+---
+
+### `removeIosKeyboardObserver`[⬆](#props-index)
+
+If `true`, removes the keyboard notification observers (`UIKeyboardWillShow`, `UIKeyboardWillHide`, `UIKeyboardWillChangeFrame`) that `WKWebView` registers internally. Useful when the keyboard is managed by surrounding native code and the WebView's automatic scroll/inset adjustments interfere with it.
+
+The default value is `false`. The value is read once when the WebView mounts and cannot be toggled afterwards — `WKWebView` registers these observers via private internal selectors, so once removed they cannot be re-registered. Remount the WebView to apply a new value.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |

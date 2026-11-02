@@ -168,6 +168,8 @@ public class CustomWebViewManager extends RNCWebViewManager {
 
 To use your custom web view, you may want to create a class for it. Your class must return a `WebView` component with the prop `nativeConfig.component` set to your native component (see below).
 
+> **Note:** since the removal of legacy-architecture support, your component receives the codegen (Fabric) props. In particular the source is delivered through the processed `newSource` prop — an object whose `headers` are an array of `{ name, value }` entries — and the legacy `source` prop is no longer passed.
+
 To get your native component, you must use `requireNativeComponent`: the same as for regular custom components.
 
 ```javascript
