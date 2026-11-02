@@ -24,6 +24,7 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.module.annotations.ReactModule
+import com.facebook.react.uimanager.ReactStylesDiffMap
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.ViewManagerDelegate
@@ -143,7 +144,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             try {
                 urlObj = URL(url)
                 val baseUrl = urlObj.protocol + "://" + urlObj.host
-                val cookie = CookieManager.getInstance().getCookie(baseUrl)
+                val cookie = webView.cookieManager.getCookie(baseUrl)
                 request.addRequestHeader("Cookie", cookie)
             } catch (e: MalformedURLException) {
                 Log.w(TAG, "Error getting cookie for DownloadManager", e)
@@ -482,8 +483,9 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
         val webView = view.webView
 
-        // Remove all previous cookies
-        CookieManager.getInstance().removeAllCookies(null)
+        // Remove all previous cookies from this WebView's cookie jar (its profile's, if one is bound).
+        // The profile is always bound before other props, see updateProperties.
+        webView.cookieManager.removeAllCookies(null)
 
         // Disable caching
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
@@ -601,22 +603,34 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "profile")
     override fun setProfile(view: RNCWebViewWrapper, value: String?) {
-        if (value.isNullOrEmpty()) return
+        // Intentionally empty: the profile is bound in updateProperties, before any other prop.
+    }
+
+    private fun applyProfile(webView: RNCWebView, value: String?) {
+        val name = value?.takeIf { it.isNotEmpty() }
+        if (name == webView.boundProfileName) return
+
+        // The Profile API only allows binding a WebView before it has loaded anything, so the
+        // profile is fixed once the WebView has mounted.
+        if (webView.isInitialPropsApplied) {
+            Log.w(TAG, "Ignoring change of WebView profile to '${name ?: "default"}': the profile can only be set when the WebView is first mounted.")
+            return
+        }
+        if (name == null) return
 
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
-            Log.w(TAG, "WebView profile '$value' ignored: MULTI_PROFILE not supported on this device.")
+            Log.w(TAG, "WebView profile '$name' ignored: MULTI_PROFILE not supported on this device.")
             return
         }
 
-        // setProfile must be called before any URL is loaded AND before getProfile
-        // is ever called — calling getProfile itself locks the WebView to its
-        // current profile. The catch covers the case where the prop is changed
-        // after first mount, which the underlying API doesn't allow.
+        // setProfile throws if the WebView has loaded a URL, evaluated JavaScript, or had
+        // getProfile called on it. updateProperties binds the profile before anything else.
         try {
-            ProfileStore.getInstance().getOrCreateProfile(value)
-            WebViewCompat.setProfile(view.webView, value)
+            ProfileStore.getInstance().getOrCreateProfile(name)
+            WebViewCompat.setProfile(webView, name)
+            webView.boundProfileName = name
         } catch (e: IllegalStateException) {
-            Log.w(TAG, "Cannot change WebView profile to '$value': ${e.message}")
+            Log.e(TAG, "Could not bind WebView to profile '$name', using the default profile instead: ${e.message}")
         }
     }
 
@@ -844,8 +858,19 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         return export
     }
 
+    override fun updateProperties(viewToUpdate: RNCWebViewWrapper, props: ReactStylesDiffMap) {
+        // Props are applied in hash-map order, not JSX order. Some setters (messagingEnabled,
+        // injectedJavaScriptObject) evaluate JavaScript, after which WebViewCompat.setProfile
+        // throws, so the profile must be bound before any other prop.
+        if (props.hasKey("profile")) {
+            applyProfile(viewToUpdate.webView, props.getString("profile"))
+        }
+        super.updateProperties(viewToUpdate, props)
+    }
+
     override fun onAfterUpdateTransaction(view: RNCWebViewWrapper) {
         super.onAfterUpdateTransaction(view)
+        view.webView.isInitialPropsApplied = true
         mPendingSource?.let { source ->
             loadSource(view, source)
         }

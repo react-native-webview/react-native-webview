@@ -11,6 +11,9 @@ type WebViewConfig = {
   label: string;
   profile?: string;
   setUrl: string;
+  // Passing onMessage makes the messaging setter run JavaScript in the WebView. The profile
+  // must still be bound before that, regardless of the order props are applied in.
+  withOnMessage?: boolean;
 };
 
 const WEBVIEW_CONFIGS: WebViewConfig[] = [
@@ -27,16 +30,23 @@ const WEBVIEW_CONFIGS: WebViewConfig[] = [
     setUrl: 'https://httpbin.org/cookies/set?token=beta',
   },
   {
+    id: 'gamma',
+    label: 'Profile "gamma" + onMessage',
+    profile: 'gamma',
+    setUrl: 'https://httpbin.org/cookies/set?token=gamma',
+    withOnMessage: true,
+  },
+  {
     id: 'default-1',
     label: 'No profile 1 (default jar)',
     profile: undefined,
-    setUrl: 'https://httpbin.org/cookies/set?token=default',
+    setUrl: 'https://httpbin.org/cookies/set?token=default-1',
   },
   {
     id: 'default-2',
     label: 'No profile 2 (default jar)',
     profile: undefined,
-    setUrl: 'https://httpbin.org/cookies/set?token=default',
+    setUrl: 'https://httpbin.org/cookies/set?token=default-2',
   },
 ];
 
@@ -70,7 +80,7 @@ export default function ProfileExample() {
     <ScrollView style={styles.container}>
       <Text style={styles.intro}>
         {
-          'Each WebView below is bound to a different androidx.webkit Profile (or no profile). Tap "Set cookie" on one row, then "Get cookie" — the other rows should not see it.'
+          'Each profiled WebView below has its own androidx.webkit Profile, so a cookie set in one row should not show up in any other row. The two "No profile" rows share the default jar, so they should see each other\'s cookie.'
         }
       </Text>
 
@@ -111,6 +121,7 @@ export default function ProfileExample() {
               refs.current[config.id] = r;
             }}
             profile={config.profile}
+            onMessage={config.withOnMessage ? () => {} : undefined}
             source={{ uri: COOKIES_URL }}
             style={styles.webview}
             textZoom={300}

@@ -1362,11 +1362,13 @@ Possible values are:
 
 Name of the [androidx.webkit `Profile`](https://developer.android.com/reference/androidx/webkit/Profile) to use for this WebView. When set, the WebView gets an isolated cookie jar, web storage, geolocation permissions, and service workers scoped to this profile, separate from the default profile used by other WebViews in the app. Useful for embedded auth flows, multi-account support, or any case where a WebView's cookies need to be independent from the rest of the app.
 
-If a profile with the given name does not exist yet, it is created on first use via `ProfileStore.getOrCreateProfile`. Profiles persist across app launches.
+If a profile with the given name does not exist yet, it is created on first use via `ProfileStore.getOrCreateProfile`. Profiles persist across app launches. `"Default"` is the name of the shared default profile, so use any other name to get an isolated profile.
 
-Requires `WebViewFeature.MULTI_PROFILE` (androidx.webkit 1.9+, Android 10+ with a recent WebView). On unsupported devices the prop is ignored — the WebView falls back to the default profile and a warning is logged via Logcat.
+Cookie handling inside the library follows the profile: file downloads send the profile's cookies, and `incognito` clears the profile's cookies instead of the default ones.
 
-> **Note**: this prop must be set when the WebView is first mounted. The Android Profile API does not allow changing a WebView's profile after it has loaded; later changes to this prop are ignored with a warning.
+Requires androidx.webkit 1.9+ and a device WebView that supports `WebViewFeature.MULTI_PROFILE` (checked at runtime; needs a recent, multi-process WebView). On unsupported devices the prop is ignored: the WebView falls back to the default profile and a warning is logged via Logcat.
+
+> **Note**: the profile is read once, when the WebView is first mounted. The Android Profile API does not allow changing a WebView's profile after it has loaded, so later changes to this prop (including removing it) are ignored with a warning. Remount the WebView, for example by changing its `key`, to switch profiles.
 
 ```jsx
 // Two WebViews with isolated cookies

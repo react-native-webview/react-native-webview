@@ -990,13 +990,19 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * Useful for embedded auth flows, multi-account support, or any case where
    * you want a WebView's cookies to be independent of the rest of the app.
    *
-   * Requires `WebViewFeature.MULTI_PROFILE` (androidx.webkit 1.9+, Android 10+
-   * with a recent WebView). On unsupported devices the prop is ignored and
+   * `"Default"` is the name of the shared default profile, so use any other
+   * name to get an isolated profile. Downloads and `incognito` use the
+   * profile's cookie jar.
+   *
+   * Requires androidx.webkit 1.9+ and a device WebView that supports
+   * `WebViewFeature.MULTI_PROFILE` (checked at runtime; needs a recent,
+   * multi-process WebView). On unsupported devices the prop is ignored and
    * the default profile is used (a warning is logged via Logcat).
    *
-   * Note: must be set when the WebView is first mounted. The Profile API does
-   * not allow changing profile after the WebView has loaded; later changes
-   * to this prop will be ignored with a warning.
+   * Note: read once, when the WebView is first mounted. The Profile API does
+   * not allow changing profile after the WebView has loaded, so later changes
+   * to this prop (including removing it) are ignored with a warning. Remount
+   * the WebView (e.g. change its `key`) to switch profiles.
    *
    * @platform android
    */

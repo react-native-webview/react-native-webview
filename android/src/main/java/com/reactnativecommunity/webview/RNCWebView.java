@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -18,6 +19,8 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.Profile;
+import androidx.webkit.ProfileStore;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -78,6 +81,40 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+    // Name of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
+    private @Nullable String boundProfileName = null;
+    // Set once the first props transaction (mount) has been applied. The profile is fixed after that.
+    private boolean initialPropsApplied = false;
+
+    public @Nullable String getBoundProfileName() {
+        return boundProfileName;
+    }
+
+    public void setBoundProfileName(@Nullable String name) {
+        boundProfileName = name;
+    }
+
+    public boolean isInitialPropsApplied() {
+        return initialPropsApplied;
+    }
+
+    public void setInitialPropsApplied(boolean applied) {
+        initialPropsApplied = applied;
+    }
+
+    /**
+     * The cookie jar this WebView actually uses: its bound Profile's when one is set,
+     * otherwise the app-wide default.
+     */
+    public CookieManager getCookieManager() {
+        if (boundProfileName != null && WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            Profile profile = ProfileStore.getInstance().getProfile(boundProfileName);
+            if (profile != null) {
+                return profile.getCookieManager();
+            }
+        }
+        return CookieManager.getInstance();
+    }
 
     /**
      * WebView must be created with an context of the current activity
