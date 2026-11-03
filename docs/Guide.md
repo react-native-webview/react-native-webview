@@ -185,17 +185,9 @@ File uploads do not require storage permissions on supported Android versions.
 
 If the file input indicates that images or video is desired with [`accept`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept), then the WebView will attempt to provide options to the user to use their camera to take a picture or video.
 
-Additionally, if the user- or environment-facing camera is specified with the [`capture`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#capture) attribute, the following must be added to the AndroidManifest.xml file for the camera to function consistently on some Android versions and devices:
+If the user- or environment-facing camera is specified with the [`capture`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#capture) attribute, the WebView opens the camera app directly. It falls back to the file chooser when the input accepts neither images nor video, or when no camera app is available.
 
-```xml
-<queries>
-    <intent>
-        <action android:name="android.media.action.IMAGE_CAPTURE" />
-    </intent>
-</queries>
-```
-
-Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app _can_ request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, it is up to the developer to request camera permission before a file upload directly using the camera is necessary.
+Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app _can_ request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, a file input with `capture` requests the camera permission first, and opens the file chooser instead if the user denies it. A file input without `capture` only shows the camera options once the permission has been granted.
 
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
