@@ -74,6 +74,12 @@ For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide
 
 Contributions are welcome, see [Contributing.md](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Contributing.md)
 
+The library lives in `packages/react-native-webview`. Platform example apps live
+in `packages/example-mobile`, `packages/example-windows`, `packages/example-macos`,
+and `packages/example-visionos`, with screens shared through `packages/example-shared`.
+See the [development instructions](docs/Contributing.md#testing-within-react-native-webview)
+for each platform's install and run commands.
+
 ### License
 
 MIT

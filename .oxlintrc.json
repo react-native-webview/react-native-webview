@@ -36,6 +36,12 @@
   },
   "overrides": [
     {
+      "files": ["packages/example-shared/src/**"],
+      "rules": {
+        "import/no-named-as-default": "off"
+      }
+    },
+    {
       "files": ["**/__tests__/**"],
       "rules": {
         "no-await-in-loop": "off",
