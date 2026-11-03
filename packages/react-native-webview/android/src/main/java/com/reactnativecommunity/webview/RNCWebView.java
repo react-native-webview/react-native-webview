@@ -81,10 +81,20 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+    // Value of the `profile` prop at mount, whether or not binding it succeeded.
+    private @Nullable String requestedProfileName = null;
     // Name of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
     private @Nullable String boundProfileName = null;
     // Set once the first props transaction (mount) has been applied. The profile is fixed after that.
     private boolean initialPropsApplied = false;
+
+    public @Nullable String getRequestedProfileName() {
+        return requestedProfileName;
+    }
+
+    public void setRequestedProfileName(@Nullable String name) {
+        requestedProfileName = name;
+    }
 
     public @Nullable String getBoundProfileName() {
         return boundProfileName;

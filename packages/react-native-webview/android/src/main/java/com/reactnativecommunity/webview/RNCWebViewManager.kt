@@ -608,14 +608,17 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     private fun applyProfile(webView: RNCWebView, value: String?) {
         val name = value?.takeIf { it.isNotEmpty() }
-        if (name == webView.boundProfileName) return
 
         // The Profile API only allows binding a WebView before it has loaded anything, so the
-        // profile is fixed once the WebView has mounted.
+        // profile is fixed once the WebView has mounted. Fabric can re-send the mount props, so
+        // compare against the requested profile: it differs from the bound one when binding failed.
         if (webView.isInitialPropsApplied) {
-            Log.w(TAG, "Ignoring change of WebView profile to '${name ?: "default"}': the profile can only be set when the WebView is first mounted.")
+            if (name != webView.requestedProfileName) {
+                Log.w(TAG, "Ignoring change of WebView profile to '${name ?: "default"}': the profile can only be set when the WebView is first mounted.")
+            }
             return
         }
+        webView.requestedProfileName = name
         if (name == null) return
 
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
