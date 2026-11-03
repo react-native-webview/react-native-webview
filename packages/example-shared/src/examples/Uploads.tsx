@@ -32,6 +32,10 @@ const HTML = `
       <label for="any-file">Any file upload</label>
       <input name="any-file" type="file">
     </p>
+    <p>
+      <label for="camera-capture">Camera capture</label>
+      <input name="camera-capture" type="file" accept="image/*" capture>
+    </p>
   </body>
 </html>
 `;
@@ -39,7 +43,7 @@ const HTML = `
 export default function Uploads() {
   return (
     <View>
-      <View style={{ height: 120 }}>
+      <View style={{ height: 160 }}>
         <WebView
           source={{ html: HTML }}
           automaticallyAdjustContentInsets={false}

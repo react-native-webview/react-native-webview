@@ -3,6 +3,7 @@ package com.reactnativecommunity.webview;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.SecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -45,6 +45,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
 
     public static final int PICKER = 1;
     public static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
+    public static final int CAMERA_PERMISSION_REQUEST = 2;
 
     final private ReactApplicationContext mContext;
 
@@ -219,11 +220,41 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
 
     public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final String[] acceptTypes, final boolean allowMultiple, final boolean isCaptureEnabled) {
         mFilePathCallback = callback;
+        openFileChooser(acceptTypes, allowMultiple, isCaptureEnabled, true);
+        return true;
+    }
+
+    private void openFileChooser(final String[] acceptTypes, final boolean allowMultiple, final boolean isCaptureEnabled, boolean canRequestCameraPermission) {
         Activity activity = mContext.getCurrentActivity();
+        if (activity == null) {
+            Log.w("RNCWebViewModule", "there is no Activity to show the file chooser");
+            cancelFileChooser();
+            return;
+        }
+
+        boolean cameraPermissionNeeded = needsCameraPermission();
+        RNCFileChooser.Action action = RNCFileChooser.getAction(
+                isCaptureEnabled,
+                acceptsImages(acceptTypes) || acceptsVideo(acceptTypes),
+                cameraPermissionNeeded,
+                canRequestCameraPermission && activity instanceof PermissionAwareActivity);
+
+        if (action == RNCFileChooser.Action.REQUEST_CAMERA_PERMISSION) {
+            // Once answered, open the camera app (granted) or the file chooser (denied)
+            ((PermissionAwareActivity) activity).requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST, (requestCode, permissions, grantResults) -> {
+                if (requestCode != CAMERA_PERMISSION_REQUEST) {
+                    return false;
+                }
+                openFileChooser(acceptTypes, allowMultiple, isCaptureEnabled, false);
+                return true;
+            });
+            return;
+        }
 
         ArrayList<Parcelable> extraIntents = new ArrayList<>();
         Intent photoIntent = null;
-        if (!needsCameraPermission()) {
+        Intent videoIntent = null;
+        if (!cameraPermissionNeeded) {
             if (acceptsImages(acceptTypes)) {
                 photoIntent = getPhotoIntent();
                 if (photoIntent != null) {
@@ -231,34 +262,56 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
                 }
             }
             if (acceptsVideo(acceptTypes)) {
-                Intent videoIntent = getVideoIntent();
+                videoIntent = getVideoIntent();
                 if (videoIntent != null) {
                     extraIntents.add(videoIntent);
                 }
             }
         }
 
-        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-        if (isCaptureEnabled) {
-            chooserIntent = photoIntent;
-        } else {
-            Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
-
-            chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
-        }
-
-        if (chooserIntent != null) {
-            if (chooserIntent.resolveActivity(activity.getPackageManager()) != null) {
-                activity.startActivityForResult(chooserIntent, PICKER);
-            } else {
-                Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
+        if (action == RNCFileChooser.Action.CAPTURE) {
+            Intent captureIntent = photoIntent != null ? photoIntent : videoIntent;
+            if (captureIntent != null && startPickerActivity(activity, captureIntent)) {
+                return;
             }
-        } else {
-            Log.w("RNCWebViewModule", "there is no Camera permission");
+            // No camera app: fall back to the file chooser
         }
 
-        return true;
+        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+        chooserIntent.putExtra(Intent.EXTRA_INTENT, getFileChooserIntent(acceptTypes, allowMultiple));
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
+
+        if (!startPickerActivity(activity, chooserIntent)) {
+            cancelFileChooser();
+        }
+    }
+
+    // Starts the intent instead of checking resolveActivity() first, which returns null on
+    // Android 11+ for apps that are not visible to this one (package visibility)
+    private boolean startPickerActivity(Activity activity, Intent intent) {
+        try {
+            activity.startActivityForResult(intent, PICKER);
+            return true;
+        } catch (ActivityNotFoundException e) {
+            Log.w("RNCWebViewModule", "there is no Activity to handle this Intent", e);
+            return false;
+        }
+    }
+
+    // The WebView only shows another file chooser once the callback has been invoked
+    private void cancelFileChooser() {
+        if (mFilePathCallback != null) {
+            mFilePathCallback.onReceiveValue(null);
+            mFilePathCallback = null;
+        }
+        if (mOutputImage != null) {
+            mOutputImage.delete();
+            mOutputImage = null;
+        }
+        if (mOutputVideo != null) {
+            mOutputVideo.delete();
+            mOutputVideo = null;
+        }
     }
 
     public void setDownloadRequest(DownloadManager.Request request) {
@@ -301,10 +354,9 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         PackageManager packageManager = activity.getPackageManager();
         try {
             String[] requestedPermissions = packageManager.getPackageInfo(activity.getApplicationContext().getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions;
-            if (Arrays.asList(requestedPermissions).contains(Manifest.permission.CAMERA)
-                    && ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                needed = true;
-            }
+            needed = RNCFileChooser.needsCameraPermission(
+                    requestedPermissions,
+                    ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
         } catch (PackageManager.NameNotFoundException e) {
             needed = true;
         }
