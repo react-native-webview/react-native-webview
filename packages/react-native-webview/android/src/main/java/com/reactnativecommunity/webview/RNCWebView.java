@@ -248,6 +248,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         return this.messagingEnabled;
     }
 
+    @SuppressLint("AddJavascriptInterface")
     protected void createRNCWebViewBridge(RNCWebView webView) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)){
           if (this.bridgeListener == null) {
@@ -270,7 +271,6 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             addJavascriptInterface(fallbackBridge, JAVASCRIPT_INTERFACE);
           }
         }
-        injectJavascriptObject();
     }
 
     private void injectJavascriptObject() {
@@ -283,16 +283,22 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
       }
     }
 
-    @SuppressLint("AddJavascriptInterface")
     public void setMessagingEnabled(boolean enabled) {
-        if (messagingEnabled == enabled) {
-            return;
-        }
-
         messagingEnabled = enabled;
+    }
 
-        if (enabled) {
+    /**
+     * Applies messagingEnabled and injectedJavaScriptObject. Their setters only store the value:
+     * applying them registers the bridge and runs JavaScript, and Fabric sets props in no
+     * particular order. RNCWebViewManager calls this once every prop of an update has been set.
+     */
+    public void applyMessagingProps() {
+        if (messagingEnabled) {
             createRNCWebViewBridge(this);
+        }
+        if (injectedJavaScriptObjectChanged) {
+            injectedJavaScriptObjectChanged = false;
+            injectJavascriptObject();
         }
     }
 
@@ -319,10 +325,13 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     protected String injectedJavaScriptObject = null;
+    private boolean injectedJavaScriptObjectChanged = false;
 
     public void setInjectedJavaScriptObject(String obj) {
-      this.injectedJavaScriptObject = obj;
-      injectJavascriptObject();
+      if (!TextUtils.equals(this.injectedJavaScriptObject, obj)) {
+        this.injectedJavaScriptObject = obj;
+        this.injectedJavaScriptObjectChanged = true;
+      }
     }
 
     public void onMessage(String message, String sourceUrl) {
