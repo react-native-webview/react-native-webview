@@ -307,20 +307,29 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     }
 
     public void callInjectedJavaScript() {
-        if (getSettings().getJavaScriptEnabled() &&
-                injectedJS != null &&
-                !TextUtils.isEmpty(injectedJS)) {
+        boolean hasInjectedJS = !TextUtils.isEmpty(injectedJS);
+        if (getSettings().getJavaScriptEnabled() && hasInjectedJS) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJS + ";\n})();");
-            injectJavascriptObject(); // re-inject the Javascript object in case it has been overwritten.
         }
+        reinjectJavascriptObject(hasInjectedJS);
     }
 
     public void callInjectedJavaScriptBeforeContentLoaded() {
-        if (getSettings().getJavaScriptEnabled() &&
-                injectedJSBeforeContentLoaded != null &&
-                !TextUtils.isEmpty(injectedJSBeforeContentLoaded)) {
+        boolean hasInjectedJS = !TextUtils.isEmpty(injectedJSBeforeContentLoaded);
+        if (getSettings().getJavaScriptEnabled() && hasInjectedJS) {
             evaluateJavascriptWithFallback("(function() {\n" + injectedJSBeforeContentLoaded + ";\n})();");
-            injectJavascriptObject();  // re-inject the Javascript object in case it has been overwritten.
+        }
+        reinjectJavascriptObject(hasInjectedJS);
+    }
+
+    /**
+     * Each page load starts with a new window, so the object is injected again on every load
+     * while injectedJavaScriptObject is set, not only when an injected script ran. After an
+     * injected script, it is also re-injected in case the script has overwritten it.
+     */
+    private void reinjectJavascriptObject(boolean afterInjectedJS) {
+        if (afterInjectedJS || injectedJavaScriptObject != null) {
+            injectJavascriptObject();
         }
     }
 
