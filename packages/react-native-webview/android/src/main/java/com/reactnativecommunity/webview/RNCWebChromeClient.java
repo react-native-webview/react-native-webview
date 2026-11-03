@@ -2,6 +2,7 @@ package com.reactnativecommunity.webview;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Message;
@@ -30,7 +31,6 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
@@ -192,21 +192,30 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+        Context context = this.mWebView.getThemedReactContext();
 
-        if (ContextCompat.checkSelfPermission(this.mWebView.getThemedReactContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            /*
-             * Keep the trace of callback and origin for the async permission request
-             */
-            geolocationPermissionCallback = callback;
-            geolocationPermissionOrigin = origin;
-
-            requestPermissions(Collections.singletonList(Manifest.permission.ACCESS_FINE_LOCATION));
-
-        } else {
+        if (RNCGeolocationPermissions.hasLocationPermission(
+                permission -> ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)) {
             callback.invoke(origin, true, false);
+            return;
         }
+
+        String[] declaredPermissions;
+        try {
+            declaredPermissions = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS)
+                    .requestedPermissions;
+        } catch (PackageManager.NameNotFoundException e) {
+            // Unknown manifest: permissionsToRequest falls back to precise and approximate location
+            declaredPermissions = null;
+        }
+
+        /*
+         * Keep the trace of callback and origin for the async permission request
+         */
+        geolocationPermissionCallback = callback;
+        geolocationPermissionOrigin = origin;
+        requestPermissions(RNCGeolocationPermissions.permissionsToRequest(declaredPermissions));
     }
 
     private PermissionAwareActivity getPermissionAwareActivity() {
@@ -256,24 +265,19 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
          */
         boolean shouldAnswerToPermissionRequest = false;
 
+        Boolean locationGranted = RNCGeolocationPermissions.locationResult(permissions, grantResults);
+        if (locationGranted != null
+                && geolocationPermissionCallback != null
+                && geolocationPermissionOrigin != null) {
+            geolocationPermissionCallback.invoke(geolocationPermissionOrigin, locationGranted, false);
+            geolocationPermissionCallback = null;
+            geolocationPermissionOrigin = null;
+        }
+
         for (int i = 0; i < permissions.length; i++) {
 
             String permission = permissions[i];
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
-
-            if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION)
-                    && geolocationPermissionCallback != null
-                    && geolocationPermissionOrigin != null) {
-
-                if (granted) {
-                    geolocationPermissionCallback.invoke(geolocationPermissionOrigin, true, false);
-                } else {
-                    geolocationPermissionCallback.invoke(geolocationPermissionOrigin, false, false);
-                }
-
-                geolocationPermissionCallback = null;
-                geolocationPermissionOrigin = null;
-            }
 
             if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
                 if (granted && grantedPermissions != null) {
