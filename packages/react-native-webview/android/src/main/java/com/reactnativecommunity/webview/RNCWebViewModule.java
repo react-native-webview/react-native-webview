@@ -293,7 +293,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
             activity.startActivityForResult(intent, PICKER);
             return true;
         } catch (ActivityNotFoundException e) {
-            Log.w("RNCWebViewModule", "there is no Activity to handle this Intent", e);
+            Log.w("RNCWebViewModule", "there is no Activity to handle this Intent");
             return false;
         }
     }
