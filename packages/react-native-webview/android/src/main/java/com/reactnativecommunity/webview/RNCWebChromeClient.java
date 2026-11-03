@@ -200,13 +200,14 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
             return;
         }
 
-        String[] declaredPermissions = null;
+        String[] declaredPermissions;
         try {
             declaredPermissions = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS)
                     .requestedPermissions;
         } catch (PackageManager.NameNotFoundException e) {
-            // Fall back to requesting both precise and approximate location
+            // Unknown manifest: permissionsToRequest falls back to precise and approximate location
+            declaredPermissions = null;
         }
 
         /*
