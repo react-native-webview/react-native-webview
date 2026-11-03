@@ -33,6 +33,15 @@ static NSString *RNCSharedCookieIdentifier(NSHTTPCookie *cookie)
     cookie.path ?: @""];
 }
 
+static NSSet<NSString *> *RNCSharedCookieIdentifiers(NSArray<NSHTTPCookie *> *cookies)
+{
+  NSMutableSet<NSString *> *identifiers = [NSMutableSet setWithCapacity:cookies.count];
+  for (NSHTTPCookie *cookie in cookies) {
+    [identifiers addObject:RNCSharedCookieIdentifier(cookie)];
+  }
+  return identifiers;
+}
+
 #if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -158,6 +167,9 @@ RCTAutoInsetsProtocol>
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
 #endif // !TARGET_OS_OSX
+
+  // Cookies in the webview's cookie store at the last change, to tell which ones the webview deleted
+  NSSet<NSString *> *_webViewCookieIdentifiers;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -601,6 +613,7 @@ RCTAutoInsetsProtocol>
     // WKHTTPCookieStore does not retain its observers; deregister before
     // dropping the reference (dealloc can no longer do it once _webView is nil).
     [_webView.configuration.websiteDataStore.httpCookieStore removeObserver:self];
+    _webViewCookieIdentifiers = nil;
     [_webView removeFromSuperview];
     if (@available(iOS 15.0, macOS 12.0, *)) {
         [_webView pauseAllMediaPlaybackWithCompletionHandler:nil];
@@ -837,8 +850,17 @@ RCTAutoInsetsProtocol>
   NSString *allowingReadAccessToURL = _allowingReadAccessToURL;
 
   [self syncCookiesToWebView:^{
+    WKHTTPCookieStore *cookieStore = webView.configuration.websiteDataStore.httpCookieStore;
+    if (self->_sharedCookiesEnabled) {
+      // Snapshot the cookies the webview starts with, unless a cookie change already did
+      [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *cookies) {
+        if (!self->_webViewCookieIdentifiers) {
+          self->_webViewCookieIdentifiers = RNCSharedCookieIdentifiers(cookies);
+        }
+      }];
+    }
     // Add observer to sync cookies from webview to sharedHTTPCookieStorage
-    [webView.configuration.websiteDataStore.httpCookieStore addObserver:self];
+    [cookieStore addObserver:self];
 
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
@@ -1554,18 +1576,25 @@ didFinishNavigation:(WKNavigation *)navigation
 {
   if(_sharedCookiesEnabled) {
     // Write all cookies from WKWebView back to sharedHTTPCookieStorage
-    [cookieStore getAllCookies:^(NSArray* cookies) {
+    [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *cookies) {
       NSHTTPCookieStorage *sharedCookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-      NSMutableSet<NSString *> *webViewCookieIdentifiers = [NSMutableSet setWithCapacity:cookies.count];
       for (NSHTTPCookie *cookie in cookies) {
-        [webViewCookieIdentifiers addObject:RNCSharedCookieIdentifier(cookie)];
         [sharedCookieStorage setCookie:cookie];
       }
-      for (NSHTTPCookie *sharedCookie in sharedCookieStorage.cookies) {
-        if (![webViewCookieIdentifiers containsObject:RNCSharedCookieIdentifier(sharedCookie)]) {
-          [sharedCookieStorage deleteCookie:sharedCookie];
+
+      // Delete only the cookies the webview deleted since the last change: cookies the webview
+      // never had (e.g. set natively by fetch after it loaded) must stay in sharedHTTPCookieStorage
+      NSSet<NSString *> *webViewCookieIdentifiers = RNCSharedCookieIdentifiers(cookies);
+      NSMutableSet<NSString *> *deletedCookieIdentifiers = [self->_webViewCookieIdentifiers mutableCopy];
+      [deletedCookieIdentifiers minusSet:webViewCookieIdentifiers];
+      if (deletedCookieIdentifiers.count > 0) {
+        for (NSHTTPCookie *sharedCookie in sharedCookieStorage.cookies) {
+          if ([deletedCookieIdentifiers containsObject:RNCSharedCookieIdentifier(sharedCookie)]) {
+            [sharedCookieStorage deleteCookie:sharedCookie];
+          }
         }
       }
+      self->_webViewCookieIdentifiers = webViewCookieIdentifiers;
     }];
   }
 }
