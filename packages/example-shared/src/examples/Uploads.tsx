@@ -32,6 +32,14 @@ const HTML = `
       <label for="any-file">Any file upload</label>
       <input name="any-file" type="file">
     </p>
+    <p>
+      <label for="photo-capture">Photo capture</label>
+      <input name="photo-capture" type="file" accept="image/*" capture>
+    </p>
+    <p>
+      <label for="video-capture">Video capture</label>
+      <input name="video-capture" type="file" accept="video/*" capture>
+    </p>
   </body>
 </html>
 `;
@@ -39,7 +47,7 @@ const HTML = `
 export default function Uploads() {
   return (
     <View>
-      <View style={{ height: 120 }}>
+      <View style={{ height: 260 }}>
         <WebView
           source={{ html: HTML }}
           automaticallyAdjustContentInsets={false}
@@ -47,7 +55,7 @@ export default function Uploads() {
       </View>
       <Text>
         {
-          'Android limitation: If the file input should show camera options for the user, and the app has the ability to request the camera permission, then the user must grant permission first in order to see the options. Since this example app does have the permission declared, you must allow it in settings to be able to see camera options. If your app does not have the camera permission declared, then there is no restriction to showing the camera options.'
+          'Android limitation: this example app declares the camera permission, so the other inputs only show camera options once it has been granted. The capture inputs ask for it.'
         }
       </Text>
       <Button
