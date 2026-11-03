@@ -1,12 +1,5 @@
-import type { HostComponent, ViewProps } from 'react-native';
-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import {
-  DirectEventHandler,
-  Double,
-  Int32,
-  WithDefault,
-} from 'react-native/Libraries/Types/CodegenTypes';
-import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import type { CodegenTypes, HostComponent, ViewProps } from 'react-native';
+import { codegenNativeCommands, codegenNativeComponent } from 'react-native';
 
 export type WebViewNativeEvent = Readonly<{
   url: string;
@@ -14,7 +7,7 @@ export type WebViewNativeEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
 }>;
 export type WebViewCustomMenuSelectionEvent = Readonly<{
   label: string;
@@ -27,7 +20,7 @@ export type WebViewMessageEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   data: string;
 }>;
 export type WebViewOpenWindowEvent = Readonly<{
@@ -39,9 +32,9 @@ export type WebViewHttpErrorEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   description: string;
-  statusCode: Int32;
+  statusCode: CodegenTypes.Int32;
 }>;
 
 export type WebViewErrorEvent = Readonly<{
@@ -50,9 +43,9 @@ export type WebViewErrorEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   domain?: string;
-  code: Int32;
+  code: CodegenTypes.Int32;
   description: string;
 }>;
 
@@ -62,8 +55,8 @@ export type WebViewNativeProgressEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
-  progress: Double;
+  lockIdentifier: CodegenTypes.Double;
+  progress: CodegenTypes.Double;
 }>;
 
 export type WebViewNavigationEvent = Readonly<{
@@ -72,7 +65,7 @@ export type WebViewNavigationEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
 }>;
@@ -83,7 +76,7 @@ export type ShouldStartLoadRequestEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
   isTopFrame: boolean;
@@ -91,32 +84,32 @@ export type ShouldStartLoadRequestEvent = Readonly<{
 
 type ScrollEvent = Readonly<{
   contentInset: {
-    bottom: Double;
-    left: Double;
-    right: Double;
-    top: Double;
+    bottom: CodegenTypes.Double;
+    left: CodegenTypes.Double;
+    right: CodegenTypes.Double;
+    top: CodegenTypes.Double;
   };
   contentOffset: {
-    y: Double;
-    x: Double;
+    y: CodegenTypes.Double;
+    x: CodegenTypes.Double;
   };
   contentSize: {
-    height: Double;
-    width: Double;
+    height: CodegenTypes.Double;
+    width: CodegenTypes.Double;
   };
   layoutMeasurement: {
-    height: Double;
-    width: Double;
+    height: CodegenTypes.Double;
+    width: CodegenTypes.Double;
   };
   targetContentOffset?: {
-    y: Double;
-    x: Double;
+    y: CodegenTypes.Double;
+    x: CodegenTypes.Double;
   };
   velocity?: {
-    y: Double;
-    x: Double;
+    y: CodegenTypes.Double;
+    x: CodegenTypes.Double;
   };
-  zoomScale?: Double;
+  zoomScale?: CodegenTypes.Double;
   responderIgnoreScroll?: boolean;
 }>;
 
@@ -135,8 +128,8 @@ export interface NativeProps extends ViewProps {
   allowFileAccess?: boolean;
   allowsProtectedMedia?: boolean;
   allowsFullscreenVideo?: boolean;
-  androidLayerType?: WithDefault<'none' | 'software' | 'hardware', 'none'>;
-  cacheMode?: WithDefault<
+  androidLayerType?: CodegenTypes.WithDefault<'none' | 'software' | 'hardware', 'none'>;
+  cacheMode?: CodegenTypes.WithDefault<
     'LOAD_DEFAULT' | 'LOAD_CACHE_ELSE_NETWORK' | 'LOAD_NO_CACHE' | 'LOAD_CACHE_ONLY',
     'LOAD_DEFAULT'
   >;
@@ -146,19 +139,19 @@ export interface NativeProps extends ViewProps {
   geolocationEnabled?: boolean;
   lackPermissionToDownloadMessage?: string;
   messagingModuleName?: string;
-  minimumFontSize?: Int32;
-  mixedContentMode?: WithDefault<'never' | 'always' | 'compatibility', 'never'>;
+  minimumFontSize?: CodegenTypes.Int32;
+  mixedContentMode?: CodegenTypes.WithDefault<'never' | 'always' | 'compatibility', 'never'>;
   nestedScrollEnabled?: boolean;
-  onContentSizeChange?: DirectEventHandler<WebViewNativeEvent>;
-  onRenderProcessGone?: DirectEventHandler<WebViewRenderProcessGoneEvent>;
+  onContentSizeChange?: CodegenTypes.DirectEventHandler<WebViewNativeEvent>;
+  onRenderProcessGone?: CodegenTypes.DirectEventHandler<WebViewRenderProcessGoneEvent>;
   overScrollMode?: string;
   saveFormDataDisabled?: boolean;
-  scalesPageToFit?: WithDefault<boolean, true>;
-  setBuiltInZoomControls?: WithDefault<boolean, true>;
+  scalesPageToFit?: CodegenTypes.WithDefault<boolean, true>;
+  setBuiltInZoomControls?: CodegenTypes.WithDefault<boolean, true>;
   setDisplayZoomControls?: boolean;
-  setSupportMultipleWindows?: WithDefault<boolean, true>;
-  textZoom?: Int32;
-  thirdPartyCookiesEnabled?: WithDefault<boolean, true>;
+  setSupportMultipleWindows?: CodegenTypes.WithDefault<boolean, true>;
+  textZoom?: CodegenTypes.Int32;
+  thirdPartyCookiesEnabled?: CodegenTypes.WithDefault<boolean, true>;
   // Workaround to watch if listener if defined
   hasOnScroll?: boolean;
   // !Android only
@@ -169,23 +162,23 @@ export interface NativeProps extends ViewProps {
   allowsInlineMediaPlayback?: boolean;
   allowsPictureInPictureMediaPlayback?: boolean;
   allowsAirPlayForMediaPlayback?: boolean;
-  allowsLinkPreview?: WithDefault<boolean, true>;
-  automaticallyAdjustContentInsets?: WithDefault<boolean, true>;
-  automaticallyAdjustsScrollIndicatorInsets?: WithDefault<boolean, false>;
-  autoManageStatusBarEnabled?: WithDefault<boolean, true>;
-  bounces?: WithDefault<boolean, true>;
+  allowsLinkPreview?: CodegenTypes.WithDefault<boolean, true>;
+  automaticallyAdjustContentInsets?: CodegenTypes.WithDefault<boolean, true>;
+  automaticallyAdjustsScrollIndicatorInsets?: CodegenTypes.WithDefault<boolean, false>;
+  autoManageStatusBarEnabled?: CodegenTypes.WithDefault<boolean, true>;
+  bounces?: CodegenTypes.WithDefault<boolean, true>;
   contentInset?: Readonly<{
-    top?: Double;
-    left?: Double;
-    bottom?: Double;
-    right?: Double;
+    top?: CodegenTypes.Double;
+    left?: CodegenTypes.Double;
+    bottom?: CodegenTypes.Double;
+    right?: CodegenTypes.Double;
   }>;
-  contentInsetAdjustmentBehavior?: WithDefault<
+  contentInsetAdjustmentBehavior?: CodegenTypes.WithDefault<
     'never' | 'automatic' | 'scrollableAxes' | 'always',
     'never'
   >;
-  contentMode?: WithDefault<'recommended' | 'mobile' | 'desktop', 'recommended'>;
-  dataDetectorTypes?: WithDefault<
+  contentMode?: CodegenTypes.WithDefault<'recommended' | 'mobile' | 'desktop', 'recommended'>;
+  dataDetectorTypes?: CodegenTypes.WithDefault<
     ReadonlyArray<
       | 'address'
       | 'link'
@@ -199,33 +192,33 @@ export interface NativeProps extends ViewProps {
     >,
     'phoneNumber'
   >;
-  decelerationRate?: Double;
-  directionalLockEnabled?: WithDefault<boolean, true>;
+  decelerationRate?: CodegenTypes.Double;
+  directionalLockEnabled?: CodegenTypes.WithDefault<boolean, true>;
   enableApplePay?: boolean;
   hideKeyboardAccessoryView?: boolean;
-  keyboardDisplayRequiresUserAction?: WithDefault<boolean, true>;
+  keyboardDisplayRequiresUserAction?: CodegenTypes.WithDefault<boolean, true>;
   limitsNavigationsToAppBoundDomains?: boolean;
-  mediaCapturePermissionGrantType?: WithDefault<
+  mediaCapturePermissionGrantType?: CodegenTypes.WithDefault<
     'prompt' | 'grant' | 'deny' | 'grantIfSameHostElsePrompt' | 'grantIfSameHostElseDeny',
     'prompt'
   >;
   pagingEnabled?: boolean;
   pullToRefreshEnabled?: boolean;
   refreshControlLightMode?: boolean;
-  removeIosKeyboardObserver?: WithDefault<boolean, false>;
-  scrollEnabled?: WithDefault<boolean, true>;
+  removeIosKeyboardObserver?: CodegenTypes.WithDefault<boolean, false>;
+  scrollEnabled?: CodegenTypes.WithDefault<boolean, true>;
   sharedCookiesEnabled?: boolean;
-  textInteractionEnabled?: WithDefault<boolean, true>;
-  useSharedProcessPool?: WithDefault<boolean, true>;
-  onContentProcessDidTerminate?: DirectEventHandler<WebViewNativeEvent>;
-  onCustomMenuSelection?: DirectEventHandler<WebViewCustomMenuSelectionEvent>;
-  onFileDownload?: DirectEventHandler<WebViewDownloadEvent>;
+  textInteractionEnabled?: CodegenTypes.WithDefault<boolean, true>;
+  useSharedProcessPool?: CodegenTypes.WithDefault<boolean, true>;
+  onContentProcessDidTerminate?: CodegenTypes.DirectEventHandler<WebViewNativeEvent>;
+  onCustomMenuSelection?: CodegenTypes.DirectEventHandler<WebViewCustomMenuSelectionEvent>;
+  onFileDownload?: CodegenTypes.DirectEventHandler<WebViewDownloadEvent>;
 
   menuItems?: ReadonlyArray<Readonly<{ label: string; key: string }>>;
   suppressMenuItems?: Readonly<string>[];
   // Workaround to watch if listener if defined
   hasOnFileDownload?: boolean;
-  fraudulentWebsiteWarningEnabled?: WithDefault<boolean, true>;
+  fraudulentWebsiteWarningEnabled?: CodegenTypes.WithDefault<boolean, true>;
   // !iOS only
 
   allowFileAccessFromFileURLs?: boolean;
@@ -235,31 +228,31 @@ export interface NativeProps extends ViewProps {
     username: string;
     password: string;
   }>;
-  cacheEnabled?: WithDefault<boolean, true>;
+  cacheEnabled?: CodegenTypes.WithDefault<boolean, true>;
   incognito?: boolean;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
-  injectedJavaScriptForMainFrameOnly?: WithDefault<boolean, true>;
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: WithDefault<boolean, true>;
+  injectedJavaScriptForMainFrameOnly?: CodegenTypes.WithDefault<boolean, true>;
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: CodegenTypes.WithDefault<boolean, true>;
   javaScriptCanOpenWindowsAutomatically?: boolean;
-  javaScriptEnabled?: WithDefault<boolean, true>;
+  javaScriptEnabled?: CodegenTypes.WithDefault<boolean, true>;
   webviewDebuggingEnabled?: boolean;
-  mediaPlaybackRequiresUserAction?: WithDefault<boolean, true>;
+  mediaPlaybackRequiresUserAction?: CodegenTypes.WithDefault<boolean, true>;
   messagingEnabled: boolean;
-  onLoadingError: DirectEventHandler<WebViewErrorEvent>;
-  onLoadingSubResourceError?: DirectEventHandler<WebViewErrorEvent>;
-  onLoadingFinish: DirectEventHandler<WebViewNavigationEvent>;
-  onLoadingProgress: DirectEventHandler<WebViewNativeProgressEvent>;
-  onLoadingStart: DirectEventHandler<WebViewNavigationEvent>;
-  onHttpError: DirectEventHandler<WebViewHttpErrorEvent>;
-  onMessage: DirectEventHandler<WebViewMessageEvent>;
-  onOpenWindow?: DirectEventHandler<WebViewOpenWindowEvent>;
+  onLoadingError: CodegenTypes.DirectEventHandler<WebViewErrorEvent>;
+  onLoadingSubResourceError?: CodegenTypes.DirectEventHandler<WebViewErrorEvent>;
+  onLoadingFinish: CodegenTypes.DirectEventHandler<WebViewNavigationEvent>;
+  onLoadingProgress: CodegenTypes.DirectEventHandler<WebViewNativeProgressEvent>;
+  onLoadingStart: CodegenTypes.DirectEventHandler<WebViewNavigationEvent>;
+  onHttpError: CodegenTypes.DirectEventHandler<WebViewHttpErrorEvent>;
+  onMessage: CodegenTypes.DirectEventHandler<WebViewMessageEvent>;
+  onOpenWindow?: CodegenTypes.DirectEventHandler<WebViewOpenWindowEvent>;
   hasOnOpenWindowEvent?: boolean;
-  onScroll?: DirectEventHandler<ScrollEvent>;
-  onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
-  showsHorizontalScrollIndicator?: WithDefault<boolean, true>;
-  showsVerticalScrollIndicator?: WithDefault<boolean, true>;
-  indicatorStyle?: WithDefault<'default' | 'black' | 'white', 'default'>;
+  onScroll?: CodegenTypes.DirectEventHandler<ScrollEvent>;
+  onShouldStartLoadWithRequest: CodegenTypes.DirectEventHandler<ShouldStartLoadRequestEvent>;
+  showsHorizontalScrollIndicator?: CodegenTypes.WithDefault<boolean, true>;
+  showsVerticalScrollIndicator?: CodegenTypes.WithDefault<boolean, true>;
+  indicatorStyle?: CodegenTypes.WithDefault<'default' | 'black' | 'white', 'default'>;
   newSource: Readonly<{
     uri?: string;
     method?: string;

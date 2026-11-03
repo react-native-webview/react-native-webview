@@ -1,9 +1,11 @@
-import type { TurboModule } from 'react-native';
+import type { CodegenTypes, TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
-import { Double } from 'react-native/Libraries/Types/CodegenTypes';
 
 export interface Spec extends TurboModule {
-  shouldStartLoadWithLockIdentifier(shouldStart: boolean, lockIdentifier: Double): void;
+  shouldStartLoadWithLockIdentifier(
+    shouldStart: boolean,
+    lockIdentifier: CodegenTypes.Double,
+  ): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('RNCWebViewModule');
