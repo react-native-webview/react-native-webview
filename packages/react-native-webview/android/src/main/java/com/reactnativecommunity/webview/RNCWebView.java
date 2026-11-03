@@ -80,6 +80,24 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected ProgressChangedFilter progressChangedFilter;
 
     /**
+     * Prop values read back by {@link RNCWebViewManager} after the prop setter has run (when the
+     * WebChromeClient is recreated, when the user agent is recomputed, when a download starts).
+     * They live on the view, not on the manager, because a single manager instance serves every
+     * WebView in the app.
+     */
+    protected boolean allowsFullscreenVideo = false;
+    protected boolean allowsProtectedMedia = false;
+    protected boolean hasOnOpenWindowEvent = false;
+    protected @Nullable
+    String userAgent;
+    protected @Nullable
+    String userAgentWithApplicationName;
+    protected @Nullable
+    String downloadingMessage;
+    protected @Nullable
+    String lackPermissionToDownloadMessage;
+
+    /**
      * WebView must be created with an context of the current activity
      * <p>
      * Activity Context is required for creation of dialogs internally by WebView
