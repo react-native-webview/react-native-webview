@@ -1527,6 +1527,19 @@ RCTAutoInsetsProtocol>
 }
 
 /**
+ * Called when the web view starts to receive content for the main frame,
+ * i.e. after the navigation response has been approved.
+ * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/webview(_:didcommit:)
+ */
+- (void)webView:(WKWebView *)webView
+didCommitNavigation:(WKNavigation *)navigation
+{
+  if (_onLoadCommit) {
+    _onLoadCommit([self baseEvent]);
+  }
+}
+
+/**
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
  */

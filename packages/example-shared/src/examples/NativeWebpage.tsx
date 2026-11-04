@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import WebView from 'react-native-webview';
+import WebView, { WebViewNavigation } from 'react-native-webview';
 
 type LoadStartEvent = {
   nativeEvent: unknown;
@@ -19,6 +19,9 @@ export default function NativeWebpage() {
         }}
         onLoadStart={(event: LoadStartEvent) => {
           console.log('onLoadStart', event.nativeEvent);
+        }}
+        onLoadCommit={({ nativeEvent }: { nativeEvent: WebViewNavigation }) => {
+          console.log('onLoadCommit', nativeEvent);
         }}
       />
     </View>

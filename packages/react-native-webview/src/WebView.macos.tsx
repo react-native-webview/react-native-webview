@@ -43,6 +43,7 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
       onLoad,
       onLoadEnd,
       onLoadProgress,
+      onLoadCommit,
       onHttpError: onHttpErrorProp,
       onMessage: onMessageProp,
       renderLoading,
@@ -182,6 +183,7 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
         onLoadingFinish={onLoadingFinish}
         onLoadingProgress={onLoadingProgress}
         onLoadingStart={onLoadingStart}
+        onLoadCommit={onLoadCommit}
         onHttpError={onHttpError}
         onMessage={onMessage}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}

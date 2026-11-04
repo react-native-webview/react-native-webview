@@ -213,6 +213,7 @@ export interface NativeProps extends ViewProps {
   onContentProcessDidTerminate?: CodegenTypes.DirectEventHandler<WebViewNativeEvent>;
   onCustomMenuSelection?: CodegenTypes.DirectEventHandler<WebViewCustomMenuSelectionEvent>;
   onFileDownload?: CodegenTypes.DirectEventHandler<WebViewDownloadEvent>;
+  onLoadCommit?: CodegenTypes.DirectEventHandler<WebViewNavigationEvent>;
 
   menuItems?: ReadonlyArray<Readonly<{ label: string; key: string }>>;
   suppressMenuItems?: Readonly<string>[];

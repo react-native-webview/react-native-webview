@@ -62,6 +62,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
       onLoadProgress,
       onContentProcessDidTerminate: onContentProcessDidTerminateProp,
       onFileDownload,
+      onLoadCommit,
       onHttpError: onHttpErrorProp,
       onMessage: onMessageProp,
       onOpenWindow: onOpenWindowProp,
@@ -213,6 +214,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
         onLoadingFinish={onLoadingFinish}
         onLoadingProgress={onLoadingProgress}
         onFileDownload={onFileDownload}
+        onLoadCommit={onLoadCommit}
         onLoadingStart={onLoadingStart}
         onHttpError={onHttpError}
         onMessage={onMessage}

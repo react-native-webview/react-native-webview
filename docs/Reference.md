@@ -19,6 +19,7 @@ This document lays out the current public properties and methods for the React N
 - [`onLoad`](Reference.md#onload)
 - [`onLoadEnd`](Reference.md#onloadend)
 - [`onLoadStart`](Reference.md#onloadstart)
+- [`onLoadCommit`](Reference.md#onloadcommit)
 - [`onLoadProgress`](Reference.md#onloadprogress)
 - [`onHttpError`](Reference.md#onhttperror)
 - [`onMessage`](Reference.md#onmessage)
@@ -456,6 +457,41 @@ Example:
 ```
 
 Function passed to `onLoadStart` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
+
+```
+canGoBack
+canGoForward
+loading
+target
+title
+url
+```
+
+---
+
+### `onLoadCommit`[⬆](#props-index)
+
+Function that is invoked when the main frame of the `WebView` commits a navigation, that is, when the `WebView` starts to receive the content of the new document. It is called after `onLoadStart` and before `onLoad`.
+
+Unlike `onLoadStart`, it is only called once the response has been accepted and server redirects have been followed, so `url` is the URL of the document that is being loaded. This lets you know which page, and therefore which origin, the `WebView` is displaying before its subresources have finished loading. Subframe navigations are not reported.
+
+| Type     | Required | Platform      |
+| -------- | -------- | ------------- |
+| function | No       | iOS and macOS |
+
+Example:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  onLoadCommit={(syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    this.url = nativeEvent.url;
+  }}
+/>
+```
+
+Function passed to `onLoadCommit` is called with a SyntheticEvent wrapping a nativeEvent with these properties:
 
 ```
 canGoBack
