@@ -1192,6 +1192,15 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   allowsProtectedMedia?: boolean;
 
   /**
+   * Boolean value to control whether webview inherits the app's camera and microphone permissions.
+   * When `false`, the user is asked to confirm before a page can use the camera or microphone,
+   * even if the app already holds the Android permission.
+   * Default is true.
+   * @platform android
+   */
+  inheritAppPermissions?: boolean;
+
+  /**
    * Function that is invoked when the `WebView` receives an SSL error for a sub-resource.
    *
    * @param event

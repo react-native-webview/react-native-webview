@@ -95,6 +95,7 @@ This document lays out the current public properties and methods for the React N
 - [`downloadingMessage`](Reference.md#downloadingMessage)
 - [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 - [`allowsProtectedMedia`](Reference.md#allowsProtectedMedia)
+- [`inheritAppPermissions`](Reference.md#inheritAppPermissions)
 - [`webviewDebuggingEnabled`](Reference.md#webviewDebuggingEnabled)
 - [`paymentRequestEnabled`](Reference.md#paymentRequestEnabled)
 
@@ -1749,6 +1750,16 @@ This is the message that is shown in the Toast when the webview is unable to dow
 
 Whether or not the Webview can play media protected by DRM. Default is `false`.
 ⚠️ Setting this to `false` won't revoke the permission already granted to the current webpage. In order to do so, you'd have to reload the page as well. ⚠️
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+### `inheritAppPermissions`[⬆](#props-index)
+
+Whether or not the WebView inherits the app's camera and microphone permissions. Default is `true`.
+
+When `true`, a page that asks for the camera or microphone gets access without any prompt as long as the app holds the matching Android permission. Set this to `false` to show a confirmation dialog ("Allow example.com to use your camera?") first, like iOS does by default (see [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)). If the user allows it and the app doesn't hold the Android permission yet, it is then requested as usual.
 
 | Type    | Required | Platform |
 | ------- | -------- | -------- |

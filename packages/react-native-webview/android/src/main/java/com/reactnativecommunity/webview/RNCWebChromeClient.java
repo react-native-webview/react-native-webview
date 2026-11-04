@@ -2,6 +2,7 @@ package com.reactnativecommunity.webview;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.core.content.ContextCompat;
@@ -31,6 +33,7 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
@@ -141,6 +144,40 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     @Override
     public void onPermissionRequest(final PermissionRequest request) {
+        if (!mWebView.inheritAppPermissions) {
+            List<String> resources = Arrays.asList(request.getResources());
+            boolean camera = resources.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+            boolean microphone = resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
+            if (camera || microphone) {
+                String devices = camera && microphone ? "camera and microphone" : (camera ? "camera" : "microphone");
+                confirmPermissionRequest(request, devices);
+                return;
+            }
+        }
+        handlePermissionRequest(request);
+    }
+
+    /**
+     * Asks the user whether the page can use the camera or microphone before handling the request,
+     * instead of granting it only because the app holds the Android permission.
+     */
+    private void confirmPermissionRequest(final PermissionRequest request, String devices) {
+        Uri origin = request.getOrigin();
+        String host = origin.getHost();
+        String site = host == null || host.isEmpty() ? origin.toString() : host;
+        AlertDialog dialog = new AlertDialog.Builder(this.mWebView.getContext())
+                .setMessage("Allow " + site + " to use your " + devices + "?")
+                .setPositiveButton("Allow", (dialogInterface, which) -> handlePermissionRequest(request))
+                .setNegativeButton("Don't allow", (dialogInterface, which) -> request.deny())
+                .setOnCancelListener(dialogInterface -> request.deny())
+                .show();
+        // Delay making "Allow" clickable for 500ms to avoid unwanted presses.
+        Button allowButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        allowButton.setEnabled(false);
+        allowButton.postDelayed(() -> allowButton.setEnabled(true), 500);
+    }
+
+    private void handlePermissionRequest(final PermissionRequest request) {
 
         grantedPermissions = new ArrayList<>();
 
