@@ -80,8 +80,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
-    // Value of the `profile` prop at mount, whether or not binding it succeeded.
-    private @Nullable String requestedProfileName = null;
+    // Value of the profile prop at mount, whether or not binding it succeeded.
+    private @Nullable String profile = null;
     // Cookie jar of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
     private @Nullable CookieManager profileCookieManager = null;
     // Set at the end of the first props update (mount). Props that can only be applied on mount,
@@ -98,12 +98,12 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         incognito = value;
     }
 
-    public @Nullable String getRequestedProfileName() {
-        return requestedProfileName;
+    public @Nullable String getProfile() {
+        return profile;
     }
 
-    public void setRequestedProfileName(@Nullable String name) {
-        requestedProfileName = name;
+    public void setProfile(@Nullable String value) {
+        profile = value;
     }
 
     public void setProfileCookieManager(@Nullable CookieManager cookieManager) {
