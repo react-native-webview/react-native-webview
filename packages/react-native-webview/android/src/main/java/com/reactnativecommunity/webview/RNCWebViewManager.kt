@@ -466,12 +466,14 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "incognito")
     override fun setIncognito(view: RNCWebViewWrapper, value: Boolean) {
-        // Applied in onAfterUpdateTransaction, after the profile is bound, so that it clears
-        // the profile's cookies rather than the default ones. Nothing to do when disabled.
-        view.webView.isIncognitoPending = value
+        // Applied on mount in onAfterUpdateTransaction, after the profile is bound, so that it
+        // clears the profile's cookies rather than the default ones.
+        view.webView.isIncognito = value
     }
 
     private fun applyIncognito(webView: RNCWebView) {
+        if (webView.isInitialPropsApplied || !webView.isIncognito) return
+
         // Remove all previous cookies from this WebView's cookie jar (its profile's, if one is bound).
         webView.cookieManager.removeAllCookies(null)
 
@@ -857,10 +859,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         // The profile has to be bound before the WebView loads a page or runs JavaScript, so it
         // comes first. Incognito comes next so that it clears the bound profile's cookies.
         bindProfile(webView)
-        if (webView.isIncognitoPending) {
-            webView.isIncognitoPending = false
-            applyIncognito(webView)
-        }
+        applyIncognito(webView)
         // Done here rather than in the prop setters: Fabric sets props in no particular
         // order, and this needs the final value of javaScriptEnabled. It also has to come
         // before the new source starts loading.
