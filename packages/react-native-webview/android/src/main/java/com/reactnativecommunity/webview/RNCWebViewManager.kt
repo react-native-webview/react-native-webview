@@ -618,7 +618,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     // Binds the requested profile at the end of the first props update, see onAfterUpdateTransaction.
     private fun bindProfile(webView: RNCWebView) {
         if (webView.isInitialPropsApplied) return
-        webView.isInitialPropsApplied = true
         val name = webView.requestedProfileName ?: return
 
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
@@ -879,6 +878,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             loadSource(view, source)
         }
         mPendingSource = null
+        // Last: props that can only be applied on mount check this flag.
+        webView.isInitialPropsApplied = true
     }
 
     override fun onDropViewInstance(view: RNCWebViewWrapper) {

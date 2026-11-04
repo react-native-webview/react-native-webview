@@ -85,7 +85,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     private @Nullable String requestedProfileName = null;
     // Name of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
     private @Nullable String boundProfileName = null;
-    // Set once the first props transaction (mount) has been applied. The profile is fixed after that.
+    // Set at the end of the first props update (mount). Props that can only be applied on mount,
+    // such as the profile, are ignored after that.
     private boolean initialPropsApplied = false;
     // Set by the incognito prop, applied by RNCWebViewManager once the profile is bound.
     private boolean incognitoPending = false;
