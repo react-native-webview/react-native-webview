@@ -818,6 +818,10 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     override fun onAfterUpdateTransaction(view: RNCWebViewWrapper) {
         super.onAfterUpdateTransaction(view)
         val webView = view.webView
+        // Done here rather than in the prop setters: Fabric sets props in no particular
+        // order, and this needs the final value of javaScriptEnabled. It also has to come
+        // before the new source starts loading.
+        webView.applyMessagingProps()
         webView.pendingSource?.let { source ->
             loadSource(view, source)
         }
