@@ -74,8 +74,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     private val mDelegate: ViewManagerDelegate<RNCWebViewWrapper> =
         RNCWebViewManagerDelegate<RNCWebViewWrapper, RNCWebViewManager>(this)
 
-    private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
-
     // This manager is a single instance shared by every WebView: keep per-view prop state on
     // RNCWebView, not in fields here.
 
@@ -95,7 +93,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     fun createViewInstance(context: ThemedReactContext, webView: RNCWebView): RNCWebViewWrapper {
         setupWebChromeClient(webView)
         context.addLifecycleEventListener(webView)
-        mWebViewConfig.configWebView(webView)
         val settings = webView.settings
         settings.builtInZoomControls = true
         settings.displayZoomControls = false
