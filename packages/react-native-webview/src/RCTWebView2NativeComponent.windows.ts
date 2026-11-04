@@ -1,5 +1,5 @@
 import React from 'react';
-import type { HostComponent, ViewProps } from 'react-native';
+import type { CodegenTypes, HostComponent, ViewProps } from 'react-native';
 import { codegenNativeCommands } from 'react-native';
 // Use NativeComponentRegistry directly for Fabric/Bridgeless mode on Windows.
 // The babel-plugin-codegen crashes with "Cannot read properties of null (reading 'loc')"
@@ -10,12 +10,6 @@ import { codegenNativeCommands } from 'react-native';
 // used by RNW's own Fabric components.
 // @ts-ignore - NativeComponentRegistry is internal
 import { get as getNativeComponent } from 'react-native/Libraries/NativeComponent/NativeComponentRegistry';
-import type {
-  DirectEventHandler,
-  Double,
-  Int32,
-  WithDefault,
-} from 'react-native/Libraries/Types/CodegenTypes';
 
 // Event types
 export type WebViewNativeEvent = Readonly<{
@@ -24,7 +18,7 @@ export type WebViewNativeEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
 }>;
 
 export type WebViewMessageEvent = Readonly<{
@@ -33,7 +27,7 @@ export type WebViewMessageEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   data: string;
 }>;
 
@@ -47,9 +41,9 @@ export type WebViewHttpErrorEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   description: string;
-  statusCode: Int32;
+  statusCode: CodegenTypes.Int32;
 }>;
 
 export type WebViewErrorEvent = Readonly<{
@@ -58,9 +52,9 @@ export type WebViewErrorEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   domain?: string;
-  code: Int32;
+  code: CodegenTypes.Int32;
   description: string;
 }>;
 
@@ -70,8 +64,8 @@ export type WebViewNativeProgressEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
-  progress: Double;
+  lockIdentifier: CodegenTypes.Double;
+  progress: CodegenTypes.Double;
 }>;
 
 export type WebViewNavigationEvent = Readonly<{
@@ -80,7 +74,7 @@ export type WebViewNavigationEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
 }>;
@@ -91,7 +85,7 @@ export type ShouldStartLoadRequestEvent = Readonly<{
   title: string;
   canGoBack: boolean;
   canGoForward: boolean;
-  lockIdentifier: Double;
+  lockIdentifier: CodegenTypes.Double;
   navigationType: 'click' | 'formsubmit' | 'backforward' | 'reload' | 'formresubmit' | 'other';
   mainDocumentURL?: string;
   isTopFrame: boolean;
@@ -99,17 +93,17 @@ export type ShouldStartLoadRequestEvent = Readonly<{
 
 // Simplified scroll event - flatten the structure to avoid codegen ordering issues
 type ScrollEvent = Readonly<{
-  contentInsetTop: Double;
-  contentInsetBottom: Double;
-  contentInsetLeft: Double;
-  contentInsetRight: Double;
-  contentOffsetX: Double;
-  contentOffsetY: Double;
-  contentSizeWidth: Double;
-  contentSizeHeight: Double;
-  layoutMeasurementWidth: Double;
-  layoutMeasurementHeight: Double;
-  zoomScale?: Double;
+  contentInsetTop: CodegenTypes.Double;
+  contentInsetBottom: CodegenTypes.Double;
+  contentInsetLeft: CodegenTypes.Double;
+  contentInsetRight: CodegenTypes.Double;
+  contentOffsetX: CodegenTypes.Double;
+  contentOffsetY: CodegenTypes.Double;
+  contentSizeWidth: CodegenTypes.Double;
+  contentSizeHeight: CodegenTypes.Double;
+  layoutMeasurementWidth: CodegenTypes.Double;
+  layoutMeasurementHeight: CodegenTypes.Double;
+  zoomScale?: CodegenTypes.Double;
 }>;
 
 // Windows-specific native props
@@ -129,40 +123,40 @@ export interface NativeProps extends ViewProps {
    * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
    * @platform windows
    */
-  onOpenWindow?: DirectEventHandler<WebViewOpenWindowEvent>;
+  onOpenWindow?: CodegenTypes.DirectEventHandler<WebViewOpenWindowEvent>;
 
   /**
    * Function that is invoked when the `WebView` responds to a request to load a new resource.
    * @platform windows
    */
-  onSourceChanged?: DirectEventHandler<WebViewNavigationEvent>;
+  onSourceChanged?: CodegenTypes.DirectEventHandler<WebViewNavigationEvent>;
 
   // Common props shared across platforms
-  cacheEnabled?: WithDefault<boolean, true>;
+  cacheEnabled?: CodegenTypes.WithDefault<boolean, true>;
   incognito?: boolean;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
-  injectedJavaScriptForMainFrameOnly?: WithDefault<boolean, true>;
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: WithDefault<boolean, true>;
+  injectedJavaScriptForMainFrameOnly?: CodegenTypes.WithDefault<boolean, true>;
+  injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: CodegenTypes.WithDefault<boolean, true>;
   javaScriptCanOpenWindowsAutomatically?: boolean;
-  javaScriptEnabled?: WithDefault<boolean, true>;
-  mediaPlaybackRequiresUserAction?: WithDefault<boolean, true>;
+  javaScriptEnabled?: CodegenTypes.WithDefault<boolean, true>;
+  mediaPlaybackRequiresUserAction?: CodegenTypes.WithDefault<boolean, true>;
   webviewDebuggingEnabled?: boolean;
   messagingEnabled: boolean;
 
   // Event handlers
-  onLoadingError: DirectEventHandler<WebViewErrorEvent>;
-  onLoadingFinish: DirectEventHandler<WebViewNavigationEvent>;
-  onLoadingProgress: DirectEventHandler<WebViewNativeProgressEvent>;
-  onLoadingStart: DirectEventHandler<WebViewNavigationEvent>;
-  onHttpError: DirectEventHandler<WebViewHttpErrorEvent>;
-  onMessage: DirectEventHandler<WebViewMessageEvent>;
-  onScroll?: DirectEventHandler<ScrollEvent>;
-  onShouldStartLoadWithRequest: DirectEventHandler<ShouldStartLoadRequestEvent>;
+  onLoadingError: CodegenTypes.DirectEventHandler<WebViewErrorEvent>;
+  onLoadingFinish: CodegenTypes.DirectEventHandler<WebViewNavigationEvent>;
+  onLoadingProgress: CodegenTypes.DirectEventHandler<WebViewNativeProgressEvent>;
+  onLoadingStart: CodegenTypes.DirectEventHandler<WebViewNavigationEvent>;
+  onHttpError: CodegenTypes.DirectEventHandler<WebViewHttpErrorEvent>;
+  onMessage: CodegenTypes.DirectEventHandler<WebViewMessageEvent>;
+  onScroll?: CodegenTypes.DirectEventHandler<ScrollEvent>;
+  onShouldStartLoadWithRequest: CodegenTypes.DirectEventHandler<ShouldStartLoadRequestEvent>;
 
   // UI props
-  showsHorizontalScrollIndicator?: WithDefault<boolean, true>;
-  showsVerticalScrollIndicator?: WithDefault<boolean, true>;
+  showsHorizontalScrollIndicator?: CodegenTypes.WithDefault<boolean, true>;
+  showsVerticalScrollIndicator?: CodegenTypes.WithDefault<boolean, true>;
 
   // Source configuration
   newSource: Readonly<{

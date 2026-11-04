@@ -62,7 +62,7 @@
     },
     "packages/react-native-webview": {
       "name": "react-native-webview",
-      "version": "16.0.2",
+      "version": "17.0.0",
       "dependencies": {
         "escape-string-regexp": "^4.0.0",
         "invariant": "2.2.4",
