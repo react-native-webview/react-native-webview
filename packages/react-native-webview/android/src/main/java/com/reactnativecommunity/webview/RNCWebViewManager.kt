@@ -24,7 +24,6 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.module.annotations.ReactModule
-import com.facebook.react.uimanager.ReactStylesDiffMap
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.ViewManagerDelegate
@@ -476,15 +475,13 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "incognito")
     override fun setIncognito(view: RNCWebViewWrapper, value: Boolean) {
-        // Don't do anything when incognito is disabled
-        if (!value) {
-            return
-        }
+        // Applied in onAfterUpdateTransaction, after the profile is bound, so that it clears
+        // the profile's cookies rather than the default ones. Nothing to do when disabled.
+        view.webView.isIncognitoPending = value
+    }
 
-        val webView = view.webView
-
+    private fun applyIncognito(webView: RNCWebView) {
         // Remove all previous cookies from this WebView's cookie jar (its profile's, if one is bound).
-        // The profile is always bound before other props, see updateProperties.
         webView.cookieManager.removeAllCookies(null)
 
         // Disable caching
@@ -603,10 +600,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "profile")
     override fun setProfile(view: RNCWebViewWrapper, value: String?) {
-        // Intentionally empty: the profile is bound in updateProperties, before any other prop.
-    }
-
-    private fun applyProfile(webView: RNCWebView, value: String?) {
+        val webView = view.webView
         val name = value?.takeIf { it.isNotEmpty() }
 
         // The Profile API only allows binding a WebView before it has loaded anything, so the
@@ -619,7 +613,13 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             return
         }
         webView.requestedProfileName = name
-        if (name == null) return
+    }
+
+    // Binds the requested profile at the end of the first props update, see onAfterUpdateTransaction.
+    private fun bindProfile(webView: RNCWebView) {
+        if (webView.isInitialPropsApplied) return
+        webView.isInitialPropsApplied = true
+        val name = webView.requestedProfileName ?: return
 
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
             Log.w(TAG, "WebView profile '$name' ignored: MULTI_PROFILE not supported on this device.")
@@ -627,7 +627,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         }
 
         // setProfile throws if the WebView has loaded a URL, evaluated JavaScript, or had
-        // getProfile called on it. updateProperties binds the profile before anything else.
+        // getProfile called on it.
         try {
             ProfileStore.getInstance().getOrCreateProfile(name)
             WebViewCompat.setProfile(webView, name)
@@ -861,23 +861,20 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         return export
     }
 
-    override fun updateProperties(viewToUpdate: RNCWebViewWrapper, props: ReactStylesDiffMap) {
-        // Props are applied in hash-map order, not JSX order. Some setters (messagingEnabled,
-        // injectedJavaScriptObject) evaluate JavaScript, after which WebViewCompat.setProfile
-        // throws, so the profile must be bound before any other prop.
-        if (props.hasKey("profile")) {
-            applyProfile(viewToUpdate.webView, props.getString("profile"))
-        }
-        super.updateProperties(viewToUpdate, props)
-    }
-
     override fun onAfterUpdateTransaction(view: RNCWebViewWrapper) {
         super.onAfterUpdateTransaction(view)
-        view.webView.isInitialPropsApplied = true
+        val webView = view.webView
+        // The profile has to be bound before the WebView loads a page or runs JavaScript, so it
+        // comes first. Incognito comes next so that it clears the bound profile's cookies.
+        bindProfile(webView)
+        if (webView.isIncognitoPending) {
+            webView.isIncognitoPending = false
+            applyIncognito(webView)
+        }
         // Done here rather than in the prop setters: Fabric sets props in no particular
         // order, and this needs the final value of javaScriptEnabled. It also has to come
         // before the new source starts loading.
-        view.webView.applyMessagingProps()
+        webView.applyMessagingProps()
         mPendingSource?.let { source ->
             loadSource(view, source)
         }

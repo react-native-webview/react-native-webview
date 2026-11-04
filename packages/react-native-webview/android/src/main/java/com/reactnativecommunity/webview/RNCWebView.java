@@ -87,6 +87,16 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     private @Nullable String boundProfileName = null;
     // Set once the first props transaction (mount) has been applied. The profile is fixed after that.
     private boolean initialPropsApplied = false;
+    // Set by the incognito prop, applied by RNCWebViewManager once the profile is bound.
+    private boolean incognitoPending = false;
+
+    public boolean isIncognitoPending() {
+        return incognitoPending;
+    }
+
+    public void setIncognitoPending(boolean pending) {
+        incognitoPending = pending;
+    }
 
     public @Nullable String getRequestedProfileName() {
         return requestedProfileName;
