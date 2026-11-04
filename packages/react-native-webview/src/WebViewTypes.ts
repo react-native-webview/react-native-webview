@@ -346,6 +346,7 @@ export interface MacOSNativeWebViewProps extends CommonNativeWebViewProps {
   scrollEnabled?: boolean;
   useSharedProcessPool?: boolean;
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+  onLoadCommit?: (event: WebViewNavigationEvent) => void;
 }
 
 export interface WindowsNativeWebViewProps extends CommonNativeWebViewProps {
@@ -632,6 +633,18 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * @platform ios
    */
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+
+  /**
+   * Function that is invoked when the main frame commits a navigation, that is,
+   * when the `WebView` starts to receive the content of the new document,
+   * after `onLoadStart` and before `onLoad`.
+   *
+   * Unlike `onLoadStart`, it is only called once the response has been
+   * accepted and server redirects have been followed, so `url` is the URL
+   * of the document being loaded. Subframe navigations are not reported.
+   * @platform ios
+   */
+  onLoadCommit?: (event: WebViewNavigationEvent) => void;
 
   /**
    * Function that is invoked when the `WebView` should open a new window.
@@ -946,6 +959,18 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
    * @platform macos
    */
   onContentProcessDidTerminate?: (event: WebViewTerminatedEvent) => void;
+
+  /**
+   * Function that is invoked when the main frame commits a navigation, that is,
+   * when the `WebView` starts to receive the content of the new document,
+   * after `onLoadStart` and before `onLoad`.
+   *
+   * Unlike `onLoadStart`, it is only called once the response has been
+   * accepted and server redirects have been followed, so `url` is the URL
+   * of the document being loaded. Subframe navigations are not reported.
+   * @platform macos
+   */
+  onLoadCommit?: (event: WebViewNavigationEvent) => void;
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {

@@ -37,6 +37,15 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     return RNCWebViewEventEmitter::OnLoadingFinishNavigationType::Other;
 }
 
+auto stringToOnLoadCommitNavigationTypeEnum(std::string value) {
+    if (value == "click") return RNCWebViewEventEmitter::OnLoadCommitNavigationType::Click;
+    if (value == "formsubmit") return RNCWebViewEventEmitter::OnLoadCommitNavigationType::Formsubmit;
+    if (value == "backforward") return RNCWebViewEventEmitter::OnLoadCommitNavigationType::Backforward;
+    if (value == "reload") return RNCWebViewEventEmitter::OnLoadCommitNavigationType::Reload;
+    if (value == "formresubmit") return RNCWebViewEventEmitter::OnLoadCommitNavigationType::Formresubmit;
+    return RNCWebViewEventEmitter::OnLoadCommitNavigationType::Other;
+}
+
 static inline std::string nullSafeString(id value) {
     if (![value isKindOfClass:[NSString class]]) {
         return std::string();
@@ -169,6 +178,22 @@ static inline std::string nullSafeStringWithLength(id value) {
                     .mainDocumentURL = nullSafeStringWithLength([dictionary valueForKey:@"mainDocumentURL"])
                 };
                 webViewEventEmitter->onLoadingFinish(data);
+            }
+        };
+        _view.onLoadCommit = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                facebook::react::RNCWebViewEventEmitter::OnLoadCommit data = {
+                    .url = nullSafeString([dictionary valueForKey:@"url"]),
+                    .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
+                    .title = nullSafeString([dictionary valueForKey:@"title"]),
+                    .navigationType = stringToOnLoadCommitNavigationTypeEnum(nullSafeStringWithLength([dictionary valueForKey:@"navigationType"])),
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoForward"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
+                    .mainDocumentURL = nullSafeStringWithLength([dictionary valueForKey:@"mainDocumentURL"])
+                };
+                webViewEventEmitter->onLoadCommit(data);
             }
         };
         _view.onLoadingProgress = [self](NSDictionary* dictionary) {
