@@ -628,9 +628,9 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         // setProfile throws if the WebView has loaded a URL, evaluated JavaScript, or had
         // getProfile called on it.
         try {
-            ProfileStore.getInstance().getOrCreateProfile(name)
+            val profile = ProfileStore.getInstance().getOrCreateProfile(name)
             WebViewCompat.setProfile(webView, name)
-            webView.boundProfileName = name
+            webView.setProfileCookieManager(profile.cookieManager)
         } catch (e: IllegalStateException) {
             Log.e(TAG, "Could not bind WebView to profile '$name', using the default profile instead: ${e.message}")
         }

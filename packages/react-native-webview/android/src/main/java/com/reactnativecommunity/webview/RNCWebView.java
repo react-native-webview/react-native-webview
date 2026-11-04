@@ -19,8 +19,6 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.JavaScriptReplyProxy;
-import androidx.webkit.Profile;
-import androidx.webkit.ProfileStore;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -83,8 +81,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected ProgressChangedFilter progressChangedFilter;
     // Value of the `profile` prop at mount, whether or not binding it succeeded.
     private @Nullable String requestedProfileName = null;
-    // Name of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
-    private @Nullable String boundProfileName = null;
+    // Cookie jar of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
+    private @Nullable CookieManager profileCookieManager = null;
     // Set at the end of the first props update (mount). Props that can only be applied on mount,
     // such as the profile, are ignored after that.
     private boolean initialPropsApplied = false;
@@ -107,12 +105,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         requestedProfileName = name;
     }
 
-    public @Nullable String getBoundProfileName() {
-        return boundProfileName;
-    }
-
-    public void setBoundProfileName(@Nullable String name) {
-        boundProfileName = name;
+    public void setProfileCookieManager(@Nullable CookieManager cookieManager) {
+        profileCookieManager = cookieManager;
     }
 
     public boolean isInitialPropsApplied() {
@@ -128,13 +122,7 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
      * otherwise the app-wide default.
      */
     public CookieManager getCookieManager() {
-        if (boundProfileName != null && WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
-            Profile profile = ProfileStore.getInstance().getProfile(boundProfileName);
-            if (profile != null) {
-                return profile.getCookieManager();
-            }
-        }
-        return CookieManager.getInstance();
+        return profileCookieManager != null ? profileCookieManager : CookieManager.getInstance();
     }
 
     /**
