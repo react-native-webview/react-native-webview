@@ -80,6 +80,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+    // Value of the inheritAppPermissions prop, read by RNCWebChromeClient when a page asks for the
+    // camera or microphone.
+    protected boolean inheritAppPermissions = true;
     // Value of the profile prop at mount, whether or not binding it succeeded.
     private @Nullable String profile = null;
     // Cookie jar of the androidx.webkit Profile this WebView is bound to, or null for the default profile.

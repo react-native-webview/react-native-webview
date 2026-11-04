@@ -27,6 +27,7 @@ import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import ProfileExample from './examples/Profile';
+import Permissions from './examples/Permissions';
 import SslError from './examples/SslError';
 
 const TESTS = {
@@ -172,6 +173,14 @@ const TESTS = {
     description: 'Isolated cookie jars via androidx.webkit Profile',
     render() {
       return <ProfileExample />;
+    },
+  },
+  Permissions: {
+    title: 'Permissions (Android)',
+    testId: 'permissions',
+    description: 'Camera permission test',
+    render() {
+      return <Permissions />;
     },
   },
 };
@@ -348,6 +357,11 @@ export default function App() {
           testID="testType_profile"
           title="Profile"
           onPress={() => changeTest('Profile')}
+        />
+        <Button
+          testID="testType_permissions"
+          title="Permissions"
+          onPress={() => changeTest('Permissions')}
         />
       </View>
 

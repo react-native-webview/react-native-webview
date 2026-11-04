@@ -488,6 +488,11 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         webView.settings.saveFormData = false
     }
 
+    @ReactProp(name = "inheritAppPermissions")
+    override fun setInheritAppPermissions(view: RNCWebViewWrapper, value: Boolean) {
+        view.webView.inheritAppPermissions = value
+    }
+
     @ReactProp(name = "injectedJavaScript")
     override fun setInjectedJavaScript(view: RNCWebViewWrapper, value: String?) {
         view.webView.injectedJS = value
