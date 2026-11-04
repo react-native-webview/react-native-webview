@@ -230,6 +230,7 @@ export interface NativeProps extends ViewProps {
   }>;
   cacheEnabled?: CodegenTypes.WithDefault<boolean, true>;
   incognito?: boolean;
+  profile?: string;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   injectedJavaScriptForMainFrameOnly?: CodegenTypes.WithDefault<boolean, true>;

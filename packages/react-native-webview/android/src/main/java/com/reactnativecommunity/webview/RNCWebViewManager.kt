@@ -15,7 +15,9 @@ import android.webkit.CookieManager
 import android.webkit.DownloadListener
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.webkit.ProfileStore
 import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
@@ -132,7 +134,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             try {
                 urlObj = URL(url)
                 val baseUrl = urlObj.protocol + "://" + urlObj.host
-                val cookie = CookieManager.getInstance().getCookie(baseUrl)
+                val cookie = webView.cookieManager.getCookie(baseUrl)
                 request.addRequestHeader("Cookie", cookie)
             } catch (e: MalformedURLException) {
                 Log.w(TAG, "Error getting cookie for DownloadManager", e)
@@ -464,15 +466,16 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "incognito")
     override fun setIncognito(view: RNCWebViewWrapper, value: Boolean) {
-        // Don't do anything when incognito is disabled
-        if (!value) {
-            return
-        }
+        // Applied on mount in onAfterUpdateTransaction, after the profile is bound, so that it
+        // clears the profile's cookies rather than the default ones.
+        view.webView.isIncognito = value
+    }
 
-        val webView = view.webView
+    private fun applyIncognito(webView: RNCWebView) {
+        if (webView.isInitialPropsApplied || !webView.isIncognito) return
 
-        // Remove all previous cookies
-        CookieManager.getInstance().removeAllCookies(null)
+        // Remove all previous cookies from this WebView's cookie jar (its profile's, if one is bound).
+        webView.cookieManager.removeAllCookies(null)
 
         // Disable caching
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
@@ -585,6 +588,44 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             "content" -> View.OVER_SCROLL_IF_CONTENT_SCROLLS
             "always" -> View.OVER_SCROLL_ALWAYS
             else -> View.OVER_SCROLL_ALWAYS
+        }
+    }
+
+    @ReactProp(name = "profile")
+    override fun setProfile(view: RNCWebViewWrapper, value: String?) {
+        val webView = view.webView
+        val name = value?.takeIf { it.isNotEmpty() }
+
+        // The Profile API only allows binding a WebView before it has loaded anything, so the
+        // profile is fixed once the WebView has mounted. Fabric can re-send the mount props, so
+        // compare against the stored prop: it is kept even when binding failed.
+        if (webView.isInitialPropsApplied) {
+            if (name != webView.profile) {
+                Log.w(TAG, "Ignoring change of WebView profile to '${name ?: "default"}': the profile can only be set when the WebView is first mounted.")
+            }
+            return
+        }
+        webView.profile = name
+    }
+
+    // Binds the profile at the end of the first props update, see onAfterUpdateTransaction.
+    private fun bindProfile(webView: RNCWebView) {
+        if (webView.isInitialPropsApplied) return
+        val name = webView.profile ?: return
+
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            Log.w(TAG, "WebView profile '$name' ignored: MULTI_PROFILE not supported on this device.")
+            return
+        }
+
+        // setProfile throws if the WebView has loaded a URL, evaluated JavaScript, or had
+        // getProfile called on it.
+        try {
+            val profile = ProfileStore.getInstance().getOrCreateProfile(name)
+            WebViewCompat.setProfile(webView, name)
+            webView.setProfileCookieManager(profile.cookieManager)
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "Could not bind WebView to profile '$name', using the default profile instead: ${e.message}")
         }
     }
 
@@ -815,6 +856,10 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     override fun onAfterUpdateTransaction(view: RNCWebViewWrapper) {
         super.onAfterUpdateTransaction(view)
         val webView = view.webView
+        // The profile has to be bound before the WebView loads a page or runs JavaScript, so it
+        // comes first. Incognito comes next so that it clears the bound profile's cookies.
+        bindProfile(webView)
+        applyIncognito(webView)
         // Done here rather than in the prop setters: Fabric sets props in no particular
         // order, and this needs the final value of javaScriptEnabled. It also has to come
         // before the new source starts loading.
@@ -823,6 +868,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             loadSource(view, source)
         }
         webView.pendingSource = null
+        // Last: props that can only be applied on mount check this flag.
+        webView.isInitialPropsApplied = true
     }
 
     override fun onDropViewInstance(view: RNCWebViewWrapper) {

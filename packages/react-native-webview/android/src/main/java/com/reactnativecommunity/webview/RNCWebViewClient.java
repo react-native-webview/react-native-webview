@@ -49,9 +49,10 @@ public class RNCWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView webView, String url) {
         super.onPageFinished(webView, url);
-        String cookies = CookieManager.getInstance().getCookie(url);
+        CookieManager cookieManager = ((RNCWebView) webView).getCookieManager();
+        String cookies = cookieManager.getCookie(url);
         if (cookies != null) {
-            CookieManager.getInstance().flush();
+            cookieManager.flush();
         }
 
         if (!mLastLoadFailed) {

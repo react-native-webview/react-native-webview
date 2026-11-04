@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -79,6 +80,51 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+    // Value of the profile prop at mount, whether or not binding it succeeded.
+    private @Nullable String profile = null;
+    // Cookie jar of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
+    private @Nullable CookieManager profileCookieManager = null;
+    // Set at the end of the first props update (mount). Props that can only be applied on mount,
+    // such as the profile, are ignored after that.
+    private boolean initialPropsApplied = false;
+    // Value of the incognito prop, applied by RNCWebViewManager on mount once the profile is bound.
+    private boolean incognito = false;
+
+    public boolean isIncognito() {
+        return incognito;
+    }
+
+    public void setIncognito(boolean value) {
+        incognito = value;
+    }
+
+    public @Nullable String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(@Nullable String value) {
+        profile = value;
+    }
+
+    public void setProfileCookieManager(@Nullable CookieManager cookieManager) {
+        profileCookieManager = cookieManager;
+    }
+
+    public boolean isInitialPropsApplied() {
+        return initialPropsApplied;
+    }
+
+    public void setInitialPropsApplied(boolean applied) {
+        initialPropsApplied = applied;
+    }
+
+    /**
+     * The cookie jar this WebView actually uses: its bound Profile's when one is set,
+     * otherwise the app-wide default.
+     */
+    public CookieManager getCookieManager() {
+        return profileCookieManager != null ? profileCookieManager : CookieManager.getInstance();
+    }
 
     /**
      * Prop values read back by {@link RNCWebViewManager} after the prop setter has run (when the

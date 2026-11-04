@@ -281,6 +281,7 @@ export interface BasicAuthCredential {
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
   incognito?: boolean;
+  profile?: string;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   injectedJavaScriptForMainFrameOnly?: boolean;
@@ -979,6 +980,33 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   cacheMode?: CacheMode;
+
+  /**
+   * Name of the [androidx.webkit `Profile`](https://developer.android.com/reference/androidx/webkit/Profile)
+   * to use for this WebView. When set, the WebView gets an isolated cookie jar,
+   * web storage, geolocation permissions, and service workers scoped to this
+   * profile, separate from the default profile used by other WebViews.
+   *
+   * Useful for embedded auth flows, multi-account support, or any case where
+   * you want a WebView's cookies to be independent of the rest of the app.
+   *
+   * `"Default"` is the name of the shared default profile, so use any other
+   * name to get an isolated profile. Downloads and `incognito` use the
+   * profile's cookie jar.
+   *
+   * Requires androidx.webkit 1.9+ and a device WebView that supports
+   * `WebViewFeature.MULTI_PROFILE` (checked at runtime; needs a recent,
+   * multi-process WebView). On unsupported devices the prop is ignored and
+   * the default profile is used (a warning is logged via Logcat).
+   *
+   * Note: read once, when the WebView is first mounted. The Profile API does
+   * not allow changing profile after the WebView has loaded, so later changes
+   * to this prop (including removing it) are ignored with a warning. Remount
+   * the WebView (e.g. change its `key`) to switch profiles.
+   *
+   * @platform android
+   */
+  profile?: string;
 
   /**
    * https://developer.android.com/reference/android/view/View#setOverScrollMode(int)
