@@ -17,14 +17,16 @@ Existem dois métodos de teste:
 
 #### Para todas as plataformas:
 
+O repositório contém a biblioteca em `packages/react-native-webview` e um aplicativo de exemplo para cada plataforma em `packages/example-*`. Os aplicativos para macOS, Windows e visionOS têm instalações separadas. Consulte o [guia em inglês](Contributing.md) para as versões necessárias e as instruções para visionOS.
+
 ```sh
-yarn install
+bun install --frozen-lockfile
 ```
 
 #### Para Android:
 
 ```sh
-yarn android
+bun run android
 ```
 
 O aplicativo de exemplo do Android será compilado, o Metro Bundler será iniciado e o aplicativo de exemplo será instalado e iniciado no emulador do Android.
@@ -32,8 +34,8 @@ O aplicativo de exemplo do Android será compilado, o Metro Bundler será inicia
 #### Para iOS:
 
 ```sh
-pod install --project-directory=example/ios
-yarn ios
+pod install --project-directory=packages/example-mobile/ios
+bun run ios
 ```
 
 O aplicativo de exemplo para iOS será compilado, o empacotador Metro será iniciado e o aplicativo de exemplo será instalado e iniciado no Simulador.
@@ -41,8 +43,9 @@ O aplicativo de exemplo para iOS será compilado, o empacotador Metro será inic
 #### Para macOS:
 
 ```sh
-pod install --project-directory=example/macos
-yarn macos
+bun install --cwd packages/example-macos --frozen-lockfile
+pod install --project-directory=packages/example-macos/macos
+bun run macos
 ```
 
 O aplicativo de exemplo para macOS será compilado, o empacotador Metro será iniciado e o aplicativo de exemplo será instalado e iniciado.
@@ -50,7 +53,8 @@ O aplicativo de exemplo para macOS será compilado, o empacotador Metro será in
 #### Para Windows:
 
 ```sh
-yarn windows
+bun install --cwd packages/example-windows --frozen-lockfile
+bun run windows
 ```
 
 O aplicativo de exemplo para Windows será compilado, o empacotador Metro será iniciado e o aplicativo de exemplo será instalado e iniciado.
@@ -60,7 +64,7 @@ O aplicativo de exemplo para Windows será compilado, o empacotador Metro será 
 Em um novo projeto `react-native init`, faça o seguinte:
 
 ```
-$ yarn add ../react-native-webview
+$ yarn add ../react-native-webview/packages/react-native-webview
 $ react-native link react-native-webview
 ```
 
@@ -88,7 +92,7 @@ Ao fazer uma alteração, você provavelmente precisará desvincular, remover, a
 
 ```
 $ react-native unlink react-native-webview && yarn remove react-native-webview
-$ yarn add ../react-native-webview && react-native link react-native-webview
+$ yarn add ../react-native-webview/packages/react-native-webview && react-native link react-native-webview
 ```
 
 ## Notas

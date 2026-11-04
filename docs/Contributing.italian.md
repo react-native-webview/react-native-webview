@@ -17,14 +17,16 @@ Ci sono due metodi per testare:
 
 #### Per tutte le piattaforme:
 
+Il repository contiene la libreria in `packages/react-native-webview` e un'app di esempio per ogni piattaforma in `packages/example-*`. Le app per macOS, Windows e visionOS hanno installazioni separate. Consulta la [guida in inglese](Contributing.md) per le versioni richieste e le istruzioni per visionOS.
+
 ```sh
-yarn install
+bun install --frozen-lockfile
 ```
 
 #### Per Android:
 
 ```sh
-yarn android
+bun run android
 ```
 
 L'applicazione di esempio per Android verrà compilata, Metro bundler si avvierà e l'applicazione verrà installata e avviata nell'emulatore Android.
@@ -32,8 +34,8 @@ L'applicazione di esempio per Android verrà compilata, Metro bundler si avvier�
 #### Per iOS:
 
 ```sh
-pod install --project-directory=example/ios
-yarn ios
+pod install --project-directory=packages/example-mobile/ios
+bun run ios
 ```
 
 L'app di esempio per iOS verrà compilata, Metro bundler verrà avviato e l'app verrà installata e avviata nel simulatore.
@@ -41,8 +43,9 @@ L'app di esempio per iOS verrà compilata, Metro bundler verrà avviato e l'app 
 #### Per macOS:
 
 ```sh
-pod install --project-directory=example/macos
-yarn macos
+bun install --cwd packages/example-macos --frozen-lockfile
+pod install --project-directory=packages/example-macos/macos
+bun run macos
 ```
 
 L'app di esempio per macOS verrà compilata, Metro bundler verrà avviato e l'app verrà installata e avviata.
@@ -50,7 +53,8 @@ L'app di esempio per macOS verrà compilata, Metro bundler verrà avviato e l'ap
 #### Per Windows:
 
 ```sh
-yarn windows
+bun install --cwd packages/example-windows --frozen-lockfile
+bun run windows
 ```
 
 L'app di esempio per Windows verrà compilata, Metro bundler verrà avviato e l'app verrà installata e avviata.
@@ -60,7 +64,7 @@ L'app di esempio per Windows verrà compilata, Metro bundler verrà avviato e l'
 In un nuovo progetto `react-native init`, fai quanto segue:
 
 ```
-$ yarn add <percorso locale a react-native-webview>
+$ yarn add <percorso locale a react-native-webview>/packages/react-native-webview
 ```
 
 Potresti riscontrare un problema in cui la mappatura dei moduli `jest-haste-map` segnala che react-native è stato aggiunto due volte.
@@ -91,7 +95,7 @@ Quando apporti una modifica, molto probabilmente dovrai rimuovere e aggiungere n
 
 ```
 $ yarn remove react-native-webview
-$ yarn add ../react-native-webview
+$ yarn add ../react-native-webview/packages/react-native-webview
 ```
 
 ## Note
