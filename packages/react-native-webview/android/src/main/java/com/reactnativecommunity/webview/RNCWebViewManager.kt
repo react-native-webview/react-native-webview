@@ -74,7 +74,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     private val mDelegate: ViewManagerDelegate<RNCWebViewWrapper> =
         RNCWebViewManagerDelegate<RNCWebViewWrapper, RNCWebViewManager>(this)
 
-    private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
     private var mAllowsFullscreenVideo = false
     private var mAllowsProtectedMedia = false
     private var mDownloadingMessage: String? = null
@@ -101,7 +100,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     fun createViewInstance(context: ThemedReactContext, webView: RNCWebView): RNCWebViewWrapper {
         setupWebChromeClient(webView)
         context.addLifecycleEventListener(webView)
-        mWebViewConfig.configWebView(webView)
         val settings = webView.settings
         settings.builtInZoomControls = true
         settings.displayZoomControls = false
