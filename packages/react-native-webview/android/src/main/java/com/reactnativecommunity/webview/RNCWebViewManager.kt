@@ -76,10 +76,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
 
-    // This manager is a single instance shared by every WebView, so per-view prop state is stored
-    // on RNCWebView. mPendingSource is the exception: it is set and consumed within the same
-    // synchronous props update of a single view (setNewSource -> onAfterUpdateTransaction).
-    private var mPendingSource: ReadableMap? = null
+    // This manager is a single instance shared by every WebView: keep per-view prop state on
+    // RNCWebView, not in fields here.
 
     override fun getDelegate(): ViewManagerDelegate<RNCWebViewWrapper> = mDelegate
 
@@ -631,7 +629,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     @ReactProp(name = "newSource")
     override fun setNewSource(view: RNCWebViewWrapper, value: ReadableMap?) {
-        mPendingSource = value
+        view.webView.pendingSource = value
     }
 
     @ReactProp(name = "textZoom")
@@ -819,10 +817,11 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     override fun onAfterUpdateTransaction(view: RNCWebViewWrapper) {
         super.onAfterUpdateTransaction(view)
-        mPendingSource?.let { source ->
+        val webView = view.webView
+        webView.pendingSource?.let { source ->
             loadSource(view, source)
         }
-        mPendingSource = null
+        webView.pendingSource = null
     }
 
     override fun onDropViewInstance(view: RNCWebViewWrapper) {

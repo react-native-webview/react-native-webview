@@ -28,6 +28,7 @@ import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -81,9 +82,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
 
     /**
      * Prop values read back by {@link RNCWebViewManager} after the prop setter has run (when the
-     * WebChromeClient is recreated, when the user agent is recomputed, when a download starts).
-     * They live on the view, not on the manager, because a single manager instance serves every
-     * WebView in the app.
+     * WebChromeClient is recreated, when the user agent is recomputed, when a download starts, and
+     * at the end of a props update for {@link #pendingSource}). They live on the view, not on the
+     * manager, because a single manager instance serves every WebView in the app.
      */
     protected boolean allowsFullscreenVideo = false;
     protected boolean allowsProtectedMedia = false;
@@ -96,6 +97,12 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     String downloadingMessage;
     protected @Nullable
     String lackPermissionToDownloadMessage;
+    /**
+     * Source set by the `newSource` prop. Loaded and cleared in
+     * RNCWebViewManager#onAfterUpdateTransaction, once every prop of the update has been applied.
+     */
+    protected @Nullable
+    ReadableMap pendingSource;
 
     /**
      * WebView must be created with an context of the current activity
