@@ -28,6 +28,7 @@ import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import ProfileExample from './examples/Profile';
 import SslError from './examples/SslError';
+import UnmountWithPendingNavigation from './examples/UnmountWithPendingNavigation';
 
 const TESTS = {
   Messaging: {
@@ -172,6 +173,14 @@ const TESTS = {
     description: 'Isolated cookie jars via androidx.webkit Profile',
     render() {
       return <ProfileExample />;
+    },
+  },
+  UnmountWithPendingNavigation: {
+    title: 'UnmountWithPendingNavigation',
+    testId: 'UnmountWithPendingNavigation',
+    description: 'Unmount while a navigation decision is pending',
+    render() {
+      return <UnmountWithPendingNavigation />;
     },
   },
 };
@@ -348,6 +357,11 @@ export default function App() {
           testID="testType_profile"
           title="Profile"
           onPress={() => changeTest('Profile')}
+        />
+        <Button
+          testID="testType_unmountWithPendingNavigation"
+          title="UnmountWithPendingNavigation"
+          onPress={() => changeTest('UnmountWithPendingNavigation')}
         />
       </View>
 

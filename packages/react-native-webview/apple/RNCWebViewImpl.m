@@ -150,11 +150,16 @@ RCTAutoInsetsProtocol>
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
 #endif // !TARGET_OS_OSX
+
+  // Navigation decisions handed to JS (`onShouldStartLoadWithRequest`) and not answered yet.
+  // RNCWebViewDecisionManager holds each one, with WebKit's decision handler, until it is resolved.
+  NSMutableSet<NSNumber *> *_pendingLockIdentifiers;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
+    _pendingLockIdentifiers = [NSMutableSet set];
 #if !TARGET_OS_OSX
     super.backgroundColor = [UIColor clearColor];
 #else
@@ -587,6 +592,16 @@ RCTAutoInsetsProtocol>
 - (void)destroyWebView
 {
   if (_webView) {
+    // An unmounted component never answers its pending `onShouldStartLoadWithRequest` events, so their
+    // decisions would stay in RNCWebViewDecisionManager forever, with WebKit's decision handlers (which
+    // can keep the WKWebView alive). Stop the page from asking for more, then cancel the open ones.
+    _webView.navigationDelegate = nil;
+    _webView.UIDelegate = nil;
+    [_webView stopLoading];
+    for (NSNumber *lockIdentifier in [_pendingLockIdentifiers copy]) {
+      [[RNCWebViewDecisionManager getInstance] setResult:NO forLockIdentifier:lockIdentifier.intValue];
+    }
+    [_pendingLockIdentifiers removeAllObjects];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
     [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
@@ -1331,8 +1346,10 @@ RCTAutoInsetsProtocol>
     }
 
     if (_onShouldStartLoadWithRequest) {
-        int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
+        __block int lockIdentifier;
+        lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler: ^(BOOL shouldStart){
             dispatch_async(dispatch_get_main_queue(), ^{
+                [self->_pendingLockIdentifiers removeObject:@(lockIdentifier)];
                 if (!shouldStart) {
                     decisionHandler(WKNavigationActionPolicyCancel);
                     return;
@@ -1354,6 +1371,7 @@ RCTAutoInsetsProtocol>
             });
 
         }];
+        [_pendingLockIdentifiers addObject:@(lockIdentifier)];
         NSMutableDictionary<NSString *, id> *event = [self baseEvent];
         if (request.mainDocumentURL) {
           [event addEntriesFromDictionary: @{
