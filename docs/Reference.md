@@ -65,12 +65,14 @@ This document lays out the current public properties and methods for the React N
 - [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
 - [`keyboardDisplayRequiresUserAction`](Reference.md#keyboardDisplayRequiresUserAction)
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
+- [`removeIosKeyboardObserver`](Reference.md#removeioskeyboardobserver)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`incognito`](Reference.md#incognito)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`cacheEnabled`](Reference.md#cacheEnabled)
 - [`cacheMode`](Reference.md#cacheMode)
+- [`profile`](Reference.md#profile)
 - [`pagingEnabled`](Reference.md#pagingEnabled)
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
@@ -309,6 +311,8 @@ NOTE: the default `true` value might cause some videos to hang loading on iOS. S
 
 Override the native component used to render the WebView. Enables a custom native WebView which uses the same JavaScript as the original WebView.
 
+> **Note:** since the removal of legacy-architecture support, the custom component receives the codegen (Fabric) props. In particular the source is delivered through the processed `newSource` prop — an object whose `headers` are an array of `{ name, value }` entries — and the legacy `source` prop is no longer passed.
+
 The `nativeConfig` prop expects an object with the following keys:
 
 - `component` (any)
@@ -500,9 +504,6 @@ url
 ### `onHttpError`[⬆](#props-index)
 
 Function that is invoked when the `WebView` receives an http error.
-
-> **_Note_**
-> Android API minimum level 23.
 
 | Type     | Required |
 | -------- | -------- |
@@ -956,7 +957,7 @@ Possible values for `mixedContentMode` are:
 
 ### `thirdPartyCookiesEnabled`[⬆](#props-index)
 
-Boolean value to enable third party cookies in the `WebView`. Used on Android Lollipop and above only as third party cookies are enabled by default on Android Kitkat and below and on iOS. The default value is `true`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
+Boolean value to enable third party cookies in the `WebView`. The default value is `true`. For more on cookies, read the [Guide](Guide.md#Managing-Cookies)
 
 | Type | Required | Platform |
 | ---- | -------- | -------- |
@@ -1018,7 +1019,7 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 
 ### `allowsPictureInPictureMediaPlayback`[⬆](#props-index)
 
-Boolean value that indicates whether HTML5 videos can play Picture in Picture. The default value is `false`.
+Boolean value that indicates whether HTML5 videos can play Picture in Picture. The default value is `true`.
 
 > **NOTE**
 >
@@ -1278,6 +1279,18 @@ If `true`, this will hide the keyboard accessory view (< > and Done).
 
 ---
 
+### `removeIosKeyboardObserver`[⬆](#props-index)
+
+If `true`, removes the keyboard notification observers (`UIKeyboardWillShow`, `UIKeyboardWillHide`, `UIKeyboardWillChangeFrame`) that `WKWebView` registers internally. Useful when the keyboard is managed by surrounding native code and the WebView's automatic scroll/inset adjustments interfere with it.
+
+The default value is `false`. The value is read once when the WebView mounts and cannot be toggled afterwards — `WKWebView` registers these observers via private internal selectors, so once removed they cannot be re-registered. Remount the WebView to apply a new value.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+---
+
 ### `allowsBackForwardNavigationGestures`[⬆](#props-index)
 
 If `true`, this will be able horizontal swipe gestures. The default value is `false`.
@@ -1342,6 +1355,30 @@ Possible values are:
 | Type   | Required | Default      | Platform |
 | ------ | -------- | ------------ | -------- |
 | string | No       | LOAD_DEFAULT | Android  |
+
+---
+
+### `profile`[⬆](#props-index)
+
+Name of the [androidx.webkit `Profile`](https://developer.android.com/reference/androidx/webkit/Profile) to use for this WebView. When set, the WebView gets an isolated cookie jar, web storage, geolocation permissions, and service workers scoped to this profile, separate from the default profile used by other WebViews in the app. Useful for embedded auth flows, multi-account support, or any case where a WebView's cookies need to be independent from the rest of the app.
+
+If a profile with the given name does not exist yet, it is created on first use via `ProfileStore.getOrCreateProfile`. Profiles persist across app launches. `"Default"` is the name of the shared default profile, so use any other name to get an isolated profile.
+
+Cookie handling inside the library follows the profile: file downloads send the profile's cookies, and `incognito` clears the profile's cookies instead of the default ones.
+
+Requires androidx.webkit 1.9+ and a device WebView that supports `WebViewFeature.MULTI_PROFILE` (checked at runtime; needs a recent, multi-process WebView). On unsupported devices the prop is ignored: the WebView falls back to the default profile and a warning is logged via Logcat.
+
+> **Note**: the profile is read once, when the WebView is first mounted. The Android Profile API does not allow changing a WebView's profile after it has loaded, so later changes to this prop (including removing it) are ignored with a warning. Remount the WebView, for example by changing its `key`, to switch profiles.
+
+```jsx
+// Two WebViews with isolated cookies
+<WebView source={{ uri: 'https://example.com' }} profile="account-a" />
+<WebView source={{ uri: 'https://example.com' }} profile="account-b" />
+```
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
 
 ---
 

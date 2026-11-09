@@ -179,38 +179,19 @@ Video recording:
 
 ##### Android
 
-Add permission in AndroidManifest.xml:
-
-```xml
-<manifest ...>
-  ......
-
-  <!-- this is required only for Android 4.1-5.1 (api 16-22)  -->
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-  ......
-</manifest>
-```
+File uploads do not require storage permissions on supported Android versions.
 
 ###### Camera option availability in uploading for Android
 
 If the file input indicates that images or video is desired with [`accept`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept), then the WebView will attempt to provide options to the user to use their camera to take a picture or video.
 
-Additionally, if the user- or environment-facing camera is specified with the [`capture`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#capture) attribute, the following must be added to the AndroidManifest.xml file for the camera to function consistently on some Android versions and devices:
+If the user- or environment-facing camera is specified with the [`capture`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#capture) attribute, the WebView opens the camera app directly. It falls back to the file chooser when the input accepts neither images nor video, or when no camera app is available.
 
-```xml
-<queries>
-    <intent>
-        <action android:name="android.media.action.IMAGE_CAPTURE" />
-    </intent>
-</queries>
-```
-
-Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app _can_ request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, it is up to the developer to request camera permission before a file upload directly using the camera is necessary.
+Normally, apps that do not have permission to use the camera can prompt the user to use an external app so that the requesting app has no need for permission. However, Android has made a special exception for this around the camera to reduce confusion for users. If an app _can_ request the camera permission because it has been declared, and the user has not granted the permission, it may not fire an intent that would use the camera (`MediaStore.ACTION_IMAGE_CAPTURE` or `MediaStore.ACTION_VIDEO_CAPTURE`). In this scenario, a file input with `capture` requests the camera permission first, and opens the file chooser instead if the user denies it. A file input without `capture` only shows the camera options once the permission has been granted.
 
 ##### Check for File Upload support, with `static isFileUploadSupported()`
 
-File Upload using `<input type="file" />` is not supported for Android 4.4 KitKat (see [details](https://github.com/delight-im/Android-AdvancedWebView/issues/4#issuecomment-70372146)):
+File Upload using `<input type="file" />` is supported on Android:
 
 ```jsx
 import { WebView } from 'react-native-webview';
@@ -379,7 +360,7 @@ By setting `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`, the J
 
 > On iOS, ~~`injectedJavaScriptBeforeContentLoaded` runs a method on WebView called `evaluateJavaScript:completionHandler:`~~ – this is no longer true as of version `8.2.0`. Instead, we use a `WKUserScript` with injection time `WKUserScriptInjectionTimeAtDocumentStart`. As a consequence, `injectedJavaScriptBeforeContentLoaded` no longer returns an evaluation value nor logs a warning to the console. In the unlikely event that your app depended upon this behaviour, please see migration steps [here](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-574919464) to retain equivalent behaviour.
 > On Android, `injectedJavaScript` runs a method on the Android WebView called `evaluateJavascriptWithFallback`
-> Note on Android Compatibility: For applications targeting `Build.VERSION_CODES.N` or later, JavaScript state from an empty WebView is no longer persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
+> Note on Android Compatibility: JavaScript state from an empty WebView is not persisted across navigations like `loadUrl(java.lang.String)`. For example, global variables and functions defined before calling `loadUrl(java.lang.String)` will not exist in the loaded page. Applications should use the Android Native API `addJavascriptInterface(Object, String)` instead to persist JavaScript objects across navigations.
 
 #### The `injectedJavaScriptObject` prop
 

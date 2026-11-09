@@ -29,7 +29,7 @@ Dal momento che WebView è stato estratto dal core di React Native, sono state i
 
 ### Compatibilità con le piattaforme
 
-Questo progetto è compatibile con le seguenti piattaforme: **iOS**, **Android**, **Windows** e **macOS**. Supporta sia **la vecchia architettura** (paper) **che la nuova architettura** (fabric). Inoltre, è compatibile con [Expo](https://docs.expo.dev/versions/latest/sdk/webview/).
+Questo progetto è compatibile con le seguenti piattaforme: **iOS**, **Android**, **Windows** e **macOS**. Supporta solo **la nuova architettura** (fabric); la vecchia architettura (paper) non è più supportata. Inoltre, è compatibile con [Expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
 ### Version
 

@@ -3,52 +3,173 @@ on: [pull_request]
 
 jobs:
   run-windows-tests:
-    name: Build & run tests
-    runs-on: windows-2022
+    name: Build & run tests (New Architecture)
+    runs-on: windows-2025-vs2026
+    defaults:
+      run:
+        working-directory: packages/example-windows
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         name: Checkout Code
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.10
+          bun-version: 1.4.4
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1.3
+        uses: microsoft/setup-msbuild@v3
         with:
-          vs-version: '[17.0,)'
+          vs-version: '[18.6.1,19.0)'
           msbuild-architecture: x64
 
       - name: Install dependencies
+        env:
+          APPIUM_SKIP_CHROMEDRIVER_INSTALL: 'true'
         run: bun install --frozen-lockfile
 
-      - name: Build
-        run: |
-          bun run build
-          bun run tsc
+      - name: Bundle example JavaScript
+        run: bun run bundle
 
+      # `install-windows-test-app` generates a Fabric (New Architecture) app by
+      # default for react-native-windows >= 0.80, and the module is built as
+      # part of the app solution via autolinking.
       - name: Build x64 release
         shell: powershell
-        run: bun run windows --release --no-packager --no-deploy --logging
+        run: bun run windows --release --no-packager --no-deploy --no-launch --logging --msbuildprops WindowsTargetPlatformVersion=10.0.26100.0
 
-      # Workaround for a bug in package searching during deploy.
-      # The deploy script only searches windows/{*/bin/x64/Release,Release/*}, but the build step above placed the packages at windows/x64/Release.
-      # Copy the packages to Windows/Release before deploying.
-      - name: Deploy
+      # WinAppDriver launches packaged apps by Application User Model ID (it
+      # crashes when handed the bare Win32 exe path). Install the Windows App
+      # SDK runtime dependencies staged by the .wapproj, register the loose
+      # layout (no signing required), and resolve the AUMID.
+      - name: Deploy test app
         shell: powershell
         run: |
-          Copy-Item -Path example\windows\x64\Release -Recurse -Destination example\windows\
-          bunx react-native run-windows --arch x64 --release --root example --logging --no-build --no-packager --deploy-from-layout
+          Get-ChildItem -Path windows\ReactApp.Package\bin, windows\ReactApp.Package\AppPackages -Recurse -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match '\.(msix|appx)$' -or $_.Name -eq 'AppxManifest.xml' } |
+            ForEach-Object { Write-Host $_.FullName }
+          Get-ChildItem -Path windows\ReactApp.Package -Recurse -Include *.msix, *.appx -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match 'Dependencies\\x64' } |
+            ForEach-Object {
+              Write-Host "Installing dependency $($_.FullName)"
+              Add-AppxPackage -Path $_.FullName -ErrorAction Continue
+            }
+          $manifest = Get-ChildItem -Path windows\ReactApp.Package\bin -Recurse -Filter AppxManifest.xml | Select-Object -First 1
+          if (-not $manifest) {
+            Write-Host "AppxManifest.xml not found under windows\ReactApp.Package\bin"
+            exit 1
+          }
+          Write-Host "Registering $($manifest.FullName)"
+          Add-AppxPackage -Register $manifest.FullName
+          $pkg = Get-AppxPackage -Name 40411fc5-8e92-4d46-b68d-b62df44b1366
+          if (-not $pkg) {
+            Write-Host "Package not found after registration"
+            exit 1
+          }
+          $aumid = "$($pkg.PackageFamilyName)!App"
+          Write-Host "App User Model ID: $aumid"
+          "WEBVIEW_APP_PATH=$aumid" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Start Appium server
+      # Keep the servers and tests in the same step. The runner can terminate
+      # child processes when their launching shell exits with open output streams.
+      - name: Run Windows end-to-end tests
         shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run --bun appium"
+        run: |
+          $appium = $null
+          $metro = $null
+          $testExitCode = 1
+          try {
+            $appium = Start-Process -WindowStyle Hidden -FilePath (Get-Command bun).Source -ArgumentList @('run', '--bun', 'appium', '--log-timestamp') -RedirectStandardOutput appium.log -RedirectStandardError appium.error.log -PassThru
+            $ready = $false
+            foreach ($attempt in 1..30) {
+              if ($appium.HasExited) { break }
+              try {
+                $status = Invoke-RestMethod -Uri http://127.0.0.1:4723/wd/hub/status -TimeoutSec 2
+                if ($status.value.build.version) {
+                  $ready = $true
+                  break
+                }
+              } catch {}
+              Start-Sleep -Seconds 2
+            }
+            if (-not $ready) {
+              Get-Content appium.log, appium.error.log -Tail 100 -ErrorAction SilentlyContinue
+              throw 'Appium did not become ready on port 4723'
+            }
+            Write-Host "Appium $($status.value.build.version) is ready"
 
-      - name: Start React server
+            $metro = Start-Process -WindowStyle Hidden -FilePath (Get-Command bun).Source -ArgumentList @('run', 'start', '--no-interactive') -RedirectStandardOutput metro.log -RedirectStandardError metro.error.log -PassThru
+            $ready = $false
+            foreach ($attempt in 1..30) {
+              if ($metro.HasExited) { break }
+              try {
+                $status = Invoke-RestMethod -Uri http://127.0.0.1:8081/status -TimeoutSec 2
+                if ($status -eq 'packager-status:running') {
+                  $ready = $true
+                  break
+                }
+              } catch {}
+              Start-Sleep -Seconds 2
+            }
+            if (-not $ready) {
+              Get-Content metro.log, metro.error.log -Tail 100 -ErrorAction SilentlyContinue
+              throw 'Metro did not become ready on port 8081'
+            }
+            Write-Host 'Metro is ready'
+
+            # Attach to an existing window: a cold start can exceed WinAppDriver's launch timeout.
+            Start-Process "shell:AppsFolder\$env:WEBVIEW_APP_PATH"
+            $handle = 0
+            foreach ($i in 1..30) {
+              Start-Sleep -Seconds 2
+              $proc = Get-Process -Name ReactApp -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+              if ($proc) {
+                $handle = $proc.MainWindowHandle
+                Write-Host "ReactApp pid $($proc.Id) window title '$($proc.MainWindowTitle)' handle $handle"
+                break
+              }
+              if (-not (Get-Process -Name ReactApp -ErrorAction SilentlyContinue)) {
+                Write-Host "ReactApp process is not running (attempt $i)"
+              }
+            }
+            if ($handle -eq 0) {
+              Write-Host "No top-level window found; recent Application error events:"
+              Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
+                Where-Object { $_.ProviderName -match 'Windows Error Reporting|Application Error' } |
+                ForEach-Object { Write-Host $_.Message; Write-Host '-----' }
+              throw 'Test app did not create a top-level window'
+            }
+            $hex = '0x{0:X}' -f [int64]$handle
+            Write-Host "Top-level window handle: $hex"
+            $env:WEBVIEW_APP_HANDLE = $hex
+
+            if ($appium.HasExited -or $metro.HasExited) {
+              throw 'A test server exited before Jest started'
+            }
+            bun run test
+            $testExitCode = $LASTEXITCODE
+          } finally {
+            foreach ($server in @($metro, $appium)) {
+              if ($server -and -not $server.HasExited) {
+                & taskkill.exe /PID $server.Id /T /F
+              }
+            }
+          }
+          exit $testExitCode
+
+      - name: Test server logs
+        if: failure()
         shell: powershell
-        run: Start-Process PowerShell -ArgumentList "bun run start"
-
-      - name: Run tests
-        run: bun run test:windows
+        run: |
+          foreach ($log in 'appium.log', 'appium.error.log', 'metro.log', 'metro.error.log') {
+            if (Test-Path $log) {
+              Write-Host "===== $log ====="
+              Get-Content $log -Tail 100
+            }
+          }
+          Write-Host '===== recent Application error events ====='
+          Get-WinEvent -LogName Application -MaxEvents 50 -ErrorAction SilentlyContinue |
+            Where-Object { $_.ProviderName -match 'Windows Error Reporting|Application Error' } |
+            ForEach-Object { Write-Host $_.Message; Write-Host '-----' }
+    timeout-minutes: 60
