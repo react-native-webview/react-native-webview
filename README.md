@@ -32,7 +32,7 @@ Considering that we have limited time, issues will mostly serve as a discussion 
 ### Platform compatibility
 
 This project is compatible with **iOS**, **Android**, **Windows** and **macOS**.  
-This project only supports **the new architecture** (fabric); the legacy architecture (paper) is no longer supported. This requires **React Native 0.76 or newer** (with the new architecture enabled) and **iOS 15.1 or newer**; on macOS, react-native-macos 0.76 or newer.  
+This project only supports **the new architecture** (fabric); the legacy architecture (paper) is no longer supported. This requires **React Native 0.80 or newer** (with the new architecture enabled) and **iOS 15.1 or newer**; on macOS, react-native-macos 0.81 or newer.  
 This project is compatible with [expo](https://docs.expo.dev/versions/latest/sdk/webview/).
 
 ### Getting Started
@@ -73,6 +73,12 @@ For more, read the [API Reference](./docs/Reference.md) and [Guide](./docs/Guide
 #### Contributing
 
 Contributions are welcome, see [Contributing.md](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Contributing.md)
+
+The library lives in `packages/react-native-webview`. Platform example apps live
+in `packages/example-mobile`, `packages/example-windows`, `packages/example-macos`,
+and `packages/example-visionos`, with screens shared through `packages/example-shared`.
+See the [development instructions](docs/Contributing.md#testing-within-react-native-webview)
+for each platform's install and run commands.
 
 ### License
 
