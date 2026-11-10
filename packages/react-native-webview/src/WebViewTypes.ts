@@ -105,6 +105,14 @@ export type DecelerationRateConstant = 'normal' | 'fast';
 
 export interface WebViewMessage extends WebViewNativeEvent {
   data: string;
+  /**
+   * Android only. URL of the top-level document at the time the message was received.
+   * Only provided for messages posted from the main frame, and only while that document
+   * still has the same origin as `url`; missing or empty otherwise.
+   * `url` stays the sender's identity as reported by the platform (origin on Android,
+   * frame URL on iOS and macOS, where it already carries the full URL).
+   */
+  mainDocumentURL?: string;
 }
 
 export interface WebViewError extends WebViewNativeEvent {

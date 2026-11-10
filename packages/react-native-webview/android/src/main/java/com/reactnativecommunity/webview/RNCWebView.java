@@ -326,7 +326,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
             this.bridgeListener = new WebViewCompat.WebMessageListener() {
               @Override
               public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy replyProxy) {
-                RNCWebView.this.onMessage(message.getData(), sourceOrigin.toString());
+                RNCWebView.this.onMessage(
+                    message.getData(),
+                    sourceOrigin.toString(),
+                    isMainFrame ? getSameOriginDocumentUrl(view.getUrl(), sourceOrigin) : null);
               }
             };
             WebViewCompat.addWebMessageListener(
@@ -414,7 +417,41 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
       }
     }
 
+    /**
+     * Returns the document URL only when it still belongs to the origin that sent the message.
+     * sourceOrigin is the trusted sender identity; the document URL is read when the message is
+     * received, so it is dropped if the page has moved to another origin in the meantime (or
+     * reports about:blank, as HTML sources do).
+     */
+    @Nullable
+    private static String getSameOriginDocumentUrl(@Nullable String documentUrl, @NonNull Uri sourceOrigin) {
+        if (documentUrl == null) {
+            return null;
+        }
+        Uri document = Uri.parse(documentUrl);
+        String scheme = document.getScheme();
+        String host = document.getHost();
+        if (scheme == null || host == null
+                || !scheme.equalsIgnoreCase(sourceOrigin.getScheme())
+                || !host.equalsIgnoreCase(sourceOrigin.getHost())
+                || getEffectivePort(document) != getEffectivePort(sourceOrigin)) {
+            return null;
+        }
+        return documentUrl;
+    }
+
+    private static int getEffectivePort(@NonNull Uri uri) {
+        if (uri.getPort() != -1) {
+            return uri.getPort();
+        }
+        return "https".equalsIgnoreCase(uri.getScheme()) ? 443 : 80;
+    }
+
     public void onMessage(String message, String sourceUrl) {
+        onMessage(message, sourceUrl, null);
+    }
+
+    public void onMessage(String message, String sourceUrl, @Nullable String mainDocumentURL) {
         ThemedReactContext reactContext = getThemedReactContext();
         RNCWebView mWebView = this;
 
@@ -428,6 +465,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
                     }
                     WritableMap data = mRNCWebViewClient.createWebViewEvent(webView, sourceUrl);
                     data.putString("data", message);
+                    if (mainDocumentURL != null) {
+                        data.putString("mainDocumentURL", mainDocumentURL);
+                    }
 
                     if (mMessagingJSModule != null) {
                         dispatchDirectMessage(data);
@@ -439,6 +479,9 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         } else {
             WritableMap eventData = Arguments.createMap();
             eventData.putString("data", message);
+            if (mainDocumentURL != null) {
+                eventData.putString("mainDocumentURL", mainDocumentURL);
+            }
 
             if (mMessagingJSModule != null) {
                 dispatchDirectMessage(eventData);

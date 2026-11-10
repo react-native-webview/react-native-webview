@@ -22,6 +22,7 @@ export type WebViewMessageEvent = Readonly<{
   canGoForward: boolean;
   lockIdentifier: CodegenTypes.Double;
   data: string;
+  mainDocumentURL?: string;
 }>;
 export type WebViewOpenWindowEvent = Readonly<{
   targetUrl: string;

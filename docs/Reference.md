@@ -576,6 +576,11 @@ Function that is invoked when the webview calls `window.ReactNativeWebView.postM
 
 `window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
 
+The event also describes where the message came from:
+
+- `event.nativeEvent.url` identifies the sender as reported by the platform. On iOS and macOS it is the URL of the frame that posted the message. On Android it is the sender's **origin** only (for example `https://example.com`, with no path or query), because the WebView API that identifies the sender exposes just the origin. In the legacy `JavascriptInterface` fallback used by old Android WebViews it is the current page URL.
+- `event.nativeEvent.mainDocumentURL` (Android) is the URL of the top-level document at the time the message was received. It is only provided for messages posted from the main frame; otherwise, and on other platforms, it is missing or an empty string, so check it for truthiness. It always shares its origin with `url`: it is left out if the page has moved to another origin by the time the message is received, and for pages loaded with `source={{ html }}`. Within the same origin it reflects the page when the message arrived, not necessarily when it was sent.
+
 | Type     | Required |
 | -------- | -------- |
 | function | No       |
