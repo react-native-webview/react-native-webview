@@ -27,6 +27,7 @@ import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import ProfileExample from './examples/Profile';
+import MessageSource from './examples/MessageSource';
 import SslError from './examples/SslError';
 
 const TESTS = {
@@ -174,6 +175,14 @@ const TESTS = {
       return <ProfileExample />;
     },
   },
+  MessageSource: {
+    title: 'Message source',
+    testId: 'messageSource',
+    description: 'What onMessage reports about the sender: url vs mainDocumentURL',
+    render() {
+      return <MessageSource />;
+    },
+  },
 };
 
 const styles = StyleSheet.create({
@@ -299,6 +308,11 @@ export default function App() {
           testID="testType_multimessaging"
           title="MultiMessaging"
           onPress={() => changeTest('MultiMessaging')}
+        />
+        <Button
+          testID="testType_messageSource"
+          title="MessageSource"
+          onPress={() => changeTest('MessageSource')}
         />
         <Button
           testID="testType_nativeWebpage"
