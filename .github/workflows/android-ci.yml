@@ -85,7 +85,7 @@ jobs:
           working-directory: packages/example-mobile
           script: |
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            maestro test -e APP_ID=com.microsoft.reacttestapp e2e > maestro.log 2>&1; status=$?; cat maestro.log; if [ "$status" -ne 0 ]; then echo "::group::Screen and errors at the time of the failure"; maestro hierarchy | grep -E '"(text|accessibilityText|resource-id)" : "[^"]' | grep -v systemui | tail -120; adb logcat -d -t 3000 | grep -E " E AndroidRuntime|ReactNativeJS|ANR in|SoLoader|chromium" | tail -100; echo "::endgroup::"; grep -E "Failed|Assertion|Error" maestro.log | tail -20; fi; exit "$status"
+            sh ../../.github/scripts/dismiss-anr-dialogs.sh com.microsoft.reacttestapp > anr.log 2>&1 & watchdog=$!; maestro test -e APP_ID=com.microsoft.reacttestapp e2e > maestro.log 2>&1; status=$?; kill "$watchdog"; cat maestro.log; echo "Apps stopped because they were not responding: $(grep -c . anr.log)"; cat anr.log; if [ "$status" -ne 0 ]; then echo "::group::Screen and errors at the time of the failure"; adb shell dumpsys window windows | grep -E "Window #" | tail -15; maestro hierarchy | grep -E '"(text|accessibilityText|resource-id)" : "[^"]' | grep -v systemui | tail -120; adb logcat -d -t 3000 | grep -E " E AndroidRuntime|ReactNativeJS|ANR in|SoLoader|chromium" | tail -100; echo "::endgroup::"; grep -E "Failed|Assertion|Error" maestro.log | tail -20; fi; exit "$status"
       - name: Upload Maestro report
         if: failure()
         uses: actions/upload-artifact@v4

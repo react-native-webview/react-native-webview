@@ -9,33 +9,13 @@
 appId: ${APP_ID}
 ---
 - launchApp
-# An Android emulator that has just booted is slow, and the system may then show "Pixel
-# Launcher isn't responding" over the app, which stays hidden until the dialog is answered.
-# Wait for the app, tapping "Wait" in that dialog whenever it shows up.
-- repeat:
-    while:
-      notVisible:
-        id: testType_pullToRefresh
-    times: 40
-    commands:
-      - runFlow:
-          when:
-            visible:
-              id: android:id/aerr_wait
-          commands:
-            - tapOn:
-                id: android:id/aerr_wait
-      - extendedWaitUntil:
-          visible:
-            id: testType_pullToRefresh
-          timeout: 5000
-          optional: true
-# On iOS the test app pushes the example screen after launch, which moves every element: wait
-# for it to settle, the tap would land on a stale position otherwise.
+# An Android emulator that has just booted can take minutes to show the app. On iOS the test
+# app pushes the example screen after launch, which moves every element: wait for it to
+# settle, the tap would land on a stale position otherwise.
 - extendedWaitUntil:
     visible:
       id: testType_pullToRefresh
-    timeout: 60000
+    timeout: 180000
 - waitForAnimationToEnd
 - tapOn:
     id: testType_pullToRefresh
