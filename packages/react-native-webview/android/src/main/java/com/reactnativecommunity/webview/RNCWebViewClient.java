@@ -2,6 +2,7 @@ package com.reactnativecommunity.webview;
 
 import android.graphics.Bitmap;
 import android.net.http.SslError;
+import android.os.Message;
 import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
@@ -52,6 +53,15 @@ public class RNCWebViewClient extends WebViewClient {
         if (wrapper != null) {
             wrapper.onLoadEnded();
         }
+    }
+
+    @Override
+    public void onFormResubmission(WebView webView, Message dontResend, Message resend) {
+        // Reloading the result of a form submission asks whether to send the form again. The
+        // default answer is kept: it is not sent, and the reload is cancelled without any other
+        // callback.
+        super.onFormResubmission(webView, dontResend, resend);
+        notifyLoadEnded(webView);
     }
 
     @Override

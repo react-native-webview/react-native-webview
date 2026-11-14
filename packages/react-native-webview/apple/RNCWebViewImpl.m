@@ -20,6 +20,11 @@
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
+#if !TARGET_OS_OSX
+// How long the indicator of an automatic refresh may stay when nothing reports
+// the end of the reload.
+static const NSTimeInterval kAutoRefreshTimeout = 10;
+#endif // !TARGET_OS_OSX
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
@@ -156,6 +161,8 @@ RCTAutoInsetsProtocol>
   BOOL _refreshTriggered;
   // A pull started a reload (no `onRefresh`): the indicator hides when it ends.
   BOOL _autoRefreshing;
+  // Identifies that reload, for the timeout that hides its indicator.
+  NSUInteger _autoRefreshToken;
   // Content offset of the scroll view at rest, taken when a drag begins.
   CGFloat _restingContentOffsetY;
 #endif // !TARGET_OS_OSX
@@ -1617,6 +1624,15 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (void)reload
 {
+  [self reloadPage];
+}
+
+/**
+ * Reloads the page. Returns NO when there was nothing to reload, in which
+ * case no navigation callback follows.
+ */
+- (BOOL)reloadPage
+{
   /**
    * A page loaded from an HTML string has nothing to reload from: WebKit
    * would load the base URL instead. Load the HTML again while it is still
@@ -1630,8 +1646,7 @@ didFinishNavigation:(WKNavigation *)navigation
     }
     NSString *currentURL = _webView.URL.absoluteString;
     if (!currentURL.length || [currentURL isEqualToString:baseURL.absoluteString]) {
-      [_webView loadHTMLString:html baseURL:baseURL];
-      return;
+      return [_webView loadHTMLString:html baseURL:baseURL] != nil;
     }
   }
 
@@ -1643,10 +1658,9 @@ didFinishNavigation:(WKNavigation *)navigation
   NSURLRequest *request = [self requestForSource:self.source];
 
   if (request.URL && !_webView.URL.absoluteString.length) {
-    [_webView loadRequest:request];
-  } else {
-    [_webView reload];
+    return [_webView loadRequest:request] != nil;
   }
+  return [_webView reload] != nil;
 }
 
 #pragma mark - Pull to refresh
@@ -1764,9 +1778,28 @@ didFinishNavigation:(WKNavigation *)navigation
       _onRefresh(@{});
     }
   } else {
-    _autoRefreshing = YES;
-    [self reload];
+    [self beginAutoRefresh];
+    if (![self reloadPage]) {
+      [self endAutoRefresh];
+    }
   }
+}
+
+- (void)beginAutoRefresh
+{
+  _autoRefreshing = YES;
+  // A reload does not always report its end, when it turns into a download for
+  // example: do not let the indicator spin forever. The page keeps loading,
+  // only the indicator goes.
+  NSUInteger token = ++_autoRefreshToken;
+  __weak __typeof(self) weakSelf = self;
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kAutoRefreshTimeout * NSEC_PER_SEC)),
+                 dispatch_get_main_queue(), ^{
+    __typeof(self) strongSelf = weakSelf;
+    if (strongSelf != nil && strongSelf->_autoRefreshToken == token) {
+      [strongSelf endAutoRefresh];
+    }
+  });
 }
 
 - (void)setRefreshControlEnabled:(BOOL)refreshControlEnabled

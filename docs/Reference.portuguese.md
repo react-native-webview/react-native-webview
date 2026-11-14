@@ -1292,7 +1292,7 @@ No iOS, definir um refresh control ativa `bounces`.
 | ----------------------------- | --------- | ------------ |
 | elemento `<RefreshControl />` | Não       | iOS, Android |
 
-Propriedades de `RefreshControl` suportadas (as outras são ignoradas, com um aviso em desenvolvimento): `refreshing`, `onRefresh`, `enabled`, `tintColor` e `progressViewOffset` nas duas plataformas, `title` e `titleColor` no iOS, `colors`, `progressBackgroundColor` e `size` no Android. No Android `tintColor` é a cor do indicador quando `colors` não está definido.
+Propriedades de `RefreshControl` suportadas (as outras são ignoradas, com um aviso em desenvolvimento): `refreshing`, `onRefresh`, `enabled`, `tintColor` e `progressViewOffset` nas duas plataformas, `title` e `titleColor` no iOS, `colors`, `progressBackgroundColor` e `size` no Android. No Android `tintColor` é a cor do indicador quando `colors` não está definido; se não for legível no disco claro predefinido, como o branco, o disco passa a ser escuro (use `progressBackgroundColor` para escolher a cor). Sem `onRefresh` o indicador é ocultado no máximo após 10 segundos, mesmo que o carregamento não tenha terminado.
 
 Exemplo:
 

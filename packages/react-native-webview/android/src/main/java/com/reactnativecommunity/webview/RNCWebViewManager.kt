@@ -934,6 +934,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     }
 
     override fun onDropViewInstance(view: RNCWebViewWrapper) {
+        view.onDropViewInstance()
         val webView = view.webView
         webView.themedReactContext.removeLifecycleEventListener(webView)
         webView.cleanupCallbacksAndDestroy()

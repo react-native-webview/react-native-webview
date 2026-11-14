@@ -1437,7 +1437,7 @@ The element is not mounted. The `WebView` reads its props and drives the native 
 
 There are two ways to use it, depending on `onRefresh`:
 
-- Without `onRefresh`, pulling reloads the page and the indicator hides when the load ends. `refreshing` is ignored (React Native's types still require it).
+- Without `onRefresh`, pulling reloads the page and the indicator hides when the load ends, or after 10 seconds if the load has not ended by then. The page keeps loading in that case, and the user can pull again. `refreshing` is ignored (React Native's types still require it).
 - With `onRefresh`, nothing is reloaded for you. Do the refresh in `onRefresh` and control the indicator with `refreshing`, like on a `ScrollView`.
 
 On iOS, setting a refresh control turns `bounces` on.
@@ -1493,7 +1493,21 @@ const onRefresh = async () => {
 />;
 ```
 
-This prop replaces `pullToRefreshEnabled` and `refreshControlLightMode`, which have been removed. `pullToRefreshEnabled` becomes `refreshControl={<RefreshControl refreshing={false} />}`, and `refreshControlLightMode` becomes `tintColor="white"` on that element.
+This prop replaces `pullToRefreshEnabled` and `refreshControlLightMode`, which have been removed. `pullToRefreshEnabled` becomes `refreshControl={<RefreshControl refreshing={false} />}`, and `refreshControlLightMode` becomes `tintColor="white"` on that element:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  refreshControl={
+    <RefreshControl
+      refreshing={false}
+      tintColor="white"
+    />
+  }
+/>
+```
+
+On Android the indicator is drawn on a disc, light by default. When `tintColor` is the indicator color and would not be readable on it, as with white, the disc is dark instead. Set `progressBackgroundColor` to choose the disc color yourself.
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)
 

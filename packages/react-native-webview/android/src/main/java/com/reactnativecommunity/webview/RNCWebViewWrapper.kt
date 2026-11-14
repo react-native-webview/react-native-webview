@@ -2,10 +2,13 @@ package com.reactnativecommunity.webview
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
+import androidx.core.graphics.ColorUtils
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.react.uimanager.UIManagerHelper
 import com.reactnativecommunity.webview.events.TopRefreshEvent
@@ -26,6 +29,10 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
   private var refreshing = false
   // True while the WebView reloads because of a pull that the app does not handle.
   private var autoRefreshing = false
+  // Hides the indicator of such a reload when nothing reports its end. Not posted on the view:
+  // a detached view only runs what it was posted once it is attached again.
+  private val autoRefreshTimeoutHandler = Handler(Looper.getMainLooper())
+  private val autoRefreshTimeout = Runnable { setAutoRefreshing(false) }
   private var refreshControlTintColor: Int? = null
   private var refreshControlColors: IntArray? = null
   private var refreshControlProgressBackgroundColor: Int? = null
@@ -56,7 +63,9 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
   fun setHasOnRefresh(hasOnRefresh: Boolean) {
     this.hasOnRefresh = hasOnRefresh
     if (hasOnRefresh) {
-      autoRefreshing = false
+      if (autoRefreshing) {
+        setAutoRefreshing(false)
+      }
       refreshLayout?.isRefreshing = refreshing
     } else if (!autoRefreshing) {
       refreshLayout?.isRefreshing = false
@@ -93,7 +102,7 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
 
   fun setRefreshControlProgressBackgroundColor(color: Int?) {
     refreshControlProgressBackgroundColor = color
-    refreshLayout?.setProgressBackgroundColorSchemeColor(color ?: DEFAULT_PROGRESS_BACKGROUND_COLOR)
+    refreshLayout?.let { applyRefreshControlColors(it) }
   }
 
   fun setRefreshControlSize(size: String?) {
@@ -106,15 +115,29 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
     refreshLayout?.setProgressViewOffset(offset)
   }
 
-  /** The page finished loading, failed to load, or its renderer is gone. */
+  /**
+   * The page finished loading, failed to load, its renderer is gone, or the reload was
+   * cancelled.
+   */
   fun onLoadEnded() {
     if (autoRefreshing) {
       setAutoRefreshing(false)
     }
   }
 
+  /** The view is dropped by React Native: nothing may run on it later. */
+  fun onDropViewInstance() {
+    autoRefreshTimeoutHandler.removeCallbacks(autoRefreshTimeout)
+  }
+
   private fun setAutoRefreshing(refreshing: Boolean) {
     autoRefreshing = refreshing
+    autoRefreshTimeoutHandler.removeCallbacks(autoRefreshTimeout)
+    if (refreshing) {
+      // A reload does not always report its end: it may start nothing (no page to reload, dead
+      // renderer) or turn into something that is not a page (a download).
+      autoRefreshTimeoutHandler.postDelayed(autoRefreshTimeout, AUTO_REFRESH_TIMEOUT_MS)
+    }
     refreshLayout?.isRefreshing = refreshing
   }
 
@@ -122,7 +145,7 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
     if (hasOnRefresh) {
       webView.dispatchEvent(webView, TopRefreshEvent(UIManagerHelper.getSurfaceId(webView), id))
     } else {
-      autoRefreshing = true
+      setAutoRefreshing(true)
       webView.reload()
     }
   }
@@ -131,8 +154,16 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
   // `tintColor` styles the indicator on both platforms.
   private fun applyRefreshControlColors(layout: RNCWebViewRefreshLayout) {
     val colors = refreshControlColors?.takeIf { it.isNotEmpty() }
-      ?: intArrayOf(refreshControlTintColor ?: Color.BLACK)
-    layout.setColorSchemeColors(*colors)
+    val tintColor = refreshControlTintColor
+    layout.setColorSchemeColors(*(colors ?: intArrayOf(tintColor ?: Color.BLACK)))
+
+    // A light tint, like the white one meant for dark pages, would not show on the default
+    // light disc: give it a dark one, unless the app chose the disc color.
+    val tintNeedsDarkBackground = colors == null && tintColor != null &&
+      ColorUtils.calculateContrast(tintColor, DEFAULT_PROGRESS_BACKGROUND_COLOR) < MIN_TINT_CONTRAST
+    val backgroundColor = refreshControlProgressBackgroundColor
+      ?: if (tintNeedsDarkBackground) DARK_PROGRESS_BACKGROUND_COLOR else DEFAULT_PROGRESS_BACKGROUND_COLOR
+    layout.setProgressBackgroundColorSchemeColor(backgroundColor)
   }
 
   private fun ensureRefreshLayout(): RNCWebViewRefreshLayout {
@@ -141,7 +172,6 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
     val newLayout = RNCWebViewRefreshLayout(context)
     newLayout.setOnRefreshListener { onRefresh() }
     applyRefreshControlColors(newLayout)
-    refreshControlProgressBackgroundColor?.let { newLayout.setProgressBackgroundColorSchemeColor(it) }
     newLayout.setSize(refreshControlSize)
     newLayout.setProgressViewOffset(refreshControlProgressViewOffset)
     newLayout.isRefreshing = hasOnRefresh && refreshing
@@ -167,6 +197,13 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
   companion object {
     // The background SwipeRefreshLayout gives its indicator by default.
     private const val DEFAULT_PROGRESS_BACKGROUND_COLOR = 0xFFFAFAFA.toInt()
+    // The background used instead when the tint color would not show on the default one.
+    private const val DARK_PROGRESS_BACKGROUND_COLOR = 0xFF424242.toInt()
+    // Contrast ratio under which a tint color is considered unreadable on a background.
+    private const val MIN_TINT_CONTRAST = 3.0
+    // How long the indicator of an automatic refresh may stay when nothing reports the end of
+    // the reload. The page keeps loading, only the indicator goes.
+    private const val AUTO_REFRESH_TIMEOUT_MS = 10_000L
 
     /**
      * A helper to get the [RNCWebViewWrapper] of the given WebView, if it is still mounted.
