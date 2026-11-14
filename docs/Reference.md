@@ -1507,7 +1507,7 @@ This prop replaces `pullToRefreshEnabled` and `refreshControlLightMode`, which h
 />
 ```
 
-On Android the indicator is drawn on a disc, light by default. When `tintColor` is the indicator color and would not be readable on it, as with white, the disc is dark instead. Set `progressBackgroundColor` to choose the disc color yourself.
+On Android the indicator is drawn on a disc, light by default. When `tintColor` is the indicator color and is too light to show on it, as with white or yellow, the disc is dark instead. Set `progressBackgroundColor` to choose the disc color yourself.
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)
 

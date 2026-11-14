@@ -199,8 +199,11 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
     private const val DEFAULT_PROGRESS_BACKGROUND_COLOR = 0xFFFAFAFA.toInt()
     // The background used instead when the tint color would not show on the default one.
     private const val DARK_PROGRESS_BACKGROUND_COLOR = 0xFF424242.toInt()
-    // Contrast ratio under which a tint color is considered unreadable on a background.
-    private const val MIN_TINT_CONTRAST = 3.0
+    // Contrast ratio with the default background under which a tint color gets the dark one.
+    // The aim is only to catch tints that disappear: white (1.04), yellow (1.03), gold (1.34),
+    // pink (1.47), #ccc (1.54). The colors apps usually put on the light disc stay on it:
+    // orange (1.89), Material green 500 (2.66), tomato (2.82), Material blue 500 (2.99).
+    private const val MIN_TINT_CONTRAST = 1.6
     // How long the indicator of an automatic refresh may stay when nothing reports the end of
     // the reload. The page keeps loading, only the indicator goes.
     private const val AUTO_REFRESH_TIMEOUT_MS = 10_000L
