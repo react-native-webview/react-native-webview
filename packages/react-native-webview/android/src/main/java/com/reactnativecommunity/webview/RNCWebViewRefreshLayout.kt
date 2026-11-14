@@ -2,6 +2,8 @@ package com.reactnativecommunity.webview
 
 import android.content.Context
 import android.view.MotionEvent
+import android.view.View
+import android.widget.ImageView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.react.uimanager.PixelUtil
 
@@ -25,6 +27,21 @@ class RNCWebViewRefreshLayout(context: Context) : SwipeRefreshLayout(context) {
     // movement, so that it refreshes after twice the default distance. This layout is given
     // the whole movement: ask for twice the distance to refresh after the same pull.
     setDistanceToTriggerSync(Math.round(PixelUtil.toPixelFromDIP(2 * DEFAULT_CIRCLE_TARGET)))
+  }
+
+  override fun onStopNestedScroll(target: View) {
+    super.onStopNestedScroll(target)
+    // SwipeRefreshLayout only animates away an indicator that is still pulled. One pulled all
+    // the way back stays visible at its resting place, just above the top edge, where its
+    // shadow shows over the page: hide it like SwipeRefreshLayout does after a refresh.
+    if (!isRefreshing) {
+      for (i in 0 until childCount) {
+        val child = getChildAt(i)
+        if (child is ImageView && child.top <= mOriginalOffsetTop) {
+          child.visibility = View.GONE
+        }
+      }
+    }
   }
 
   override fun onInterceptTouchEvent(ev: MotionEvent): Boolean = false

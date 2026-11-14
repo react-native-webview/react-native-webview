@@ -167,6 +167,9 @@ RCTAutoInsetsProtocol>
   BOOL _autoRefreshing;
   // Identifies that reload, for the timeout that hides its indicator.
   NSUInteger _autoRefreshToken;
+  // The navigation of that reload: the end of another one, such as the
+  // previous reload that this one cancelled, does not end it.
+  WKNavigation *_autoRefreshNavigation;
   // Content offset of the scroll view at rest, taken when a drag begins.
   CGFloat _restingContentOffsetY;
 #endif // !TARGET_OS_OSX
@@ -624,6 +627,7 @@ RCTAutoInsetsProtocol>
     _refreshControl = nil;
     _refreshTriggered = NO;
     _autoRefreshing = NO;
+    _autoRefreshNavigation = nil;
     if (_menuItems) {
       UIMenuController *menuController = [UIMenuController sharedMenuController];
       menuController.menuItems = nil;
@@ -1134,7 +1138,12 @@ RCTAutoInsetsProtocol>
   // Ensure webview takes the position and dimensions of RNCWebViewImpl
   _webView.frame = self.bounds;
 #if !TARGET_OS_OSX
-  _webView.scrollView.contentInset = _contentInset;
+  // While it refreshes, UIRefreshControl adds its height to the top inset and
+  // takes it back when it ends. Leave the insets alone then: resetting them
+  // puts the indicator above the content, out of sight.
+  if (_refreshControl == nil || !_refreshControl.isRefreshing) {
+    _webView.scrollView.contentInset = _contentInset;
+  }
   // A component that mounts with `refreshing` set asks for the indicator
   // before the web view is in a window, where UIKit cannot show it.
   if (_refreshing && _hasOnRefresh && _webView.window != nil && _refreshControl != nil && !_refreshControl.isRefreshing) {
@@ -1499,7 +1508,7 @@ RCTAutoInsetsProtocol>
   didFailProvisionalNavigation:(WKNavigation *)navigation
                      withError:(NSError *)error
 {
-  [self endAutoRefresh];
+  [self endAutoRefreshForNavigation:navigation];
 
   if (_onLoadingError) {
     if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) {
@@ -1585,7 +1594,7 @@ RCTAutoInsetsProtocol>
   didFailNavigation:(WKNavigation *)navigation
           withError:(NSError *)error
 {
-  [self endAutoRefresh];
+  [self endAutoRefreshForNavigation:navigation];
 }
 
 /**
@@ -1608,7 +1617,7 @@ RCTAutoInsetsProtocol>
 - (void)webView:(WKWebView *)webView
 didFinishNavigation:(WKNavigation *)navigation
 {
-  [self endAutoRefresh];
+  [self endAutoRefreshForNavigation:navigation];
 
   if (_ignoreSilentHardwareSwitch) {
     [self forceIgnoreSilentHardwareSwitch:true];
@@ -1666,10 +1675,10 @@ didFinishNavigation:(WKNavigation *)navigation
 }
 
 /**
- * Reloads the page. Returns NO when there was nothing to reload, in which
- * case no navigation callback follows.
+ * Reloads the page and returns its navigation, or nil when there was nothing
+ * to reload, in which case no navigation callback follows.
  */
-- (BOOL)reloadPage
+- (WKNavigation *)reloadPage
 {
   /**
    * A page loaded from an HTML string has nothing to reload from: WebKit
@@ -1682,7 +1691,7 @@ didFinishNavigation:(WKNavigation *)navigation
     if (!baseURL) {
       baseURL = [NSURL URLWithString:@"about:blank"];
     }
-    return [self loadHTMLSource:html baseURL:baseURL];
+    return [self loadHTMLSource:html baseURL:baseURL] ? _htmlSourceNavigation : nil;
   }
 
   /**
@@ -1693,16 +1702,32 @@ didFinishNavigation:(WKNavigation *)navigation
   NSURLRequest *request = [self requestForSource:self.source];
 
   if (request.URL && !_webView.URL.absoluteString.length) {
-    return [_webView loadRequest:request] != nil;
+    return [_webView loadRequest:request];
   }
-  return [_webView reload] != nil;
+  return [_webView reload];
 }
 
 #pragma mark - Pull to refresh
 
+/**
+ * A navigation ended. The reload of a pull to refresh is over when it is its
+ * own: a second pull cancels the reload of the first one, whose failure must
+ * not hide the indicator of the second.
+ */
+- (void)endAutoRefreshForNavigation:(WKNavigation *)navigation
+{
+#if !TARGET_OS_OSX
+  if (_autoRefreshNavigation != nil && navigation != _autoRefreshNavigation) {
+    return;
+  }
+  [self endAutoRefresh];
+#endif // !TARGET_OS_OSX
+}
+
 - (void)endAutoRefresh
 {
 #if !TARGET_OS_OSX
+  _autoRefreshNavigation = nil;
   if (_autoRefreshing) {
     _autoRefreshing = NO;
     [_refreshControl endRefreshing];
@@ -1726,10 +1751,17 @@ didFinishNavigation:(WKNavigation *)navigation
     // the web view, so it is the window of the web view that counts.
     // Without a pull the indicator sits above the content: scroll it into
     // view, like React Native does for a ScrollView.
+    // beginRefreshing adds the height of the indicator to the top inset: scroll
+    // to the new top, not by that height, which would move the content twice
+    // and does not survive the web view resetting the offset when it loads.
+    // Only from the top of the page, where the indicator is.
     UIScrollView *scrollView = _webView.scrollView;
-    CGPoint offset = {scrollView.contentOffset.x, scrollView.contentOffset.y - _refreshControl.frame.size.height};
-    [scrollView setContentOffset:offset animated:YES];
+    BOOL atTop = scrollView.contentOffset.y <= -scrollView.adjustedContentInset.top + 0.5;
     [_refreshControl beginRefreshing];
+    if (atTop) {
+      CGPoint offset = {scrollView.contentOffset.x, -scrollView.adjustedContentInset.top};
+      [scrollView setContentOffset:offset animated:YES];
+    }
   }
 #endif // !TARGET_OS_OSX
 }
@@ -1817,7 +1849,8 @@ didFinishNavigation:(WKNavigation *)navigation
     }
   } else {
     [self beginAutoRefresh];
-    if (![self reloadPage]) {
+    _autoRefreshNavigation = [self reloadPage];
+    if (_autoRefreshNavigation == nil) {
       [self endAutoRefresh];
     }
   }
