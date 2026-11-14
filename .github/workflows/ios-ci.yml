@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      MAESTRO_VERSION: 2.12.1
     steps:
       - name: Checkout
         uses: actions/checkout@v7

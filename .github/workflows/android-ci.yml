@@ -39,6 +39,8 @@ jobs:
     timeout-minutes: 60
   e2e:
     runs-on: ubuntu-latest
+    env:
+      MAESTRO_VERSION: 2.12.1
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -82,7 +84,7 @@ jobs:
           disable-animations: false
           working-directory: packages/example-mobile
           script: |
-            cd android && ./gradlew --no-daemon installDebug -PreactNativeArchitectures=x86_64
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
             maestro test -e APP_ID=com.microsoft.reacttestapp e2e
       - name: Upload Maestro report
         if: failure()
