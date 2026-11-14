@@ -1279,7 +1279,7 @@ Exemplo:
 
 Ativa o gesto de puxar para atualizar. Recebe um elemento [`<RefreshControl />`](https://reactnative.dev/docs/refreshcontrol) do React Native, como em uma `ScrollView`.
 
-O elemento não é montado. A `WebView` lê as suas propriedades e controla diretamente o indicador nativo: `UIRefreshControl` no iOS, `SwipeRefreshLayout` no Android. No Android o gesto segue o que a página informa, portanto funciona com páginas que rolam dentro de um elemento e não começa quando a página não está no topo.
+O elemento não é montado. A `WebView` lê as suas propriedades e controla diretamente o indicador nativo: `UIRefreshControl` no iOS, `SwipeRefreshLayout` no Android. No Android o gesto segue o que a página informa, portanto funciona com páginas que rolam dentro de um elemento e não começa quando a página não está no topo. No iOS um elemento que rola sozinho recebe o gesto, como no Safari: o indicador só aparece quando o próprio documento é puxado.
 
 Há duas formas de usar, dependendo de `onRefresh`:
 

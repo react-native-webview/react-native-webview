@@ -1284,7 +1284,7 @@ Esempio:
 
 Abilita il gesto di trascinamento per aggiornare. Accetta un elemento [`<RefreshControl />`](https://reactnative.dev/docs/refreshcontrol) di React Native, come in una `ScrollView`.
 
-L'elemento non viene montato. La `WebView` ne legge le proprietà e gestisce direttamente l'indicatore nativo: `UIRefreshControl` su iOS, `SwipeRefreshLayout` su Android. Su Android il gesto segue ciò che la pagina segnala, quindi funziona anche con le pagine che scorrono all'interno di un elemento e non parte quando la pagina non è in cima.
+L'elemento non viene montato. La `WebView` ne legge le proprietà e gestisce direttamente l'indicatore nativo: `UIRefreshControl` su iOS, `SwipeRefreshLayout` su Android. Su Android il gesto segue ciò che la pagina segnala, quindi funziona anche con le pagine che scorrono all'interno di un elemento e non parte quando la pagina non è in cima. Su iOS un elemento che scorre da solo riceve il trascinamento, come in Safari: l'indicatore appare solo quando viene trascinato il documento stesso.
 
 Ci sono due modi di usarla, a seconda di `onRefresh`:
 

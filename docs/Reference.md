@@ -1433,7 +1433,7 @@ Example:
 
 Enables pull to refresh. Pass a React Native [`<RefreshControl />`](https://reactnative.dev/docs/refreshcontrol) element, like on a `ScrollView`.
 
-The element is not mounted. The `WebView` reads its props and drives the native refresh indicator itself: `UIRefreshControl` on iOS, `SwipeRefreshLayout` on Android. On Android the gesture follows what the page reports, so it works with pages that scroll inside an element, and it does not start when the page is scrolled down.
+The element is not mounted. The `WebView` reads its props and drives the native refresh indicator itself: `UIRefreshControl` on iOS, `SwipeRefreshLayout` on Android. On Android the gesture follows what the page reports, so it works with pages that scroll inside an element, and it does not start when the page is scrolled down. On iOS an element that scrolls by itself takes the pull, like in Safari: the refresh control only shows when the document itself is pulled.
 
 There are two ways to use it, depending on `onRefresh`:
 

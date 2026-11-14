@@ -8,6 +8,7 @@ import {
   Keyboard,
   Button,
   Platform,
+  StatusBar,
 } from 'react-native';
 
 import Alerts from './examples/Alerts';
@@ -190,6 +191,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5FCFF',
     padding: 8,
+    // Android draws the app under the status bar (edge to edge) and SafeAreaView only pads
+    // on iOS, which left the header buttons under the status bar, where taps do not land.
+    paddingTop: 8 + (StatusBar.currentHeight ?? 0),
   },
   exampleContainer: {
     padding: 16,

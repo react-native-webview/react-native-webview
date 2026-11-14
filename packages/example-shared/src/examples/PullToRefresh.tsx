@@ -57,11 +57,10 @@ export default function PullToRefresh() {
 
   useEffect(() => () => clearTimeout(timeout.current), []);
 
-  const reset = () => {
+  const resetRefresh = () => {
     clearTimeout(timeout.current);
     setRefreshing(false);
     setRefreshCount(0);
-    setLoadCount(0);
   };
 
   // Controlled: the app decides what a refresh does and when it is over.
@@ -100,7 +99,8 @@ export default function PullToRefresh() {
           testID="pullToRefresh_mode"
           title={`Mode: ${mode}`}
           onPress={() => {
-            reset();
+            // The WebView stays mounted: the refresh control is added, changed or removed.
+            resetRefresh();
             setMode(NEXT_MODE[mode]);
           }}
         />
@@ -108,7 +108,9 @@ export default function PullToRefresh() {
           testID="pullToRefresh_page"
           title={`Page: ${page}`}
           onPress={() => {
-            reset();
+            // A new WebView is mounted for the other page.
+            resetRefresh();
+            setLoadCount(0);
             setPage(NEXT_PAGE[page]);
           }}
         />
@@ -119,7 +121,7 @@ export default function PullToRefresh() {
         <Text testID="pullToRefresh_state">{refreshing ? 'Refreshing' : 'Idle'}</Text>
       </View>
       <WebView
-        key={`${mode}-${page}`}
+        key={page}
         testID="pullToRefresh_webView"
         style={styles.webView}
         source={{ html: PAGES[page] }}
