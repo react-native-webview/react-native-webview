@@ -10,11 +10,13 @@ appId: ${APP_ID}
 ---
 - launchApp
 # On iOS the test app pushes the example screen after launch, which moves every element: wait
-# for it to settle, the tap would land on a stale position otherwise.
+# for it to settle, the tap would land on a stale position otherwise. The timeout is long
+# because the first launch on an emulator that has just booted is slow: on CI the app was
+# once not on screen yet after a minute.
 - extendedWaitUntil:
     visible:
       id: testType_pullToRefresh
-    timeout: 60000
+    timeout: 180000
 - waitForAnimationToEnd
 - tapOn:
     id: testType_pullToRefresh
