@@ -146,6 +146,10 @@ RCTAutoInsetsProtocol>
   // Workaround for StatusBar appearance bug for iOS 12
   // https://github.com/react-native-webview/react-native-webview/issues/62
   BOOL _isFullScreenVideoOpen;
+  // The navigation that last loaded the `html` source, and whether its page is
+  // still the one on screen: `reload` then loads the HTML again.
+  WKNavigation *_htmlSourceNavigation;
+  BOOL _htmlSourceShown;
 #if !TARGET_OS_OSX
   UIStatusBarStyle _savedStatusBarStyle;
 #endif // !TARGET_OS_OSX
@@ -612,6 +616,8 @@ RCTAutoInsetsProtocol>
     } else if (@available(iOS 14.5, macOS 11.3, *)) {
         [_webView suspendAllMediaPlayback:nil];
     }
+    _htmlSourceNavigation = nil;
+    _htmlSourceShown = NO;
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = nil;
     _webView.scrollView.refreshControl = nil;
@@ -829,7 +835,7 @@ RCTAutoInsetsProtocol>
     if (!baseURL) {
       baseURL = [NSURL URLWithString:@"about:blank"];
     }
-    [_webView loadHTMLString:html baseURL:baseURL];
+    [self loadHTMLSource:html baseURL:baseURL];
     return;
   }
   // Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
@@ -1129,6 +1135,11 @@ RCTAutoInsetsProtocol>
   _webView.frame = self.bounds;
 #if !TARGET_OS_OSX
   _webView.scrollView.contentInset = _contentInset;
+  // A component that mounts with `refreshing` set asks for the indicator
+  // before the web view is in a window, where UIKit cannot show it.
+  if (_refreshing && _hasOnRefresh && self.window != nil && _refreshControl != nil && !_refreshControl.isRefreshing) {
+    [self setNativeRefreshing:YES];
+  }
 #endif // !TARGET_OS_OSX
 }
 
@@ -1578,6 +1589,19 @@ RCTAutoInsetsProtocol>
 }
 
 /**
+ * Called when the page of a main frame navigation replaces the one on screen,
+ * for every kind of navigation: a link, a reload, going back.
+ * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview
+ */
+- (void)webView:(WKWebView *)webView
+  didCommitNavigation:(WKNavigation *)navigation
+{
+  // Going back to the page of the `html` source is a navigation of its own, so
+  // that page then counts as any other page and `reload` leaves it to WebKit.
+  _htmlSourceShown = navigation != nil && navigation == _htmlSourceNavigation;
+}
+
+/**
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
  */
@@ -1628,6 +1652,20 @@ didFinishNavigation:(WKNavigation *)navigation
 }
 
 /**
+ * Loads the `html` source and remembers its navigation, to know later whether
+ * its page is still the one on screen. Returns NO when WebKit started nothing.
+ */
+- (BOOL)loadHTMLSource:(NSString *)html baseURL:(NSURL *)baseURL
+{
+  _htmlSourceNavigation = [_webView loadHTMLString:html baseURL:baseURL];
+  // Until another page commits. Not comparing URLs: WebKit rewrites the one it
+  // reports (`https://example.com` becomes `https://example.com/`), and a
+  // real page may have the same URL as the base URL.
+  _htmlSourceShown = _htmlSourceNavigation != nil;
+  return _htmlSourceShown;
+}
+
+/**
  * Reloads the page. Returns NO when there was nothing to reload, in which
  * case no navigation callback follows.
  */
@@ -1639,15 +1677,12 @@ didFinishNavigation:(WKNavigation *)navigation
    * the page on screen.
    */
   NSString *html = [RCTConvert NSString:_source[@"html"]];
-  if (html) {
+  if (html && _htmlSourceShown) {
     NSURL *baseURL = [RCTConvert NSURL:_source[@"baseUrl"]];
     if (!baseURL) {
       baseURL = [NSURL URLWithString:@"about:blank"];
     }
-    NSString *currentURL = _webView.URL.absoluteString;
-    if (!currentURL.length || [currentURL isEqualToString:baseURL.absoluteString]) {
-      return [_webView loadHTMLString:html baseURL:baseURL] != nil;
-    }
+    return [self loadHTMLSource:html baseURL:baseURL];
   }
 
   /**
@@ -1685,7 +1720,9 @@ didFinishNavigation:(WKNavigation *)navigation
     _refreshTriggered = NO;
     _autoRefreshing = NO;
     [_refreshControl endRefreshing];
-  } else if (!_refreshControl.isRefreshing) {
+  } else if (!_refreshControl.isRefreshing && self.window != nil) {
+    // Not before the web view is in a window: UIKit ignores it there, and
+    // layoutSubviews asks again.
     // Without a pull the indicator sits above the content: scroll it into
     // view, like React Native does for a ScrollView.
     UIScrollView *scrollView = _webView.scrollView;

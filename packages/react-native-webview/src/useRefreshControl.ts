@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import type { ReactElement } from 'react';
+import { RefreshControl } from 'react-native';
 import type { ColorValue, RefreshControlProps } from 'react-native';
 
 /**
@@ -93,6 +94,18 @@ export const useRefreshControl = (
       );
     }
   }, [unsupportedProps]);
+
+  // A component that renders a `RefreshControl` with props of its own works on
+  // a `ScrollView`, which renders it. Here those props are never seen.
+  const isOtherComponent =
+    __DEV__ && refreshControl != null && refreshControl.type !== RefreshControl;
+  useEffect(() => {
+    if (isOtherComponent) {
+      console.warn(
+        'WebView: `refreshControl` is not a React Native `RefreshControl` element. The element is not rendered: only the props set on the element itself are used.',
+      );
+    }
+  }, [isOtherComponent]);
 
   return {
     refreshControlEnabled: props != null && props.enabled !== false,

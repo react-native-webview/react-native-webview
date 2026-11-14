@@ -20,6 +20,13 @@ class RNCWebViewRefreshLayout(context: Context) : SwipeRefreshLayout(context) {
   private var progressViewOffset = 0f
   private var hasCustomProgressViewOffset = false
 
+  init {
+    // A ScrollView's refresh control takes the touches itself and counts half of the finger
+    // movement, so that it refreshes after twice the default distance. This layout is given
+    // the whole movement: ask for twice the distance to refresh after the same pull.
+    setDistanceToTriggerSync(Math.round(PixelUtil.toPixelFromDIP(2 * DEFAULT_CIRCLE_TARGET)))
+  }
+
   override fun onInterceptTouchEvent(ev: MotionEvent): Boolean = false
 
   override fun onTouchEvent(ev: MotionEvent): Boolean = false

@@ -144,6 +144,18 @@ describe('useRefreshControl', () => {
     expect(warn.mock.calls[0][0]).toContain('testID, style');
   });
 
+  test('warns about a component that is not a RefreshControl', () => {
+    // Stands for a component that renders a RefreshControl with an onRefresh of its own. That
+    // works on a ScrollView, which renders it. Here it is never called.
+    const ThemedRefreshControl = jest.fn(() => null);
+    const { result } = renderRefreshControl(<ThemedRefreshControl />);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('is not rendered');
+    expect(ThemedRefreshControl).not.toHaveBeenCalled();
+    expect(result.current.hasOnRefresh).toBe(false);
+  });
+
   test('stops the native indicator when the app does not start refreshing', () => {
     const onRefresh = jest.fn();
     const { result, setNativeRefreshing } = renderRefreshControl(
