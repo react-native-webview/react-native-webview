@@ -42,7 +42,7 @@ const NEXT_PAGE: Record<Page, Page> = { document: 'inner', inner: 'document' };
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  controls: { flexDirection: 'row', justifyContent: 'space-between' },
+  controls: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   status: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   webView: { flex: 1 },
 });
@@ -53,6 +53,7 @@ export default function PullToRefresh() {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshCount, setRefreshCount] = useState(0);
   const [loadCount, setLoadCount] = useState(0);
+  const [mountCount, setMountCount] = useState(0);
   const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => () => clearTimeout(timeout.current), []);
@@ -106,6 +107,20 @@ export default function PullToRefresh() {
           }}
         />
         <Button
+          testID="pullToRefresh_mount"
+          title="Mount"
+          onPress={() => {
+            // A new WebView is mounted with `refreshing` already set. It stays set until the
+            // mode is changed.
+            clearTimeout(timeout.current);
+            setMode('controlled');
+            setRefreshing(true);
+            setRefreshCount(0);
+            setLoadCount(0);
+            setMountCount((count) => count + 1);
+          }}
+        />
+        <Button
           testID="pullToRefresh_page"
           title={`Page: ${page}`}
           onPress={() => {
@@ -122,7 +137,7 @@ export default function PullToRefresh() {
         <Text testID="pullToRefresh_state">{refreshing ? 'Refreshing' : 'Idle'}</Text>
       </View>
       <WebView
-        key={page}
+        key={`${page}-${mountCount}`}
         testID="pullToRefresh_webView"
         style={styles.webView}
         source={{ html: PAGES[page] }}

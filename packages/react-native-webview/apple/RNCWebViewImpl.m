@@ -1744,6 +1744,7 @@ didFinishNavigation:(WKNavigation *)navigation
   if (!refreshing) {
     _refreshTriggered = NO;
     _autoRefreshing = NO;
+    _autoRefreshNavigation = nil;
     [_refreshControl endRefreshing];
   } else if (!_refreshControl.isRefreshing && _webView.window != nil) {
     // Not before the web view is in a window: UIKit ignores it there, and
@@ -1793,6 +1794,7 @@ didFinishNavigation:(WKNavigation *)navigation
       _refreshControl = nil;
       _refreshTriggered = NO;
       _autoRefreshing = NO;
+      _autoRefreshNavigation = nil;
     }
     return;
   }
