@@ -37,3 +37,57 @@ jobs:
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Bundle example JavaScript
+        run: bun run bundle:android
+        working-directory: packages/example-mobile
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+      - name: Build Android test app
+        run: ./gradlew --no-daemon assembleDebug -PreactNativeArchitectures=x86_64
+        working-directory: packages/example-mobile/android
+      - name: Install Maestro
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run end-to-end tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_7
+          disable-animations: false
+          working-directory: packages/example-mobile
+          script: |
+            cd android && ./gradlew --no-daemon installDebug -PreactNativeArchitectures=x86_64
+            maestro test -e APP_ID=com.microsoft.reacttestapp e2e
+      - name: Upload Maestro report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-android
+          path: ~/.maestro/tests
+    timeout-minutes: 60

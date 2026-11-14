@@ -28,6 +28,25 @@ jobs:
           device=$(xcrun simctl list devices "${device_name}" available | grep "${device_name} (")
           re='\(([-0-9A-Fa-f]+)\)'
           [[ $device =~ $re ]] || exit 1
-          xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination "platform=iOS Simulator,id=${BASH_REMATCH[1]}" CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
+          echo "SIMULATOR_ID=${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
+          xcodebuild -workspace WebviewExample.xcworkspace -scheme ReactTestApp -destination "platform=iOS Simulator,id=${BASH_REMATCH[1]}" -derivedDataPath build CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO build
         working-directory: packages/example-mobile/ios
+      - name: Install Maestro
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+      - name: Run end-to-end tests
+        run: |
+          xcrun simctl bootstatus "$SIMULATOR_ID" -b
+          xcrun simctl install "$SIMULATOR_ID" ios/build/Build/Products/Debug-iphonesimulator/ReactTestApp.app
+          maestro --device "$SIMULATOR_ID" test -e APP_ID=com.microsoft.ReactTestApp e2e
+        working-directory: packages/example-mobile
+        env:
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: 300000
+      - name: Upload Maestro report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-ios
+          path: ~/.maestro/tests
     timeout-minutes: 60
