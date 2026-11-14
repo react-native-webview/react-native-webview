@@ -93,8 +93,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
      * refreshParent with the nested scrolling callbacks, the same way a RecyclerView drives a
      * SwipeRefreshLayout.
      *
-     * These fields have no initializers on purpose: setOverScrollMode() is called by the View
-     * constructor, before the initializers of this class run.
+     * The fields that setOverScrollMode() reads have no initializers on purpose: the View
+     * constructor calls it before the initializers of this class run.
      */
     // The layout that shows the refresh indicator, or null when there is no refresh control.
     private @Nullable NestedScrollingParent3 refreshParent;

@@ -1560,6 +1560,17 @@ RCTAutoInsetsProtocol>
 }
 
 /**
+ * Called when a navigation fails after the page started to arrive. Nothing is
+ * reported to JS for it, but a reload started by a pull to refresh is over.
+ */
+- (void)webView:(WKWebView *)webView
+  didFailNavigation:(WKNavigation *)navigation
+          withError:(NSError *)error
+{
+  [self endAutoRefresh];
+}
+
+/**
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
  */

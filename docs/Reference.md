@@ -77,8 +77,7 @@ This document lays out the current public properties and methods for the React N
 - [`allowsLinkPreview`](Reference.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.md#textZoom)
-- [`pullToRefreshEnabled`](Reference.md#pullToRefreshEnabled)
-- [`refreshControlLightMode`](Reference.md#refreshControlLightMode)
+- [`refreshControl`](Reference.md#refreshControl)
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
@@ -1430,23 +1429,71 @@ Example:
 
 ---
 
-### `pullToRefreshEnabled`[⬆](#props-index)
+### `refreshControl`[⬆](#props-index)
 
-Boolean value that determines whether a pull to refresh gesture is available in the `WebView`. The default value is `false`. If `true`, sets `bounces` automatically to `true`.
+Enables pull to refresh. Pass a React Native [`<RefreshControl />`](https://reactnative.dev/docs/refreshcontrol) element, like on a `ScrollView`.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+The element is not mounted. The `WebView` reads its props and drives the native refresh indicator itself: `UIRefreshControl` on iOS, `SwipeRefreshLayout` on Android. On Android the gesture follows what the page reports, so it works with pages that scroll inside an element, and it does not start when the page is scrolled down.
 
-### `refreshControlLightMode`[⬆](#props-index)
+There are two ways to use it, depending on `onRefresh`:
 
-(ios only)
-Boolean value that determines whether the refresh control color is white or not.
-Default is `false`, meaning the refresh control color will be the default.
+- Without `onRefresh`, pulling reloads the page and the indicator hides when the load ends. `refreshing` is ignored (React Native's types still require it).
+- With `onRefresh`, nothing is reloaded for you. Do the refresh in `onRefresh` and control the indicator with `refreshing`, like on a `ScrollView`.
 
-| Type    | Required | Platform |
-| ------- | -------- | -------- |
-| boolean | No       | iOS      |
+On iOS, setting a refresh control turns `bounces` on.
+
+| Type                         | Required | Platform     |
+| ---------------------------- | -------- | ------------ |
+| `<RefreshControl />` element | No       | iOS, Android |
+
+Supported `RefreshControl` props (the others are ignored, with a warning in development):
+
+| Prop                      | Platform     | Notes                                                    |
+| ------------------------- | ------------ | -------------------------------------------------------- |
+| `refreshing`              | iOS, Android | Only used with `onRefresh`                               |
+| `onRefresh`               | iOS, Android | Called when the user releases a pull                     |
+| `enabled`                 | iOS, Android |                                                          |
+| `tintColor`               | iOS, Android | On Android, the indicator color when `colors` is not set |
+| `progressViewOffset`      | iOS, Android |                                                          |
+| `title`                   | iOS          |                                                          |
+| `titleColor`              | iOS          |                                                          |
+| `colors`                  | Android      |                                                          |
+| `progressBackgroundColor` | Android      |                                                          |
+| `size`                    | Android      |                                                          |
+
+Example, reloading the page:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  refreshControl={<RefreshControl refreshing={false} />}
+/>
+```
+
+Example, handling the refresh yourself:
+
+```jsx
+const [refreshing, setRefreshing] = useState(false);
+
+const onRefresh = async () => {
+  setRefreshing(true);
+  await reloadData();
+  setRefreshing(false);
+};
+
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      tintColor="tomato"
+    />
+  }
+/>;
+```
+
+This prop replaces `pullToRefreshEnabled` and `refreshControlLightMode`, which have been removed. `pullToRefreshEnabled` becomes `refreshControl={<RefreshControl refreshing={false} />}`, and `refreshControlLightMode` becomes `tintColor="white"` on that element.
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)
 
