@@ -71,8 +71,7 @@ Questo documento elenca le attuali proprietà e metodi pubblici di React Native 
 - [`allowsLinkPreview`](Reference.italian.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.italian.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.italian.md#textZoom)
-- [`pullToRefreshEnabled`](Reference.italian.md#pullToRefreshEnabled)
-- [`refreshControlLightMode`](Reference.italian.md#refreshControlLightMode)
+- [`refreshControl`](Reference.italian.md#refreshControl)
 - [`ignoreSilentHardwareSwitch`](Reference.italian.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.italian.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.italian.md#limitsNavigationsToAppBoundDomains)
@@ -1281,24 +1280,35 @@ Esempio:
 
 ---
 
-### `pullToRefreshEnabled`[⬆](#props-index)
+### `refreshControl`[⬆](#props-index)
 
-Boolean che determina se è abilitato il gesto di trascinamento per aggiornare nella WebView. Il valore predefinito è `false`, il che significa che il gesto di trascinamento per aggiornare non è disponibile. Se impostato su `true`, abiliterà automaticamente la proprietà `bounces` a `true`, consentendo al contenuto di rimbalzare quando viene trascinato oltre i limiti.
+Abilita il gesto di trascinamento per aggiornare. Accetta un elemento [`<RefreshControl />`](https://reactnative.dev/docs/refreshcontrol) di React Native, come in una `ScrollView`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+L'elemento non viene montato. La `WebView` ne legge le proprietà e gestisce direttamente l'indicatore nativo: `UIRefreshControl` su iOS, `SwipeRefreshLayout` su Android. Su Android il gesto segue ciò che la pagina segnala, quindi funziona anche con le pagine che scorrono all'interno di un elemento e non parte quando la pagina non è in cima. Su iOS un elemento che scorre da solo riceve il trascinamento, come in Safari: l'indicatore appare solo quando viene trascinato il documento stesso.
 
-### `refreshControlLightMode`[⬆](#props-index)
+Ci sono due modi di usarla, a seconda di `onRefresh`:
 
-(solo iOS)
+- Senza `onRefresh`, il trascinamento ricarica la pagina e l'indicatore scompare al termine del caricamento. `refreshing` viene ignorato (i tipi di React Native lo richiedono comunque).
+- Con `onRefresh`, non viene ricaricato nulla automaticamente. Esegui l'aggiornamento in `onRefresh` e controlla l'indicatore con `refreshing`, come in una `ScrollView`.
 
-Valore booleano che determina se il colore del controllo di aggiornamento è bianco o meno.
-L'impostazione predefinita è "false", il che significa che il colore del controllo di aggiornamento sarà quello predefinito.
+Su iOS, impostare un refresh control abilita `bounces`.
 
-| Tipo    | Obbligatorio | Piattaforma |
-| ------- | ------------ | ----------- |
-| boolean | No           | iOS         |
+| Tipo                          | Obbligatorio | Piattaforma  |
+| ----------------------------- | ------------ | ------------ |
+| elemento `<RefreshControl />` | No           | iOS, Android |
+
+Proprietà di `RefreshControl` supportate (le altre vengono ignorate, con un avviso in sviluppo): `refreshing`, `onRefresh`, `enabled` e `progressViewOffset` su entrambe le piattaforme, `tintColor`, `title` e `titleColor` su iOS, `colors`, `progressBackgroundColor` e `size` su Android. Sono le stesse piattaforme di React Native, tranne `enabled`, che qui funziona anche su iOS. Senza `onRefresh` l'indicatore viene nascosto al più tardi dopo 10 secondi, anche se il caricamento non è terminato.
+
+Esempio:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  refreshControl={<RefreshControl refreshing={false} />}
+/>
+```
+
+Questa proprietà sostituisce `pullToRefreshEnabled` e `refreshControlLightMode`, che sono state rimosse. `pullToRefreshEnabled` diventa `refreshControl={<RefreshControl refreshing={false} />}` e `refreshControlLightMode` diventa `tintColor="white"` su quell'elemento.
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)
 

@@ -37,3 +37,64 @@ jobs:
         shell: bash
         working-directory: packages/example-mobile/android
     timeout-minutes: 60
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      MAESTRO_VERSION: 2.12.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Bundle example JavaScript
+        run: bun run bundle:android
+        working-directory: packages/example-mobile
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+      - name: Build Android test app
+        run: ./gradlew --no-daemon assembleDebug -PreactNativeArchitectures=x86_64
+        working-directory: packages/example-mobile/android
+      - name: Install Maestro
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run end-to-end tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_7
+          disable-animations: false
+          working-directory: packages/example-mobile
+          # A freshly booted emulator on a slow runner sometimes shows "Pixel Launcher isn't
+          # responding" over the app, which the test then cannot see. The setting makes the
+          # system kill an app that hangs instead of showing that dialog. It does not remove a
+          # dialog that is already there: the script started next to Maestro does that.
+          script: |
+            adb shell settings put global hide_error_dialogs 1
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            sh ../../.github/scripts/dismiss-anr-dialogs.sh com.microsoft.reacttestapp > anr.log 2>&1 & watchdog=$!; maestro test -e APP_ID=com.microsoft.reacttestapp e2e > maestro.log 2>&1; status=$?; kill "$watchdog"; cat maestro.log; echo "Apps stopped because they were not responding: $(grep -c "is not responding" anr.log)"; cat anr.log; if [ "$status" -ne 0 ]; then echo "::group::Screen and errors at the time of the failure"; adb shell dumpsys window windows | grep -E "Window #" | tail -15; maestro hierarchy | grep -E '"(text|accessibilityText|resource-id)" : "[^"]' | grep -v systemui | tail -120; adb logcat -d -t 3000 | grep -E " E AndroidRuntime|ReactNativeJS|ANR in|SoLoader|chromium" | tail -100; echo "::endgroup::"; grep -E "Failed|Assertion|Error" maestro.log | tail -20; fi; exit "$status"
+      - name: Upload Maestro report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-android
+          path: ~/.maestro/tests
+    timeout-minutes: 60

@@ -71,8 +71,7 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`allowsLinkPreview`](Reference.portuguese.md#allowsLinkPreview)
 - [`sharedCookiesEnabled`](Reference.portuguese.md#sharedCookiesEnabled)
 - [`textZoom`](Reference.portuguese.md#textZoom)
-- [`pullToRefreshEnabled`](Reference.portuguese.md#pullToRefreshEnabled)
-- [`refreshControlLightMode`](Reference.portuguese.md#refreshControlLightMode)
+- [`refreshControl`](Reference.portuguese.md#refreshControl)
 - [`ignoreSilentHardwareSwitch`](Reference.portuguese.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.portuguese.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.portuguese.md#limitsNavigationsToAppBoundDomains)
@@ -1276,24 +1275,35 @@ Exemplo:
 
 ---
 
-### `pullToRefreshEnabled`[⬆](#props-index)<!-- Link gerado com jump2header -->
+### `refreshControl`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
-Valor booleano que determina se um gesto de puxar para atualizar está disponível na `WebView`. O valor padrão é `falso`. Se `true`, define `bounces` automaticamente para `true`.
+Ativa o gesto de puxar para atualizar. Recebe um elemento [`<RefreshControl />`](https://reactnative.dev/docs/refreshcontrol) do React Native, como em uma `ScrollView`.
 
-| Tipo    | Requerido | Plataforma |
-| ------- | --------- | ---------- |
-| boolean | Não       | iOS        |
+O elemento não é montado. A `WebView` lê as suas propriedades e controla diretamente o indicador nativo: `UIRefreshControl` no iOS, `SwipeRefreshLayout` no Android. No Android o gesto segue o que a página informa, portanto funciona com páginas que rolam dentro de um elemento e não começa quando a página não está no topo. No iOS um elemento que rola sozinho recebe o gesto, como no Safari: o indicador só aparece quando o próprio documento é puxado.
 
-### `refreshControlLightMode`[⬆](#props-index)<!-- Link gerado com jump2header -->
+Há duas formas de usar, dependendo de `onRefresh`:
 
-(somente ios)
+- Sem `onRefresh`, puxar recarrega a página e o indicador desaparece quando o carregamento termina. `refreshing` é ignorado (os tipos do React Native ainda o exigem).
+- Com `onRefresh`, nada é recarregado automaticamente. Faça a atualização em `onRefresh` e controle o indicador com `refreshing`, como em uma `ScrollView`.
 
-Valor booleano que determina se a cor do controle de atualização é branca ou não.
-O padrão é `false`, o que significa que a cor do controle de atualização será o padrão.
+No iOS, definir um refresh control ativa `bounces`.
 
-| Tipo    | Requerido | Plataforma |
-| ------- | --------- | ---------- |
-| boolean | Não       | iOS        |
+| Tipo                          | Requerido | Plataforma   |
+| ----------------------------- | --------- | ------------ |
+| elemento `<RefreshControl />` | Não       | iOS, Android |
+
+Propriedades de `RefreshControl` suportadas (as outras são ignoradas, com um aviso em desenvolvimento): `refreshing`, `onRefresh`, `enabled` e `progressViewOffset` nas duas plataformas, `tintColor`, `title` e `titleColor` no iOS, `colors`, `progressBackgroundColor` e `size` no Android. São as mesmas plataformas do React Native, exceto `enabled`, que aqui também funciona no iOS. Sem `onRefresh` o indicador é ocultado no máximo após 10 segundos, mesmo que o carregamento não tenha terminado.
+
+Exemplo:
+
+```jsx
+<WebView
+  source={{ uri: 'https://reactnative.dev' }}
+  refreshControl={<RefreshControl refreshing={false} />}
+/>
+```
+
+Esta propriedade substitui `pullToRefreshEnabled` e `refreshControlLightMode`, que foram removidas. `pullToRefreshEnabled` passa a ser `refreshControl={<RefreshControl refreshing={false} />}` e `refreshControlLightMode` passa a ser `tintColor="white"` nesse elemento.
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)<!-- Link gerado com jump2header -->
 

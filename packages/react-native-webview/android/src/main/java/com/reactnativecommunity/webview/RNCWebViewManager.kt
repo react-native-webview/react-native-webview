@@ -19,8 +19,10 @@ import androidx.webkit.ProfileStore
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableType
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.common.build.ReactBuildConfig
 import com.facebook.react.module.annotations.ReactModule
@@ -40,6 +42,7 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent
 import com.reactnativecommunity.webview.events.TopMessageEvent
 import com.reactnativecommunity.webview.events.TopOpenWindowEvent
+import com.reactnativecommunity.webview.events.TopRefreshEvent
 import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent
 import org.json.JSONException
@@ -581,6 +584,54 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         view.webView.nestedScrollEnabled = value
     }
 
+    @ReactProp(name = "refreshControlEnabled")
+    override fun setRefreshControlEnabled(view: RNCWebViewWrapper, value: Boolean) {
+        view.setRefreshControlEnabled(value)
+    }
+
+    @ReactProp(name = "hasOnRefresh")
+    override fun setHasOnRefresh(view: RNCWebViewWrapper, value: Boolean) {
+        view.setHasOnRefresh(value)
+    }
+
+    @ReactProp(name = "refreshing")
+    override fun setRefreshing(view: RNCWebViewWrapper, value: Boolean) {
+        view.setRefreshing(value)
+    }
+
+    @ReactProp(name = "refreshControlColors", customType = "ColorArray")
+    override fun setRefreshControlColors(view: RNCWebViewWrapper, value: ReadableArray?) {
+        if (value == null) {
+            view.setRefreshControlColors(null)
+            return
+        }
+        // Each color is either an integer or, for a PlatformColor, a map to resolve.
+        val colors = IntArray(value.size())
+        for (i in 0 until value.size()) {
+            colors[i] = if (value.getType(i) == ReadableType.Map) {
+                ColorPropConverter.getColor(value.getMap(i), view.context, Color.BLACK)
+            } else {
+                value.getInt(i)
+            }
+        }
+        view.setRefreshControlColors(colors)
+    }
+
+    @ReactProp(name = "refreshControlProgressBackgroundColor", customType = "Color")
+    override fun setRefreshControlProgressBackgroundColor(view: RNCWebViewWrapper, value: Int?) {
+        view.setRefreshControlProgressBackgroundColor(value)
+    }
+
+    @ReactProp(name = "refreshControlSize")
+    override fun setRefreshControlSize(view: RNCWebViewWrapper, value: String?) {
+        view.setRefreshControlSize(value)
+    }
+
+    @ReactProp(name = "refreshControlProgressViewOffset")
+    override fun setRefreshControlProgressViewOffset(view: RNCWebViewWrapper, value: Float) {
+        view.setRefreshControlProgressViewOffset(value)
+    }
+
     @ReactProp(name = "overScrollMode")
     override fun setOverScrollMode(view: RNCWebViewWrapper, value: String?) {
         view.webView.overScrollMode = when (value) {
@@ -739,9 +790,11 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     override fun setPagingEnabled(view: RNCWebViewWrapper, value: Boolean) {}
 
-    override fun setPullToRefreshEnabled(view: RNCWebViewWrapper, value: Boolean) {}
+    override fun setRefreshControlTintColor(view: RNCWebViewWrapper, value: Int?) {}
 
-    override fun setRefreshControlLightMode(view: RNCWebViewWrapper, value: Boolean) {}
+    override fun setRefreshControlTitle(view: RNCWebViewWrapper, value: String?) {}
+
+    override fun setRefreshControlTitleColor(view: RNCWebViewWrapper, value: Int?) {}
 
     override fun setRemoveIosKeyboardObserver(view: RNCWebViewWrapper, value: Boolean) {}
 
@@ -774,6 +827,10 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     override fun reload(view: RNCWebViewWrapper) {
         view.webView.reload()
+    }
+
+    override fun setNativeRefreshing(view: RNCWebViewWrapper, refreshing: Boolean) {
+        view.setNativeRefreshing(refreshing)
     }
 
     override fun stopLoading(view: RNCWebViewWrapper) {
@@ -850,6 +907,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         export[TopRenderProcessGoneEvent.EVENT_NAME] = MapBuilder.of("registrationName", "onRenderProcessGone")
         export[TopCustomMenuSelectionEvent.EVENT_NAME] = MapBuilder.of("registrationName", "onCustomMenuSelection")
         export[TopOpenWindowEvent.EVENT_NAME] = MapBuilder.of("registrationName", "onOpenWindow")
+        export[TopRefreshEvent.EVENT_NAME] = MapBuilder.of("registrationName", "onRefresh")
         return export
     }
 
@@ -873,6 +931,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     }
 
     override fun onDropViewInstance(view: RNCWebViewWrapper) {
+        view.onDropViewInstance()
         val webView = view.webView
         webView.themedReactContext.removeLifecycleEventListener(webView)
         webView.cleanupCallbacksAndDestroy()

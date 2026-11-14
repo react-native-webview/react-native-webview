@@ -13,6 +13,8 @@ import {
 } from './WebViewShared';
 import { IOSWebViewProps, DecelerationRateConstant, WebViewSourceUri } from './WebViewTypes';
 
+import { useRefreshControl } from './useRefreshControl';
+
 import styles from './WebView.styles';
 
 const resolveAssetSource = (source: ImageSourcePropType) => Image.resolveAssetSource(source);
@@ -80,6 +82,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
       decelerationRate: decelerationRateProp,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       removeIosKeyboardObserver,
+      refreshControl,
       ...otherProps
     },
     ref,
@@ -122,6 +125,24 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
       onShouldStartLoadWithRequestCallback,
       onContentProcessDidTerminateProp,
     });
+
+    const setNativeRefreshing = useCallback((refreshing: boolean) => {
+      if (webViewRef.current) {
+        Commands.setNativeRefreshing(webViewRef.current, refreshing);
+      }
+    }, []);
+    const refreshControlProps = useRefreshControl(refreshControl, setNativeRefreshing);
+
+    const usesRemovedRefreshProps =
+      'pullToRefreshEnabled' in otherProps || 'refreshControlLightMode' in otherProps;
+    useEffect(() => {
+      if (__DEV__ && usesRemovedRefreshProps) {
+        console.warn(
+          'WebView: `pullToRefreshEnabled` and `refreshControlLightMode` have been removed. ' +
+            'Pass a `<RefreshControl />` element to the `refreshControl` prop instead.',
+        );
+      }
+    }, [usesRemovedRefreshProps]);
 
     useImperativeHandle(
       ref,
@@ -242,6 +263,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
         style={webViewStyles}
         hasOnFileDownload={!!onFileDownload}
         ref={webViewRef}
+        {...refreshControlProps}
         {...nativeConfig?.props}
       />
     );

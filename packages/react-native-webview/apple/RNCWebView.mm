@@ -6,6 +6,7 @@
 #import <react/renderer/components/RNCWebViewSpec/Props.h>
 #import <react/renderer/components/RNCWebViewSpec/RCTComponentViewHelpers.h>
 
+#import <React/RCTConversions.h>
 #import <React/RCTFabricComponentsPlugins.h>
 
 using namespace facebook::react;
@@ -244,6 +245,12 @@ static inline std::string nullSafeStringWithLength(id value) {
                 webViewEventEmitter->onScroll(data);
             }
         };
+        _view.onRefresh = [self](NSDictionary* dictionary) {
+            if (_eventEmitter) {
+                auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
+                webViewEventEmitter->onRefresh({});
+            }
+        };
         _view.onHttpError = [self](NSDictionary* dictionary) {
             if (_eventEmitter) {
                 auto webViewEventEmitter = std::static_pointer_cast<RNCWebViewEventEmitter const>(_eventEmitter);
@@ -315,8 +322,21 @@ static inline std::string nullSafeStringWithLength(id value) {
     REMAP_WEBVIEW_PROP(fraudulentWebsiteWarningEnabled)
     #endif // !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(enableApplePay)
-    REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
-    REMAP_WEBVIEW_PROP(refreshControlLightMode)
+    // Pull to refresh. `refreshing` comes last: a refreshing control ignores
+    // changes to how it looks.
+    REMAP_WEBVIEW_PROP(hasOnRefresh)
+    #if !TARGET_OS_OSX
+    if (oldViewProps.refreshControlTintColor != newViewProps.refreshControlTintColor) {
+        _view.refreshControlTintColor = RCTUIColorFromSharedColor(newViewProps.refreshControlTintColor);
+    }
+    if (oldViewProps.refreshControlTitleColor != newViewProps.refreshControlTitleColor) {
+        _view.refreshControlTitleColor = RCTUIColorFromSharedColor(newViewProps.refreshControlTitleColor);
+    }
+    #endif // !TARGET_OS_OSX
+    REMAP_WEBVIEW_STRING_PROP(refreshControlTitle)
+    REMAP_WEBVIEW_PROP(refreshControlProgressViewOffset)
+    REMAP_WEBVIEW_PROP(refreshControlEnabled)
+    REMAP_WEBVIEW_PROP(refreshing)
     REMAP_WEBVIEW_PROP(bounces)
     REMAP_WEBVIEW_PROP(useSharedProcessPool)
     REMAP_WEBVIEW_STRING_PROP(userAgent)
@@ -549,6 +569,10 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
 
 - (void)reload {
     [_view reload];
+}
+
+- (void)setNativeRefreshing:(BOOL)refreshing {
+    [_view setNativeRefreshing:refreshing];
 }
 
 - (void)requestFocus {

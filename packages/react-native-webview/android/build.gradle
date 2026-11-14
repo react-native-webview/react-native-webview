@@ -92,6 +92,8 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion')}"
     implementation "androidx.webkit:webkit:${safeExtGet('webkitVersion')}"
+    // Same version as the one React Native ships for its own RefreshControl.
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     testImplementation "junit:junit:4.13.2"
 }

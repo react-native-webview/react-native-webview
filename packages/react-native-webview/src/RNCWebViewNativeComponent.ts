@@ -1,4 +1,4 @@
-import type { CodegenTypes, HostComponent, ViewProps } from 'react-native';
+import type { CodegenTypes, ColorValue, HostComponent, ViewProps } from 'react-native';
 import { codegenNativeCommands, codegenNativeComponent } from 'react-native';
 
 export type WebViewNativeEvent = Readonly<{
@@ -203,8 +203,8 @@ export interface NativeProps extends ViewProps {
     'prompt'
   >;
   pagingEnabled?: boolean;
-  pullToRefreshEnabled?: boolean;
-  refreshControlLightMode?: boolean;
+  refreshControlTitle?: string;
+  refreshControlTitleColor?: ColorValue;
   removeIosKeyboardObserver?: CodegenTypes.WithDefault<boolean, false>;
   scrollEnabled?: CodegenTypes.WithDefault<boolean, true>;
   sharedCookiesEnabled?: boolean;
@@ -266,6 +266,22 @@ export interface NativeProps extends ViewProps {
   userAgent?: string;
   injectedJavaScriptObject?: string;
   paymentRequestEnabled?: boolean;
+
+  // Pull to refresh (iOS and Android). These are filled in from the
+  // `refreshControl` prop by `useRefreshControl`.
+  refreshControlEnabled?: boolean;
+  // Whether the app handles the refresh itself. When false, the native side
+  // reloads the page and hides the indicator once the load ends.
+  hasOnRefresh?: boolean;
+  refreshing?: boolean;
+  onRefresh?: CodegenTypes.DirectEventHandler<null>;
+  refreshControlTintColor?: ColorValue;
+  refreshControlProgressViewOffset?: CodegenTypes.Float;
+  // Android only
+  refreshControlColors?: ReadonlyArray<ColorValue>;
+  refreshControlProgressBackgroundColor?: ColorValue;
+  refreshControlSize?: CodegenTypes.WithDefault<'default' | 'large', 'default'>;
+  // !Android only
 }
 
 export interface NativeCommands {
@@ -279,6 +295,10 @@ export interface NativeCommands {
   ) => void;
   requestFocus: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
   postMessage: (viewRef: React.ElementRef<HostComponent<NativeProps>>, data: string) => void;
+  setNativeRefreshing: (
+    viewRef: React.ElementRef<HostComponent<NativeProps>>,
+    refreshing: boolean,
+  ) => void;
   // Android Only
   loadUrl: (viewRef: React.ElementRef<HostComponent<NativeProps>>, url: string) => void;
   clearFormData: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
@@ -299,6 +319,7 @@ export const Commands = codegenNativeCommands<NativeCommands>({
     'injectJavaScript',
     'requestFocus',
     'postMessage',
+    'setNativeRefreshing',
     'loadUrl',
     'clearFormData',
     'clearCache',

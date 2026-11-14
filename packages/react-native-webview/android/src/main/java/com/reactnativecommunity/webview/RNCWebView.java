@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -18,6 +19,8 @@ import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.NestedScrollingParent3;
+import androidx.core.view.ViewCompat;
 import androidx.webkit.JavaScriptReplyProxy;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
@@ -80,6 +83,64 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+
+    /*
+     * Pull to refresh. RNCWebViewRefreshGesture decides when the finger pulls the indicator,
+     * and refreshParent shows it.
+     *
+     * The fields that setOverScrollMode() reads have no initializers on purpose: the View
+     * constructor calls it before the initializers of this class run.
+     */
+    // The layout that shows the refresh indicator, or null when there is no refresh control.
+    private @Nullable NestedScrollingParent3 refreshParent;
+    private final RNCWebViewRefreshGesture refreshGesture =
+            new RNCWebViewRefreshGesture(ViewConfiguration.get(getContext()).getScaledTouchSlop());
+    // The gesture drives refreshParent with the nested scrolling callbacks, the same way a
+    // RecyclerView drives a SwipeRefreshLayout.
+    private final RNCWebViewRefreshGesture.Target refreshGestureTarget = new RNCWebViewRefreshGesture.Target() {
+        @Override
+        public boolean start() {
+            if (refreshParent == null
+                    || !refreshParent.onStartNestedScroll(RNCWebView.this, RNCWebView.this, ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_TOUCH)) {
+                return false;
+            }
+            refreshParent.onNestedScrollAccepted(RNCWebView.this, RNCWebView.this, ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_TOUCH);
+            suppressEdgeEffect();
+            return true;
+        }
+
+        @Override
+        public void pull(int distance) {
+            if (refreshParent == null) {
+                return;
+            }
+            nestedScrollConsumed[0] = 0;
+            nestedScrollConsumed[1] = 0;
+            refreshParent.onNestedScroll(RNCWebView.this, 0, 0, 0, -distance, ViewCompat.TYPE_TOUCH, nestedScrollConsumed);
+        }
+
+        @Override
+        public int release(int distance) {
+            if (refreshParent == null) {
+                return 0;
+            }
+            nestedScrollConsumed[0] = 0;
+            nestedScrollConsumed[1] = 0;
+            refreshParent.onNestedPreScroll(RNCWebView.this, 0, distance, nestedScrollConsumed, ViewCompat.TYPE_TOUCH);
+            return nestedScrollConsumed[1];
+        }
+
+        @Override
+        public void stop() {
+            if (refreshParent != null) {
+                refreshParent.onStopNestedScroll(RNCWebView.this, ViewCompat.TYPE_TOUCH);
+            }
+        }
+    };
+    // The edge effect is turned off while the indicator is pulled, both would show otherwise.
+    private boolean edgeEffectSuppressed;
+    private int savedOverScrollMode;
+    private final int[] nestedScrollConsumed = new int[2];
     // Value of the profile prop at mount, whether or not binding it succeeded.
     private @Nullable String profile = null;
     // Cookie jar of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
@@ -198,7 +259,102 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         if (this.nestedScrollEnabled) {
             requestDisallowInterceptTouchEvent(true);
         }
-        return super.onTouchEvent(event);
+
+        final int action = event.getActionMasked();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                refreshGesture.onDown(event.getPointerId(0), event.getX(), event.getY());
+                // Before the WebView sees the event, so that the new edge effect is armed by it.
+                restoreEdgeEffect();
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                refreshGesture.onPointerDown();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                refreshGesture.onMove(event.getPointerCount(), event.getPointerId(0), event.getX(), event.getY());
+                break;
+            default:
+                break;
+        }
+
+        // Finger movement that went to the indicator: the page must not scroll by it.
+        final int touchOffsetY = refreshGesture.getTouchOffsetY();
+        final boolean handled;
+        if (touchOffsetY != 0) {
+            MotionEvent offsetEvent = MotionEvent.obtain(event);
+            offsetEvent.offsetLocation(0, touchOffsetY);
+            handled = super.onTouchEvent(offsetEvent);
+            offsetEvent.recycle();
+        } else {
+            handled = super.onTouchEvent(event);
+        }
+
+        if (action == MotionEvent.ACTION_UP) {
+            refreshGesture.onUp();
+        } else if (action == MotionEvent.ACTION_CANCEL) {
+            refreshGesture.onCancel();
+        }
+        return handled;
+    }
+
+    @Override
+    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY,
+                                   int scrollRangeX, int scrollRangeY, int maxOverScrollX,
+                                   int maxOverScrollY, boolean isTouchEvent) {
+        // isTouchEvent is not reliable here: the overscroll is reported after the touch event
+        // has been handled, so the finger is tracked in onTouchEvent() instead.
+        refreshGesture.onBeforeScroll(deltaY, scrollY);
+        final boolean clamped = super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX,
+                scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
+        refreshGesture.onAfterScroll(deltaY);
+        return clamped;
+    }
+
+    /**
+     * Sets the layout that shows the refresh indicator and receives the overscroll of the page,
+     * or null to turn pull to refresh off.
+     */
+    public void setRefreshParent(@Nullable NestedScrollingParent3 refreshParent) {
+        if (this.refreshParent == refreshParent) {
+            return;
+        }
+        // Ends a gesture in progress on the previous layout, without refreshing.
+        refreshGesture.setTarget(null);
+        this.refreshParent = refreshParent;
+        if (refreshParent == null) {
+            restoreEdgeEffect();
+        } else {
+            refreshGesture.setTarget(refreshGestureTarget);
+        }
+    }
+
+    private void suppressEdgeEffect() {
+        if (edgeEffectSuppressed) {
+            return;
+        }
+        savedOverScrollMode = getOverScrollMode();
+        super.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        edgeEffectSuppressed = true;
+    }
+
+    // Done when the next gesture starts and not when this one ends: the last overscroll of a
+    // gesture is reported after the finger is up and would flash the edge effect.
+    private void restoreEdgeEffect() {
+        if (!edgeEffectSuppressed) {
+            return;
+        }
+        edgeEffectSuppressed = false;
+        super.setOverScrollMode(savedOverScrollMode);
+    }
+
+    @Override
+    public void setOverScrollMode(int mode) {
+        if (edgeEffectSuppressed) {
+            // Applied once the edge effect is restored.
+            savedOverScrollMode = mode;
+            return;
+        }
+        super.setOverScrollMode(mode);
     }
 
     @Override

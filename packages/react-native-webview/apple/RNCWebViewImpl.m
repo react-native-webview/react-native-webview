@@ -20,6 +20,11 @@
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
+#if !TARGET_OS_OSX
+// How long the indicator of an automatic refresh may stay when nothing reports
+// the end of the reload.
+static const NSTimeInterval kAutoRefreshTimeout = 10;
+#endif // !TARGET_OS_OSX
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
@@ -141,6 +146,10 @@ RCTAutoInsetsProtocol>
   // Workaround for StatusBar appearance bug for iOS 12
   // https://github.com/react-native-webview/react-native-webview/issues/62
   BOOL _isFullScreenVideoOpen;
+  // The navigation that last loaded the `html` source, and whether its page is
+  // still the one on screen: `reload` then loads the HTML again.
+  WKNavigation *_htmlSourceNavigation;
+  BOOL _htmlSourceShown;
 #if !TARGET_OS_OSX
   UIStatusBarStyle _savedStatusBarStyle;
 #endif // !TARGET_OS_OSX
@@ -149,6 +158,20 @@ RCTAutoInsetsProtocol>
 #if !TARGET_OS_OSX
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
+
+  UIRefreshControl *_refreshControl;
+  // The pull went past the threshold and the finger is still down: the refresh
+  // starts on release, and is dropped if the user drags back up first.
+  BOOL _refreshTriggered;
+  // A pull started a reload (no `onRefresh`): the indicator hides when it ends.
+  BOOL _autoRefreshing;
+  // Identifies that reload, for the timeout that hides its indicator.
+  NSUInteger _autoRefreshToken;
+  // The navigation of that reload: the end of another one, such as the
+  // previous reload that this one cancelled, does not end it.
+  WKNavigation *_autoRefreshNavigation;
+  // Content offset of the scroll view at rest, taken when a drag begins.
+  CGFloat _restingContentOffsetY;
 #endif // !TARGET_OS_OSX
 }
 
@@ -518,13 +541,10 @@ RCTAutoInsetsProtocol>
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
 #if !TARGET_OS_OSX
-    if (_pullToRefreshEnabled) {
-      [self addPullToRefreshControl];
-    }
     _webView.scrollView.scrollEnabled = _scrollEnabled;
     _webView.scrollView.pagingEnabled = _pagingEnabled;
-    //For UIRefreshControl to work correctly, the bounces should always be true
-    _webView.scrollView.bounces = _pullToRefreshEnabled || _bounces;
+    // Also sets `bounces`, which UIRefreshControl needs.
+    [self updateRefreshControl];
     _webView.scrollView.showsHorizontalScrollIndicator = _showsHorizontalScrollIndicator;
     _webView.scrollView.showsVerticalScrollIndicator = _showsVerticalScrollIndicator;
 
@@ -599,8 +619,15 @@ RCTAutoInsetsProtocol>
     } else if (@available(iOS 14.5, macOS 11.3, *)) {
         [_webView suspendAllMediaPlayback:nil];
     }
+    _htmlSourceNavigation = nil;
+    _htmlSourceShown = NO;
 #if !TARGET_OS_OSX
     _webView.scrollView.delegate = nil;
+    _webView.scrollView.refreshControl = nil;
+    _refreshControl = nil;
+    _refreshTriggered = NO;
+    _autoRefreshing = NO;
+    _autoRefreshNavigation = nil;
     if (_menuItems) {
       UIMenuController *menuController = [UIMenuController sharedMenuController];
       menuController.menuItems = nil;
@@ -812,7 +839,7 @@ RCTAutoInsetsProtocol>
     if (!baseURL) {
       baseURL = [NSURL URLWithString:@"about:blank"];
     }
-    [_webView loadHTMLString:html baseURL:baseURL];
+    [self loadHTMLSource:html baseURL:baseURL];
     return;
   }
   // Add cookie for subsequent resource requests sent by page itself, if cookie was set in headers on WebView
@@ -995,6 +1022,16 @@ RCTAutoInsetsProtocol>
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
   scrollView.decelerationRate = _decelerationRate;
+  _restingContentOffsetY = -scrollView.adjustedContentInset.top;
+}
+
+// UIScrollViewDelegate method
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+  if (_refreshTriggered) {
+    _refreshTriggered = NO;
+    [self startRefresh];
+  }
 }
 #endif // !TARGET_OS_OSX
 
@@ -1016,6 +1053,12 @@ RCTAutoInsetsProtocol>
 // UIScrollViewDelegate method
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+  // The user dragged back up before letting go: drop the pending refresh.
+  if (_refreshTriggered && scrollView.isDragging && scrollView.contentOffset.y >= _restingContentOffsetY) {
+    _refreshTriggered = NO;
+    [_refreshControl endRefreshing];
+  }
+
   // Don't allow scrolling the scrollView.
   if (!_scrollEnabled) {
     scrollView.bounds = _webView.bounds;
@@ -1095,7 +1138,17 @@ RCTAutoInsetsProtocol>
   // Ensure webview takes the position and dimensions of RNCWebViewImpl
   _webView.frame = self.bounds;
 #if !TARGET_OS_OSX
-  _webView.scrollView.contentInset = _contentInset;
+  // While it refreshes, UIRefreshControl adds its height to the top inset and
+  // takes it back when it ends. Leave the insets alone then: resetting them
+  // puts the indicator above the content, out of sight.
+  if (_refreshControl == nil || !_refreshControl.isRefreshing) {
+    _webView.scrollView.contentInset = _contentInset;
+  }
+  // A component that mounts with `refreshing` set asks for the indicator
+  // before the web view is in a window, where UIKit cannot show it.
+  if (_refreshing && _hasOnRefresh && _webView.window != nil && _refreshControl != nil && !_refreshControl.isRefreshing) {
+    [self setNativeRefreshing:YES];
+  }
 #endif // !TARGET_OS_OSX
 }
 
@@ -1335,6 +1388,10 @@ RCTAutoInsetsProtocol>
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (!shouldStart) {
                     decisionHandler(WKNavigationActionPolicyCancel);
+                    if (isTopFrame) {
+                        // A refused reload never reaches the navigation callbacks.
+                        [self endAutoRefresh];
+                    }
                     return;
                 }
                 if (self->_onLoadingStart) {
@@ -1395,6 +1452,7 @@ RCTAutoInsetsProtocol>
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
 {
   RCTLogWarn(@"Webview Process Terminated");
+  [self endAutoRefresh];
   if (_onContentProcessDidTerminate) {
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     _onContentProcessDidTerminate(event);
@@ -1450,6 +1508,8 @@ RCTAutoInsetsProtocol>
   didFailProvisionalNavigation:(WKNavigation *)navigation
                      withError:(NSError *)error
 {
+  [self endAutoRefreshForNavigation:navigation];
+
   if (_onLoadingError) {
     if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) {
       // NSURLErrorCancelled is reported when a page has a redirect OR if you load
@@ -1527,12 +1587,38 @@ RCTAutoInsetsProtocol>
 }
 
 /**
+ * Called when a navigation fails after the page started to arrive. Nothing is
+ * reported to JS for it, but a reload started by a pull to refresh is over.
+ */
+- (void)webView:(WKWebView *)webView
+  didFailNavigation:(WKNavigation *)navigation
+          withError:(NSError *)error
+{
+  [self endAutoRefreshForNavigation:navigation];
+}
+
+/**
+ * Called when the page of a main frame navigation replaces the one on screen,
+ * for every kind of navigation: a link, a reload, going back.
+ * @see https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview
+ */
+- (void)webView:(WKWebView *)webView
+  didCommitNavigation:(WKNavigation *)navigation
+{
+  // Going back to the page of the `html` source is a navigation of its own, so
+  // that page then counts as any other page and `reload` leaves it to WebKit.
+  _htmlSourceShown = navigation != nil && navigation == _htmlSourceNavigation;
+}
+
+/**
  * Called when the navigation is complete.
  * @see https://fburl.com/rtys6jlb
  */
 - (void)webView:(WKWebView *)webView
 didFinishNavigation:(WKNavigation *)navigation
 {
+  [self endAutoRefreshForNavigation:navigation];
+
   if (_ignoreSilentHardwareSwitch) {
     [self forceIgnoreSilentHardwareSwitch:true];
   }
@@ -1571,6 +1657,43 @@ didFinishNavigation:(WKNavigation *)navigation
 
 - (void)reload
 {
+  [self reloadPage];
+}
+
+/**
+ * Loads the `html` source and remembers its navigation, to know later whether
+ * its page is still the one on screen. Returns NO when WebKit started nothing.
+ */
+- (BOOL)loadHTMLSource:(NSString *)html baseURL:(NSURL *)baseURL
+{
+  _htmlSourceNavigation = [_webView loadHTMLString:html baseURL:baseURL];
+  // Until another page commits. Not comparing URLs: WebKit rewrites the one it
+  // reports (`https://example.com` becomes `https://example.com/`), and a
+  // real page may have the same URL as the base URL.
+  _htmlSourceShown = _htmlSourceNavigation != nil;
+  return _htmlSourceShown;
+}
+
+/**
+ * Reloads the page and returns its navigation, or nil when there was nothing
+ * to reload, in which case no navigation callback follows.
+ */
+- (WKNavigation *)reloadPage
+{
+  /**
+   * A page loaded from an HTML string has nothing to reload from: WebKit
+   * would load the base URL instead. Load the HTML again while it is still
+   * the page on screen.
+   */
+  NSString *html = [RCTConvert NSString:_source[@"html"]];
+  if (html && _htmlSourceShown) {
+    NSURL *baseURL = [RCTConvert NSURL:_source[@"baseUrl"]];
+    if (!baseURL) {
+      baseURL = [NSURL URLWithString:@"about:blank"];
+    }
+    return [self loadHTMLSource:html baseURL:baseURL] ? _htmlSourceNavigation : nil;
+  }
+
   /**
    * When the initial load fails due to network connectivity issues,
    * [_webView reload] doesn't reload the webpage. Therefore, we must
@@ -1579,41 +1702,207 @@ didFinishNavigation:(WKNavigation *)navigation
   NSURLRequest *request = [self requestForSource:self.source];
 
   if (request.URL && !_webView.URL.absoluteString.length) {
-    [_webView loadRequest:request];
-  } else {
-    [_webView reload];
+    return [_webView loadRequest:request];
   }
+  return [_webView reload];
 }
+
+#pragma mark - Pull to refresh
+
+/**
+ * A navigation ended. The reload of a pull to refresh is over when it is its
+ * own: a second pull cancels the reload of the first one, whose failure must
+ * not hide the indicator of the second.
+ */
+- (void)endAutoRefreshForNavigation:(WKNavigation *)navigation
+{
 #if !TARGET_OS_OSX
-- (void)addPullToRefreshControl
-{
-  UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-  _refreshControl = refreshControl;
-  if(_refreshControlLightMode) {
-    [refreshControl setTintColor:[UIColor whiteColor]];
+  if (_autoRefreshNavigation != nil && navigation != _autoRefreshNavigation) {
+    return;
   }
-  [_webView.scrollView addSubview: refreshControl];
-  [refreshControl addTarget:self action:@selector(pullToRefresh:) forControlEvents: UIControlEventValueChanged];
+  [self endAutoRefresh];
+#endif // !TARGET_OS_OSX
 }
 
-- (void)pullToRefresh:(UIRefreshControl *)refreshControl
+- (void)endAutoRefresh
 {
-  [self reload];
-  [refreshControl endRefreshing];
+#if !TARGET_OS_OSX
+  _autoRefreshNavigation = nil;
+  if (_autoRefreshing) {
+    _autoRefreshing = NO;
+    [_refreshControl endRefreshing];
+  }
+#endif // !TARGET_OS_OSX
 }
 
-
-- (void)setPullToRefreshEnabled:(BOOL)pullToRefreshEnabled
+- (void)setNativeRefreshing:(BOOL)refreshing
 {
-  _pullToRefreshEnabled = pullToRefreshEnabled;
+#if !TARGET_OS_OSX
+  if (_refreshControl == nil) {
+    return;
+  }
+  if (!refreshing) {
+    _refreshTriggered = NO;
+    _autoRefreshing = NO;
+    _autoRefreshNavigation = nil;
+    [_refreshControl endRefreshing];
+  } else if (!_refreshControl.isRefreshing && _webView.window != nil) {
+    // Not before the web view is in a window: UIKit ignores it there, and
+    // layoutSubviews asks again. This view gets its window before it adds
+    // the web view, so it is the window of the web view that counts.
+    // Without a pull the indicator sits above the content: scroll it into
+    // view, like React Native does for a ScrollView.
+    // beginRefreshing adds the height of the indicator to the top inset: scroll
+    // to the new top, not by that height, which would move the content twice
+    // and does not survive the web view resetting the offset when it loads.
+    // Only from the top of the page, where the indicator is.
+    UIScrollView *scrollView = _webView.scrollView;
+    BOOL atTop = scrollView.contentOffset.y <= -scrollView.adjustedContentInset.top + 0.5;
+    [_refreshControl beginRefreshing];
+    if (atTop) {
+      CGPoint offset = {scrollView.contentOffset.x, -scrollView.adjustedContentInset.top};
+      [scrollView setContentOffset:offset animated:YES];
+    }
+  }
+#endif // !TARGET_OS_OSX
+}
 
-  if (pullToRefreshEnabled) {
-    [self addPullToRefreshControl];
+- (void)setRefreshing:(BOOL)refreshing
+{
+  _refreshing = refreshing;
+  [self setNativeRefreshing:refreshing];
+}
+
+#if !TARGET_OS_OSX
+/**
+ * Creates, styles or removes the UIRefreshControl so that it matches the
+ * props. Safe to call at any time: it does nothing until the web view exists.
+ */
+- (void)updateRefreshControl
+{
+  if (_webView == nil) {
+    return;
+  }
+  UIScrollView *scrollView = _webView.scrollView;
+  // For UIRefreshControl to work correctly, the bounces should always be true
+  scrollView.bounces = _refreshControlEnabled || _bounces;
+
+  if (!_refreshControlEnabled) {
+    if (_refreshControl != nil) {
+      [_refreshControl endRefreshing];
+      scrollView.refreshControl = nil;
+      _refreshControl = nil;
+      _refreshTriggered = NO;
+      _autoRefreshing = NO;
+      _autoRefreshNavigation = nil;
+    }
+    return;
+  }
+
+  BOOL created = _refreshControl == nil;
+  if (created) {
+    _refreshControl = [[UIRefreshControl alloc] init];
+    [_refreshControl addTarget:self
+                        action:@selector(refreshControlValueChanged:)
+              forControlEvents:UIControlEventValueChanged];
+    // Not `addSubview:`. The scroll view lays out its own refresh control and
+    // accounts for it in its insets.
+    scrollView.refreshControl = _refreshControl;
+  }
+
+  _refreshControl.tintColor = _refreshControlTintColor;
+  if (_refreshControlTitle.length) {
+    NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+    if (_refreshControlTitleColor != nil) {
+      attributes[NSForegroundColorAttributeName] = _refreshControlTitleColor;
+    }
+    _refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:_refreshControlTitle
+                                                                       attributes:attributes];
   } else {
-    [_refreshControl removeFromSuperview];
+    _refreshControl.attributedTitle = nil;
   }
+  _refreshControl.bounds = CGRectMake(_refreshControl.bounds.origin.x,
+                                      -_refreshControlProgressViewOffset,
+                                      _refreshControl.bounds.size.width,
+                                      _refreshControl.bounds.size.height);
 
-  [self setBounces:_bounces];
+  // The styling above has to come first: a refreshing control ignores it.
+  if (created && _refreshing && _hasOnRefresh) {
+    [self setNativeRefreshing:YES];
+  }
+}
+
+- (void)refreshControlValueChanged:(UIRefreshControl *)refreshControl
+{
+  if (_webView.scrollView.isDragging) {
+    // Reloading while the finger is still down makes the page jump under it.
+    _refreshTriggered = YES;
+  } else {
+    [self startRefresh];
+  }
+}
+
+- (void)startRefresh
+{
+  if (_hasOnRefresh) {
+    // The indicator now spins until `refreshing` is set back to false.
+    if (_onRefresh) {
+      _onRefresh(@{});
+    }
+  } else {
+    [self beginAutoRefresh];
+    _autoRefreshNavigation = [self reloadPage];
+    if (_autoRefreshNavigation == nil) {
+      [self endAutoRefresh];
+    }
+  }
+}
+
+- (void)beginAutoRefresh
+{
+  _autoRefreshing = YES;
+  // A reload does not always report its end, when it turns into a download for
+  // example: do not let the indicator spin forever. The page keeps loading,
+  // only the indicator goes.
+  NSUInteger token = ++_autoRefreshToken;
+  __weak __typeof(self) weakSelf = self;
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kAutoRefreshTimeout * NSEC_PER_SEC)),
+                 dispatch_get_main_queue(), ^{
+    __typeof(self) strongSelf = weakSelf;
+    if (strongSelf != nil && strongSelf->_autoRefreshToken == token) {
+      [strongSelf endAutoRefresh];
+    }
+  });
+}
+
+- (void)setRefreshControlEnabled:(BOOL)refreshControlEnabled
+{
+  _refreshControlEnabled = refreshControlEnabled;
+  [self updateRefreshControl];
+}
+
+- (void)setRefreshControlTintColor:(UIColor *)refreshControlTintColor
+{
+  _refreshControlTintColor = refreshControlTintColor;
+  [self updateRefreshControl];
+}
+
+- (void)setRefreshControlTitle:(NSString *)refreshControlTitle
+{
+  _refreshControlTitle = [refreshControlTitle copy];
+  [self updateRefreshControl];
+}
+
+- (void)setRefreshControlTitleColor:(UIColor *)refreshControlTitleColor
+{
+  _refreshControlTitleColor = refreshControlTitleColor;
+  [self updateRefreshControl];
+}
+
+- (void)setRefreshControlProgressViewOffset:(CGFloat)refreshControlProgressViewOffset
+{
+  _refreshControlProgressViewOffset = refreshControlProgressViewOffset;
+  [self updateRefreshControl];
 }
 #endif // !TARGET_OS_OSX
 
@@ -1663,7 +1952,7 @@ didFinishNavigation:(WKNavigation *)navigation
 {
   _bounces = bounces;
   //For UIRefreshControl to work correctly, the bounces should always be true
-  _webView.scrollView.bounces = _pullToRefreshEnabled || bounces;
+  _webView.scrollView.bounces = _refreshControlEnabled || bounces;
 }
 #endif // !TARGET_OS_OSX
 

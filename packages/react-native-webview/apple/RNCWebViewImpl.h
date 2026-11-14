@@ -111,15 +111,23 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL ignoreSilentHardwareSwitch;
 @property (nonatomic, copy) NSString * _Nullable allowingReadAccessToURL;
 @property (nonatomic, copy) NSDictionary * _Nullable basicAuthCredential;
-@property (nonatomic, assign) BOOL pullToRefreshEnabled;
-@property (nonatomic, assign) BOOL refreshControlLightMode;
+// Pull to refresh (iOS only). Without `hasOnRefresh`, pulling reloads the page
+// and the indicator hides when the load ends. With it, `onRefresh` is emitted
+// and the indicator follows `refreshing`.
+@property (nonatomic, copy) RCTDirectEventBlock onRefresh;
+@property (nonatomic, assign) BOOL refreshControlEnabled;
+@property (nonatomic, assign) BOOL hasOnRefresh;
+@property (nonatomic, assign) BOOL refreshing;
+@property (nonatomic, assign) CGFloat refreshControlProgressViewOffset;
+@property (nonatomic, copy) NSString * _Nullable refreshControlTitle;
 @property (nonatomic, assign) BOOL enableApplePay;
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
 @property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;
 @property (nonatomic, copy) RCTDirectEventBlock onCustomMenuSelection;
 #if !TARGET_OS_OSX
 @property (nonatomic, assign) WKDataDetectorTypes dataDetectorTypes;
-@property (nonatomic, weak) UIRefreshControl * _Nullable refreshControl;
+@property (nonatomic, strong) UIColor * _Nullable refreshControlTintColor;
+@property (nonatomic, strong) UIColor * _Nullable refreshControlTitleColor;
 #endif
 
 #if !TARGET_OS_OSX
@@ -145,10 +153,9 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)requestFocus;
 - (void)clearCache:(BOOL)includeDiskFiles;
 - (void)destroyWebView;
-#if !TARGET_OS_OSX
-- (void)addPullToRefreshControl;
-- (void)pullToRefresh:(UIRefreshControl *)refreshControl;
-#endif
+// Shows or hides the refresh indicator without going through the `refreshing`
+// prop. Used to bring the indicator back in line with the JS side.
+- (void)setNativeRefreshing:(BOOL)refreshing;
 
 @end
 

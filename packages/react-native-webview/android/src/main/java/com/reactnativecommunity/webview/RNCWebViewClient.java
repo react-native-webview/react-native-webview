@@ -2,6 +2,7 @@ package com.reactnativecommunity.webview;
 
 import android.graphics.Bitmap;
 import android.net.http.SslError;
+import android.os.Message;
 import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
@@ -46,9 +47,27 @@ public class RNCWebViewClient extends WebViewClient {
         basicAuthCredential = credential;
     }
 
+    // Lets the refresh control hide its indicator after a reload it started itself.
+    private void notifyLoadEnded(WebView webView) {
+        RNCWebViewWrapper wrapper = RNCWebViewWrapper.fromWebView(webView);
+        if (wrapper != null) {
+            wrapper.onLoadEnded();
+        }
+    }
+
+    @Override
+    public void onFormResubmission(WebView webView, Message dontResend, Message resend) {
+        // Reloading the result of a form submission asks whether to send the form again. The
+        // default answer is kept: it is not sent, and the reload is cancelled without any other
+        // callback.
+        super.onFormResubmission(webView, dontResend, resend);
+        notifyLoadEnded(webView);
+    }
+
     @Override
     public void onPageFinished(WebView webView, String url) {
         super.onPageFinished(webView, url);
+        notifyLoadEnded(webView);
         CookieManager cookieManager = ((RNCWebView) webView).getCookieManager();
         String cookies = cookieManager.getCookie(url);
         if (cookies != null) {
@@ -238,6 +257,7 @@ public class RNCWebViewClient extends WebViewClient {
 
         super.onReceivedError(webView, errorCode, description, failingUrl);
         mLastLoadFailed = true;
+        notifyLoadEnded(webView);
 
         // In case of an error JS side expect to get a finish event first, and then get an error event
         // Android WebView does it in the opposite way, so we need to simulate that behavior
@@ -289,6 +309,8 @@ public class RNCWebViewClient extends WebViewClient {
         if(webView == null){
             return true;
         }
+
+        notifyLoadEnded(webView);
 
         WritableMap event = createWebViewEvent(webView, webView.getUrl());
         event.putBoolean("didCrash", detail.didCrash());
