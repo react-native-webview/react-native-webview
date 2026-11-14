@@ -85,7 +85,7 @@ jobs:
           working-directory: packages/example-mobile
           script: |
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            maestro test -e APP_ID=com.microsoft.reacttestapp e2e
+            maestro test -e APP_ID=com.microsoft.reacttestapp e2e || { echo "::group::Screen and errors at the time of the failure"; maestro hierarchy; adb logcat -d -t 3000 | grep -E "AndroidRuntime|ReactNativeJS|FATAL EXCEPTION|ANR in|SoLoader|chromium" | tail -150; echo "::endgroup::"; exit 1; }
       - name: Upload Maestro report
         if: failure()
         uses: actions/upload-artifact@v4
