@@ -7,6 +7,7 @@ import {
   NativeMethodsMixin,
   UIManagerStatic,
   NativeScrollEvent,
+  RefreshControlProps,
 } from 'react-native';
 
 import type NativeWebViewComponent from './RNCWebViewNativeComponent';
@@ -658,21 +659,26 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   injectedJavaScriptBeforeContentLoadedForMainFrameOnly?: boolean;
 
   /**
-   * Boolean value that determines whether a pull to refresh gesture is
-   * available in the `WebView`. The default value is `false`.
-   * If `true`, sets `bounces` automatically to `true`
-   * @platform ios
+   * Enables pull to refresh. Pass a React Native `<RefreshControl />` element,
+   * like on a `ScrollView`.
    *
-   */
-  pullToRefreshEnabled?: boolean;
-
-  /**
-   * Boolean value that determines whether the refresh control color is white or not.
-   * The default value is `false`, meaning the refresh control color will be the default.
-   * @platform ios
+   * The element is not mounted: the `WebView` reads its props and drives the
+   * native refresh indicator itself (`UIRefreshControl` on iOS,
+   * `SwipeRefreshLayout` on Android).
    *
+   * - Without `onRefresh`, pulling reloads the page and the indicator hides
+   *   when the load ends. `refreshing` is ignored.
+   * - With `onRefresh`, nothing is reloaded for you: do the refresh in
+   *   `onRefresh` and control the indicator with `refreshing`.
+   *
+   * Supported props: `refreshing`, `onRefresh`, `enabled`, `tintColor`,
+   * `progressViewOffset`, plus `title` and `titleColor` on iOS, and `colors`,
+   * `progressBackgroundColor` and `size` on Android. On Android `tintColor` is
+   * used when `colors` is not set.
+   *
+   * @platform ios, android
    */
-  refreshControlLightMode?: boolean;
+  refreshControl?: ReactElement<RefreshControlProps>;
 
   /**
    * Determines the style of the scroll indicators. This property works the same
@@ -1161,6 +1167,28 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   nestedScrollEnabled?: boolean;
+
+  /**
+   * Enables pull to refresh. Pass a React Native `<RefreshControl />` element,
+   * like on a `ScrollView`.
+   *
+   * The element is not mounted: the `WebView` reads its props and drives the
+   * native refresh indicator itself (`UIRefreshControl` on iOS,
+   * `SwipeRefreshLayout` on Android).
+   *
+   * - Without `onRefresh`, pulling reloads the page and the indicator hides
+   *   when the load ends. `refreshing` is ignored.
+   * - With `onRefresh`, nothing is reloaded for you: do the refresh in
+   *   `onRefresh` and control the indicator with `refreshing`.
+   *
+   * Supported props: `refreshing`, `onRefresh`, `enabled`, `tintColor`,
+   * `progressViewOffset`, plus `title` and `titleColor` on iOS, and `colors`,
+   * `progressBackgroundColor` and `size` on Android. On Android `tintColor` is
+   * used when `colors` is not set.
+   *
+   * @platform ios, android
+   */
+  refreshControl?: ReactElement<RefreshControlProps>;
 
   /**
    * Sets the minimum font size.

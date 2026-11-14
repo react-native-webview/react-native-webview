@@ -35,6 +35,8 @@ import {
   type ShouldStartLoadRequestEvent,
 } from './WebViewTypes';
 
+import { useRefreshControl } from './useRefreshControl';
+
 import styles from './WebView.styles';
 
 const resolveAssetSource = (source: ImageSourcePropType) => Image.resolveAssetSource(source);
@@ -89,6 +91,7 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
       nativeConfig,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       injectedJavaScriptObject,
+      refreshControl,
       ...otherProps
     },
     ref,
@@ -139,6 +142,13 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
       onShouldStartLoadWithRequestProp,
       onShouldStartLoadWithRequestCallback,
     });
+
+    const setNativeRefreshing = useCallback((refreshing: boolean) => {
+      if (webViewRef.current) {
+        Commands.setNativeRefreshing(webViewRef.current, refreshing);
+      }
+    }, []);
+    const refreshControlProps = useRefreshControl(refreshControl, setNativeRefreshing);
 
     useImperativeHandle(
       ref,
@@ -288,6 +298,7 @@ const WebViewComponent = forwardRef<unknown, AndroidWebViewProps>(
         setDisplayZoomControls={setDisplayZoomControls}
         nestedScrollEnabled={nestedScrollEnabled}
         injectedJavaScriptObject={JSON.stringify(injectedJavaScriptObject)}
+        {...refreshControlProps}
         {...nativeConfig?.props}
       />
     );
