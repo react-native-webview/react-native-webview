@@ -1137,7 +1137,7 @@ RCTAutoInsetsProtocol>
   _webView.scrollView.contentInset = _contentInset;
   // A component that mounts with `refreshing` set asks for the indicator
   // before the web view is in a window, where UIKit cannot show it.
-  if (_refreshing && _hasOnRefresh && self.window != nil && _refreshControl != nil && !_refreshControl.isRefreshing) {
+  if (_refreshing && _hasOnRefresh && _webView.window != nil && _refreshControl != nil && !_refreshControl.isRefreshing) {
     [self setNativeRefreshing:YES];
   }
 #endif // !TARGET_OS_OSX
@@ -1720,9 +1720,10 @@ didFinishNavigation:(WKNavigation *)navigation
     _refreshTriggered = NO;
     _autoRefreshing = NO;
     [_refreshControl endRefreshing];
-  } else if (!_refreshControl.isRefreshing && self.window != nil) {
+  } else if (!_refreshControl.isRefreshing && _webView.window != nil) {
     // Not before the web view is in a window: UIKit ignores it there, and
-    // layoutSubviews asks again.
+    // layoutSubviews asks again. This view gets its window before it adds
+    // the web view, so it is the window of the web view that counts.
     // Without a pull the indicator sits above the content: scroll it into
     // view, like React Native does for a ScrollView.
     UIScrollView *scrollView = _webView.scrollView;

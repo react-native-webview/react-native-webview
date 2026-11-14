@@ -65,6 +65,26 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     WebViewCompat.WebMessageListener bridgeListener = null;
 
     /**
+     * android.webkit.WebChromeClient fundamentally does not support JS injection into frames other
+     * than the main frame, so these two properties are mostly here just for parity with iOS & macOS.
+     */
+    protected boolean injectedJavaScriptForMainFrameOnly = true;
+    protected boolean injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
+
+    protected boolean messagingEnabled = false;
+    protected @Nullable
+    String messagingModuleName;
+    protected @Nullable
+    RNCWebViewMessagingModule mMessagingJSModule;
+    protected @Nullable
+    RNCWebViewClient mRNCWebViewClient;
+    protected boolean sendContentSizeChangeEvents = false;
+    private OnScrollDispatchHelper mOnScrollDispatchHelper;
+    protected boolean hasScrollEvent = false;
+    protected boolean nestedScrollEnabled = false;
+    protected ProgressChangedFilter progressChangedFilter;
+
+    /*
      * Pull to refresh. RNCWebViewRefreshGesture decides when the finger pulls the indicator,
      * and refreshParent shows it.
      *

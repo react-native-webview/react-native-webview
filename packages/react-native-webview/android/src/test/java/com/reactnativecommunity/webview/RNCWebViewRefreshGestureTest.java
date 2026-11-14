@@ -249,6 +249,23 @@ public class RNCWebViewRefreshGestureTest {
     }
 
     @Test
+    public void movingDownAfterPassingTheStartDoesNotPull() {
+        startPulling();
+        gesture.onMove(1, 0, X, Y + 130);
+        gesture.onMove(1, 0, X, Y - 20);
+        target.calls.clear();
+
+        // Chromium has not reported a scroll yet: the finger alone must not pull again.
+        gesture.onMove(1, 0, X, Y + 10);
+        assertCalls();
+
+        // A new overscroll says that the page is back at its top.
+        gesture.onBeforeScroll(-30, 0);
+        gesture.onMove(1, 0, X, Y + 30);
+        assertCalls("pull 20");
+    }
+
+    @Test
     public void pullingAgainNeedsThePageBackAtItsTop() {
         startPulling();
         gesture.onMove(1, 0, X, Y + 130);
