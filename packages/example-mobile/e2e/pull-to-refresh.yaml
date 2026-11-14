@@ -141,3 +141,38 @@ appId: ${APP_ID}
     commands:
       - assertVisible: 'Refreshes: 0'
 - assertVisible: Idle
+
+# A WebView that mounts with `refreshing` already set shows the indicator, and hides it when
+# `refreshing` is cleared, here by changing the mode. Only iOS exposes the indicator to the
+# test, through its title: it has to be below the status line, where the WebView is, and not
+# above its content, out of sight.
+- tapOn:
+    id: pullToRefresh_mount
+- assertVisible: 'Mode: controlled'
+- extendedWaitUntil:
+    visible: 'Loads: 1'
+    timeout: 30000
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible:
+            text: Refreshing
+            below:
+              id: pullToRefresh_state
+          timeout: 10000
+- tapOn:
+    id: pullToRefresh_mode
+- assertVisible: 'Mode: auto'
+- assertVisible: Idle
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          notVisible:
+            text: Refreshing
+            below:
+              id: pullToRefresh_state
+          timeout: 10000
