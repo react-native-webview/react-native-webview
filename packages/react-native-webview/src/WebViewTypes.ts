@@ -671,10 +671,10 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * - With `onRefresh`, nothing is reloaded for you: do the refresh in
    *   `onRefresh` and control the indicator with `refreshing`.
    *
-   * Supported props: `refreshing`, `onRefresh`, `enabled`, `tintColor`,
-   * `progressViewOffset`, plus `title` and `titleColor` on iOS, and `colors`,
-   * `progressBackgroundColor` and `size` on Android. On Android `tintColor` is
-   * used when `colors` is not set.
+   * Supported props, on the same platforms as in React Native: `refreshing`,
+   * `onRefresh`, `enabled`, `progressViewOffset`, plus `tintColor`, `title` and
+   * `titleColor` on iOS, and `colors`, `progressBackgroundColor` and `size` on
+   * Android.
    *
    * @platform ios, android
    */
@@ -1181,10 +1181,10 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * - With `onRefresh`, nothing is reloaded for you: do the refresh in
    *   `onRefresh` and control the indicator with `refreshing`.
    *
-   * Supported props: `refreshing`, `onRefresh`, `enabled`, `tintColor`,
-   * `progressViewOffset`, plus `title` and `titleColor` on iOS, and `colors`,
-   * `progressBackgroundColor` and `size` on Android. On Android `tintColor` is
-   * used when `colors` is not set.
+   * Supported props, on the same platforms as in React Native: `refreshing`,
+   * `onRefresh`, `enabled`, `progressViewOffset`, plus `tintColor`, `title` and
+   * `titleColor` on iOS, and `colors`, `progressBackgroundColor` and `size` on
+   * Android.
    *
    * @platform ios, android
    */

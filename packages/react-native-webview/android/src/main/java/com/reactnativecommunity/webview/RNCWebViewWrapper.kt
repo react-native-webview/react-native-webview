@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
-import androidx.core.graphics.ColorUtils
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.react.uimanager.UIManagerHelper
 import com.reactnativecommunity.webview.events.TopRefreshEvent
@@ -33,7 +32,6 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
   // a detached view only runs what it was posted once it is attached again.
   private val autoRefreshTimeoutHandler = Handler(Looper.getMainLooper())
   private val autoRefreshTimeout = Runnable { setAutoRefreshing(false) }
-  private var refreshControlTintColor: Int? = null
   private var refreshControlColors: IntArray? = null
   private var refreshControlProgressBackgroundColor: Int? = null
   private var refreshControlSize = SwipeRefreshLayout.DEFAULT
@@ -90,11 +88,6 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
     }
   }
 
-  fun setRefreshControlTintColor(color: Int?) {
-    refreshControlTintColor = color
-    refreshLayout?.let { applyRefreshControlColors(it) }
-  }
-
   fun setRefreshControlColors(colors: IntArray?) {
     refreshControlColors = colors
     refreshLayout?.let { applyRefreshControlColors(it) }
@@ -102,7 +95,7 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
 
   fun setRefreshControlProgressBackgroundColor(color: Int?) {
     refreshControlProgressBackgroundColor = color
-    refreshLayout?.let { applyRefreshControlColors(it) }
+    refreshLayout?.setProgressBackgroundColorSchemeColor(color ?: DEFAULT_PROGRESS_BACKGROUND_COLOR)
   }
 
   fun setRefreshControlSize(size: String?) {
@@ -150,20 +143,12 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
     }
   }
 
-  // SwipeRefreshLayout uses the tint color when no `colors` are given, so that a single
-  // `tintColor` styles the indicator on both platforms.
+  // Like React Native's RefreshControl: without `colors` the indicator has the default color of
+  // SwipeRefreshLayout, black, and `tintColor` is for iOS only. The default is passed explicitly
+  // because SwipeRefreshLayout does not accept an empty list.
   private fun applyRefreshControlColors(layout: RNCWebViewRefreshLayout) {
-    val colors = refreshControlColors?.takeIf { it.isNotEmpty() }
-    val tintColor = refreshControlTintColor
-    layout.setColorSchemeColors(*(colors ?: intArrayOf(tintColor ?: Color.BLACK)))
-
-    // A light tint, like the white one meant for dark pages, would not show on the default
-    // light disc: give it a dark one, unless the app chose the disc color.
-    val tintNeedsDarkBackground = colors == null && tintColor != null &&
-      ColorUtils.calculateContrast(tintColor, DEFAULT_PROGRESS_BACKGROUND_COLOR) < MIN_TINT_CONTRAST
-    val backgroundColor = refreshControlProgressBackgroundColor
-      ?: if (tintNeedsDarkBackground) DARK_PROGRESS_BACKGROUND_COLOR else DEFAULT_PROGRESS_BACKGROUND_COLOR
-    layout.setProgressBackgroundColorSchemeColor(backgroundColor)
+    val colors = refreshControlColors?.takeIf { it.isNotEmpty() } ?: intArrayOf(Color.BLACK)
+    layout.setColorSchemeColors(*colors)
   }
 
   private fun ensureRefreshLayout(): RNCWebViewRefreshLayout {
@@ -172,6 +157,7 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
     val newLayout = RNCWebViewRefreshLayout(context)
     newLayout.setOnRefreshListener { onRefresh() }
     applyRefreshControlColors(newLayout)
+    refreshControlProgressBackgroundColor?.let { newLayout.setProgressBackgroundColorSchemeColor(it) }
     newLayout.setSize(refreshControlSize)
     newLayout.setProgressViewOffset(refreshControlProgressViewOffset)
     newLayout.isRefreshing = hasOnRefresh && refreshing
@@ -197,13 +183,6 @@ class RNCWebViewWrapper(context: Context, val webView: RNCWebView) : FrameLayout
   companion object {
     // The background SwipeRefreshLayout gives its indicator by default.
     private const val DEFAULT_PROGRESS_BACKGROUND_COLOR = 0xFFFAFAFA.toInt()
-    // The background used instead when the tint color would not show on the default one.
-    private const val DARK_PROGRESS_BACKGROUND_COLOR = 0xFF424242.toInt()
-    // Contrast ratio with the default background under which a tint color gets the dark one.
-    // The aim is only to catch tints that disappear: white (1.04), yellow (1.03), gold (1.34),
-    // pink (1.47), #ccc (1.54). The colors apps usually put on the light disc stay on it:
-    // orange (1.89), Material green 500 (2.66), tomato (2.82), Material blue 500 (2.99).
-    private const val MIN_TINT_CONTRAST = 1.6
     // How long the indicator of an automatic refresh may stay when nothing reports the end of
     // the reload. The page keeps loading, only the indicator goes.
     private const val AUTO_REFRESH_TIMEOUT_MS = 10_000L

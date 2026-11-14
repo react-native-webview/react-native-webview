@@ -88,6 +88,7 @@ export default function PullToRefresh() {
       <RefreshControl
         refreshing={false}
         tintColor="#1971c2"
+        colors={['#1971c2']}
       />
     );
   }

@@ -1448,18 +1448,18 @@ On iOS, setting a refresh control turns `bounces` on.
 
 Supported `RefreshControl` props (the others are ignored, with a warning in development):
 
-| Prop                      | Platform     | Notes                                                    |
-| ------------------------- | ------------ | -------------------------------------------------------- |
-| `refreshing`              | iOS, Android | Only used with `onRefresh`                               |
-| `onRefresh`               | iOS, Android | Called when the user releases a pull                     |
-| `enabled`                 | iOS, Android |                                                          |
-| `tintColor`               | iOS, Android | On Android, the indicator color when `colors` is not set |
-| `progressViewOffset`      | iOS, Android |                                                          |
-| `title`                   | iOS          |                                                          |
-| `titleColor`              | iOS          |                                                          |
-| `colors`                  | Android      |                                                          |
-| `progressBackgroundColor` | Android      |                                                          |
-| `size`                    | Android      |                                                          |
+| Prop                      | Platform     | Notes                                |
+| ------------------------- | ------------ | ------------------------------------ |
+| `refreshing`              | iOS, Android | Only used with `onRefresh`           |
+| `onRefresh`               | iOS, Android | Called when the user releases a pull |
+| `enabled`                 | iOS, Android |                                      |
+| `tintColor`               | iOS          |                                      |
+| `progressViewOffset`      | iOS, Android |                                      |
+| `title`                   | iOS          |                                      |
+| `titleColor`              | iOS          |                                      |
+| `colors`                  | Android      |                                      |
+| `progressBackgroundColor` | Android      |                                      |
+| `size`                    | Android      |                                      |
 
 Example, reloading the page:
 
@@ -1493,21 +1493,7 @@ const onRefresh = async () => {
 />;
 ```
 
-This prop replaces `pullToRefreshEnabled` and `refreshControlLightMode`, which have been removed. `pullToRefreshEnabled` becomes `refreshControl={<RefreshControl refreshing={false} />}`, and `refreshControlLightMode` becomes `tintColor="white"` on that element:
-
-```jsx
-<WebView
-  source={{ uri: 'https://reactnative.dev' }}
-  refreshControl={
-    <RefreshControl
-      refreshing={false}
-      tintColor="white"
-    />
-  }
-/>
-```
-
-On Android the indicator is drawn on a disc, light by default. When `tintColor` is the indicator color and is too light to show on it, as with white or yellow, the disc is dark instead. Set `progressBackgroundColor` to choose the disc color yourself.
+This prop replaces `pullToRefreshEnabled` and `refreshControlLightMode`, which have been removed. `pullToRefreshEnabled` becomes `refreshControl={<RefreshControl refreshing={false} />}`, and `refreshControlLightMode` becomes `tintColor="white"` on that element. Both were iOS only: the refresh control now works on Android too, where the indicator is styled with `colors` and `progressBackgroundColor`, as in React Native.
 
 ### `ignoreSilentHardwareSwitch`[⬆](#props-index)
 

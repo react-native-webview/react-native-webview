@@ -599,11 +599,6 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         view.setRefreshing(value)
     }
 
-    @ReactProp(name = "refreshControlTintColor", customType = "Color")
-    override fun setRefreshControlTintColor(view: RNCWebViewWrapper, value: Int?) {
-        view.setRefreshControlTintColor(value)
-    }
-
     @ReactProp(name = "refreshControlColors", customType = "ColorArray")
     override fun setRefreshControlColors(view: RNCWebViewWrapper, value: ReadableArray?) {
         if (value == null) {
@@ -794,6 +789,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     override fun setKeyboardDisplayRequiresUserAction(view: RNCWebViewWrapper, value: Boolean) {}
 
     override fun setPagingEnabled(view: RNCWebViewWrapper, value: Boolean) {}
+
+    override fun setRefreshControlTintColor(view: RNCWebViewWrapper, value: Int?) {}
 
     override fun setRefreshControlTitle(view: RNCWebViewWrapper, value: String?) {}
 
