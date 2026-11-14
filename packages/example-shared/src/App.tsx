@@ -28,6 +28,7 @@ import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import ProfileExample from './examples/Profile';
 import SslError from './examples/SslError';
+import PullToRefresh from './examples/PullToRefresh';
 
 const TESTS = {
   Messaging: {
@@ -166,6 +167,14 @@ const TESTS = {
       return <SslError />;
     },
   },
+  PullToRefresh: {
+    title: 'PullToRefresh',
+    testId: 'pullToRefresh',
+    description: 'Pull to refresh test',
+    render() {
+      return <PullToRefresh />;
+    },
+  },
   Profile: {
     title: 'Profile (Android)',
     testId: 'profile',
@@ -203,14 +212,20 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flex: 1,
   },
-  restartButton: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  headerButton: {
     padding: 6,
-    fontSize: 16,
     borderRadius: 5,
     backgroundColor: '#F3F3F3',
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'flex-end',
+  },
+  hidden: {
+    display: 'none',
   },
   closeKeyboardView: {
     width: 5,
@@ -225,6 +240,8 @@ const styles = StyleSheet.create({
 export default function App() {
   const [restarting, setRestarting] = useState(false);
   const [currentTest, setCurrentTest] = useState(TESTS.Alerts);
+  // Hiding the list of tests leaves most of the screen to the current one.
+  const [testPickerVisible, setTestPickerVisible] = useState(true);
 
   const simulateRestart = () => {
     setRestarting(true);
@@ -243,16 +260,26 @@ export default function App() {
         testID="closeKeyboard"
       />
 
-      <TouchableOpacity
-        testID="restart_button"
-        onPress={simulateRestart}
-        style={styles.restartButton}
-        activeOpacity={0.6}
-      >
-        <Text>{'Simulate Restart'}</Text>
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <TouchableOpacity
+          testID="toggle_tests_button"
+          onPress={() => setTestPickerVisible((visible) => !visible)}
+          style={styles.headerButton}
+          activeOpacity={0.6}
+        >
+          <Text>{testPickerVisible ? 'Hide Tests' : 'Show Tests'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          testID="restart_button"
+          onPress={simulateRestart}
+          style={styles.headerButton}
+          activeOpacity={0.6}
+        >
+          <Text>{'Simulate Restart'}</Text>
+        </TouchableOpacity>
+      </View>
 
-      <View style={styles.testPickerContainer}>
+      <View style={testPickerVisible ? styles.testPickerContainer : styles.hidden}>
         <Button
           testID="testType_alerts"
           title="Alerts"
@@ -344,6 +371,13 @@ export default function App() {
           title="SslError"
           onPress={() => changeTest('SslError')}
         />
+        {(Platform.OS === 'ios' || Platform.OS === 'android') && (
+          <Button
+            testID="testType_pullToRefresh"
+            title="PullToRefresh"
+            onPress={() => changeTest('PullToRefresh')}
+          />
+        )}
         <Button
           testID="testType_profile"
           title="Profile"

@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -18,6 +19,8 @@ import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.NestedScrollingParent3;
+import androidx.core.view.ViewCompat;
 import androidx.webkit.JavaScriptReplyProxy;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
@@ -80,6 +83,40 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     protected boolean hasScrollEvent = false;
     protected boolean nestedScrollEnabled = false;
     protected ProgressChangedFilter progressChangedFilter;
+
+    /*
+     * Pull to refresh.
+     *
+     * The WebView cannot tell whether the page is at its top: the page may scroll inside an inner
+     * element, be a map, or be zoomed in. Chromium can: when a touch scroll goes past what the
+     * page consumes, it reports the rest through overScrollBy(). That rest is handed to
+     * refreshParent with the nested scrolling callbacks, the same way a RecyclerView drives a
+     * SwipeRefreshLayout.
+     *
+     * These fields have no initializers on purpose: setOverScrollMode() is called by the View
+     * constructor, before the initializers of this class run.
+     */
+    // The layout that shows the refresh indicator, or null when there is no refresh control.
+    private @Nullable NestedScrollingParent3 refreshParent;
+    // A single finger is down and no other finger has joined it.
+    private boolean singleTouchInProgress;
+    // refreshParent accepted the current gesture and receives its overscroll.
+    private boolean refreshGestureActive;
+    // Distance the indicator has been pulled during the current gesture, in pixels.
+    private int refreshPulledDistance;
+    // Finger movement that went to the indicator instead of the page. Touch events are shifted
+    // by this much so that the page does not scroll while the indicator moves back up.
+    private int touchOffsetY;
+    private int activePointerId;
+    private float touchStartX;
+    private float touchStartY;
+    private float lastTouchX;
+    private float lastTouchY;
+    private int touchSlop;
+    // The edge effect is turned off while the indicator is pulled, both would show otherwise.
+    private boolean edgeEffectSuppressed;
+    private int savedOverScrollMode;
+    private final int[] nestedScrollConsumed = new int[2];
     // Value of the profile prop at mount, whether or not binding it succeeded.
     private @Nullable String profile = null;
     // Cookie jar of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
@@ -198,7 +235,189 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         if (this.nestedScrollEnabled) {
             requestDisallowInterceptTouchEvent(true);
         }
-        return super.onTouchEvent(event);
+
+        final int action = event.getActionMasked();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                // A gesture that never got its ACTION_UP, for instance after a detach.
+                stopRefreshGesture(true);
+                // Before the WebView sees the event, so that the new edge effect is armed by it.
+                restoreEdgeEffect();
+                singleTouchInProgress = true;
+                touchOffsetY = 0;
+                activePointerId = event.getPointerId(0);
+                touchStartX = lastTouchX = event.getX();
+                touchStartY = lastTouchY = event.getY();
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                // Pinching also overscrolls, it must not start a refresh.
+                singleTouchInProgress = false;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                onTouchMove(event);
+                break;
+            default:
+                break;
+        }
+
+        final boolean handled;
+        if (touchOffsetY != 0) {
+            MotionEvent offsetEvent = MotionEvent.obtain(event);
+            offsetEvent.offsetLocation(0, touchOffsetY);
+            handled = super.onTouchEvent(offsetEvent);
+            offsetEvent.recycle();
+        } else {
+            handled = super.onTouchEvent(event);
+        }
+
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+            singleTouchInProgress = false;
+            // A cancelled gesture, for instance one taken over by a parent, must not refresh.
+            stopRefreshGesture(action == MotionEvent.ACTION_CANCEL);
+        }
+        return handled;
+    }
+
+    private void onTouchMove(MotionEvent event) {
+        final float x = event.getX();
+        final float y = event.getY();
+        if (event.getPointerCount() != 1 || event.getPointerId(0) != activePointerId) {
+            // Another finger is involved: follow it without reading a movement into the jump.
+            activePointerId = event.getPointerId(0);
+            lastTouchX = x;
+            lastTouchY = y;
+            return;
+        }
+
+        // Positive when the finger moves up.
+        final float distance = lastTouchY - y;
+        final int dy = (int) distance;
+        lastTouchX = x;
+        // Keep the fraction of a pixel that was not used for the next event.
+        lastTouchY = y + (distance - dy);
+
+        if (refreshGestureActive && refreshParent != null && dy != 0) {
+            // Moving back up first moves the indicator back, and only then scrolls the page.
+            nestedScrollConsumed[0] = 0;
+            nestedScrollConsumed[1] = 0;
+            refreshParent.onNestedPreScroll(this, 0, dy, nestedScrollConsumed, ViewCompat.TYPE_TOUCH);
+            touchOffsetY += nestedScrollConsumed[1];
+            refreshPulledDistance = Math.max(0, refreshPulledDistance - nestedScrollConsumed[1]);
+        }
+    }
+
+    /**
+     * Chromium calls this for regular scrolls as well as for overscrolls. A scroll that would end
+     * above the top edge is the part of the gesture that nothing in the page consumed.
+     */
+    @Override
+    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY,
+                                   int scrollRangeX, int scrollRangeY, int maxOverScrollX,
+                                   int maxOverScrollY, boolean isTouchEvent) {
+        // isTouchEvent is not reliable here: the overscroll is reported after the touch event
+        // has been handled, so the finger is tracked in onTouchEvent() instead.
+        final int unconsumedY = deltaY < 0 ? Math.min(scrollY + deltaY, 0) : 0;
+        if (unconsumedY < 0 && singleTouchInProgress && !refreshGestureActive) {
+            startRefreshGesture();
+        }
+
+        final boolean clamped = super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX,
+                scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
+
+        if (unconsumedY < 0 && refreshGestureActive && refreshParent != null) {
+            nestedScrollConsumed[0] = 0;
+            nestedScrollConsumed[1] = 0;
+            refreshParent.onNestedScroll(this, 0, 0, 0, unconsumedY, ViewCompat.TYPE_TOUCH, nestedScrollConsumed);
+            refreshPulledDistance -= unconsumedY;
+        }
+        return clamped;
+    }
+
+    private void startRefreshGesture() {
+        if (refreshParent == null) {
+            return;
+        }
+        // Only a finger that is moving down, and more down than sideways, pulls the indicator.
+        // This leaves out sideways swipes, and the end of a fling that reaches the top of the
+        // page just as a finger lands.
+        if (touchSlop == 0) {
+            touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+        }
+        final float movedX = Math.abs(lastTouchX - touchStartX);
+        final float movedY = lastTouchY - touchStartY;
+        if (movedY < touchSlop / 2f || movedY <= movedX) {
+            return;
+        }
+        // Refused while a refresh is running or when the refresh control is disabled.
+        if (!refreshParent.onStartNestedScroll(this, this, ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_TOUCH)) {
+            return;
+        }
+        refreshParent.onNestedScrollAccepted(this, this, ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_TOUCH);
+        refreshGestureActive = true;
+        refreshPulledDistance = 0;
+        suppressEdgeEffect();
+    }
+
+    private void stopRefreshGesture(boolean cancel) {
+        if (!refreshGestureActive) {
+            return;
+        }
+        refreshGestureActive = false;
+        if (refreshParent != null) {
+            if (cancel && refreshPulledDistance > 0) {
+                // There is no way to cancel: move the indicator all the way back, so that
+                // ending the gesture does not refresh.
+                nestedScrollConsumed[0] = 0;
+                nestedScrollConsumed[1] = 0;
+                refreshParent.onNestedPreScroll(this, 0, refreshPulledDistance, nestedScrollConsumed, ViewCompat.TYPE_TOUCH);
+            }
+            refreshParent.onStopNestedScroll(this, ViewCompat.TYPE_TOUCH);
+        }
+        refreshPulledDistance = 0;
+    }
+
+    /**
+     * Sets the layout that shows the refresh indicator and receives the overscroll of the page,
+     * or null to turn pull to refresh off.
+     */
+    public void setRefreshParent(@Nullable NestedScrollingParent3 refreshParent) {
+        if (this.refreshParent == refreshParent) {
+            return;
+        }
+        stopRefreshGesture(true);
+        this.refreshParent = refreshParent;
+        if (refreshParent == null) {
+            restoreEdgeEffect();
+        }
+    }
+
+    private void suppressEdgeEffect() {
+        if (edgeEffectSuppressed) {
+            return;
+        }
+        savedOverScrollMode = getOverScrollMode();
+        super.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        edgeEffectSuppressed = true;
+    }
+
+    // Done when the next gesture starts and not when this one ends: the last overscroll of a
+    // gesture is reported after the finger is up and would flash the edge effect.
+    private void restoreEdgeEffect() {
+        if (!edgeEffectSuppressed) {
+            return;
+        }
+        edgeEffectSuppressed = false;
+        super.setOverScrollMode(savedOverScrollMode);
+    }
+
+    @Override
+    public void setOverScrollMode(int mode) {
+        if (edgeEffectSuppressed) {
+            // Applied once the edge effect is restored.
+            savedOverScrollMode = mode;
+            return;
+        }
+        super.setOverScrollMode(mode);
     }
 
     @Override

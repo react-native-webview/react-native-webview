@@ -1,0 +1,101 @@
+# Pull to refresh, on the PullToRefresh example.
+#
+#   maestro test -e APP_ID=com.microsoft.reacttestapp e2e/pull-to-refresh.yaml   (Android)
+#   maestro test -e APP_ID=com.microsoft.ReactTestApp e2e/pull-to-refresh.yaml   (iOS)
+#
+# The example shows three counters next to the WebView, which is what the assertions read:
+# "Refreshes" counts the calls to onRefresh, "Loads" the page loads.
+appId: ${APP_ID}
+---
+- launchApp
+- tapOn:
+    id: testType_pullToRefresh
+# Leaves most of the screen to the WebView, the swipes below need the room.
+- tapOn:
+    id: toggle_tests_button
+- extendedWaitUntil:
+    visible: 'Loads: 1'
+    timeout: 60000
+
+# Controlled (the refresh control has an onRefresh): a pull at the top of the page calls
+# onRefresh once, the app keeps the indicator for a moment, and the page is not reloaded.
+- swipe:
+    start: 50%, 45%
+    end: 50%, 85%
+    duration: 700
+- assertVisible: 'Refreshes: 1'
+- extendedWaitUntil:
+    visible: Idle
+    timeout: 10000
+- assertVisible: 'Loads: 1'
+
+# Away from the top, pulling down scrolls the page and does not refresh.
+- swipe:
+    start: 50%, 85%
+    end: 50%, 45%
+    duration: 300
+- swipe:
+    start: 50%, 85%
+    end: 50%, 45%
+    duration: 300
+- swipe:
+    start: 50%, 50%
+    end: 50%, 65%
+    duration: 1000
+- assertVisible: 'Refreshes: 1'
+- assertVisible: Idle
+
+# Automatic (no onRefresh): a pull reloads the page, and nothing is asked of the app.
+- tapOn:
+    id: pullToRefresh_mode
+- assertVisible: 'Mode: auto'
+- extendedWaitUntil:
+    visible: 'Loads: 1'
+    timeout: 30000
+- swipe:
+    start: 50%, 45%
+    end: 50%, 85%
+    duration: 700
+- extendedWaitUntil:
+    visible: 'Loads: 2'
+    timeout: 30000
+- assertVisible: 'Refreshes: 0'
+
+# Without a refresh control, a pull does nothing.
+- tapOn:
+    id: pullToRefresh_mode
+- assertVisible: 'Mode: off'
+- extendedWaitUntil:
+    visible: 'Loads: 1'
+    timeout: 30000
+- swipe:
+    start: 50%, 45%
+    end: 50%, 85%
+    duration: 700
+- assertVisible: 'Loads: 1'
+- assertVisible: 'Refreshes: 0'
+
+# A page that scrolls inside an element: the WebView itself never scrolls, so its scroll
+# position says nothing. Scrolled down, pulling must scroll the element back.
+- tapOn:
+    id: pullToRefresh_mode
+- assertVisible: 'Mode: controlled'
+- tapOn:
+    id: pullToRefresh_page
+- assertVisible: 'Page: inner'
+- extendedWaitUntil:
+    visible: 'Loads: 1'
+    timeout: 30000
+- swipe:
+    start: 50%, 85%
+    end: 50%, 45%
+    duration: 300
+- swipe:
+    start: 50%, 85%
+    end: 50%, 45%
+    duration: 300
+- swipe:
+    start: 50%, 50%
+    end: 50%, 65%
+    duration: 1000
+- assertVisible: 'Refreshes: 0'
