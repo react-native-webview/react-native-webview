@@ -1452,7 +1452,7 @@ Supported `RefreshControl` props (the others are ignored, with a warning in deve
 | ------------------------- | ------------ | ------------------------------------ |
 | `refreshing`              | iOS, Android | Only used with `onRefresh`           |
 | `onRefresh`               | iOS, Android | Called when the user releases a pull |
-| `enabled`                 | iOS, Android |                                      |
+| `enabled`                 | iOS, Android | Android only in React Native         |
 | `tintColor`               | iOS          |                                      |
 | `progressViewOffset`      | iOS, Android |                                      |
 | `title`                   | iOS          |                                      |

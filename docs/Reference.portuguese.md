@@ -1292,7 +1292,7 @@ No iOS, definir um refresh control ativa `bounces`.
 | ----------------------------- | --------- | ------------ |
 | elemento `<RefreshControl />` | Não       | iOS, Android |
 
-Propriedades de `RefreshControl` suportadas (as outras são ignoradas, com um aviso em desenvolvimento): `refreshing`, `onRefresh`, `enabled` e `progressViewOffset` nas duas plataformas, `tintColor`, `title` e `titleColor` no iOS, `colors`, `progressBackgroundColor` e `size` no Android, como no React Native. Sem `onRefresh` o indicador é ocultado no máximo após 10 segundos, mesmo que o carregamento não tenha terminado.
+Propriedades de `RefreshControl` suportadas (as outras são ignoradas, com um aviso em desenvolvimento): `refreshing`, `onRefresh`, `enabled` e `progressViewOffset` nas duas plataformas, `tintColor`, `title` e `titleColor` no iOS, `colors`, `progressBackgroundColor` e `size` no Android. São as mesmas plataformas do React Native, exceto `enabled`, que aqui também funciona no iOS. Sem `onRefresh` o indicador é ocultado no máximo após 10 segundos, mesmo que o carregamento não tenha terminado.
 
 Exemplo:
 
