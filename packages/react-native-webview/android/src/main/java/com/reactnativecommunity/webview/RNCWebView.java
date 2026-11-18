@@ -13,6 +13,7 @@ import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -84,6 +85,8 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
     private @Nullable String profile = null;
     // Cookie jar of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
     private @Nullable CookieManager profileCookieManager = null;
+    // Web storage of the androidx.webkit Profile this WebView is bound to, or null for the default profile.
+    private @Nullable WebStorage profileWebStorage = null;
     // Set at the end of the first props update (mount). Props that can only be applied on mount,
     // such as the profile, are ignored after that.
     private boolean initialPropsApplied = false;
@@ -110,6 +113,10 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
         profileCookieManager = cookieManager;
     }
 
+    public void setProfileWebStorage(@Nullable WebStorage webStorage) {
+        profileWebStorage = webStorage;
+    }
+
     public boolean isInitialPropsApplied() {
         return initialPropsApplied;
     }
@@ -124,6 +131,14 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
      */
     public CookieManager getCookieManager() {
         return profileCookieManager != null ? profileCookieManager : CookieManager.getInstance();
+    }
+
+    /**
+     * The web storage (localStorage, sessionStorage, IndexedDB) this WebView actually uses:
+     * its bound Profile's when one is set, otherwise the app-wide default.
+     */
+    public WebStorage getWebStorage() {
+        return profileWebStorage != null ? profileWebStorage : WebStorage.getInstance();
     }
 
     /**
