@@ -476,6 +476,10 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
         // Remove all previous cookies from this WebView's cookie jar (its profile's, if one is bound).
         webView.cookieManager.removeAllCookies(null)
+        webView.cookieManager.flush()
+
+        // Remove localStorage, sessionStorage and IndexedDB as well, like iOS's non-persistent data store.
+        webView.webStorage.deleteAllData()
 
         // Disable caching
         webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
@@ -624,6 +628,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             val profile = ProfileStore.getInstance().getOrCreateProfile(name)
             WebViewCompat.setProfile(webView, name)
             webView.setProfileCookieManager(profile.cookieManager)
+            webView.setProfileWebStorage(profile.webStorage)
         } catch (e: IllegalStateException) {
             Log.e(TAG, "Could not bind WebView to profile '$name', using the default profile instead: ${e.message}")
         }
