@@ -165,10 +165,14 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         webView: RNCWebView,
     ) {
         val activity = webView.themedReactContext.currentActivity
+        // The client is about to be replaced: leave fullscreen while it can still undo it
+        (webView.webChromeClient as RNCWebChromeClient?)?.onHideCustomView()
         if (webView.allowsFullscreenVideo && activity != null) {
             val initialRequestedOrientation = activity.requestedOrientation
             val webChromeClient: RNCWebChromeClient =
                 object : RNCWebChromeClient(webView) {
+                    private var hiddenViews = emptyList<View>()
+
                     override fun getDefaultVideoPoster(): Bitmap? {
                         return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
                     }
@@ -195,15 +199,17 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
                         // but that breaks the Modal's styles and layout, so we need this to render
                         // in the main View hierarchy regardless
                         val rootView = rootView
+                        // Hide everything under the video, not just the WebView, so that
+                        // the app is not laid out in the fullscreen orientation
+                        hiddenViews = (0 until rootView.childCount).map(rootView::getChildAt)
                         rootView.addView(mVideoView, FULLSCREEN_LAYOUT_PARAMS)
 
                         // Different root views, we are in a Modal
                         if (rootView.rootView !== mWebView.rootView) {
-                            mWebView.rootView.visibility = View.GONE
-                        } else {
-                            // Same view hierarchy (no Modal), just hide the WebView then
-                            mWebView.visibility = View.GONE
+                            hiddenViews += mWebView.rootView
                         }
+                        hiddenViews = hiddenViews.filter { it.visibility == View.VISIBLE }
+                        hiddenViews.forEach { it.visibility = View.GONE }
                         mWebView.themedReactContext.addLifecycleEventListener(this)
                     }
 
@@ -212,30 +218,27 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
                             return
                         }
 
-                        // Same logic as above
-                        val rootView = rootView
-                        if (rootView.rootView !== mWebView.rootView) {
-                            mWebView.rootView.visibility = View.VISIBLE
-                        } else {
-                            // Same view hierarchy (no Modal)
-                            mWebView.visibility = View.VISIBLE
+                        try {
+                            activity.window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+                            rootView.removeView(mVideoView)
+                            mCustomViewCallback.onCustomViewHidden()
+                            // Before the root is shown again, or it is laid out in the
+                            // fullscreen orientation
+                            activity.requestedOrientation = initialRequestedOrientation
+                        } finally {
+                            hiddenViews.forEach { it.visibility = View.VISIBLE }
+                            hiddenViews = emptyList()
+                            mVideoView = null
+                            mCustomViewCallback = null
+                            mWebView.themedReactContext.removeLifecycleEventListener(this)
                         }
-                        activity.window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-                        rootView.removeView(mVideoView)
-                        mCustomViewCallback.onCustomViewHidden()
-                        mVideoView = null
-                        mCustomViewCallback = null
-                        activity.requestedOrientation = initialRequestedOrientation
-                        mWebView.themedReactContext.removeLifecycleEventListener(this)
                     }
                 }
             webChromeClient.setAllowsProtectedMedia(webView.allowsProtectedMedia)
             webChromeClient.setHasOnOpenWindowEvent(webView.hasOnOpenWindowEvent)
             webView.webChromeClient = webChromeClient
         } else {
-            var webChromeClient = webView.webChromeClient as RNCWebChromeClient?
-            webChromeClient?.onHideCustomView()
-            webChromeClient = object : RNCWebChromeClient(webView) {
+            val webChromeClient = object : RNCWebChromeClient(webView) {
                 override fun getDefaultVideoPoster(): Bitmap? {
                     return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
                 }
