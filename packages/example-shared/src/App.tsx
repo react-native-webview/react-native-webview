@@ -28,6 +28,7 @@ import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
 import ProfileExample from './examples/Profile';
 import SslError from './examples/SslError';
+import LoadError from './examples/LoadError';
 
 const TESTS = {
   Messaging: {
@@ -172,6 +173,14 @@ const TESTS = {
     description: 'Isolated cookie jars via androidx.webkit Profile',
     render() {
       return <ProfileExample />;
+    },
+  },
+  LoadError: {
+    title: 'LoadError',
+    testId: 'LoadError',
+    description: 'onError reports the URL that failed',
+    render() {
+      return <LoadError />;
     },
   },
 };
@@ -348,6 +357,11 @@ export default function App() {
           testID="testType_profile"
           title="Profile"
           onPress={() => changeTest('Profile')}
+        />
+        <Button
+          testID="testType_loadError"
+          title="LoadError"
+          onPress={() => changeTest('LoadError')}
         />
       </View>
 
