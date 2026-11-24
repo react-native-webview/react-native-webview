@@ -1,6 +1,6 @@
 Nonostante la web view integrata disponga di molte funzionalità, non è possibile gestire tutti i casi d'uso in React Native. Tuttavia, è possibile estendere la web view con codice nativo senza dover forkare React Native o duplicare l'intero codice esistente della web view.
 
-Prima di procedere, è consigliabile avere un'idea di base dei concetti legati ai [native UI components](https://reactnative.dev/docs/native-components-android) (componenti dell'interfaccia utente nativi). Inoltre, è opportuno familiarizzarsi con il [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) (codice nativo per le web view), poiché sarà necessario farvi riferimento durante l'implementazione delle nuove funzionalità, anche se non è richiesta una conoscenza approfondita.
+Prima di procedere, è consigliabile avere un'idea di base dei concetti legati ai [native UI components](https://reactnative.dev/docs/legacy/native-components-android) (componenti dell'interfaccia utente nativi). Inoltre, è opportuno familiarizzarsi con il [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/packages/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.kt) (codice nativo per le web view), poiché sarà necessario farvi riferimento durante l'implementazione delle nuove funzionalità, anche se non è richiesta una conoscenza approfondita.
 
 ## Codice nativo
 
@@ -41,7 +41,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
 }
 ```
 
-Poi dovrai seguire i soliti passaggi per [register the module](https://reactnative.dev/docs/native-modules-android#register-the-module-android-specific) (registrare il modulo Android).
+Poi dovrai seguire i soliti passaggi per [register the module](https://reactnative.dev/docs/legacy/native-modules-android#register-the-module-android-specific) (registrare il modulo Android).
 
 ### Aggiungere nuove proprietà
 
@@ -105,7 +105,7 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 
 Puoi far partire l'evento nel tuo client della web view. Puoi anche collegare handler già esistenti se i tuoi eventi si basano su di essi.
 
-Fai riferimento al file [RNCWebViewManager.java](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) nel codice sorgente di `react-native-webview` per vedere quali handler sono disponibili e come sono implementati. Puoi estendere qualsiasi metodo qui per fornire funzionalità aggiuntive.
+Fai riferimento al file [RNCWebViewManager.kt](https://github.com/react-native-webview/react-native-webview/blob/master/packages/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.kt) nel codice sorgente di `react-native-webview` per vedere quali handler sono disponibili e come sono implementati. Puoi estendere qualsiasi metodo qui per fornire funzionalità aggiuntive.
 
 ```java
 public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {

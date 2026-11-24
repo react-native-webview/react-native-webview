@@ -1,6 +1,6 @@
 Embora a visualização da Web integrada tenha muitos recursos, não é possível lidar com todos os casos de uso no React Native. Você pode, no entanto, estender a visualização da web com código nativo sem bifurcar o React Native ou duplicar todo o código de visualização da web existente.
 
-Antes de fazer isso, você deve estar familiarizado com os conceitos de [componentes de interface do usuário nativos](https://reactnative.dev/docs/native-components-android). Você também deve se familiarizar com o [código nativo para visualizações da web](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java), pois você terá que usar isso como referência ao implementar novos recursos, embora não seja necessária uma compreensão profunda.
+Antes de fazer isso, você deve estar familiarizado com os conceitos de [componentes de interface do usuário nativos](https://reactnative.dev/docs/legacy/native-components-android). Você também deve se familiarizar com o [código nativo para visualizações da web](https://github.com/react-native-webview/react-native-webview/blob/master/packages/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.kt), pois você terá que usar isso como referência ao implementar novos recursos, embora não seja necessária uma compreensão profunda.
 
 ## Código Nativo
 
@@ -41,7 +41,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
 }
 ```
 
-Você precisará seguir as etapas usuais para [registrar o módulo](https://reactnative.dev/docs/native-modules-android#register-the-module-android-specific).
+Você precisará seguir as etapas usuais para [registrar o módulo](https://reactnative.dev/docs/legacy/native-modules-android#register-the-module-android-specific).
 
 ### Adicionando novas propriedades
 
@@ -105,7 +105,7 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 
 Você pode acionar o evento em seu cliente de visualização da web. Você pode conectar manipuladores existentes se seus eventos forem baseados neles.
 
-Você deve consultar [RNCWebViewManager.java](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) na base de código react-native-webview para ver quais manipuladores estão disponíveis e como eles são implementados. Você pode estender quaisquer métodos aqui para fornecer funcionalidade extra.
+Você deve consultar [RNCWebViewManager.kt](https://github.com/react-native-webview/react-native-webview/blob/master/packages/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.kt) na base de código react-native-webview para ver quais manipuladores estão disponíveis e como eles são implementados. Você pode estender quaisquer métodos aqui para fornecer funcionalidade extra.
 
 ```java
 public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
