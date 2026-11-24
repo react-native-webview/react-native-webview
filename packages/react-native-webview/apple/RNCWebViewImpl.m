@@ -150,6 +150,9 @@ RCTAutoInsetsProtocol>
   UIScrollViewContentInsetAdjustmentBehavior _savedContentInsetAdjustmentBehavior;
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
 #endif // !TARGET_OS_OSX
+
+  // User scripts added by resetupScripts, so that scripts added by other code can be told apart.
+  NSMutableArray<WKUserScript *> *_ownUserScripts;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -178,6 +181,7 @@ RCTAutoInsetsProtocol>
     _injectedJavaScriptForMainFrameOnly = YES;
     _injectedJavaScriptBeforeContentLoaded = nil;
     _injectedJavaScriptBeforeContentLoadedForMainFrameOnly = YES;
+    _ownUserScripts = [NSMutableArray array];
     _enableApplePay = NO;
 #if !TARGET_OS_OSX
     // Match the codegen prop defaults: with Fabric, updateProps only runs a
@@ -1786,10 +1790,30 @@ didFinishNavigation:(WKNavigation *)navigation
   [self writeCookiesToWebView:cookies completion:completion];
 }
 
+- (void)addOwnUserScript:(WKUserScript *)userScript toController:(WKUserContentController *)userContentController {
+  [userContentController addUserScript:userScript];
+  [_ownUserScripts addObject:userScript];
+}
+
+- (NSArray<WKUserScript *> *)userScriptsAddedByOthers:(WKUserContentController *)userContentController {
+  NSMutableArray<WKUserScript *> *userScripts = [NSMutableArray array];
+  for (WKUserScript *userScript in userContentController.userScripts) {
+    if ([_ownUserScripts indexOfObjectIdenticalTo:userScript] == NSNotFound) {
+      [userScripts addObject:userScript];
+    }
+  }
+  return userScripts;
+}
+
 - (void)resetupScripts:(WKWebViewConfiguration *)wkWebViewConfig {
+  // WebKit can only remove all user scripts at once, so scripts added by other code
+  // (for example SDKs that instrument the WKWebView) are kept and added back below.
+  NSArray<WKUserScript *> *userScriptsAddedByOthers = [self userScriptsAddedByOthers:wkWebViewConfig.userContentController];
   [wkWebViewConfig.userContentController removeAllUserScripts];
+  [_ownUserScripts removeAllObjects];
   [wkWebViewConfig.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
   if(self.enableApplePay){
+    // Apple Pay is unavailable on pages that have any user script, so none are added back.
     if (self.postMessageScript){
       [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                                 name:MessageHandlerName];
@@ -1818,7 +1842,7 @@ didFinishNavigation:(WKNavigation *)navigation
                                          "})(window.history)\n", HistoryShimName
   ];
   WKUserScript *userScript = [[WKUserScript alloc] initWithSource:html5HistoryAPIShimSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES];
-  [wkWebViewConfig.userContentController addUserScript:userScript];
+  [self addOwnUserScript:userScript toController:wkWebViewConfig.userContentController];
 
   if(_sharedCookiesEnabled) {
     // More info to sending cookies with WKWebView
@@ -1836,18 +1860,21 @@ didFinishNavigation:(WKNavigation *)navigation
     if (self.postMessageScript){
       [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                                 name:MessageHandlerName];
-      [wkWebViewConfig.userContentController addUserScript:self.postMessageScript];
+      [self addOwnUserScript:self.postMessageScript toController:wkWebViewConfig.userContentController];
     }
     if (self.atEndScript) {
-      [wkWebViewConfig.userContentController addUserScript:self.atEndScript];
+      [self addOwnUserScript:self.atEndScript toController:wkWebViewConfig.userContentController];
     }
   }
   // Whether or not messaging is enabled, add the startup script if it exists.
   if (self.atStartScript) {
-    [wkWebViewConfig.userContentController addUserScript:self.atStartScript];
+    [self addOwnUserScript:self.atStartScript toController:wkWebViewConfig.userContentController];
   }
   if (self.injectedObjectJsonScript) {
-    [wkWebViewConfig.userContentController addUserScript:self.injectedObjectJsonScript];
+    [self addOwnUserScript:self.injectedObjectJsonScript toController:wkWebViewConfig.userContentController];
+  }
+  for (WKUserScript *userScriptAddedByOthers in userScriptsAddedByOthers) {
+    [wkWebViewConfig.userContentController addUserScript:userScriptAddedByOthers];
   }
 }
 
