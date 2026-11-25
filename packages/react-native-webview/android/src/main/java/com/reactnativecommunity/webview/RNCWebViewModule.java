@@ -477,7 +477,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
                 break;
         }
 
-        File storageDir = mContext.getExternalFilesDir(null);
+        File storageDir = mContext.getCacheDir();
 
         return File.createTempFile(prefix, suffix, storageDir);
     }
