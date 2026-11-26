@@ -755,6 +755,16 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   menuItems?: WebViewCustomMenuItems[];
 
   /**
+   * Whether `window.open()` and `target="_blank"` links open a native child window. The window is
+   * linked to its opener, so `window.opener`, `postMessage` and `popup.closed` work as in a browser.
+   * It has no injected scripts and no `ReactNativeWebView` bridge. New-window requests bypass
+   * `onOpenWindow`, `originWhitelist` and `onShouldStartLoadWithRequest` while this is enabled.
+   * The default value is `false`.
+   * @platform ios
+   */
+  setSupportMultipleWindows?: boolean;
+
+  /**
    * An array of strings which will be suppressed from the menu.
    * @platform ios
    */
@@ -1062,7 +1072,7 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
   saveFormDataDisabled?: boolean;
 
   /**
-   * Boolean value to set whether the WebView supports multiple windows. Used on Android only
+   * Boolean value to set whether the WebView supports multiple windows.
    * The default value is `true`.
    * @platform android
    */

@@ -9,6 +9,7 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#import "RNCWebViewChildWindow.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
@@ -126,6 +127,11 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *injectedObjectJsonScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
+#if TARGET_OS_IOS
+@property (nonatomic, strong) NSMutableArray<RNCWebViewChildWindow *> *childWindows;
+// Every child window's WKWebView until it is released, including windows that are still closing.
+@property (nonatomic, strong) NSHashTable<WKWebView *> *childWebViews;
+#endif // TARGET_OS_IOS
 @end
 
 @implementation RNCWebViewImpl
@@ -187,6 +193,9 @@ RCTAutoInsetsProtocol>
     _dataDetectorTypes = WKDataDetectorTypePhoneNumber;
 #endif // !TARGET_OS_OSX
 #if TARGET_OS_IOS
+    // Matches the codegen default of `setSupportMultipleWindows`. WebView.ios.tsx passes `false`
+    // unless the app sets it.
+    _supportMultipleWindows = YES;
     _savedStatusBarStyle = RCTSharedApplication().statusBarStyle;
     _savedStatusBarHidden = RCTSharedApplication().statusBarHidden;
 #endif // TARGET_OS_IOS
@@ -381,6 +390,13 @@ RCTAutoInsetsProtocol>
  */
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
+#if TARGET_OS_IOS
+  if (_supportMultipleWindows) {
+    // nil when the window cannot be presented: `window.open()` returns null and this WebView keeps its page.
+    return [self openChildWindowWithConfiguration:configuration userAgent:webView.customUserAgent];
+  }
+#endif // TARGET_OS_IOS
+
   if (!navigationAction.targetFrame.isMainFrame) {
     NSURL *url = navigationAction.request.URL;
 
@@ -586,6 +602,9 @@ RCTAutoInsetsProtocol>
 
 - (void)destroyWebView
 {
+#if TARGET_OS_IOS
+  [self closeAllChildWindowsAnimated:NO];
+#endif // TARGET_OS_IOS
   if (_webView) {
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:HistoryShimName];
     [_webView.configuration.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
@@ -1289,6 +1308,138 @@ RCTAutoInsetsProtocol>
 
 #endif // !TARGET_OS_OSX
 
+#if TARGET_OS_IOS
+#pragma mark - Native child windows
+
+- (WKWebView *)openChildWindowWithConfiguration:(WKWebViewConfiguration *)configuration
+                                      userAgent:(NSString *)userAgent
+{
+  UIViewController *presenter = [self topViewController];
+  if (presenter == nil || presenter.isBeingPresented || presenter.isBeingDismissed) {
+    return nil;
+  }
+
+  RNCWebViewChildWindow *window = [[RNCWebViewChildWindow alloc] initWithConfiguration:configuration
+                                                                             userAgent:userAgent
+                                                                           inspectable:_webviewDebuggingEnabled];
+  __weak RNCWebViewImpl *weakSelf = self;
+  window.onOpenWindow = ^WKWebView *(RNCWebViewChildWindow *opener,
+                                     WKWebViewConfiguration *childConfiguration,
+                                     WKNavigationAction *navigationAction) {
+    RNCWebViewImpl *strongSelf = weakSelf;
+    if (strongSelf == nil || !strongSelf.supportMultipleWindows) {
+      return nil;
+    }
+    return [strongSelf openChildWindowWithConfiguration:childConfiguration userAgent:opener.webView.customUserAgent];
+  };
+  window.onCloseRequest = ^(RNCWebViewChildWindow *closingWindow) {
+    [weakSelf closeChildWindow:closingWindow animated:YES];
+  };
+
+  if (self.childWindows == nil) {
+    self.childWindows = [NSMutableArray new];
+    self.childWebViews = [NSHashTable weakObjectsHashTable];
+  }
+  [self.childWindows addObject:window];
+  [self.childWebViews addObject:window.webView];
+
+  UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:window];
+  navigationController.presentationController.delegate = window;
+  __weak UINavigationController *weakNavigationController = navigationController;
+  [presenter presentViewController:navigationController animated:YES completion:^{
+    window.isPresented = YES;
+    // A close requested while the window was still being presented is completed here.
+    if (window.isClosed) {
+      [RNCWebViewImpl dismissClosedWindowsFrom:weakNavigationController];
+    }
+  }];
+  return window.webView;
+}
+
+/**
+ * Closes `window` and every window opened on top of it with a single dismissal.
+ */
+- (void)closeChildWindow:(RNCWebViewChildWindow *)window animated:(BOOL)animated
+{
+  NSUInteger index = [self.childWindows indexOfObjectIdenticalTo:window];
+  if (index == NSNotFound) {
+    return;
+  }
+  NSRange range = NSMakeRange(index, self.childWindows.count - index);
+  NSArray<RNCWebViewChildWindow *> *closingWindows = [self.childWindows subarrayWithRange:range];
+  [self.childWindows removeObjectsInRange:range];
+
+  for (RNCWebViewChildWindow *closingWindow in closingWindows.reverseObjectEnumerator) {
+    [closingWindow tearDown];
+  }
+
+  // UIKit ignores a dismissal while a presentation is in progress. The sheets are then dismissed in
+  // the presentation completion, so the pages are released now.
+  for (RNCWebViewChildWindow *closingWindow in closingWindows) {
+    if (!closingWindow.isPresented && closingWindow.navigationController.presentingViewController != nil) {
+      for (RNCWebViewChildWindow *releasingWindow in closingWindows) {
+        [releasingWindow releaseWebView];
+      }
+      return;
+    }
+  }
+
+  // Not presented: swiped away.
+  UIViewController *presenter = window.isPresented ? window.navigationController.presentingViewController : nil;
+  if (presenter != nil && animated) {
+    // The pages stay on the sheets while they slide away and are released once off screen.
+    [presenter dismissViewControllerAnimated:YES completion:^{
+      for (RNCWebViewChildWindow *closingWindow in closingWindows) {
+        [closingWindow releaseWebView];
+      }
+    }];
+    return;
+  }
+  for (RNCWebViewChildWindow *closingWindow in closingWindows) {
+    [closingWindow releaseWebView];
+  }
+  [presenter dismissViewControllerAnimated:NO completion:nil];
+}
+
+/**
+ * Dismisses the sheet of `navigationController` and every closed window's sheet below it, from the
+ * first controller below them that is not a closed window.
+ */
++ (void)dismissClosedWindowsFrom:(UINavigationController *)navigationController
+{
+  UIViewController *presenter = navigationController.presentingViewController;
+  while ([presenter isKindOfClass:[UINavigationController class]]) {
+    UIViewController *root = ((UINavigationController *)presenter).viewControllers.firstObject;
+    if (![root isKindOfClass:[RNCWebViewChildWindow class]] || !((RNCWebViewChildWindow *)root).isClosed) {
+      break;
+    }
+    presenter = presenter.presentingViewController;
+  }
+  [presenter dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (BOOL)isChildWindowWebView:(WKWebView *)webView
+{
+  return webView != nil && [self.childWebViews containsObject:webView];
+}
+
+- (void)closeAllChildWindowsAnimated:(BOOL)animated
+{
+  RNCWebViewChildWindow *firstWindow = self.childWindows.firstObject;
+  if (firstWindow != nil) {
+    [self closeChildWindow:firstWindow animated:animated];
+  }
+}
+
+/**
+ * A new main-frame document replaces the frame that opened the child windows, so they are closed.
+ */
+- (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation
+{
+  [self closeAllChildWindowsAnimated:YES];
+}
+#endif // TARGET_OS_IOS
+
 /**
  * Decides whether to allow or cancel a navigation.
  * @see https://fburl.com/42r9fxob
@@ -1315,6 +1466,20 @@ RCTAutoInsetsProtocol>
     NSURLRequest *request = navigationAction.request;
     BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
     BOOL hasTargetFrame = navigationAction.targetFrame != nil;
+
+#if TARGET_OS_IOS
+    // A child window must not navigate this WebView's page, for example through `opener.top.location`.
+    if (navigationAction.targetFrame.isMainFrame && [self isChildWindowWebView:navigationAction.sourceFrame.webView]) {
+      decisionHandler(WKNavigationActionPolicyCancel);
+      return;
+    }
+
+    // New-window requests continue to `createWebViewWithConfiguration`, which opens a native child window.
+    if (!hasTargetFrame && _supportMultipleWindows) {
+      decisionHandler(WKNavigationActionPolicyAllow);
+      return;
+    }
+#endif // TARGET_OS_IOS
 
     if (_onOpenWindow && !hasTargetFrame) {
       // When OnOpenWindow should be called, we want to prevent the navigation
@@ -1395,6 +1560,10 @@ RCTAutoInsetsProtocol>
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
 {
   RCTLogWarn(@"Webview Process Terminated");
+#if TARGET_OS_IOS
+  // The frame that opened the child windows is gone with the terminated process.
+  [self closeAllChildWindowsAnimated:NO];
+#endif // TARGET_OS_IOS
   if (_onContentProcessDidTerminate) {
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     _onContentProcessDidTerminate(event);
