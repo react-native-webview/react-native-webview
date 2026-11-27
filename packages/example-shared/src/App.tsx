@@ -23,6 +23,7 @@ import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
 import GooglePay from './examples/GooglePay';
 import CustomMenu from './examples/CustomMenu';
+import MultiWindow from './examples/MultiWindow';
 import OpenWindow from './examples/OpenWindow';
 import SuppressMenuItems from './examples/Suppress';
 import ClearData from './examples/ClearData';
@@ -140,6 +141,14 @@ const TESTS = {
     description: 'Test to custom context menu shown on highlighting text',
     render() {
       return <CustomMenu />;
+    },
+  },
+  MultiWindow: {
+    title: 'Multi Window (iOS)',
+    testId: 'MultiWindow',
+    description: 'Open window.open() in a native child window',
+    render() {
+      return <MultiWindow />;
     },
   },
   OpenWindow: {
@@ -324,6 +333,13 @@ export default function App() {
           title="CustomMenu"
           onPress={() => changeTest('CustomMenu')}
         />
+        {Platform.OS === 'ios' && (
+          <Button
+            testID="testType_multiWindow"
+            title="MultiWindow"
+            onPress={() => changeTest('MultiWindow')}
+          />
+        )}
         <Button
           testID="testType_openwindow"
           title="OpenWindow"

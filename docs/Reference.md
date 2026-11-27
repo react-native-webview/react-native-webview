@@ -1597,12 +1597,28 @@ Example:
 
 ### `setSupportMultipleWindows`[⬆](#props-index)
 
-Sets whether the WebView supports multiple windows. See [Android documentation](<'https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)'>) for more information.
-Setting this to `false` can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
+Sets whether the WebView supports multiple windows.
 
-| Type    | Required | Default | Platform |
-| ------- | -------- | ------- | -------- |
-| boolean | No       | true    | Android  |
+On Android, see the [Android documentation](<'https://developer.android.com/reference/android/webkit/WebSettings#setSupportMultipleWindows(boolean)'>) for more information. Setting this to `false` can expose the application to this [vulnerability](https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/) allowing a malicious iframe to escape into the top layer DOM.
+
+On iOS, `window.open()` and `target="_blank"` links open a native child window while this is `true`. Some flows need a real popup window, such as payment and sign-in providers that talk to their popup through `window.opener`. The child window is a `WKWebView` built from the configuration WebKit supplies, so WebKit links it to its opener. `window.open()` returns a reference to it, `window.opener` and `postMessage` work in both directions, and the opener sees `popup.closed === true` once the window is closed.
+
+The child window:
+
+- is presented as a sheet with a Close button and the page host as its title;
+- has no injected scripts and no `ReactNativeWebView` bridge, so `onMessage` never receives its messages;
+- navigates freely inside itself;
+- shares the website data store, process pool, preferences and user agent of the WebView;
+- opens nested child windows the same way;
+- cannot navigate the top-level page of the WebView, for example through `opener.top.location`;
+- shows JavaScript dialogs with the calling frame's host as their title;
+- closes on the Close button, a swipe down, `window.close()`, a crash of its content process, a new page in the WebView, or unmounting the WebView. Closing a window also closes the windows opened from it.
+
+New-window requests bypass `onOpenWindow`, `originWhitelist` and `onShouldStartLoadWithRequest` while this is `true`. The popup blocker still applies: open the window directly from a user gesture, or set `javaScriptCanOpenWindowsAutomatically`.
+
+| Type    | Required | Default                     | Platform     |
+| ------- | -------- | --------------------------- | ------------ |
+| boolean | No       | `true` Android, `false` iOS | Android, iOS |
 
 Example:
 

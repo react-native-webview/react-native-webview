@@ -423,6 +423,11 @@ static inline std::string nullSafeStringWithLength(id value) {
 
         [_view setSuppressMenuItems:suppressMenuItems];
     }
+#if TARGET_OS_IOS
+    if (oldViewProps.setSupportMultipleWindows != newViewProps.setSupportMultipleWindows) {
+        _view.supportMultipleWindows = newViewProps.setSupportMultipleWindows;
+    }
+#endif // TARGET_OS_IOS
     if (oldViewProps.hasOnFileDownload != newViewProps.hasOnFileDownload) {
         if (newViewProps.hasOnFileDownload) {
             _view.onFileDownload = [self](NSDictionary* dictionary) {

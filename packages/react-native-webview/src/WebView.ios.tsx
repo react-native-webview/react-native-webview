@@ -80,6 +80,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
       decelerationRate: decelerationRateProp,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       removeIosKeyboardObserver,
+      setSupportMultipleWindows = false,
       ...otherProps
     },
     ref,
@@ -203,6 +204,7 @@ const WebViewComponent = forwardRef<unknown, IOSWebViewProps>(
         {...otherProps}
         fraudulentWebsiteWarningEnabled={fraudulentWebsiteWarningEnabled}
         javaScriptEnabled={javaScriptEnabled}
+        setSupportMultipleWindows={setSupportMultipleWindows}
         cacheEnabled={cacheEnabled}
         useSharedProcessPool={useSharedProcessPool}
         textInteractionEnabled={textInteractionEnabled}
